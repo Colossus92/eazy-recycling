@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    id("org.unbroken-dome.xjc") version "2.0.0"
 }
 
 group = "nl.eazysoftware"
@@ -29,6 +30,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-web-services")
+    implementation("org.springframework.ws:spring-ws-core")
+    implementation("wsdl4j:wsdl4j:1.6.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     compileOnly("org.projectlombok:lombok")
@@ -52,6 +56,18 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
+xjc {
+    xjcVersion.set("3.0")
+    srcDirName.set("${projectDir}/src/main/resources/schema/")
+    strictCheck.set(false)
+    extension.set(true)
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.withType<Jar> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+

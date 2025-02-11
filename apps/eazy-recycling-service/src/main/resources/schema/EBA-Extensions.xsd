@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    File:                EBA-Extensions.xsd
+    Version:             v1.0.1
+    Data:                2013-12-05
+    Creator:             TNO (Michiel Stornebrink)
+    Purpose:             XML schema UBL extensions that may be used in EBA standard
+    Documentation:       EBA standard v1.0
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    xmlns:eba="http://ns.tln.nl/eba/schemas/1-0/" targetNamespace="http://ns.tln.nl/eba/schemas/1-0/" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="ReplyAddress" type="eba:ReplyAddressType">
+        <xs:annotation>
+            <xs:documentation>Defines the type of reply address, either a webservice or an email address </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+    <xs:complexType name="ReplyAddressType">
+        <xs:choice>
+            <xs:element name="Webservice">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="WebserviceEndPoint" type="xs:anyURI"/>
+                        <xs:element name="Username" type="xs:string" minOccurs="0"/>
+                        <xs:element name="Password" type="xs:string" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="EmailAddress" type="xs:string"/>
+        </xs:choice>
+    </xs:complexType>
+</xs:schema>
