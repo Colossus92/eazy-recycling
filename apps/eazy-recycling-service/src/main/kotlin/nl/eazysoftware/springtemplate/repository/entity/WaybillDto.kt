@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
-data class PlanningEntryDto(
+data class WaybillDto(
     val id: String,
     @Id val uuid: UUID,
     val note: String,
