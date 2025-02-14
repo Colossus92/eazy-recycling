@@ -1,6 +1,6 @@
 package nl.eazysoftware.springtemplate.domain.mapper
 
-import nl.eazysoftware.springtemplate.repository.entitiy.*
+import nl.eazysoftware.springtemplate.repository.entity.*
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.*
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ID
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NetNetWeightMeasure
@@ -41,7 +41,7 @@ abstract class WaybillMapper {
     @Mapping(target = "containerNumber", expression = "java(toContainerNumber(source))")
     abstract fun toDto(source: GoodsItemType): GoodsItem
 
-    @Mapping(source = "ID.value", target = "id")
+    @Mapping(target = "id", expression = "java(getLocationId(source))")
     @Mapping(source = "locationTypeCode.value", target = "locationTypeCode")
     @Mapping(target = "description", expression = "java(toDescription(source))")
     abstract fun toDto(source: LocationType): Location
@@ -54,6 +54,12 @@ abstract class WaybillMapper {
     @Mapping(source = "country.name.value", target = "country")
     abstract fun toDto(postalAddress: AddressType): Address
 
+    fun getLocationId(source: LocationType): String {
+        return source.id
+            ?.value
+            ?: (source.address.postalZone.value + source.address.buildingNumber.value)
+
+    }
 
     fun toDto(source: ID): String {
         return source.value
@@ -61,22 +67,6 @@ abstract class WaybillMapper {
 
     fun toDto(source: UUID): String {
         return source.value
-    }
-
-    fun toDto(source: PartyType?): Company? {
-        return source
-            ?.let {
-                val chamberOfCommerceId: String? = getChamberOfCommerceId(it)
-                val vihbId: String? = getVihbId(it)
-
-
-                return Company(
-                    chamberOfCommerceId = chamberOfCommerceId,
-                    vihbId = vihbId,
-                    name = mapNameType(it.partyNames),
-                    address = toDto(it.postalAddress)
-                )
-            }
     }
 
     fun toConsigneeDto(waybill: Waybill): Company? {
@@ -159,16 +149,32 @@ abstract class WaybillMapper {
         return source.descriptions.joinToString { it.value }
     }
 
+    private fun toDto(source: PartyType?): Company? {
+        return source
+            ?.let {
+                val chamberOfCommerceId: String? = getChamberOfCommerceId(it)
+                val vihbId: String? = getVihbId(it)
+
+
+                return Company(
+                    chamberOfCommerceId = chamberOfCommerceId,
+                    vihbId = vihbId,
+                    name = mapNameType(it.partyNames),
+                    address = toDto(it.postalAddress)
+                )
+            }
+    }
+
     private fun getChamberOfCommerceId(source: PartyType): String? {
         return source.partyIdentifications
-            .firstOrNull { it.id.schemeID == "KvK" }
+            .firstOrNull { it.id.schemeAgencyName == "KvK" }
             ?.id
             ?.value
     }
 
     private fun getVihbId(source: PartyType): String? {
         return source.partyIdentifications
-            .firstOrNull { it.id.schemeID == "VIHB" }
+            .firstOrNull { it.id.schemeAgencyName == "VIHB" }
             ?.id
             ?.value
     }

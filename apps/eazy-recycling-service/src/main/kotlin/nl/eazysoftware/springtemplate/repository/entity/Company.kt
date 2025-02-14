@@ -1,12 +1,13 @@
-package nl.eazysoftware.springtemplate.repository.entitiy
+package nl.eazysoftware.springtemplate.repository.entity
 
 import jakarta.persistence.*
+import java.util.*
 
 @Entity
 data class Company(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val id: UUID? = null,
 
     @Column(unique = true, nullable = true)
     val chamberOfCommerceId: String? = null,

@@ -1,10 +1,6 @@
-package nl.eazysoftware.springtemplate.repository.entitiy
+package nl.eazysoftware.springtemplate.repository.entity
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToOne
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -13,26 +9,26 @@ data class PlanningEntry(
     val id: String,
     @Id val uuid: UUID,
     val note: String,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "consignee_party_id", referencedColumnName = "id")
     val consigneeParty: Company,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "consignor_party_id", referencedColumnName = "id")
     val consignorParty: Company,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
     val carrierParty: Company,
-    @ManyToOne
+    @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "pickup_party_id", referencedColumnName = "id")
     val pickupParty: Company,
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_item_id", referencedColumnName = "id")
     val goodsItem: GoodsItem,
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
     val deliveryLocation: Location,
     val deliveryDateTime: LocalDateTime,
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
     val pickupLocation: Location,
     val pickupDateTime: LocalDateTime,

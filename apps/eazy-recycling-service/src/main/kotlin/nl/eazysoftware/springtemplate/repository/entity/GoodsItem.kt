@@ -1,4 +1,4 @@
-package nl.eazysoftware.springtemplate.repository.entitiy
+package nl.eazysoftware.springtemplate.repository.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
