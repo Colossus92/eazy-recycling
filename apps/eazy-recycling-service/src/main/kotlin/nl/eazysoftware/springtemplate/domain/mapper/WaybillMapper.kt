@@ -1,6 +1,6 @@
 package nl.eazysoftware.springtemplate.domain.mapper
 
-import nl.eazysoftware.springtemplate.repository.entity.*
+import nl.eazysoftware.springtemplate.repository.entity.waybill.*
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.*
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ID
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NetNetWeightMeasure

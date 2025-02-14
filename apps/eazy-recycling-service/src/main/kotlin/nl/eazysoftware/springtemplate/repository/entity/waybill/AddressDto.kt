@@ -1,4 +1,4 @@
-package nl.eazysoftware.springtemplate.repository.entity
+package nl.eazysoftware.springtemplate.repository.entity.waybill
 
 import jakarta.persistence.Embeddable
 import lombok.NoArgsConstructor
