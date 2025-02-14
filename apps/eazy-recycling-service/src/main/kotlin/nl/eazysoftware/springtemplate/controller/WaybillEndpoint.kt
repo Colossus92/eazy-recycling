@@ -34,7 +34,7 @@ class WaybillEndpoint(
 
         val xml = marshalToXml(waybill)
         logger.info("Received SOAP Waybill XML:\n$xml")
-        return waybill;
+        return waybill
     }
 
     private fun marshalToXml(obj: Any): String {
