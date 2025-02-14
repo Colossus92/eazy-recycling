@@ -1,11 +1,9 @@
 package nl.eazysoftware.springtemplate.repository.entity.waybill
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 
 @Entity
+@Table(name = "goods_items")
 data class GoodsItemDto(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +15,4 @@ data class GoodsItemDto(
     val name: String,
     val euralCode: String,
     val containerNumber: String,
-) {
-
-}
+)

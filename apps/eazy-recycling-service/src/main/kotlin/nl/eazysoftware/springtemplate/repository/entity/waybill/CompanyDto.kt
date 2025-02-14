@@ -1,9 +1,11 @@
 package nl.eazysoftware.springtemplate.repository.entity.waybill
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
+@Table(name = "companies")
 data class CompanyDto(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -16,7 +18,8 @@ data class CompanyDto(
     val vihbId: String? = null,
     val name: String,
     @Embedded
-    val address: AddressDto
+    val address: AddressDto,
 
+    val updatedAt: LocalDateTime = LocalDateTime.now(),
 
 )

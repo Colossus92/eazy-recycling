@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
+@Table(name = "waybills")
 data class WaybillDto(
     val id: String,
     @Id val uuid: UUID,
@@ -33,5 +34,19 @@ data class WaybillDto(
     val pickupLocation: LocationDto,
     val pickupDateTime: LocalDateTime,
     val licensePlate: String,
+
+    @Column(nullable = false)
+    var updatedAt: LocalDateTime? = null
 ) {
+    @PrePersist
+    fun prePersist() {
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now()
+        }
+    }
+
+    @PreUpdate
+    fun preUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
 }

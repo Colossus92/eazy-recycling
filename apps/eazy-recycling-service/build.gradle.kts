@@ -27,25 +27,38 @@ repositories {
     mavenCentral()
 }
 
+val springVersion: String by project
+
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-web-services")
-    implementation("org.springframework.ws:spring-ws-core")
+    // Spring Boot Core Dependencies
+    implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
+    implementation("org.springframework.ws:spring-ws-core:4.0.11")
+
+    // Database
+    implementation("org.postgresql:postgresql:42.7.5")
+    runtimeOnly("com.h2database:h2:2.3.232")
+
+    // Web
     implementation("wsdl4j:wsdl4j:1.6.3")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.mapstruct:mapstruct:1.6.3")
-    kapt("org.mapstruct:mapstruct-processor:1.6.3")
-    compileOnly("org.projectlombok:lombok")
-    runtimeOnly("com.h2database:h2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
+
+    // Code
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Mapstruct
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    kapt("org.mapstruct:mapstruct-processor:1.6.3")
+
+    // Testing
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
 }
 
 kotlin {

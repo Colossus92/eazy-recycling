@@ -1,11 +1,21 @@
 spring:
   application.name: spring-template
   datasource:
-      url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
-  h2:
-    console:
-      enabled: true
-logging.level.root: DEBUG
+    url: jdbc:postgresql://db.qtnjbdjufwzbmdzndnku.supabase.co:5432/postgres?user=postgres&password=VXU_kpk1qkm7mkb4djw
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      jakarta.persistence:
+        schema-generation.scripts:
+          action: create
+          create-target: create.sql
+          create-source: metadata
+          drop-target: drop.sql
+          drop-source: metadata
+      hibernate:
+        hbm2ddl.auto: none
+        show_sql: true
+        format_sql: true
+        schema-generation.scripts.action: create
+        schema-generation.scripts.create-target: schema.sql
+        dialect: org.hibernate.dialect.PostgreSQLDialect

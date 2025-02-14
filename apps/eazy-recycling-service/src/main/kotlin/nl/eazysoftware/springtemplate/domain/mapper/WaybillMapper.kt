@@ -31,6 +31,7 @@ abstract class WaybillMapper {
     @Mapping(target = "deliveryDateTime", expression = "java(toDeliveryDateTime(waybill))")
     @Mapping(target = "pickupDateTime", expression = "java(toPickupDateTime(waybill))")
     @Mapping(target = "licensePlate", expression = "java(toLicensePlate(waybill))")
+    @Mapping(target = "updatedAt", ignore = true)
     abstract fun toDto(waybill: Waybill): WaybillDto
 
     @Mapping(target = "id", ignore = true)
