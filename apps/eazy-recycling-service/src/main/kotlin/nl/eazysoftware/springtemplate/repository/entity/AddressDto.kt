@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor
 
 @Embeddable
 @NoArgsConstructor
-data class Address(
+data class AddressDto(
     var streetName: String?,
     var buildingName: String?,
     var buildingNumber: String?,

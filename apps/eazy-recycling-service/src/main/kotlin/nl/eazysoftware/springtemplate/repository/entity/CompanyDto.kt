@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-data class Company(
+data class CompanyDto(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
@@ -16,7 +16,7 @@ data class Company(
     val vihbId: String? = null,
     val name: String,
     @Embedded
-    val address: Address
+    val address: AddressDto
 
 
 )

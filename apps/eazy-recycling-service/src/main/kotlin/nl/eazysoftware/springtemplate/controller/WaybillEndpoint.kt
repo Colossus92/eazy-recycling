@@ -29,7 +29,7 @@ class WaybillEndpoint(
     @ResponsePayload
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "Waybill")
     fun receiveWaybill(@RequestPayload waybill: Waybill): Waybill {
-        val dto = mapper.toPlanningEntry(waybill)
+        val dto = mapper.toDto(waybill)
         repository.save(dto)
 
         val xml = marshalToXml(waybill)

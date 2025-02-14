@@ -5,32 +5,32 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
-data class PlanningEntry(
+data class PlanningEntryDto(
     val id: String,
     @Id val uuid: UUID,
     val note: String,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "consignee_party_id", referencedColumnName = "id")
-    val consigneeParty: Company,
+    val consigneeParty: CompanyDto,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "consignor_party_id", referencedColumnName = "id")
-    val consignorParty: Company,
+    val consignorParty: CompanyDto,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
-    val carrierParty: Company,
+    val carrierParty: CompanyDto,
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "pickup_party_id", referencedColumnName = "id")
-    val pickupParty: Company,
+    val pickupParty: CompanyDto,
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_item_id", referencedColumnName = "id")
-    val goodsItem: GoodsItem,
+    val goodsItem: GoodsItemDto,
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
-    val deliveryLocation: Location,
+    val deliveryLocation: LocationDto,
     val deliveryDateTime: LocalDateTime,
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
-    val pickupLocation: Location,
+    val pickupLocation: LocationDto,
     val pickupDateTime: LocalDateTime,
     val licensePlate: String,
 ) {

@@ -14,9 +14,10 @@ import java.time.LocalDateTime
 
 @Mapper(
     componentModel = "spring",
-    unmappedTargetPolicy = ReportingPolicy.WARN,
+    unmappedTargetPolicy = ReportingPolicy.ERROR,
 )
 abstract class WaybillMapper {
+
     @Mapping(target = "note", expression = "java(toNote(waybill))")
     @Mapping(source = "ID", target = "id")
     @Mapping(source = "UUID", target = "uuid")
@@ -24,13 +25,13 @@ abstract class WaybillMapper {
     @Mapping(target = "pickupParty", expression = "java(toPickupPartyDto(waybill))")
     @Mapping(target = "consignorParty", expression = "java(toConsignorPartyDto(waybill))")
     @Mapping(target = "carrierParty", expression = "java(toCarrierPartyDto(waybill))")
-    @Mapping(target = "goodsItem", expression = "java(toGoodsItem(waybill))")
+    @Mapping(target = "goodsItem", expression = "java(toGoodsItemDto(waybill))")
     @Mapping(target = "deliveryLocation", expression = "java(toDeliveryLocationDto(waybill))")
     @Mapping(target = "pickupLocation", expression = "java(toPickupLocationDto(waybill))")
     @Mapping(target = "deliveryDateTime", expression = "java(toDeliveryDateTime(waybill))")
     @Mapping(target = "pickupDateTime", expression = "java(toPickupDateTime(waybill))")
     @Mapping(target = "licensePlate", expression = "java(toLicensePlate(waybill))")
-    abstract fun toPlanningEntry(waybill: Waybill): PlanningEntry
+    abstract fun toDto(waybill: Waybill): PlanningEntryDto
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "ID", target = "wasteStreamNumber")
@@ -39,12 +40,12 @@ abstract class WaybillMapper {
     @Mapping(target = "name", expression = "java(toName(source))")
     @Mapping(target = "euralCode", expression = "java(toEuralCode(source))")
     @Mapping(target = "containerNumber", expression = "java(toContainerNumber(source))")
-    abstract fun toDto(source: GoodsItemType): GoodsItem
+    abstract fun toDto(source: GoodsItemType): GoodsItemDto
 
-    @Mapping(target = "id", expression = "java(getLocationId(source))")
+    @Mapping(target = "id", expression = "java(toLocationId(source))")
     @Mapping(source = "locationTypeCode.value", target = "locationTypeCode")
     @Mapping(target = "description", expression = "java(toDescription(source))")
-    abstract fun toDto(source: LocationType): Location
+    abstract fun toDto(source: LocationType): LocationDto
 
     @Mapping(source = "streetName.value", target = "streetName")
     @Mapping(source = "buildingName.value", target = "buildingName")
@@ -52,9 +53,9 @@ abstract class WaybillMapper {
     @Mapping(source = "cityName.value", target = "city")
     @Mapping(source = "postalZone.value", target = "postalCode")
     @Mapping(source = "country.name.value", target = "country")
-    abstract fun toDto(postalAddress: AddressType): Address
+    abstract fun toDto(postalAddress: AddressType): AddressDto
 
-    fun getLocationId(source: LocationType): String {
+    fun toLocationId(source: LocationType): String {
         return source.id
             ?.value
             ?: (source.address.postalZone.value + source.address.buildingNumber.value)
@@ -69,23 +70,23 @@ abstract class WaybillMapper {
         return source.value
     }
 
-    fun toConsigneeDto(waybill: Waybill): Company? {
+    fun toConsigneeDto(waybill: Waybill): CompanyDto? {
         return toDto(waybill.shipment.consignments.first().consigneeParty)
     }
 
-    fun toPickupPartyDto(waybill: Waybill): Company? {
+    fun toPickupPartyDto(waybill: Waybill): CompanyDto? {
         return toDto(waybill.shipment.goodsItems.first().pickup.pickupParty)
     }
 
-    fun toConsignorPartyDto(waybill: Waybill): Company? {
+    fun toConsignorPartyDto(waybill: Waybill): CompanyDto? {
         return toDto(waybill.shipment.consignments.first().consignorParty)
     }
 
-    fun toCarrierPartyDto(waybill: Waybill): Company? {
+    fun toCarrierPartyDto(waybill: Waybill): CompanyDto? {
         return toDto(waybill.shipment.consignments.first().carrierParty)
     }
 
-    fun toGoodsItem(waybill: Waybill): GoodsItem {
+    fun toGoodsItemDto(waybill: Waybill): GoodsItemDto {
         return toDto(waybill.shipment.goodsItems.first())
     }
 
@@ -113,11 +114,11 @@ abstract class WaybillMapper {
         return source.goodsItemContainers.first().id.value
     }
 
-    fun toDeliveryLocationDto(source: Waybill): Location {
+    fun toDeliveryLocationDto(source: Waybill): LocationDto {
         return toDto(source.shipment.goodsItems.first().delivery.deliveryLocation)
     }
 
-    fun toPickupLocationDto(source: Waybill): Location {
+    fun toPickupLocationDto(source: Waybill): LocationDto {
         return toDto(source.shipment.goodsItems.first().pickup.pickupLocation)
     }
 
@@ -149,14 +150,14 @@ abstract class WaybillMapper {
         return source.descriptions.joinToString { it.value }
     }
 
-    private fun toDto(source: PartyType?): Company? {
+    private fun toDto(source: PartyType?): CompanyDto? {
         return source
             ?.let {
                 val chamberOfCommerceId: String? = getChamberOfCommerceId(it)
                 val vihbId: String? = getVihbId(it)
 
 
-                return Company(
+                return CompanyDto(
                     chamberOfCommerceId = chamberOfCommerceId,
                     vihbId = vihbId,
                     name = mapNameType(it.partyNames),
