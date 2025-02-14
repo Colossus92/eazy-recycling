@@ -5,8 +5,7 @@ import jakarta.persistence.*
 @Entity
 data class Location(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String? = null,
     val description: String,
     val locationTypeCode: String,
     @Embedded

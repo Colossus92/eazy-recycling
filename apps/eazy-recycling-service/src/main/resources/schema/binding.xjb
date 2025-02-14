@@ -1,0 +1,32 @@
+<bindings version="1.0"
+          xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+          xmlns:udt="urn:oasis:names:specification:ubl:schema:xsd:UnqualifiedDataTypes-2"
+          >
+
+    <bindings>
+        <globalBindings>
+            <xjc:simple/>
+        </globalBindings>
+    </bindings>
+
+    <bindings schemaLocation="./common/UBL-UnqualifiedDataTypes-2.1.xsd">
+        <bindings node="xs:complexType[@name='DateType']">
+            <property>
+                <baseType>
+                    <xjc:javaType name="java.time.LocalDate"
+                                  adapter="nl.eazysoftware.springtemplate.domain.mapper.LocalDateXmlAdapter"/>
+                </baseType>
+            </property>
+        </bindings>
+        <bindings node="xs:complexType[@name='TimeType']">
+            <property>
+                <baseType>
+                    <xjc:javaType name="java.time.LocalTime"
+                                  adapter="nl.eazysoftware.springtemplate.domain.mapper.LocalTimeXmlAdapter"/>
+                </baseType>
+            </property>
+        </bindings>
+    </bindings>
+</bindings>
