@@ -76,11 +76,11 @@
         consignor_party_id uuid,
         pickup_party_id uuid,
         uuid uuid not null,
-        delivery_location_id varchar(255) unique,
+        delivery_location_id varchar(255),
         id varchar(255),
         license_plate varchar(255),
         note varchar(255),
-        pickup_location_id varchar(255) unique,
+        pickup_location_id varchar(255),
         primary key (uuid)
     );
 

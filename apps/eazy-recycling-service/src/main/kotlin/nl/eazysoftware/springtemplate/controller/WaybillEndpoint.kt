@@ -3,6 +3,7 @@ package nl.eazysoftware.springtemplate.controller
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
 import nl.eazysoftware.springtemplate.domain.mapper.WaybillMapper
+import nl.eazysoftware.springtemplate.domain.mapper.WaybillService
 import nl.eazysoftware.springtemplate.repository.WaybillRepository
 import oasis.names.specification.ubl.schema.xsd.waybill_2.Waybill
 import org.slf4j.Logger
@@ -17,6 +18,7 @@ import java.io.StringWriter
 class WaybillEndpoint(
     val mapper: WaybillMapper,
     val repository: WaybillRepository,
+    val waybillService: WaybillService,
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(WaybillEndpoint::class.java)
@@ -30,7 +32,7 @@ class WaybillEndpoint(
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "Waybill")
     fun receiveWaybill(@RequestPayload waybill: Waybill): Waybill {
         val dto = mapper.toDto(waybill)
-        repository.save(dto)
+        waybillService.save(dto)
 
         val xml = marshalToXml(waybill)
         logger.info("Received SOAP Waybill XML:\n$xml")
