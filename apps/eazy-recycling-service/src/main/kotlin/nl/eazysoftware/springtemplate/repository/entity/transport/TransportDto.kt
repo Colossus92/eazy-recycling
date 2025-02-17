@@ -10,7 +10,7 @@ import java.util.*
 
 @Entity
 @Table(name = "transports")
-data class Transport(
+data class TransportDto(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID = UUID.randomUUID(),

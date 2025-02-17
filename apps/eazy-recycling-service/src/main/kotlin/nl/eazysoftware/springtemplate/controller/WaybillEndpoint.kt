@@ -3,7 +3,7 @@ package nl.eazysoftware.springtemplate.controller
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
 import nl.eazysoftware.springtemplate.domain.mapper.WaybillMapper
-import nl.eazysoftware.springtemplate.repository.PlanningRepository
+import nl.eazysoftware.springtemplate.repository.WaybillRepository
 import oasis.names.specification.ubl.schema.xsd.waybill_2.Waybill
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -16,7 +16,7 @@ import java.io.StringWriter
 @Endpoint
 class WaybillEndpoint(
     val mapper: WaybillMapper,
-    val repository: PlanningRepository,
+    val repository: WaybillRepository,
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(WaybillEndpoint::class.java)
