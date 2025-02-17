@@ -13,25 +13,25 @@ import java.util.*
 data class TransportDto(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID = UUID.randomUUID(),
+    val id: UUID? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "waybill_id", referencedColumnName = "uuid", nullable = true)
     val waybill: WaybillDto? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "custom_origin_id", referencedColumnName = "id", nullable = true)
     val customOrigin: LocationDto? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "custom_destination_id", referencedColumnName = "id", nullable = true)
     val customDestination: LocationDto? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "truck_id", referencedColumnName = "license_plate", nullable = false)
     val truck: Truck,
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = false)
     val driver: Driver,
 

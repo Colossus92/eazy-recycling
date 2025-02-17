@@ -1,5 +1,6 @@
-package nl.eazysoftware.springtemplate.repository.entity.transport
+package nl.eazysoftware.springtemplate.repository
 
+import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
 import org.springframework.data.jpa.repository.JpaRepository
 import java.time.LocalDateTime
 import java.util.UUID
