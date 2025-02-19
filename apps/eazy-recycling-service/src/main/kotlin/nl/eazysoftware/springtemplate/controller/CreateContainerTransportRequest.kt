@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class CreateContainerTransportRequest(
+    val id: String,
     val customerId: UUID,
     val pickupDateTime: LocalDateTime,
     val originAddress: AddressRequest,

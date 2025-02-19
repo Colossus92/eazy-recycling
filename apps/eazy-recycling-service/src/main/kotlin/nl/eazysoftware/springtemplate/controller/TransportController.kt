@@ -26,6 +26,11 @@ class TransportController(
         return transportService.assignContainerTransport(request)
     }
 
+    @PutMapping
+    fun updateTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
+        return transportService.updateTransport(request)
+    }
+
     @GetMapping("/{pickupDate}")
     fun getTransportByDateSortedByTruck(@PathVariable("pickupDate") pickupDate: LocalDate): Map<String, List<TransportDto>> {
         return transportService.getTransportByDateSortedByTruck(pickupDate)

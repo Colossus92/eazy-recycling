@@ -2,6 +2,7 @@ package nl.eazysoftware.springtemplate.domain.mapper
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.springtemplate.controller.AddressRequest
 import nl.eazysoftware.springtemplate.controller.CreateContainerTransportRequest
 import nl.eazysoftware.springtemplate.repository.*
 import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
@@ -73,35 +74,8 @@ class TransportService(
         val driver = driverRepository.findById(request.driverId)
             .orElseThrow { EntityNotFoundException("Driver with id $request.driverId not found") }
 
-        val origin = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            request.originAddress.postalCode,
-            request.originAddress.buildingNumber
-        )
-            ?: LocationDto(
-                address = AddressDto(
-                    streetName = request.originAddress.streetName,
-                    buildingNumber = request.originAddress.buildingNumber,
-                    postalCode = request.originAddress.postalCode,
-                    city = request.originAddress.city,
-                    country = request.originAddress.country
-                ),
-                id = UUID.randomUUID().toString()
-            )
-
-        val destination = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            request.destinationAddress.postalCode,
-            request.destinationAddress.buildingNumber
-        )
-            ?: LocationDto(
-                address = AddressDto(
-                    streetName = request.destinationAddress.streetName,
-                    buildingNumber = request.destinationAddress.buildingNumber,
-                    postalCode = request.destinationAddress.postalCode,
-                    city = request.destinationAddress.city,
-                    country = request.destinationAddress.country
-                ),
-                id = UUID.randomUUID().toString()
-            )
+        val origin = findOrCreateLocation(request.originAddress)
+        val destination = findOrCreateLocation(request.destinationAddress)
 
         val transport = TransportDto(
             consignorParty = customer,
@@ -152,4 +126,42 @@ class TransportService(
             ?: company
 
     }
+
+    fun updateTransport(request: CreateContainerTransportRequest): TransportDto {
+        val transport = transportRepository.findById(UUID.fromString(request.id))
+            .orElseThrow { EntityNotFoundException("Transport with id ${request.id} not found") }
+
+        val updatedTransport = transport.copy(
+            consignorParty = companyRepository.findById(request.customerId)
+                .orElseThrow { EntityNotFoundException("Company with id ${request.customerId} not found") },
+            pickupLocation =  findOrCreateLocation(request.originAddress),
+            pickupDateTime = request.pickupDateTime,
+            deliveryLocation = findOrCreateLocation(request.destinationAddress),
+            deliveryDateTime = request.deliveryDateTime,
+            containerType = request.containerType,
+            transportType = request.transportType,
+            truck = truckRepository.findByLicensePlate(request.licensePlate)
+                ?: throw EntityNotFoundException("Truck with ${request.licensePlate} not found"),
+            driver = driverRepository.findById(request.driverId)
+                .orElseThrow { EntityNotFoundException("Driver with id ${request.driverId} not found") }
+        )
+
+        return transportRepository.save(updatedTransport)
+    }
+
+    private fun findOrCreateLocation(address: AddressRequest) =
+        (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
+            address.postalCode,
+            address.buildingNumber
+        )
+            ?: LocationDto(
+                address = AddressDto(
+                    streetName = address.streetName,
+                    buildingNumber = address.buildingNumber,
+                    postalCode = address.postalCode,
+                    city = address.city,
+                    country = address.country
+                ),
+                id = UUID.randomUUID().toString()
+            ))
 }
