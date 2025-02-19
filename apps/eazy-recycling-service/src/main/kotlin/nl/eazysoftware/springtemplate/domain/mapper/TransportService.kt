@@ -1,14 +1,16 @@
 package nl.eazysoftware.springtemplate.domain.mapper
 
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.springtemplate.repository.DriverRepository
+import nl.eazysoftware.springtemplate.controller.CreateContainerTransportRequest
+import nl.eazysoftware.springtemplate.repository.*
 import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
-import nl.eazysoftware.springtemplate.repository.TransportRepository
-import nl.eazysoftware.springtemplate.repository.TruckRepository
-import nl.eazysoftware.springtemplate.repository.WaybillRepository
+import nl.eazysoftware.springtemplate.repository.entity.transport.TransportType
+import nl.eazysoftware.springtemplate.repository.entity.waybill.AddressDto
+import nl.eazysoftware.springtemplate.repository.entity.waybill.LocationDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class TransportService(
@@ -16,6 +18,8 @@ class TransportService(
     private val truckRepository: TruckRepository,
     private val waybillRepository: WaybillRepository,
     private val driverRepository: DriverRepository,
+    private val locationRepository: LocationRepository,
+    private val companyRepository: CompanyRepository,
 ) {
 
     fun getTransportByDateSortedByTruck(pickupDate: LocalDate): Map<String, List<TransportDto>> {
@@ -36,7 +40,7 @@ class TransportService(
         return transportsByTruck
     }
 
-    fun assignTransport(waybillId: UUID, licensePlate: String, driverId: UUID): TransportDto {
+    fun assignWaybillTransport(waybillId: UUID, licensePlate: String, driverId: UUID): TransportDto {
         val waybill = waybillRepository.findById(waybillId)
             .orElseThrow { EntityNotFoundException("Waybill with id $waybillId not found") }
 
@@ -49,7 +53,8 @@ class TransportService(
         val transport = TransportDto(
             waybill = waybill,
             truck = truck,
-            driver = driver
+            driver = driver,
+            transportType = TransportType.WAYBILL,
         )
 
         return transportRepository.save(transport)
@@ -57,5 +62,54 @@ class TransportService(
 
     fun getAllTransports(): List<TransportDto> {
         return transportRepository.findAll()
+    }
+
+    fun assignContainerTransport(request: CreateContainerTransportRequest): TransportDto {
+        val truck = truckRepository.findByLicensePlate(request.licensePlate)
+            ?: throw EntityNotFoundException("Truck with $request.licensePlate not found")
+        val customer = companyRepository.findById(request.customerId)
+            .getOrNull()
+            ?: throw EntityNotFoundException("Company with id $request.customerId not found")
+        val driver = driverRepository.findById(request.driverId)
+            .orElseThrow { EntityNotFoundException("Driver with id $request.driverId not found") }
+
+        val origin = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(request.originAddress.streetName, request.originAddress.buildingNumber)
+            ?: LocationDto(
+                address = AddressDto(
+                    streetName = request.originAddress.streetName,
+                    buildingNumber = request.originAddress.buildingNumber,
+                    postalCode = request.originAddress.postalCode,
+                    city = request.originAddress.city,
+                    country = request.originAddress.country
+                ),
+                id = UUID.randomUUID().toString()
+            )
+
+        val destination = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(request.destinationAddress.streetName, request.destinationAddress.buildingNumber)
+            ?: LocationDto(
+                address = AddressDto(
+                    streetName = request.originAddress.streetName,
+                    buildingNumber = request.originAddress.buildingNumber,
+                    postalCode = request.originAddress.postalCode,
+                    city = request.originAddress.city,
+                    country = request.originAddress.country
+                ),
+                id = UUID.randomUUID().toString()
+            )
+
+        val transport = TransportDto(
+            customer = customer,
+            customOrigin = origin,
+            pickupDateTime = request.pickupDateTime,
+            customDestination = destination,
+            deliveryDateTime = request.deliveryDateTime,
+            truck = truck,
+            driver = driver,
+            transportType = request.transportType,
+            containerType = request.containerType,
+            waybill = null,
+        )
+
+        return transportRepository.save(transport)
     }
 }

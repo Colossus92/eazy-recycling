@@ -7,8 +7,8 @@ import jakarta.persistence.*
 data class LocationDto(
     @Id
     val id: String,
-    val description: String,
-    val locationTypeCode: String,
+    val description: String? = null,
+    val locationTypeCode: String? = null,
     @Embedded
     val address: AddressDto,
 )

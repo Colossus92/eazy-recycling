@@ -1,1 +1,1 @@
-rootProject.name = "spring-template"
+rootProject.name = "eazy-recycling-service"

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor
 @NoArgsConstructor
 data class AddressDto(
     var streetName: String?,
-    var buildingName: String?,
+    var buildingName: String? = null,
     var buildingNumber: String?,
     var city: String?,
     var postalCode: String?,

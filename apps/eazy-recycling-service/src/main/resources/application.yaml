@@ -1,5 +1,5 @@
 spring:
-  application.name: spring-template
+  application.name: eazy-recycling-service
   datasource:
     url: jdbc:postgresql://db.qtnjbdjufwzbmdzndnku.supabase.co:5432/postgres?user=postgres&password=VXU_kpk1qkm7mkb4djw
     driver-class-name: org.postgresql.Driver

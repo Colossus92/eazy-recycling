@@ -1,6 +1,5 @@
 package nl.eazysoftware.springtemplate.controller
 
-import jakarta.websocket.server.PathParam
 import nl.eazysoftware.springtemplate.domain.mapper.TransportService
 import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
 import org.springframework.web.bind.annotation.*
@@ -17,9 +16,14 @@ class TransportController(
         return transportService.getAllTransports()
     }
 
-    @PostMapping
-    fun assignTransport(@RequestBody request: CreateTransportRequest): TransportDto {
-        return transportService.assignTransport(request.waybillId, request.licensePlate, request.driverId)
+    @PostMapping("/waybill")
+    fun assignWaybillTransport(@RequestBody request: CreateWaybillTransportRequest): TransportDto {
+        return transportService.assignWaybillTransport(request.waybillId, request.licensePlate, request.driverId)
+    }
+
+    @PostMapping("/container")
+    fun createContainerTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
+        return transportService.assignContainerTransport(request)
     }
 
     @GetMapping("/{pickupDate}")
