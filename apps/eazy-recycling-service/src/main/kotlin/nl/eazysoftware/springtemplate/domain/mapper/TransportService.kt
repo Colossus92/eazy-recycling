@@ -31,7 +31,7 @@ class TransportService(
 
         val trucks = truckRepository.findAll().map { it.licensePlate }.toSet()
         val transportsByTruck = transportRepository
-            .findByPickupDateTimeBetween(start, end)
+            .findByTruckIsNotNullAndPickupDateTimeBetween(start, end)
             .groupBy { it.truck?.licensePlate ?: "NOT_ASSIGNED" }
             .toMutableMap()
 
@@ -74,7 +74,7 @@ class TransportService(
             .orElseThrow { EntityNotFoundException("Driver with id $request.driverId not found") }
 
         val origin = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            request.originAddress.streetName,
+            request.originAddress.postalCode,
             request.originAddress.buildingNumber
         )
             ?: LocationDto(
@@ -89,16 +89,16 @@ class TransportService(
             )
 
         val destination = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            request.destinationAddress.streetName,
+            request.destinationAddress.postalCode,
             request.destinationAddress.buildingNumber
         )
             ?: LocationDto(
                 address = AddressDto(
-                    streetName = request.originAddress.streetName,
-                    buildingNumber = request.originAddress.buildingNumber,
-                    postalCode = request.originAddress.postalCode,
-                    city = request.originAddress.city,
-                    country = request.originAddress.country
+                    streetName = request.destinationAddress.streetName,
+                    buildingNumber = request.destinationAddress.buildingNumber,
+                    postalCode = request.destinationAddress.postalCode,
+                    city = request.destinationAddress.city,
+                    country = request.destinationAddress.country
                 ),
                 id = UUID.randomUUID().toString()
             )

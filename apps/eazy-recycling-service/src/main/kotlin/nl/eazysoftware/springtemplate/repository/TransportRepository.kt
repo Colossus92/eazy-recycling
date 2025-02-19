@@ -9,7 +9,7 @@ import java.util.*
 
 interface TransportRepository : JpaRepository<TransportDto, UUID> {
 
-    fun findByPickupDateTimeBetween(start: LocalDateTime, end: LocalDateTime): List<TransportDto>
+    fun findByTruckIsNotNullAndPickupDateTimeBetween(start: LocalDateTime, end: LocalDateTime): List<TransportDto>
     fun findByGoods_Uuid(waybillId: UUID): TransportDto?
 
     @Query(
