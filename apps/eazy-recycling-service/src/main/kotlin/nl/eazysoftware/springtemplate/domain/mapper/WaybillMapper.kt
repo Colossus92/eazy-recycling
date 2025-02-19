@@ -1,5 +1,8 @@
 package nl.eazysoftware.springtemplate.domain.mapper
 
+import nl.eazysoftware.springtemplate.repository.entity.goods.GoodsItemDto
+import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
+import nl.eazysoftware.springtemplate.repository.entity.truck.Truck
 import nl.eazysoftware.springtemplate.repository.entity.waybill.*
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.*
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ID
@@ -18,21 +21,25 @@ import java.time.LocalDateTime
 )
 abstract class WaybillMapper {
 
-    @Mapping(target = "note", expression = "java(toNote(waybill))")
-    @Mapping(source = "ID", target = "id")
-    @Mapping(source = "UUID", target = "uuid")
-    @Mapping(target = "consigneeParty", expression = "java(toConsigneeDto(waybill))")
-    @Mapping(target = "pickupParty", expression = "java(toPickupPartyDto(waybill))")
+    @Mapping(target = "goods.note", expression = "java(toNote(waybill))")
+    @Mapping(source = "ID", target = "goods.id")
+    @Mapping(source = "UUID", target = "goods.uuid")
+    @Mapping(target = "goods.consigneeParty", expression = "java(toConsigneeDto(waybill))")
+    @Mapping(target = "goods.pickupParty", expression = "java(toPickupPartyDto(waybill))")
     @Mapping(target = "consignorParty", expression = "java(toConsignorPartyDto(waybill))")
     @Mapping(target = "carrierParty", expression = "java(toCarrierPartyDto(waybill))")
-    @Mapping(target = "goodsItem", expression = "java(toGoodsItemDto(waybill))")
+    @Mapping(target = "goods.goodsItem", expression = "java(toGoodsItemDto(waybill))")
     @Mapping(target = "deliveryLocation", expression = "java(toDeliveryLocationDto(waybill))")
     @Mapping(target = "pickupLocation", expression = "java(toPickupLocationDto(waybill))")
     @Mapping(target = "deliveryDateTime", expression = "java(toDeliveryDateTime(waybill))")
     @Mapping(target = "pickupDateTime", expression = "java(toPickupDateTime(waybill))")
-    @Mapping(target = "licensePlate", expression = "java(toLicensePlate(waybill))")
+    @Mapping(target = "truck", expression = "java(toTruck(waybill))")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "transportType", ignore = true)
+    @Mapping(target = "containerType", ignore = true)
+    @Mapping(target = "driver", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    abstract fun toDto(waybill: Waybill): WaybillDto
+    abstract fun toDto(waybill: Waybill): TransportDto
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "ID", target = "wasteStreamNumber")
@@ -139,8 +146,9 @@ abstract class WaybillMapper {
         return LocalDateTime.of(deliveryDate, deliveryTime)
     }
 
-    fun toLicensePlate(source: Waybill): String {
-        return source.shipment.shipmentStages.first().transportMeans.roadTransport.licensePlateID.value
+    fun toTruck(source: Waybill): Truck {
+        val licensePlate = source.shipment.shipmentStages.first().transportMeans.roadTransport.licensePlateID.value
+        return Truck(licensePlate = licensePlate)
     }
 
     fun toNote(source: Waybill): String {

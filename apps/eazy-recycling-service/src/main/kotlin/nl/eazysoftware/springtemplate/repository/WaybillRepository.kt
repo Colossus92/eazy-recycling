@@ -10,7 +10,7 @@ import java.util.*
 interface WaybillRepository : JpaRepository<WaybillDto, UUID>{
     @Query("""
         SELECT w FROM WaybillDto w 
-        LEFT JOIN TransportDto t ON w.uuid = t.waybill.uuid
+        LEFT JOIN TransportDto t ON w.uuid = t.goods.uuid
         WHERE t.id IS NULL
         AND w.pickupDateTime BETWEEN :start AND :end
     """)

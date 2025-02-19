@@ -1,4 +1,4 @@
-package nl.eazysoftware.springtemplate.repository.entity.waybill
+package nl.eazysoftware.springtemplate.repository.entity.goods
 
 import jakarta.persistence.*
 

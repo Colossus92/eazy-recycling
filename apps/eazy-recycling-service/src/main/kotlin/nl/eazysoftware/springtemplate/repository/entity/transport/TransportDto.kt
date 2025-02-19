@@ -2,6 +2,7 @@ package nl.eazysoftware.springtemplate.repository.entity.transport
 
 import jakarta.persistence.*
 import nl.eazysoftware.springtemplate.repository.entity.driver.Driver
+import nl.eazysoftware.springtemplate.repository.entity.goods.GoodsDto
 import nl.eazysoftware.springtemplate.repository.entity.truck.Truck
 import nl.eazysoftware.springtemplate.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.springtemplate.repository.entity.waybill.LocationDto
@@ -24,40 +25,58 @@ data class TransportDto(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID? = null,
 
+    /**
+     * The party client ordering the transport
+     */
+    @ManyToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "consignor_party_id", referencedColumnName = "id")
+    val consignorParty: CompanyDto,
+
+    @ManyToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
+    val carrierParty: CompanyDto,
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
+    val pickupLocation: LocationDto,
+
+    val pickupDateTime: LocalDateTime,
+
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
+    val deliveryLocation: LocationDto,
+
+    val deliveryDateTime: LocalDateTime,
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     val transportType: TransportType? = null,
 
     val containerType: String? = null,
 
-    @ManyToOne(cascade = [CascadeType.ALL])
-    @JoinColumn(name = "customer_id", referencedColumnName = "id")
-    val customer: CompanyDto? = null,
+    @ManyToOne
+    @JoinColumn(name = "truck_id", referencedColumnName = "license_plate", nullable = true)
+    val truck: Truck? = null,
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "waybill_id", referencedColumnName = "uuid", nullable = true)
-    val waybill: WaybillDto? = null,
+    @ManyToOne
+    @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = true)
+    val driver: Driver? = null,
 
-    @ManyToOne(cascade = [CascadeType.ALL], optional = true)
-    @JoinColumn(name = "custom_origin_id", referencedColumnName = "id", nullable = true)
-    val customOrigin: LocationDto? = null,
-
-    val pickupDateTime: LocalDateTime? = null,
-
-    @ManyToOne(cascade = [CascadeType.ALL], optional = true)
-    @JoinColumn(name = "custom_destination_id", referencedColumnName = "id", nullable = true)
-    val customDestination: LocationDto? = null,
-
-    val deliveryDateTime: LocalDateTime? = null,
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "truck_id", referencedColumnName = "license_plate", nullable = false)
-    val truck: Truck,
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = false)
-    val driver: Driver,
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "goods_id", referencedColumnName = "uuid")
+    val goods: GoodsDto? = null,
 
     @Column(nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
-)
+    var updatedAt: LocalDateTime? = LocalDateTime.now(),
+
+    ) {
+    @PrePersist
+    fun prePersist() {
+        updatedAt = LocalDateTime.now()
+    }
+
+    @PreUpdate
+    fun preUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
+}

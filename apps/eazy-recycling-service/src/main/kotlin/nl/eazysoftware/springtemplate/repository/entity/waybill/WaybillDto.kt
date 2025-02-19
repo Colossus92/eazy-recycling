@@ -1,6 +1,7 @@
 package nl.eazysoftware.springtemplate.repository.entity.waybill
 
 import jakarta.persistence.*
+import nl.eazysoftware.springtemplate.repository.entity.goods.GoodsItemDto
 import java.time.LocalDateTime
 import java.util.UUID
 

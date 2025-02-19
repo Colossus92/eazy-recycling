@@ -1,13 +1,16 @@
 package nl.eazysoftware.springtemplate.domain.mapper
 
+import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.springtemplate.controller.CreateContainerTransportRequest
 import nl.eazysoftware.springtemplate.repository.*
 import nl.eazysoftware.springtemplate.repository.entity.transport.TransportDto
 import nl.eazysoftware.springtemplate.repository.entity.transport.TransportType
 import nl.eazysoftware.springtemplate.repository.entity.waybill.AddressDto
+import nl.eazysoftware.springtemplate.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.springtemplate.repository.entity.waybill.LocationDto
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -16,10 +19,10 @@ import kotlin.jvm.optionals.getOrNull
 class TransportService(
     private val transportRepository: TransportRepository,
     private val truckRepository: TruckRepository,
-    private val waybillRepository: WaybillRepository,
     private val driverRepository: DriverRepository,
     private val locationRepository: LocationRepository,
     private val companyRepository: CompanyRepository,
+    private val entityManager: EntityManager,
 ) {
 
     fun getTransportByDateSortedByTruck(pickupDate: LocalDate): Map<String, List<TransportDto>> {
@@ -28,8 +31,8 @@ class TransportService(
 
         val trucks = truckRepository.findAll().map { it.licensePlate }.toSet()
         val transportsByTruck = transportRepository
-            .findByWaybill_PickupDateTimeBetween(start, end)
-            .groupBy { it.truck.licensePlate ?: "NOT_ASSIGNED" }
+            .findByPickupDateTimeBetween(start, end)
+            .groupBy { it.truck?.licensePlate ?: "NOT_ASSIGNED" }
             .toMutableMap()
 
         val missingLicensePlates = trucks - transportsByTruck.keys
@@ -41,8 +44,8 @@ class TransportService(
     }
 
     fun assignWaybillTransport(waybillId: UUID, licensePlate: String, driverId: UUID): TransportDto {
-        val waybill = waybillRepository.findById(waybillId)
-            .orElseThrow { EntityNotFoundException("Waybill with id $waybillId not found") }
+        val transport = transportRepository.findByGoods_Uuid(waybillId)
+            ?: throw EntityNotFoundException("Waybill with id $waybillId not found")
 
         val truck = truckRepository.findByLicensePlate(licensePlate)
             ?: throw EntityNotFoundException("Truck with $licensePlate not found")
@@ -50,14 +53,11 @@ class TransportService(
         val driver = driverRepository.findById(driverId)
             .orElseThrow { EntityNotFoundException("Driver with id $driverId not found") }
 
-        val transport = TransportDto(
-            waybill = waybill,
+        return transportRepository.save(transport.copy(
             truck = truck,
             driver = driver,
             transportType = TransportType.WAYBILL,
-        )
-
-        return transportRepository.save(transport)
+        ))
     }
 
     fun getAllTransports(): List<TransportDto> {
@@ -73,7 +73,10 @@ class TransportService(
         val driver = driverRepository.findById(request.driverId)
             .orElseThrow { EntityNotFoundException("Driver with id $request.driverId not found") }
 
-        val origin = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(request.originAddress.streetName, request.originAddress.buildingNumber)
+        val origin = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
+            request.originAddress.streetName,
+            request.originAddress.buildingNumber
+        )
             ?: LocationDto(
                 address = AddressDto(
                     streetName = request.originAddress.streetName,
@@ -85,7 +88,10 @@ class TransportService(
                 id = UUID.randomUUID().toString()
             )
 
-        val destination = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(request.destinationAddress.streetName, request.destinationAddress.buildingNumber)
+        val destination = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
+            request.destinationAddress.streetName,
+            request.destinationAddress.buildingNumber
+        )
             ?: LocationDto(
                 address = AddressDto(
                     streetName = request.originAddress.streetName,
@@ -98,18 +104,52 @@ class TransportService(
             )
 
         val transport = TransportDto(
-            customer = customer,
-            customOrigin = origin,
+            consignorParty = customer,
+            pickupLocation = origin,
             pickupDateTime = request.pickupDateTime,
-            customDestination = destination,
+            deliveryLocation = destination,
             deliveryDateTime = request.deliveryDateTime,
             truck = truck,
             driver = driver,
             transportType = request.transportType,
             containerType = request.containerType,
-            waybill = null,
+            carrierParty = companyRepository.findById(UUID.fromString("a5f516e7-d504-436f-b9bb-79a95da73902"))
+                .orElseThrow { EntityNotFoundException("Default carrier not found") }
         )
 
         return transportRepository.save(transport)
+    }
+
+    @Transactional
+    fun save(transportDto: TransportDto): TransportDto {
+        val truck = transportDto.truck?.licensePlate
+            ?.let { truckRepository.findByLicensePlate(it) }
+        val consignor = findCompany(transportDto.consignorParty)
+        val carrier = findCompany(transportDto.carrierParty)
+
+        val updatedGoods = transportDto.goods?.let { goods ->
+            val consignee = findCompany(goods.consigneeParty)
+            val pickup = findCompany(goods.pickupParty)
+
+            goods.copy(
+                consigneeParty = consignee,
+                pickupParty = pickup
+            )
+        }
+
+        val updatedTransport = transportDto.copy(
+            goods = updatedGoods,
+            consignorParty = consignor,
+            carrierParty = carrier,
+            truck = truck,
+        )
+
+        return entityManager.merge(updatedTransport)
+    }
+
+    fun findCompany(company: CompanyDto): CompanyDto {
+        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
+            ?: company
+
     }
 }

@@ -1,9 +1,6 @@
 package nl.eazysoftware.springtemplate.repository.entity.truck
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
@@ -13,12 +10,22 @@ data class Truck(
     @Column(name = "license_plate", nullable = false)
     val licensePlate: String,
 
-    @Column(nullable = false)
-    val brand: String,
+    @Column
+    val brand: String? = null,
 
-    @Column(nullable = false)
-    val model: String,
+    @Column
+    val model: String? = null,
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime = LocalDateTime.now()
-)
+    var updatedAt: LocalDateTime = LocalDateTime.now()
+) {
+    @PrePersist
+    fun prePersist() {
+        updatedAt = LocalDateTime.now()
+    }
+
+    @PreUpdate
+    fun preUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
+}

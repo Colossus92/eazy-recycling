@@ -7,5 +7,6 @@ import java.util.UUID
 
 interface TransportRepository : JpaRepository<TransportDto, UUID> {
 
-    fun findByWaybill_PickupDateTimeBetween(start: LocalDateTime, end: LocalDateTime): List<TransportDto>
+    fun findByPickupDateTimeBetween(start: LocalDateTime, end: LocalDateTime): List<TransportDto>
+    fun findByGoods_Uuid(waybillId: UUID): TransportDto?
 }
