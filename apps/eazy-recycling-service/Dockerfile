@@ -1,8 +1,12 @@
-FROM eclipse-temurin:21-jdk-alpine
-
+FROM gradle:jdk21-alpine AS builder
 WORKDIR /app
+COPY . .
+RUN gradle clean build --no-daemon
 
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Poort instellen en applicatie starten
+EXPOSE 8080
+CMD ["java", "-jar", "app.jar"]
