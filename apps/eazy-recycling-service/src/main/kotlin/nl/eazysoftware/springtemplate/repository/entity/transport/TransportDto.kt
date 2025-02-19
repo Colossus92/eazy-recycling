@@ -6,7 +6,6 @@ import nl.eazysoftware.springtemplate.repository.entity.goods.GoodsDto
 import nl.eazysoftware.springtemplate.repository.entity.truck.Truck
 import nl.eazysoftware.springtemplate.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.springtemplate.repository.entity.waybill.LocationDto
-import nl.eazysoftware.springtemplate.repository.entity.waybill.WaybillDto
 import java.time.LocalDateTime
 import java.util.*
 

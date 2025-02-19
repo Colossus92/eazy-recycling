@@ -4,8 +4,6 @@ import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
 import nl.eazysoftware.springtemplate.domain.mapper.TransportService
 import nl.eazysoftware.springtemplate.domain.mapper.WaybillMapper
-import nl.eazysoftware.springtemplate.domain.mapper.WaybillService
-import nl.eazysoftware.springtemplate.repository.WaybillRepository
 import oasis.names.specification.ubl.schema.xsd.waybill_2.Waybill
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
