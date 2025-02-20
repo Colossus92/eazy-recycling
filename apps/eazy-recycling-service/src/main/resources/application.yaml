@@ -1,7 +1,7 @@
 spring:
   application.name: eazy-recycling-service
   datasource:
-    url: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.qtnjbdjufwzbmdzndnku&password=VXU_kpk1qkm7mkb4djw
+    url: # Specify in environment variable SPRING_DATASOURCE_URL
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
