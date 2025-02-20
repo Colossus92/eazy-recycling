@@ -2,7 +2,9 @@ FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+COPY app.jar /app/app.jar
 
+WORKDIR /app
+
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
