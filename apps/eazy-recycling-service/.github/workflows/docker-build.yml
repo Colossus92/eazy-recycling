@@ -13,7 +13,6 @@ env:
 jobs:
   docker-build-publish:
     runs-on: ubuntu-latest
-    needs: [ gradle-build ]
     steps:
       - uses: actions/checkout@v4
 
