@@ -38,7 +38,7 @@ dependencies {
     implementation("org.springframework.ws:spring-ws-core:4.0.11")
 
     // Database
-    implementation("org.postgresql:postgresql:42.7.5")
+    runtimeOnly("org.postgresql:postgresql:42.7.5")
     runtimeOnly("com.h2database:h2:2.3.232")
 
     // Web
@@ -56,7 +56,12 @@ dependencies {
     kapt("org.mapstruct:mapstruct-processor:1.6.3")
 
     // Testing
-    testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion") {
+        exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+    }
+    testImplementation("org.testcontainers:postgresql:1.20.5")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
     testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
 }
