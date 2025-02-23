@@ -63,14 +63,14 @@ create table if not exists transports (
                             updated_at timestamp(6) not null,
                             carrier_party_id uuid,
                             consignor_party_id uuid,
-                            driver_id uuid not null,
+                            driver_id uuid,
                             goods_id uuid unique,
                             id uuid not null,
                             container_type varchar(255),
                             delivery_location_id varchar(255) unique,
                             pickup_location_id varchar(255) unique,
                             transport_type varchar(255) check (transport_type in ('EXCHANGE','PICKUP','EMPTY','DELIVERY','WAYBILL')),
-                            truck_id varchar(255) not null,
+                            truck_id varchar(255),
                             primary key (id)
 );
 
