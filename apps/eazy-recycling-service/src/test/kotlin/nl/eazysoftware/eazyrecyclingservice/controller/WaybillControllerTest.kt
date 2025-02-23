@@ -31,9 +31,9 @@ class WaybillControllerTest(): TestContainerBaseTest() {
 
     @Test
     fun `When a waybill is created it can be retrieved`() {
-        val post = given()
+        given()
             .contentType("text/xml")
-            .body(readFileAsString("waybill.xml"))
+            .body(readFileAsString())
             .`when`()
             .post("/ws")
             .then()
@@ -51,8 +51,8 @@ class WaybillControllerTest(): TestContainerBaseTest() {
         .then()
         .statusCode(200)
 
-    private fun readFileAsString(fileName: String): String {
-        val path = Paths.get(ClassLoader.getSystemResource(fileName).toURI())
+    private fun readFileAsString(): String {
+        val path = Paths.get(ClassLoader.getSystemResource("waybill.xml").toURI())
         return String(Files.readAllBytes(path))
     }
 }
