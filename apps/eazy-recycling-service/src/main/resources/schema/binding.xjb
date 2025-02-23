@@ -15,7 +15,7 @@
             <property>
                 <baseType>
                     <xjc:javaType name="java.time.LocalDate"
-                                  adapter="nl.eazysoftware.springtemplate.domain.mapper.LocalDateXmlAdapter"/>
+                                  adapter="nl.eazysoftware.eazyrecyclingservice.domain.mapper.LocalDateXmlAdapter"/>
                 </baseType>
             </property>
         </bindings>
@@ -23,7 +23,7 @@
             <property>
                 <baseType>
                     <xjc:javaType name="java.time.LocalTime"
-                                  adapter="nl.eazysoftware.springtemplate.domain.mapper.LocalTimeXmlAdapter"/>
+                                  adapter="nl.eazysoftware.eazyrecyclingservice.domain.mapper.LocalTimeXmlAdapter"/>
                 </baseType>
             </property>
         </bindings>
