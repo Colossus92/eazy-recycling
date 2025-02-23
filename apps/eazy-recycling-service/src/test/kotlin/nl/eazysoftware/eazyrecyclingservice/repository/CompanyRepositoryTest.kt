@@ -1,6 +1,5 @@
-package nl.eazysoftware.eazyrecyclingservice
+package nl.eazysoftware.eazyrecyclingservice.repository
 
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import org.assertj.core.api.Assertions.assertThat
@@ -14,7 +13,7 @@ private const val VIHB_ID = "VXXB324324"
 class CompanyRepositoryTest(
     @Autowired
     private val companyRepository: CompanyRepository
-): BaseTest() {
+): TestContainerBaseTest() {
 
     @AfterTest
     fun cleanUp() {

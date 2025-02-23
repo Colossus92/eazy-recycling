@@ -1,18 +1,17 @@
-package nl.eazysoftware.eazyrecyclingservice
+package nl.eazysoftware.eazyrecyclingservice.repository
 
-import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions
 import org.springframework.beans.factory.annotation.Autowired
 import java.util.*
 import kotlin.test.AfterTest
 import kotlin.test.Test
 
-class LocationRepositoryTest(
+class LocationRepositoryTestTestContainer(
     @Autowired
     private val locationRepository: LocationRepository,
-): BaseTest() {
+): TestContainerBaseTest() {
 
     @AfterTest
     fun cleanUp() {
@@ -38,6 +37,6 @@ class LocationRepositoryTest(
 
         val retrievedLocation = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(location.address.postalCode!!, location.address.buildingNumber!!)
 
-        assertThat(retrievedLocation).isEqualTo(savedLocation)
+        Assertions.assertThat(retrievedLocation).isEqualTo(savedLocation)
     }
 }
