@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.Test
 
-class TruckTest @Autowired constructor(
+class TruckRepositoryTest @Autowired constructor(
     private val truckRepository: TruckRepository
 ) : BaseTest() {
 
