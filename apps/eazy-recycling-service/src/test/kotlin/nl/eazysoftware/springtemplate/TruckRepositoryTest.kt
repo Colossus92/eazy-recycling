@@ -11,6 +11,11 @@ class TruckRepositoryTest @Autowired constructor(
 ) : BaseTest() {
 
     @Test
+    fun cleanUp() {
+        truckRepository.deleteAll()
+    }
+
+    @Test
     fun `should save and retrieve a Truck`() {
         val truck = Truck("N-678-VT", "Peugeot", "E-2008")
 

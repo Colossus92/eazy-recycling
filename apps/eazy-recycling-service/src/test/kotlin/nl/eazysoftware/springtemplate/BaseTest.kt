@@ -3,6 +3,7 @@ package nl.eazysoftware.springtemplate
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.TestInstance
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -10,7 +11,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 @SpringBootTest(properties = ["spring.profiles.active=test"])
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseTest {
 
     companion object {
@@ -30,10 +30,5 @@ abstract class BaseTest {
             registry.add("spring.datasource.password") { postgresContainer.password }
             registry.add("spring.datasource.driver-class-name") { "org.postgresql.Driver" }
         }
-    }
-
-    @AfterAll
-    fun stopContainer() {
-        postgresContainer.stop()
     }
 }
