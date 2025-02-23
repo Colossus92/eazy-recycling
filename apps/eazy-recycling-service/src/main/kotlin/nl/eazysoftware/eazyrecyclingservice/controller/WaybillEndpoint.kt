@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller
 
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.Marshaller
-import nl.eazysoftware.eazyrecyclingservice.domain.mapper.TransportService
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.domain.mapper.WaybillMapper
 import oasis.names.specification.ubl.schema.xsd.waybill_2.Waybill
 import org.slf4j.Logger

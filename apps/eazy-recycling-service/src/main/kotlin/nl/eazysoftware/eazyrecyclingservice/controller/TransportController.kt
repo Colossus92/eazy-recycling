@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller
 
-import nl.eazysoftware.eazyrecyclingservice.domain.mapper.TransportService
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate

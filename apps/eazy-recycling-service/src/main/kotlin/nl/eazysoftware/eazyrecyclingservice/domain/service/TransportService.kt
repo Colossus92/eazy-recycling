@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.mapper
+package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
