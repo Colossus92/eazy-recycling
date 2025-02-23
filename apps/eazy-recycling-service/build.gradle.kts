@@ -60,6 +60,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("org.testcontainers:postgresql:1.20.5")
+    testImplementation("io.rest-assured:rest-assured")
     testImplementation("org.testcontainers:junit-jupiter:1.20.5")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")

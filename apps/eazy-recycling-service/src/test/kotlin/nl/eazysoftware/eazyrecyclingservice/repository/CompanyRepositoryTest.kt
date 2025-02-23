@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository
 
+import nl.eazysoftware.eazyrecyclingservice.TestContainerBaseTest
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import org.assertj.core.api.Assertions.assertThat

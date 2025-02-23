@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository
 
+import nl.eazysoftware.eazyrecyclingservice.TestContainerBaseTest
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.assertj.core.api.Assertions
 import org.springframework.beans.factory.annotation.Autowired
