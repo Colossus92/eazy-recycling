@@ -5,15 +5,29 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.ValidatableResponse
 import nl.eazysoftware.eazyrecyclingservice.TestContainerBaseTest
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.BeforeEach
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.server.LocalServerPort
 import java.nio.file.Files
 import java.nio.file.Paths
+import kotlin.test.AfterTest
 import kotlin.test.Test
 
 
-class WaybillControllerTest(): TestContainerBaseTest() {
+class WaybillControllerTest(
+    @Autowired
+    private val transportRepository: TransportRepository,
+
+    @Autowired
+    private val companyRepository: CompanyRepository,
+
+    @Autowired
+    private val locationRepository: LocationRepository,
+): TestContainerBaseTest() {
 
     @LocalServerPort
     private val port: Int? = null
@@ -21,6 +35,13 @@ class WaybillControllerTest(): TestContainerBaseTest() {
     @BeforeEach
     fun setUp() {
         RestAssured.baseURI = "http://localhost:$port"
+    }
+
+    @AfterTest
+    fun cleanUp() {
+        transportRepository.deleteAll()
+        companyRepository.deleteAll()
+        locationRepository.deleteAll()
     }
 
     @Test
