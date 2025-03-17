@@ -1,10 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill
 
 import jakarta.persistence.Embeddable
-import lombok.NoArgsConstructor
 
 @Embeddable
-@NoArgsConstructor
 data class AddressDto(
     var streetName: String?,
     var buildingName: String? = null,
@@ -12,6 +10,6 @@ data class AddressDto(
     var city: String?,
     var postalCode: String?,
     var country: String?
-
-
-)
+){
+    constructor(): this(null, null, null, null, null, null)
+}

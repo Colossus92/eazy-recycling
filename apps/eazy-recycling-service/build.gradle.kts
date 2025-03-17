@@ -47,9 +47,6 @@ dependencies {
 
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
-    compileOnly("org.projectlombok:lombok:1.18.36")
-    annotationProcessor("org.projectlombok:lombok:1.18.36")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
     // Mapstruct
     implementation("org.mapstruct:mapstruct:1.6.3")
