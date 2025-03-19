@@ -13,7 +13,7 @@ class SoapMethodOverrideFilter : Filter {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         val httpRequest = request as HttpServletRequest
 
-        if (httpRequest.method == "GET" && httpRequest.contentLength > 0) {
+        if (httpRequest.method == "GET" && httpRequest.requestURI == "/ws") {
             val wrappedRequest = HttpMethodOverrideRequestWrapper(httpRequest)
             chain.doFilter(wrappedRequest, response)
             return
