@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller
 
 import jakarta.xml.bind.JAXBContext
-import jakarta.xml.bind.Marshaller
 import nl.eazysoftware.eazyrecyclingservice.config.web.DynamicNamespaceFilter
 import nl.eazysoftware.eazyrecyclingservice.domain.mapper.WaybillMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.xml.sax.InputSource
-import java.io.StringWriter
 import javax.xml.parsers.SAXParserFactory
 
 @RestController
