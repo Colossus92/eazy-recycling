@@ -1,13 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice
 
-import org.junit.jupiter.api.Disabled
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 
-@Disabled
 @Testcontainers
 @SpringBootTest(
     properties = ["spring.profiles.active=test"],
