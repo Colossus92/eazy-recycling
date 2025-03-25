@@ -56,7 +56,7 @@ class WaybillControllerTest(
             .contentType("text/xml")
             .body(readFileAsString())
             .`when`()
-            .get("/ws")
+            .post("/ws")
             .then()
             .statusCode(200)
 
