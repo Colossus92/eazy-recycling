@@ -34,16 +34,27 @@ class ExternalWaybillController(
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/ws")
-    fun receiveWaybill(@RequestBody body: String) {
+    fun receiveWaybill(@RequestBody body: String): String {
         logger.info("Received Waybill XML:\n$body")
+
         val xmlWithNamespace = if (!body.contains("xmlns=")) {
             body.replace("<Waybill", """<Waybill xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:oasis:names:specification:ubl:schema:xsd:Waybill-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2" xmlns:eba="http://ns.tln.nl/eba/schemas/1-0/" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Waybill-2 http://docs.oasis-open.org/ubl/prd1-UBL-2.1/xsd/maindoc/UBL-Waybill-2.1.xsd http://ns.tln.nl/eba/schemas/1-0/ ..\..\schemas\1-0-1\EBA-Extensions.xsd"""")
         } else body
 
+
         val waybill = unmarshal(xmlWithNamespace)
+
 
         val dto = mapper.toDto(waybill)
         transportService.save(dto)
+
+        // Marshal the waybill object back to an XML string
+        val marshaller = jaxbContext.createMarshaller()
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+        val writer = StringWriter()
+        marshaller.marshal(waybill, writer)
+
+        return writer.toString()
     }
 
     private fun unmarshal(xmlWithNamespace: String): Waybill {
