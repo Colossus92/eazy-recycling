@@ -99,11 +99,11 @@ abstract class WaybillMapper {
     }
 
     fun toDto(source: QuantityType): Int {
-        return source.value.toInt()
+        return source.value?.toInt() ?: 0
     }
 
     fun toDto(source: NetNetWeightMeasure): Int {
-        return source.value.toInt()
+        return source.value?.toInt() ?: 0
     }
 
     fun toUnit(source: GoodsItemType): String {

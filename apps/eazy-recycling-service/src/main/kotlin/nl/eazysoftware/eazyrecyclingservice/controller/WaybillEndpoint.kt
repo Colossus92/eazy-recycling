@@ -29,11 +29,12 @@ class WaybillEndpoint(
     @ResponsePayload
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "Waybill")
     fun receiveWaybill(@RequestPayload waybill: Waybill): Waybill {
+        val xml = marshalToXml(waybill)
+        logger.info("Received SOAP Waybill XML:\n$xml")
+
         val dto = mapper.toDto(waybill)
         transportService.save(dto)
 
-        val xml = marshalToXml(waybill)
-        logger.info("Received SOAP Waybill XML:\n$xml")
         return waybill
     }
 
