@@ -38,10 +38,7 @@ class CompanyRepositoryTest(
         val savedCompany = companyRepository.save(company)
         val retrievedCompany = companyRepository.findByChamberOfCommerceIdAndVihbId(CHAMBER_OF_COMMERCE_ID, null)
 
-        assertThat(retrievedCompany)
-            .usingRecursiveComparison()
-            .ignoringFields("updatedAt")
-            .isEqualTo(savedCompany)
+        assertThat(retrievedCompany).isEqualTo(savedCompany)
     }
 
     @Test
@@ -61,10 +58,7 @@ class CompanyRepositoryTest(
         val savedCompany = companyRepository.save(company)
         val retrievedCompany = companyRepository.findByChamberOfCommerceIdAndVihbId(null, VIHB_ID)
 
-        assertThat(retrievedCompany)
-            .usingRecursiveComparison()
-            .ignoringFields("updatedAt")
-            .isEqualTo(savedCompany)
+        assertThat(retrievedCompany).isEqualTo(savedCompany)
     }
 
     @Test
@@ -85,10 +79,7 @@ class CompanyRepositoryTest(
         val savedCompany = companyRepository.save(company)
         val retrievedCompany = companyRepository.findByChamberOfCommerceIdAndVihbId(CHAMBER_OF_COMMERCE_ID, VIHB_ID)
 
-        assertThat(retrievedCompany)
-            .usingRecursiveComparison()
-            .ignoringFields("updatedAt")
-            .isEqualTo(savedCompany)
+        assertThat(retrievedCompany).isEqualTo(savedCompany)
     }
 
     @Test
