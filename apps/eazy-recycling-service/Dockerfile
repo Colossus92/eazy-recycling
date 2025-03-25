@@ -1,12 +1,11 @@
-FROM eclipse-temurin:21-jdk-alpine
-
+# Use a builder stage to build the JAR
+FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
+COPY . .
+RUN ./gradlew clean build
 
-ARG JAR_FILE=./build/libs/app.jar
-COPY ${JAR_FILE} /app/app.jar
-
-
+# Use a lightweight JDK image to run the JAR
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-
-EXPOSE 8080
+COPY --from=builder /app/build/libs/app.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
