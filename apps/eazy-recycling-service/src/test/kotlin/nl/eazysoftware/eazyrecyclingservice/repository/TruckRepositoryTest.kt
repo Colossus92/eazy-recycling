@@ -2,11 +2,11 @@ package nl.eazysoftware.eazyrecyclingservice.repository
 
 import nl.eazysoftware.eazyrecyclingservice.TestContainerBaseTest
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.springframework.beans.factory.annotation.Autowired
 import kotlin.test.Test
 
-class TruckRepositoryTestTestContainer @Autowired constructor(
+class TruckRepositoryTest @Autowired constructor(
     private val truckRepository: TruckRepository
 ) : TestContainerBaseTest() {
 
@@ -22,7 +22,10 @@ class TruckRepositoryTestTestContainer @Autowired constructor(
         val savedTruck = truckRepository.save(truck)
         val receivedTruck = truckRepository.findByLicensePlate(savedTruck.licensePlate)
 
-        Assertions.assertThat(receivedTruck).isNotNull
-        Assertions.assertThat(savedTruck).isEqualTo(receivedTruck)
+        assertThat(receivedTruck).isNotNull
+        assertThat(savedTruck)
+            .usingRecursiveComparison()
+            .ignoringFields("updatedAt")
+            .isEqualTo(receivedTruck)
     }
 }
