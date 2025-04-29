@@ -25,4 +25,19 @@ class TruckService(
             .findByLicensePlate(licensePlate)
             ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
     }
+
+    fun deleteTruck(licensePlate: String) {
+        truckRepository.deleteById(licensePlate)
+    }
+
+    fun updateTruck(licensePlate: String, truck: Truck): Truck {
+        if (!licensePlate.equals(truck.licensePlate, ignoreCase = true)) {
+            throw IllegalStateException("Cannot change truck license plate")
+        }
+
+       truckRepository.findByLicensePlate(licensePlate)
+            ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
+
+        return truckRepository.save(truck)
+    }
 }

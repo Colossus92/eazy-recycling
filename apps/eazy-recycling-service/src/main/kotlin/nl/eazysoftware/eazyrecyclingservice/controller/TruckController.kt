@@ -27,4 +27,16 @@ class TruckController(
     fun getTruckByLicensePlate(@PathVariable licensePlate: String): Truck {
         return truckService.getTruckByLicensePlate(licensePlate)
     }
+
+    @DeleteMapping("/{licensePlate}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteTruck(@PathVariable licensePlate: String) {
+        truckService.deleteTruck(licensePlate)
+    }
+
+    @PutMapping("/{licensePlate}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateTruck(@PathVariable licensePlate: String, @RequestBody truck: Truck): Truck {
+        return truckService.updateTruck(licensePlate, truck)
+    }
 }
