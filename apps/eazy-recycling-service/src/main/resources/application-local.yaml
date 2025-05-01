@@ -1,3 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://127.0.0.1:54322/postgres?user=postgres&password=postgres
+supabase:
+  api:
+    url: ${SUPABASE_API_URL:}
+    secret: ${SUPABASE_API_SECRET:}
+    publishable: ${SUPABASE_API_PUBLISHABLE:}
