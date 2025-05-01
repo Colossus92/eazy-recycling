@@ -1,10 +1,9 @@
-package nl.eazysoftware.eazyrecyclingservice.repository.entity.container
+package nl.eazysoftware.eazyrecyclingservice.controller
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import java.util.UUID
 
-data class Container(
-    val uuid: UUID,
+data class CreateContainerRequest(
     val id: String,
     val location: ContainerLocation,
     val notes: String,
