@@ -1,11 +1,12 @@
 plugins {
-    kotlin("jvm") version "1.9.25"
-    kotlin("plugin.spring") version "1.9.25"
-    id("org.springframework.boot") version "3.4.1"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.20"
+    id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.jpa") version "1.9.25"
-    kotlin("kapt") version "2.1.10"
+    kotlin("plugin.jpa") version "2.1.20"
+    kotlin("kapt") version "2.1.20"
     id("org.unbroken-dome.xjc") version "2.0.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
 }
 
 group = "nl.eazysoftware"
@@ -40,13 +41,24 @@ dependencies {
     // Database
     runtimeOnly("org.postgresql:postgresql:42.7.5")
     runtimeOnly("com.h2database:h2:2.3.232")
-
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4")) {
+        (this as ExternalModuleDependency).exclude("org.jetbrains.kotlinx", "kotlinx-serialization-core-jvm")
+    }
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
     // Web
     implementation("wsdl4j:wsdl4j:1.6.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
-
+    implementation("io.ktor:ktor-client-cio:3.1.2")
+    implementation(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.0"))
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.8.0")
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
+    
+    // Environment variables
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     // Mapstruct
     implementation("org.mapstruct:mapstruct:1.6.3")
