@@ -4,6 +4,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.put
 import nl.eazysoftware.eazyrecyclingservice.controller.user.CreateUserRequest
 import org.slf4j.Logger
@@ -22,6 +24,11 @@ class UserRepository(private val supabaseClient: SupabaseClient) {
     }
 
     fun createUser(createUserRequest: CreateUserRequest) {
+        val rolesJsonArray = buildJsonArray {
+            createUserRequest.roles.forEach { role ->
+                add(JsonPrimitive(role))
+            }
+        }
         runBlocking {
             supabaseClient.auth.admin.createUserWithEmail {
                 email = createUserRequest.email
@@ -30,6 +37,7 @@ class UserRepository(private val supabaseClient: SupabaseClient) {
                 userMetadata {
                     put("first_name", createUserRequest.firstName)
                     put("last_name", createUserRequest.lastName)
+                    put("roles", rolesJsonArray)
                 }
             }
         }

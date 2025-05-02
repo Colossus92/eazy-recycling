@@ -5,4 +5,6 @@ data class CreateUserRequest(
     val password: String,
     val firstName: String,
     val lastName: String,
-)
+    val roles: Array<String>,
+) {
+}
