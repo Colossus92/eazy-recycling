@@ -6,8 +6,10 @@ import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import nl.eazysoftware.eazyrecyclingservice.controller.user.CreateUserRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.user.UpdateUserRequest
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
@@ -52,6 +54,25 @@ class UserRepository(private val supabaseClient: SupabaseClient) {
     fun getById(id: String): UserInfo {
         return runBlocking {
             supabaseClient.auth.admin.retrieveUserById(id)
+        }
+    }
+
+    fun updateUser(id: String, updateUserRequest: UpdateUserRequest) {
+        val rolesJsonArray = buildJsonArray {
+            updateUserRequest.roles.forEach { role ->
+                add(JsonPrimitive(role))
+            }
+        }
+
+        return runBlocking {
+            supabaseClient.auth.admin.updateUserById(id) {
+                email = updateUserRequest.email
+                userMetadata = buildJsonObject {
+                    put("first_name", updateUserRequest.firstName)
+                    put("last_name", updateUserRequest.lastName)
+                    put("roles", rolesJsonArray)
+                }
+            }
         }
     }
 

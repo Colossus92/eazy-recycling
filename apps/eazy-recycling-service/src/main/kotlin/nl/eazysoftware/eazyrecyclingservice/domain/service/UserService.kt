@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import io.github.jan.supabase.auth.user.UserInfo
 import nl.eazysoftware.eazyrecyclingservice.controller.user.CreateUserRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.user.UpdateUserRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.UserRepository
 import org.springframework.stereotype.Service
 
@@ -24,6 +25,10 @@ class UserService(
 
     fun getById(id: String): UserInfo {
         return userRepository.getById(id)
+    }
+
+    fun updateUser(id: String, updateUserRequest: UpdateUserRequest) {
+        return userRepository.updateUser(id, updateUserRequest)
     }
 
 }
