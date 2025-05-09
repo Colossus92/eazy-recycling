@@ -1,0 +1,48 @@
+# Supabase
+.branches
+.temp
+.env
+.env.*
+!.env.example
+
+# Supabase local development
+**/supabase/.temp/
+**/supabase/.branches/
+**/supabase/seed.sql
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Build output
+dist/
+build/
+out/
+
+# IDE and editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+
+# Local development
+.local
+.cache/
+.turbo/
+
+# Testing
+coverage/
+
+# Misc
+.DS_Store
+Thumbs.db
