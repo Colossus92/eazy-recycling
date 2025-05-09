@@ -19,3 +19,6 @@ spring:
         schema-generation.scripts.action: create
         schema-generation.scripts.create-target: schema.sql
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  devtools:
+    livereload:
+      enabled: true

@@ -37,7 +37,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
     implementation("org.springframework.ws:spring-ws-core:4.0.11")
-
+    runtimeOnly("org.springframework.boot:spring-boot-devtools:$springVersion")
     // Database
     runtimeOnly("org.postgresql:postgresql:42.7.5")
     runtimeOnly("com.h2database:h2:2.3.232")
