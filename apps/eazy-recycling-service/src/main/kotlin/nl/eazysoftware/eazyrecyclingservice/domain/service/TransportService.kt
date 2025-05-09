@@ -37,7 +37,7 @@ class TransportService(
         val trucks = truckRepository.findAll().map { it.licensePlate }.toSet()
         val transportsByTruck = transportRepository
             .findByTruckIsNotNullAndPickupDateTimeBetween(start, end)
-            .groupBy { it.truck?.licensePlate ?: "NOT_ASSIGNED" }
+            .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }
             .toMutableMap()
 
         val missingLicensePlates = trucks - transportsByTruck.keys

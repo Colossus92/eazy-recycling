@@ -26,7 +26,7 @@ data class TransportView(
     constructor(transportDto: TransportDto): this(
         date = transportDto.pickupDateTime.toLocalDate().toString(),
         id = transportDto.id.toString(),
-        truckLicensePlate =  transportDto.truck?.licensePlate ?: "NOT_ASSIGNED",
+        truckLicensePlate =  transportDto.truck?.licensePlate ?: "Niet toegewezen",
         originCity = transportDto.pickupLocation.address.city,
         destinationCity = transportDto.deliveryLocation.address.city,
         driver = transportDto.driver,
