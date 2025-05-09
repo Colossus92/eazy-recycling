@@ -20,7 +20,8 @@ data class TransportView(
     val truckLicensePlate: String,
     val originCity: String?,
     val destinationCity: String?,
-    val driver: Driver?
+    val driver: Driver?,
+    val status: TransportDto.Status,
 ) {
 
     constructor(transportDto: TransportDto): this(
@@ -30,5 +31,6 @@ data class TransportView(
         originCity = transportDto.pickupLocation.address.city,
         destinationCity = transportDto.deliveryLocation.address.city,
         driver = transportDto.driver,
+        status = transportDto.getStatus()
     )
 }

@@ -69,6 +69,14 @@ data class TransportDto(
     var updatedAt: LocalDateTime? = LocalDateTime.now(),
 
     ) {
+
+    enum class Status {
+        UNPLANNED,
+        PLANNED,
+        FINISHED,
+        INVOICED,
+    }
+
     @PrePersist
     fun prePersist() {
         updatedAt = LocalDateTime.now()
@@ -77,5 +85,18 @@ data class TransportDto(
     @PreUpdate
     fun preUpdate() {
         updatedAt = LocalDateTime.now()
+    }
+
+    fun getStatus(): Status {
+        if (driver == null || truck == null) {
+            return Status.UNPLANNED
+        }
+        
+        val now = LocalDateTime.now()
+        if (now.isAfter(deliveryDateTime)) {
+            return Status.FINISHED
+        }
+        
+        return Status.PLANNED
     }
 }
