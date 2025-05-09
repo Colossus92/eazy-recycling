@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.DateInfo
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
@@ -177,7 +176,7 @@ class TransportService(
             daysInWeek.last().atTime(23, 59, 59)
         )
 
-        val dateInfo = daysInWeek.map { DateInfo(it.toString(), it.dayOfWeek) }
+        val dateInfo = daysInWeek.map { it.toString() }
 
 
         val transportsView = transports.map { transportDto -> TransportView(transportDto) }
