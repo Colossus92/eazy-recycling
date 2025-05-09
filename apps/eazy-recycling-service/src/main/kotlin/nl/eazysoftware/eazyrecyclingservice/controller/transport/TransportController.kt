@@ -1,8 +1,16 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.CreateWaybillTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 
 @RestController
@@ -34,5 +42,10 @@ class TransportController(
     @GetMapping("/{pickupDate}")
     fun getTransportByDateSortedByTruck(@PathVariable("pickupDate") pickupDate: LocalDate): Map<String, List<TransportDto>> {
         return transportService.getTransportByDateSortedByTruck(pickupDate)
+    }
+
+    @GetMapping("/planning/{pickupDate}")
+    fun getPlanningByDate(@PathVariable("pickupDate") pickupDate: LocalDate): PlanningView {
+        return transportService.getPlanningByDate(pickupDate)
     }
 }

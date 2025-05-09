@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
+
 import java.util.*
 
 interface TransportRepository : JpaRepository<TransportDto, UUID> {
@@ -25,4 +26,6 @@ interface TransportRepository : JpaRepository<TransportDto, UUID> {
     ): List<TransportDto>
 
     fun findAllByGoodsNotNull(): List<TransportDto>
+
+    fun findByPickupDateTimeIsBetween(start: LocalDateTime, end: LocalDateTime): List<TransportDto>
 }

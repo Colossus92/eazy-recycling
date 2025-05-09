@@ -4,6 +4,10 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.DateInfo
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
 import nl.eazysoftware.eazyrecyclingservice.repository.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -13,6 +17,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDt
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
@@ -164,4 +169,34 @@ class TransportService(
                 ),
                 id = UUID.randomUUID().toString()
             ))
+
+    fun getPlanningByDate(pickupDate: LocalDate): PlanningView {
+        val daysInWeek = getDaysInWeek(pickupDate)
+        val transports = transportRepository.findByPickupDateTimeIsBetween(
+            daysInWeek.first().atTime(0, 0, 0),
+            daysInWeek.last().atTime(23, 59, 59)
+        )
+
+        val dateInfo = daysInWeek.map { DateInfo(it.toString(), it.dayOfWeek) }
+
+
+        val transportsView = transports.map { transportDto -> TransportView(transportDto) }
+            .groupBy { transportView -> transportView.truckLicensePlate }
+            .map { (truckLicensePlate, transportViews) ->
+                TransportsView(truckLicensePlate, transportViews.groupBy { it.date })
+            }
+
+        return PlanningView(dateInfo, transportsView)
+    }
+
+    private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
+        // Find the first day of the week (Monday) for the given date
+        val dayOfWeek = day.dayOfWeek.ordinal.toLong()
+        val monday = day.minus(dayOfWeek, ChronoUnit.DAYS)
+
+        // Create a list with all 7 days of the week
+        return (0L..6L).map { dayOffset ->
+            monday.plus(dayOffset, ChronoUnit.DAYS)
+        }
+    }
 }
