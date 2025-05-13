@@ -31,7 +31,7 @@ class TransportController(
 
     @PostMapping("/container")
     fun createContainerTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
-        return transportService.assignContainerTransport(request)
+        return transportService.createContainerTransport(request)
     }
 
     @PutMapping

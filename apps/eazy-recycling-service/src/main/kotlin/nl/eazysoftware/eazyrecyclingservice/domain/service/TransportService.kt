@@ -8,11 +8,14 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
 import nl.eazysoftware.eazyrecyclingservice.repository.*
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.driver.Driver
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -29,6 +32,8 @@ class TransportService(
     private val companyRepository: CompanyRepository,
     private val entityManager: EntityManager,
 ) {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     fun getTransportByDateSortedByTruck(pickupDate: LocalDate): Map<String, List<TransportDto>> {
         val start = pickupDate.atStartOfDay()
@@ -58,42 +63,57 @@ class TransportService(
         val driver = driverRepository.findById(driverId)
             .orElseThrow { EntityNotFoundException("Driver with id $driverId not found") }
 
-        return transportRepository.save(transport.copy(
-            truck = truck,
-            driver = driver,
-            transportType = TransportType.WAYBILL,
-        ))
+        return transportRepository.save(
+            transport.copy(
+                truck = truck,
+                driver = driver,
+                transportType = TransportType.WAYBILL,
+            )
+        )
     }
 
     fun getAllTransports(): List<TransportDto> {
         return transportRepository.findAll()
     }
 
-    fun assignContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        val truck = truckRepository.findByLicensePlate(request.licensePlate)
-            ?: throw EntityNotFoundException("Truck with $request.licensePlate not found")
-        val customer = companyRepository.findById(request.customerId)
+    fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
+        val truck = request.licensePlate?.let { findTruck(it) }
+        val consignorParty = companyRepository.findById(request.consignorPartyId)
             .getOrNull()
             ?: throw EntityNotFoundException("Company with id $request.customerId not found")
-        val driver = driverRepository.findById(request.driverId)
-            .orElseThrow { EntityNotFoundException("Driver with id $request.driverId not found") }
-
-        val origin = findOrCreateLocation(request.originAddress)
-        val destination = findOrCreateLocation(request.destinationAddress)
+        val driver = request.driverId?.let { findDriver(it) }
+        val pickupLocation = findOrCreateLocation(AddressRequest(
+            streetName = request.pickupStreet,
+            buildingNumber = request.pickupHouseNumber,
+            postalCode = request.pickupPostalCode,
+            city = request.pickupCity,
+        ))
+        val deliveryLocation = findOrCreateLocation(
+            AddressRequest(
+                streetName = request.deliveryStreet,
+                buildingNumber = request.deliveryHouseNumber,
+                postalCode = request.deliveryPostalCode,
+                city = request.deliveryCity,
+            )
+        )
 
         val transport = TransportDto(
-            consignorParty = customer,
-            pickupLocation = origin,
+            consignorParty = consignorParty,
+            pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
-            deliveryLocation = destination,
+            deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
             truck = truck,
             driver = driver,
-            transportType = request.transportType,
+            transportType = request.typeOfTransport,
             containerType = request.containerType,
-            carrierParty = companyRepository.findById(UUID.fromString("a5f516e7-d504-436f-b9bb-79a95da73902"))
-                .orElseThrow { EntityNotFoundException("Default carrier not found") }
+            carrierParty = request.carrierPartyId
+                .let { companyRepository.findById(it) }
+                .getOrNull()
+                ?: throw  EntityNotFoundException("Default carrier not found")
         )
+
+        log.info("Creating container transport: $transport")
 
         return transportRepository.save(transport)
     }
@@ -136,18 +156,30 @@ class TransportService(
             .orElseThrow { EntityNotFoundException("Transport with id ${request.id} not found") }
 
         val updatedTransport = transport.copy(
-            consignorParty = companyRepository.findById(request.customerId)
-                .orElseThrow { EntityNotFoundException("Company with id ${request.customerId} not found") },
-            pickupLocation =  findOrCreateLocation(request.originAddress),
+            consignorParty = companyRepository.findById(request.consignorPartyId)
+                .orElseThrow { EntityNotFoundException("Company with id ${request.consignorPartyId} not found") },
+            pickupLocation = findOrCreateLocation(
+                AddressRequest(
+                    streetName = request.pickupStreet,
+                    buildingNumber = request.pickupHouseNumber,
+                    postalCode = request.pickupPostalCode,
+                    city = request.pickupCity,
+                )
+            ),
             pickupDateTime = request.pickupDateTime,
-            deliveryLocation = findOrCreateLocation(request.destinationAddress),
+            deliveryLocation = findOrCreateLocation(
+                AddressRequest(
+                    streetName = request.deliveryStreet,
+                    buildingNumber = request.deliveryHouseNumber,
+                    postalCode = request.deliveryPostalCode,
+                    city = request.deliveryCity,
+                )
+            ),
             deliveryDateTime = request.deliveryDateTime,
             containerType = request.containerType,
-            transportType = request.transportType,
-            truck = truckRepository.findByLicensePlate(request.licensePlate)
-                ?: throw EntityNotFoundException("Truck with ${request.licensePlate} not found"),
-            driver = driverRepository.findById(request.driverId)
-                .orElseThrow { EntityNotFoundException("Driver with id ${request.driverId} not found") }
+            transportType = request.typeOfTransport,
+            truck = request.licensePlate?.let { findTruck(it) },
+            driver = request.driverId?.let { findDriver(it) },
         )
 
         return transportRepository.save(updatedTransport)
@@ -197,5 +229,16 @@ class TransportService(
         return (0L..6L).map { dayOffset ->
             monday.plus(dayOffset, ChronoUnit.DAYS)
         }
+    }
+
+    private fun findTruck(licensePlate: String): Truck? {
+        return truckRepository.findByLicensePlate(licensePlate)
+            ?: throw EntityNotFoundException("Truck with $licensePlate not found")
+    }
+
+    private fun findDriver(driverId: UUID): Driver? {
+        return driverRepository.findById(driverId)
+            .getOrNull()
+            ?: throw EntityNotFoundException("Driver with id $driverId not found")
     }
 }

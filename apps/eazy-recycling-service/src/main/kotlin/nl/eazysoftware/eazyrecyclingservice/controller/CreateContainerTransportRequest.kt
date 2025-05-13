@@ -5,16 +5,26 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 data class CreateContainerTransportRequest(
-    val id: String,
-    val customerId: UUID,
+    val id: String?,
+    val consignorPartyId: UUID,
     val pickupDateTime: LocalDateTime,
-    val originAddress: AddressRequest,
     val deliveryDateTime: LocalDateTime,
-    val destinationAddress: AddressRequest,
-    val containerType: String,
-    val transportType: TransportType,
-    val licensePlate: String,
-    val driverId: UUID,
+    val containerType: String?,
+    val typeOfTransport: TransportType,
+    val licensePlate: String?,
+    val driverId: UUID?,
+    val carrierPartyId: UUID,
+    val pickupPartyId: String?,
+    val pickupStreet: String,
+    val pickupHouseNumber: String,
+    val pickupPostalCode: String,
+    val pickupCity: String,
+    val consigneePartyId: String?,
+    val deliveryPartyId: String,
+    val deliveryStreet: String,
+    val deliveryHouseNumber: String,
+    val deliveryPostalCode: String,
+    val deliveryCity: String,
 )
 
 data class AddressRequest(
