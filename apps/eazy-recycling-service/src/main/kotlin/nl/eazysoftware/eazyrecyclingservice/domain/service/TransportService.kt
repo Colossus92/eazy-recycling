@@ -212,9 +212,9 @@ class TransportService(
 
 
         val transportsView = transports.map { transportDto -> TransportView(transportDto) }
-            .groupBy { transportView -> transportView.truckLicensePlate }
+            .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
             .map { (truckLicensePlate, transportViews) ->
-                TransportsView(truckLicensePlate, transportViews.groupBy { it.date })
+                TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
             }
 
         return PlanningView(dateInfo, transportsView)

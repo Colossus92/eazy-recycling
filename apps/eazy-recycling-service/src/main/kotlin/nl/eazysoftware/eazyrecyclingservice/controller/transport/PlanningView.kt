@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.driver.Driver
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 
 
 data class PlanningView(
@@ -15,9 +16,10 @@ data class TransportsView(
 )
 
 data class TransportView(
-    val date: String,
+    val pickupDate: String,
+    val deliveryDate: String,
     val id: String,
-    val truckLicensePlate: String,
+    val truck: Truck?,
     val originCity: String?,
     val destinationCity: String?,
     val driver: Driver?,
@@ -26,9 +28,10 @@ data class TransportView(
 ) {
 
     constructor(transportDto: TransportDto): this(
-        date = transportDto.pickupDateTime.toLocalDate().toString(),
+        pickupDate = transportDto.pickupDateTime.toLocalDate().toString(),
+        deliveryDate = transportDto.deliveryDateTime.toLocalDate().toString(),
         id = transportDto.id.toString(),
-        truckLicensePlate =  transportDto.truck?.licensePlate ?: "Niet toegewezen",
+        truck =  transportDto.truck,
         originCity = transportDto.pickupLocation.address.city,
         destinationCity = transportDto.deliveryLocation.address.city,
         driver = transportDto.driver,
