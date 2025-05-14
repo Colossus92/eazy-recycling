@@ -37,7 +37,7 @@ abstract class WaybillMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "transportType", ignore = true)
     @Mapping(target = "displayNumber", ignore = true)
-    @Mapping(target = "containerType", ignore = true)
+    @Mapping(target = "wasteContainer", ignore = true)
     @Mapping(target = "driver", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     abstract fun toDto(waybill: Waybill): TransportDto

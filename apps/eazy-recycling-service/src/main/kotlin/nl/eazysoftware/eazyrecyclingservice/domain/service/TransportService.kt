@@ -31,6 +31,7 @@ class TransportService(
     private val locationRepository: LocationRepository,
     private val companyRepository: CompanyRepository,
     private val entityManager: EntityManager,
+    private val wasteContainerRepository: WasteContainerRepository,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -82,6 +83,7 @@ class TransportService(
             .getOrNull()
             ?: throw EntityNotFoundException("Company with id $request.customerId not found")
         val driver = request.driverId?.let { findDriver(it) }
+        val wasteContainer = request.containerId?.let { wasteContainerRepository.getReferenceById(it)}
         val pickupLocation = findOrCreateLocation(AddressRequest(
             streetName = request.pickupStreet,
             buildingNumber = request.pickupHouseNumber,
@@ -106,7 +108,7 @@ class TransportService(
             truck = truck,
             driver = driver,
             transportType = request.typeOfTransport,
-            containerType = request.containerType,
+            wasteContainer = wasteContainer,
             carrierParty = request.carrierPartyId
                 .let { companyRepository.findById(it) }
                 .getOrNull()
@@ -154,7 +156,7 @@ class TransportService(
     fun updateTransport(request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(UUID.fromString(request.id))
             .orElseThrow { EntityNotFoundException("Transport with id ${request.id} not found") }
-
+        val wasteContainer = request.containerId?.let { wasteContainerRepository.getReferenceById(it)}
         val updatedTransport = transport.copy(
             consignorParty = companyRepository.findById(request.consignorPartyId)
                 .orElseThrow { EntityNotFoundException("Company with id ${request.consignorPartyId} not found") },
@@ -176,7 +178,7 @@ class TransportService(
                 )
             ),
             deliveryDateTime = request.deliveryDateTime,
-            containerType = request.containerType,
+            wasteContainer = wasteContainer,
             transportType = request.typeOfTransport,
             truck = request.truckId?.let { findTruck(it) },
             driver = request.driverId?.let { findDriver(it) },

@@ -25,6 +25,7 @@ data class TransportView(
     val driver: ProfileDto?,
     val status: TransportDto.Status,
     val displayNumber: String?,
+    val containerId: String?
 ) {
 
     constructor(transportDto: TransportDto): this(
@@ -36,6 +37,7 @@ data class TransportView(
         destinationCity = transportDto.deliveryLocation.address.city,
         driver = transportDto.driver,
         status = transportDto.getStatus(),
-        displayNumber = transportDto.displayNumber
+        displayNumber = transportDto.displayNumber,
+        containerId = transportDto.wasteContainer?.id,
     )
 }

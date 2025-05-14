@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -56,7 +57,9 @@ data class TransportDto(
     @Column(nullable = true)
     val transportType: TransportType? = null,
 
-    val containerType: String? = null,
+    @OneToOne(cascade = [CascadeType.ALL])
+    @JoinColumn(name = "container_id", referencedColumnName = "uuid")
+    val wasteContainer: WasteContainerDto? = null,
 
     @ManyToOne
     @JoinColumn(name = "truck_id", referencedColumnName = "license_plate", nullable = true)
