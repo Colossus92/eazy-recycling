@@ -46,7 +46,7 @@ BEGIN
   EXECUTE format('SELECT nextval(''%I'')', seq_name) INTO next_val;
 
   -- Always override input
-  NEW.display_number := year_prefix || '-' || LPAD(next_val::TEXT, 6, '0');
+  NEW.display_number := year_prefix || '-' || LPAD(next_val::TEXT, 4, '0');
   RETURN NEW;
 END;
 $function$

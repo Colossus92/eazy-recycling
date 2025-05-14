@@ -95,8 +95,8 @@ CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     AS $$begin
   insert into public.profiles (id, first_name, last_name)
   values (
-    new.id, 
-    new.raw_user_meta_data->>'first_name', 
+    new.id,
+    new.raw_user_meta_data->>'first_name',
     new.raw_user_meta_data->>'last_name'
     );
   return new;
@@ -188,7 +188,8 @@ CREATE TABLE IF NOT EXISTS "public"."locations" (
     "id" character varying(255) NOT NULL,
     "location_type_code" character varying(255),
     "postal_code" character varying(255),
-    "street_name" character varying(255)
+    "street_name" character varying(255),
+    CONSTRAINT locations_postal_building_unique UNIQUE (postal_code, building_number)
 );
 
 
