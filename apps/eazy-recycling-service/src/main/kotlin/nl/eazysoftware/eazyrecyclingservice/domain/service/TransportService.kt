@@ -77,7 +77,7 @@ class TransportService(
     }
 
     fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        val truck = request.licensePlate?.let { findTruck(it) }
+        val truck = request.truckId?.let { findTruck(it) }
         val consignorParty = companyRepository.findById(request.consignorPartyId)
             .getOrNull()
             ?: throw EntityNotFoundException("Company with id $request.customerId not found")
@@ -178,7 +178,7 @@ class TransportService(
             deliveryDateTime = request.deliveryDateTime,
             containerType = request.containerType,
             transportType = request.typeOfTransport,
-            truck = request.licensePlate?.let { findTruck(it) },
+            truck = request.truckId?.let { findTruck(it) },
             driver = request.driverId?.let { findDriver(it) },
         )
 

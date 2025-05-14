@@ -11,7 +11,6 @@ data class CreateContainerTransportRequest(
     val deliveryDateTime: LocalDateTime,
     val containerType: String?,
     val typeOfTransport: TransportType,
-    val licensePlate: String?,
     val driverId: UUID?,
     val carrierPartyId: UUID,
     val pickupPartyId: String?,
