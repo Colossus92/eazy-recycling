@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class CreateContainerTransportRequest(
     val id: String?,
@@ -25,6 +25,9 @@ data class CreateContainerTransportRequest(
     val deliveryHouseNumber: String,
     val deliveryPostalCode: String,
     val deliveryCity: String,
+    val truckId: String?,
+    val driver: UUID?,
+    val containerId: UUID?,
 )
 
 data class AddressRequest(

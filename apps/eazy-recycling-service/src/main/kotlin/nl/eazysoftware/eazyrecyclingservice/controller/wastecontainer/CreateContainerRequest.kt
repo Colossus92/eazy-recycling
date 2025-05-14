@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import java.util.UUID

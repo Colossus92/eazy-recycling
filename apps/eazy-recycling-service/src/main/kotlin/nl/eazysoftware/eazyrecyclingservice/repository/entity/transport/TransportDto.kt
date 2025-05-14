@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 
 import jakarta.persistence.*
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.driver.Driver
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDateTime
@@ -64,7 +64,7 @@ data class TransportDto(
 
     @ManyToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = true)
-    val driver: Driver? = null,
+    val driver: ProfileDto? = null,
 
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_id", referencedColumnName = "uuid")

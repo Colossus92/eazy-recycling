@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import io.github.jan.supabase.auth.user.UserInfo
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest
@@ -8,10 +9,10 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
 import nl.eazysoftware.eazyrecyclingservice.repository.*
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.driver.Driver
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
@@ -27,7 +28,7 @@ import kotlin.jvm.optionals.getOrNull
 class TransportService(
     private val transportRepository: TransportRepository,
     private val truckRepository: TruckRepository,
-    private val driverRepository: DriverRepository,
+    private val profileRepository: ProfileRepository,
     private val locationRepository: LocationRepository,
     private val companyRepository: CompanyRepository,
     private val entityManager: EntityManager,
@@ -60,7 +61,7 @@ class TransportService(
         val truck = truckRepository.findByLicensePlate(licensePlate)
             ?: throw EntityNotFoundException("Truck with $licensePlate not found")
 
-        val driver = driverRepository.findById(driverId)
+        val driver = profileRepository.findById(driverId)
             .orElseThrow { EntityNotFoundException("Driver with id $driverId not found") }
 
         return transportRepository.save(
@@ -236,9 +237,7 @@ class TransportService(
             ?: throw EntityNotFoundException("Truck with $licensePlate not found")
     }
 
-    private fun findDriver(driverId: UUID): Driver? {
-        return driverRepository.findById(driverId)
-            .getOrNull()
-            ?: throw EntityNotFoundException("Driver with id $driverId not found")
+    private fun findDriver(driverId: UUID): ProfileDto? {
+        return profileRepository.getReferenceById(driverId)
     }
 }

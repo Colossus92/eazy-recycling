@@ -5,7 +5,11 @@ import nl.eazysoftware.eazyrecyclingservice.controller.user.CreateUserRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.user.UpdateUserRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.UserRepository
 import org.springframework.stereotype.Service
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 
+//TODO refactor to use ProfileDto?
 @Service
 class UserService(
     private val userRepository: UserRepository
@@ -29,6 +33,20 @@ class UserService(
 
     fun updateUser(id: String, updateUserRequest: UpdateUserRequest) {
         return userRepository.updateUser(id, updateUserRequest)
+    }
+
+    fun findAllDrivers(): List<UserInfo> {
+        return userRepository.getAllUsers()
+            .filter { user ->
+                user.userMetadata?.get("roles")?.let { rolesJson ->
+                    when (rolesJson) {
+                        is JsonArray -> rolesJson.any { role ->
+                            (role as? JsonPrimitive)?.content == Roles.DRIVER.description
+                        }
+                        else -> false
+                    }
+                } ?: false
+            }
     }
 
 }

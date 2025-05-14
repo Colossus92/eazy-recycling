@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.driver.Driver
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 
 
 data class PlanningView(
@@ -22,7 +22,7 @@ data class TransportView(
     val truck: Truck?,
     val originCity: String?,
     val destinationCity: String?,
-    val driver: Driver?,
+    val driver: ProfileDto?,
     val status: TransportDto.Status,
     val displayNumber: String?,
 ) {
