@@ -39,11 +39,6 @@ class TransportController(
         return transportService.updateTransport(request)
     }
 
-    @GetMapping("/{pickupDate}")
-    fun getTransportByDateSortedByTruck(@PathVariable("pickupDate") pickupDate: LocalDate): Map<String, List<TransportDto>> {
-        return transportService.getTransportByDateSortedByTruck(pickupDate)
-    }
-
     @GetMapping("/planning/{pickupDate}")
     fun getPlanningByDate(@PathVariable("pickupDate") pickupDate: LocalDate): PlanningView {
         return transportService.getPlanningByDate(pickupDate)
