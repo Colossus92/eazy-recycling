@@ -57,14 +57,23 @@ class TransportService(
             postalCode = request.pickupPostalCode,
             city = request.pickupCity,
         ))
-        val deliveryLocation = findOrCreateLocation(
-            AddressRequest(
-                streetName = request.deliveryStreet,
-                buildingNumber = request.deliveryHouseNumber,
-                postalCode = request.deliveryPostalCode,
-                city = request.deliveryCity,
+        
+        // For delivery location, check if it's the same as pickup location (by postal code and building number)
+        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode && 
+                                  request.pickupHouseNumber == request.deliveryHouseNumber) {
+            // If they're the same, reuse the pickup location to avoid unique constraint violation
+            pickupLocation
+        } else {
+            // Otherwise, find or create a new location
+            findOrCreateLocation(
+                AddressRequest(
+                    streetName = request.deliveryStreet,
+                    buildingNumber = request.deliveryHouseNumber,
+                    postalCode = request.deliveryPostalCode,
+                    city = request.deliveryCity,
+                )
             )
-        )
+        }
 
         val transport = TransportDto(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
@@ -72,10 +81,10 @@ class TransportService(
             pickupDateTime = request.pickupDateTime,
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
-            truck = entityManager.getReference(Truck::class.java, request.truckId),
-            driver = entityManager.getReference(ProfileDto::class.java, request.driverId),
+            truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
+            driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
             transportType = request.typeOfTransport,
-            wasteContainer = entityManager.getReference(WasteContainerDto::class.java, request.containerId),
+            wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
         )
 
@@ -118,37 +127,42 @@ class TransportService(
     fun updateTransport(request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(UUID.fromString(request.id))
             .orElseThrow { EntityNotFoundException("Transport with id ${request.id} not found") }
+            
+        val pickupLocation = findOrCreateLocation(AddressRequest(
+            streetName = request.pickupStreet,
+            buildingNumber = request.pickupHouseNumber,
+            postalCode = request.pickupPostalCode,
+            city = request.pickupCity
+        ))
+        
+        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
+                                  request.pickupHouseNumber == request.deliveryHouseNumber) {
+            pickupLocation
+        } else {
+            findOrCreateLocation(AddressRequest(
+                streetName = request.deliveryStreet,
+                buildingNumber = request.deliveryHouseNumber,
+                postalCode = request.deliveryPostalCode,
+                city = request.deliveryCity
+            ))
+        }
+            
         val updatedTransport = transport.copy(
-            consignorParty = companyRepository.findById(request.consignorPartyId)
-                .orElseThrow { EntityNotFoundException("Company with id ${request.consignorPartyId} not found") },
-            pickupLocation = findOrCreateLocation(
-                AddressRequest(
-                    streetName = request.pickupStreet,
-                    buildingNumber = request.pickupHouseNumber,
-                    postalCode = request.pickupPostalCode,
-                    city = request.pickupCity,
-                )
-            ),
+            consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
+            pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
-            deliveryLocation = findOrCreateLocation(
-                AddressRequest(
-                    streetName = request.deliveryStreet,
-                    buildingNumber = request.deliveryHouseNumber,
-                    postalCode = request.deliveryPostalCode,
-                    city = request.deliveryCity,
-                )
-            ),
+            deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
-            wasteContainer = entityManager.getReference(WasteContainerDto::class.java, request.containerId),
+            wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             transportType = request.typeOfTransport,
-            truck = entityManager.getReference(Truck::class.java, request.truckId),
-            driver = entityManager.getReference(ProfileDto::class.java, request.driverId),
+            truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
+            driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
         )
 
         return transportRepository.save(updatedTransport)
     }
 
-    private fun findOrCreateLocation(address: AddressRequest) =
+    fun findOrCreateLocation(address: AddressRequest) =
         (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
             address.postalCode,
             address.buildingNumber
