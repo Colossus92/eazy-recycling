@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
-import io.github.jan.supabase.auth.user.UserInfo
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest

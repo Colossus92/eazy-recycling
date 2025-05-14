@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.user
 
-import io.github.jan.supabase.auth.user.UserInfo
 import nl.eazysoftware.eazyrecyclingservice.domain.service.UserService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
