@@ -33,21 +33,21 @@ data class TransportDto(
     /**
      * The party client ordering the transport
      */
-    @ManyToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     @JoinColumn(name = "consignor_party_id", referencedColumnName = "id")
     val consignorParty: CompanyDto,
 
-    @ManyToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
     val carrierParty: CompanyDto,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne
     @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
     val pickupLocation: LocationDto,
 
     val pickupDateTime: LocalDateTime,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
     val deliveryLocation: LocationDto,
 
@@ -57,7 +57,7 @@ data class TransportDto(
     @Column(nullable = true)
     val transportType: TransportType? = null,
 
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne
     @JoinColumn(name = "container_id", referencedColumnName = "uuid")
     val wasteContainer: WasteContainerDto? = null,
 

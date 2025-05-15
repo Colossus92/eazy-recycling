@@ -207,4 +207,8 @@ class TransportService(
             monday.plus(dayOffset, ChronoUnit.DAYS)
         }
     }
+
+    fun deleteTransport(id: UUID) {
+        transportRepository.deleteById(id)
+    }
 }

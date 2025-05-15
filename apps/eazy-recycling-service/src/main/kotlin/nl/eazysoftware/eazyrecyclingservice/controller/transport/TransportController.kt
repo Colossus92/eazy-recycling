@@ -4,14 +4,18 @@ import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportR
 import nl.eazysoftware.eazyrecyclingservice.controller.CreateWaybillTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.util.UUID
 
 @RestController
 @RequestMapping("/transport")
@@ -42,5 +46,11 @@ class TransportController(
     @GetMapping("/planning/{pickupDate}")
     fun getPlanningByDate(@PathVariable("pickupDate") pickupDate: LocalDate): PlanningView {
         return transportService.getPlanningByDate(pickupDate)
+    }
+
+    @DeleteMapping(path = ["/{id}"])
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteTransport(@PathVariable("id") id: UUID) {
+        transportService.deleteTransport(id)
     }
 }
