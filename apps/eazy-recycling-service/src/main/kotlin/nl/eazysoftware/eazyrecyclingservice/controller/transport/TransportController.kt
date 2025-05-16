@@ -28,6 +28,11 @@ class TransportController(
         return transportService.getAllTransports()
     }
 
+    @GetMapping(path = ["/{id}"])
+    fun getTransportById(@PathVariable id: UUID): TransportDto {
+        return transportService.getTransportById(id)
+    }
+
     @PostMapping("/waybill")
     fun assignWaybillTransport(@RequestBody request: CreateWaybillTransportRequest): TransportDto {
         return transportService.assignWaybillTransport(request.waybillId, request.licensePlate, request.driverId)
@@ -44,7 +49,7 @@ class TransportController(
     }
 
     @GetMapping("/planning/{pickupDate}")
-    fun getPlanningByDate(@PathVariable("pickupDate") pickupDate: LocalDate): PlanningView {
+    fun getPlanningByDate(@PathVariable pickupDate: LocalDate): PlanningView {
         return transportService.getPlanningByDate(pickupDate)
     }
 

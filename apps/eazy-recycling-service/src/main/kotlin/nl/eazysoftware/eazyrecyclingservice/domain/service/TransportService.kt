@@ -17,6 +17,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.slf4j.LoggerFactory
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -51,16 +52,19 @@ class TransportService(
     }
 
     fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        val pickupLocation = findOrCreateLocation(AddressRequest(
-            streetName = request.pickupStreet,
-            buildingNumber = request.pickupHouseNumber,
-            postalCode = request.pickupPostalCode,
-            city = request.pickupCity,
-        ))
-        
+        val pickupLocation = findOrCreateLocation(
+            AddressRequest(
+                streetName = request.pickupStreet,
+                buildingNumber = request.pickupHouseNumber,
+                postalCode = request.pickupPostalCode,
+                city = request.pickupCity,
+            )
+        )
+
         // For delivery location, check if it's the same as pickup location (by postal code and building number)
-        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode && 
-                                  request.pickupHouseNumber == request.deliveryHouseNumber) {
+        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
+            request.pickupHouseNumber == request.deliveryHouseNumber
+        ) {
             // If they're the same, reuse the pickup location to avoid unique constraint violation
             pickupLocation
         } else {
@@ -127,26 +131,31 @@ class TransportService(
     fun updateTransport(request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(UUID.fromString(request.id))
             .orElseThrow { EntityNotFoundException("Transport with id ${request.id} not found") }
-            
-        val pickupLocation = findOrCreateLocation(AddressRequest(
-            streetName = request.pickupStreet,
-            buildingNumber = request.pickupHouseNumber,
-            postalCode = request.pickupPostalCode,
-            city = request.pickupCity
-        ))
-        
+
+        val pickupLocation = findOrCreateLocation(
+            AddressRequest(
+                streetName = request.pickupStreet,
+                buildingNumber = request.pickupHouseNumber,
+                postalCode = request.pickupPostalCode,
+                city = request.pickupCity
+            )
+        )
+
         val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
-                                  request.pickupHouseNumber == request.deliveryHouseNumber) {
+            request.pickupHouseNumber == request.deliveryHouseNumber
+        ) {
             pickupLocation
         } else {
-            findOrCreateLocation(AddressRequest(
-                streetName = request.deliveryStreet,
-                buildingNumber = request.deliveryHouseNumber,
-                postalCode = request.deliveryPostalCode,
-                city = request.deliveryCity
-            ))
+            findOrCreateLocation(
+                AddressRequest(
+                    streetName = request.deliveryStreet,
+                    buildingNumber = request.deliveryHouseNumber,
+                    postalCode = request.deliveryPostalCode,
+                    city = request.deliveryCity
+                )
+            )
         }
-            
+
         val updatedTransport = transport.copy(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
             pickupLocation = pickupLocation,
@@ -210,5 +219,10 @@ class TransportService(
 
     fun deleteTransport(id: UUID) {
         transportRepository.deleteById(id)
+    }
+
+    fun getTransportById(id: UUID): TransportDto {
+        return transportRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 }
