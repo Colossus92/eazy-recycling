@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
@@ -49,8 +50,13 @@ class TransportController(
     }
 
     @GetMapping("/planning/{pickupDate}")
-    fun getPlanningByDate(@PathVariable pickupDate: LocalDate): PlanningView {
-        return transportService.getPlanningByDate(pickupDate)
+    fun getPlanningByDate(
+        @PathVariable pickupDate: LocalDate,
+        @RequestParam(required = false) truckId: String? = null,
+        @RequestParam(required = false) driverId: UUID? = null,
+        @RequestParam(required = false) status: String? = null
+    ): PlanningView {
+        return transportService.getPlanningByDate(pickupDate, truckId, driverId, status)
     }
 
     @DeleteMapping(path = ["/{id}"])
