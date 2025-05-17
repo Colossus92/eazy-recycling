@@ -81,8 +81,10 @@ class TransportService(
 
         val transport = TransportDto(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
+            pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.pickupCompanyId) },
             pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
+            deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.deliveryCompanyId) },
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
             truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },

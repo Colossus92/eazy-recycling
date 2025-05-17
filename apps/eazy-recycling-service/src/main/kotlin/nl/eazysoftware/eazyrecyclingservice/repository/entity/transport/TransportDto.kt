@@ -41,11 +41,28 @@ data class TransportDto(
     @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
     val carrierParty: CompanyDto,
 
+    /**
+     * This is the company that is located at the pickup location.
+     *
+     * This is not necessarily the Pickup Party! The pickup party is the company disposing the waste.
+     */
+    @ManyToOne
+    @JoinColumn(name = "pickup_company_id", referencedColumnName = "id")
+    val pickupCompany: CompanyDto?,
+
     @OneToOne
     @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
     val pickupLocation: LocationDto,
 
     val pickupDateTime: LocalDateTime,
+
+    /**
+     * This is the company that is located at the delivery location.
+     *
+     */
+    @ManyToOne
+    @JoinColumn(name = "delivery_company_id", referencedColumnName = "id")
+    val deliveryCompany: CompanyDto?,
 
     @OneToOne
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
