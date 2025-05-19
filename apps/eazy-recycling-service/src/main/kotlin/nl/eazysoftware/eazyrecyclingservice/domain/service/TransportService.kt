@@ -166,7 +166,7 @@ class TransportService(
             deliveryDateTime = request.deliveryDateTime,
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             transportType = request.transportType,
-            truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
+            truck = if (request.truckId?.isNotEmpty() ?: false) entityManager.getReference(Truck::class.java, request.truckId) else null,
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
         )
 
