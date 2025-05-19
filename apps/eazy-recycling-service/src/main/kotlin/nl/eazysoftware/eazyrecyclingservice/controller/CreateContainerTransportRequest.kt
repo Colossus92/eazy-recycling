@@ -5,11 +5,10 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class CreateContainerTransportRequest(
-    val id: String?,
     val consignorPartyId: UUID,
     val pickupDateTime: LocalDateTime,
     val deliveryDateTime: LocalDateTime,
-    val typeOfTransport: TransportType,
+    val transportType: TransportType,
     val driverId: UUID?,
     val carrierPartyId: UUID,
     val pickupCompanyId: UUID?,

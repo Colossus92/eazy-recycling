@@ -44,9 +44,9 @@ class TransportController(
         return transportService.createContainerTransport(request)
     }
 
-    @PutMapping
-    fun updateTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
-        return transportService.updateTransport(request)
+    @PutMapping(path = ["/{id}"])
+    fun updateTransport(@PathVariable id: UUID, @RequestBody request: CreateContainerTransportRequest): TransportDto {
+        return transportService.updateTransport(id, request)
     }
 
     @GetMapping("/planning/{pickupDate}")
