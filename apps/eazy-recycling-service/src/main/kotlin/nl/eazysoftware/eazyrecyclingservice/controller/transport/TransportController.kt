@@ -4,18 +4,8 @@ import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportR
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
-import java.util.UUID
+import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("/transport")
@@ -46,16 +36,6 @@ class TransportController(
     @PutMapping(path = ["/{id}"])
     fun updateTransport(@PathVariable id: UUID, @RequestBody request: CreateContainerTransportRequest): TransportDto {
         return transportService.updateTransport(id, request)
-    }
-
-    @GetMapping("/planning/{pickupDate}")
-    fun getPlanningByDate(
-        @PathVariable pickupDate: LocalDate,
-        @RequestParam(required = false) truckId: String? = null,
-        @RequestParam(required = false) driverId: UUID? = null,
-        @RequestParam(required = false) status: String? = null
-    ): PlanningView {
-        return transportService.getPlanningByDate(pickupDate, truckId, driverId, status)
     }
 
     @DeleteMapping(path = ["/{id}"])

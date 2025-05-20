@@ -124,12 +124,6 @@ class TransportService(
         return entityManager.merge(updatedTransport)
     }
 
-    fun findCompany(company: CompanyDto): CompanyDto {
-        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
-            ?: company
-
-    }
-
     fun updateTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(id)
             .orElseThrow { EntityNotFoundException("Transport with id $id not found") }
@@ -173,7 +167,16 @@ class TransportService(
         return transportRepository.save(updatedTransport)
     }
 
-    fun findOrCreateLocation(address: AddressRequest) =
+    fun deleteTransport(id: UUID) {
+        transportRepository.deleteById(id)
+    }
+
+    fun getTransportById(id: UUID): TransportDto {
+        return transportRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException("Transport with id $id not found")
+    }
+
+    private fun findOrCreateLocation(address: AddressRequest) =
         (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
             address.postalCode,
             address.buildingNumber
@@ -189,52 +192,10 @@ class TransportService(
                 id = UUID.randomUUID().toString()
             ))
 
-    fun getPlanningByDate(
-        pickupDate: LocalDate,
-        truckId: String? = null,
-        driverId: UUID? = null,
-        status: String? = null
-    ): PlanningView {
-        val daysInWeek = getDaysInWeek(pickupDate)
-        val statuses = status?.split(',') ?: emptyList()
-        
-        // Get all transports for the week
-        val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay(),
-            daysInWeek.last().atTime(23, 59, 59))
-            .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
-            .filter { transport -> driverId == null || transport.driver?.id == driverId }
-            .filter { transport -> statuses.isEmpty() || statuses.contains(transport.getStatus().name) }
 
-        val dateInfo = daysInWeek.map { it.toString() }
+    private fun findCompany(company: CompanyDto): CompanyDto {
+        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
+            ?: company
 
-
-        val transportsView = transports.map { transportDto -> TransportView(transportDto) }
-            .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
-            .map { (truckLicensePlate, transportViews) ->
-                TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
-            }
-
-        return PlanningView(dateInfo, transportsView)
-    }
-
-    private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
-        // Find the first day of the week (Monday) for the given date
-        val dayOfWeek = day.dayOfWeek.ordinal.toLong()
-        val monday = day.minus(dayOfWeek, ChronoUnit.DAYS)
-
-        // Create a list with all 7 days of the week
-        return (0L..6L).map { dayOffset ->
-            monday.plus(dayOffset, ChronoUnit.DAYS)
-        }
-    }
-
-    fun deleteTransport(id: UUID) {
-        transportRepository.deleteById(id)
-    }
-
-    fun getTransportById(id: UUID): TransportDto {
-        return transportRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 }

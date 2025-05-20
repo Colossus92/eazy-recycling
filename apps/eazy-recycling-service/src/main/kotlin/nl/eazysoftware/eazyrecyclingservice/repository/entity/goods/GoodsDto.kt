@@ -18,12 +18,15 @@ data class GoodsDto(
     val goodsItem: GoodsItemDto,
 
     /**
-     * The party actually disposing the goods
+     * The party receiving the goods after the transport is finished.
      */
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "consignee_party_id", referencedColumnName = "id")
     val consigneeParty: CompanyDto,
 
+    /**
+     * The party actually disposing the goods, this does not have to be the same company or location at the pickup location.
+     */
     @ManyToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "pickup_party_id", referencedColumnName = "id")
     val pickupParty: CompanyDto,
