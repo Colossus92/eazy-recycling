@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
@@ -39,18 +39,18 @@ class CompanyController(
     }
 
     data class CompanyRequest(
-            val chamberOfCommerceId: String?,
-            val vihbId: String?,
-            val name: String?,
-            val address: AddressRequest?,
+        val chamberOfCommerceId: String?,
+        val vihbId: String?,
+        val name: String?,
+        val address: AddressRequest?,
     )
 
     data class AddressRequest(
-            val streetName: String,
-            val buildingName: String? = null,
-            val buildingNumber: String,
-            val postalCode: String,
-            val city: String,
-            val country: String = "Nederland",
+        val streetName: String,
+        val buildingName: String? = null,
+        val buildingNumber: String,
+        val postalCode: String,
+        val city: String,
+        val country: String = "Nederland",
     )
 }

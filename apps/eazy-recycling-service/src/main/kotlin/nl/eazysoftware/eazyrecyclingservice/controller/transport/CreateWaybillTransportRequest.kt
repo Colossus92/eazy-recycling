@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import java.util.UUID
 

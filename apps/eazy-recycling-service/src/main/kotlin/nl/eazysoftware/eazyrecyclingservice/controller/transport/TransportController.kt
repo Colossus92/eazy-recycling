@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
-import nl.eazysoftware.eazyrecyclingservice.controller.CreateWaybillTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.http.HttpStatus

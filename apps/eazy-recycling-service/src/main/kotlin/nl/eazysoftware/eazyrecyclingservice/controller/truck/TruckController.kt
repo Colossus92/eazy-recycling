@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.truck
 
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TruckService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
