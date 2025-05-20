@@ -24,7 +24,7 @@ class TransportController(
     }
 
     @PostMapping("/waybill")
-    fun assignWaybillTransport(@RequestBody request: CreateWaybillTransportRequest): TransportDto {
+    fun assignWaybillTransport(@RequestBody request: AssignWaybillTransportRequest): TransportDto {
         return transportService.assignWaybillTransport(request.waybillId, request.licensePlate, request.driverId)
     }
 
