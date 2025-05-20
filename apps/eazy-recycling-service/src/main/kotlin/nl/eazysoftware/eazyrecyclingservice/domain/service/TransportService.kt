@@ -4,10 +4,9 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
-import nl.eazysoftware.eazyrecyclingservice.repository.*
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -20,8 +19,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Service
