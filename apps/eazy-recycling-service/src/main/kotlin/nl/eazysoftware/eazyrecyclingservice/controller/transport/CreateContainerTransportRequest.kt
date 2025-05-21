@@ -1,34 +1,26 @@
-package nl.eazysoftware.eazyrecyclingservice.controller
+package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
-data class CreateContainerTransportRequest(
-    val consignorPartyId: UUID,
-    val pickupDateTime: LocalDateTime,
-    val deliveryDateTime: LocalDateTime,
-    val transportType: TransportType,
-    val driverId: UUID?,
-    val carrierPartyId: UUID,
-    val pickupCompanyId: UUID?,
-    val pickupStreet: String,
-    val pickupHouseNumber: String,
-    val pickupPostalCode: String,
-    val pickupCity: String,
-    val deliveryCompanyId: UUID?,
-    val deliveryStreet: String,
-    val deliveryHouseNumber: String,
-    val deliveryPostalCode: String,
-    val deliveryCity: String,
-    val truckId: String?,
-    val containerId: UUID?,
-)
-
-data class AddressRequest(
-    val streetName: String,
-    val buildingNumber: String,
-    val postalCode: String,
-    val city: String,
-    val country: String = "Nederland"
+open class CreateContainerTransportRequest(
+    open val consignorPartyId: UUID,
+    open val pickupDateTime: LocalDateTime,
+    open val deliveryDateTime: LocalDateTime,
+    open val transportType: TransportType,
+    open val driverId: UUID?,
+    open val carrierPartyId: UUID,
+    open val pickupCompanyId: UUID?,
+    open val pickupStreet: String,
+    open val pickupBuildingNumber: String,
+    open val pickupPostalCode: String,
+    open val pickupCity: String,
+    open val deliveryCompanyId: UUID?,
+    open val deliveryStreet: String,
+    open val deliveryBuildingNumber: String,
+    open val deliveryPostalCode: String,
+    open val deliveryCity: String,
+    open val truckId: String?,
+    open val containerId: UUID?,
 )

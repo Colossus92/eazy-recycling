@@ -8,8 +8,14 @@ import java.util.*
 @Entity
 @Table(name = "goods")
 data class GoodsDto(
+    /**
+     * Waybill ID field
+     */
     val id: String,
 
+    /**
+     * Waybill UUID field
+     */
     @Id val uuid: UUID,
     val note: String,
 

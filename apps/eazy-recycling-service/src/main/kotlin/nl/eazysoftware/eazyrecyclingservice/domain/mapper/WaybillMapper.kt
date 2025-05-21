@@ -39,7 +39,7 @@ abstract class WaybillMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "transportType", ignore = true)
     @Mapping(target = "displayNumber", ignore = true)
-    @Mapping(target = "wasteContainer", ignore = true)
+    @Mapping(target = "wasteContainer", ignore = true) // TODO resolve container
     @Mapping(target = "driver", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     abstract fun toDto(waybill: Waybill): TransportDto
@@ -50,7 +50,6 @@ abstract class WaybillMapper {
     @Mapping(target = "unit", expression = "java(toUnit(source))")
     @Mapping(target = "name", expression = "java(toName(source))")
     @Mapping(target = "euralCode", expression = "java(toEuralCode(source))")
-    @Mapping(target = "containerNumber", expression = "java(toContainerNumber(source))")
     abstract fun toDto(source: GoodsItemType): GoodsItemDto
 
     @Mapping(target = "id", expression = "java(toLocationId(source))")

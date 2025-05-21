@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
-import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.http.HttpStatus
@@ -31,6 +30,11 @@ class TransportController(
     @PostMapping("/container")
     fun createContainerTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
         return transportService.createContainerTransport(request)
+    }
+
+    @PostMapping("/waste")
+    fun createWasteTransport(@RequestBody request: CreateWasteTransportRequest): TransportDto {
+        return transportService.createWaybillTransport(request)
     }
 
     @PutMapping(path = ["/{id}"])

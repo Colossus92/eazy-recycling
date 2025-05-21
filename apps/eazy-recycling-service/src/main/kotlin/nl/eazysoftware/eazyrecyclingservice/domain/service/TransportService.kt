@@ -2,12 +2,15 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.controller.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.controller.CreateContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.AddressRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
@@ -49,39 +52,60 @@ class TransportService(
     }
 
     fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        val pickupLocation = findOrCreateLocation(
-            AddressRequest(
-                streetName = request.pickupStreet,
-                buildingNumber = request.pickupHouseNumber,
-                postalCode = request.pickupPostalCode,
-                city = request.pickupCity,
-            )
+        return createBaseTransport(request = request, goods = null)
+    }
+
+    fun createWaybillTransport(request: CreateWasteTransportRequest): TransportDto {
+        val goodsItem = GoodsItemDto(
+            wasteStreamNumber = request.wasteStreamNumber,
+            netNetWeight = request.weight,
+            unit = request.unit,
+            quantity = request.quantity,
+            euralCode = request.euralCode,
+            name = request.goodsName,
         )
 
-        // For delivery location, check if it's the same as pickup location (by postal code and building number)
+        val goods = GoodsDto(
+            id = UUID.randomUUID().toString(),
+            uuid = UUID.randomUUID(),
+            note = request.note,
+            goodsItem = goodsItem,
+            consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
+            pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId),
+        )
+
+        return createBaseTransport(request = request, goods = goods)
+    }
+
+    private fun createBaseTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
+        // Common location handling logic
+        val pickupLocation = findOrCreateLocation(AddressRequest(
+            streetName = request.deliveryStreet,
+            buildingNumber = request.deliveryBuildingNumber,
+            postalCode = request.deliveryPostalCode,
+            city = request.deliveryCity
+        ))
+
+        // Check if delivery location is the same as pickup
         val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
-            request.pickupHouseNumber == request.deliveryHouseNumber
-        ) {
-            // If they're the same, reuse the pickup location to avoid unique constraint violation
+            request.pickupBuildingNumber == request.deliveryBuildingNumber) {
             pickupLocation
         } else {
-            // Otherwise, find or create a new location
-            findOrCreateLocation(
-                AddressRequest(
-                    streetName = request.deliveryStreet,
-                    buildingNumber = request.deliveryHouseNumber,
-                    postalCode = request.deliveryPostalCode,
-                    city = request.deliveryCity,
-                )
-            )
+            findOrCreateLocation(AddressRequest(
+                streetName = request.deliveryStreet,
+                buildingNumber = request.deliveryBuildingNumber,
+                postalCode = request.deliveryPostalCode,
+                city = request.deliveryCity
+            ))
         }
 
+        // Create and return the transport
         val transport = TransportDto(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
-            pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.pickupCompanyId) },
+            pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
             pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
-            deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.deliveryCompanyId) },
+            deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
             truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
@@ -89,10 +113,10 @@ class TransportService(
             transportType = request.transportType,
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
+            goods = goods
         )
 
-        log.info("Creating container transport: $transport")
-
+        log.info("Creating transport: $transport")
         return transportRepository.save(transport)
     }
 
@@ -128,21 +152,21 @@ class TransportService(
         val pickupLocation = findOrCreateLocation(
             AddressRequest(
                 streetName = request.pickupStreet,
-                buildingNumber = request.pickupHouseNumber,
+                buildingNumber = request.pickupBuildingNumber,
                 postalCode = request.pickupPostalCode,
                 city = request.pickupCity
             )
         )
 
         val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
-            request.pickupHouseNumber == request.deliveryHouseNumber
+            request.pickupBuildingNumber == request.deliveryBuildingNumber
         ) {
             pickupLocation
         } else {
             findOrCreateLocation(
                 AddressRequest(
                     streetName = request.deliveryStreet,
-                    buildingNumber = request.deliveryHouseNumber,
+                    buildingNumber = request.deliveryBuildingNumber,
                     postalCode = request.deliveryPostalCode,
                     city = request.deliveryCity
                 )

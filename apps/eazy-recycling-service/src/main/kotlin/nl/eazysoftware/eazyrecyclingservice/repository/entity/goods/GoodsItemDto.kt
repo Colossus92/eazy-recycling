@@ -14,5 +14,4 @@ data class GoodsItemDto(
     val quantity: Int,
     val name: String,
     val euralCode: String,
-    val containerNumber: String,
 )
