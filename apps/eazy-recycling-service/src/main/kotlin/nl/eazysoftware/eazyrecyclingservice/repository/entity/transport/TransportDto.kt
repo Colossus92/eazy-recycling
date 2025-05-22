@@ -91,6 +91,8 @@ data class TransportDto(
     @JoinColumn(name = "driver_id", referencedColumnName = "id", nullable = true)
     val driver: ProfileDto? = null,
 
+    val note: String,
+
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_id", referencedColumnName = "uuid")
     val goods: GoodsDto? = null,

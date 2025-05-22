@@ -23,4 +23,5 @@ open class CreateContainerTransportRequest(
     open val deliveryCity: String,
     open val truckId: String?,
     open val containerId: UUID?,
+    open val note: String,
 )

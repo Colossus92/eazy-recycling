@@ -17,7 +17,6 @@ data class GoodsDto(
      * Waybill UUID field
      */
     @Id val uuid: UUID,
-    val note: String,
 
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_item_id", referencedColumnName = "id")

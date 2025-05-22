@@ -21,7 +21,7 @@ import java.time.LocalDateTime
 )
 abstract class WaybillMapper {
 
-    @Mapping(target = "goods.note", expression = "java(toNote(waybill))")
+    @Mapping(target = "note", expression = "java(toNote(waybill))")
     @Mapping(source = "ID", target = "goods.id")
     @Mapping(source = "UUID", target = "goods.uuid")
     @Mapping(target = "goods.consigneeParty", expression = "java(toConsigneeDto(waybill))")

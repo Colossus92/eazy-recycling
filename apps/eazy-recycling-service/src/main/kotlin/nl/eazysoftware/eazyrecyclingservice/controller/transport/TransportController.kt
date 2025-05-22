@@ -32,14 +32,19 @@ class TransportController(
         return transportService.createContainerTransport(request)
     }
 
-    @PostMapping("/waste")
-    fun createWasteTransport(@RequestBody request: CreateWasteTransportRequest): TransportDto {
-        return transportService.createWaybillTransport(request)
+    @PutMapping(path = ["/container/{id}"])
+    fun updateContainerTransport(@PathVariable id: UUID, @RequestBody request: CreateContainerTransportRequest): TransportDto {
+        return transportService.updateContainerTransport(id, request)
     }
 
-    @PutMapping(path = ["/{id}"])
-    fun updateTransport(@PathVariable id: UUID, @RequestBody request: CreateContainerTransportRequest): TransportDto {
-        return transportService.updateTransport(id, request)
+    @PostMapping("/waste")
+    fun createWasteTransport(@RequestBody request: CreateWasteTransportRequest): TransportDto {
+        return transportService.createWasteTransport(request)
+    }
+
+    @PutMapping(path = ["/waste/{id}"])
+    fun updateWasteTransport(@PathVariable id: UUID, @RequestBody request: CreateWasteTransportRequest): TransportDto {
+        return transportService.updateWasteTransport(id, request)
     }
 
     @DeleteMapping(path = ["/{id}"])

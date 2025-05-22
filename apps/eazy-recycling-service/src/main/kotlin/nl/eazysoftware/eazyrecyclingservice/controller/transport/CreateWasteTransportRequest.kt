@@ -25,13 +25,13 @@ data class CreateWasteTransportRequest(
     override val deliveryCity: String,
     override val truckId: String?,
     override val containerId: UUID?,
+    override val note: String,
     val wasteStreamNumber: String,
     val weight: Int,
     val unit: String,
     val quantity: Int,
     val goodsName: String,
     val euralCode: String,
-    val note: String,
 ): CreateContainerTransportRequest( // Waste transport is also a container transport
     consignorPartyId = consignorPartyId,
     pickupDateTime = pickupDateTime,
@@ -51,4 +51,5 @@ data class CreateWasteTransportRequest(
     deliveryCity = deliveryCity,
     truckId = truckId,
     containerId = containerId,
+    note = note,
 )

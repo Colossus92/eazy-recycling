@@ -52,10 +52,10 @@ class TransportService(
     }
 
     fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        return createBaseTransport(request = request, goods = null)
+        return createContainerTransport(request = request, goods = null)
     }
 
-    fun createWaybillTransport(request: CreateWasteTransportRequest): TransportDto {
+    fun createWasteTransport(request: CreateWasteTransportRequest): TransportDto {
         val goodsItem = GoodsItemDto(
             wasteStreamNumber = request.wasteStreamNumber,
             netNetWeight = request.weight,
@@ -68,16 +68,15 @@ class TransportService(
         val goods = GoodsDto(
             id = UUID.randomUUID().toString(),
             uuid = UUID.randomUUID(),
-            note = request.note,
             goodsItem = goodsItem,
-            consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
-            pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId),
+            consigneeParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.consigneePartyId)),
+            pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId)),
         )
 
-        return createBaseTransport(request = request, goods = goods)
+        return createContainerTransport(request = request, goods = goods)
     }
 
-    private fun createBaseTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
+    private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
         // Common location handling logic
         val pickupLocation = findOrCreateLocation(AddressRequest(
             streetName = request.deliveryStreet,
@@ -113,7 +112,8 @@ class TransportService(
             transportType = request.transportType,
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
-            goods = goods
+            goods = goods,
+            note = request.note,
         )
 
         log.info("Creating transport: $transport")
@@ -145,9 +145,84 @@ class TransportService(
         return entityManager.merge(updatedTransport)
     }
 
-    fun updateTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
+    fun updateContainerTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
+        return transportRepository.save(getUpdatedTransport(id, request))
+    }
+
+    @Transactional
+    fun updateWasteTransport(id: UUID, request: CreateWasteTransportRequest): TransportDto {
+        var transport = getUpdatedTransport(id, request)
+
+        // Update goods information if it exists
+        val updatedGoods = transport.goods?.let { existingGoods ->
+            val goodsItem = existingGoods.goodsItem.copy(
+                wasteStreamNumber = request.wasteStreamNumber,
+                netNetWeight = request.weight,
+                unit = request.unit,
+                quantity = request.quantity,
+                euralCode = request.euralCode,
+                name = request.goodsName
+            )
+
+            existingGoods.copy(
+                goodsItem = goodsItem,
+                consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
+                pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId)
+            )
+        } ?: GoodsDto(
+            id = UUID.randomUUID().toString(),
+            uuid = UUID.randomUUID(),
+            goodsItem = GoodsItemDto(
+                wasteStreamNumber = request.wasteStreamNumber,
+                netNetWeight = request.weight,
+                unit = request.unit,
+                quantity = request.quantity,
+                euralCode = request.euralCode,
+                name = request.goodsName
+            ),
+            consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
+            pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId)
+        )
+
+        transport = transport.copy(goods = updatedGoods)
+
+        return transportRepository.save(transport)
+    }
+
+    fun deleteTransport(id: UUID) {
+        transportRepository.deleteById(id)
+    }
+
+    fun getTransportById(id: UUID): TransportDto {
+        return transportRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException("Transport with id $id not found")
+    }
+
+    private fun findOrCreateLocation(address: AddressRequest) =
+        (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
+            address.postalCode,
+            address.buildingNumber
+        )
+            ?: LocationDto(
+                address = AddressDto(
+                    streetName = address.streetName,
+                    buildingNumber = address.buildingNumber,
+                    postalCode = address.postalCode,
+                    city = address.city,
+                    country = address.country
+                ),
+                id = UUID.randomUUID().toString()
+            ))
+
+
+    private fun findCompany(company: CompanyDto): CompanyDto {
+        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
+            ?: company
+    }
+
+    private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(id)
-            .orElseThrow { EntityNotFoundException("Transport with id $id not found") }
+        .orElseThrow { EntityNotFoundException("Transport with id $id not found") }
 
         val pickupLocation = findOrCreateLocation(
             AddressRequest(
@@ -185,38 +260,6 @@ class TransportService(
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
         )
 
-        return transportRepository.save(updatedTransport)
-    }
-
-    fun deleteTransport(id: UUID) {
-        transportRepository.deleteById(id)
-    }
-
-    fun getTransportById(id: UUID): TransportDto {
-        return transportRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException("Transport with id $id not found")
-    }
-
-    private fun findOrCreateLocation(address: AddressRequest) =
-        (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            address.postalCode,
-            address.buildingNumber
-        )
-            ?: LocationDto(
-                address = AddressDto(
-                    streetName = address.streetName,
-                    buildingNumber = address.buildingNumber,
-                    postalCode = address.postalCode,
-                    city = address.city,
-                    country = address.country
-                ),
-                id = UUID.randomUUID().toString()
-            ))
-
-
-    private fun findCompany(company: CompanyDto): CompanyDto {
-        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
-            ?: company
-
+        return updatedTransport
     }
 }
