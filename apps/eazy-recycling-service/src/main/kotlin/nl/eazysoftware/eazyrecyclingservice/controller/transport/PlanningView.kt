@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 
@@ -25,7 +26,8 @@ data class TransportView(
     val driver: ProfileDto?,
     val status: TransportDto.Status,
     val displayNumber: String?,
-    val containerId: String?
+    val containerId: String?,
+    val transportType: TransportType
 ) {
 
     constructor(transportDto: TransportDto): this(
@@ -39,5 +41,6 @@ data class TransportView(
         status = transportDto.getStatus(),
         displayNumber = transportDto.displayNumber,
         containerId = transportDto.wasteContainer?.id,
+        transportType = transportDto.transportType
     )
 }

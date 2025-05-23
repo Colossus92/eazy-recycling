@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
 import java.util.UUID
@@ -10,6 +11,7 @@ data class CreateWasteTransportRequest(
     override val consignorPartyId: UUID,
     override val pickupDateTime: LocalDateTime,
     override val deliveryDateTime: LocalDateTime,
+    override val containerOperation: ContainerOperation,
     override val transportType: TransportType,
     override val driverId: UUID?,
     override val carrierPartyId: UUID,
@@ -36,6 +38,7 @@ data class CreateWasteTransportRequest(
     consignorPartyId = consignorPartyId,
     pickupDateTime = pickupDateTime,
     deliveryDateTime = deliveryDateTime,
+    containerOperation = containerOperation,
     transportType = transportType,
     driverId = driverId,
     carrierPartyId = carrierPartyId,

@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.mapper
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.*
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.*
@@ -37,7 +38,8 @@ abstract class WaybillMapper {
     @Mapping(target = "pickupDateTime", expression = "java(toPickupDateTime(waybill))")
     @Mapping(target = "truck", expression = "java(toTruck(waybill))")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "transportType", ignore = true)
+    @Mapping(target = "transportType", expression = "java(waste())")
+    @Mapping(target = "containerOperation", ignore = true)
     @Mapping(target = "displayNumber", ignore = true)
     @Mapping(target = "wasteContainer", ignore = true) // TODO resolve container
     @Mapping(target = "driver", ignore = true)
@@ -64,6 +66,10 @@ abstract class WaybillMapper {
     @Mapping(source = "postalZone.value", target = "postalCode")
     @Mapping(source = "country.name.value", target = "country")
     abstract fun toDto(postalAddress: AddressType): AddressDto
+
+    fun waste(): TransportType {
+        return TransportType.WASTE
+    }
 
     fun toLocationId(source: LocationType): String {
         return source.id

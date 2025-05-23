@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
 import java.util.UUID
@@ -9,6 +10,7 @@ open class CreateContainerTransportRequest(
     open val pickupDateTime: LocalDateTime,
     open val deliveryDateTime: LocalDateTime,
     open val transportType: TransportType,
+    open val containerOperation: ContainerOperation,
     open val driverId: UUID?,
     open val carrierPartyId: UUID,
     open val pickupCompanyId: UUID?,

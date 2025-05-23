@@ -12,7 +12,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -42,7 +41,6 @@ class TransportService(
             transport.copy(
                 truck = entityManager.getReference(Truck::class.java, licensePlate),
                 driver = entityManager.getReference(ProfileDto::class.java, driverId),
-                transportType = TransportType.WAYBILL,
             )
         )
     }
@@ -109,6 +107,7 @@ class TransportService(
             deliveryDateTime = request.deliveryDateTime,
             truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
+            containerOperation = request.containerOperation,
             transportType = request.transportType,
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
@@ -166,8 +165,8 @@ class TransportService(
 
             existingGoods.copy(
                 goodsItem = goodsItem,
-                consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
-                pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId)
+                consigneeParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.consigneePartyId)),
+                pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId))
             )
         } ?: GoodsDto(
             id = UUID.randomUUID().toString(),
@@ -258,6 +257,7 @@ class TransportService(
             transportType = request.transportType,
             truck = if (request.truckId?.isNotEmpty() ?: false) entityManager.getReference(Truck::class.java, request.truckId) else null,
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
+            note = request.note
         )
 
         return updatedTransport

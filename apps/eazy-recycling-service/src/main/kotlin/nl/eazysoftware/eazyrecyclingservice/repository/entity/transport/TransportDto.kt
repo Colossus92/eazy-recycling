@@ -7,15 +7,19 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
+import java.awt.Container
 import java.time.LocalDateTime
 import java.util.*
 
 enum class TransportType {
+    CONTAINER,
+    WASTE,
+}
+enum class ContainerOperation {
     EXCHANGE,
     PICKUP,
     EMPTY,
     DELIVERY,
-    WAYBILL,
 }
 
 @Entity
@@ -77,7 +81,11 @@ data class TransportDto(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    val transportType: TransportType? = null,
+    val transportType: TransportType,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "container_operation", columnDefinition = "container_operations", nullable = true)
+    val containerOperation: ContainerOperation? = null,
 
     @OneToOne
     @JoinColumn(name = "container_id", referencedColumnName = "uuid")
