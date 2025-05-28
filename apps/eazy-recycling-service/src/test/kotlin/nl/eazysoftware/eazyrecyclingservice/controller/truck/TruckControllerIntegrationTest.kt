@@ -13,9 +13,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.LocalDateTime
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -137,5 +141,157 @@ class TruckControllerIntegrationTest {
                 .content(objectMapper.writeValueAsString(duplicateTruck))
         )
             .andExpect(status().isConflict)
+    }
+
+    @Test
+    fun `should get all trucks`() {
+        // Given
+        val truck1 = Truck(
+            licensePlate = "GET-ALL-1",
+            brand = "Volvo",
+            model = "FH16"
+        )
+        val truck2 = Truck(
+            licensePlate = "GET-ALL-2",
+            brand = "Mercedes",
+            model = "Actros"
+        )
+        truckRepository.saveAll(listOf(truck1, truck2))
+
+        // When & Then
+        mockMvc.perform(get("/trucks"))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray)
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[?(@.licensePlate == 'GET-ALL-1')]").exists())
+            .andExpect(jsonPath("$[?(@.licensePlate == 'GET-ALL-2')]").exists())
+    }
+
+    @Test
+    fun `should get truck by license plate`() {
+        // Given
+        val truck = Truck(
+            licensePlate = "GET-ONE",
+            brand = "Scania",
+            model = "R450"
+        )
+        truckRepository.save(truck)
+
+        // When & Then
+        mockMvc.perform(get("/trucks/GET-ONE"))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.licensePlate").value("GET-ONE"))
+            .andExpect(jsonPath("$.brand").value("Scania"))
+            .andExpect(jsonPath("$.model").value("R450"))
+    }
+
+    @Test
+    fun `should return not found when getting truck with non-existent license plate`() {
+        // When & Then
+        mockMvc.perform(get("/trucks/NON-EXISTENT"))
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should delete truck by license plate`() {
+        // Given
+        val truck = Truck(
+            licensePlate = "DELETE-ME",
+            brand = "MAN",
+            model = "TGX"
+        )
+        truckRepository.save(truck)
+
+        // When & Then
+        mockMvc.perform(delete("/trucks/DELETE-ME"))
+            .andExpect(status().isNoContent)
+
+        // Verify truck was deleted
+        assertThat(truckRepository.findByIdOrNull("DELETE-ME")).isNull()
+    }
+
+    @Test
+    fun `should update truck`() {
+        // Given
+        val originalTruck = Truck(
+            licensePlate = "UPDATE-ME",
+            brand = "Volvo",
+            model = "FH16"
+        )
+        truckRepository.save(originalTruck)
+
+        val updatedTruck = Truck(
+            licensePlate = "UPDATE-ME", // Same license plate
+            brand = "Volvo Updated",
+            model = "FH16 Updated"
+        )
+
+        // When & Then
+        mockMvc.perform(
+            put("/trucks/UPDATE-ME")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedTruck))
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.licensePlate").value("UPDATE-ME"))
+            .andExpect(jsonPath("$.brand").value("Volvo Updated"))
+            .andExpect(jsonPath("$.model").value("FH16 Updated"))
+
+        // Verify truck was updated in the database
+        val savedTruck = truckRepository.findByIdOrNull("UPDATE-ME")
+        assertThat(savedTruck).isNotNull
+        assertThat(savedTruck?.brand).isEqualTo("Volvo Updated")
+        assertThat(savedTruck?.model).isEqualTo("FH16 Updated")
+    }
+
+    @Test
+    fun `should return not found when updating non-existent truck`() {
+        // Given
+        val truck = Truck(
+            licensePlate = "NON-EXISTENT",
+            brand = "Brand",
+            model = "Model"
+        )
+
+        // When & Then
+        mockMvc.perform(
+            put("/trucks/NON-EXISTENT")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(truck))
+        )
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should return bad request when updating truck with mismatched license plate`() {
+        // Given
+        val originalTruck = Truck(
+            licensePlate = "ORIGINAL",
+            brand = "Original Brand",
+            model = "Original Model"
+        )
+        truckRepository.save(originalTruck)
+
+        val truckWithDifferentLicensePlate = Truck(
+            licensePlate = "DIFFERENT", // Different from path variable
+            brand = "New Brand",
+            model = "New Model"
+        )
+
+        // When & Then
+        mockMvc.perform(
+            put("/trucks/ORIGINAL")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(truckWithDifferentLicensePlate))
+        )
+            .andExpect(status().isBadRequest)
+
+        // Verify original truck was not modified
+        val savedTruck = truckRepository.findByIdOrNull("ORIGINAL")
+        assertThat(savedTruck).isNotNull
+        assertThat(savedTruck?.brand).isEqualTo("Original Brand")
+        assertThat(savedTruck?.model).isEqualTo("Original Model")
     }
 }
