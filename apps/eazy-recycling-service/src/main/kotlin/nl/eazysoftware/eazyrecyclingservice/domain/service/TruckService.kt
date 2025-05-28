@@ -30,7 +30,7 @@ class TruckService(
     fun getTruckByLicensePlate(licensePlate: String): Truck {
         return truckRepository
             .findByIdOrNull(licensePlate)
-            ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
+            ?: throw EntityNotFoundException("Vrachtwagen met kenteken $licensePlate niet gevonden")
     }
 
     fun deleteTruck(licensePlate: String) {
@@ -39,11 +39,11 @@ class TruckService(
 
     fun updateTruck(licensePlate: String, truck: Truck): Truck {
         if (!licensePlate.equals(truck.licensePlate, ignoreCase = true)) {
-            throw IllegalStateException("Cannot change truck license plate")
+            throw IllegalArgumentException("Vrachtwagen komt niet overeen met kenteken $licensePlate")
         }
 
        truckRepository.findByIdOrNull(licensePlate)
-            ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
+            ?: throw EntityNotFoundException("Vrachtwagen met kenteken $licensePlate niet gevonden")
 
         return truckRepository.save(truck)
     }
