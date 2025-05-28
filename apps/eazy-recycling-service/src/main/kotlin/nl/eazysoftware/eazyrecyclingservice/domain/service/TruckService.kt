@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 
 @Service
@@ -11,9 +12,11 @@ class TruckService(
 ) {
 
     fun createTruck(truck: Truck) {
-        truckRepository.save(
-            truck
-        )
+        if (truckRepository.existsById(truck.licensePlate)) {
+            throw DuplicateKeyException("Vrachtwagen met kenteken ${truck.licensePlate} bestaat al")
+        }
+
+        truckRepository.save(truck)
     }
 
     fun getAllTrucks(): List<Truck> {
