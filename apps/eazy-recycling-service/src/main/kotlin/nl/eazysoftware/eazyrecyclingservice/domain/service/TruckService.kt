@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,6 +13,9 @@ class TruckService(
 ) {
 
     fun createTruck(truck: Truck) {
+        val truck = truck.copy(
+            licensePlate = truck.licensePlate.uppercase(),
+        )
         if (truckRepository.existsById(truck.licensePlate)) {
             throw DuplicateKeyException("Vrachtwagen met kenteken ${truck.licensePlate} bestaat al")
         }
@@ -25,7 +29,7 @@ class TruckService(
 
     fun getTruckByLicensePlate(licensePlate: String): Truck {
         return truckRepository
-            .findByLicensePlate(licensePlate)
+            .findByIdOrNull(licensePlate)
             ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
     }
 
@@ -38,7 +42,7 @@ class TruckService(
             throw IllegalStateException("Cannot change truck license plate")
         }
 
-       truckRepository.findByLicensePlate(licensePlate)
+       truckRepository.findByIdOrNull(licensePlate)
             ?: throw EntityNotFoundException("Truck with license plate $licensePlate not found")
 
         return truckRepository.save(truck)
