@@ -82,6 +82,20 @@ create table if not exists trucks (
                         primary key (license_plate)
 );
 
+create table if not exists waste_containers (
+                           uuid uuid not null,
+                           id varchar(255),
+                           notes varchar(255),
+                           building_name varchar(255),
+                           building_number varchar(255),
+                           city varchar(255),
+                           country varchar(255),
+                           postal_code varchar(255),
+                           street_name varchar(255),
+                           location_company_id uuid,
+                           primary key (uuid)
+);
+
 create table if not exists waybills (
                           delivery_date_time timestamp(6),
                           goods_item_id bigint unique,
@@ -149,6 +163,11 @@ alter table if exists transports
     add constraint FK2lgi3xage1g6g2daa75jhnw1c
         foreign key (truck_id)
             references trucks;
+
+alter table if exists waste_containers
+    add constraint FK_waste_containers_company
+        foreign key (location_company_id)
+            references companies;
 
 alter table if exists waybills
     add constraint FKexb5sdt0oqb9a6ehk1f05krmv
