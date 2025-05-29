@@ -5,6 +5,9 @@ import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import org.hibernate.exception.ConstraintViolationException
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -24,7 +27,14 @@ class CompanyService(private val companyRepository: CompanyRepository) {
                 country = company.address?.country
             ),
         )
-        return companyRepository.save(companyDto)
+        try {
+            return companyRepository.save(companyDto)
+        } catch (e: DataIntegrityViolationException) {
+            if (isDuplicateKeyException(e)) {
+                throw DuplicateKeyException("Kvk nummer of VIHB nummer al in gebruik.")
+            }
+            throw e
+        }
     }
 
     fun findAll(): List<CompanyDto> {
@@ -33,7 +43,7 @@ class CompanyService(private val companyRepository: CompanyRepository) {
 
     fun findById(id: String): CompanyDto {
         return companyRepository.findById(UUID.fromString(id))
-            .orElseThrow { EntityNotFoundException("Company with id $id not found") }
+            .orElseThrow { EntityNotFoundException("Bedrijf met id $id niet gevonden") }
     }
 
     fun delete(id: String) {
@@ -42,8 +52,8 @@ class CompanyService(private val companyRepository: CompanyRepository) {
 
     fun update(id: String, updatedCompany: CompanyDto): CompanyDto {
         val existingCompany = companyRepository.findById(UUID.fromString(id))
-            .orElseThrow { EntityNotFoundException("Company with id $id not found") }
-        return companyRepository.save(existingCompany.copy(
+            .orElseThrow { EntityNotFoundException("Bedrijf met id $id niet gevonden") }
+        val companyToSave = existingCompany.copy(
             id = existingCompany.id,
             name = updatedCompany.name,
             chamberOfCommerceId = updatedCompany.chamberOfCommerceId,
@@ -56,6 +66,22 @@ class CompanyService(private val companyRepository: CompanyRepository) {
                 city = updatedCompany.address.city,
                 country = updatedCompany.address.country
             ),
-        ))
+        )
+
+        try {
+            return companyRepository.save(companyToSave)
+        } catch (e: DataIntegrityViolationException) {
+            if (isDuplicateKeyException(e)) {
+                throw DuplicateKeyException("Kvk nummer of VIHB nummer al in gebruik.")
+            }
+            throw e
+        }
+    }
+
+    private fun isDuplicateKeyException(e: DataIntegrityViolationException): Boolean {
+        val cause = e.cause
+        return cause is ConstraintViolationException
+                && (cause.constraintName?.contains("companies_chamber_of_commerce_id_key") == true
+                || cause.constraintName?.contains("companies_vihb_id_key") == true)
     }
 }

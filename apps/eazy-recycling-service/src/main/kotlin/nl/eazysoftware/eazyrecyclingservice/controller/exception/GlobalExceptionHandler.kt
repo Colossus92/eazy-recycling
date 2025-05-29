@@ -19,7 +19,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException::class)
-    fun handleDuplicateKeyException(ex: EntityNotFoundException): ResponseEntity<ErrorResponse> {
+    fun handleEntityNotFoundException(ex: EntityNotFoundException): ResponseEntity<ErrorResponse> {
         val errorResponse = ErrorResponse(
             message = ex.message ?: "Object niet gevonden",
         )
