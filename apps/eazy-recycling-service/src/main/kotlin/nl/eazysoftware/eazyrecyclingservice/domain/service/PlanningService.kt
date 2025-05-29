@@ -11,7 +11,8 @@ import java.util.*
 
 @Service
 class PlanningService(
-    private val transportRepository: TransportRepository
+    private val transportRepository: TransportRepository,
+    private val truckService: TruckService
 ) {
 
     fun getPlanningByDate(
@@ -33,14 +34,33 @@ class PlanningService(
 
         val dateInfo = daysInWeek.map { it.toString() }
 
-
-        val transportsView = transports.map { transportDto -> TransportView(transportDto) }
+        fun createTransportsView(): MutableList<TransportsView> = transports.map { transportDto -> TransportView(transportDto) }
             .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
             .map { (truckLicensePlate, transportViews) ->
                 TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
+            }.toMutableList()
+
+        val transportsView = createTransportsView()
+
+        addMissingTrucks(transportsView)
+
+        transportsView.sortWith(compareBy<TransportsView> {
+            when {
+                it.truck == "Niet toegewezen" -> 0
+                it.transports.isNotEmpty() -> 1
+                else -> 2
             }
+        }.thenBy { it.truck }) // Then sort alphabetically by truck license plate
 
         return PlanningView(dateInfo, transportsView)
+    }
+
+    private fun addMissingTrucks(transportsView: MutableList<TransportsView>) {
+        truckService.getAllTrucks()
+            .map { it.licensePlate }
+            .filter { it !in transportsView.map { it.truck } }
+            .map { TransportsView(it, emptyMap()) }
+            .apply { transportsView.addAll(this) }
     }
 
     private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
