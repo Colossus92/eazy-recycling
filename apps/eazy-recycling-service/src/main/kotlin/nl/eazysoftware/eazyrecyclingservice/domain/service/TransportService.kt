@@ -197,11 +197,8 @@ class TransportService(
             ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 
-    private fun findOrCreateLocation(address: AddressRequest) =
-        (locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-            address.postalCode,
-            address.buildingNumber
-        )
+    private fun findOrCreateLocation(address: AddressRequest): LocationDto {
+        return locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(address.postalCode, address.buildingNumber)
             ?: LocationDto(
                 address = AddressDto(
                     streetName = address.streetName,
@@ -211,7 +208,8 @@ class TransportService(
                     country = address.country
                 ),
                 id = UUID.randomUUID().toString()
-            ))
+            ).let { locationRepository.save(it) }
+    }
 
 
     private fun findCompany(company: CompanyDto): CompanyDto {
