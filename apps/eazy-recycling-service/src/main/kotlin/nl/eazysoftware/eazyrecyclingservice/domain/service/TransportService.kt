@@ -216,7 +216,7 @@ class TransportService(
 
     private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
         val transport = transportRepository.findById(id)
-        .orElseThrow { EntityNotFoundException("Transport with id $id not found") }
+        .orElseThrow { EntityNotFoundException("Transport met id $id is niet gevonden") }
 
         val pickupLocation = findOrCreateLocation(
             AddressRequest(
@@ -243,14 +243,18 @@ class TransportService(
 
         val updatedTransport = transport.copy(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
+            carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
+            pickupCompany = entityManager.getReference(CompanyDto::class.java, request.pickupCompanyId),
             pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
+            deliveryCompany = entityManager.getReference(CompanyDto::class.java, request.deliveryCompanyId),
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             transportType = request.transportType,
             truck = if (request.truckId?.isNotEmpty() ?: false) entityManager.getReference(Truck::class.java, request.truckId) else null,
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
+            containerOperation = request.containerOperation,
             note = request.note
         )
 

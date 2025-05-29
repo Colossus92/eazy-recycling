@@ -58,22 +58,27 @@ create table if not exists locations (
 );
 
 create table if not exists transports (
-                            delivery_date_time timestamp(6),
-                            pickup_date_time timestamp(6),
-                            updated_at timestamp(6) not null,
-                            carrier_party_id uuid,
-                            consignor_party_id uuid,
-                            driver_id uuid,
-                            goods_id uuid unique,
-                            id uuid not null,
-                            container_type varchar(255),
-                            delivery_location_id varchar(255) unique,
-                            pickup_location_id varchar(255) unique,
-                            transport_type varchar(255) check (transport_type in ('EXCHANGE','PICKUP','EMPTY','DELIVERY','WAYBILL')),
-                            truck_id varchar(255),
-                            primary key (id)
+                          delivery_date_time timestamp(6) without time zone,
+                          pickup_date_time timestamp(6) without time zone,
+                          updated_at timestamp(6) without time zone NOT NULL,
+                          carrier_party_id uuid,
+                          consignor_party_id uuid,
+                          driver_id uuid,
+                          goods_id uuid,
+                          id uuid NOT NULL,
+                          delivery_location_id character varying(255),
+                          pickup_location_id character varying(255),
+                          transport_type text,
+                          truck_id character varying(255),
+                          display_number text,
+                          container_id uuid,
+                          delivery_company_id uuid,
+                          pickup_company_id uuid,
+                          note text,
+                          container_operation text
 );
 
+create type container_operations as enum ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL');
 create table if not exists trucks (
                         updated_at timestamp(6) not null,
                         brand varchar(255),
@@ -114,6 +119,13 @@ create table if not exists waybills (
                           primary key (uuid)
 );
 
+create table if not exists profiles (
+                           id uuid not null,
+                           first_name text not null,
+                           last_name text not null
+);
+
+
 alter table if exists goods
     add constraint FKmmq89gkjejce7jk9b3ifrq85n
         foreign key (consignee_party_id)
@@ -143,11 +155,6 @@ alter table if exists transports
     add constraint FKr7jo64ck7hsa4d9i2mucxlrjv
         foreign key (delivery_location_id)
             references locations;
-
-alter table if exists transports
-    add constraint FKi82vj9n4pe2k5fbgdmj8mc8tr
-        foreign key (driver_id)
-            references drivers;
 
 alter table if exists transports
     add constraint FK8jrwx32tgeb6xn4e9jg5mueuj
