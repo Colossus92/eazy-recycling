@@ -4,10 +4,13 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Service
 class PlanningService(
@@ -27,20 +30,15 @@ class PlanningService(
         // Get all transports for the week
         val transports = transportRepository.findByPickupDateTimeIsBetween(
             daysInWeek.first().atStartOfDay(),
-            daysInWeek.last().atTime(23, 59, 59))
+            daysInWeek.last().atTime(23, 59, 59)
+        )
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
             .filter { transport -> statuses.isEmpty() || statuses.contains(transport.getStatus().name) }
 
         val dateInfo = daysInWeek.map { it.toString() }
 
-        fun createTransportsView(): MutableList<TransportsView> = transports.map { transportDto -> TransportView(transportDto) }
-            .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
-            .map { (truckLicensePlate, transportViews) ->
-                TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
-            }.toMutableList()
-
-        val transportsView = createTransportsView()
+        val transportsView = createTransportsView(transports)
 
         addMissingTrucks(transportsView)
 
@@ -54,6 +52,13 @@ class PlanningService(
 
         return PlanningView(dateInfo, transportsView)
     }
+
+    fun createTransportsView(transports: List<TransportDto>) =
+        transports.map { transportDto -> TransportView(transportDto) }
+            .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
+            .map { (truckLicensePlate, transportViews) ->
+                TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
+            }.toMutableList()
 
     private fun addMissingTrucks(transportsView: MutableList<TransportsView>) {
         truckService.getAllTrucks()

@@ -16,7 +16,9 @@ data class GoodsDto(
     /**
      * Waybill UUID field
      */
-    @Id val uuid: UUID,
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    val uuid: UUID? = null,
 
     @OneToOne(cascade = [CascadeType.ALL])
     @JoinColumn(name = "goods_item_id", referencedColumnName = "id")
@@ -25,14 +27,14 @@ data class GoodsDto(
     /**
      * The party receiving the goods after the transport is finished.
      */
-    @ManyToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     @JoinColumn(name = "consignee_party_id", referencedColumnName = "id")
     val consigneeParty: CompanyDto,
 
     /**
      * The party actually disposing the goods, this does not have to be the same company or location at the pickup location.
      */
-    @ManyToOne(cascade = [CascadeType.ALL])
+    @ManyToOne
     @JoinColumn(name = "pickup_party_id", referencedColumnName = "id")
     val pickupParty: CompanyDto,
 

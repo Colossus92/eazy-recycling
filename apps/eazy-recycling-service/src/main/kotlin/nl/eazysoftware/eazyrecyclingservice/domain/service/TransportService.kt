@@ -65,7 +65,6 @@ class TransportService(
 
         val goods = GoodsDto(
             id = UUID.randomUUID().toString(),
-            uuid = UUID.randomUUID(),
             goodsItem = goodsItem,
             consigneeParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.consigneePartyId)),
             pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId)),
@@ -75,17 +74,15 @@ class TransportService(
     }
 
     private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
-        // Common location handling logic
         val pickupLocation = findOrCreateLocation(AddressRequest(
-            streetName = request.deliveryStreet,
-            buildingNumber = request.deliveryBuildingNumber,
-            postalCode = request.deliveryPostalCode,
-            city = request.deliveryCity
+            streetName = request.pickupStreet,
+            buildingNumber = request.pickupBuildingNumber,
+            postalCode = request.pickupPostalCode,
+            city = request.pickupCity
         ))
 
         // Check if delivery location is the same as pickup
-        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
-            request.pickupBuildingNumber == request.deliveryBuildingNumber) {
+        val deliveryLocation = if (isDeliveryAndPickupSameLocation(request)) {
             pickupLocation
         } else {
             findOrCreateLocation(AddressRequest(
@@ -230,8 +227,7 @@ class TransportService(
             )
         )
 
-        val deliveryLocation = if (request.pickupPostalCode == request.deliveryPostalCode &&
-            request.pickupBuildingNumber == request.deliveryBuildingNumber
+        val deliveryLocation = if (isDeliveryAndPickupSameLocation(request)
         ) {
             pickupLocation
         } else {
@@ -260,4 +256,7 @@ class TransportService(
 
         return updatedTransport
     }
+
+    private fun isDeliveryAndPickupSameLocation(request: CreateContainerTransportRequest): Boolean =
+        request.pickupPostalCode == request.deliveryPostalCode && request.pickupBuildingNumber == request.deliveryBuildingNumber
 }
