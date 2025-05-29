@@ -41,7 +41,7 @@ class CompanyController(
     data class CompanyRequest(
         val chamberOfCommerceId: String?,
         val vihbId: String?,
-        val name: String?,
+        val name: String,
         val address: AddressRequest?,
     )
 

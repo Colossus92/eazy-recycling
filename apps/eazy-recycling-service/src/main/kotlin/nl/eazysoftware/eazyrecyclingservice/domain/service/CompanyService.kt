@@ -15,7 +15,7 @@ import java.util.UUID
 class CompanyService(private val companyRepository: CompanyRepository) {
     fun create(company: CompanyController.CompanyRequest): CompanyDto {
         val companyDto = CompanyDto(
-            name = company.name ?: "",
+            name = company.name,
             chamberOfCommerceId = company.chamberOfCommerceId,
             vihbId = company.vihbId,
             address = AddressDto(
@@ -51,25 +51,11 @@ class CompanyService(private val companyRepository: CompanyRepository) {
     }
 
     fun update(id: String, updatedCompany: CompanyDto): CompanyDto {
-        val existingCompany = companyRepository.findById(UUID.fromString(id))
+        companyRepository.findById(UUID.fromString(id))
             .orElseThrow { EntityNotFoundException("Bedrijf met id $id niet gevonden") }
-        val companyToSave = existingCompany.copy(
-            id = existingCompany.id,
-            name = updatedCompany.name,
-            chamberOfCommerceId = updatedCompany.chamberOfCommerceId,
-            vihbId = updatedCompany.vihbId,
-            address = AddressDto(
-                streetName = updatedCompany.address.streetName,
-                buildingName = updatedCompany.address.buildingName,
-                buildingNumber = updatedCompany.address.buildingNumber,
-                postalCode = updatedCompany.address.postalCode,
-                city = updatedCompany.address.city,
-                country = updatedCompany.address.country
-            ),
-        )
 
         try {
-            return companyRepository.save(companyToSave)
+            return companyRepository.save(updatedCompany)
         } catch (e: DataIntegrityViolationException) {
             if (isDuplicateKeyException(e)) {
                 throw DuplicateKeyException("Kvk nummer of VIHB nummer al in gebruik.")
