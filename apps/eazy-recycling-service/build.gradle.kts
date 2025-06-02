@@ -36,6 +36,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springVersion")
     implementation("org.springframework.ws:spring-ws-core:4.0.11")
     // Database
     runtimeOnly("org.postgresql:postgresql:42.7.5")

@@ -6,3 +6,4 @@ supabase:
     url: ${SUPABASE_API_URL:}
     secret: ${SUPABASE_API_SECRET:}
     publishable: ${SUPABASE_API_PUBLISHABLE:}
+    jwt-secret: ${SUPABASE_API_JWT_SECRET:}
