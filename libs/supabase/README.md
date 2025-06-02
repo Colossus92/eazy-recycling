@@ -2,6 +2,9 @@
 
 This repository contains the Supabase backend for the Eazy Recycling application. It includes database migrations, configuration, and setup for the Supabase services.
 
+## Reminders when rolling out
+1. Enable the auth hook under Authentication > Auth Hooks > select custom_access_token_hook
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) (v14 or newer)

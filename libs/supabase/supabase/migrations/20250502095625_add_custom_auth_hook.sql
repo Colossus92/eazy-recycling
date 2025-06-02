@@ -82,4 +82,10 @@ to supabase_auth_admin
 using (true);
 
 
-
+grant execute
+    on function public.custom_access_token_hook
+    to supabase_auth_admin;
+grant usage on schema public to supabase_auth_admin;
+revoke execute
+    on function public.custom_access_token_hook
+    from authenticated, anon;
