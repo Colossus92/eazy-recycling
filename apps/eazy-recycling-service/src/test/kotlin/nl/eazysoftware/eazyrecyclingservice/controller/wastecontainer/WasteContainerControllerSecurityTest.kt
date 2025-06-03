@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import org.junit.jupiter.api.AfterEach
@@ -30,9 +29,6 @@ class WasteContainerControllerSecurityTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
-
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var wasteContainerRepository: WasteContainerRepository
