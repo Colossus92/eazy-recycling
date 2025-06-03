@@ -24,9 +24,7 @@ import javax.crypto.spec.SecretKeySpec
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(
-    jsr250Enabled = true,  // Enable @RolesAllowed
-)
+@EnableMethodSecurity
 class SecurityConfig {
 
     private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)

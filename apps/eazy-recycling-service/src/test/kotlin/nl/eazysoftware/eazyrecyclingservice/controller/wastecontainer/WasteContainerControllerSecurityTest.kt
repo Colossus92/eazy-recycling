@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
