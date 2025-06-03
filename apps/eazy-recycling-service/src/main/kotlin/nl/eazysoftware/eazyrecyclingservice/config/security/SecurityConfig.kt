@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.core.GrantedAuthorityDefaults
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.JwtValidators
@@ -61,10 +60,12 @@ class SecurityConfig {
     fun jwtAuthenticationConverter(): JwtAuthenticationConverter {
         val jwtGrantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("user_roles")
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("")
 
-        val jwtAuthenticationConverter = JwtAuthenticationConverter()
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter)
-        return jwtAuthenticationConverter
+        return JwtAuthenticationConverter()
+            .apply {
+                this.setJwtGrantedAuthoritiesConverter { jwt -> jwtGrantedAuthoritiesConverter.convert(jwt) }
+            }
     }
 
     @Bean
@@ -93,14 +94,6 @@ class SecurityConfig {
         )
 
         return jwtDecoder
-    }
-
-    /**
-     * Removes the by default required ROLE_ prefix from the granted authorities
-     */
-    @Bean
-    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults {
-        return GrantedAuthorityDefaults("")
     }
 
 }
