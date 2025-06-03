@@ -1,6 +1,6 @@
-package nl.eazysoftware.eazyrecyclingservice.config.web
+package nl.eazysoftware.eazyrecyclingservice.config.security
 
-
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
@@ -30,7 +29,7 @@ import javax.crypto.spec.SecretKeySpec
 )
 class SecurityConfig {
 
-    private val logger = org.slf4j.LoggerFactory.getLogger(SecurityConfig::class.java)
+    private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
 
     @Value("\${supabase.api.jwt-secret}")
     private lateinit var jwtSecret: String
@@ -49,7 +48,7 @@ class SecurityConfig {
                     .anyRequest().authenticated() // All other requests just require authentication (any role)
             }
             .oauth2ResourceServer { oauth2 ->
-                oauth2.jwt { jwt -> 
+                oauth2.jwt { jwt ->
                     jwt.decoder(jwtDecoder())
                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
                 }

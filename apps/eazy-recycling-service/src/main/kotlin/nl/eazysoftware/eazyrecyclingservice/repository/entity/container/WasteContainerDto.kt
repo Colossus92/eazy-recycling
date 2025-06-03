@@ -20,5 +20,5 @@ data class WasteContainerDto(
     @Embedded
     var address: AddressDto? = null,
     
-    val notes: String,
+    val notes: String?,
 )

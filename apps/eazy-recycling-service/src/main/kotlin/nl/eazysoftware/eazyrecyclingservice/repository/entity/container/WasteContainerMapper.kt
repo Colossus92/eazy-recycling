@@ -21,9 +21,8 @@ class WasteContainerMapper {
         )
     }
 
-    private fun toAddress(dto: WasteContainerDto): AddressDto {
+    private fun toAddress(dto: WasteContainerDto): AddressDto? {
         return dto.company?.address
             ?: dto.address
-            ?: throw IllegalStateException("No address found")
     }
 }

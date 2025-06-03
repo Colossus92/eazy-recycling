@@ -59,7 +59,7 @@ class WasteContainerService(
             notes = container.notes,
         )
 
-        setLocationDetails(dto, container.location.companyId, container.location.address)
+        setLocationDetails(dto, container.location?.companyId, container.location?.address)
 
         return dto
     }
@@ -70,7 +70,7 @@ class WasteContainerService(
             notes = container.notes,
         )
 
-        setLocationDetails(dto, container.location.companyId, container.location.address)
+        setLocationDetails(dto, container.location?.companyId, container.location?.address)
 
         return dto
     }
@@ -82,7 +82,7 @@ class WasteContainerService(
     ) {
         companyId?.run {
             val company: CompanyDto = companyRepository.findById(this)
-                .orElseThrow { EntityNotFoundException("Company with id $this not found") }
+                .orElseThrow { EntityNotFoundException("Bedrijf met id $this niet gevonden") }
             dto.company = company
         } ?: run {
             dto.address = address
