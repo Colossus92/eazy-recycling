@@ -14,3 +14,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
+
+supabase:
+  api:
+    jwt-secret: super-secret-jwt-token-with-at-least-32-characters-long
+    url: https://supabase.com
