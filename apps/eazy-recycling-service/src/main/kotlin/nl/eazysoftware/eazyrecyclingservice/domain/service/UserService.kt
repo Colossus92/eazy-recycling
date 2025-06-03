@@ -41,7 +41,7 @@ class UserService(
                 user.userMetadata?.get("roles")?.let { rolesJson ->
                     when (rolesJson) {
                         is JsonArray -> rolesJson.any { role ->
-                            (role as? JsonPrimitive)?.content == Roles.DRIVER.description
+                            (role as? JsonPrimitive)?.content == Roles.CHAUFFEUR
                         }
                         else -> false
                     }

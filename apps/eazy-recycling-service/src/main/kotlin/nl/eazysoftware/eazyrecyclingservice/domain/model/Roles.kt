@@ -1,8 +1,22 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model
 
-enum class Roles(val description: String) {
-    PLANNER("planner"),
-    DRIVER("chauffeur"),
-    ADMIN("admin"),
+/**
+ * Constants class for role names used throughout the application
+ * These constants should be used for role-based access control with @RolesAllowed annotations
+ */
+object Roles {
+    /**
+     * Administrator role with full system access
+     */
+    const val ADMIN = "admin"
 
+    /**
+     * Chauffeur role for truck drivers
+     */
+    const val CHAUFFEUR = "chauffeur"
+
+    /**
+     * Planner role for scheduling and logistics
+     */
+    const val PLANNER = "planner"
 }
