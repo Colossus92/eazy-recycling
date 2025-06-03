@@ -72,16 +72,4 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
                 .with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
         )
     }
-
-    /**
-     * Performs a custom request with admin role authentication.
-     *
-     * @param requestBuilder The request builder to use
-     * @return The result of the request
-     */
-    fun perform(requestBuilder: MockHttpServletRequestBuilder): ResultActions {
-        return mockMvc.perform(
-            requestBuilder.with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
-        )
-    }
 }
