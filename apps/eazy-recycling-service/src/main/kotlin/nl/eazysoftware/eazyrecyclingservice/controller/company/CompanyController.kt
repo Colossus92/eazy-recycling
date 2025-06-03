@@ -1,8 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,27 +16,33 @@ class CompanyController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     fun createCompany(@RequestBody company: CompanyRequest): CompanyDto {
         return companyService.create(company)
     }
 
     @GetMapping
+    @PreAuthorize(HAS_ANY_ROLE)
     fun getCompanies(): List<CompanyDto> {
         return companyService.findAll()
     }
 
     @GetMapping("/{id}")
+
+    @PreAuthorize(HAS_ANY_ROLE)
     fun getById(@PathVariable("id") id: String): CompanyDto {
         return companyService.findById(id)
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteCompany(@PathVariable("id") id: String) {
         companyService.delete(id)
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     fun updateCompany(@PathVariable("id") id: String, @RequestBody company: CompanyDto): CompanyDto {
         return companyService.update(id, company)
     }
