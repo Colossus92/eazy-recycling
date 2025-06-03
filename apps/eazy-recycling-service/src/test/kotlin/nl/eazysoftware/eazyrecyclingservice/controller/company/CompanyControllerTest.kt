@@ -2,6 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,6 +23,12 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper
 ) {
+    private lateinit var securedMockMvc: SecuredMockMvc
+
+    @BeforeEach
+    fun setup() {
+        securedMockMvc = SecuredMockMvc(mockMvc)
+    }
 
     private fun companyRequest(
         chamberOfCommerceId: String?= "12345678",
@@ -44,10 +51,9 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     @Test
     fun `create company - success`() {
         val req = companyRequest()
-        mockMvc.perform(
-            post("/companies")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(req))
+        securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
         )
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.chamberOfCommerceId").value(req.chamberOfCommerceId))
@@ -57,14 +63,16 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     @Disabled
     fun `create company - duplicate chamberOfCommerceId returns 409`() {
         val req = companyRequest()
-        mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andExpect(status().isCreated)
 
-        mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andExpect(status().isConflict)
             .andExpect(jsonPath("$.message").exists())
     }
@@ -72,12 +80,13 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     @Test
     fun `get companies - returns list`() {
         val req = companyRequest()
-        mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andExpect(status().isCreated)
 
-        mockMvc.perform(get("/companies"))
+        securedMockMvc.get("/companies")
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(1))
     }
@@ -85,36 +94,39 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     @Test
     fun `get company by id - success`() {
         val req = companyRequest()
-        val mvcResult = mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andReturn()
         val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
-        mockMvc.perform(get("/companies/${created.id}"))
+        securedMockMvc.get("/companies/${created.id}")
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(created.id.toString()))
     }
 
     @Test
     fun `get company by id - not found returns 404`() {
-        mockMvc.perform(get("/companies/00000000-0000-0000-0000-000000000000"))
+        securedMockMvc.get("/companies/00000000-0000-0000-0000-000000000000")
             .andExpect(status().isNotFound)
     }
 
     @Test
     fun `update company - success`() {
         val req = companyRequest()
-        val mvcResult = mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andReturn()
         val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
         val updated = created.copy(name = "Updated BV")
 
-        mockMvc.perform(put("/companies/${created.id}")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(updated)))
+        securedMockMvc.put(
+            "/companies/${created.id}",
+            objectMapper.writeValueAsString(updated)
+        )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.name").value("Updated BV"))
     }
@@ -124,22 +136,25 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `update company - duplicate chamberOfCommerceId returns 409`() {
         val req1 = companyRequest(chamberOfCommerceId = "11111111", vihbId = "VIHB1")
         val req2 = companyRequest(chamberOfCommerceId = "22222222", vihbId = "VIHB2")
-        val mvcResult1 = mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req1)))
+        val mvcResult1 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req1)
+        )
             .andReturn()
-        val mvcResult2 = mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req2)))
+        val mvcResult2 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req2)
+        )
             .andReturn()
         val created1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
         val created2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
 
         // Try to update company2 with company1's chamberOfCommerceId
         val update = created2.copy(chamberOfCommerceId = created1.chamberOfCommerceId)
-        mockMvc.perform(put("/companies/${created2.id}")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(update)))
+        securedMockMvc.put(
+            "/companies/${created2.id}",
+            objectMapper.writeValueAsString(update)
+        )
             .andExpect(status().isConflict)
     }
 
@@ -160,28 +175,30 @@ class CompanyControllerIntegrationTest @Autowired constructor(
                 country = req.address.country
             ),
         )
-        mockMvc.perform(put("/companies/${company.id}")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(company)))
+        securedMockMvc.put(
+            "/companies/${company.id}",
+            objectMapper.writeValueAsString(company)
+        )
             .andExpect(status().isNotFound)
     }
 
     @Test
     fun `delete company - success`() {
         val req = companyRequest()
-        val mvcResult = mockMvc.perform(post("/companies")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(req)))
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
             .andReturn()
         val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
-        mockMvc.perform(delete("/companies/${created.id}"))
+        securedMockMvc.delete("/companies/${created.id}")
             .andExpect(status().isNoContent)
     }
 
     @Test
     fun `delete company - not found returns 204`() {
-        mockMvc.perform(delete("/companies/00000000-0000-0000-0000-000000000000"))
+        securedMockMvc.delete("/companies/00000000-0000-0000-0000-000000000000")
             .andExpect(status().isNoContent)
     }
 }

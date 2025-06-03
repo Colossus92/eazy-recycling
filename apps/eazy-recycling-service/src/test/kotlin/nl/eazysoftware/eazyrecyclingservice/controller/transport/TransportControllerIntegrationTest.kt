@@ -1,10 +1,14 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -13,9 +17,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -27,12 +29,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDateTime
 import java.util.*
-import jakarta.persistence.EntityManager
-import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -42,6 +41,8 @@ class TransportControllerIntegrationTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    private lateinit var securedMockMvc: SecuredMockMvc
 
     @Autowired
     private lateinit var objectMapper: ObjectMapper
@@ -66,6 +67,8 @@ class TransportControllerIntegrationTest {
 
     @BeforeEach
     fun setup() {
+        securedMockMvc = SecuredMockMvc(mockMvc)
+        
         // Create test company
         testCompany = CompanyDto(
             name = "Test Company",
@@ -131,7 +134,7 @@ class TransportControllerIntegrationTest {
         transportRepository.saveAll(listOf(transport1, transport2))
 
         // When & Then
-        mockMvc.perform(get("/transport"))
+        securedMockMvc.get("/transport")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray)
@@ -145,7 +148,7 @@ class TransportControllerIntegrationTest {
         val savedTransport = transportRepository.save(transport)
 
         // When & Then
-        mockMvc.perform(get("/transport/${savedTransport.id}"))
+        securedMockMvc.get("/transport/${savedTransport.id}")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.note").value("Test Transport"))
@@ -155,7 +158,7 @@ class TransportControllerIntegrationTest {
     fun `should return not found when getting transport with non-existent id`() {
         // When & Then
         val nonExistentId = UUID.randomUUID()
-        mockMvc.perform(get("/transport/$nonExistentId"))
+        securedMockMvc.get("/transport/$nonExistentId")
             .andExpect(status().isNotFound)
     }
 
@@ -186,10 +189,9 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/transport/container")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+        securedMockMvc.post(
+            "/transport/container",
+            objectMapper.writeValueAsString(request)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -239,10 +241,9 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/transport/waste")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+        securedMockMvc.post(
+            "/transport/waste",
+            objectMapper.writeValueAsString(request)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -291,10 +292,9 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/transport/container/${savedTransport.id}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest))
+        securedMockMvc.put(
+            "/transport/container/${savedTransport.id}",
+            objectMapper.writeValueAsString(updateRequest)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -362,10 +362,9 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/transport/waste/${savedTransport.id}")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest))
+        securedMockMvc.put(
+            "/transport/waste/${savedTransport.id}",
+            objectMapper.writeValueAsString(updateRequest)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -422,10 +421,9 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/transport/waybill")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assignRequest))
+        securedMockMvc.post(
+            "/transport/waybill",
+            objectMapper.writeValueAsString(assignRequest)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -446,7 +444,7 @@ class TransportControllerIntegrationTest {
         val savedTransport = transportRepository.save(transport)
 
         // When & Then
-        mockMvc.perform(delete("/transport/${savedTransport.id}"))
+        securedMockMvc.delete("/transport/${savedTransport.id}")
             .andExpect(status().isNoContent)
 
         // Verify transport was deleted
@@ -481,16 +479,14 @@ class TransportControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/transport/container/$nonExistentId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest))
+        securedMockMvc.put(
+            "/transport/container/$nonExistentId",
+            objectMapper.writeValueAsString(updateRequest)
         )
             .andExpect(status().isNotFound)
     }
 
     private fun createTestTransport(note: String, goods: GoodsDto? = null): TransportDto {
-
         return TransportDto(
             consignorParty = testCompany,
             carrierParty = testCompany,

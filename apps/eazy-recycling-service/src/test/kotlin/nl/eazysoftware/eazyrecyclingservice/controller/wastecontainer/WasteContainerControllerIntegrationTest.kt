@@ -8,8 +8,10 @@ import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -18,10 +20,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -36,6 +34,8 @@ class WasteContainerControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+    private lateinit var securedMockMvc: SecuredMockMvc
+
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
@@ -44,6 +44,11 @@ class WasteContainerControllerIntegrationTest {
 
     @Autowired
     private lateinit var companyRepository: CompanyRepository
+
+    @BeforeEach
+    fun setup() {
+        securedMockMvc = SecuredMockMvc(mockMvc)
+    }
 
     @AfterEach
     fun cleanup() {
@@ -73,10 +78,9 @@ class WasteContainerControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/containers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(containerRequest))
+        securedMockMvc.post(
+            "/containers",
+            objectMapper.writeValueAsString(containerRequest)
         )
             .andExpect(status().isCreated)
 
@@ -116,10 +120,9 @@ class WasteContainerControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/containers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(containerRequest))
+        securedMockMvc.post(
+            "/containers",
+            objectMapper.writeValueAsString(containerRequest)
         )
             .andExpect(status().isCreated)
 
@@ -163,7 +166,7 @@ class WasteContainerControllerIntegrationTest {
         wasteContainerRepository.saveAll(listOf(container1, container2))
 
         // When & Then
-        mockMvc.perform(get("/containers"))
+        securedMockMvc.get("/containers")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray)
@@ -189,7 +192,7 @@ class WasteContainerControllerIntegrationTest {
         val containerId = wasteContainerRepository.save(container).uuid!!
 
         // When & Then
-        mockMvc.perform(get("/containers/$containerId"))
+        securedMockMvc.get("/containers/$containerId")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value("GET-ONE"))
@@ -201,7 +204,7 @@ class WasteContainerControllerIntegrationTest {
     fun `should return not found when getting container with non-existent id`() {
         // When & Then
         val nonExistentId = UUID.randomUUID()
-        mockMvc.perform(get("/containers/$nonExistentId"))
+        securedMockMvc.get("/containers/$nonExistentId")
             .andExpect(status().isNotFound)
     }
 
@@ -222,7 +225,7 @@ class WasteContainerControllerIntegrationTest {
         val containerId = wasteContainerRepository.save(container).uuid!!
 
         // When & Then
-        mockMvc.perform(delete("/containers/$containerId"))
+        securedMockMvc.delete("/containers/$containerId")
             .andExpect(status().isNoContent)
 
         // Verify container was deleted
@@ -263,10 +266,9 @@ class WasteContainerControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/containers/$containerId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedContainer))
+        securedMockMvc.put(
+            "/containers/$containerId",
+            objectMapper.writeValueAsString(updatedContainer)
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value("UPDATE-ME"))
@@ -303,10 +305,9 @@ class WasteContainerControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/containers/$nonExistentId")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(container))
+        securedMockMvc.put(
+            "/containers/$nonExistentId",
+            objectMapper.writeValueAsString(container)
         )
             .andExpect(status().isNotFound)
     }

@@ -3,8 +3,10 @@ package nl.eazysoftware.eazyrecyclingservice.controller.truck
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -13,10 +15,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -29,11 +27,18 @@ class TruckControllerIntegrationTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+    private lateinit var securedMockMvc: SecuredMockMvc
+
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
     private lateinit var truckRepository: TruckRepository
+
+    @BeforeEach
+    fun setup() {
+        securedMockMvc = SecuredMockMvc(mockMvc)
+    }
 
     @AfterEach
     fun cleanup() {
@@ -50,12 +55,10 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/trucks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(truck))
-        )
-            .andExpect(status().isCreated)
+        securedMockMvc.post(
+            "/trucks",
+            objectMapper.writeValueAsString(truck)
+        ).andExpect(status().isCreated)
 
         // Verify truck was saved in the database
         val savedTruck = truckRepository.findByIdOrNull("ABC-123")
@@ -81,12 +84,10 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/trucks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(duplicateTruck))
-        )
-            .andExpect(status().isConflict)
+        securedMockMvc.post(
+            "/trucks",
+            objectMapper.writeValueAsString(duplicateTruck)
+        ).andExpect(status().isConflict)
 
         // Verify the original truck was not modified
         val savedTruck = truckRepository.findByIdOrNull("XYZ-789")
@@ -104,12 +105,10 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/trucks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(minimalTruck))
-        )
-            .andExpect(status().isCreated)
+        securedMockMvc.post(
+            "/trucks",
+            objectMapper.writeValueAsString(minimalTruck)
+        ).andExpect(status().isCreated)
 
         // Verify truck was saved with null optional fields
         val savedTruck = truckRepository.findByIdOrNull("MIN-123")
@@ -135,12 +134,10 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            post("/trucks")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(duplicateTruck))
-        )
-            .andExpect(status().isConflict)
+        securedMockMvc.post(
+            "/trucks",
+            objectMapper.writeValueAsString(duplicateTruck)
+        ).andExpect(status().isConflict)
     }
 
     @Test
@@ -159,7 +156,7 @@ class TruckControllerIntegrationTest {
         truckRepository.saveAll(listOf(truck1, truck2))
 
         // When & Then
-        mockMvc.perform(get("/trucks"))
+        securedMockMvc.get("/trucks")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray)
@@ -179,7 +176,7 @@ class TruckControllerIntegrationTest {
         truckRepository.save(truck)
 
         // When & Then
-        mockMvc.perform(get("/trucks/GET-ONE"))
+        securedMockMvc.get("/trucks/GET-ONE")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.licensePlate").value("GET-ONE"))
@@ -190,7 +187,7 @@ class TruckControllerIntegrationTest {
     @Test
     fun `should return not found when getting truck with non-existent license plate`() {
         // When & Then
-        mockMvc.perform(get("/trucks/NON-EXISTENT"))
+        securedMockMvc.get("/trucks/NON-EXISTENT")
             .andExpect(status().isNotFound)
     }
 
@@ -205,7 +202,7 @@ class TruckControllerIntegrationTest {
         truckRepository.save(truck)
 
         // When & Then
-        mockMvc.perform(delete("/trucks/DELETE-ME"))
+        securedMockMvc.delete("/trucks/DELETE-ME")
             .andExpect(status().isNoContent)
 
         // Verify truck was deleted
@@ -229,10 +226,9 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/trucks/UPDATE-ME")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedTruck))
+        securedMockMvc.put(
+            "/trucks/UPDATE-ME",
+            objectMapper.writeValueAsString(updatedTruck)
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.licensePlate").value("UPDATE-ME"))
@@ -256,10 +252,9 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/trucks/NON-EXISTENT")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(truck))
+        securedMockMvc.put(
+            "/trucks/NON-EXISTENT",
+            objectMapper.writeValueAsString(truck)
         )
             .andExpect(status().isNotFound)
     }
@@ -281,10 +276,9 @@ class TruckControllerIntegrationTest {
         )
 
         // When & Then
-        mockMvc.perform(
-            put("/trucks/ORIGINAL")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(truckWithDifferentLicensePlate))
+        securedMockMvc.put(
+            "/trucks/ORIGINAL",
+            objectMapper.writeValueAsString(truckWithDifferentLicensePlate)
         )
             .andExpect(status().isBadRequest)
 
