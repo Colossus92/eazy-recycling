@@ -75,10 +75,9 @@ create table if not exists transports (
                           delivery_company_id uuid,
                           pickup_company_id uuid,
                           note text,
-                          container_operation text
+                          container_operation text CHECK (container_operation IN ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL'))
 );
 
-create type container_operations as enum ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL');
 create table if not exists trucks (
                         updated_at timestamp(6) not null,
                         brand varchar(255),
@@ -125,88 +124,16 @@ create table if not exists profiles (
                            last_name text not null
 );
 
-
-alter table if exists goods
-    add constraint FKmmq89gkjejce7jk9b3ifrq85n
-        foreign key (consignee_party_id)
-            references companies;
-
-alter table if exists goods
-    add constraint FK8b4xllidyrhdclt6pjqo5k5aq
-        foreign key (goods_item_id)
-            references goods_items;
-
-alter table if exists goods
-    add constraint FKjxo4a2n1ffa1vi323ixkm0efl
-        foreign key (pickup_party_id)
-            references companies;
-
-alter table if exists transports
-    add constraint FK9vtcum4wow21lygabe1baemab
-        foreign key (carrier_party_id)
-            references companies;
-
-alter table if exists transports
-    add constraint FKpfpjw6nu1nix3orr0vc2c2na6
-        foreign key (consignor_party_id)
-            references companies;
-
-alter table if exists transports
-    add constraint FKr7jo64ck7hsa4d9i2mucxlrjv
-        foreign key (delivery_location_id)
-            references locations;
-
-alter table if exists transports
-    add constraint FK8jrwx32tgeb6xn4e9jg5mueuj
-        foreign key (goods_id)
-            references goods;
-
-alter table if exists transports
-    add constraint FK163l7w977al0i5bepjq1207ne
-        foreign key (pickup_location_id)
-            references locations;
-
-alter table if exists transports
-    add constraint FK2lgi3xage1g6g2daa75jhnw1c
-        foreign key (truck_id)
-            references trucks;
-
-alter table if exists waste_containers
-    add constraint FK_waste_containers_company
-        foreign key (location_company_id)
-            references companies;
-
-alter table if exists waybills
-    add constraint FKexb5sdt0oqb9a6ehk1f05krmv
-        foreign key (carrier_party_id)
-            references companies;
-
-alter table if exists waybills
-    add constraint FKsrjknpahp89cmae80n86m0hsy
-        foreign key (consignee_party_id)
-            references companies;
-
-alter table if exists waybills
-    add constraint FKswgts2ytehbdal35brikeaexc
-        foreign key (consignor_party_id)
-            references companies;
-
-alter table if exists waybills
-    add constraint FK6wh6ln69550kuiji853lvwitl
-        foreign key (delivery_location_id)
-            references locations;
-
-alter table if exists waybills
-    add constraint FKhaxs4v1au4fk8sahm9map6j49
-        foreign key (goods_item_id)
-            references goods_items;
-
-alter table if exists waybills
-    add constraint FKh7c49u3crn1swqeoton0umk4x
-        foreign key (pickup_location_id)
-            references locations;
-
-alter table if exists waybills
-    add constraint FK3x2ksx5hynkablsj7k46cg1qs
-        foreign key (pickup_party_id)
-            references companies;
+create table if not exists container_operations_log (
+                          updated_at timestamp(6) not null,
+                          id uuid not null,
+                          created_at timestamp(6) not null,
+                          transport_type text,
+                          truck_id character varying(255),
+                          display_number text,
+                          container_id uuid,
+                          delivery_company_id uuid,
+                          pickup_company_id uuid,
+                          note text,
+                          container_operation text CHECK (container_operation IN ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL'))
+);

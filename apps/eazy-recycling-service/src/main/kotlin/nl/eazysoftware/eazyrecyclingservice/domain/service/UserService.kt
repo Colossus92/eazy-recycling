@@ -9,7 +9,6 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 
-//TODO refactor to use ProfileDto?
 @Service
 class UserService(
     private val userRepository: UserRepository
@@ -32,7 +31,11 @@ class UserService(
     }
 
     fun updateUser(id: String, updateUserRequest: UpdateUserRequest) {
-        return userRepository.updateUser(id, updateUserRequest)
+        return userRepository.updateUserIncludingRoles(id, updateUserRequest)
+    }
+
+    fun updateProfile(id: String, updateUserRequest: UpdateUserRequest) {
+        return userRepository.updateProfile(id, updateUserRequest)
     }
 
     fun findAllDrivers(): List<UserInfo> {

@@ -10,14 +10,10 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import nl.eazysoftware.eazyrecyclingservice.controller.user.CreateUserRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.user.UpdateUserRequest
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 
 @Repository
 class UserRepository(private val supabaseClient: SupabaseClient) {
-
-    private val log: Logger = LoggerFactory.getLogger(UserRepository::class.java)
 
     fun getAllUsers(): List<UserInfo> {
         return runBlocking {
@@ -57,7 +53,7 @@ class UserRepository(private val supabaseClient: SupabaseClient) {
         }
     }
 
-    fun updateUser(id: String, updateUserRequest: UpdateUserRequest) {
+    fun updateUserIncludingRoles(id: String, updateUserRequest: UpdateUserRequest) {
         val rolesJsonArray = buildJsonArray {
             updateUserRequest.roles.forEach { role ->
                 add(JsonPrimitive(role))
@@ -71,6 +67,18 @@ class UserRepository(private val supabaseClient: SupabaseClient) {
                     put("first_name", updateUserRequest.firstName)
                     put("last_name", updateUserRequest.lastName)
                     put("roles", rolesJsonArray)
+                }
+            }
+        }
+    }
+
+    fun updateProfile(id: String, updateUserRequest: UpdateUserRequest) {
+        return runBlocking {
+            supabaseClient.auth.admin.updateUserById(id) {
+                email = updateUserRequest.email
+                userMetadata = buildJsonObject {
+                    put("first_name", updateUserRequest.firstName)
+                    put("last_name", updateUserRequest.lastName)
                 }
             }
         }
