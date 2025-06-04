@@ -74,6 +74,7 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.20.5")
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
     testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
