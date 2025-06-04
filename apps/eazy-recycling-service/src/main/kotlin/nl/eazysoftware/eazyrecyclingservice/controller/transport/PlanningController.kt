@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PlanningService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.util.*
@@ -11,6 +13,7 @@ class PlanningController(
     val planningService: PlanningService
 ) {
 
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @GetMapping("/{pickupDate}")
     fun getPlanningByDate(
         @PathVariable pickupDate: LocalDate,
