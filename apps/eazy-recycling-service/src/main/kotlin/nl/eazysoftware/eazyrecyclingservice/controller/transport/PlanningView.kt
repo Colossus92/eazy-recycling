@@ -27,7 +27,8 @@ data class TransportView(
     val status: TransportDto.Status,
     val displayNumber: String?,
     val containerId: String?,
-    val transportType: TransportType
+    val transportType: TransportType,
+    val sequenceNumber: Int,
 ) {
 
     constructor(transportDto: TransportDto): this(
@@ -41,6 +42,7 @@ data class TransportView(
         status = transportDto.getStatus(),
         displayNumber = transportDto.displayNumber,
         containerId = transportDto.wasteContainer?.id,
-        transportType = transportDto.transportType
+        transportType = transportDto.transportType,
+        sequenceNumber = transportDto.sequenceNumber,
     )
 }

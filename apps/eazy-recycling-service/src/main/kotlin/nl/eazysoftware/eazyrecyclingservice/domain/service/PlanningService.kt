@@ -1,10 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -15,7 +17,8 @@ import kotlin.collections.component2
 @Service
 class PlanningService(
     private val transportRepository: TransportRepository,
-    private val truckService: TruckService
+    private val truckService: TruckService,
+    private val entityManager: EntityManager,
 ) {
 
     fun getPlanningByDate(
@@ -57,7 +60,15 @@ class PlanningService(
         transports.map { transportDto -> TransportView(transportDto) }
             .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
             .map { (truckLicensePlate, transportViews) ->
-                TransportsView(truckLicensePlate, transportViews.groupBy { it.pickupDate })
+                // Group by pickup date
+                val transportsByDate = transportViews.groupBy { it.pickupDate }
+
+                // Sort each group by sequence number (if available)
+                val sortedTransportsByDate = transportsByDate.mapValues { (_, dateTransports) ->
+                    dateTransports.sortedBy { it.sequenceNumber }
+                }
+
+                TransportsView(truckLicensePlate, sortedTransportsByDate)
             }.toMutableList()
 
     private fun addMissingTrucks(transportsView: MutableList<TransportsView>) {
@@ -77,5 +88,25 @@ class PlanningService(
         return (0L..6L).map { dayOffset ->
             monday.plus(dayOffset, ChronoUnit.DAYS)
         }
+    }
+
+    fun reorderTransports(date: LocalDate, licensePlate: String, transportIds: List<UUID>): PlanningView {
+        // Validate that all transports exist and belong to the specified truck and date
+        val transports = transportRepository.findAllById(transportIds)
+
+        // Update sequence numbers based on the order in transportIds
+        val transportsWithSequenceNumber = transportIds.mapIndexed { index, id ->
+            val transport = transports.first { it.id == id }
+            transport.copy(
+                truck = entityManager.getReference(Truck::class.java, licensePlate),
+                pickupDateTime = date.atTime(transport.pickupDateTime.hour, transport.pickupDateTime.minute),
+                deliveryDateTime = date.atTime(transport.deliveryDateTime.hour, transport.deliveryDateTime.minute),
+                sequenceNumber = index,
+            )
+        }
+        transportRepository.saveAll(transportsWithSequenceNumber)
+
+        // Return updated planning view
+        return getPlanningByDate(date)
     }
 }

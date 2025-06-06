@@ -85,7 +85,8 @@ class PlanningControllerSecurityTest {
                                     status = TransportDto.Status.PLANNED,
                                     displayNumber = "123",
                                     containerId = UUID.randomUUID().toString(),
-                                    transportType = TransportType.CONTAINER
+                                    transportType = TransportType.CONTAINER,
+                                    sequenceNumber = 1,
                                 )
                             )
                         )

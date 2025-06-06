@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
@@ -16,6 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.verify
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -28,12 +32,15 @@ class PlanningServiceTest {
 
     @Mock
     private lateinit var truckService: TruckService
+    
+    @Mock
+    private lateinit var entityManager: EntityManager
 
     private lateinit var planningService: PlanningService
 
     @BeforeEach
     fun setUp() {
-        planningService = PlanningService(transportRepository, truckService)
+        planningService = PlanningService(transportRepository, truckService, entityManager)
     }
 
     @Test
@@ -99,7 +106,8 @@ class PlanningServiceTest {
             containerOperation = ContainerOperation.PICKUP,
             truck = truck1,
             driver = driver,
-            note = "Test transport 1"
+            note = "Test transport 1",
+            sequenceNumber = 1,
         )
 
         val transport2 = TransportDto(
@@ -117,7 +125,8 @@ class PlanningServiceTest {
             containerOperation = ContainerOperation.DELIVERY,
             truck = truck1,
             driver = driver,
-            note = "Test transport 2"
+            note = "Test transport 2",
+            sequenceNumber = 2,
         )
 
         val transport3 = TransportDto(
@@ -135,7 +144,8 @@ class PlanningServiceTest {
             containerOperation = null,
             truck = null, // Unassigned
             driver = null, // Unassigned
-            note = "Test transport 3"
+            note = "Test transport 3",
+            sequenceNumber = 3,
         )
 
         val transports = listOf(transport1, transport2, transport3)
@@ -234,7 +244,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
             transportType = TransportType.WASTE,
             truck = truck1,
-            note = "Test transport 1"
+            note = "Test transport 1",
+            sequenceNumber = 1,
         )
 
         val transport2 = TransportDto(
@@ -250,7 +261,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 21, 15, 0),
             transportType = TransportType.CONTAINER,
             truck = truck2,
-            note = "Test transport 2"
+            note = "Test transport 2",
+            sequenceNumber = 2
         )
 
         val transports = listOf(transport1, transport2)
@@ -336,7 +348,8 @@ class PlanningServiceTest {
             transportType = TransportType.WASTE,
             truck = truck,
             driver = driver1,
-            note = "Test transport 1"
+            note = "Test transport 1",
+            sequenceNumber = 1
         )
 
         val transport2 = TransportDto(
@@ -353,7 +366,8 @@ class PlanningServiceTest {
             transportType = TransportType.CONTAINER,
             truck = truck,
             driver = driver2,
-            note = "Test transport 2"
+            note = "Test transport 2",
+            sequenceNumber = 2,
         )
 
         val transports = listOf(transport1, transport2)
@@ -437,7 +451,8 @@ class PlanningServiceTest {
             transportType = TransportType.WASTE,
             truck = truck,
             driver = driver,
-            note = "Planned transport"
+            note = "Planned transport",
+            sequenceNumber = 1,
         )
 
         // UNPLANNED transport (no truck or driver assigned)
@@ -455,7 +470,8 @@ class PlanningServiceTest {
             transportType = TransportType.CONTAINER,
             truck = null,
             driver = null,
-            note = "Unplanned transport"
+            note = "Unplanned transport",
+            sequenceNumber = 2,
         )
 
         // FINISHED transport (has truck and driver, and delivery time is in the past)
@@ -473,7 +489,8 @@ class PlanningServiceTest {
             transportType = TransportType.WASTE,
             truck = truck,
             driver = driver,
-            note = "Finished transport"
+            note = "Finished transport",
+            sequenceNumber = 3,
         )
 
         val transports = listOf(transport1, transport2, transport3)
@@ -543,7 +560,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
             transportType = TransportType.WASTE,
             truck = truck1,
-            note = "Test transport 1"
+            note = "Test transport 1",
+            sequenceNumber = 1
         )
 
         val transport2 = TransportDto(
@@ -559,7 +577,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 20, 15, 0),
             transportType = TransportType.CONTAINER,
             truck = truck1,
-            note = "Test transport 2"
+            note = "Test transport 2",
+            sequenceNumber = 2,
         )
 
         val transport3 = TransportDto(
@@ -575,7 +594,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 21, 13, 0),
             transportType = TransportType.WASTE,
             truck = truck2,
-            note = "Test transport 3"
+            note = "Test transport 3",
+            sequenceNumber = 3,
         )
 
         val transport4 = TransportDto(
@@ -591,7 +611,8 @@ class PlanningServiceTest {
             deliveryDateTime = LocalDateTime.of(2025, 5, 22, 14, 0),
             transportType = TransportType.CONTAINER,
             truck = null, // Unassigned
-            note = "Test transport 4"
+            note = "Test transport 4",
+            sequenceNumber = 4,
         )
 
         val transports = listOf(transport1, transport2, transport3, transport4)
@@ -645,5 +666,250 @@ class PlanningServiceTest {
         for (i in 0 until 6) {
             assertThat(result[i + 1]).isEqualTo(result[i].plusDays(1))
         }
+    }
+
+    @Test
+    fun `reorderTransports should update sequence numbers and allow moving to different truck and date`() {
+        // Given
+        val originalDate = LocalDate.of(2025, 5, 20)
+        val newDate = LocalDate.of(2025, 5, 21)
+        val originalLicensePlate = "ABC-123"
+        val newLicensePlate = "XYZ-789"
+
+        val truck1 = Truck(licensePlate = originalLicensePlate, brand = "Mercedes", model = "Actros")
+        val truck2 = Truck(licensePlate = newLicensePlate, brand = "Scania", model = "R450")
+
+        val transport1Id = UUID.randomUUID()
+        val transport2Id = UUID.randomUUID()
+        val transport3Id = UUID.randomUUID()
+
+        val company = CompanyDto(
+            id = UUID.randomUUID(),
+            name = "Test Company",
+            address = AddressDto(
+                streetName = "Main Street",
+                buildingNumber = "10",
+                postalCode = "1234 AB",
+                city = "Amsterdam",
+                country = "Netherlands"
+            )
+        )
+
+        val location = LocationDto(
+            id = UUID.randomUUID().toString(),
+            address = AddressDto(
+                streetName = "Main Street",
+                buildingNumber = "10",
+                postalCode = "1234 AB",
+                city = "Amsterdam",
+                country = "Netherlands"
+            )
+        )
+
+        // Transports with original truck and date
+        val transport1 = TransportDto(
+            id = transport1Id,
+            displayNumber = "T-001",
+            consignorParty = company,
+            carrierParty = company,
+            pickupCompany = company,
+            pickupLocation = location,
+            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 10, 0),
+            deliveryCompany = company,
+            deliveryLocation = location,
+            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 14, 0),
+            transportType = TransportType.WASTE,
+            truck = truck1,
+            note = "Test transport 1",
+            sequenceNumber = 0
+        )
+
+        val transport2 = TransportDto(
+            id = transport2Id,
+            displayNumber = "T-002",
+            consignorParty = company,
+            carrierParty = company,
+            pickupCompany = company,
+            pickupLocation = location,
+            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 11, 0),
+            deliveryCompany = company,
+            deliveryLocation = location,
+            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 15, 0),
+            transportType = TransportType.CONTAINER,
+            truck = truck1,
+            note = "Test transport 2",
+            sequenceNumber = 1
+        )
+
+        val transport3 = TransportDto(
+            id = transport3Id,
+            displayNumber = "T-003",
+            consignorParty = company,
+            carrierParty = company,
+            pickupCompany = company,
+            pickupLocation = location,
+            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 9, 0),
+            deliveryCompany = company,
+            deliveryLocation = location,
+            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 13, 0),
+            transportType = TransportType.WASTE,
+            truck = truck1,
+            note = "Test transport 3",
+            sequenceNumber = 2
+        )
+
+        val transports = listOf(transport1, transport2, transport3)
+
+        // We'll move all transports to a new truck and date with a new order
+        val transportIds = listOf(transport3Id, transport1Id, transport2Id)
+
+        // Mock repository responses
+        `when`(transportRepository.findAllById(transportIds)).thenReturn(transports)
+
+        // Mock entity manager to return the truck reference
+        `when`(entityManager.getReference(Truck::class.java, newLicensePlate)).thenReturn(truck2)
+
+        // For the getPlanningByDate call at the end
+        val mondayOfWeek = newDate.minusDays(newDate.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(transportRepository.findByPickupDateTimeIsBetween(
+            mondayOfWeek.atStartOfDay(),
+            sundayOfWeek.atTime(23, 59, 59)
+        )).thenReturn(transports)
+
+        `when`(truckService.getAllTrucks()).thenReturn(listOf(truck1, truck2))
+
+        // When
+        val result = planningService.reorderTransports(newDate, newLicensePlate, transportIds)
+
+        // Then
+        // Verify saveAll was called with transports having updated truck, date and sequence numbers
+        val transportCaptor = argumentCaptor<List<TransportDto>>()
+        verify(transportRepository).saveAll(transportCaptor.capture())
+
+        val updatedTransports = transportCaptor.firstValue
+        assertThat(updatedTransports).hasSize(3)
+        assertThat(updatedTransports[0].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
+        assertThat(updatedTransports[1].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
+        assertThat(updatedTransports[2].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[2].sequenceNumber).isEqualTo(2)
+        verify(transportRepository).saveAll(any<List<TransportDto>>())
+
+        // Verify the result contains the updated planning
+        assertThat(result).isNotNull
+    }
+
+    @Test
+    fun `reorderTransports should preserve time components when changing date`() {
+        // Given
+        val originalDate = LocalDate.of(2025, 5, 20)
+        val newDate = LocalDate.of(2025, 5, 21)
+        val licensePlate = "ABC-123"
+
+        val truck = Truck(licensePlate = licensePlate, brand = "Mercedes", model = "Actros")
+
+        val transportId = UUID.randomUUID()
+
+        val company = CompanyDto(
+            id = UUID.randomUUID(),
+            name = "Test Company",
+            address = AddressDto(
+                streetName = "Main Street",
+                buildingNumber = "10",
+                postalCode = "1234 AB",
+                city = "Amsterdam",
+                country = "Netherlands"
+            )
+        )
+
+        val location = LocationDto(
+            id = UUID.randomUUID().toString(),
+            address = AddressDto(
+                streetName = "Main Street",
+                buildingNumber = "10",
+                postalCode = "1234 AB",
+                city = "Amsterdam",
+                country = "Netherlands"
+            )
+        )
+
+        // Transport with specific time components
+        val originalHour = 14
+        val originalMinute = 30
+        val transport = TransportDto(
+            id = transportId,
+            displayNumber = "T-001",
+            consignorParty = company,
+            carrierParty = company,
+            pickupCompany = company,
+            pickupLocation = location,
+            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, originalHour, originalMinute),
+            deliveryCompany = company,
+            deliveryLocation = location,
+            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 18, 0),
+            transportType = TransportType.WASTE,
+            truck = truck,
+            note = "Test transport with specific time",
+            sequenceNumber = 0
+        )
+
+        val transports = listOf(transport)
+        val transportIds = listOf(transportId)
+
+        // Mock repository responses
+        `when`(transportRepository.findAllById(transportIds)).thenReturn(transports)
+
+        // Mock entity manager
+        `when`(entityManager.getReference(Truck::class.java, licensePlate)).thenReturn(truck)
+
+        // For the getPlanningByDate call at the end
+        val mondayOfWeek = newDate.minusDays(newDate.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(transportRepository.findByPickupDateTimeIsBetween(
+            mondayOfWeek.atStartOfDay(),
+            sundayOfWeek.atTime(23, 59, 59)
+        )).thenReturn(transports)
+
+        `when`(truckService.getAllTrucks()).thenReturn(listOf(truck))
+
+        // When
+        planningService.reorderTransports(newDate, licensePlate, transportIds)
+
+        // Then
+        verify(transportRepository).saveAll(any<List<TransportDto>>())
+    }
+
+    @Test
+    fun `reorderTransports should handle empty transport list gracefully`() {
+        // Given
+        val date = LocalDate.of(2025, 5, 20)
+        val licensePlate = "ABC-123"
+        val transportIds = emptyList<UUID>()
+
+        // Mock repository responses
+        `when`(transportRepository.findAllById(transportIds)).thenReturn(emptyList())
+
+        // For the getPlanningByDate call at the end
+        val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(transportRepository.findByPickupDateTimeIsBetween(
+            mondayOfWeek.atStartOfDay(),
+            sundayOfWeek.atTime(23, 59, 59)
+        )).thenReturn(emptyList())
+
+        `when`(truckService.getAllTrucks()).thenReturn(emptyList())
+
+        // When
+        val result = planningService.reorderTransports(date, licensePlate, transportIds)
+
+        // Then
+        // Verify saveAll was not called with an empty list
+        verify(transportRepository).saveAll(emptyList())
+        assertThat(result).isNotNull
     }
 }

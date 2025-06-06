@@ -410,7 +410,8 @@ class TransportControllerIntegrationTest {
             deliveryDateTime = LocalDateTime.now().plusDays(2),
             transportType = TransportType.WASTE,
             note = "Unassigned Waybill Transport",
-            goods = goods
+            goods = goods,
+            sequenceNumber = 1,
         )
         val savedTransport = transportRepository.save(transport)
 
@@ -501,7 +502,8 @@ class TransportControllerIntegrationTest {
             truck = testTruck,
             driver = testDriver,
             note = note,
-            goods = goods
+            goods = goods,
+            sequenceNumber = 1,
         )
     }
 }

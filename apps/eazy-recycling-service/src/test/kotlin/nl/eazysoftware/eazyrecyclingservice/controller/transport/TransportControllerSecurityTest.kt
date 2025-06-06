@@ -151,7 +151,8 @@ class TransportControllerSecurityTest {
             note = "Test transport",
             pickupCompany = mockCompanyDto(),
             deliveryCompany = mockCompanyDto(),
-            containerOperation = ContainerOperation.DELIVERY
+            containerOperation = ContainerOperation.DELIVERY,
+            sequenceNumber = 1,
         )
 
         // Create transport with a different driver

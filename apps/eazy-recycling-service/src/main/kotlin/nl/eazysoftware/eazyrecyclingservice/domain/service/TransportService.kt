@@ -110,6 +110,7 @@ class TransportService(
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
             goods = goods,
             note = request.note,
+            sequenceNumber = 9999
         )
 
         log.info("Creating transport: $transport")

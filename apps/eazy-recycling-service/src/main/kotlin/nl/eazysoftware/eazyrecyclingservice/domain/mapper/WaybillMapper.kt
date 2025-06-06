@@ -44,6 +44,7 @@ abstract class WaybillMapper {
     @Mapping(target = "wasteContainer", ignore = true) // TODO resolve container
     @Mapping(target = "driver", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "sequenceNumber", constant = "9999")
     abstract fun toDto(waybill: Waybill): TransportDto
 
     @Mapping(target = "id", ignore = true)

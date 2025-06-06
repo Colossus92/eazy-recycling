@@ -23,4 +23,20 @@ class PlanningController(
     ): PlanningView {
         return planningService.getPlanningByDate(pickupDate, truckId, driverId, status)
     }
+
+    @PutMapping("/reorder")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    fun reorderTransports(@RequestBody reorderRequest: TransportReorderRequest): PlanningView {
+        return planningService.reorderTransports(
+            reorderRequest.date,
+            reorderRequest.licensePlate,
+            reorderRequest.transportIds
+        )
+    }
 }
+
+data class TransportReorderRequest(
+    val date: LocalDate,
+    val licensePlate: String,
+    val transportIds: List<UUID>
+)

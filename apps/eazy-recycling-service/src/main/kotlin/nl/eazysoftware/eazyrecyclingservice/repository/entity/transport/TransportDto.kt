@@ -108,6 +108,9 @@ data class TransportDto(
     @Column(nullable = false)
     var updatedAt: LocalDateTime? = LocalDateTime.now(),
 
+    @Column(nullable = false)
+    var sequenceNumber: Int
+
     ) {
 
     enum class Status {
