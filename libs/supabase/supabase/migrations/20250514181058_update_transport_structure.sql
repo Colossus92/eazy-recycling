@@ -1,5 +1,3 @@
-create sequence "public"."transport_seq_25";
-
 drop policy "Enable delete for authenticated users only" on "public"."drivers";
 
 drop policy "Enable insert for authenticated users only" on "public"."drivers";
