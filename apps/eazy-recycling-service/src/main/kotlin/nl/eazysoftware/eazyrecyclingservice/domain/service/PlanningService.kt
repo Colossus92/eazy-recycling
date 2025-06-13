@@ -1,9 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.PlanningView
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportView
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.TransportsView
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.*
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
@@ -11,8 +9,6 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Service
 class PlanningService(
@@ -108,5 +104,18 @@ class PlanningService(
 
         // Return updated planning view
         return getPlanningByDate(date)
+    }
+
+    fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
+        return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
+            driverId,
+            startDate.atStartOfDay(),
+            endDate.atTime(23, 59, 59))
+            .groupBy { it.pickupDateTime.toLocalDate() }
+            .mapValues { (_, transportsByDate) ->
+                transportsByDate
+                    .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }
+                    .mapValues { (_, transportsByTruck) -> transportsByTruck.map{ DriverPlanningItem(it) } }
+            }
     }
 }
