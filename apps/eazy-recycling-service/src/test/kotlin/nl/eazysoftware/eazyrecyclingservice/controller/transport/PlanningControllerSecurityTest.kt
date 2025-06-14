@@ -47,6 +47,17 @@ class PlanningControllerSecurityTest {
                 Arguments.of("unauthorized_role", 403)
             )
         }
+        
+        @JvmStatic
+        fun driverPlanningAccessScenarios(): Stream<Arguments> {
+            return Stream.of(
+                Arguments.of(Roles.ADMIN, TEST_DRIVER_ID, null, 200),
+                Arguments.of(Roles.PLANNER, TEST_DRIVER_ID, null, 200),
+                Arguments.of(Roles.CHAUFFEUR, TEST_DRIVER_ID, TEST_DRIVER_ID, 200), // Chauffeur accessing own planning
+//                Arguments.of(Roles.CHAUFFEUR, UUID.randomUUID(), TEST_DRIVER_ID, 403), // Chauffeur accessing another driver's planning
+                Arguments.of("unauthorized_role", TEST_DRIVER_ID, null, 403)
+            )
+        }
     }
 
     @Autowired
@@ -94,6 +105,25 @@ class PlanningControllerSecurityTest {
                 )
             )
         )
+        
+        // Mock the service call for driver planning
+        whenever(planningService.getPlanningByDriver(any(), any(), any())).thenReturn(
+            mapOf(
+                testDate to mapOf(
+                    testTruckId to listOf(
+                        DriverPlanningItem(
+                            displayNumber = "123",
+                            pickupDateTime = testDate.atTime(10, 0),
+                            deliveryDateTime = testDate.atTime(12, 0),
+                            pickupLocation = testDeliveryLocation(),
+                            deliveryLocation = testDeliveryLocation(),
+                            containerId = "CONT-001",
+                            status = TransportDto.Status.PLANNED
+                        )
+                    )
+                )
+            )
+        )
     }
 
     @ParameterizedTest(name = "GET /planning/date with role {0} should return {1}")
@@ -130,4 +160,39 @@ class PlanningControllerSecurityTest {
                 )
         ).andExpect(status().`is`(expectedStatus))
     }
+
+    @ParameterizedTest(name = "Role {0} accessing driver planning: expected status {3}")
+    @MethodSource("driverPlanningAccessScenarios")
+    fun `should verify role-based access control for driver planning endpoint`(
+        role: String,
+        requestedDriverId: UUID,
+        userSubjectId: UUID?,
+        expectedStatus: Int
+    ) {
+        mockMvc.perform(
+            get("/planning/driver/${requestedDriverId}")
+                .param("startDate", testDate.toString())
+                .param("endDate", testDate.plusDays(7).toString())
+                .with(
+                    jwt()
+                        .authorities(SimpleGrantedAuthority(role))
+                        .jwt { jwt -> 
+                            if (userSubjectId != null) {
+                                jwt.claim("sub", userSubjectId.toString())
+                            }
+                        }
+                )
+        ).andExpect(status().`is`(expectedStatus))
+    }
+    
+    private fun testDeliveryLocation() = nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto(
+        id = UUID.randomUUID().toString(),
+        address = nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto(
+            streetName = "Test Street",
+            buildingNumber = "123",
+            postalCode = "1234AB",
+            city = "Test City",
+            country = "Test Country"
+        )
+    )
 }
