@@ -4,8 +4,10 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class DriverPlanningItem(
+    val id: UUID?,
     val displayNumber: String?,
     val pickupDateTime: LocalDateTime,
     val deliveryDateTime: LocalDateTime,
@@ -15,6 +17,7 @@ data class DriverPlanningItem(
     val status: TransportDto.Status,
 ) {
     constructor(transport: TransportDto) : this(
+        transport.id,
         transport.displayNumber,
         transport.pickupDateTime,
         transport.deliveryDateTime,
