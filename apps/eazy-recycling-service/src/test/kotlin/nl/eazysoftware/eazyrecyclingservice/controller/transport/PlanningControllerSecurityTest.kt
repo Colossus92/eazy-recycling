@@ -112,6 +112,7 @@ class PlanningControllerSecurityTest {
                 testDate to mapOf(
                     testTruckId to listOf(
                         DriverPlanningItem(
+                            id = UUID.randomUUID(),
                             displayNumber = "123",
                             pickupDateTime = testDate.atTime(10, 0),
                             deliveryDateTime = testDate.atTime(12, 0),
