@@ -1,30 +1,34 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 
+import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import java.time.LocalDateTime
+import jakarta.persistence.Table
+import java.time.ZonedDateTime
 import java.util.UUID
 
+@Entity
+@Table(name = "signatures")
 data class SignaturesDto(
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID? = null,
+    val transportId: UUID? = null,
 
-    val consignorSignature: String? = null,
-    val consignorEmail: String? = null,
-    val consignorSignedAt: LocalDateTime? = null,
+    var consignorSignature: String? = null,
+    var consignorEmail: String? = null,
+    var consignorSignedAt: ZonedDateTime? = null,
 
-    val pickupSignature: String? = null,
-    val pickupEmail: String? = null,
-    val pickupSignedAt: LocalDateTime? = null,
+    var pickupSignature: String? = null,
+    var pickupEmail: String? = null,
+    var pickupSignedAt: ZonedDateTime? = null,
 
-    val carrierSignature: String? = null,
-    val carrierEmail: String? = null,
-    val carrierSignedAt: LocalDateTime? = null,
+    var carrierSignature: String? = null,
+    var carrierEmail: String? = null,
+    var carrierSignedAt: ZonedDateTime? = null,
 
-    val consigneeSignature: String? = null,
-    val consigneeEmail: String? = null,
-    val consigneeSignedAt: LocalDateTime? = null,
+    var consigneeSignature: String? = null,
+    var consigneeEmail: String? = null,
+    var consigneeSignedAt: ZonedDateTime? = null,
 )
