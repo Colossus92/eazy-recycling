@@ -152,5 +152,5 @@ create table if not exists signatures (
                                        "carrier_signed_at" timestamp with time zone,
                                        "consignee_signature" text,
                                        "consignee_email" text,
-                                       "consignee_signed_at" text
+                                       "consignee_signed_at" timestamp with time zone
 );

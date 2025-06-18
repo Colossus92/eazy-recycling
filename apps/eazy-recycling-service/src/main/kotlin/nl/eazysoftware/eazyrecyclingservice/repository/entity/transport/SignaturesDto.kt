@@ -1,8 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import java.time.ZonedDateTime
@@ -13,8 +12,8 @@ import java.util.UUID
 data class SignaturesDto(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    val transportId: UUID? = null,
+    @Column(name = "transport_id")
+    val transportId: UUID,
 
     var consignorSignature: String? = null,
     var consignorEmail: String? = null,

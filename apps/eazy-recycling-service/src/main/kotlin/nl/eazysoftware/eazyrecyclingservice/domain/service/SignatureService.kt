@@ -29,7 +29,7 @@ class SignatureService(
                 pickupSigned = false
             )
 
-    fun saveSignature(id: UUID, request: CreateSignatureRequest): Any {
+    fun saveSignature(id: UUID, request: CreateSignatureRequest): SignatureStatusView {
         val signatures = signaturesRepository.findByIdOrNull(id) ?: SignaturesDto(transportId = id)
 
         when (request.party) {
