@@ -39,7 +39,7 @@ class PlanningService(
 
         val transportsView = createTransportsView(transports)
 
-        addMissingTrucks(transportsView)
+        addMissingTrucks(transportsView, truckId)
 
         transportsView.sortWith(compareBy<TransportsView> {
             when {
@@ -67,12 +67,20 @@ class PlanningService(
                 TransportsView(truckLicensePlate, sortedTransportsByDate)
             }.toMutableList()
 
-    private fun addMissingTrucks(transportsView: MutableList<TransportsView>) {
-        truckService.getAllTrucks()
-            .map { it.licensePlate }
-            .filter { it !in transportsView.map { it.truck } }
-            .map { TransportsView(it, emptyMap()) }
-            .apply { transportsView.addAll(this) }
+    private fun addMissingTrucks(transportsView: MutableList<TransportsView>, truckId: String?) {
+        if (truckId != null && transportsView.any { it.truck == truckId }) {
+            return
+        }
+        
+        truckId?.let {
+            transportsView.add(TransportsView(it, emptyMap()))
+        } ?: run {
+            val existingTrucks = transportsView.map { it.truck }.toSet()
+            truckService.getAllTrucks()
+                .map { it.licensePlate }
+                .filterNot { it in existingTrucks }
+                .forEach { transportsView.add(TransportsView(it, emptyMap())) }
+        }
     }
 
     private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
@@ -110,12 +118,13 @@ class PlanningService(
         return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
             driverId,
             startDate.atStartOfDay(),
-            endDate.atTime(23, 59, 59))
+            endDate.atTime(23, 59, 59)
+        )
             .groupBy { it.pickupDateTime.toLocalDate() }
             .mapValues { (_, transportsByDate) ->
                 transportsByDate
                     .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }
-                    .mapValues { (_, transportsByTruck) -> transportsByTruck.map{ DriverPlanningItem(it) } }
+                    .mapValues { (_, transportsByTruck) -> transportsByTruck.map { DriverPlanningItem(it) } }
             }
     }
 }

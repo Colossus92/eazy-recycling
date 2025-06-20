@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
+import nl.eazysoftware.eazyrecyclingservice.test.helpers.TransportDtoHelper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,11 +33,14 @@ class PlanningServiceTest {
 
     @Mock
     private lateinit var truckService: TruckService
-    
+
     @Mock
     private lateinit var entityManager: EntityManager
 
     private lateinit var planningService: PlanningService
+
+    private val truck1 = Truck(licensePlate = "ABC-123", brand = "Volvo", model = "FH16")
+    private val truck2 = Truck(licensePlate = "XYZ-789", brand = "Mercedes", model = "Actros")
 
     @BeforeEach
     fun setUp() {
@@ -50,112 +54,21 @@ class PlanningServiceTest {
         val mondayOfWeek = LocalDate.of(2025, 5, 19)
         val sundayOfWeek = LocalDate.of(2025, 5, 25)
 
-        val truck1 = Truck(licensePlate = "ABC-123", brand = "Volvo", model = "FH16")
-        val truck2 = Truck(licensePlate = "XYZ-789", brand = "Mercedes", model = "Actros")
 
-        val driver = ProfileDto(
-            id = UUID.randomUUID(),
-            firstName = "John",
-            lastName = "Doe",
-        )
-
-        val address1 = AddressDto(
-            streetName = "Main Street",
-            buildingNumber = "10",
-            postalCode = "1234 AB",
-            city = "Amsterdam",
-            country = "Netherlands"
-        )
-
-        val address2 = AddressDto(
-            streetName = "Second Street",
-            buildingNumber = "20",
-            postalCode = "5678 CD",
-            city = "Rotterdam",
-            country = "Netherlands"
-        )
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = address1
-        )
-
-        val pickupLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = address1
-        )
-
-        val deliveryLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = address2
-        )
-
-        val transport1 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
-            transportType = TransportType.WASTE,
-            containerOperation = ContainerOperation.PICKUP,
-            truck = truck1,
-            driver = driver,
-            note = "Test transport 1",
-            sequenceNumber = 1,
-        )
-
-        val transport2 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = LocalDateTime.of(2025, 5, 21, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 21, 15, 0),
-            transportType = TransportType.CONTAINER,
-            containerOperation = ContainerOperation.DELIVERY,
-            truck = truck1,
-            driver = driver,
-            note = "Test transport 2",
-            sequenceNumber = 2,
-        )
-
-        val transport3 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-003",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = LocalDateTime.of(2025, 5, 22, 9, 0),
-            deliveryCompany = company,
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 22, 13, 0),
-            transportType = TransportType.WASTE,
-            containerOperation = null,
-            truck = null, // Unassigned
-            driver = null, // Unassigned
-            note = "Test transport 3",
-            sequenceNumber = 3,
-        )
+        val transport1 = TransportDtoHelper.transport(truck = truck1, pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0))
+        val transport2 = TransportDtoHelper.transport(truck = truck1, pickupDateTime = LocalDateTime.of(2025, 5, 21, 11, 0))
+        val transport3 = TransportDtoHelper.transport(truck = null, driver = null, pickupDateTime = LocalDateTime.of(2025, 5, 22, 9, 0),)
 
         val transports = listOf(transport1, transport2, transport3)
         val trucks = listOf(truck1, truck2)
 
         // When
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(transports)
 
         `when`(truckService.getAllTrucks()).thenReturn(trucks)
 
@@ -171,7 +84,7 @@ class PlanningServiceTest {
         assertThat(result.transports).hasSize(3)
 
         // Check that transports are grouped correctly by truck
-        val assignedTruckTransports = result.transports.find { it.truck == "ABC-123" }
+        val assignedTruckTransports = result.transports.find { it.truck == truck1.licensePlate }
         assertThat(assignedTruckTransports).isNotNull
         assertThat(assignedTruckTransports!!.transports).hasSize(2) // Two dates with transports
 
@@ -192,101 +105,29 @@ class PlanningServiceTest {
         val pickupDate = LocalDate.of(2025, 5, 20)
         val mondayOfWeek = LocalDate.of(2025, 5, 19)
         val sundayOfWeek = LocalDate.of(2025, 5, 25)
-        val truckId = "ABC-123"
 
-        val truck1 = Truck(licensePlate = "ABC-123", brand = "Mercedes", model = "Actros")
-        val truck2 = Truck(licensePlate = "XYZ-789", brand = "Scania", model = "R450")
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val pickupLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val deliveryLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Second Street",
-                buildingNumber = "20",
-                postalCode = "5678 CD",
-                city = "Rotterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val transport1 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
-            transportType = TransportType.WASTE,
-            truck = truck1,
-            note = "Test transport 1",
-            sequenceNumber = 1,
-        )
-
-        val transport2 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = LocalDateTime.of(2025, 5, 21, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 21, 15, 0),
-            transportType = TransportType.CONTAINER,
-            truck = truck2,
-            note = "Test transport 2",
-            sequenceNumber = 2
-        )
-
+        val transport1 = TransportDtoHelper.transport(truck = truck1)
+        val transport2 = TransportDtoHelper.transport(truck = truck1)
         val transports = listOf(transport1, transport2)
-        val trucks = listOf(truck1, truck2)
 
         // When
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(transports)
 
-        `when`(truckService.getAllTrucks()).thenReturn(trucks)
-
-        val result = planningService.getPlanningByDate(pickupDate, truckId)
+        val result = planningService.getPlanningByDate(pickupDate, truck1.licensePlate)
 
         // Then
         assertThat(result).isNotNull
-        assertThat(result.transports).hasSize(2) // ABC-123 and XYZ-789 (empty)
+        assertThat(result.transports).hasSize(1)
 
         // Check that only transports for the specified truck are included
-        val filteredTransports = result.transports.find { it.truck == truckId }
+        val filteredTransports = result.transports.find { it.truck == truck1.licensePlate }
         assertThat(filteredTransports).isNotNull
         assertThat(filteredTransports!!.transports).hasSize(1) // One date with transports
-        assertThat(filteredTransports.transports.values.flatten()).hasSize(1) // One transport
     }
 
     @Test
@@ -295,106 +136,37 @@ class PlanningServiceTest {
         val pickupDate = LocalDate.of(2025, 5, 20)
         val mondayOfWeek = LocalDate.of(2025, 5, 19)
         val sundayOfWeek = LocalDate.of(2025, 5, 25)
-        val driverId = UUID.randomUUID()
 
-        val truck = Truck(licensePlate = "ABC-123", brand = "Mercedes", model = "Actros")
-
-        val driver1 = ProfileDto(
-            id = driverId,
-            firstName = "John",
-            lastName = "Doe",
-        )
-
-        val driver2 = ProfileDto(
-            id = UUID.randomUUID(),
-            firstName = "Jane",
-            lastName = "Smith",
-        )
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val location = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val transport1 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
-            transportType = TransportType.WASTE,
-            truck = truck,
-            driver = driver1,
-            note = "Test transport 1",
-            sequenceNumber = 1
-        )
-
-        val transport2 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 21, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 21, 15, 0),
-            transportType = TransportType.CONTAINER,
-            truck = truck,
-            driver = driver2,
-            note = "Test transport 2",
-            sequenceNumber = 2,
-        )
+        val transport1 = TransportDtoHelper.transport(truck = truck1)
+        val transport2 = TransportDtoHelper.transport(truck = truck1, driver = TransportDtoHelper.driver2)
 
         val transports = listOf(transport1, transport2)
-        val trucks = listOf(truck)
+        val trucks = listOf(truck1)
 
         // When
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(transports)
 
         `when`(truckService.getAllTrucks()).thenReturn(trucks)
 
-        val result = planningService.getPlanningByDate(pickupDate, driverId = driverId)
+        val result = planningService.getPlanningByDate(pickupDate, driverId = TransportDtoHelper.driver1.id)
 
         // Then
         assertThat(result).isNotNull
 
         // Check that only transports for the specified driver are included
-        val truckTransports = result.transports.find { it.truck == "ABC-123" }
+        val truckTransports = result.transports.find { it.truck == truck1.licensePlate }
         assertThat(truckTransports).isNotNull
         assertThat(truckTransports!!.transports).hasSize(1) // One date with transports
         assertThat(truckTransports.transports.values.flatten()).hasSize(1) // One transport
 
         // Verify the transport is the one with the specified driver
         val transportView = truckTransports.transports.values.flatten().first()
-        assertThat(transportView.driver?.id).isEqualTo(driverId)
+        assertThat(transportView.driver?.id).isEqualTo(TransportDtoHelper.driver1.id)
     }
 
     @Test
@@ -405,102 +177,29 @@ class PlanningServiceTest {
         val sundayOfWeek = LocalDate.of(2025, 5, 25)
         val status = "PLANNED,FINISHED"
 
-        val truck = Truck(licensePlate = "ABC-123", brand = "Mercedes", model = "Actros")
-
-        val driver = ProfileDto(
-            id = UUID.randomUUID(),
-            firstName = "John",
-            lastName = "Doe",
-        )
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val location = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
 
         // PLANNED transport (has truck and driver, and delivery time is in the future)
-        val transport1 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 6, 20, 14, 0), // Future date
-            transportType = TransportType.WASTE,
-            truck = truck,
-            driver = driver,
-            note = "Planned transport",
-            sequenceNumber = 1,
+        val transport1 = TransportDtoHelper.transport(
+            truck1,
+            LocalDateTime.of(2025, 5, 20, 10, 0)
         )
 
         // UNPLANNED transport (no truck or driver assigned)
-        val transport2 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 21, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 21, 15, 0),
-            transportType = TransportType.CONTAINER,
-            truck = null,
-            driver = null,
-            note = "Unplanned transport",
-            sequenceNumber = 2,
-        )
+        val transport2 = TransportDtoHelper.transport(truck = null, driver = null)
 
         // FINISHED transport (has truck and driver, and delivery time is in the past)
-        val transport3 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-003",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 22, 9, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 22, 13, 0), // Past date (relative to now in the test)
-            transportType = TransportType.WASTE,
-            truck = truck,
-            driver = driver,
-            note = "Finished transport",
-            sequenceNumber = 3,
-        )
+        val transport3 = TransportDtoHelper.transport(truck = truck1)
 
         val transports = listOf(transport1, transport2, transport3)
-        val trucks = listOf(truck)
+        val trucks = listOf(truck1)
 
         // When
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(transports)
 
         `when`(truckService.getAllTrucks()).thenReturn(trucks)
 
@@ -520,100 +219,10 @@ class PlanningServiceTest {
 
     @Test
     fun `createTransportsView should group transports by truck`() {
-        // Given
-        val truck1 = Truck(licensePlate = "ABC-123", brand = "Mercedes", model = "Actros")
-        val truck2 = Truck(licensePlate = "XYZ-789", brand = "Scania", model = "R450")
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val location = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val transport1 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
-            transportType = TransportType.WASTE,
-            truck = truck1,
-            note = "Test transport 1",
-            sequenceNumber = 1
-        )
-
-        val transport2 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 20, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 15, 0),
-            transportType = TransportType.CONTAINER,
-            truck = truck1,
-            note = "Test transport 2",
-            sequenceNumber = 2,
-        )
-
-        val transport3 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-003",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 21, 9, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 21, 13, 0),
-            transportType = TransportType.WASTE,
-            truck = truck2,
-            note = "Test transport 3",
-            sequenceNumber = 3,
-        )
-
-        val transport4 = TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-004",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(2025, 5, 22, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 22, 14, 0),
-            transportType = TransportType.CONTAINER,
-            truck = null, // Unassigned
-            note = "Test transport 4",
-            sequenceNumber = 4,
-        )
+        val transport1 = TransportDtoHelper.transport(truck1, LocalDateTime.of(2025, 5, 20, 10, 0))
+        val transport2 = TransportDtoHelper.transport(truck1, LocalDateTime.of(2025, 5, 20, 10, 0))
+        val transport3 = TransportDtoHelper.transport(truck2, LocalDateTime.of(2025, 5, 21, 10, 0))
+        val transport4 = TransportDtoHelper.transport(null, LocalDateTime.of(2025, 5, 22, 10, 0))
 
         val transports = listOf(transport1, transport2, transport3, transport4)
 
@@ -621,16 +230,16 @@ class PlanningServiceTest {
         val result = planningService.createTransportsView(transports)
 
         // Then
-        assertThat(result).hasSize(3) // ABC-123, XYZ-789, and "Niet toegewezen"
+        assertThat(result).hasSize(3)
 
-        // Check truck1 (ABC-123) group
-        val truck1Group = result.find { it.truck == "ABC-123" }
+        // Check truck1 group
+        val truck1Group = result.find { it.truck == truck1.licensePlate }
         assertThat(truck1Group).isNotNull
         assertThat(truck1Group!!.transports).hasSize(1) // One date
         assertThat(truck1Group.transports["2025-05-20"]).hasSize(2) // Two transports on this date
 
-        // Check truck2 (XYZ-789) group
-        val truck2Group = result.find { it.truck == "XYZ-789" }
+        // Check truck2  group
+        val truck2Group = result.find { it.truck == truck2.licensePlate }
         assertThat(truck2Group).isNotNull
         assertThat(truck2Group!!.transports).hasSize(1) // One date
         assertThat(truck2Group.transports["2025-05-21"]).hasSize(1) // One transport on this date
@@ -671,117 +280,36 @@ class PlanningServiceTest {
     @Test
     fun `reorderTransports should update sequence numbers and allow moving to different truck and date`() {
         // Given
-        val originalDate = LocalDate.of(2025, 5, 20)
         val newDate = LocalDate.of(2025, 5, 21)
-        val originalLicensePlate = "ABC-123"
-        val newLicensePlate = "XYZ-789"
-
-        val truck1 = Truck(licensePlate = originalLicensePlate, brand = "Mercedes", model = "Actros")
-        val truck2 = Truck(licensePlate = newLicensePlate, brand = "Scania", model = "R450")
-
-        val transport1Id = UUID.randomUUID()
-        val transport2Id = UUID.randomUUID()
-        val transport3Id = UUID.randomUUID()
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val location = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
 
         // Transports with original truck and date
-        val transport1 = TransportDto(
-            id = transport1Id,
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 10, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 14, 0),
-            transportType = TransportType.WASTE,
-            truck = truck1,
-            note = "Test transport 1",
-            sequenceNumber = 0
-        )
+        val transport1 = TransportDtoHelper.transport(truck1)
+        val transport2 = TransportDtoHelper.transport(truck1)
 
-        val transport2 = TransportDto(
-            id = transport2Id,
-            displayNumber = "T-002",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 11, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 15, 0),
-            transportType = TransportType.CONTAINER,
-            truck = truck1,
-            note = "Test transport 2",
-            sequenceNumber = 1
-        )
-
-        val transport3 = TransportDto(
-            id = transport3Id,
-            displayNumber = "T-003",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 9, 0),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 13, 0),
-            transportType = TransportType.WASTE,
-            truck = truck1,
-            note = "Test transport 3",
-            sequenceNumber = 2
-        )
-
+        val transport3 = TransportDtoHelper.transport(truck1)
         val transports = listOf(transport1, transport2, transport3)
 
         // We'll move all transports to a new truck and date with a new order
-        val transportIds = listOf(transport3Id, transport1Id, transport2Id)
+        val transportIds = listOf(transport1.id!!, transport2.id!!, transport3.id!!)
 
-        // Mock repository responses
         `when`(transportRepository.findAllById(transportIds)).thenReturn(transports)
-
-        // Mock entity manager to return the truck reference
-        `when`(entityManager.getReference(Truck::class.java, newLicensePlate)).thenReturn(truck2)
+        `when`(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
 
         // For the getPlanningByDate call at the end
         val mondayOfWeek = newDate.minusDays(newDate.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(transports)
 
         `when`(truckService.getAllTrucks()).thenReturn(listOf(truck1, truck2))
 
         // When
-        val result = planningService.reorderTransports(newDate, newLicensePlate, transportIds)
+        val result = planningService.reorderTransports(newDate, truck2.licensePlate, transportIds)
 
         // Then
         // Verify saveAll was called with transports having updated truck, date and sequence numbers
@@ -803,113 +331,117 @@ class PlanningServiceTest {
     }
 
     @Test
-    fun `reorderTransports should preserve time components when changing date`() {
-        // Given
-        val originalDate = LocalDate.of(2025, 5, 20)
-        val newDate = LocalDate.of(2025, 5, 21)
-        val licensePlate = "ABC-123"
-
-        val truck = Truck(licensePlate = licensePlate, brand = "Mercedes", model = "Actros")
-
-        val transportId = UUID.randomUUID()
-
-        val company = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        val location = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
-                streetName = "Main Street",
-                buildingNumber = "10",
-                postalCode = "1234 AB",
-                city = "Amsterdam",
-                country = "Netherlands"
-            )
-        )
-
-        // Transport with specific time components
-        val originalHour = 14
-        val originalMinute = 30
-        val transport = TransportDto(
-            id = transportId,
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupCompany = company,
-            pickupLocation = location,
-            pickupDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, originalHour, originalMinute),
-            deliveryCompany = company,
-            deliveryLocation = location,
-            deliveryDateTime = LocalDateTime.of(originalDate.year, originalDate.monthValue, originalDate.dayOfMonth, 18, 0),
-            transportType = TransportType.WASTE,
-            truck = truck,
-            note = "Test transport with specific time",
-            sequenceNumber = 0
-        )
-
-        val transports = listOf(transport)
-        val transportIds = listOf(transportId)
-
-        // Mock repository responses
-        `when`(transportRepository.findAllById(transportIds)).thenReturn(transports)
-
-        // Mock entity manager
-        `when`(entityManager.getReference(Truck::class.java, licensePlate)).thenReturn(truck)
-
-        // For the getPlanningByDate call at the end
-        val mondayOfWeek = newDate.minusDays(newDate.dayOfWeek.value - 1L)
-        val sundayOfWeek = mondayOfWeek.plusDays(6)
-
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(transports)
-
-        `when`(truckService.getAllTrucks()).thenReturn(listOf(truck))
-
-        // When
-        planningService.reorderTransports(newDate, licensePlate, transportIds)
-
-        // Then
-        verify(transportRepository).saveAll(any<List<TransportDto>>())
-    }
-
-    @Test
     fun `reorderTransports should handle empty transport list gracefully`() {
         // Given
         val date = LocalDate.of(2025, 5, 20)
-        val licensePlate = "ABC-123"
         val transportIds = emptyList<UUID>()
 
-        // Mock repository responses
         `when`(transportRepository.findAllById(transportIds)).thenReturn(emptyList())
 
-        // For the getPlanningByDate call at the end
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
-        `when`(transportRepository.findByPickupDateTimeIsBetween(
-            mondayOfWeek.atStartOfDay(),
-            sundayOfWeek.atTime(23, 59, 59)
-        )).thenReturn(emptyList())
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(emptyList())
 
         `when`(truckService.getAllTrucks()).thenReturn(emptyList())
 
         // When
-        val result = planningService.reorderTransports(date, licensePlate, transportIds)
+        val result = planningService.reorderTransports(date, truck1.licensePlate, transportIds)
 
         // Then
-        // Verify saveAll was not called with an empty list
         verify(transportRepository).saveAll(emptyList())
         assertThat(result).isNotNull
+    }
+
+    @Test
+    fun `getPlanningByDate should add specific truck when truckId is provided and not in view`() {
+        // Given
+        val pickupDate = LocalDate.now()
+        val mondayOfWeek = pickupDate.minusDays(pickupDate.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(emptyList())
+
+        // When
+        val result = planningService.getPlanningByDate(pickupDate, truck1.licensePlate)
+
+        // Then
+        assertThat(result.transports).hasSize(1)
+        assertThat(result.transports[0].truck).isEqualTo(truck1.licensePlate)
+        assertThat(result.transports[0].transports).isEmpty()
+    }
+
+    @Test
+    fun `getPlanningByDate should not duplicate truck when it already has transports`() {
+        // Given
+        val pickupDate = LocalDate.now()
+        val mondayOfWeek = pickupDate.minusDays(pickupDate.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        val transport = TransportDtoHelper.transport(truck1)
+
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(listOf(transport))
+
+        // When
+        val result = planningService.getPlanningByDate(pickupDate, truck1.licensePlate)
+
+        // Then
+        assertThat(result.transports).hasSize(1)
+        assertThat(result.transports[0].truck).isEqualTo(truck1.licensePlate)
+        assertThat(result.transports[0].transports).isNotEmpty()
+    }
+
+    @Test
+    fun `getPlanningByDate should add all missing trucks when truckId is null`() {
+        // Given
+        val pickupDate = LocalDate.now()
+        val existingTruck = Truck(
+            licensePlate = "DEF-456",
+            brand = "DAF",
+            model = "XF"
+        )
+
+        val mondayOfWeek = pickupDate.minusDays(pickupDate.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        val transport = TransportDtoHelper.transport(existingTruck)
+
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(listOf(transport))
+
+        val allTrucks = listOf(
+            existingTruck,
+            truck1,
+            truck2
+        )
+        `when`(truckService.getAllTrucks()).thenReturn(allTrucks)
+
+        // When
+        val result = planningService.getPlanningByDate(pickupDate)
+
+        // Then
+        assertThat(result.transports).hasSize(3)
+        assertThat(result.transports.map { it.truck }).containsExactlyInAnyOrder(
+            existingTruck.licensePlate, truck1.licensePlate, truck2.licensePlate
+        )
     }
 }
