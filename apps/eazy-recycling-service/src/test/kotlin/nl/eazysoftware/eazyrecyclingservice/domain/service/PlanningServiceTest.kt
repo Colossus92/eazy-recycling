@@ -2,14 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import nl.eazysoftware.eazyrecyclingservice.test.helpers.TransportDtoHelper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -318,11 +312,11 @@ class PlanningServiceTest {
 
         val updatedTransports = transportCaptor.firstValue
         assertThat(updatedTransports).hasSize(3)
-        assertThat(updatedTransports[0].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[0].pickupDateTime.toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
-        assertThat(updatedTransports[1].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[1].pickupDateTime.toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
-        assertThat(updatedTransports[2].pickupDateTime!!.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[2].pickupDateTime.toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[2].sequenceNumber).isEqualTo(2)
         verify(transportRepository).saveAll(any<List<TransportDto>>())
 
