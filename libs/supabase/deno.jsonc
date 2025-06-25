@@ -1,5 +1,4 @@
 {
-  "imports": {},
   "compilerOptions": {
     "allowJs": true,
     "strict": true,
@@ -11,13 +10,13 @@
   },
   "lint": {
     "include": ["**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["**/node_modules/**", "**/dist/**"]
   },
   "fmt": {
     "include": ["**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["**/node_modules/**", "**/dist/**"]
   },
-  "tasks": {
-    "dev": "deno run --allow-net --allow-env --allow-read index.ts"
+  "imports": {
+    "jsr:": "https://jsr.io/"
   }
 }
