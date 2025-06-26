@@ -2,6 +2,7 @@
 import { createClient } from 'npm:@supabase/supabase-js';
 import { format } from 'npm:date-fns';
 import { TransportData } from './db.ts';
+import { SigneeInfo } from './index.ts';
 
 type StorageOptions = {
   contentType: string;
@@ -27,17 +28,14 @@ const STORAGE_BUCKET = 'waybills';
  * @param partyType - Type of party (consignor/consignee)
  * @returns Formatted filename with path
  */
-export function generateFileName(transportData: TransportData, partyType: string): string {
-  const timestamp = format(
-    partyType === 'carrier' ? (transportData.signatures.carrier_signed_at ?? new Date()) :
-    partyType === 'consignee' ? (transportData.signatures.consignee_signed_at ?? new Date()) :
-    partyType === 'consignor' ? (transportData.signatures.consignor_signed_at ?? new Date()) :
-    partyType === 'pickup' ? (transportData.signatures.pickup_signed_at ?? new Date()) :
-    new Date(),
-    'yyyy-MM-dd_HH-mm-ss'
-  );
+export function generateFileName(transportData: TransportData, signeeInfo: SigneeInfo): string {
+  // Use the signed timestamp or current date
+  const dateToFormat = signeeInfo.signedAt || new Date();
   
-  return `${STORAGE_BUCKET}/${transportData.transport.id}/waybill_${transportData.transport.display_number}_${partyType}_signed_${timestamp}.pdf`;
+  // Format the timestamp for the filename
+  const timestamp = format(dateToFormat, 'yyyy-MM-dd_HH-mm-ss');
+  
+  return `${STORAGE_BUCKET}/${transportData.transport.id}/waybill_${transportData.transport.display_number}_${signeeInfo.type}_signed_${timestamp}.pdf`;
 }
 
 /**

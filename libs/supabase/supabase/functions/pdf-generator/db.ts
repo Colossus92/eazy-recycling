@@ -2,7 +2,7 @@ import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 
 // Initialize database connection pool
 const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
-const pool = new postgres.Pool(databaseUrl, 3, true)
+export const pool = new postgres.Pool(databaseUrl, 3, true)
 
 /**
  * Type definition for the transport data object
