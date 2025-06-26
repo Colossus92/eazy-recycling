@@ -46,6 +46,9 @@ export interface TransportData {
     consignee_signature?: string;
     consignee_email?: string;
     consignee_signed_at?: string;
+    pickup_signature?: string;
+    pickup_email?: string;
+    pickup_signed_at?: string;
   };
   delivery_company: {
     id: string;
