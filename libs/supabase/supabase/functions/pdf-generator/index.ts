@@ -1,232 +1,24 @@
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import { PDFDocument, PageSizes, rgb } from 'npm:pdf-lib'
+import type { PDFPage } from 'npm:pdf-lib'
 import { format } from 'npm:date-fns'
-import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
-
-const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
-const pool = new postgres.Pool(databaseUrl, 3, true)
-
-/**
- * Type definition for the transport data object
- */
-interface TransportData {
-  transport: {
-    id: string;
-    display_number: string;
-    transport_type: string;
-    pickup_date_time: string;
-    delivery_date_time: string;
-    note?: string;
-  };
-  consignor: {
-    id: string;
-    name: string;
-    street_name: string;
-    building_number: string;
-    postal_code: string;
-    city: string;
-    country: string;
-    chamber_of_commerce_id: string;
-    vihb_id?: string;
-  };
-  goods: {
-    id: string;
-    eural_code: string;
-    name: string;
-    quantity: number;
-    unit: string;
-    net_net_weight: number;
-    waste_stream_number?: string;
-  };
-  signatures: {
-    consignor_signature?: string;
-    consignor_email?: string;
-    consignor_signed_at?: string;
-    carrier_signature?: string;
-    carrier_email?: string;
-    carrier_signed_at?: string;
-    consignee_signature?: string;
-    consignee_email?: string;
-    consignee_signed_at?: string;
-  };
-  delivery_company: {
-    id: string;
-    name: string;
-    street_name: string;
-    building_number: string;
-    postal_code: string;
-    city: string;
-    country: string;
-    chamber_of_commerce_id: string;
-    vihb_id?: string;
-  };
-}
-
-/**
- * Fetches comprehensive transport data for PDF generation
- * @param transportId The UUID of the transport
- * @returns The transport data or an error response
- */
-async function fetchSignatureData(transportId: string): Promise<{ data?: TransportData, response?: Response }> {
-  // Validate if it's a valid UUID
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(transportId)) {
-    return {
-      response: new Response(JSON.stringify({ error: 'Invalid format' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      })
-    };
-  }
-  
-  let connection;
-  try {
-    connection = await pool.connect();
-    
-    // Get transport details
-    const transportResult = await connection.queryObject`
-      SELECT 
-        t.id, 
-        t.display_number, 
-        t.transport_type, 
-        t.pickup_date_time, 
-        t.delivery_date_time, 
-        t.note,
-        t.goods_id
-      FROM 
-        transports t 
-      WHERE 
-        t.id = ${transportId}
-    `;
-    
-    if (transportResult.rows.length === 0) {
-      return {
-        response: new Response(JSON.stringify({ error: 'Transport not found' }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' }
-        })
-      };
-    }
-    
-    const transport = transportResult.rows[0];
-    const goodsId = transport.goods_id;
-    
-    // Get consignor details
-    const consignorResult = await connection.queryObject`
-      SELECT 
-        c.id,
-        c.name,
-        c.street_name,
-        c.building_number,
-        c.postal_code,
-        c.city,
-        c.country,
-        c.chamber_of_commerce_id,
-        c.vihb_id
-      FROM 
-        transports t
-      JOIN 
-        companies c ON t.consignor_party_id = c.id
-      WHERE 
-        t.id = ${transportId}
-    `;
-    
-    // Get goods details
-    const goodsResult = await connection.queryObject`
-      SELECT 
-        g.id,
-        gi.eural_code,
-        gi.name,
-        gi.quantity,
-        gi.unit,
-        gi.net_net_weight,
-        gi.waste_stream_number
-      FROM 
-        goods g
-      JOIN
-        goods_items gi ON g.goods_item_id = gi.id
-      WHERE 
-        g.uuid = ${goodsId}
-    `;
-    
-    // Get delivery company details
-    const deliveryCompanyResult = await connection.queryObject`
-      SELECT 
-        c.id,
-        c.name,
-        c.street_name,
-        c.building_number,
-        c.postal_code,
-        c.city,
-        c.country,
-        c.chamber_of_commerce_id,
-        c.vihb_id
-      FROM 
-        transports t
-      JOIN 
-        companies c ON t.delivery_company_id = c.id
-      WHERE 
-        t.id = ${transportId}
-    `;
-    
-    // Get signatures data
-    const signaturesResult = await connection.queryObject`
-      SELECT 
-        consignor_signature,
-        consignor_email,
-        consignor_signed_at,
-        carrier_signature,
-        carrier_email,
-        carrier_signed_at,
-        consignee_signature,
-        consignee_email,
-        consignee_signed_at
-      FROM 
-        signatures
-      WHERE 
-        transport_id = ${transportId}
-    `;
-    
-    // Compile all data into a structured object
-    const transportData: TransportData = {
-      transport: {
-        id: transport.id,
-        display_number: transport.display_number,
-        transport_type: transport.transport_type,
-        pickup_date_time: transport.pickup_date_time,
-        delivery_date_time: transport.delivery_date_time,
-        note: transport.note
-      },
-      consignor: consignorResult.rows[0],
-      goods: goodsResult.rows[0],
-      signatures: signaturesResult.rows[0],
-      delivery_company: deliveryCompanyResult.rows[0]
-    };
-    
-    return { data: transportData };
-  } catch (err) {
-    console.error('Database error:', err);
-    return {
-      response: new Response(JSON.stringify({ error: 'Database error', details: String(err) }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      })
-    };
-  } finally {
-    if (connection) connection.release();
-  }
-}
+import { fetchTransportData, TransportData } from './db.ts'
 
 Deno.serve(async (req) => {
-  console.log('Database url: ', databaseUrl);
   try {
     const url = new URL(req.url);
     const pathParts = url.pathname.split('/').filter(Boolean);
     const transportId = pathParts[pathParts.length - 1];
-    const { data: transportData, response } = await fetchSignatureData(transportId);
+    const { data: transportData, response } = await fetchTransportData(transportId);
     
     if (response) return response;
 
+    if (!transportData) {
+      return new Response(JSON.stringify({ error: 'No transport data available' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
     // Generate PDF
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage(PageSizes.A4);
@@ -244,11 +36,12 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error(err);
-    return new Response(String(err?.message ?? err), { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return new Response(errorMessage, { status: 500 });
   }
 })
 
-async function drawBackgroundWaybill(page: any, pdfDoc: PDFDocument) {
+async function drawBackgroundWaybill(page: PDFPage, pdfDoc: PDFDocument) {
   const waybillImage = await pdfDoc.embedPng(Uint8Array.from(atob(base64Image), c => c.charCodeAt(0)))
   
   page.drawImage(waybillImage, {
@@ -259,7 +52,7 @@ async function drawBackgroundWaybill(page: any, pdfDoc: PDFDocument) {
   })
 }
 
-function drawData(page: any, transportData: TransportData) { 
+function drawData(page: PDFPage, transportData: TransportData) { 
    const pickupParty = {
      name: 'Jan Jansen',
      address: 'Abe Bonnemastraat 58',
@@ -318,7 +111,7 @@ function drawData(page: any, transportData: TransportData) {
    drawWaste(page, waste); 
 }
 
-async function drawSignatures(page: any, pdfDoc: PDFDocument) {
+async function drawSignatures(page: PDFPage, pdfDoc: PDFDocument) {
   const signatureImage = await pdfDoc.embedPng(Uint8Array.from(atob(signature), c => c.charCodeAt(0)))
   page.drawImage(signatureImage, {
     x: 50,
@@ -349,7 +142,7 @@ async function drawSignatures(page: any, pdfDoc: PDFDocument) {
 function drawParty(
   x: number,
   y: number,
-  page: any, 
+  page: PDFPage, 
   party: { name?: string; address?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
   // Handle name - use empty string if undefined
   const name = party.name || '';
@@ -393,7 +186,7 @@ function drawParty(
   }
 }
 
-function drawDate(page: any, date: Date, x: number, y: number) {
+function drawDate(page: PDFPage, date: Date, x: number, y: number) {
   page.drawText(format(date, 'dd-MM-yyyy'), {
     x,
     y,
@@ -402,7 +195,7 @@ function drawDate(page: any, date: Date, x: number, y: number) {
   });
 }
 
-function drawLicensePlate(page: any, licensePlate: string) {
+function drawLicensePlate(page: PDFPage, licensePlate: string) {
   page.drawText(licensePlate, {
     x: 350,
     y: 475,
@@ -411,7 +204,7 @@ function drawLicensePlate(page: any, licensePlate: string) {
   });
 }
 
-function drawDetails(page: any) {
+function drawDetails(page: PDFPage) {
   page.drawText('x', {
     x: 547,
     y: 512,
@@ -432,7 +225,7 @@ function drawDetails(page: any) {
   })
 }
 
-function drawWaste(page: any, waste: { wasteStreamNumber: string, name: string, amount: string, euralcode: string, weight: string }) {
+function drawWaste(page: PDFPage, waste: { wasteStreamNumber: string, name: string, amount: string, euralcode: string, weight: string }) {
   page.drawText(waste.wasteStreamNumber, {
     x: 60,
     y: 410,
