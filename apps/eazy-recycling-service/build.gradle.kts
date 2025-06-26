@@ -47,6 +47,7 @@ dependencies {
     }
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:functions-kt")
     // Web
     implementation("wsdl4j:wsdl4j:1.6.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
