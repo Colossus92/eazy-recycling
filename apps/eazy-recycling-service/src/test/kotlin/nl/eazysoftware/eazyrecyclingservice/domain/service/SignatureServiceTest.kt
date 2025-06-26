@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import io.github.jan.supabase.SupabaseClient
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -23,7 +24,11 @@ class SignatureServiceTest {
     @Mock
     private lateinit var signaturesRepository: SignaturesRepository
 
+    @Mock
+    private lateinit var supabase: SupabaseClient
+
     private lateinit var signatureService: SignatureService
+
 
     private val testId = UUID.randomUUID()
     private val testSignature = "base64EncodedSignature"
@@ -32,7 +37,7 @@ class SignatureServiceTest {
 
     @BeforeEach
     fun setUp() {
-        signatureService = SignatureService(signaturesRepository)
+        signatureService = SignatureService(signaturesRepository, supabase)
     }
 
     @Test
