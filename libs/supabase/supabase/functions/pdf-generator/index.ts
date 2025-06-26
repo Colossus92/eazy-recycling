@@ -2,7 +2,7 @@ import { PDFDocument, PageSizes } from 'npm:pdf-lib';
 import { fetchTransportData, TransportData } from './db.ts';
 import { drawBackgroundWaybill, drawData, drawSignatures } from './pdf.ts';
 import { generateFileName, uploadFile } from './storage.ts';
-import { sendToQueue } from "./queue.ts";
+import { triggerEmail } from "./email.ts";
 
 // Type definitions
 type ApiResponse = {
@@ -132,7 +132,11 @@ Deno.serve(async (req) => {
     const pdfBytes = await generatePdf(transportData);
     const fileName = generateFileName(transportData, signeeInfo);
     await uploadFile(pdfBytes, fileName);
-    await sendToQueue(signeeInfo, fileName);
+    
+    // Call triggerEmail asynchronously without waiting for the result
+    triggerEmail(signeeInfo, fileName).catch(error => {
+      console.error('Email trigger error (non-blocking):', error);
+    });
 
     // Return success response with signee info
     return createApiResponse(201, { 

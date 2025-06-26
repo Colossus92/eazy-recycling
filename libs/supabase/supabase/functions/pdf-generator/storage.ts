@@ -1,21 +1,13 @@
 
-import { createClient } from 'npm:@supabase/supabase-js';
 import { format } from 'npm:date-fns';
 import { TransportData } from './db.ts';
 import { SigneeInfo } from './index.ts';
+import { supabase } from './client.ts';
 
 type StorageOptions = {
   contentType: string;
   upsert: boolean;
 };
-
-/**
- * Initialize Supabase client with service role for privileged operations
- */
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') ?? '',
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-);
 
 /**
  * Storage bucket name for waybill PDFs
