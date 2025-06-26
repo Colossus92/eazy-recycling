@@ -3,15 +3,19 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 import io.github.jan.supabase.SupabaseClient
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -27,6 +31,9 @@ class SignatureServiceTest {
     @Mock
     private lateinit var supabase: SupabaseClient
 
+    @Mock
+    private lateinit var transportService: TransportService
+
     private lateinit var signatureService: SignatureService
 
 
@@ -37,7 +44,7 @@ class SignatureServiceTest {
 
     @BeforeEach
     fun setUp() {
-        signatureService = SignatureService(signaturesRepository, supabase)
+        signatureService = SignatureService(signaturesRepository, supabase, transportService)
     }
 
     @Test
@@ -147,5 +154,42 @@ class SignatureServiceTest {
         assertTrue(result.carrierSigned)
         assertFalse(result.consigneeSigned)
         assertFalse(result.pickupSigned)
+    }
+
+    @Test
+    fun `saveSignature should throw IllegalStateException when transport type is CONTAINER`() {
+        // Given
+        val transportId = UUID.randomUUID()
+        val transport = TransportDto(
+            id = transportId,
+            transportType = TransportType.CONTAINER,
+            consignorParty = mock(),
+            carrierParty = mock(),
+            pickupLocation = mock(),
+            pickupDateTime = LocalDateTime.now(),
+            deliveryLocation = mock(),
+            deliveryDateTime = LocalDateTime.now(),
+            note = "",
+            pickupCompany = mock(),
+            deliveryCompany = mock(),
+            driver = mock(),
+            sequenceNumber = 1
+        )
+        
+        val request = CreateSignatureRequest(
+            party = "consignor",
+            signature = testSignature,
+            email = testEmail
+        )
+        
+        `when`(transportService.getTransportById(transportId)).thenReturn(transport)
+        
+        // When & Then
+        val exception = assertThrows(IllegalStateException::class.java) {
+            signatureService.saveSignature(transportId, request)
+        }
+        
+        // Verify the exception message contains the transport type
+        assertTrue(exception.message!!.contains(TransportType.CONTAINER.toString()))
     }
 }

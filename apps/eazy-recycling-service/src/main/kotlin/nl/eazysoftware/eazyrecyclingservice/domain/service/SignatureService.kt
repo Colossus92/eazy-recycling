@@ -10,6 +10,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -21,7 +22,8 @@ import java.util.*
 @Service
 class SignatureService(
     private val signaturesRepository: SignaturesRepository,
-    private val supabaseClient: SupabaseClient
+    private val supabaseClient: SupabaseClient,
+    private val transportService: TransportService,
 ) {
     private val logger = LoggerFactory.getLogger(SignatureService::class.java)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -43,6 +45,12 @@ class SignatureService(
             )
 
     fun saveSignature(id: UUID, request: CreateSignatureRequest): SignatureStatusView {
+        val transport = transportService.getTransportById(id)
+
+        if (transport.transportType != TransportType.WASTE) {
+            throw IllegalStateException("Niet mogelijk om te signeren voor transport met type ${transport.transportType}")
+        }
+
         val signatures = signaturesRepository.findByIdOrNull(id) ?: SignaturesDto(transportId = id)
 
         when (request.party) {

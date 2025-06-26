@@ -34,6 +34,15 @@ class GlobalExceptionHandler {
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
 
+
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleDuplicateKeyException(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            message = ex.message ?: "Deze actie brengt de data in een ongeldige toestand en is niet toegestaan",
+        )
+        return ResponseEntity(errorResponse, HttpStatus.CONFLICT)
+    }
+
     data class ErrorResponse(
         val message: String,
     )
