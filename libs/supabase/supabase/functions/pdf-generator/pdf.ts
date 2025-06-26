@@ -16,69 +16,25 @@ export async function drawBackgroundWaybill(page: PDFPage, pdfDoc: PDFDocument) 
 }
 
 export function drawData(page: PDFPage, transportData: TransportData) {
-    const pickupParty = {
-        name: 'Jan Jansen',
-        address: 'Abe Bonnemastraat 58',
-        postalCode: '2662 EJ',
-        city: 'Bergschenhoek',
-    }
-
-    const carrier = {
-        name: 'Jan Jansen',
-        address: 'Abe Bonnemastraat 58',
-        postalCode: '2662 EJ',
-        city: 'Bergschenhoek',
-        vihb: 'VIHB123456789'
-    }
-
-    const pickupLocation = {
-        name: 'Jan Jansen',
-        address: 'Abe Bonnemastraat 58',
-        postalCode: '2662 EJ',
-        city: 'Bergschenhoek',
-    }
-
-    const deliveryLocation = {
-        name: 'Jan Jansen',
-        address: 'Abe Bonnemastraat 58',
-        postalCode: '2662 EJ',
-        city: 'Bergschenhoek',
-    }
-
-    const consignee = {
-        name: 'Jan Jansen',
-        address: 'Abe Bonnemastraat 58',
-        postalCode: '2662 EJ',
-        city: 'Bergschenhoek',
-    }
-
-    const waste = {
-        wasteStreamNumber: 'VERWE1234567',
-        name: 'Waste',
-        amount: '10',
-        euralcode: 'C01',
-        weight: '10'
-    }
-
     drawParty(110, 755, page, transportData.consignor);
-    drawParty(110, 640, page, pickupParty);
-    drawParty(125, 575, page, carrier);
-    drawParty(380, 640, page, pickupLocation);
-    drawParty(390, 575, page, deliveryLocation);
-    drawParty(125, 500, page, consignee);
+    drawParty(110, 640, page, transportData.pickup_party);
+    drawParty(125, 575, page, transportData.carrier_party);
+    drawParty(380, 640, page, transportData.pickup_location);
+    drawParty(390, 575, page, transportData.delivery_location);
+    drawParty(125, 500, page, transportData.consignee);
     drawDate(page, new Date(), 399, 602);
     drawDate(page, new Date(), 400, 537);
-    drawLicensePlate(page, 'AB1234');
+    drawLicensePlate(page, transportData.transport.truck_id);
+    drawCarrierVihb(page, transportData.carrier_party.vihb_id);
     drawDetails(page);
-    drawWaste(page, waste);
+    drawWaste(page, transportData.goods);
 }
 
 function drawParty(
     x: number,
     y: number,
     page: PDFPage,
-    party: { name?: string; address?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
-    // Handle name - use empty string if undefined
+    party: { name?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
     const name = party.name || '';
     page.drawText(name, {
         x,
@@ -87,10 +43,9 @@ function drawParty(
         color: rgb(0, 0, 0)
     });
 
-    // Handle address - construct from street_name and building_number if available, or use address field
     const address = (party.street_name && party.building_number) ?
-        `${party.street_name} ${party.building_number}` :
-        (party.address || '');
+        `${party.street_name?.substring(0, 36)} ${party.building_number}` :
+        '';
     page.drawText(address, {
         x: x,
         y: y - 13,
@@ -98,7 +53,6 @@ function drawParty(
         color: rgb(0, 0, 0)
     });
 
-    // Handle postal code and city - use postal_code if available, otherwise use postalCode
     const postalCode = party.postal_code || party.postalCode || '';
     const city = party.city || '';
     page.drawText(`${postalCode} ${city}`, {
@@ -108,7 +62,6 @@ function drawParty(
         color: rgb(0, 0, 0)
     });
 
-    // Handle VIHB - use vihb_id if available, otherwise use vihb
     const vihbText = party.vihb_id || party.vihb || '';
     if (vihbText) {
         page.drawText(vihbText, {
@@ -129,13 +82,22 @@ function drawDate(page: PDFPage, date: Date, x: number, y: number) {
     });
 }
 
-function drawLicensePlate(page: PDFPage, licensePlate: string) {
-    page.drawText(licensePlate, {
+function drawLicensePlate(page: PDFPage, licensePlate?: string) {
+    {page.drawText(licensePlate ? licensePlate : '-', {
         x: 350,
         y: 475,
         size: 10,
         color: rgb(0, 0, 0)
-    });
+    });}
+}
+
+function drawCarrierVihb(page: PDFPage, vihb?: string) {
+    {page.drawText(vihb ? vihb : '-', {
+        x: 365,
+        y: 500,
+        size: 10,
+        color: rgb(0, 0, 0)
+    });}
 }
 
 function drawDetails(page: PDFPage) {
@@ -159,36 +121,43 @@ function drawDetails(page: PDFPage) {
     })
 }
 
-function drawWaste(page: PDFPage, waste: { wasteStreamNumber: string, name: string, amount: string, euralcode: string, weight: string }) {
-    page.drawText(waste.wasteStreamNumber, {
+function drawWaste(page: PDFPage, goods: {
+    eural_code: string;
+    name: string;
+    quantity: number;
+    unit: string;
+    net_net_weight: number;
+    waste_stream_number: string;
+  }) {
+    page.drawText(goods.waste_stream_number, {
         x: 60,
         y: 410,
         size: 10,
         color: rgb(0, 0, 0)
     })
 
-    page.drawText(waste.name, {
+    page.drawText(goods.name, {
         x: 150,
         y: 410,
         size: 10,
         color: rgb(0, 0, 0)
     })
 
-    page.drawText(waste.amount, {
+    page.drawText(goods.quantity.toString(), {
         x: 355,
         y: 410,
         size: 10,
         color: rgb(0, 0, 0)
     })
 
-    page.drawText(waste.euralcode, {
+    page.drawText(goods.eural_code, {
         x: 410,
         y: 410,
         size: 10,
         color: rgb(0, 0, 0)
     })
 
-    page.drawText(waste.weight, {
+    page.drawText(goods.net_net_weight.toString(), {
         x: 485,
         y: 410,
         size: 10,
@@ -209,10 +178,10 @@ function extractBase64FromDataUrl(dataUrl?: string): string | null {
 }
 
 export async function drawSignatures(page: PDFPage, pdfDoc: PDFDocument, transportData: TransportData) {
-    await drawSignature(page, pdfDoc, 50, 0, transportData.signatures.pickup_signature);
-    await drawSignature(page, pdfDoc, 190, 0, transportData.signatures.consignor_signature);
-    await drawSignature(page, pdfDoc, 300, 0, transportData.signatures.carrier_signature);
-    await drawSignature(page, pdfDoc, 435, 0, transportData.signatures.consignee_signature);
+    await drawSignature(page, pdfDoc, 50, 0, transportData.signatures.consignor_signature);
+    await drawSignature(page, pdfDoc, 180, 0, transportData.signatures.pickup_signature);
+    await drawSignature(page, pdfDoc, 310, 0, transportData.signatures.carrier_signature);
+    await drawSignature(page, pdfDoc, 440, 0, transportData.signatures.consignee_signature);
 }
 
 async function drawSignature(page: PDFPage, pdfDoc: PDFDocument, x: number, y: number, signature?: string) {

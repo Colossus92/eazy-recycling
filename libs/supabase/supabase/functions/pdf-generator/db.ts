@@ -14,6 +14,7 @@ export interface TransportData {
     transport_type: string;
     pickup_date_time: string;
     delivery_date_time: string;
+    truck_id?: string;
     note?: string;
   };
   consignor: {
@@ -28,13 +29,12 @@ export interface TransportData {
     vihb_id?: string;
   };
   goods: {
-    id: string;
     eural_code: string;
     name: string;
     quantity: number;
     unit: string;
     net_net_weight: number;
-    waste_stream_number?: string;
+    waste_stream_number: string;
   };
   signatures: {
     consignor_signature?: string;
@@ -61,6 +61,51 @@ export interface TransportData {
     chamber_of_commerce_id: string;
     vihb_id?: string;
   };
+  pickup_party: {
+    id: string;
+    name: string;
+    street_name: string;
+    building_number: string;
+    postal_code: string;
+    city: string;
+    country: string;
+    chamber_of_commerce_id: string;
+    vihb_id?: string;
+  };
+  carrier_party: {
+    id: string;
+    name: string;
+    street_name: string;
+    building_number: string;
+    postal_code: string;
+    city: string;
+    country: string;
+    chamber_of_commerce_id: string;
+    vihb_id?: string;
+  };
+  consignee: {
+    id: string;
+    name: string;
+    street_name: string;
+    building_number: string;
+    postal_code: string;
+    city: string;
+    country: string;
+    chamber_of_commerce_id: string;
+    vihb_id?: string;
+  };
+  pickup_location: {
+    street_name: string;
+    building_number: string;
+    postal_code: string;
+    city: string;
+  }
+  delivery_location: {
+    street_name: string;
+    building_number: string;
+    postal_code: string;
+    city: string;
+  }
 }
 
 /**
@@ -102,7 +147,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.pickup_date_time, 
         t.delivery_date_time, 
         t.note,
-        t.goods_id
+        t.goods_id,
+        t.truck_id
       FROM 
         transports t 
       WHERE 
@@ -127,6 +173,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       delivery_date_time: string;
       note?: string;
       goods_id: string;
+      truck_id: string;
     }
     
     const transport = transportResult.rows[0] as TransportRow;
@@ -152,7 +199,6 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.id = ${transportId}
     `;
     
-    // Get goods details
     const goodsResult = await connection.queryObject`
       SELECT 
         g.id,
@@ -170,7 +216,6 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         g.uuid = ${goodsId}
     `;
     
-    // Get delivery company details
     const deliveryCompanyResult = await connection.queryObject`
       SELECT 
         c.id,
@@ -190,7 +235,25 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.id = ${transportId}
     `;
     
-    // Get signatures data
+    const carrierPartyResult = await connection.queryObject`
+      SELECT 
+        c.id,
+        c.name,
+        c.street_name,
+        c.building_number,
+        c.postal_code,
+        c.city,
+        c.country,
+        c.chamber_of_commerce_id,
+        c.vihb_id
+      FROM 
+        transports t
+      JOIN 
+        companies c ON t.carrier_party_id = c.id
+      WHERE 
+        t.id = ${transportId}
+    `;
+    
     const signaturesResult = await connection.queryObject`
       SELECT 
         consignor_signature,
@@ -201,14 +264,82 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         carrier_signed_at,
         consignee_signature,
         consignee_email,
-        consignee_signed_at
+        consignee_signed_at,
+        pickup_signature,
+        pickup_email,
+        pickup_signed_at
       FROM 
         signatures
       WHERE 
         transport_id = ${transportId}
     `;
-    
-    // Compile all data into a structured object
+
+    const pickupPartyResult = await connection.queryObject`
+      SELECT 
+        c.id,
+        c.name,
+        c.street_name,
+        c.building_number,
+        c.postal_code,
+        c.city,
+        c.country,
+        c.chamber_of_commerce_id,
+        c.vihb_id
+      FROM 
+        transports t
+      JOIN 
+        goods g ON t.goods_id = g.uuid
+      JOIN
+        companies c ON g.pickup_party_id = c.id
+      WHERE 
+        t.id = ${transportId}
+    `;
+    const consigneeResult = await connection.queryObject`
+      SELECT 
+        c.id,
+        c.name,
+        c.street_name,
+        c.building_number,
+        c.postal_code,
+        c.city,
+        c.country,
+        c.chamber_of_commerce_id,
+        c.vihb_id
+      FROM 
+        transports t
+      JOIN 
+        goods g ON t.goods_id = g.uuid
+      JOIN
+        companies c ON g.consignee_party_id = c.id
+      WHERE 
+        t.id = ${transportId}
+    `;
+    const pickupLocationResult = await connection.queryObject`
+      SELECT 
+        l.street_name,
+        l.building_number,
+        l.postal_code,
+        l.city
+      FROM 
+        transports t
+      JOIN 
+        locations l ON t.pickup_location_id = l.id
+      WHERE 
+        t.id = ${transportId}
+    `; 
+    const deliveryLocationResult = await connection.queryObject`
+      SELECT 
+        l.street_name,
+        l.building_number,
+        l.postal_code,
+        l.city
+      FROM 
+        transports t
+      JOIN 
+        locations l ON t.delivery_location_id = l.id
+      WHERE 
+        t.id = ${transportId}
+    `;    
     const transportData: TransportData = {
       transport: {
         id: String(transport.id),
@@ -216,12 +347,18 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         transport_type: String(transport.transport_type),
         pickup_date_time: String(transport.pickup_date_time),
         delivery_date_time: String(transport.delivery_date_time),
-        note: transport.note ? String(transport.note) : undefined
+        note: transport.note ? String(transport.note) : undefined,
+        truck_id: transport.truck_id ? String(transport.truck_id) : undefined,
       },
       consignor: consignorResult.rows[0] as TransportData['consignor'],
       goods: goodsResult.rows[0] as TransportData['goods'],
       signatures: signaturesResult.rows[0] as TransportData['signatures'],
-      delivery_company: deliveryCompanyResult.rows[0] as TransportData['delivery_company']
+      delivery_company: deliveryCompanyResult.rows[0] as TransportData['delivery_company'],
+      pickup_party: pickupPartyResult.rows[0] as TransportData['pickup_party'],
+      carrier_party: carrierPartyResult.rows[0] as TransportData['carrier_party'],
+      consignee: consigneeResult.rows[0] as TransportData['consignee'],
+      pickup_location: pickupLocationResult.rows[0] as TransportData['pickup_location'],
+      delivery_location: deliveryLocationResult.rows[0] as TransportData['delivery_location']
     };
     
     return { data: transportData };

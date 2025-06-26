@@ -12,7 +12,7 @@ export async function sendEmail(email: string, base64Data: string) {
             Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-            from: 'onboarding@resend.dev',
+            from: 'noreply@eazysoftware.nl',
             to: email,
             subject: `Begeleidingsbrief - WHD Metaalrecycling`,
             html: emailHtml,

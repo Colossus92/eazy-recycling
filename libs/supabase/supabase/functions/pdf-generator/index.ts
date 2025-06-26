@@ -111,6 +111,7 @@ Deno.serve(async (req) => {
     const { transportId, partyType } = await extractRequestData(req);
     console.log(`Generating pdf for the party ${partyType} of transport ${transportId}`);
     const { data: transportData, response } = await fetchTransportData(transportId);
+    console.log(`[${transportId}] Transport data: ${JSON.stringify(transportData?.transport)}`);
     if (response) return response;
 
     const signeeInfo = getSigneeInfo(partyType, transportData);
