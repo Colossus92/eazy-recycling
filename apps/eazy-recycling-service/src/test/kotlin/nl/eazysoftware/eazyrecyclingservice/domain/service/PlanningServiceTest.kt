@@ -353,6 +353,108 @@ class PlanningServiceTest {
     }
 
     @Test
+    fun `reorderTransports should set truck to null when license plate is Niet toegewezen`() {
+        // Given
+        val date = LocalDate.of(2025, 5, 21)
+        val notAssignedLicensePlate = "Niet toegewezen"
+
+        // Transports with original truck
+        val transport1 = TransportDtoHelper.transport(truck1)
+        val transport2 = TransportDtoHelper.transport(truck1)
+        val transportIds = listOf(transport1.id!!, transport2.id!!)
+        
+        `when`(transportRepository.findAllById(transportIds)).thenReturn(listOf(transport1, transport2))
+        
+        // For the getPlanningByDate call at the end
+        val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(listOf(transport1, transport2))
+
+        `when`(truckService.getAllTrucks()).thenReturn(listOf(truck1, truck2))
+
+        // When
+        val result = planningService.reorderTransports(date, notAssignedLicensePlate, transportIds)
+
+        // Then
+        // Verify saveAll was called with transports having null truck
+        val transportCaptor = argumentCaptor<List<TransportDto>>()
+        verify(transportRepository).saveAll(transportCaptor.capture())
+
+        val updatedTransports = transportCaptor.firstValue
+        assertThat(updatedTransports).hasSize(2)
+        
+        // Verify truck is set to null for all transports
+        updatedTransports.forEach { transport ->
+            assertThat(transport.truck).isNull()
+            assertThat(transport.pickupDateTime.toLocalDate()).isEqualTo(date)
+        }
+        
+        // Verify sequence numbers are updated correctly
+        assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
+        assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
+        
+        // Verify the result contains the updated planning
+        assertThat(result).isNotNull
+    }
+
+    @Test
+    fun `reorderTransports should set truck reference when license plate is not Niet toegewezen`() {
+        // Given
+        val date = LocalDate.of(2025, 5, 21)
+        
+        // Transports with no truck (unassigned)
+        val transport1 = TransportDtoHelper.transport(truck = null)
+        val transport2 = TransportDtoHelper.transport(truck = null)
+        val transportIds = listOf(transport1.id!!, transport2.id!!)
+        
+        `when`(transportRepository.findAllById(transportIds)).thenReturn(listOf(transport1, transport2))
+        `when`(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
+        
+        // For the getPlanningByDate call at the end
+        val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
+        val sundayOfWeek = mondayOfWeek.plusDays(6)
+
+        `when`(
+            transportRepository.findByPickupDateTimeIsBetween(
+                mondayOfWeek.atStartOfDay(),
+                sundayOfWeek.atTime(23, 59, 59)
+            )
+        ).thenReturn(listOf(transport1, transport2))
+
+        `when`(truckService.getAllTrucks()).thenReturn(listOf(truck1, truck2))
+
+        // When
+        val result = planningService.reorderTransports(date, truck2.licensePlate, transportIds)
+
+        // Then
+        // Verify saveAll was called with transports having the correct truck reference
+        val transportCaptor = argumentCaptor<List<TransportDto>>()
+        verify(transportRepository).saveAll(transportCaptor.capture())
+
+        val updatedTransports = transportCaptor.firstValue
+        assertThat(updatedTransports).hasSize(2)
+        
+        // Verify truck is set to the referenced truck for all transports
+        updatedTransports.forEach { transport ->
+            assertThat(transport.truck).isEqualTo(truck2)
+            assertThat(transport.pickupDateTime.toLocalDate()).isEqualTo(date)
+        }
+        
+        // Verify sequence numbers are updated correctly
+        assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
+        assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
+        
+        // Verify the result contains the updated planning
+        assertThat(result).isNotNull
+    }
+
+    @Test
     fun `getPlanningByDate should add specific truck when truckId is provided and not in view`() {
         // Given
         val pickupDate = LocalDate.now()

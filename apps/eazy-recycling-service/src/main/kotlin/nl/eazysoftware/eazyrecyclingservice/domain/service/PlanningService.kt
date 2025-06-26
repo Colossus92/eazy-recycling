@@ -101,8 +101,14 @@ class PlanningService(
         // Update sequence numbers based on the order in transportIds
         val transportsWithSequenceNumber = transportIds.mapIndexed { index, id ->
             val transport = transports.first { it.id == id }
+            var truck: Truck? = null
+
+            if (licensePlate != "Niet toegewezen") {
+                truck = entityManager.getReference(Truck::class.java, licensePlate)
+            }
+
             transport.copy(
-                truck = entityManager.getReference(Truck::class.java, licensePlate),
+                truck = truck,
                 pickupDateTime = date.atTime(transport.pickupDateTime.hour, transport.pickupDateTime.minute),
                 deliveryDateTime = date.atTime(transport.deliveryDateTime.hour, transport.deliveryDateTime.minute),
                 sequenceNumber = index,
