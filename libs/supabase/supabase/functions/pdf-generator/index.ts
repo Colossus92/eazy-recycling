@@ -26,8 +26,6 @@ export type SigneeInfo = {
  * @returns Object containing signature, signed timestamp and email
  */
 export function getSigneeInfo(partyType: string, transportData?: TransportData): SigneeInfo {
-  // partyType is now passed directly as a parameter
-  console.log('partyType', partyType);
   switch (partyType) {
     case 'consignor':
       return {
@@ -110,16 +108,13 @@ async function extractRequestData(req: Request): Promise<{ transportId: string, 
 // Main server handler
 Deno.serve(async (req) => {
   try {
-    // Extract data from request body instead of URL
     const { transportId, partyType } = await extractRequestData(req);
-    
-    // Fetch transport data
+    console.log(`Generating pdf for the party ${partyType} of transport ${transportId}`);
     const { data: transportData, response } = await fetchTransportData(transportId);
     if (response) return response;
 
     const signeeInfo = getSigneeInfo(partyType, transportData);
 
-    // Check if transport data exists
     if (!transportData) {
       return createApiResponse(404, { 
         success: false, 
@@ -128,16 +123,17 @@ Deno.serve(async (req) => {
       });
     }
     
-    // Generate PDF and upload to storage
+    console.log(`[${transportId}] Transport found, generating pdf...`);
     const pdfBytes = await generatePdf(transportData);
     const fileName = generateFileName(transportData, signeeInfo);
+    console.log(`[${transportId}] Generated pdf, uploading to storage...`);
     await uploadFile(pdfBytes, fileName);
-    
+    console.log(`[${transportId}] Uploaded pdf to storage, sending email...`);
     // Call triggerEmail asynchronously without waiting for the result
     triggerEmail(signeeInfo, fileName).catch(error => {
       console.error('Email trigger error (non-blocking):', error);
     });
-
+    console.log(`[${transportId}] Email triggered, returning success response...`);
     // Return success response with signee info
     return createApiResponse(201, { 
       success: true, 
