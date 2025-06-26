@@ -3,7 +3,19 @@
  * This function mails the waybill PDF to the signee
  */
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+import { createClient } from "npm:@supabase/supabase-js@2";
+
+// Initialize environment variables
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+
+// Initialize Supabase client with service role for privileged operations
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+);
+
+// Storage bucket name for waybill PDFs
+const STORAGE_BUCKET = 'waybills';
 
 // Type definitions
 type ApiResponse = {
@@ -16,6 +28,62 @@ type EmailRequest = {
   email: string;
   fileName: string;
 };
+
+/**
+ * Download a file from Supabase Storage
+ * @param filePath - Path to the file in storage
+ * @returns Base64 encoded file content
+ */
+async function downloadFileFromStorage(filePath: string): Promise<{ base64Data: string }> {  
+  console.log(`Downloading file from bucket: ${STORAGE_BUCKET}, path: ${filePath}`);
+  
+  // Download the file
+  const { data, error } = await supabase
+    .storage
+    .from(STORAGE_BUCKET)
+    .download(filePath);
+  
+  if (error) {
+    console.error('Storage download error:', error);
+    throw new Error(`Failed to download file: ${error.message}`);
+  }
+  
+  if (!data) {
+    throw new Error('No data received from storage');
+  }
+  
+  // For Resend API, we need to encode the file properly for email attachments
+  // The Resend API expects base64 encoded data for attachments
+  
+  // In Deno, we can use the built-in btoa function for base64 encoding
+  // But we need to handle binary data properly
+  
+  // First convert the blob to an ArrayBuffer
+  const arrayBuffer = await data.arrayBuffer();
+  
+  // Convert to base64 using a safe chunking approach to avoid call stack issues
+  // This is important for larger PDF files
+  let binary = '';
+  const bytes = new Uint8Array(arrayBuffer);
+  const len = bytes.byteLength;
+  
+  // Process in chunks to avoid memory issues
+  const chunkSize = 1024;
+  for (let i = 0; i < len; i += chunkSize) {
+    const chunk = bytes.slice(i, Math.min(i + chunkSize, len));
+    const binaryChunk = Array.from(chunk)
+      .map(byte => String.fromCharCode(byte))
+      .join('');
+    binary += binaryChunk;
+  }
+  
+  // Use btoa to convert the binary string to base64
+  const base64Data = btoa(binary);
+  
+  console.log(`File encoded successfully, size: ${base64Data.length} characters`);
+  
+  return { base64Data };
+}
 
 /**
  * Create a standardized API response
@@ -135,6 +203,27 @@ Deno.serve(async (req) => {
       </html>
     `;
 
+    // Download the PDF file from storage
+    console.log(`Attempting to download file: ${body.fileName}`);
+    let base64Data: string | undefined;
+    
+    try {
+      // Download the file from Supabase Storage
+      const result = await downloadFileFromStorage(body.fileName);
+      base64Data = result.base64Data;
+           
+      console.log(`Successfully downloaded file: ${body.fileName}`);
+    } catch (downloadError) {
+      console.error('Error downloading file:', downloadError);
+    }
+    
+    if (!base64Data) {
+      return createApiResponse(500, { 
+        success: false, 
+        message: 'Failed to download waybill PDF' 
+      });
+    }
+
     // Send the email with the waybill attached
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -149,8 +238,8 @@ Deno.serve(async (req) => {
         html: emailHtml,
         attachments: [
           {
-            path: 'https://resend.com/static/sample/invoice.pdf',
-            filename: 'invoice.pdf',
+            content: base64Data,
+            filename: 'begeleidingsbrief.pdf',
           },
         ],
       }),
