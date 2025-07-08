@@ -28,4 +28,8 @@ data class Truck(
     fun preUpdate() {
         updatedAt = LocalDateTime.now()
     }
+
+    fun getDisplayName(): String {
+        return "$model ($licensePlate)"
+    }
 }

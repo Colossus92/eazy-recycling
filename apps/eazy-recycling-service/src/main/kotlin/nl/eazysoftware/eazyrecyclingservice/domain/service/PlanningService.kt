@@ -34,12 +34,11 @@ class PlanningService(
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
             .filter { transport -> statuses.isEmpty() || statuses.contains(transport.getStatus().name) }
-
         val dateInfo = daysInWeek.map { it.toString() }
-
         val transportsView = createTransportsView(transports)
 
-        addMissingTrucks(transportsView, truckId)
+        getMissingTrucks(transports, truckId)
+            .forEach { transportsView.add(TransportsView(it.getDisplayName(), emptyMap())) }
 
         transportsView.sortWith(compareBy<TransportsView> {
             when {
@@ -54,8 +53,8 @@ class PlanningService(
 
     fun createTransportsView(transports: List<TransportDto>) =
         transports.map { transportDto -> TransportView(transportDto) }
-            .groupBy { transportView -> transportView.truck?.licensePlate ?: "Niet toegewezen" }
-            .map { (truckLicensePlate, transportViews) ->
+            .groupBy { transportView -> transportView.truck }
+            .map { (truck, transportViews) ->
                 // Group by pickup date
                 val transportsByDate = transportViews.groupBy { it.pickupDate }
 
@@ -63,24 +62,28 @@ class PlanningService(
                 val sortedTransportsByDate = transportsByDate.mapValues { (_, dateTransports) ->
                     dateTransports.sortedBy { it.sequenceNumber }
                 }
+                val displayName = truck?.getDisplayName() ?: "Niet toegewezen"
 
-                TransportsView(truckLicensePlate, sortedTransportsByDate)
+                TransportsView(displayName, sortedTransportsByDate)
             }.toMutableList()
 
-    private fun addMissingTrucks(transportsView: MutableList<TransportsView>, truckId: String?) {
-        if (truckId != null && transportsView.any { it.truck == truckId }) {
-            return
+
+    private fun getMissingTrucks(transports: List<TransportDto>, truckId: String?): List<Truck> {
+        // When filtered by truckId which already has transports, don't add missing trucks because this would erase the filter
+        if (truckId != null && transports.any { it.truck?.licensePlate == truckId }) {
+            return emptyList()
         }
-        
-        truckId?.let {
-            transportsView.add(TransportsView(it, emptyMap()))
-        } ?: run {
-            val existingTrucks = transportsView.map { it.truck }.toSet()
-            truckService.getAllTrucks()
-                .map { it.licensePlate }
-                .filterNot { it in existingTrucks }
-                .forEach { transportsView.add(TransportsView(it, emptyMap())) }
+
+        val missingTrucks: List<Truck>
+
+        if (truckId != null) {
+            missingTrucks = listOf(truckService.getTruckByLicensePlate(truckId))
+        } else {
+            val existingTrucks = transports.map { it.truck }.toSet()
+            missingTrucks = truckService.getAllTrucks().filterNot { it in existingTrucks }
         }
+
+        return missingTrucks
     }
 
     private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
