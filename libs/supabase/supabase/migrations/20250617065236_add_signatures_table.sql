@@ -14,7 +14,7 @@ create table "public"."signatures" (
     "consignee_signed_at" text
 );
 
-
+alter table "public"."signatures" alter column "consignee_signed_at" set data type timestamp with time zone using "consignee_signed_at"::timestamp with time zone;
 alter table "public"."signatures" enable row level security;
 
 CREATE UNIQUE INDEX signatures_pkey ON public.signatures USING btree (transport_id);
