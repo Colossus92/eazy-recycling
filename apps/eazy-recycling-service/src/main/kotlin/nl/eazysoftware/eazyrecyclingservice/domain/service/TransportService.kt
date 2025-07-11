@@ -29,6 +29,7 @@ class TransportService(
     private val locationRepository: LocationRepository,
     private val companyRepository: CompanyRepository,
     private val entityManager: EntityManager,
+    private val pdfGenerationClient: PdfGenerationClient,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -71,7 +72,13 @@ class TransportService(
             pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId)),
         )
 
-        return createContainerTransport(request = request, goods = goods)
+        val wasteTransport = createContainerTransport(request = request, goods = goods)
+
+        wasteTransport.id?.let { transportId ->
+            pdfGenerationClient.triggerPdfGeneration(transportId, "empty")
+        }
+
+        return wasteTransport
     }
 
     private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {

@@ -1,14 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.storage.storage
-import io.ktor.http.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.signature.LatestPdfResponse
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
@@ -26,7 +19,6 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 import javax.imageio.ImageIO
-import java.util.Base64
 
 private const val bucket = "waybills"
 
@@ -34,10 +26,10 @@ private const val bucket = "waybills"
 class WaybillDocumentService(
     private val signaturesRepository: SignaturesRepository,
     private val supabaseClient: SupabaseClient,
+    private val pdfGenerationClient: PdfGenerationClient,
     private val transportService: TransportService,
 ) {
     private val logger = LoggerFactory.getLogger(WaybillDocumentService::class.java)
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun getSignatureStatuses(id: UUID): SignatureStatusView =
         signaturesRepository.findByIdOrNull(id)
@@ -97,35 +89,9 @@ class WaybillDocumentService(
 
         signaturesRepository.save(signatures)
 
-        triggerPdfGeneration(id, request.party)
+        pdfGenerationClient.triggerPdfGeneration(id, request.party)
 
         return getSignatureStatuses(id)
-    }
-
-    /**
-     * Triggers the Supabase edge function to generate and send a PDF asynchronously.
-     * The transaction does not wait for this function to complete.
-     */
-    private fun triggerPdfGeneration(transportId: UUID, partyType: String) {
-        coroutineScope.launch {
-            try {
-                logger.info("Triggering PDF generation for transport ID: $transportId")
-                supabaseClient.functions.invoke(
-                    function = "pdf-generator",
-                    body = buildJsonObject {
-                        put("partyType", partyType)
-                        put("transportId", transportId.toString())
-                    },
-                    headers = Headers.build {
-                        append(HttpHeaders.ContentType, "application/json")
-                    }
-                )
-
-                logger.info("PDF generation triggered successfully for transport ID: $transportId and party type: $partyType")
-            } catch (e: Exception) {
-                logger.error("Failed to trigger PDF generation for transport ID: $transportId", e)
-            }
-        }
     }
 
     suspend fun getLatestPdf(id: UUID): LatestPdfResponse {
