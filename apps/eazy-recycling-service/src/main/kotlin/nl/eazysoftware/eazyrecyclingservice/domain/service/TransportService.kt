@@ -11,7 +11,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -160,7 +159,8 @@ class TransportService(
                 unit = request.unit,
                 quantity = request.quantity,
                 euralCode = request.euralCode,
-                name = request.goodsName
+                name = request.goodsName,
+                processingMethodCode = request.processingMethodCode
             )
 
             existingGoods.copy(
