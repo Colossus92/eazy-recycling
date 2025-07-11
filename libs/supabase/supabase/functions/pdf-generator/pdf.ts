@@ -130,7 +130,6 @@ function drawWaste(page: PDFPage, goods: {
     eural_code: string;
     processing_method_code: string;
   }) {
-    console.log("drawWaste: ", goods);
     page.drawText(goods.waste_stream_number, {
         x: 60,
         y: 410,
@@ -153,16 +152,16 @@ function drawWaste(page: PDFPage, goods: {
     })
 
     page.drawText(goods.eural_code, {
-        x: 410,
+        x: 405,
         y: 410,
-        size: 10,
+        size: 8,
         color: rgb(0, 0, 0)
     })
 
     page.drawText(goods.processing_method_code, {
-        x: 456,
+        x: 458,
         y: 410,
-        size: 10,
+        size: 8,
         color: rgb(0, 0, 0)
     })
 

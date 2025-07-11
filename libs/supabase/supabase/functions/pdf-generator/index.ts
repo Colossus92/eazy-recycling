@@ -1,22 +1,22 @@
-import { PDFDocument, PageSizes } from 'npm:pdf-lib';
-import { fetchTransportData, TransportData } from './db.ts';
-import { drawBackgroundWaybill, drawData, drawSignatures } from './pdf.ts';
-import { generateFileName, uploadFile } from './storage.ts';
-import { triggerEmail } from "./email.ts";
+import {PDFDocument, PageSizes} from 'npm:pdf-lib';
+import {fetchTransportData, TransportData} from './db.ts';
+import {drawBackgroundWaybill, drawData, drawSignatures} from './pdf.ts';
+import {generateFileName, uploadFile} from './storage.ts';
+import {triggerEmail} from "./email.ts";
 
 // Type definitions
 type ApiResponse = {
-  success: boolean;
-  message: string;
-  fileName?: string;
-  error?: string;
+    success: boolean;
+    message: string;
+    fileName?: string;
+    error?: string;
 };
 
 export type SigneeInfo = {
-  type: string;
-  signature?: string;
-  signedAt?: Date | string;
-  email?: string;
+    type: string;
+    signature?: string;
+    signedAt?: Date | string;
+    email?: string;
 };
 
 /**
@@ -26,38 +26,38 @@ export type SigneeInfo = {
  * @returns Object containing signature, signed timestamp and email
  */
 export function getSigneeInfo(partyType: string, transportData?: TransportData): SigneeInfo {
-  switch (partyType) {
-    case 'consignor':
-      return {
-        type: 'consignor',
-        signature: transportData?.signatures.consignor_signature,
-        signedAt: transportData?.signatures.consignor_signed_at,
-        email: transportData?.signatures.consignor_email
-      };
-    case 'consignee':
-      return {
-        type: 'consignee',
-        signature: transportData?.signatures.consignee_signature,
-        signedAt: transportData?.signatures.consignee_signed_at,
-        email: transportData?.signatures.consignee_email
-      };
-    case 'pickup':
-      return {
-        type: 'pickup',
-        signature: transportData?.signatures.pickup_signature,
-        signedAt: transportData?.signatures.pickup_signed_at,
-        email: transportData?.signatures.pickup_email
-      };
-    case 'carrier':
-      return {
-        type: 'carrier',
-        signature: transportData?.signatures.carrier_signature,
-        signedAt: transportData?.signatures.carrier_signed_at,
-        email: transportData?.signatures.carrier_email
-      };
-    default:
-      throw new Error('Invalid party type');
-  }
+    switch (partyType) {
+        case 'consignor':
+            return {
+                type: 'consignor',
+                signature: transportData?.signatures.consignor_signature,
+                signedAt: transportData?.signatures.consignor_signed_at,
+                email: transportData?.signatures.consignor_email
+            };
+        case 'consignee':
+            return {
+                type: 'consignee',
+                signature: transportData?.signatures.consignee_signature,
+                signedAt: transportData?.signatures.consignee_signed_at,
+                email: transportData?.signatures.consignee_email
+            };
+        case 'pickup':
+            return {
+                type: 'pickup',
+                signature: transportData?.signatures.pickup_signature,
+                signedAt: transportData?.signatures.pickup_signed_at,
+                email: transportData?.signatures.pickup_email
+            };
+        case 'carrier':
+            return {
+                type: 'carrier',
+                signature: transportData?.signatures.carrier_signature,
+                signedAt: transportData?.signatures.carrier_signed_at,
+                email: transportData?.signatures.carrier_email
+            };
+        default:
+            throw new Error('Invalid party type');
+    }
 }
 
 /**
@@ -66,14 +66,14 @@ export function getSigneeInfo(partyType: string, transportData?: TransportData):
  * @returns Promise resolving to PDF binary content
  */
 async function generatePdf(transportData: TransportData): Promise<Uint8Array> {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage(PageSizes.A4);
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage(PageSizes.A4);
 
-  await drawBackgroundWaybill(page, pdfDoc);
-  drawData(page, transportData);
-  await drawSignatures(page, pdfDoc, transportData);
+    await drawBackgroundWaybill(page, pdfDoc);
+    drawData(page, transportData);
+    await drawSignatures(page, pdfDoc, transportData);
 
-  return await pdfDoc.save();
+    return await pdfDoc.save();
 }
 
 /**
@@ -83,13 +83,13 @@ async function generatePdf(transportData: TransportData): Promise<Uint8Array> {
  * @returns Response object
  */
 function createApiResponse(status: number, body: ApiResponse): Response {
-  return new Response(
-    JSON.stringify(body),
-    { 
-      status,
-      headers: { "Content-Type": "application/json" } 
-    }
-  );
+    return new Response(
+        JSON.stringify(body),
+        {
+            status,
+            headers: {"Content-Type": "application/json"}
+        }
+    );
 }
 
 /**
@@ -98,58 +98,62 @@ function createApiResponse(status: number, body: ApiResponse): Response {
  * @returns Object containing transportId and partyType
  */
 async function extractRequestData(req: Request): Promise<{ transportId: string, partyType: string }> {
-  const body = await req.json();
-  return {
-    transportId: body.transportId,
-    partyType: body.partyType
-  };
+    const body = await req.json();
+    return {
+        transportId: body.transportId,
+        partyType: body.partyType
+    };
 }
 
 // Main server handler
 Deno.serve(async (req) => {
-  try {
-    const { transportId, partyType } = await extractRequestData(req);
-    console.log(`Generating pdf for the party ${partyType} of transport ${transportId}`);
-    const { data: transportData, response } = await fetchTransportData(transportId);
-    console.log(`[${transportId}] Transport data: ${JSON.stringify(transportData?.transport)}`);
-    if (response) return response;
+    try {
+        const {transportId, partyType} = await extractRequestData(req);
+        console.log(`Generating pdf for the party ${partyType} of transport ${transportId}`);
+        const {data: transportData, response} = await fetchTransportData(transportId);
+        console.log(`[${transportId}] Transport data: ${JSON.stringify(transportData?.transport)}`);
+        if (response) return response;
 
-    const signeeInfo = getSigneeInfo(partyType, transportData);
+        const signeeInfo = getSigneeInfo(partyType, transportData);
 
-    if (!transportData) {
-      return createApiResponse(404, { 
-        success: false, 
-        message: 'Resource not found', 
-        error: 'No transport data available' 
-      });
+        if (!transportData) {
+            return createApiResponse(404, {
+                success: false,
+                message: 'Resource not found',
+                error: 'No transport data available'
+            });
+        }
+
+        console.log(`[${transportId}] Transport found, generating pdf...`);
+        const pdfBytes = await generatePdf(transportData);
+        const fileName = generateFileName(transportData, signeeInfo);
+        console.log(`[${transportId}] Generated pdf, uploading to storage...`);
+        await uploadFile(pdfBytes, fileName);
+        console.log(`[${transportId}] Uploaded pdf to storage...`);
+        // Call triggerEmail asynchronously without waiting for the result
+        if (signeeInfo.email) {
+            triggerEmail(signeeInfo, fileName).catch(error => {
+                console.error('Email trigger error (non-blocking):', error);
+            });
+            console.log(`[${transportId}] Email triggered...`);
+        }
+
+        console.log(`[${transportId}] PDF successfully generated and stored`);
+        // Return success response with signee info
+        return createApiResponse(201, {
+            success: true,
+            message: 'PDF successfully generated and stored',
+            fileName
+        });
+    } catch (err) {
+        // Log error and return appropriate error response
+        console.error('PDF generation error:', err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+
+        return createApiResponse(500, {
+            success: false,
+            message: 'Internal server error',
+            error: errorMessage
+        });
     }
-    
-    console.log(`[${transportId}] Transport found, generating pdf...`);
-    const pdfBytes = await generatePdf(transportData);
-    const fileName = generateFileName(transportData, signeeInfo);
-    console.log(`[${transportId}] Generated pdf, uploading to storage...`);
-    await uploadFile(pdfBytes, fileName);
-    console.log(`[${transportId}] Uploaded pdf to storage, sending email...`);
-    // Call triggerEmail asynchronously without waiting for the result
-    triggerEmail(signeeInfo, fileName).catch(error => {
-      console.error('Email trigger error (non-blocking):', error);
-    });
-    console.log(`[${transportId}] Email triggered, returning success response...`);
-    // Return success response with signee info
-    return createApiResponse(201, { 
-      success: true, 
-      message: 'PDF successfully generated and stored', 
-      fileName 
-    });
-  } catch (err) {
-    // Log error and return appropriate error response
-    console.error('PDF generation error:', err);
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    
-    return createApiResponse(500, { 
-      success: false, 
-      message: 'Internal server error', 
-      error: errorMessage 
-    });
-  }
 });
