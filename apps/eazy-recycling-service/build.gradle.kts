@@ -48,6 +48,7 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.github.jan-tennert.supabase:functions-kt")
+    implementation("io.github.jan-tennert.supabase:storage-kt")
     // Web
     implementation("wsdl4j:wsdl4j:1.6.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
@@ -57,6 +58,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.8.0")
+
+    implementation("org.apache.pdfbox:pdfbox:2.0.30")
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
     

@@ -2,42 +2,56 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.functions.functions
+import io.github.jan.supabase.storage.storage
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.signature.LatestPdfResponse
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
+import org.apache.pdfbox.pdmodel.PDDocument
+import org.apache.pdfbox.rendering.PDFRenderer
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import java.io.File
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.imageio.ImageIO
+import java.util.Base64
+
+private const val bucket = "waybills"
 
 @Service
-class SignatureService(
+class WaybillDocumentService(
     private val signaturesRepository: SignaturesRepository,
     private val supabaseClient: SupabaseClient,
     private val transportService: TransportService,
 ) {
-    private val logger = LoggerFactory.getLogger(SignatureService::class.java)
+    private val logger = LoggerFactory.getLogger(WaybillDocumentService::class.java)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun getSignatureStatuses(id: UUID): SignatureStatusView =
         signaturesRepository.findByIdOrNull(id)
-            ?.let { signatures -> SignatureStatusView(
+            ?.let { signatures ->
+                SignatureStatusView(
+                    id,
+                    consignorSigned = signatures.consignorSignature != null,
+                    carrierSigned = signatures.carrierSignature != null,
+                    consigneeSigned = signatures.consigneeSignature != null,
+                    pickupSigned = signatures.pickupSignature != null,
+                )
+            }
+            ?: SignatureStatusView(
                 id,
-                consignorSigned = signatures.consignorSignature != null,
-                carrierSigned = signatures.carrierSignature != null,
-                consigneeSigned = signatures.consigneeSignature != null,
-                pickupSigned = signatures.pickupSignature != null,
-            )}
-            ?: SignatureStatusView(id,
                 consignorSigned = false,
                 carrierSigned = false,
                 consigneeSigned = false,
@@ -59,21 +73,25 @@ class SignatureService(
                 signatures.consignorEmail = request.email
                 signatures.consignorSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
+
             "consignee" -> {
                 signatures.consigneeSignature = request.signature
                 signatures.consigneeEmail = request.email
                 signatures.consigneeSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
+
             "carrier" -> {
                 signatures.carrierSignature = request.signature
                 signatures.carrierEmail = request.email
                 signatures.carrierSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
+
             "pickup" -> {
                 signatures.pickupSignature = request.signature
                 signatures.pickupEmail = request.email
                 signatures.pickupSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
+
             else -> throw IllegalArgumentException("Ongeldige partij: ${request.party}")
         }
 
@@ -83,7 +101,7 @@ class SignatureService(
 
         return getSignatureStatuses(id)
     }
-    
+
     /**
      * Triggers the Supabase edge function to generate and send a PDF asynchronously.
      * The transaction does not wait for this function to complete.
@@ -102,11 +120,98 @@ class SignatureService(
                         append(HttpHeaders.ContentType, "application/json")
                     }
                 )
-                
+
                 logger.info("PDF generation triggered successfully for transport ID: $transportId and party type: $partyType")
             } catch (e: Exception) {
                 logger.error("Failed to trigger PDF generation for transport ID: $transportId", e)
             }
+        }
+    }
+
+    suspend fun getLatestPdf(id: UUID): LatestPdfResponse {
+        try {
+            val bucket = supabaseClient.storage.from(bucket)
+            // The path should be the folder structure within the bucket
+            val path = "waybills/$id" // This will look for files under waybills/{uuid}/
+
+            logger.info("Fetching PDF files for transport ID: $id from path: $path")
+            val files = bucket.list(path)
+            logger.info("Found ${files.size} files in path $path")
+
+            if (files.isEmpty()) {
+                logger.info("No PDF files found for transport ID: $id")
+                return LatestPdfResponse(
+                    url = null,
+                    thumbnail = null
+                )
+            }
+
+            // Get the most recently updated file
+            val latestFile = files
+                .sortedByDescending { it.updatedAt }
+                .first()
+
+            logger.info("Latest PDF file found: ${latestFile.name}, updated at: ${latestFile.updatedAt}")
+
+            // Generate a public URL for the file
+            val fileUrl = bucket.authenticatedUrl(path + "/" + latestFile.name)
+
+            // Generate thumbnail
+            val thumbnail = createThumbnail(path, latestFile.name)
+
+            return LatestPdfResponse(
+                url = fileUrl,
+                thumbnail = thumbnail
+            )
+        } catch (e: Exception) {
+            logger.error("Error retrieving PDF for transport ID: $id", e)
+            return LatestPdfResponse(
+                url = null,
+                thumbnail = null
+            )
+        }
+    }
+
+    /**
+     * Creates a thumbnail from a PDF file and returns it as a Base64 encoded string
+     */
+    suspend fun createThumbnail(path: String, name: String): String? {
+        try {
+            val bytes = supabaseClient.storage.from(bucket).downloadAuthenticated("$path/$name")
+            val inputPdf = File.createTempFile("waybill", ".pdf")
+            val outputImage = File.createTempFile("thumbnail", ".jpg")
+
+            try {
+                // Write the downloaded bytes to a temporary file
+                inputPdf.writeBytes(bytes)
+
+                // Create ByteArrayOutputStream to store the image data
+                val baos = ByteArrayOutputStream()
+
+                PDDocument.load(inputPdf).use { document ->
+                    val renderer = PDFRenderer(document)
+
+                    // Render the first page at 100 DPI
+                    val image: BufferedImage = renderer.renderImageWithDPI(0, 100f)
+
+                    // Write to ByteArrayOutputStream instead of file
+                    ImageIO.write(image, "jpg", baos)
+                    ImageIO.write(image, "jpg", outputImage) // Also save to file for logging
+
+                    logger.info("✅ Thumbnail created for $path/$name")
+                }
+
+                // Convert to Base64
+                val thumbnailBase64 = Base64.getEncoder().encodeToString(baos.toByteArray())
+                return "data:image/jpeg;base64,$thumbnailBase64"
+            } finally {
+                // Clean up temporary files
+                inputPdf.delete()
+                outputImage.delete()
+            }
+        } catch (e: Exception) {
+            logger.error("Error creating thumbnail for $path/$name", e)
+            return null
         }
     }
 }

@@ -34,7 +34,7 @@ class SignatureServiceTest {
     @Mock
     private lateinit var transportService: TransportService
 
-    private lateinit var signatureService: SignatureService
+    private lateinit var waybillDocumentService: WaybillDocumentService
 
 
     private val testId = UUID.randomUUID()
@@ -44,7 +44,7 @@ class SignatureServiceTest {
 
     @BeforeEach
     fun setUp() {
-        signatureService = SignatureService(signaturesRepository, supabase, transportService)
+        waybillDocumentService = WaybillDocumentService(signaturesRepository, supabase, transportService)
     }
 
     @Test
@@ -53,7 +53,7 @@ class SignatureServiceTest {
         `when`(signaturesRepository.findById(testId)).thenReturn(Optional.empty())
 
         // When
-        val result = signatureService.getSignatureStatuses(testId)
+        val result = waybillDocumentService.getSignatureStatuses(testId)
 
         // Then
         assertEquals(testId, result.transportId)
@@ -84,7 +84,7 @@ class SignatureServiceTest {
         `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
 
         // When
-        val result = signatureService.getSignatureStatuses(testId)
+        val result = waybillDocumentService.getSignatureStatuses(testId)
 
         // Then
         assertEquals(testId, result.transportId)
@@ -115,7 +115,7 @@ class SignatureServiceTest {
         `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
 
         // When
-        val result = signatureService.getSignatureStatuses(testId)
+        val result = waybillDocumentService.getSignatureStatuses(testId)
 
         // Then
         assertEquals(testId, result.transportId)
@@ -146,7 +146,7 @@ class SignatureServiceTest {
         `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
 
         // When
-        val result = signatureService.getSignatureStatuses(testId)
+        val result = waybillDocumentService.getSignatureStatuses(testId)
 
         // Then
         assertEquals(testId, result.transportId)
@@ -186,7 +186,7 @@ class SignatureServiceTest {
         
         // When & Then
         val exception = assertThrows(IllegalStateException::class.java) {
-            signatureService.saveSignature(transportId, request)
+            waybillDocumentService.saveSignature(transportId, request)
         }
         
         // Verify the exception message contains the transport type
