@@ -53,6 +53,7 @@ abstract class WaybillMapper {
     @Mapping(target = "unit", expression = "java(toUnit(source))")
     @Mapping(target = "name", expression = "java(toName(source))")
     @Mapping(target = "euralCode", expression = "java(toEuralCode(source))")
+    @Mapping(target = "processingMethodCode", expression = "java(toProcessingMethod(source))")
     abstract fun toDto(source: GoodsItemType): GoodsItemDto
 
     @Mapping(target = "id", expression = "java(toLocationId(source))")
@@ -125,6 +126,13 @@ abstract class WaybillMapper {
 
     fun toEuralCode(source: GoodsItemType): String {
         return source.items.first().commodityClassifications.first().itemClassificationCode.value
+    }
+
+    fun toProcessingMethod(source: GoodsItemType): String? {
+        return source.items.first()
+            .additionalItemProperties.find { it.name.value == "vewerkingsmethode" }
+            ?.value
+            ?.value
     }
 
     fun toContainerNumber(source: GoodsItemType): String {

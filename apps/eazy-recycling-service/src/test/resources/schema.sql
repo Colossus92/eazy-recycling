@@ -41,6 +41,7 @@ create table if not exists goods_items (
                              name varchar(255),
                              unit varchar(255),
                              waste_stream_number varchar(255),
+                             processing_method_code text,
                              primary key (id)
 );
 
@@ -154,3 +155,14 @@ create table if not exists signatures (
                                        "consignee_email" text,
                                        "consignee_signed_at" timestamp with time zone
 );
+
+create table if not exists eural (
+                                  "code" text not null,
+                                  "description" text not null
+);
+
+create table if not exists processing_methods (
+                                  "code" text not null,
+                                  "description" text not null
+);
+

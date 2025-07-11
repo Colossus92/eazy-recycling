@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -237,7 +238,8 @@ class TransportControllerIntegrationTest {
             unit = "KG",
             quantity = 1,
             goodsName = "Test Waste",
-            euralCode = "200301"
+            euralCode = "200301",
+            processingMethodCode = "A.02",
         )
 
         // When & Then
@@ -317,7 +319,8 @@ class TransportControllerIntegrationTest {
             unit = "KG",
             quantity = 1,
             euralCode = "200101",
-            name = "Original Waste"
+            name = "Original Waste",
+            processingMethodCode = "A.02",
         )
 
         val goods = GoodsDto(
@@ -358,7 +361,8 @@ class TransportControllerIntegrationTest {
             unit = "KG",
             quantity = 2,
             goodsName = "Updated Waste",
-            euralCode = "200301"
+            euralCode = "200301",
+            processingMethodCode = "A.02"
         )
 
         // When & Then
@@ -389,7 +393,8 @@ class TransportControllerIntegrationTest {
             unit = "KG",
             quantity = 1,
             euralCode = "200201",
-            name = "Waybill Waste"
+            name = "Waybill Waste",
+            processingMethodCode = "A.02",
         )
 
         val goods = GoodsDto(

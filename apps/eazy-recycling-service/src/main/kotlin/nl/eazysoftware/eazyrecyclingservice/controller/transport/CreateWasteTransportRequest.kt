@@ -34,6 +34,7 @@ data class CreateWasteTransportRequest(
     val quantity: Int,
     val goodsName: String,
     val euralCode: String,
+    val processingMethodCode: String,
 ): CreateContainerTransportRequest( // Waste transport is also a container transport
     consignorPartyId = consignorPartyId,
     pickupDateTime = pickupDateTime,

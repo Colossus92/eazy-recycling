@@ -261,7 +261,8 @@ class TransportControllerSecurityTest {
             unit = "KG",
             quantity = 1,
             euralCode = "EURAL-123",
-            goodsName = "Test Goods"
+            goodsName = "Test Goods",
+            processingMethodCode = "A.02",
         )
 
         return objectMapper.writeValueAsString(request)
