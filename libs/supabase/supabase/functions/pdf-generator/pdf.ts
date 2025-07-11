@@ -122,13 +122,15 @@ function drawDetails(page: PDFPage) {
 }
 
 function drawWaste(page: PDFPage, goods: {
-    eural_code: string;
     name: string;
     quantity: number;
     unit: string;
     net_net_weight: number;
     waste_stream_number: string;
+    eural_code: string;
+    processing_method_code: string;
   }) {
+    console.log("drawWaste: ", goods);
     page.drawText(goods.waste_stream_number, {
         x: 60,
         y: 410,
@@ -152,6 +154,13 @@ function drawWaste(page: PDFPage, goods: {
 
     page.drawText(goods.eural_code, {
         x: 410,
+        y: 410,
+        size: 10,
+        color: rgb(0, 0, 0)
+    })
+
+    page.drawText(goods.processing_method_code, {
+        x: 456,
         y: 410,
         size: 10,
         color: rgb(0, 0, 0)

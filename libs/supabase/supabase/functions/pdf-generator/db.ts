@@ -29,12 +29,13 @@ export interface TransportData {
     vihb_id?: string;
   };
   goods: {
-    eural_code: string;
     name: string;
     quantity: number;
     unit: string;
     net_net_weight: number;
     waste_stream_number: string;
+    eural_code: string;
+    processing_method_code: string;
   };
   signatures: {
     consignor_signature?: string;
@@ -207,7 +208,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         gi.quantity,
         gi.unit,
         gi.net_net_weight,
-        gi.waste_stream_number
+        gi.waste_stream_number,
+        gi.processing_method_code
       FROM 
         goods g
       JOIN
