@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/waste-stream")
+@RequestMapping("/waste-streams")
 @PreAuthorize(HAS_ANY_ROLE)
 class WasteStreamController(
     private val wasteStreamService: WasteStreamService,

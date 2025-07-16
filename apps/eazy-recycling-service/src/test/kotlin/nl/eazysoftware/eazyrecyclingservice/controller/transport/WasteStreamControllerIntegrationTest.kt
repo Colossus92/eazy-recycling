@@ -61,7 +61,7 @@ class WasteStreamControllerIntegrationTest {
         wasteStreamRepository.saveAll(listOf(wasteStreamDto1, wasteStreamDto2))
 
         // When & Then
-        securedMockMvc.get("/waste-stream")
+        securedMockMvc.get("/waste-streams")
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray)
@@ -82,7 +82,7 @@ class WasteStreamControllerIntegrationTest {
 
         // When & Then
         securedMockMvc.post(
-            "/waste-stream",
+            "/waste-streams",
             objectMapper.writeValueAsString(wasteStreamDto)
         )
             .andExpect(status().isOk)
@@ -113,7 +113,7 @@ class WasteStreamControllerIntegrationTest {
 
         // When & Then
         securedMockMvc.put(
-            "/waste-stream/WS-004",
+            "/waste-streams/WS-004",
             objectMapper.writeValueAsString(updatedWasteStreamDto)
         )
             .andExpect(status().isOk)
@@ -144,7 +144,7 @@ class WasteStreamControllerIntegrationTest {
 
         // When & Then
         securedMockMvc.put(
-            "/waste-stream/WS-005",
+            "/waste-streams/WS-005",
             objectMapper.writeValueAsString(updatedWasteStreamDto)
         )
             .andExpect(status().isBadRequest)
@@ -165,7 +165,7 @@ class WasteStreamControllerIntegrationTest {
 
         // When & Then
         securedMockMvc.put(
-            "/waste-stream/WS-999",
+            "/waste-streams/WS-999",
             objectMapper.writeValueAsString(nonExistentWasteStreamDto)
         )
             .andExpect(status().isNotFound)
@@ -181,11 +181,38 @@ class WasteStreamControllerIntegrationTest {
         wasteStreamRepository.save(wasteStreamDto)
 
         // When & Then
-        securedMockMvc.delete("/waste-stream/WS-007")
+        securedMockMvc.delete("/waste-streams/WS-007")
             .andExpect(status().isOk)
 
         // Verify waste stream was deleted from the database
         val deletedWasteStream = wasteStreamRepository.findById("WS-007")
         assertThat(deletedWasteStream).isEmpty
+    }
+    
+    @Test
+    fun `should return error when creating waste stream with existing number`() {
+        // Given
+        val existingWasteStreamDto = WasteStreamDto(
+            number = "WS-008",
+            name = "Existing Stream"
+        )
+        wasteStreamRepository.save(existingWasteStreamDto)
+        
+        val duplicateWasteStreamDto = WasteStreamDto(
+            number = "WS-008",
+            name = "Duplicate Stream"
+        )
+        
+        // When & Then
+        securedMockMvc.post(
+            "/waste-streams",
+            objectMapper.writeValueAsString(duplicateWasteStreamDto)
+        )
+            .andExpect(status().isBadRequest)
+            
+        // Verify original waste stream is unchanged
+        val savedWasteStream = wasteStreamRepository.findById("WS-008")
+        assertThat(savedWasteStream).isPresent
+        assertThat(savedWasteStream.get().name).isEqualTo("Existing Stream")
     }
 }

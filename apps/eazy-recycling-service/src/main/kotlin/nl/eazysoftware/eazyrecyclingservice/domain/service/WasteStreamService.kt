@@ -15,6 +15,9 @@ class WasteStreamService(
     }
 
     fun createWasteStream(wasteStreamDto: WasteStreamDto): WasteStreamDto {
+        wasteStreamRepository.existsById(wasteStreamDto.number)
+            .let { if (it) throw IllegalArgumentException("Afvalstroom met nummer ${wasteStreamDto.number} bestaat al") }
+
         return wasteStreamRepository.save(wasteStreamDto)
     }
 

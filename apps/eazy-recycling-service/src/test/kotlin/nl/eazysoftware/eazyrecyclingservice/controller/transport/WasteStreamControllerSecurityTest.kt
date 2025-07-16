@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.stream.Stream
 
+private const val PATH = "/waste-streams"
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -52,28 +54,28 @@ class WasteStreamControllerSecurityTest {
         fun roleAccessScenarios(): Stream<Arguments> {
             return Stream.of(
                 // GET all waste streams - any authenticated role can access
-                Arguments.of("/waste-stream", "GET", Roles.ADMIN, 200),
-                Arguments.of("/waste-stream", "GET", Roles.PLANNER, 200),
-                Arguments.of("/waste-stream", "GET", Roles.CHAUFFEUR, 200),
-                Arguments.of("/waste-stream", "GET", "unauthorized_role", 403),
+                Arguments.of(PATH, "GET", Roles.ADMIN, 200),
+                Arguments.of(PATH, "GET", Roles.PLANNER, 200),
+                Arguments.of(PATH, "GET", Roles.CHAUFFEUR, 200),
+                Arguments.of(PATH, "GET", "unauthorized_role", 403),
 
                 // POST (create) waste stream - any authenticated role can access
-                Arguments.of("/waste-stream", "POST", Roles.ADMIN, 200),
-                Arguments.of("/waste-stream", "POST", Roles.PLANNER, 200),
-                Arguments.of("/waste-stream", "POST", Roles.CHAUFFEUR, 200),
-                Arguments.of("/waste-stream", "POST", "unauthorized_role", 403),
+                Arguments.of(PATH, "POST", Roles.ADMIN, 200),
+                Arguments.of(PATH, "POST", Roles.PLANNER, 200),
+                Arguments.of(PATH, "POST", Roles.CHAUFFEUR, 200),
+                Arguments.of(PATH, "POST", "unauthorized_role", 403),
 
                 // PUT (update) waste stream - any authenticated role can access
-                Arguments.of("/waste-stream/TEST-001", "PUT", Roles.ADMIN, 200),
-                Arguments.of("/waste-stream/TEST-001", "PUT", Roles.PLANNER, 200),
-                Arguments.of("/waste-stream/TEST-001", "PUT", Roles.CHAUFFEUR, 200),
-                Arguments.of("/waste-stream/TEST-001", "PUT", "unauthorized_role", 403),
+                Arguments.of("$PATH/TEST-001", "PUT", Roles.ADMIN, 200),
+                Arguments.of("$PATH/TEST-001", "PUT", Roles.PLANNER, 200),
+                Arguments.of("$PATH/TEST-001", "PUT", Roles.CHAUFFEUR, 200),
+                Arguments.of("$PATH/TEST-001", "PUT", "unauthorized_role", 403),
 
                 // DELETE waste stream - any authenticated role can access
-                Arguments.of("/waste-stream/TEST-001", "DELETE", Roles.ADMIN, 200),
-                Arguments.of("/waste-stream/TEST-001", "DELETE", Roles.PLANNER, 200),
-                Arguments.of("/waste-stream/TEST-001", "DELETE", Roles.CHAUFFEUR, 200),
-                Arguments.of("/waste-stream/TEST-001", "DELETE", "unauthorized_role", 403)
+                Arguments.of("$PATH/TEST-001", "DELETE", Roles.ADMIN, 200),
+                Arguments.of("$PATH/TEST-001", "DELETE", Roles.PLANNER, 200),
+                Arguments.of("$PATH/TEST-001", "DELETE", Roles.CHAUFFEUR, 200),
+                Arguments.of("$PATH/TEST-001", "DELETE", "unauthorized_role", 403)
             )
         }
     }
