@@ -34,6 +34,9 @@ class SignatureServiceTest {
     @Mock
     private lateinit var transportService: TransportService
 
+    @Mock
+    private lateinit var pdfGenerationClient: PdfGenerationClient
+
     private lateinit var waybillDocumentService: WaybillDocumentService
 
 
@@ -44,7 +47,7 @@ class SignatureServiceTest {
 
     @BeforeEach
     fun setUp() {
-        waybillDocumentService = WaybillDocumentService(signaturesRepository, supabase, transportService)
+        waybillDocumentService = WaybillDocumentService(signaturesRepository, supabase, pdfGenerationClient, transportService)
     }
 
     @Test

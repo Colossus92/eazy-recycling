@@ -141,28 +141,32 @@ create table if not exists container_operations_log (
 );
 
 create table if not exists signatures (
-                                       "transport_id" uuid not null,
-                                       "consignor_signature" text,
-                                       "consignor_email" text,
-                                       "consignor_signed_at" timestamp with time zone,
-                                       "pickup_signature" text,
-                                       "pickup_email" text,
-                                       "pickup_signed_at" timestamp with time zone,
-                                       "carrier_signature" text,
-                                       "carrier_email" text,
-                                       "carrier_signed_at" timestamp with time zone,
-                                       "consignee_signature" text,
-                                       "consignee_email" text,
-                                       "consignee_signed_at" timestamp with time zone
+                                       transport_id uuid not null,
+                                       consignor_signature text,
+                                       consignor_email text,
+                                       consignor_signed_at timestamp with time zone,
+                                       pickup_signature text,
+                                       pickup_email text,
+                                       pickup_signed_at timestamp with time zone,
+                                       carrier_signature text,
+                                       carrier_email text,
+                                       carrier_signed_at timestamp with time zone,
+                                       consignee_signature text,
+                                       consignee_email text,
+                                       consignee_signed_at timestamp with time zone
 );
 
 create table if not exists eural (
-                                  "code" text not null,
-                                  "description" text not null
+                                  code text not null,
+                                  description text not null
 );
 
 create table if not exists processing_methods (
-                                  "code" text not null,
-                                  "description" text not null
+                                  code text not null,
+                                  description text not null
 );
 
+create table if not exists waste_stream (
+                                  number text not null,
+                                  name text not null
+);
