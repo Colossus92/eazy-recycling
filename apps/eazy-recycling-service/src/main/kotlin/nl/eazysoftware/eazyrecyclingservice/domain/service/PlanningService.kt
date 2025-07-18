@@ -97,11 +97,10 @@ class PlanningService(
         }
     }
 
-    fun reorderTransports(date: LocalDate, licensePlate: String, transportIds: List<UUID>): PlanningView {
-        // Validate that all transports exist and belong to the specified truck and date
+    fun reorderTransports(date: LocalDate, displayName: String, transportIds: List<UUID>): PlanningView {
+        val licensePlate = Truck.extractLicensePlateFromDisplayName(displayName)
         val transports = transportRepository.findAllById(transportIds)
 
-        // Update sequence numbers based on the order in transportIds
         val transportsWithSequenceNumber = transportIds.mapIndexed { index, id ->
             val transport = transports.first { it.id == id }
             var truck: Truck? = null
@@ -119,7 +118,6 @@ class PlanningService(
         }
         transportRepository.saveAll(transportsWithSequenceNumber)
 
-        // Return updated planning view
         return getPlanningByDate(date)
     }
 

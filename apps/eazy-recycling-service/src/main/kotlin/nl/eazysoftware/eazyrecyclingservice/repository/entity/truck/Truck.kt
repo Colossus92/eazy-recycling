@@ -32,4 +32,13 @@ data class Truck(
     fun getDisplayName(): String {
         return "$model ($licensePlate)"
     }
+
+    companion object {
+        fun extractLicensePlateFromDisplayName(displayName: String): String {
+            if (displayName.indexOf("(") == -1 || displayName.indexOf(")") == -1) {
+                return displayName
+            }
+            return displayName.substring(displayName.indexOf("(") + 1, displayName.indexOf(")"))
+        }
+    }
 }
