@@ -1,4 +1,3 @@
-
 import { format } from 'npm:date-fns';
 import { TransportData } from './db.ts';
 import { SigneeInfo } from './index.ts';
@@ -13,6 +12,11 @@ type StorageOptions = {
  * Storage bucket name for waybill PDFs
  */
 const STORAGE_BUCKET = 'waybills';
+
+/**
+ * Storage bucket name for signatures
+ */
+const SIGNATURES_BUCKET = 'signatures';
 
 /**
  * Generate a unique filename for the PDF
@@ -49,4 +53,57 @@ export async function uploadFile(file: Uint8Array, fileName: string): Promise<vo
     console.error('Storage upload error:', error);
     throw new Error(`Failed to upload PDF: ${error.message}`);
   }
+}
+
+/**
+ * Fetch signature image from storage bucket
+ * @param transportId - ID of the transport
+ * @param partyType - Type of party (consignor, consignee, carrier, pickup)
+ * @returns Promise resolving to signature data URL or null if not found
+ */
+export async function fetchSignatureFromBucket(transportId: string, partyType: string): Promise<string | null> {
+  try {
+    const signatureFileName = `${transportId}/${partyType}.png`;
+    
+    // Download the file
+    const { data, error } = await supabase.storage
+      .from(SIGNATURES_BUCKET)
+      .download(signatureFileName);
+    
+    if (error || !data) {
+      console.log(`Signature not found for ${partyType} in transport ${transportId}`);
+      return null;
+    }
+    
+    // Convert the blob to a base64 data URL
+    const arrayBuffer = await data.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    const base64 = btoa(String.fromCharCode(...bytes));
+    
+    return `data:image/png;base64,${base64}`;
+  } catch (error) {
+    console.error(`Error fetching signature for ${partyType}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Fetch all signatures for a transport
+ * @param transportId - ID of the transport
+ * @returns Promise resolving to an object containing all signatures
+ */
+export async function fetchAllSignatures(transportId: string): Promise<Record<string, string | undefined>> {
+  const partyTypes = ['consignor', 'consignee', 'carrier', 'pickup'];
+  
+  const signatures: Record<string, string | undefined> = {};
+  
+  // Use Promise.all to fetch all signatures in parallel
+  await Promise.all(
+    partyTypes.map(async (partyType) => {
+      const signature = await fetchSignatureFromBucket(transportId, partyType);
+      signatures[`${partyType}_signature`] = signature || undefined;
+    })
+  );
+  
+  return signatures;
 }

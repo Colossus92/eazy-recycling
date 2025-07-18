@@ -1,7 +1,8 @@
 import {PDFDocument, PageSizes} from 'npm:pdf-lib';
 import {fetchTransportData, TransportData} from './db.ts';
-import {drawBackgroundWaybill, drawData, drawSignatures} from './pdf.ts';
-import {generateFileName, uploadFile} from './storage.ts';
+import {drawBackgroundWaybill, drawData} from './pdf.ts';
+import {drawSignatures} from './signatures.ts';
+import {generateFileName, uploadFile, fetchAllSignatures} from './storage.ts';
 import {triggerEmail} from "./email.ts";
 
 // Type definitions
@@ -25,35 +26,42 @@ export type SigneeInfo = {
  * @param partyType - The type of party (consignor, consignee, etc.)
  * @returns Object containing signature, signed timestamp and email
  */
-export function getSigneeInfo(partyType: string, transportData?: TransportData): SigneeInfo {
+export function getSigneeInfo(partyType: string, transportData?: TransportData, signatures?: Record<string, string | undefined>): SigneeInfo {
     switch (partyType) {
         case 'consignor':
             return {
                 type: 'consignor',
-                signature: transportData?.signatures.consignor_signature,
+                signature: signatures?.consignor_signature || transportData?.signatures.consignor_signature,
                 signedAt: transportData?.signatures.consignor_signed_at,
                 email: transportData?.signatures.consignor_email
             };
         case 'consignee':
             return {
                 type: 'consignee',
-                signature: transportData?.signatures.consignee_signature,
+                signature: signatures?.consignee_signature || transportData?.signatures.consignee_signature,
                 signedAt: transportData?.signatures.consignee_signed_at,
                 email: transportData?.signatures.consignee_email
             };
         case 'pickup':
             return {
                 type: 'pickup',
-                signature: transportData?.signatures.pickup_signature,
+                signature: signatures?.pickup_signature || transportData?.signatures.pickup_signature,
                 signedAt: transportData?.signatures.pickup_signed_at,
                 email: transportData?.signatures.pickup_email
             };
         case 'carrier':
             return {
                 type: 'carrier',
-                signature: transportData?.signatures.carrier_signature,
+                signature: signatures?.carrier_signature || transportData?.signatures.carrier_signature,
                 signedAt: transportData?.signatures.carrier_signed_at,
                 email: transportData?.signatures.carrier_email
+            };
+        case 'empty':
+            return {
+                type: 'empty',
+                signature: '',
+                signedAt: '',
+                email: ''
             };
         default:
             throw new Error('Invalid party type');
@@ -65,13 +73,16 @@ export function getSigneeInfo(partyType: string, transportData?: TransportData):
  * @param transportData - Data to be included in the PDF
  * @returns Promise resolving to PDF binary content
  */
-async function generatePdf(transportData: TransportData): Promise<Uint8Array> {
+async function generatePdf(transportData: TransportData, signeeInfo: SigneeInfo, signatures?: Record<string, string | undefined>): Promise<Uint8Array> {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage(PageSizes.A4);
 
     await drawBackgroundWaybill(page, pdfDoc);
     drawData(page, transportData);
-    await drawSignatures(page, pdfDoc, transportData);
+
+    if (signeeInfo.type !== 'empty') {
+        await drawSignatures(page, pdfDoc, transportData, signatures);
+    }
 
     return await pdfDoc.save();
 }
@@ -114,8 +125,6 @@ Deno.serve(async (req) => {
         console.log(`[${transportId}] Transport data: ${JSON.stringify(transportData?.transport)}`);
         if (response) return response;
 
-        const signeeInfo = getSigneeInfo(partyType, transportData);
-
         if (!transportData) {
             return createApiResponse(404, {
                 success: false,
@@ -124,8 +133,14 @@ Deno.serve(async (req) => {
             });
         }
 
+        // Fetch signatures from bucket
+        console.log(`[${transportId}] Fetching signatures from bucket...`);
+        const signatures = await fetchAllSignatures(transportId);
+        
+        const signeeInfo = getSigneeInfo(partyType, transportData, signatures);
+
         console.log(`[${transportId}] Transport found, generating pdf...`);
-        const pdfBytes = await generatePdf(transportData);
+        const pdfBytes = await generatePdf(transportData, signeeInfo, signatures);
         const fileName = generateFileName(transportData, signeeInfo);
         console.log(`[${transportId}] Generated pdf, uploading to storage...`);
         await uploadFile(pdfBytes, fileName);
