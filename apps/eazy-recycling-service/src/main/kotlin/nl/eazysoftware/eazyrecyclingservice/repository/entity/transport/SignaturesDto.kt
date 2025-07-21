@@ -15,19 +15,15 @@ data class SignaturesDto(
     @Column(name = "transport_id")
     val transportId: UUID,
 
-    var consignorSignature: String? = null,
     var consignorEmail: String? = null,
     var consignorSignedAt: ZonedDateTime? = null,
 
-    var pickupSignature: String? = null,
     var pickupEmail: String? = null,
     var pickupSignedAt: ZonedDateTime? = null,
 
-    var carrierSignature: String? = null,
     var carrierEmail: String? = null,
     var carrierSignedAt: ZonedDateTime? = null,
 
-    var consigneeSignature: String? = null,
     var consigneeEmail: String? = null,
     var consigneeSignedAt: ZonedDateTime? = null,
 )

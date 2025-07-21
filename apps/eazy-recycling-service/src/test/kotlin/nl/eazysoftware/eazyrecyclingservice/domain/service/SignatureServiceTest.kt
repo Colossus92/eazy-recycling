@@ -2,13 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import io.github.jan.supabase.SupabaseClient
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.assertThrows
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,11 +12,14 @@ import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.util.Optional
-import java.util.UUID
+import java.util.*
+
+private const val CONSIGNOR_PNG = "consignor.png"
+private const val CONSIGNEE_PNG = "consignee.png"
+private const val CARRIER_PNG = "carrier.png"
+private const val PICKUP_PNG = "pickup.png"
 
 @ExtendWith(MockitoExtension::class)
 class SignatureServiceTest {
@@ -37,23 +36,31 @@ class SignatureServiceTest {
     @Mock
     private lateinit var pdfGenerationClient: PdfGenerationClient
 
+    @Mock
+    private lateinit var storageClient: StorageClient
+
     private lateinit var waybillDocumentService: WaybillDocumentService
 
 
     private val testId = UUID.randomUUID()
     private val testSignature = "base64EncodedSignature"
     private val testEmail = "test@example.com"
-    private val testDateTime = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
 
     @BeforeEach
     fun setUp() {
-        waybillDocumentService = WaybillDocumentService(signaturesRepository, supabase, pdfGenerationClient, transportService)
+        waybillDocumentService = WaybillDocumentService(
+            signaturesRepository,
+            supabase,
+            pdfGenerationClient,
+            transportService,
+            storageClient,
+        )
     }
 
     @Test
     fun `getSignatureStatuses should return all signatures as false when no signatures exist`() {
         // Given
-        `when`(signaturesRepository.findById(testId)).thenReturn(Optional.empty())
+        whenever(storageClient.listSignatures(testId)).thenReturn(listOf())
 
         // When
         val result = waybillDocumentService.getSignatureStatuses(testId)
@@ -69,23 +76,7 @@ class SignatureServiceTest {
     @Test
     fun `getSignatureStatuses should return correct status when all signatures exist`() {
         // Given
-        val signatures = SignaturesDto(
-            transportId = testId,
-            consignorSignature = testSignature,
-            consignorEmail = testEmail,
-            consignorSignedAt = testDateTime,
-            pickupSignature = testSignature,
-            pickupEmail = testEmail,
-            pickupSignedAt = testDateTime,
-            carrierSignature = testSignature,
-            carrierEmail = testEmail,
-            carrierSignedAt = testDateTime,
-            consigneeSignature = testSignature,
-            consigneeEmail = testEmail,
-            consigneeSignedAt = testDateTime
-        )
-        `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
-
+        whenever(storageClient.listSignatures(testId)).thenReturn(listOf(CONSIGNOR_PNG, CARRIER_PNG, PICKUP_PNG, CONSIGNEE_PNG))
         // When
         val result = waybillDocumentService.getSignatureStatuses(testId)
 
@@ -100,53 +91,7 @@ class SignatureServiceTest {
     @Test
     fun `getSignatureStatuses should return correct status when only some signatures exist`() {
         // Given
-        val signatures = SignaturesDto(
-            transportId = testId,
-            consignorSignature = testSignature,
-            consignorEmail = testEmail,
-            consignorSignedAt = testDateTime,
-            pickupSignature = null,
-            pickupEmail = null,
-            pickupSignedAt = null,
-            carrierSignature = testSignature,
-            carrierEmail = testEmail,
-            carrierSignedAt = testDateTime,
-            consigneeSignature = null,
-            consigneeEmail = null,
-            consigneeSignedAt = null
-        )
-        `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
-
-        // When
-        val result = waybillDocumentService.getSignatureStatuses(testId)
-
-        // Then
-        assertEquals(testId, result.transportId)
-        assertTrue(result.consignorSigned)
-        assertTrue(result.carrierSigned)
-        assertFalse(result.consigneeSigned)
-        assertFalse(result.pickupSigned)
-    }
-
-    @Test
-    fun `getSignatureStatuses should handle empty signature strings correctly`() {
-        // Given
-        val signatures = SignaturesDto(
-            transportId = testId,
-            consignorSignature = "",  // Empty string should be treated as signed
-            consignorEmail = testEmail,
-            consignorSignedAt = testDateTime,
-            pickupSignature = null,
-            pickupEmail = null,
-            pickupSignedAt = null,
-            carrierSignature = "   ", // Whitespace should be treated as signed
-            carrierEmail = testEmail,
-            carrierSignedAt = testDateTime,
-            consigneeSignature = null,
-            consigneeEmail = null,
-            consigneeSignedAt = null
-        )
-        `when`(signaturesRepository.findById(testId)).thenReturn(Optional.of(signatures))
+        whenever(storageClient.listSignatures(testId)).thenReturn(listOf(CONSIGNOR_PNG, CARRIER_PNG))
 
         // When
         val result = waybillDocumentService.getSignatureStatuses(testId)

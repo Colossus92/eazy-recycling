@@ -28,27 +28,21 @@ class WaybillDocumentService(
     private val supabaseClient: SupabaseClient,
     private val pdfGenerationClient: PdfGenerationClient,
     private val transportService: TransportService,
+    private val storageClient: StorageClient,
 ) {
     private val logger = LoggerFactory.getLogger(WaybillDocumentService::class.java)
 
     fun getSignatureStatuses(id: UUID): SignatureStatusView =
-        signaturesRepository.findByIdOrNull(id)
-            ?.let { signatures ->
+        storageClient.listSignatures(id)
+            .let { signatures ->
                 SignatureStatusView(
                     id,
-                    consignorSigned = signatures.consignorSignature != null,
-                    carrierSigned = signatures.carrierSignature != null,
-                    consigneeSigned = signatures.consigneeSignature != null,
-                    pickupSigned = signatures.pickupSignature != null,
+                    consignorSigned = signatures.contains("consignor.png"),
+                    carrierSigned = signatures.contains("carrier.png"),
+                    consigneeSigned = signatures.contains("consignee.png"),
+                    pickupSigned = signatures.contains("pickup.png"),
                 )
             }
-            ?: SignatureStatusView(
-                id,
-                consignorSigned = false,
-                carrierSigned = false,
-                consigneeSigned = false,
-                pickupSigned = false
-            )
 
     fun saveSignature(id: UUID, request: CreateSignatureRequest): SignatureStatusView {
         val transport = transportService.getTransportById(id)
@@ -61,25 +55,21 @@ class WaybillDocumentService(
 
         when (request.party) {
             "consignor" -> {
-                signatures.consignorSignature = request.signature
                 signatures.consignorEmail = request.email
                 signatures.consignorSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
 
             "consignee" -> {
-                signatures.consigneeSignature = request.signature
                 signatures.consigneeEmail = request.email
                 signatures.consigneeSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
 
             "carrier" -> {
-                signatures.carrierSignature = request.signature
                 signatures.carrierEmail = request.email
                 signatures.carrierSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
 
             "pickup" -> {
-                signatures.pickupSignature = request.signature
                 signatures.pickupEmail = request.email
                 signatures.pickupSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
             }
@@ -89,6 +79,7 @@ class WaybillDocumentService(
 
         signaturesRepository.save(signatures)
 
+        storageClient.saveSignature(id, request.signature, request.party)
         pdfGenerationClient.triggerPdfGeneration(id, request.party)
 
         return getSignatureStatuses(id)
