@@ -263,6 +263,7 @@ class TransportControllerSecurityTest {
             euralCode = "EURAL-123",
             goodsName = "Test Goods",
             processingMethodCode = "A.02",
+            consignorClassification = 4
         )
 
         return objectMapper.writeValueAsString(request)

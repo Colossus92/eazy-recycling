@@ -68,6 +68,7 @@ class TransportService(
         val goods = GoodsDto(
             id = UUID.randomUUID().toString(),
             goodsItem = goodsItem,
+            consignorClassification = request.consignorClassification,
             consigneeParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.consigneePartyId)),
             pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId)),
         )
@@ -118,7 +119,7 @@ class TransportService(
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
             goods = goods,
             note = request.note,
-            sequenceNumber = 9999
+            sequenceNumber = 9999,
         )
 
         log.info("Creating transport: $transport")
@@ -171,6 +172,7 @@ class TransportService(
             )
 
             existingGoods.copy(
+                consignorClassification = request.consignorClassification,
                 goodsItem = goodsItem,
                 consigneeParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.consigneePartyId)),
                 pickupParty = entityManager.getReference(CompanyDto::class.java, UUID.fromString(request.pickupPartyId))
@@ -187,6 +189,7 @@ class TransportService(
                 name = request.goodsName,
                 processingMethodCode = request.processingMethodCode,
             ),
+            consignorClassification = request.consignorClassification,
             consigneeParty = entityManager.getReference(CompanyDto::class.java, request.consigneePartyId),
             pickupParty = entityManager.getReference(CompanyDto::class.java, request.pickupPartyId)
         )

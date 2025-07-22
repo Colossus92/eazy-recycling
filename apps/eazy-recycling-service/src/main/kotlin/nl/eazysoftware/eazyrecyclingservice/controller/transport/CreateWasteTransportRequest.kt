@@ -28,6 +28,7 @@ data class CreateWasteTransportRequest(
     override val truckId: String?,
     override val containerId: UUID?,
     override val note: String,
+    val consignorClassification: Int,
     val wasteStreamNumber: String?,
     val weight: Int,
     val unit: String,

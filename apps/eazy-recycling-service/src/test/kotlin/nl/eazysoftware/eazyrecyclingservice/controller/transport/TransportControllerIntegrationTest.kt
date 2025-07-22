@@ -239,6 +239,7 @@ class TransportControllerIntegrationTest {
             goodsName = "Test Waste",
             euralCode = "200301",
             processingMethodCode = "A.02",
+            consignorClassification = 1,
         )
 
         // When & Then
@@ -326,7 +327,8 @@ class TransportControllerIntegrationTest {
             id = UUID.randomUUID().toString(),
             goodsItem = goodsItem,
             consigneeParty = testCompany,
-            pickupParty = testCompany
+            pickupParty = testCompany,
+            consignorClassification = 2
         )
 
         val transport = createTestTransport("Original Waste Transport", goods)
@@ -361,7 +363,8 @@ class TransportControllerIntegrationTest {
             quantity = 2,
             goodsName = "Updated Waste",
             euralCode = "200301",
-            processingMethodCode = "A.02"
+            processingMethodCode = "A.02",
+            consignorClassification = 1
         )
 
         // When & Then
@@ -381,6 +384,7 @@ class TransportControllerIntegrationTest {
         assertThat(updatedTransport?.note).isEqualTo("Updated Waste Transport")
         assertThat(updatedTransport?.goods?.goodsItem?.wasteStreamNumber).isEqualTo("Updated-WSN")
         assertThat(updatedTransport?.goods?.goodsItem?.netNetWeight).isEqualTo(2000)
+        assertThat(updatedTransport?.goods?.consignorClassification).isOne
     }
 
     @Test
@@ -400,7 +404,8 @@ class TransportControllerIntegrationTest {
             id = UUID.randomUUID().toString(),
             goodsItem = goodsItem,
             consigneeParty = testCompany,
-            pickupParty = testCompany
+            pickupParty = testCompany,
+            consignorClassification = 2
         )
 
         val transport = TransportDto(

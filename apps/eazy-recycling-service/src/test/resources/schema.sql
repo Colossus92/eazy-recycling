@@ -24,6 +24,7 @@ create table if not exists drivers (
 create table if not exists goods (
                        goods_item_id bigint unique,
                        updated_at timestamp(6) not null,
+                       consignor_classification smallint,
                        consignee_party_id uuid,
                        pickup_party_id uuid,
                        uuid uuid not null,

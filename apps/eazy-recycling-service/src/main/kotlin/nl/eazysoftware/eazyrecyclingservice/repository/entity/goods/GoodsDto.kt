@@ -25,6 +25,16 @@ data class GoodsDto(
     val goodsItem: GoodsItemDto,
 
     /**
+     * The classification of the consignor, this can be:
+     *      1 = Ontdoener
+     *      2 = Ontvanger
+     *      3 = Handelaar
+     *      4 = Bemiddelaar
+     */
+    @Column(name = "consignor_classification", nullable = false)
+    val consignorClassification: Int,
+
+    /**
      * The party receiving the goods after the transport is finished.
      */
     @ManyToOne
