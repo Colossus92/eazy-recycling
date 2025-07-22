@@ -36,18 +36,15 @@ export interface TransportData {
     waste_stream_number: string;
     eural_code: string;
     processing_method_code: string;
+    consignor_classification: number;
   };
   signatures: {
-    consignor_signature?: string;
     consignor_email?: string;
     consignor_signed_at?: string;
-    carrier_signature?: string;
     carrier_email?: string;
     carrier_signed_at?: string;
-    consignee_signature?: string;
     consignee_email?: string;
     consignee_signed_at?: string;
-    pickup_signature?: string;
     pickup_email?: string;
     pickup_signed_at?: string;
   };
@@ -203,6 +200,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
     const goodsResult = await connection.queryObject`
       SELECT 
         g.id,
+        g.consignor_classification,
         gi.eural_code,
         gi.name,
         gi.quantity,
@@ -258,16 +256,12 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
     
     const signaturesResult = await connection.queryObject`
       SELECT 
-        consignor_signature,
         consignor_email,
         consignor_signed_at,
-        carrier_signature,
         carrier_email,
         carrier_signed_at,
-        consignee_signature,
         consignee_email,
         consignee_signed_at,
-        pickup_signature,
         pickup_email,
         pickup_signed_at
       FROM 

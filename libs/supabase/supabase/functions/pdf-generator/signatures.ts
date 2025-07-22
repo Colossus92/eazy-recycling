@@ -48,14 +48,12 @@ async function drawSignature(page: PDFPage, pdfDoc: PDFDocument, x: number, y: n
 export async function drawSignatures(
     page: PDFPage, 
     pdfDoc: PDFDocument, 
-    transportData: TransportData,
     bucketSignatures?: Record<string, string | undefined>
 ) {
-    // Use bucket signatures if available, otherwise fall back to database signatures
-    const consignorSignature = bucketSignatures?.consignor_signature || transportData.signatures.consignor_signature;
-    const pickupSignature = bucketSignatures?.pickup_signature || transportData.signatures.pickup_signature;
-    const carrierSignature = bucketSignatures?.carrier_signature || transportData.signatures.carrier_signature;
-    const consigneeSignature = bucketSignatures?.consignee_signature || transportData.signatures.consignee_signature;
+    const consignorSignature = bucketSignatures?.consignor_signature;
+    const pickupSignature = bucketSignatures?.pickup_signature;
+    const carrierSignature = bucketSignatures?.carrier_signature;
+    const consigneeSignature = bucketSignatures?.consignee_signature;
 
     await drawSignature(page, pdfDoc, 50, 0, consignorSignature);
     await drawSignature(page, pdfDoc, 180, 0, pickupSignature);

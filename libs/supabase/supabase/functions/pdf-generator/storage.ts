@@ -14,11 +14,6 @@ type StorageOptions = {
 const STORAGE_BUCKET = 'waybills';
 
 /**
- * Storage bucket name for signatures
- */
-const SIGNATURES_BUCKET = 'signatures';
-
-/**
  * Generate a unique filename for the PDF
  * @param transportData - Transport data
  * @param partyType - Type of party (consignor/consignee)
@@ -63,11 +58,11 @@ export async function uploadFile(file: Uint8Array, fileName: string): Promise<vo
  */
 export async function fetchSignatureFromBucket(transportId: string, partyType: string): Promise<string | null> {
   try {
-    const signatureFileName = `${transportId}/${partyType}.png`;
+    const signatureFileName = `signatures/${transportId}/${partyType}.png`;
     
     // Download the file
     const { data, error } = await supabase.storage
-      .from(SIGNATURES_BUCKET)
+      .from(STORAGE_BUCKET)
       .download(signatureFileName);
     
     if (error || !data) {

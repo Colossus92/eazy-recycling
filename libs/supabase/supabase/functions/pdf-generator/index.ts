@@ -31,28 +31,28 @@ export function getSigneeInfo(partyType: string, transportData?: TransportData, 
         case 'consignor':
             return {
                 type: 'consignor',
-                signature: signatures?.consignor_signature || transportData?.signatures.consignor_signature,
+                signature: signatures?.consignor_signature,
                 signedAt: transportData?.signatures.consignor_signed_at,
                 email: transportData?.signatures.consignor_email
             };
         case 'consignee':
             return {
                 type: 'consignee',
-                signature: signatures?.consignee_signature || transportData?.signatures.consignee_signature,
+                signature: signatures?.consignee_signature,
                 signedAt: transportData?.signatures.consignee_signed_at,
                 email: transportData?.signatures.consignee_email
             };
         case 'pickup':
             return {
                 type: 'pickup',
-                signature: signatures?.pickup_signature || transportData?.signatures.pickup_signature,
+                signature: signatures?.pickup_signature,
                 signedAt: transportData?.signatures.pickup_signed_at,
                 email: transportData?.signatures.pickup_email
             };
         case 'carrier':
             return {
                 type: 'carrier',
-                signature: signatures?.carrier_signature || transportData?.signatures.carrier_signature,
+                signature: signatures?.carrier_signature,
                 signedAt: transportData?.signatures.carrier_signed_at,
                 email: transportData?.signatures.carrier_email
             };
@@ -81,7 +81,7 @@ async function generatePdf(transportData: TransportData, signeeInfo: SigneeInfo,
     drawData(page, transportData);
 
     if (signeeInfo.type !== 'empty') {
-        await drawSignatures(page, pdfDoc, transportData, signatures);
+        await drawSignatures(page, pdfDoc, signatures);
     }
 
     return await pdfDoc.save();
