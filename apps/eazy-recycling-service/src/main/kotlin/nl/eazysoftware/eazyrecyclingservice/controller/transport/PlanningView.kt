@@ -18,7 +18,7 @@ data class TransportsView(
 
 data class TransportView(
     val pickupDate: String,
-    val deliveryDate: String,
+    val deliveryDate: String?,
     val id: String,
     val truck: Truck?,
     val originCity: String?,
@@ -33,7 +33,7 @@ data class TransportView(
 
     constructor(transportDto: TransportDto): this(
         pickupDate = transportDto.pickupDateTime.toLocalDate().toString(),
-        deliveryDate = transportDto.deliveryDateTime.toLocalDate().toString(),
+        deliveryDate = transportDto.deliveryDateTime?.toLocalDate()?.toString().takeIf { transportDto.deliveryDateTime != null },
         id = transportDto.id.toString(),
         truck =  transportDto.truck,
         originCity = transportDto.pickupLocation.address.city,

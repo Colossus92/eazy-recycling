@@ -76,7 +76,7 @@ data class TransportDto(
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
     val deliveryLocation: LocationDto,
 
-    val deliveryDateTime: LocalDateTime,
+    val deliveryDateTime: LocalDateTime?,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
@@ -135,7 +135,7 @@ data class TransportDto(
         }
         
         val now = LocalDateTime.now()
-        if (now.isAfter(deliveryDateTime)) {
+        if (now.isAfter(pickupDateTime)) {
             return Status.FINISHED
         }
         

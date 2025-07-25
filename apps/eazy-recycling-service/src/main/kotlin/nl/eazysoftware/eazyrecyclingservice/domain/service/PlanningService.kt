@@ -112,7 +112,7 @@ class PlanningService(
             transport.copy(
                 truck = truck,
                 pickupDateTime = date.atTime(transport.pickupDateTime.hour, transport.pickupDateTime.minute),
-                deliveryDateTime = date.atTime(transport.deliveryDateTime.hour, transport.deliveryDateTime.minute),
+                deliveryDateTime = transport.deliveryDateTime?.let { date.atTime(it.hour, it.minute) },
                 sequenceNumber = index,
             )
         }

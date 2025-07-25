@@ -8,7 +8,7 @@ import java.util.UUID
 open class CreateContainerTransportRequest(
     open val consignorPartyId: UUID,
     open val pickupDateTime: LocalDateTime,
-    open val deliveryDateTime: LocalDateTime,
+    open val deliveryDateTime: LocalDateTime?,
     open val transportType: TransportType,
     open val containerOperation: ContainerOperation,
     open val driverId: UUID?,

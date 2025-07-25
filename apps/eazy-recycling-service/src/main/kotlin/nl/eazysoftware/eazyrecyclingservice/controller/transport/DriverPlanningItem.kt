@@ -10,7 +10,7 @@ data class DriverPlanningItem(
     val id: UUID?,
     val displayNumber: String?,
     val pickupDateTime: LocalDateTime,
-    val deliveryDateTime: LocalDateTime,
+    val deliveryDateTime: LocalDateTime?,
     val pickupLocation: LocationDto,
     val deliveryLocation: LocationDto,
     val containerId: String?,

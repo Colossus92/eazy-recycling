@@ -10,7 +10,7 @@ data class CreateWasteTransportRequest(
     val pickupPartyId: String,
     override val consignorPartyId: UUID,
     override val pickupDateTime: LocalDateTime,
-    override val deliveryDateTime: LocalDateTime,
+    override val deliveryDateTime: LocalDateTime?,
     override val containerOperation: ContainerOperation,
     override val transportType: TransportType,
     override val driverId: UUID?,
