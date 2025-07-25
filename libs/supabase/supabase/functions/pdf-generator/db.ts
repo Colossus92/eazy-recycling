@@ -13,7 +13,7 @@ export interface TransportData {
     display_number: string;
     transport_type: string;
     pickup_date_time: string;
-    delivery_date_time: string;
+    delivery_date_time?: string;
     truck_id?: string;
     note?: string;
   };
@@ -119,6 +119,22 @@ export function isValidUUID(id: string): boolean {
 }
 
 /**
+ * Formats a date string to DD-MM-YYYY format
+ * @param dateString The date string to format
+ * @returns Formatted date string in DD-MM-YYYY format
+ */
+export function formatDate(dateString: string): string {
+  if (!dateString) return '';
+  
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+  const year = date.getFullYear();
+  
+  return `${day}-${month}-${year}`;
+}
+
+/**
  * Fetches comprehensive transport data for PDF generation
  * @param transportId The UUID of the transport
  * @returns The transport data or an error response
@@ -170,7 +186,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       display_number: string;
       transport_type: string;
       pickup_date_time: string;
-      delivery_date_time: string;
+      delivery_date_time?: string;
       note?: string;
       goods_id: string;
       truck_id: string;
@@ -349,8 +365,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         id: String(transport.id),
         display_number: String(transport.display_number),
         transport_type: String(transport.transport_type),
-        pickup_date_time: String(transport.pickup_date_time),
-        delivery_date_time: String(transport.delivery_date_time),
+        pickup_date_time: formatDate(String(transport.pickup_date_time)),
+        delivery_date_time: transport.delivery_date_time ? formatDate(String(transport.delivery_date_time)) : undefined,
         note: transport.note ? String(transport.note) : undefined,
         truck_id: transport.truck_id ? String(transport.truck_id) : undefined,
       },

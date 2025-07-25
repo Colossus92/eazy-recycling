@@ -1,6 +1,5 @@
 import { PDFDocument, rgb } from 'npm:pdf-lib'
 import type { PDFPage } from 'npm:pdf-lib'
-import { format } from 'npm:date-fns'
 import { TransportData } from './db.ts'
 
 
@@ -22,8 +21,8 @@ export function drawData(page: PDFPage, transportData: TransportData) {
     drawParty(110, 640, page, transportData.pickup_party);
     drawParty(380, 640, page, transportData.pickup_location);
     drawParty(390, 575, page, transportData.delivery_location);
-    drawDate(page, new Date(), 399, 602);
-    drawDate(page, new Date(), 400, 537);
+    transportData.transport.pickup_date_time && drawDate(page, transportData.transport.pickup_date_time, 399, 602);
+    transportData.transport.delivery_date_time && drawDate(page, transportData.transport.delivery_date_time, 400, 537);
     drawLicensePlate(page, transportData.transport.truck_id);
     drawDetails(page);
     drawWaste(page, transportData.goods);
@@ -59,7 +58,7 @@ function drawConsignorClassification(page: PDFPage, consignorClassification: num
 }
 
 function drawConsignee(page: PDFPage, transportData: TransportData) {
-    let x = 0;
+    let x: number;
     const y = 510;
 
     if (transportData.carrier_party.id === transportData.consignor.id) {
@@ -131,8 +130,8 @@ function drawParty(
     }
 }
 
-function drawDate(page: PDFPage, date: Date, x: number, y: number) {
-    page.drawText(format(date, 'dd-MM-yyyy'), {
+function drawDate(page: PDFPage, date: string, x: number, y: number) {
+    page.drawText(date, {
         x,
         y,
         size: 10,
