@@ -66,7 +66,9 @@ function drawParty(
     y: number,
     page: PDFPage,
     party: { name?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
-    const name = party.name || '';
+
+        console.log("Party", party)
+    const name = party?.name || '';
     page.drawText(name, {
         x,
         y,

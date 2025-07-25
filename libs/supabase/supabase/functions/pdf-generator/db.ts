@@ -93,12 +93,14 @@ export interface TransportData {
     vihb_id?: string;
   };
   pickup_location: {
+    name?: string;
     street_name: string;
     building_number: string;
     postal_code: string;
     city: string;
   }
   delivery_location: {
+    name?: string;
     street_name: string;
     building_number: string;
     postal_code: string;
@@ -312,6 +314,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
     `;
     const pickupLocationResult = await connection.queryObject`
       SELECT 
+        c.name,
         l.street_name,
         l.building_number,
         l.postal_code,
@@ -320,11 +323,14 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         transports t
       JOIN 
         locations l ON t.pickup_location_id = l.id
+      LEFT JOIN
+        companies c ON t.pickup_company_id = c.id
       WHERE 
         t.id = ${transportId}
     `; 
     const deliveryLocationResult = await connection.queryObject`
-      SELECT 
+      SELECT
+        c.name,
         l.street_name,
         l.building_number,
         l.postal_code,
@@ -333,6 +339,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         transports t
       JOIN 
         locations l ON t.delivery_location_id = l.id
+      LEFT JOIN
+        companies c ON t.delivery_company_id = c.id
       WHERE 
         t.id = ${transportId}
     `;    
@@ -356,6 +364,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       pickup_location: pickupLocationResult.rows[0] as TransportData['pickup_location'],
       delivery_location: deliveryLocationResult.rows[0] as TransportData['delivery_location']
     };
+
+    console.log("Delivery location result", deliveryLocationResult.rows[0])
     
     return { data: transportData };
   } catch (err) {
