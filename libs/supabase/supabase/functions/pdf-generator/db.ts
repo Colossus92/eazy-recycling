@@ -364,8 +364,6 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       pickup_location: pickupLocationResult.rows[0] as TransportData['pickup_location'],
       delivery_location: deliveryLocationResult.rows[0] as TransportData['delivery_location']
     };
-
-    console.log("Delivery location result", deliveryLocationResult.rows[0])
     
     return { data: transportData };
   } catch (err) {

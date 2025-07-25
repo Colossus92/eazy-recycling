@@ -17,16 +17,14 @@ export async function drawBackgroundWaybill(page: PDFPage, pdfDoc: PDFDocument) 
 
 export function drawData(page: PDFPage, transportData: TransportData) {
     drawConsignorClassification(page, transportData.goods.consignor_classification);
+    drawConsignee(page, transportData);
     drawParty(110, 755, page, transportData.consignor);
     drawParty(110, 640, page, transportData.pickup_party);
-    drawParty(125, 575, page, transportData.carrier_party);
     drawParty(380, 640, page, transportData.pickup_location);
     drawParty(390, 575, page, transportData.delivery_location);
-    drawParty(125, 500, page, transportData.consignee);
     drawDate(page, new Date(), 399, 602);
     drawDate(page, new Date(), 400, 537);
     drawLicensePlate(page, transportData.transport.truck_id);
-    drawCarrierVihb(page, transportData.carrier_party.vihb_id);
     drawDetails(page);
     drawWaste(page, transportData.goods);
 }
@@ -34,7 +32,6 @@ export function drawData(page: PDFPage, transportData: TransportData) {
 function drawConsignorClassification(page: PDFPage, consignorClassification: number) {
     let x = 0;
     const y = 768;
-    console.log(consignorClassification)
     switch (consignorClassification) {
         case 1:
             x = 60;
@@ -61,13 +58,41 @@ function drawConsignorClassification(page: PDFPage, consignorClassification: num
     })
 }
 
+function drawConsignee(page: PDFPage, transportData: TransportData) {
+    let x = 0;
+    const y = 510;
+
+    if (transportData.carrier_party.id === transportData.consignor.id) {
+        x = 134;
+    } else if (transportData.carrier_party.id === transportData.pickup_party.id) {
+        x = 187;
+    }
+    else if (transportData.carrier_party.id === transportData.consignee.id) {
+        x = 242;
+        drawParty(125, 500, page, transportData.consignee);
+        drawCarrierVihb(page, transportData.consignee.vihb_id);
+    }
+    else {
+        x = 404;
+        drawParty(125, 500, page, transportData.consignee);
+        drawParty(125, 575, page, transportData.carrier_party);
+        drawCarrierVihb(page, transportData.consignee.vihb_id);
+    }
+
+    page.drawText('x', {
+        x: x,
+        y: y,
+        size: 12,
+        color: rgb(0, 0, 0)
+    })
+}
+
 function drawParty(
     x: number,
     y: number,
     page: PDFPage,
     party: { name?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
 
-        console.log("Party", party)
     const name = party?.name || '';
     page.drawText(name, {
         x,
@@ -116,21 +141,25 @@ function drawDate(page: PDFPage, date: Date, x: number, y: number) {
 }
 
 function drawLicensePlate(page: PDFPage, licensePlate?: string) {
-    {page.drawText(licensePlate ? licensePlate : '-', {
-        x: 350,
-        y: 475,
-        size: 10,
-        color: rgb(0, 0, 0)
-    });}
+    {
+        page.drawText(licensePlate ? licensePlate : '-', {
+            x: 350,
+            y: 475,
+            size: 10,
+            color: rgb(0, 0, 0)
+        });
+    }
 }
 
 function drawCarrierVihb(page: PDFPage, vihb?: string) {
-    {page.drawText(vihb ? vihb : '-', {
-        x: 365,
-        y: 500,
-        size: 10,
-        color: rgb(0, 0, 0)
-    });}
+    {
+        page.drawText(vihb ? vihb : '-', {
+            x: 365,
+            y: 500,
+            size: 10,
+            color: rgb(0, 0, 0)
+        });
+    }
 }
 
 function drawDetails(page: PDFPage) {
@@ -163,9 +192,8 @@ function drawWaste(page: PDFPage, goods: {
     eural_code: string;
     processing_method_code: string;
     consignor_classification: number;
-  }) {
-    console.log("NO ERROR", goods)
-    
+}) {
+
     goods.waste_stream_number && page.drawText(goods.waste_stream_number, {
         x: 60,
         y: 410,
