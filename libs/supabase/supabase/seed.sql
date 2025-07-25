@@ -34,17 +34,35 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '');
 
 insert into public.eural (code, description)
-values ('17 04', 'metaal (inclusief legeringen)'),
-       ('17 04 01 c', 'koper, brons en messing'),
-       ('17 04 02 c', 'aluminium'),
-       ('17 04 03 c', 'lood'),
-       ('17 04 04 c', 'zink'),
-       ('17 04 05 c', 'ijzer en staal'),
-       ('17 04 06 c', 'tin'),
-       ('17 04 07 c', 'gemengde metalen'),
-       ('17 04 09* c', 'metaalafval dat met gevaarlijke stoffen is verontreinigd'),
-       ('17 04 10* c', 'kabels die olie, koolteer of andere gevaarlijke stoffen bevatten'),
-       ('17 04 11 c', 'niet onder 17 04 10 vallende kabels)');
+values ('16 01 17', 'ferrometalen'),
+       ('16 01 18', 'non-ferrometalen'),
+       ('17 04 01', 'koper, brons en messing'),
+       ('17 04 02', 'aluminium'),
+       ('17 04 03', 'lood'),
+       ('17 04 04', 'zink'),
+       ('17 04 05', 'ijzer en staal'),
+       ('17 04 06', 'tin'),
+       ('17 04 07', 'gemengde metalen'),
+       ('20 01 40', 'metalen'),
+       ('16 02 14', 'niet onder 16 02 09 tot en met 16 02 13 vallende afgedankte apparatuur'),
+       ('16 02 16', 'niet onder 16 02 15 vallende uit afgedankte apparatuur verwijderde onderdelen (trafo''s en elektromotoren)'),
+       ('20 01 36', 'niet onder 20 01 21, 20 01 23 en 20 01 35 vallende afgedankte elektrische en elektronische apparatuur'),
+       ('09 01 11*', 'wegwerpcamera''s met onder 16 06 01, 16 06 02 of 16 06 03 vermelde batterijen 09 01 12 niet onder 09
+01 11 vallende wegwerpcamera''s met batterijen'),
+       ('16 02 13*', 'niet onder 16 02 09 tot en met 16 02 12 vallende afgedankte apparatuur die gevaarlijke onderdelen
+bevat'),
+       ('16 02 15*', 'uit afgedankte apparatuur verwijderde gevaarlijke onderdelen'),
+       ('20 01 35*', 'niet onder 20 01 21 en 20 01 23 vallende afgedankte elektrische en elektronische apparatuur die
+gevaarlijke onderdelen bevat'),
+       ('16 06 01*', 'loodaccu''s'),
+       ('17 04 11', 'niet onder 17 04 10 vallende kabels'),
+       ('20 01 33*', 'onder 16 06 01, 16 06 02 of 16 06 03 vermelde batterijen en accu’s alsmede ongesorteerde mengsels van batterijen en accu''s die
+dergelijke batterijen en accu''s bevatten'),
+       ('20 01 34', 'niet onder 20 01 33 vallende batterijen en accu''s'),
+       ('16 06 02*', 'NiCd-batterijen'),
+       ('19 12 10', 'brandbaar afval (RDF)'),
+       ('19 12 11*', 'overig afval (inclusief mengsels van materialen) van mechanische afvalverwerking dat gevaarlijke stoffen bevat'),
+       ('19 12 12 o', 'overig, niet onder 19 12 11 vallend afval (inclusief mengsels van materialen) van mechanische afvalverwerking');
 
 INSERT INTO processing_methods (code, description)
 VALUES ('A.01', 'Bewaren'),
