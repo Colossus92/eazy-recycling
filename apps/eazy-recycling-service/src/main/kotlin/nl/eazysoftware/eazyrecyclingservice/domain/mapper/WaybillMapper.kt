@@ -45,6 +45,7 @@ abstract class WaybillMapper {
     @Mapping(target = "driver", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "sequenceNumber", constant = "9999")
+    @Mapping(target = "transportHours", ignore = true)
     abstract fun toDto(waybill: Waybill): TransportDto
 
     @Mapping(target = "id", ignore = true)

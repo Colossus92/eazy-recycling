@@ -78,7 +78,8 @@ create table if not exists transports (
                           pickup_company_id uuid,
                           note text,
                           container_operation text CHECK (container_operation IN ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL')),
-                          sequence_number integer
+                          sequence_number integer,
+                          transport_hours NUMERIC(3,1)
 );
 
 create table if not exists trucks (

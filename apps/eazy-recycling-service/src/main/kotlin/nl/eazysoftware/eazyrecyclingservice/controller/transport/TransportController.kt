@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -76,9 +77,23 @@ class TransportController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @DeleteMapping(path = ["/{id}"])
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Transactional
     fun deleteTransport(@PathVariable("id") id: UUID) {
         transportService.deleteTransport(id)
     }
+
+    @PreAuthorize(HAS_ANY_ROLE)
+    @PostMapping(path = ["/{id}/finished"])
+    @Transactional
+    fun markTransportAsFinished(@PathVariable id: UUID, @RequestBody request: TransportFinishedRequest): TransportDto {
+        val transport = transportService.getTransportById(id)
+        
+        checkAuthorization(transport)
+        
+        return transportService.markTransportAsFinished(id, request.hours)
+    }
+
+    data class TransportFinishedRequest(val hours: Double)
 
     private fun checkAuthorization(transport: TransportDto) {
         val authentication = SecurityContextHolder.getContext().authentication

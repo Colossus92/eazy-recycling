@@ -104,6 +104,9 @@ data class TransportDto(
     @JoinColumn(name = "goods_id", referencedColumnName = "uuid")
     val goods: GoodsDto? = null,
 
+    @Column(name = "transport_hours")
+    val transportHours: Double? = null,
+
     @Column(nullable = false)
     var updatedAt: LocalDateTime? = LocalDateTime.now(),
 
@@ -134,8 +137,7 @@ data class TransportDto(
             return Status.UNPLANNED
         }
         
-        val now = LocalDateTime.now()
-        if (now.isAfter(pickupDateTime)) {
+        if (transportHours != null) {
             return Status.FINISHED
         }
         

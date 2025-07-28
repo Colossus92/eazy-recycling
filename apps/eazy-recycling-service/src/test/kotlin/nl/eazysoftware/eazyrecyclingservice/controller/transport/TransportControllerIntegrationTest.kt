@@ -496,6 +496,119 @@ class TransportControllerIntegrationTest {
             .andExpect(status().isNotFound)
     }
 
+    @Test
+    fun `should mark transport as finished`() {
+        // Given
+        val transport = createTestTransport("Transport to be finished")
+        val savedTransport = transportRepository.save(transport)
+        val request = TransportController.TransportFinishedRequest(hours = 2.5)
+
+        // When & Then
+        securedMockMvc.post(
+            "/transport/${savedTransport.id}/finished",
+            objectMapper.writeValueAsString(request)
+        )
+            .andExpect(status().isOk)
+
+        // Verify transport was marked as finished in the database
+        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+        assertThat(updatedTransport).isNotNull
+        assertThat(updatedTransport?.transportHours).isEqualTo(2.5)
+        assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
+    }
+
+    @Test
+    fun `should return not found when marking non-existent transport as finished`() {
+        // Given
+        val nonExistentId = UUID.randomUUID()
+        val request = TransportController.TransportFinishedRequest(hours = 2.0)
+
+        // When & Then
+        securedMockMvc.post(
+            "/transport/$nonExistentId/finished",
+            objectMapper.writeValueAsString(request)
+        )
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should forbid non-driver user from marking someone else's transport as finished`() {
+        // Given
+        val transport = createTestTransport("Another Driver's Transport")
+        val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
+        val request = TransportController.TransportFinishedRequest(hours = 1.5)
+        
+        // Different user ID than the driver
+        val differentUserId = UUID.randomUUID().toString()
+
+        // When & Then - Using a different user ID as the JWT subject
+        securedMockMvc.postWithSubject(
+            "/transport/${savedTransport.id}/finished",
+            objectMapper.writeValueAsString(request),
+            differentUserId,
+            listOf("chauffeur") // Non-admin role
+        )
+            .andExpect(status().isForbidden)
+
+        // Verify transport was NOT marked as finished
+        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+        assertThat(updatedTransport).isNotNull
+        assertThat(updatedTransport?.transportHours).isNull()
+        assertThat(updatedTransport?.getStatus()).isNotEqualTo(TransportDto.Status.FINISHED)
+    }
+
+    @Test
+    fun `should allow admin to mark any transport as finished`() {
+        // Given
+        val transport = createTestTransport("Admin Access Transport")
+        val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
+        val request = TransportController.TransportFinishedRequest(hours = 4.0)
+        
+        // Different user ID than the driver
+        val adminUserId = UUID.randomUUID().toString()
+
+        // When & Then - Using admin role
+        securedMockMvc.postWithSubject(
+            "/transport/${savedTransport.id}/finished",
+            objectMapper.writeValueAsString(request),
+            adminUserId,
+            listOf("admin")
+        )
+            .andExpect(status().isOk)
+
+        // Verify transport was marked as finished
+        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+        assertThat(updatedTransport).isNotNull
+        assertThat(updatedTransport?.transportHours).isEqualTo(4.0)
+        assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
+    }
+
+    @Test
+    fun `should allow planner to mark any transport as finished`() {
+        // Given
+        val transport = createTestTransport("Planner Access Transport")
+        val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
+        val request = TransportController.TransportFinishedRequest(hours = 2.75)
+        
+        // Different user ID than the driver
+        val plannerUserId = UUID.randomUUID().toString()
+
+        // When & Then - Using planner role
+        securedMockMvc.postWithSubject(
+            "/transport/${savedTransport.id}/finished",
+            objectMapper.writeValueAsString(request),
+            plannerUserId,
+            listOf("planner")
+        )
+            .andExpect(status().isOk)
+
+        // Verify transport was marked as finished
+        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+        assertThat(updatedTransport).isNotNull
+        assertThat(updatedTransport?.transportHours).isEqualTo(2.75)
+        assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
+    }
+
     private fun createTestTransport(note: String, goods: GoodsDto? = null): TransportDto {
         return TransportDto(
             consignorParty = testCompany,

@@ -45,6 +45,27 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
     }
 
     /**
+     * Performs a POST request with custom subject and roles.
+     *
+     * @param url The URL to perform the POST request on
+     * @param content The content to send in the request body
+     * @param subject The subject claim to include in the JWT
+     * @param roles The roles to include in the JWT
+     * @return The result of the request
+     */
+    fun postWithSubject(url: String, content: String, subject: String, roles: List<String> = listOf(Roles.ADMIN)): ResultActions {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)
+                .with(jwt()
+                    .jwt { it.claim("sub", subject) }
+                    .authorities(roles.map { SimpleGrantedAuthority(it) })
+                )
+        )
+    }
+
+    /**
      * Performs a PUT request with admin role authentication.
      *
      * @param url The URL to perform the PUT request on

@@ -277,4 +277,12 @@ class TransportService(
 
     private fun isDeliveryAndPickupSameLocation(request: CreateContainerTransportRequest): Boolean =
         request.pickupPostalCode == request.deliveryPostalCode && request.pickupBuildingNumber == request.deliveryBuildingNumber
+
+    fun markTransportAsFinished(id: UUID, transportHours: Double): TransportDto {
+        return transportRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("Transport met id $id niet gevonden") }
+            .let {
+                transportRepository.save(it.copy(transportHours = transportHours))
+            }
+    }
 }
