@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport.signature
 
-import kotlinx.coroutines.runBlocking
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CreateSignatureRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WaybillDocumentService
@@ -28,15 +27,4 @@ class SignatureController(
     fun saveSignature(@PathVariable id: UUID, @RequestBody request: CreateSignatureRequest) =
         waybillDocumentService.saveSignature(id, request)
 
-    @PreAuthorize(HAS_ANY_ROLE)
-    @GetMapping("/latest")
-    fun getLatestPdf(@PathVariable id: UUID): LatestPdfResponse = runBlocking {
-        waybillDocumentService.getLatestPdf(id)
-    }
-
 }
-
-data class LatestPdfResponse(
-    val url: String?,
-    val thumbnail: String? = null
-)

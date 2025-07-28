@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
-import io.github.jan.supabase.SupabaseClient
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -28,9 +27,6 @@ class SignatureServiceTest {
     private lateinit var signaturesRepository: SignaturesRepository
 
     @Mock
-    private lateinit var supabase: SupabaseClient
-
-    @Mock
     private lateinit var transportService: TransportService
 
     @Mock
@@ -50,7 +46,6 @@ class SignatureServiceTest {
     fun setUp() {
         waybillDocumentService = WaybillDocumentService(
             signaturesRepository,
-            supabase,
             pdfGenerationClient,
             transportService,
             storageClient,
