@@ -232,6 +232,10 @@ class TransportService(
         val transport = transportRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Transport met id $id is niet gevonden") }
 
+        if (transport.getStatus() === TransportDto.Status.FINISHED) {
+            throw IllegalStateException("Transport is gereed gemeld en kan niet meer worden aangepast.")
+        }
+
         val pickupLocation = findOrCreateLocation(
             AddressRequest(
                 streetName = request.pickupStreet,
