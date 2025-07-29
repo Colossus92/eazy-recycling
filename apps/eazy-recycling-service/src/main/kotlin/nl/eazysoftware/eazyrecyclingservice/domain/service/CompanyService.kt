@@ -1,23 +1,21 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
-import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.repository.BranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class CompanyService(
     private val companyRepository: CompanyRepository,
-    private val entityManager: EntityManager,
     private val branchRepository: BranchRepository,
 ) {
     fun create(company: CompanyController.CompanyRequest): CompanyDto {
@@ -79,11 +77,6 @@ class CompanyService(
     }
 
     fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
-        val companyExists = companyRepository.existsById(companyId)
-        if (!companyExists) {
-            throw EntityNotFoundException("Bedrijf met id $companyId niet gevonden")
-        }
-        
         // Check if a branch with the same postal code and building number already exists for this company
         if (branchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
                 companyId,
@@ -94,7 +87,10 @@ class CompanyService(
             throw DuplicateKeyException("Er bestaat al een vestiging op dit adres (postcode en huisnummer) voor dit bedrijf.")
         }
 
-        val company = entityManager.getReference(CompanyDto::class.java, companyId)
+        // Use findById instead of getReference to avoid proxy serialization issues
+        val company = companyRepository.findById(companyId)
+            .orElseThrow { EntityNotFoundException("Bedrijf met id $companyId niet gevonden") }
+            
         val branchDto = CompanyBranchDto(
             companyId = company,
             address = AddressDto(

@@ -1,9 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import nl.eazysoftware.eazyrecyclingservice.repository.BranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
@@ -12,12 +10,12 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,7 +25,6 @@ class CompanyBranchControllerTest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper,
     val companyRepository: CompanyRepository,
-    val branchRepository: BranchRepository
 ) {
     private lateinit var securedMockMvc: SecuredMockMvc
     private lateinit var testCompany: CompanyDto
@@ -75,7 +72,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         val req = branchRequest()
         
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(req)
         )
             .andExpect(status().isOk)
@@ -93,14 +90,14 @@ class CompanyBranchControllerTest @Autowired constructor(
         
         // First create a branch
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(req)
         )
             .andExpect(status().isOk)
         
         // Try to create another branch with the same postal code and building number
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(req)
         )
             .andExpect(status().isConflict)
@@ -116,7 +113,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         )
         
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(firstBranch)
         )
             .andExpect(status().isOk)
@@ -128,7 +125,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         )
         
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(secondBranch)
         )
             .andExpect(status().isOk)
@@ -145,7 +142,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         )
         
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(firstBranch)
         )
             .andExpect(status().isOk)
@@ -157,7 +154,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         )
         
         securedMockMvc.post(
-            "/companies/${testCompany.id}/branch",
+            "/companies/${testCompany.id}/branches",
             objectMapper.writeValueAsString(secondBranch)
         )
             .andExpect(status().isOk)
@@ -171,7 +168,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         val nonExistentCompanyId = UUID.randomUUID()
         
         securedMockMvc.post(
-            "/companies/$nonExistentCompanyId/branch",
+            "/companies/$nonExistentCompanyId/branches",
             objectMapper.writeValueAsString(req)
         )
             .andExpect(status().isNotFound)

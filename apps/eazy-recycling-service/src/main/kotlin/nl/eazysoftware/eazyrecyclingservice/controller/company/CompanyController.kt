@@ -8,7 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/companies")
@@ -49,7 +49,7 @@ class CompanyController(
         return companyService.update(id, company)
     }
 
-    @PostMapping("/{id}/branch")
+    @PostMapping("/{id}/branches")
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     fun createBranch(@PathVariable("id") id: UUID, @RequestBody branch: AddressRequest): CompanyBranchDto {
         return companyService.createBranch(id, branch)

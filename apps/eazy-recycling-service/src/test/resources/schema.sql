@@ -13,7 +13,7 @@ create table if not exists companies (
                            primary key (id)
 );
 
-create table company_branches (
+create table if not exists company_branches (
                          id uuid not null,
                          company_id uuid not null,
                          street_name text not null,
