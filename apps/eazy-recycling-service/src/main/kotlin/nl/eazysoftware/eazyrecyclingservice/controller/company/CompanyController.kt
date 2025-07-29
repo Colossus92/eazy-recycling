@@ -3,10 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/companies")
@@ -45,6 +47,12 @@ class CompanyController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     fun updateCompany(@PathVariable("id") id: String, @RequestBody company: CompanyDto): CompanyDto {
         return companyService.update(id, company)
+    }
+
+    @PostMapping("/{id}/branch")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    fun createBranch(@PathVariable("id") id: UUID, @RequestBody branch: AddressRequest): CompanyBranchDto {
+        return companyService.createBranch(id, branch)
     }
 
     data class CompanyRequest(

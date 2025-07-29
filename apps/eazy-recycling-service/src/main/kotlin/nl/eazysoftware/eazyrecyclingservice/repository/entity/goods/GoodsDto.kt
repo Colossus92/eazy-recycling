@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.goods
 
 import jakarta.persistence.*
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.time.LocalDateTime
 import java.util.*
 

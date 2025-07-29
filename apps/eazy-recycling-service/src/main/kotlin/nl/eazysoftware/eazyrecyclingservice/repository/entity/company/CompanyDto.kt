@@ -1,8 +1,15 @@
-package nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill
+package nl.eazysoftware.eazyrecyclingservice.repository.entity.company
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "companies")
@@ -22,4 +29,4 @@ data class CompanyDto(
 
     val updatedAt: LocalDateTime = LocalDateTime.now(),
 
-)
+    )

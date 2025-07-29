@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository
 
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 

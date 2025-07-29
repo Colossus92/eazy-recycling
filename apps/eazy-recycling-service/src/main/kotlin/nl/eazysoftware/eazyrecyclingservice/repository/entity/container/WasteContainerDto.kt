@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.entity.container
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.util.*
 
 @Entity

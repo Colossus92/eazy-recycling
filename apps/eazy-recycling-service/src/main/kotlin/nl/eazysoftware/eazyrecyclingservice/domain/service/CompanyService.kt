@@ -1,10 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
+import nl.eazysoftware.eazyrecyclingservice.repository.BranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.DuplicateKeyException
@@ -12,7 +15,11 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class CompanyService(private val companyRepository: CompanyRepository) {
+class CompanyService(
+    private val companyRepository: CompanyRepository,
+    private val entityManager: EntityManager,
+    private val branchRepository: BranchRepository,
+) {
     fun create(company: CompanyController.CompanyRequest): CompanyDto {
         val companyDto = CompanyDto(
             name = company.name,
@@ -69,5 +76,32 @@ class CompanyService(private val companyRepository: CompanyRepository) {
         return cause is ConstraintViolationException
                 && (cause.constraintName?.contains("companies_chamber_of_commerce_id_key") == true
                 || cause.constraintName?.contains("companies_vihb_id_key") == true)
+    }
+
+    fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
+        // Check if a branch with the same postal code and building number already exists for this company
+        if (branchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
+                companyId,
+                branch.postalCode,
+                branch.buildingNumber
+            )
+        ) {
+            throw DuplicateKeyException("Er bestaat al een vestiging op dit adres (postcode en huisnummer) voor dit bedrijf.")
+        }
+
+        val company = entityManager.getReference(CompanyDto::class.java, companyId)
+        val branchDto = CompanyBranchDto(
+            companyId = company,
+            address = AddressDto(
+                streetName = branch.streetName,
+                buildingName = branch.buildingName,
+                buildingNumber = branch.buildingNumber,
+                postalCode = branch.postalCode,
+                city = branch.city,
+                country = branch.country
+            )
+        )
+
+        return branchRepository.save(branchDto)
     }
 }

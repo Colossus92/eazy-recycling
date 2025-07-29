@@ -1,7 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -161,11 +163,11 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `update company - not found returns 404`() {
         val req = companyRequest()
         val company = CompanyDto(
-            id = java.util.UUID.randomUUID(),
+            id = UUID.randomUUID(),
             chamberOfCommerceId = req.chamberOfCommerceId!!,
             vihbId = req.vihbId,
             name = req.name,
-            address = nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto(
+            address = AddressDto(
                 streetName = req.address!!.streetName,
                 buildingName = req.address.buildingName,
                 buildingNumber = req.address.buildingNumber,
