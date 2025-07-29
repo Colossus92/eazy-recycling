@@ -13,6 +13,19 @@ create table if not exists companies (
                            primary key (id)
 );
 
+create table company_branches (
+                         id uuid not null,
+                         company_id uuid not null,
+                         street_name text not null,
+                         postal_code text not null,
+                         city text not null,
+                         updated_at timestamp(6),
+                         building_name text,
+                         building_number text not null,
+                         country text
+);
+
+
 create table if not exists drivers (
                          updated_at timestamp(6) not null,
                          id uuid not null,

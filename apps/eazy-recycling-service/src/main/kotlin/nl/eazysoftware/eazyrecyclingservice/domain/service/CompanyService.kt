@@ -79,6 +79,11 @@ class CompanyService(
     }
 
     fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
+        val companyExists = companyRepository.existsById(companyId)
+        if (!companyExists) {
+            throw EntityNotFoundException("Bedrijf met id $companyId niet gevonden")
+        }
+        
         // Check if a branch with the same postal code and building number already exists for this company
         if (branchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
                 companyId,
