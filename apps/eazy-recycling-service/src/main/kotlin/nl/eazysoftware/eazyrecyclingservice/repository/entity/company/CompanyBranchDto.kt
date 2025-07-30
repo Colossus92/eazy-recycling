@@ -14,7 +14,7 @@ data class CompanyBranchDto(
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
-    val companyId: CompanyDto,
+    val company: CompanyDto,
 
     @Embedded
     val address: AddressDto,

@@ -8,7 +8,7 @@ import java.util.*
 
 interface BranchRepository: JpaRepository<CompanyBranchDto, UUID> {
     
-    @Query("SELECT COUNT(b) > 0 FROM CompanyBranchDto b WHERE b.companyId.id = :companyId AND b.address.postalCode = :postalCode AND b.address.buildingNumber = :buildingNumber")
+    @Query("SELECT COUNT(b) > 0 FROM CompanyBranchDto b WHERE b.company.id = :companyId AND b.address.postalCode = :postalCode AND b.address.buildingNumber = :buildingNumber")
     fun existsByCompanyIdAndPostalCodeAndBuildingNumber(
         @Param("companyId") companyId: UUID,
         @Param("postalCode") postalCode: String,

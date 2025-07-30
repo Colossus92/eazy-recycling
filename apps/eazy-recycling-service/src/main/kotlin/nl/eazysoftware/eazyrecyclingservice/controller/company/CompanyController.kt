@@ -25,8 +25,8 @@ class CompanyController(
 
     @GetMapping
     @PreAuthorize(HAS_ANY_ROLE)
-    fun getCompanies(): List<CompanyDto> {
-        return companyService.findAll()
+    fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompanyService.CompanyResponse> {
+        return companyService.findAll(includeBranches)
     }
 
     @GetMapping("/{id}")
