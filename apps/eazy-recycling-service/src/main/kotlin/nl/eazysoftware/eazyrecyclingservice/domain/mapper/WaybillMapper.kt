@@ -5,7 +5,8 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.*
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import oasis.names.specification.ubl.schema.xsd.commonaggregatecomponents_2.*
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.ID
 import oasis.names.specification.ubl.schema.xsd.commonbasiccomponents_2.NetNetWeightMeasure
@@ -33,9 +34,11 @@ abstract class WaybillMapper {
     @Mapping(target = "goods.goodsItem", expression = "java(toGoodsItemDto(waybill))")
     @Mapping(target = "deliveryLocation", expression = "java(toDeliveryLocationDto(waybill))")
     @Mapping(target = "deliveryCompany", ignore = true)
+    @Mapping(target = "deliveryCompanyBranch", ignore = true)
     @Mapping(target = "deliveryDateTime", expression = "java(toDeliveryDateTime(waybill))")
     @Mapping(target = "pickupLocation", expression = "java(toPickupLocationDto(waybill))")
     @Mapping(target = "pickupCompany", ignore = true)
+    @Mapping(target = "pickupCompanyBranch", ignore = true)
     @Mapping(target = "pickupDateTime", expression = "java(toPickupDateTime(waybill))")
     @Mapping(target = "truck", expression = "java(toTruck(waybill))")
     @Mapping(target = "id", ignore = true)

@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import nl.eazysoftware.eazyrecyclingservice.repository.BranchRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -28,7 +28,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     val mockMvc: MockMvc,
     val objectMapper: ObjectMapper,
     val companyRepository: CompanyRepository,
-    val branchRepository: BranchRepository
+    val companyBranchRepository: CompanyBranchRepository
 ) {
     private lateinit var securedMockMvc: SecuredMockMvc
     private lateinit var testCompany: CompanyDto
@@ -81,8 +81,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         )
         
         testBranches = listOf(
-            branchRepository.save(branch1),
-            branchRepository.save(branch2)
+            companyBranchRepository.save(branch1),
+            companyBranchRepository.save(branch2)
         )
     }
 
@@ -208,7 +208,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             )
         )
         
-        val secondCompanyBranch = branchRepository.save(
+        val secondCompanyBranch = companyBranchRepository.save(
             CompanyBranchDto(
                 company = secondCompany,
                 address = AddressDto(

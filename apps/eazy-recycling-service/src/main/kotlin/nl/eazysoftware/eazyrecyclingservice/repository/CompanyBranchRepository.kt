@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import java.util.*
 
-interface BranchRepository: JpaRepository<CompanyBranchDto, UUID> {
+interface CompanyBranchRepository: JpaRepository<CompanyBranchDto, UUID> {
     
     @Query("SELECT COUNT(b) > 0 FROM CompanyBranchDto b WHERE b.company.id = :companyId AND b.address.postalCode = :postalCode AND b.address.buildingNumber = :buildingNumber")
     fun existsByCompanyIdAndPostalCodeAndBuildingNumber(

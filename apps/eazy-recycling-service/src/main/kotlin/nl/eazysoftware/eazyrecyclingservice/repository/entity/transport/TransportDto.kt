@@ -1,11 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDateTime
 import java.util.*
@@ -57,6 +58,10 @@ data class TransportDto(
     @JoinColumn(name = "pickup_company_id", referencedColumnName = "id")
     val pickupCompany: CompanyDto?,
 
+    @ManyToOne
+    @JoinColumn(name = "pickup_company_branch_id", referencedColumnName = "id")
+    val pickupCompanyBranch: CompanyBranchDto? = null,
+
     @OneToOne
     @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
     val pickupLocation: LocationDto,
@@ -71,6 +76,10 @@ data class TransportDto(
     @ManyToOne
     @JoinColumn(name = "delivery_company_id", referencedColumnName = "id")
     val deliveryCompany: CompanyDto?,
+
+    @ManyToOne
+    @JoinColumn(name = "delivery_company_branch_id", referencedColumnName = "id")
+    val deliveryCompanyBranch: CompanyBranchDto? = null,
 
     @OneToOne
     @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")

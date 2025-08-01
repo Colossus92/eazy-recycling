@@ -5,9 +5,12 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
@@ -15,7 +18,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
@@ -28,6 +30,7 @@ class TransportService(
     private val transportRepository: TransportRepository,
     private val locationRepository: LocationRepository,
     private val companyRepository: CompanyRepository,
+    private val companyBranchRepository: CompanyBranchRepository,
     private val entityManager: EntityManager,
     private val pdfGenerationClient: PdfGenerationClient,
 ) {
@@ -83,6 +86,12 @@ class TransportService(
     }
 
     private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
+        validateBranchCompanyRelationships(
+            pickupBranchId = request.pickupCompanyBranchId,
+            pickupCompanyId = request.pickupCompanyId,
+            deliveryBranchId = request.deliveryCompanyBranchId,
+            deliveryCompanyId = request.deliveryCompanyId
+        )
         val pickupLocation = findOrCreateLocation(AddressRequest(
             streetName = request.pickupStreet,
             buildingNumber = request.pickupBuildingNumber,
@@ -106,9 +115,11 @@ class TransportService(
         val transport = TransportDto(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
             pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
+            pickupCompanyBranch = request.pickupCompanyBranchId?.let { entityManager.getReference(CompanyBranchDto::class.java, it) },
             pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
             deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
+            deliveryCompanyBranch = request.deliveryCompanyBranchId?.let { entityManager.getReference(CompanyBranchDto::class.java, it) },
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
             truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
@@ -124,6 +135,39 @@ class TransportService(
 
         log.info("Creating transport: $transport")
         return transportRepository.save(transport)
+    }
+
+    /**
+     * Validates that branch IDs belong to their respective company IDs
+     * 
+     * @param pickupBranchId The ID of the pickup branch
+     * @param pickupCompanyId The ID of the pickup company
+     * @param deliveryBranchId The ID of the delivery branch
+     * @param deliveryCompanyId The ID of the delivery company
+     * @throws EntityNotFoundException If a branch is not found
+     * @throws IllegalArgumentException If a branch doesn't belong to the specified company
+     */
+    private fun validateBranchCompanyRelationships(
+        pickupBranchId: UUID?,
+        pickupCompanyId: UUID?,
+        deliveryBranchId: UUID?,
+        deliveryCompanyId: UUID?
+    ) {
+        validateBranchCompanyRelationShip(pickupBranchId, pickupCompanyId)
+        validateBranchCompanyRelationShip(deliveryBranchId, deliveryCompanyId)
+    }
+
+    private fun validateBranchCompanyRelationShip(companyBranchId: UUID?, companyId: UUID?) {
+        if (companyBranchId != null && companyId != null) {
+            val companyBranch = companyBranchRepository.findById(companyBranchId)
+            if (companyBranch.isEmpty) {
+                throw EntityNotFoundException("Vestiging met id $companyBranchId niet gevonden")
+            }
+
+            if (companyBranch.get().company.id != companyId) {
+                throw IllegalArgumentException("Vestiging met id $companyBranchId is niet van bedrijf met id $companyId")
+            }
+        }
     }
 
     @Transactional
@@ -229,6 +273,7 @@ class TransportService(
     }
 
     private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
+        validateBranchCompanyRelationships(request.pickupCompanyBranchId, request.pickupCompanyId, request.deliveryCompanyBranchId, request.deliveryCompanyId)
         val transport = transportRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Transport met id $id is niet gevonden") }
 
@@ -263,11 +308,13 @@ class TransportService(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
             pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.pickupCompanyId)},
+            pickupCompanyBranch = request.pickupCompanyBranchId?.let { entityManager.getReference(CompanyBranchDto::class.java, request.pickupCompanyBranchId)},
             pickupLocation = pickupLocation,
             pickupDateTime = request.pickupDateTime,
             deliveryLocation = deliveryLocation,
             deliveryDateTime = request.deliveryDateTime,
             deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.deliveryCompanyId) },
+            deliveryCompanyBranch = request.deliveryCompanyBranchId?.let { entityManager.getReference(CompanyBranchDto::class.java, request.deliveryCompanyBranchId) },
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             transportType = request.transportType,
             truck = if (request.truckId?.isNotEmpty() ?: false) entityManager.getReference(Truck::class.java, request.truckId) else null,

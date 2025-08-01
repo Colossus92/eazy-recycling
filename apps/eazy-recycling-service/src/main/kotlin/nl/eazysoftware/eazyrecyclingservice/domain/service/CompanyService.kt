@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
-import nl.eazysoftware.eazyrecyclingservice.repository.BranchRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -17,7 +17,7 @@ import java.util.*
 @Service
 class CompanyService(
     private val companyRepository: CompanyRepository,
-    private val branchRepository: BranchRepository,
+    private val companyBranchRepository: CompanyBranchRepository,
 ) {
     fun create(company: CompanyController.CompanyRequest): CompanyDto {
         val companyDto = CompanyDto(
@@ -47,7 +47,7 @@ class CompanyService(
         var companies = companyRepository.findAll().map { CompanyResponse.from(it) }
 
         if (includeBranches) {
-            val branches = branchRepository.findAll()
+            val branches = companyBranchRepository.findAll()
             companies = companies.map { company ->
                 company.copy(branches = branches.filter { it.company.id == company.id })
             }
@@ -88,7 +88,7 @@ class CompanyService(
 
     fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
         // Check if a branch with the same postal code and building number already exists for this company
-        if (branchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
+        if (companyBranchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
                 companyId,
                 branch.postalCode,
                 branch.buildingNumber
@@ -113,7 +113,7 @@ class CompanyService(
             )
         )
 
-        return branchRepository.save(branchDto)
+        return companyBranchRepository.save(branchDto)
     }
 
     data class CompanyResponse(

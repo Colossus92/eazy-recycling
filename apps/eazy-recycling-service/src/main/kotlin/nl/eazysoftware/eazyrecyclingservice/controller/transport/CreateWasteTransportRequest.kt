@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class CreateWasteTransportRequest(
     val consigneePartyId: String,
@@ -16,11 +16,13 @@ data class CreateWasteTransportRequest(
     override val driverId: UUID?,
     override val carrierPartyId: UUID,
     override val pickupCompanyId: UUID?,
+    override val pickupCompanyBranchId: UUID? = null,
     override val pickupStreet: String,
     override val pickupBuildingNumber: String,
     override val pickupPostalCode: String,
     override val pickupCity: String,
     override val deliveryCompanyId: UUID?,
+    override val deliveryCompanyBranchId: UUID? = null,
     override val deliveryStreet: String,
     override val deliveryBuildingNumber: String,
     override val deliveryPostalCode: String,
@@ -45,11 +47,13 @@ data class CreateWasteTransportRequest(
     driverId = driverId,
     carrierPartyId = carrierPartyId,
     pickupCompanyId = pickupCompanyId,
+    pickupCompanyBranchId = pickupCompanyBranchId,
     pickupStreet = pickupStreet,
     pickupBuildingNumber = pickupBuildingNumber,
     pickupPostalCode = pickupPostalCode,
     pickupCity = pickupCity,
     deliveryCompanyId = deliveryCompanyId,
+    deliveryCompanyBranchId = deliveryCompanyBranchId,
     deliveryStreet = deliveryStreet,
     deliveryBuildingNumber = deliveryBuildingNumber,
     deliveryPostalCode = deliveryPostalCode,

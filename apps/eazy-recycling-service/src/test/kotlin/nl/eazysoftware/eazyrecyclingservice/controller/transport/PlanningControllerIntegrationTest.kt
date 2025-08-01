@@ -4,12 +4,12 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.AfterEach
@@ -266,8 +266,7 @@ class PlanningControllerIntegrationTest {
             truck = testTruck,
             driver = testDriver,
             deliveryCompany = testCompany,
-            sequenceNumber = 1,
-            transportType = TransportType.CONTAINER,
+            sequenceNumber = 1, transportType = TransportType.CONTAINER,
         )
 
         val transport2 = TransportDto(
