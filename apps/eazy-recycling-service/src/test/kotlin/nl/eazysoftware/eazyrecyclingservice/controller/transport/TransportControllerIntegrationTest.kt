@@ -3,9 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
@@ -15,10 +18,10 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
+import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,11 +62,15 @@ class TransportControllerIntegrationTest {
     @Autowired
     private lateinit var entityManager: EntityManager
 
+    @Autowired
+    private lateinit var companyBranchRepository: CompanyBranchRepository
+
     private lateinit var testCompany: CompanyDto
     private lateinit var testLocation: LocationDto
     private lateinit var testTruck: Truck
     private lateinit var testDriver: ProfileDto
     private lateinit var testContainer: WasteContainerDto
+    private lateinit var testBranch: CompanyBranchDto
 
     @BeforeEach
     fun setup() {
@@ -81,6 +88,19 @@ class TransportControllerIntegrationTest {
             )
         )
         companyRepository.save(testCompany)
+
+        // Create test branch
+        testBranch = CompanyBranchDto(
+            company = testCompany,
+            address = AddressDto(
+                streetName = "Branch Street",
+                buildingNumber = "456",
+                postalCode = "5678CD",
+                city = "Branch City",
+                country = "Branch Country"
+            )
+        )
+        companyBranchRepository.save(testBranch)
 
         // Create test location
         testLocation = LocationDto(
@@ -607,6 +627,215 @@ class TransportControllerIntegrationTest {
         assertThat(updatedTransport).isNotNull
         assertThat(updatedTransport?.transportHours).isEqualTo(2.75)
         assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
+    }
+
+    @Test
+    fun `should create container transport with branch references`() {
+        // Given
+        val request = CreateContainerTransportRequest(
+            consignorPartyId = testCompany.id!!,
+            pickupDateTime = LocalDateTime.now().plusDays(1),
+            deliveryDateTime = LocalDateTime.now().plusDays(2),
+            transportType = TransportType.CONTAINER,
+            containerOperation = ContainerOperation.DELIVERY,
+            driverId = testDriver.id,
+            carrierPartyId = testCompany.id!!,
+            pickupCompanyId = testCompany.id,
+            pickupCompanyBranchId = testBranch.id,
+            pickupStreet = "Branch Street",
+            pickupBuildingNumber = "456",
+            pickupPostalCode = "5678CD",
+            pickupCity = "Branch City",
+            deliveryCompanyId = testCompany.id,
+            deliveryCompanyBranchId = testBranch.id,
+            deliveryStreet = "Branch Street",
+            deliveryBuildingNumber = "456",
+            deliveryPostalCode = "5678CD",
+            deliveryCity = "Branch City",
+            truckId = testTruck.licensePlate,
+            containerId = testContainer.uuid,
+            note = "Transport with Branch References"
+        )
+
+        // When & Then
+        securedMockMvc.post(
+            "/transport/container",
+            objectMapper.writeValueAsString(request)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.note").value("Transport with Branch References"))
+            .andExpect(jsonPath("$.transportType").value("CONTAINER"))
+            .andExpect(jsonPath("$.containerOperation").value("DELIVERY"))
+
+        // Verify transport was saved in the database with branch references
+        val savedTransports = transportRepository.findAll()
+        assertThat(savedTransports).hasSize(1)
+        assertThat(savedTransports[0].note).isEqualTo("Transport with Branch References")
+        assertThat(savedTransports[0].pickupCompanyBranch?.id).isEqualTo(testBranch.id)
+        assertThat(savedTransports[0].deliveryCompanyBranch?.id).isEqualTo(testBranch.id)
+    }
+
+    @Test
+    fun `should update container transport with branch references`() {
+        // Given
+        val transport = createTestTransport("Original Transport")
+        val savedTransport = transportRepository.save(transport)
+
+        val updateRequest = CreateContainerTransportRequest(
+            consignorPartyId = testCompany.id!!,
+            pickupDateTime = LocalDateTime.now().plusDays(3),
+            deliveryDateTime = LocalDateTime.now().plusDays(4),
+            transportType = TransportType.CONTAINER,
+            containerOperation = ContainerOperation.EXCHANGE,
+            driverId = testDriver.id,
+            carrierPartyId = testCompany.id!!,
+            pickupCompanyId = testCompany.id,
+            pickupCompanyBranchId = testBranch.id,
+            pickupStreet = "Branch Street",
+            pickupBuildingNumber = "456",
+            pickupPostalCode = "5678CD",
+            pickupCity = "Branch City",
+            deliveryCompanyId = testCompany.id,
+            deliveryCompanyBranchId = testBranch.id,
+            deliveryStreet = "Branch Street",
+            deliveryBuildingNumber = "456",
+            deliveryPostalCode = "5678CD",
+            deliveryCity = "Branch City",
+            truckId = testTruck.licensePlate,
+            containerId = testContainer.uuid,
+            note = "Updated Transport with Branches"
+        )
+
+        // When & Then
+        securedMockMvc.put(
+            "/transport/container/${savedTransport.id}",
+            objectMapper.writeValueAsString(updateRequest)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.note").value("Updated Transport with Branches"))
+            .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
+
+        // Verify transport was updated in the database with branch references
+        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+        assertThat(updatedTransport).isNotNull
+        assertThat(updatedTransport?.note).isEqualTo("Updated Transport with Branches")
+        assertThat(updatedTransport?.pickupCompanyBranch?.id).isEqualTo(testBranch.id)
+        assertThat(updatedTransport?.deliveryCompanyBranch?.id).isEqualTo(testBranch.id)
+    }
+
+    @Test
+    fun `should fail when branch does not belong to company`() {
+        // Given
+        // Create a second company
+        val anotherCompany = CompanyDto(
+            name = "Another Company",
+            address = AddressDto(
+                streetName = "Another Street",
+                buildingNumber = "789",
+                postalCode = "9012EF",
+                city = "Another City",
+                country = "Another Country"
+            )
+        )
+        companyRepository.save(anotherCompany)
+
+        val request = CreateContainerTransportRequest(
+            consignorPartyId = testCompany.id!!,
+            pickupDateTime = LocalDateTime.now().plusDays(1),
+            deliveryDateTime = LocalDateTime.now().plusDays(2),
+            transportType = TransportType.CONTAINER,
+            containerOperation = ContainerOperation.DELIVERY,
+            driverId = testDriver.id,
+            carrierPartyId = testCompany.id!!,
+            pickupCompanyId = anotherCompany.id, // Different company
+            pickupCompanyBranchId = testBranch.id, // Branch belongs to testCompany
+            pickupStreet = "Branch Street",
+            pickupBuildingNumber = "456",
+            pickupPostalCode = "5678CD",
+            pickupCity = "Branch City",
+            deliveryCompanyId = testCompany.id,
+            deliveryCompanyBranchId = testBranch.id,
+            deliveryStreet = "Branch Street",
+            deliveryBuildingNumber = "456",
+            deliveryPostalCode = "5678CD",
+            deliveryCity = "Branch City",
+            truckId = testTruck.licensePlate,
+            containerId = testContainer.uuid,
+            note = "Invalid Branch-Company Relationship"
+        )
+
+        // When & Then
+        securedMockMvc.post(
+            "/transport/container",
+            objectMapper.writeValueAsString(request)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.message").value(containsString("is niet van bedrijf")))
+
+        // Verify no transport was saved
+        val savedTransports = transportRepository.findAll()
+        assertThat(savedTransports).isEmpty()
+    }
+
+    @Test
+    fun `should create waste transport with branch references`() {
+        // Given
+        val request = CreateWasteTransportRequest(
+            consigneePartyId = testCompany.id.toString(),
+            pickupPartyId = testCompany.id.toString(),
+            consignorPartyId = testCompany.id!!,
+            pickupDateTime = LocalDateTime.now().plusDays(1),
+            deliveryDateTime = LocalDateTime.now().plusDays(2),
+            transportType = TransportType.WASTE,
+            containerOperation = ContainerOperation.PICKUP,
+            driverId = testDriver.id,
+            carrierPartyId = testCompany.id!!,
+            pickupCompanyId = testCompany.id,
+            pickupCompanyBranchId = testBranch.id,
+            pickupStreet = "Branch Street",
+            pickupBuildingNumber = "456",
+            pickupPostalCode = "5678CD",
+            pickupCity = "Branch City",
+            deliveryCompanyId = testCompany.id,
+            deliveryCompanyBranchId = testBranch.id,
+            deliveryStreet = "Branch Street",
+            deliveryBuildingNumber = "456",
+            deliveryPostalCode = "5678CD",
+            deliveryCity = "Branch City",
+            truckId = testTruck.licensePlate,
+            containerId = testContainer.uuid,
+            note = "Waste Transport with Branches",
+            wasteStreamNumber = "WSN123",
+            weight = 1000,
+            unit = "KG",
+            quantity = 1,
+            goodsName = "Test Waste",
+            euralCode = "200301",
+            processingMethodCode = "A.02",
+            consignorClassification = 1,
+        )
+
+        // When & Then
+        securedMockMvc.post(
+            "/transport/waste",
+            objectMapper.writeValueAsString(request)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.note").value("Waste Transport with Branches"))
+            .andExpect(jsonPath("$.transportType").value("WASTE"))
+            .andExpect(jsonPath("$.containerOperation").value("PICKUP"))
+            .andExpect(jsonPath("$.goods").exists())
+            .andExpect(jsonPath("$.goods.goodsItem.wasteStreamNumber").value("WSN123"))
+
+        // Verify transport was saved in the database with branch references
+        val savedTransports = transportRepository.findAll()
+        assertThat(savedTransports).hasSize(1)
+        assertThat(savedTransports[0].note).isEqualTo("Waste Transport with Branches")
+        assertThat(savedTransports[0].pickupCompanyBranch?.id).isEqualTo(testBranch.id)
+        assertThat(savedTransports[0].deliveryCompanyBranch?.id).isEqualTo(testBranch.id)
     }
 
     private fun createTestTransport(note: String, goods: GoodsDto? = null): TransportDto {
