@@ -353,4 +353,152 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         securedMockMvc.delete("/companies/00000000-0000-0000-0000-000000000000")
             .andExpect(status().isNoContent)
     }
+
+    @Test
+    fun `delete branch - success`() {
+        // Create a company first
+        val req = companyRequest(
+            chamberOfCommerceId = "55443322", 
+            vihbId = "VIHB555"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for the company
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Branch Street",
+            buildingName = "Branch Building",
+            buildingNumber = "123",
+            postalCode = "1111AA",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        val branchResult = securedMockMvc.post(
+            "/companies/${company.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andReturn()
+        val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+
+        // Delete the branch
+        securedMockMvc.delete("/companies/${company.id}/branches/${branch.id}")
+            .andExpect(status().isNoContent)
+    }
+
+    @Test
+    fun `delete branch - company not found returns 404`() {
+        val nonExistentCompanyId = UUID.randomUUID()
+        val nonExistentBranchId = UUID.randomUUID()
+        
+        securedMockMvc.delete("/companies/$nonExistentCompanyId/branches/$nonExistentBranchId")
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `delete branch - branch not found returns 404`() {
+        // Create a company first
+        val req = companyRequest(
+            chamberOfCommerceId = "66554433", 
+            vihbId = "VIHB666"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        val nonExistentBranchId = UUID.randomUUID()
+        
+        securedMockMvc.delete("/companies/${company.id}/branches/$nonExistentBranchId")
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `delete branch - branch belongs to different company returns 400`() {
+        // Create first company
+        val req1 = companyRequest(
+            chamberOfCommerceId = "77665544", 
+            vihbId = "VIHB777"
+        )
+        val mvcResult1 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req1)
+        )
+            .andReturn()
+        val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
+
+        // Create second company
+        val req2 = companyRequest(
+            chamberOfCommerceId = "88776655", 
+            vihbId = "VIHB888"
+        )
+        val mvcResult2 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req2)
+        )
+            .andReturn()
+        val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for company2
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Branch Street",
+            buildingName = "Branch Building",
+            buildingNumber = "456",
+            postalCode = "2222BB",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        val branchResult = securedMockMvc.post(
+            "/companies/${company2.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andReturn()
+        val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+
+        // Try to delete the branch using company1's ID (should fail)
+        securedMockMvc.delete("/companies/${company1.id}/branches/${branch.id}")
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `delete company with branches - success`() {
+        // Create a company
+        val req = companyRequest(
+            chamberOfCommerceId = "99887766", 
+            vihbId = "VIHB999"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for the company
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Branch Street",
+            buildingName = "Branch Building",
+            buildingNumber = "789",
+            postalCode = "3333CC",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        securedMockMvc.post(
+            "/companies/${company.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andExpect(status().isOk)
+
+        // Delete the company (should also delete its branches)
+        securedMockMvc.delete("/companies/${company.id}")
+            .andExpect(status().isNoContent)
+    }
 }
