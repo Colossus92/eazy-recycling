@@ -55,6 +55,13 @@ class CompanyController(
         return companyService.createBranch(id, branch)
     }
 
+    @DeleteMapping("/{id}/branches/{branchId}")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteBranch(@PathVariable("id") id: UUID, @PathVariable("branchId") branchId: UUID) {
+        companyService.deleteBranch(id, branchId)
+    }
+
     data class CompanyRequest(
         val chamberOfCommerceId: String?,
         val vihbId: String?,

@@ -44,12 +44,14 @@ class CompanyService(
     }
 
     fun findAll(includeBranches: Boolean): List<CompanyResponse> {
-        var companies = companyRepository.findAll().map { CompanyResponse.from(it) }
-
+        val companies = companyRepository.findAll().map { CompanyResponse.from(it) }
         if (includeBranches) {
             val branches = companyBranchRepository.findAll()
-            companies = companies.map { company ->
-                company.copy(branches = branches.filter { it.company.id == company.id })
+                .map { branch -> CompanyBranchResponse.from(branch) }
+
+            return companies.map { company ->
+                val companyBranches = branches.filter { it.companyId == company.id }
+                company.copy(branches = companyBranches)
             }
         }
 
@@ -116,6 +118,17 @@ class CompanyService(
         return companyBranchRepository.save(branchDto)
     }
 
+    fun deleteBranch(companyId: UUID, branchId: UUID) {
+        val branch = companyBranchRepository.findById(branchId)
+            .orElseThrow { EntityNotFoundException("Vestiging met id $branchId niet gevonden") }
+
+        if (branch.company.id != companyId) {
+            throw IllegalArgumentException("Vestiging met id $branchId is niet van bedrijf met id $companyId")
+        }
+
+        companyBranchRepository.deleteById(branchId)
+    }
+
     data class CompanyResponse(
         val id: UUID,
         val chamberOfCommerceId: String?,
@@ -123,7 +136,7 @@ class CompanyService(
         val name: String,
         val address: AddressDto,
         val updatedAt: LocalDateTime = LocalDateTime.now(),
-        val branches: List<CompanyBranchDto> = emptyList(),
+        val branches: List<CompanyBranchResponse> = emptyList(),
 
         ) {
 
@@ -144,5 +157,28 @@ class CompanyService(
             }
         }
     }
-}
 
+    data class CompanyBranchResponse(
+        val id: UUID,
+        val address: AddressDto,
+        val companyId: UUID,
+    ) {
+        companion object {
+            fun from(branch: CompanyBranchDto): CompanyBranchResponse {
+                if (branch.id == null) {
+                    throw IllegalArgumentException("Vestiging heeft geen id")
+                }
+
+                if (branch.company.id == null) {
+                    throw IllegalArgumentException("Vestiging is niet gekoppeld aan een bedrijf met een id")
+                }
+
+                return CompanyBranchResponse(
+                    id = branch.id!!,
+                    address = branch.address,
+                    companyId = branch.company.id!!,
+                )
+            }
+        }
+    }
+}
