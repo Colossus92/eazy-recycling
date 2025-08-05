@@ -55,11 +55,21 @@ class CompanyController(
         return companyService.createBranch(id, branch)
     }
 
-    @DeleteMapping("/{id}/branches/{branchId}")
+    @DeleteMapping("/{companyId}/branches/{branchId}")
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteBranch(@PathVariable("id") id: UUID, @PathVariable("branchId") branchId: UUID) {
-        companyService.deleteBranch(id, branchId)
+    fun deleteBranch(@PathVariable("companyId") companyId: UUID, @PathVariable("branchId") branchId: UUID) {
+        companyService.deleteBranch(companyId, branchId)
+    }
+
+    @PutMapping("/{companyId}/branches/{branchId}")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updateBranch(
+        @PathVariable("companyId") companyId: UUID,
+                     @PathVariable("branchId") branchId: UUID,
+        @RequestBody branch: AddressRequest) {
+        companyService.updateBranch(companyId, branchId, branch)
     }
 
     data class CompanyRequest(

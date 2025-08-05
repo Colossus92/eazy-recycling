@@ -129,6 +129,30 @@ class CompanyService(
         companyBranchRepository.deleteById(branchId)
     }
 
+    fun updateBranch(companyId: UUID, branchId: UUID, branchAddress: CompanyController.AddressRequest) {
+        val branch = companyBranchRepository.findById(branchId)
+            .orElseThrow { EntityNotFoundException("Vestiging met id $branchId niet gevonden") }
+
+        if (branch.company.id != companyId) {
+            throw IllegalArgumentException("Vestiging met id $branchId is niet van bedrijf met id $companyId")
+        }
+
+        val updatedBranch = CompanyBranchDto(
+            id = branchId,
+            company = branch.company,
+            address = AddressDto(
+                streetName = branchAddress.streetName,
+                buildingName = branchAddress.buildingName,
+                buildingNumber = branchAddress.buildingNumber,
+                postalCode = branchAddress.postalCode,
+                city = branchAddress.city,
+                country = branchAddress.country
+            )
+        )
+
+        companyBranchRepository.save(updatedBranch)
+    }
+
     data class CompanyResponse(
         val id: UUID,
         val chamberOfCommerceId: String?,
