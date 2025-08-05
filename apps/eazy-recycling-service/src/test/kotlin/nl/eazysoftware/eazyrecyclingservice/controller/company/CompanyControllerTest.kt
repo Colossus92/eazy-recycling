@@ -501,4 +501,216 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         securedMockMvc.delete("/companies/${company.id}")
             .andExpect(status().isNoContent)
     }
+
+    @Test
+    fun `update branch - success`() {
+        // Create a company first
+        val req = companyRequest(
+            chamberOfCommerceId = "11998877", 
+            vihbId = "VIHB111"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for the company
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Original Street",
+            buildingName = "Original Building",
+            buildingNumber = "100",
+            postalCode = "1000AA",
+            city = "Original City",
+            country = "Nederland"
+        )
+        
+        val branchResult = securedMockMvc.post(
+            "/companies/${company.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andReturn()
+        val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+
+        // Update the branch
+        val updateRequest = CompanyController.AddressRequest(
+            streetName = "Updated Street",
+            buildingName = "Updated Building",
+            buildingNumber = "200",
+            postalCode = "2000BB",
+            city = "Updated City",
+            country = "Nederland"
+        )
+
+        securedMockMvc.put("/companies/${company.id}/branches/${branch.id}", objectMapper.writeValueAsString(updateRequest))
+            .andExpect(status().isNoContent)
+
+        // Verify the branch was updated by fetching companies with branches
+        securedMockMvc.get("/companies?includeBranches=true")
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value("Updated Building"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("200"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("2000BB"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
+    }
+
+    @Test
+    fun `update branch - company not found returns 404`() {
+        val nonExistentCompanyId = UUID.randomUUID()
+        val nonExistentBranchId = UUID.randomUUID()
+        
+        val updateRequest = CompanyController.AddressRequest(
+            streetName = "Test Street",
+            buildingName = "Test Building",
+            buildingNumber = "123",
+            postalCode = "1234AB",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        securedMockMvc.put("/companies/$nonExistentCompanyId/branches/$nonExistentBranchId", objectMapper.writeValueAsString(updateRequest))
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `update branch - branch not found returns 404`() {
+        // Create a company first
+        val req = companyRequest(
+            chamberOfCommerceId = "22998877", 
+            vihbId = "VIHB222"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        val nonExistentBranchId = UUID.randomUUID()
+        
+        val updateRequest = CompanyController.AddressRequest(
+            streetName = "Test Street",
+            buildingName = "Test Building",
+            buildingNumber = "123",
+            postalCode = "1234AB",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        securedMockMvc.put("/companies/${company.id}/branches/$nonExistentBranchId", objectMapper.writeValueAsString(updateRequest))
+            .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `update branch - branch belongs to different company returns 400`() {
+        // Create first company
+        val req1 = companyRequest(
+            chamberOfCommerceId = "33998877", 
+            vihbId = "VIHB333"
+        )
+        val mvcResult1 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req1)
+        )
+            .andReturn()
+        val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
+
+        // Create second company
+        val req2 = companyRequest(
+            chamberOfCommerceId = "44998877", 
+            vihbId = "VIHB444"
+        )
+        val mvcResult2 = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req2)
+        )
+            .andReturn()
+        val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for company2
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Branch Street",
+            buildingName = "Branch Building",
+            buildingNumber = "300",
+            postalCode = "3000CC",
+            city = "Test City",
+            country = "Nederland"
+        )
+        
+        val branchResult = securedMockMvc.post(
+            "/companies/${company2.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andReturn()
+        val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+
+        // Try to update the branch using company1's ID (should fail)
+        val updateRequest = CompanyController.AddressRequest(
+            streetName = "Updated Street",
+            buildingName = "Updated Building",
+            buildingNumber = "400",
+            postalCode = "4000DD",
+            city = "Updated City",
+            country = "Nederland"
+        )
+
+        securedMockMvc.put("/companies/${company1.id}/branches/${branch.id}", objectMapper.writeValueAsString(updateRequest))
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `update branch - partial update with null building name`() {
+        // Create a company first
+        val req = companyRequest(
+            chamberOfCommerceId = "55998877", 
+            vihbId = "VIHB555"
+        )
+        val mvcResult = securedMockMvc.post(
+            "/companies",
+            objectMapper.writeValueAsString(req)
+        )
+            .andReturn()
+        val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+
+        // Create a branch for the company
+        val branchRequest = CompanyController.AddressRequest(
+            streetName = "Original Street",
+            buildingName = "Original Building",
+            buildingNumber = "500",
+            postalCode = "5000EE",
+            city = "Original City",
+            country = "Nederland"
+        )
+        
+        val branchResult = securedMockMvc.post(
+            "/companies/${company.id}/branches",
+            objectMapper.writeValueAsString(branchRequest)
+        )
+            .andReturn()
+        val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+
+        // Update the branch with null building name
+        val updateRequest = CompanyController.AddressRequest(
+            streetName = "Updated Street",
+            buildingName = null,
+            buildingNumber = "600",
+            postalCode = "6000FF",
+            city = "Updated City",
+            country = "Nederland"
+        )
+
+        securedMockMvc.put("/companies/${company.id}/branches/${branch.id}", objectMapper.writeValueAsString(updateRequest))
+            .andExpect(status().isNoContent)
+
+        // Verify the branch was updated correctly
+        securedMockMvc.get("/companies?includeBranches=true")
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value(null))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("600"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000FF"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
+    }
 }
