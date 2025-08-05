@@ -85,7 +85,7 @@ class CompanyService(
         val cause = e.cause
         return cause is ConstraintViolationException
                 && (cause.constraintName?.contains("companies_chamber_of_commerce_id_key") == true
-                || cause.constraintName?.contains("companies_vihb_id_key") == true)
+                || cause.constraintName?.contains("companies_vihb_number_key") == true)
     }
 
     fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
