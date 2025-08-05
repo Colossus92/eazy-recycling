@@ -1,5 +1,3 @@
-create sequence "public"."transport_seq_25";
-
 drop policy "Enable all access for authenticated users only" on "public"."trips";
 
 revoke delete on table "public"."trips" from "anon";
