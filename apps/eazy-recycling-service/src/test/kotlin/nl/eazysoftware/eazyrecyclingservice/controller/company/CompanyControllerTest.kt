@@ -8,7 +8,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -113,24 +112,6 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         )
             .andExpect(status().isCreated)
             .andExpect(jsonPath("$.chamberOfCommerceId").value(req.chamberOfCommerceId))
-    }
-
-    @Test
-    @Disabled
-    fun `create company - duplicate chamberOfCommerceId returns 409`() {
-        val req = companyRequest()
-        securedMockMvc.post(
-            "/companies",
-            objectMapper.writeValueAsString(req)
-        )
-            .andExpect(status().isCreated)
-
-        securedMockMvc.post(
-            "/companies",
-            objectMapper.writeValueAsString(req)
-        )
-            .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.message").exists())
     }
 
     @Test
@@ -278,33 +259,6 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.name").value("Updated BV"))
-    }
-
-    @Test
-    @Disabled
-    fun `update company - duplicate chamberOfCommerceId returns 409`() {
-        val req1 = companyRequest(chamberOfCommerceId = "11111111", vihbId = "VIHB1")
-        val req2 = companyRequest(chamberOfCommerceId = "22222222", vihbId = "VIHB2")
-        val mvcResult1 = securedMockMvc.post(
-            "/companies",
-            objectMapper.writeValueAsString(req1)
-        )
-            .andReturn()
-        val mvcResult2 = securedMockMvc.post(
-            "/companies",
-            objectMapper.writeValueAsString(req2)
-        )
-            .andReturn()
-        val created1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
-        val created2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
-
-        // Try to update company2 with company1's chamberOfCommerceId
-        val update = created2.copy(chamberOfCommerceId = created1.chamberOfCommerceId)
-        securedMockMvc.put(
-            "/companies/${created2.id}",
-            objectMapper.writeValueAsString(update)
-        )
-            .andExpect(status().isConflict)
     }
 
     @Test
