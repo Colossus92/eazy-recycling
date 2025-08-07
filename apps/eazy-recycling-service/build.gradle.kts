@@ -35,6 +35,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
+    implementation("org.springframework.boot:spring-boot-starter-validation:$springVersion")
+
     implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springVersion")
@@ -58,6 +60,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.8.0")
+    implementation("jakarta.validation:jakarta.validation-api:3.1.1")
 
     implementation("org.apache.pdfbox:pdfbox:2.0.30")
     // Code

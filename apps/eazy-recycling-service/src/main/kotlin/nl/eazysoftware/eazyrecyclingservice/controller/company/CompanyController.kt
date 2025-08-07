@@ -1,5 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
+import jakarta.validation.Valid
+import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
@@ -19,7 +21,7 @@ class CompanyController(
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    fun createCompany(@RequestBody company: CompanyRequest): CompanyDto {
+    fun createCompany(@Valid @RequestBody company: CompanyRequest): CompanyDto {
         return companyService.create(company)
     }
 
@@ -73,7 +75,10 @@ class CompanyController(
     }
 
     data class CompanyRequest(
+        @field:Pattern(regexp = "^$|^[\\d]{8}$", message = "KVK nummer moet bestaan uit 8 cijfers, of leeg zijn")
         val chamberOfCommerceId: String?,
+
+        @field:Pattern(regexp = "^$|^[0-9]{6}[VIHBX]{4}\$", message = "VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn")
         val vihbId: String?,
         val name: String,
         val address: AddressRequest?,

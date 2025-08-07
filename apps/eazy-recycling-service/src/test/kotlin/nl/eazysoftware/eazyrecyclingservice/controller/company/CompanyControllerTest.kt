@@ -87,7 +87,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     private fun companyRequest(
         chamberOfCommerceId: String? = "98765432",
-        vihbId: String? = "VIHB456", 
+            vihbId: String? = "123456VIHB",
         name: String = "Test BV"
     ) = CompanyController.CompanyRequest(
         chamberOfCommerceId = chamberOfCommerceId,
@@ -118,7 +118,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `get companies - returns list`() {
         val req = companyRequest(
             chamberOfCommerceId = "11223344", 
-            vihbId = "VIHB789"
+            vihbId = "987654XIXX"
         )
         securedMockMvc.post(
             "/companies",
@@ -219,7 +219,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `get company by id - success`() {
         val req = companyRequest(
             chamberOfCommerceId = "55667788", 
-            vihbId = "VIHB555"
+            vihbId = "654321XXXX"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -243,7 +243,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `update company - success`() {
         val req = companyRequest(
             chamberOfCommerceId = "99887766", 
-            vihbId = "VIHB999"
+            vihbId = "999999VXHB"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -289,7 +289,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     fun `delete company - success`() {
         val req = companyRequest(
             chamberOfCommerceId = "44332211", 
-            vihbId = "VIHB444"
+            vihbId = "444444XXBX"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -313,7 +313,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company first
         val req = companyRequest(
             chamberOfCommerceId = "55443322", 
-            vihbId = "VIHB555"
+            vihbId = "555555VIHB"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -358,7 +358,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company first
         val req = companyRequest(
             chamberOfCommerceId = "66554433", 
-            vihbId = "VIHB666"
+            vihbId = "666666VIHB"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -378,7 +378,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create first company
         val req1 = companyRequest(
             chamberOfCommerceId = "77665544", 
-            vihbId = "VIHB777"
+            vihbId = "777777XIHX"
         )
         val mvcResult1 = securedMockMvc.post(
             "/companies",
@@ -390,7 +390,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create second company
         val req2 = companyRequest(
             chamberOfCommerceId = "88776655", 
-            vihbId = "VIHB888"
+            vihbId = "888888XIXX"
         )
         val mvcResult2 = securedMockMvc.post(
             "/companies",
@@ -426,7 +426,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company
         val req = companyRequest(
             chamberOfCommerceId = "99887766", 
-            vihbId = "VIHB999"
+            vihbId = "999999XIBH"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -461,7 +461,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company first
         val req = companyRequest(
             chamberOfCommerceId = "11998877", 
-            vihbId = "VIHB111"
+            vihbId = "111111VIXH"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -533,7 +533,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company first
         val req = companyRequest(
             chamberOfCommerceId = "22998877", 
-            vihbId = "VIHB222"
+            vihbId = "222222XIBH"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",
@@ -562,7 +562,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create first company
         val req1 = companyRequest(
             chamberOfCommerceId = "33998877", 
-            vihbId = "VIHB333"
+            vihbId = "333333XXHB"
         )
         val mvcResult1 = securedMockMvc.post(
             "/companies",
@@ -574,7 +574,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create second company
         val req2 = companyRequest(
             chamberOfCommerceId = "44998877", 
-            vihbId = "VIHB444"
+            vihbId = "444444XXHB"
         )
         val mvcResult2 = securedMockMvc.post(
             "/companies",
@@ -619,7 +619,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         // Create a company first
         val req = companyRequest(
             chamberOfCommerceId = "55998877", 
-            vihbId = "VIHB555"
+            vihbId = "555555XXHB"
         )
         val mvcResult = securedMockMvc.post(
             "/companies",

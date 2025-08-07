@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController.CompanyRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
@@ -46,7 +46,7 @@ class CompanyControllerSecurityTest {
         testCompany = CompanyDto(
             name = "Test Company",
             chamberOfCommerceId = "12345678",
-            vihbId = "VIHB12345",
+            vihbId = "123456VIHB",
             address = AddressDto(
                 streetName = "Test Street",
                 buildingName = "Test Building",
@@ -119,7 +119,7 @@ class CompanyControllerSecurityTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(CompanyRequest(
                     chamberOfCommerceId = "87654321",
-                    vihbId = "VIHB54321",
+                    vihbId = "654321VIHB",
                     name = "New Test Company",
                     address = CompanyController.AddressRequest(
                         streetName = "Test Street",
