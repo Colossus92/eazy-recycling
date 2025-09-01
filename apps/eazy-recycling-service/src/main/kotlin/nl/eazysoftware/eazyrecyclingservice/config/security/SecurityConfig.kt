@@ -34,6 +34,9 @@ class SecurityConfig {
     @Value("\${supabase.api.url}")
     private lateinit var supabaseUrl: String
 
+    @Value("\${cors.allowed-origins}")
+    private lateinit var allowedOrigins: String
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
@@ -71,10 +74,15 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("*")
+        
+        val origins = allowedOrigins.split(",").map { it.trim() }
+        configuration.allowedOriginPatterns = origins
+        
+        // Set default values for other CORS settings since you simplified the config
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")
         configuration.exposedHeaders = listOf("Authorization")
+        configuration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
