@@ -35,7 +35,7 @@ class CompanyControllerValidationTest {
                 "Main St",
                 "",
                 "1",
-                "1234AB",
+                "1234 AB",
                 "Amsterdam"
             )
         )
@@ -54,7 +54,7 @@ class CompanyControllerValidationTest {
                 "Main St",
                 "",
                 "1",
-                "1234AB",
+                "1234 AB",
                 "Amsterdam"
             )
         )
@@ -94,13 +94,55 @@ class CompanyControllerValidationTest {
         )
     }
 
+    @ParameterizedTest
+    @MethodSource("validPostalCodes")
+    fun `valid postal code should not have any violations`(validPostalCode: String) {
+        val company = CompanyController.CompanyRequest(
+            "12345678",
+            "123456VIHB",
+            "Company",
+            CompanyController.AddressRequest(
+                "Main St",
+                "",
+                "1",
+                validPostalCode,
+                "Amsterdam"
+            )
+        )
+        val violations = validator.validate(company)
+        assertThat(violations).isEmpty()
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidPostalCodes")
+    fun `invalid postal code should have a violation`(invalidPostalCode: String) {
+        val company = CompanyController.CompanyRequest(
+            "12345678",
+            "123456VIHB",
+            "Company",
+            CompanyController.AddressRequest(
+                "Main St",
+                "",
+                "1",
+                invalidPostalCode,
+                "Amsterdam"
+            )
+        )
+        val violations = validator.validate(company)
+
+        assertThat(violations).hasSize(1)
+        assertThat(violations).extracting(ConstraintViolation<*>::getMessage).containsExactly(
+            tuple("Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
+        )
+    }
+
     companion object {
 
         private val addressRequest = CompanyController.AddressRequest(
             "Main St",
             "",
             "1",
-            "1234AB",
+            "1234 AB",
             "Amsterdam"
         )
 
@@ -131,102 +173,53 @@ class CompanyControllerValidationTest {
 
         @JvmStatic
         fun invalidVihbIds() = listOf(
-            "1234567VIHB",
-            "12345VIHB",
-            "123456VIHBA",
-            "1234-5VIHB",
-            "VIHB123456",
-            "123456VIHBX",
-            "123456VIH",
+            "1234567VIHB",    // 7 digits (too many digits)
+            "12345VIHB",      // 5 digits (too few digits)
+            "123456VIHBA",    // 5 letters (too many letters)
+            "1234-5VIHB",     // special characters in digits
+            "VIHB123456",     // letters first, digits last
+            "123456VIHBX",    // invalid letter combination (not from VIHBX)
+            "123456VIH",      // 3 letters (too few letters)
+            "123456ABCD",     // invalid letters (A, C, D not allowed)
+            "123456vihb",     // lowercase letters
+            "123456Vihb",     // mixed case letters
+            "123456VIHB1",    // digit at end instead of letter
+            "12345AVIHB",     // letter in digit section
+            "123456VI-B",     // special character in letter section
+            "123 456VIHB",    // space in digit section
         )
 
-        
+        @JvmStatic
+        fun validPostalCodes() = listOf(
+            "1234 AB",        // standard Dutch postal code
+            "9999 ZZ",        // edge case with highest values
+            "0000 AA",        // edge case with lowest values
+            "5678 XY",        // mixed letters
+            "1111 BB",        // repeated digits and letters
+        )
+
+        @JvmStatic
+        fun invalidPostalCodes() = listOf(
+            "123 AB",         // 3 digits (too few)
+            "12345 AB",       // 5 digits (too many)
+            "1234AB",         // no space
+            "1234  AB",       // double space
+            "1234 ab",        // lowercase letters
+            "1234 Ab",        // mixed case letters
+            "1234 A",         // 1 letter (too few)
+            "1234 ABC",       // 3 letters (too many)
+            "1234 A1",        // digit in letter section
+            "123A AB",        // letter in digit section
+            "1234-AB",        // dash instead of space
+            "1234.AB",        // dot instead of space
+            " 1234 AB",       // leading space
+            "1234 AB ",       // trailing space
+            "12 34 AB",       // space in digit section
+            "1234 A B",       // space in letter section
+            "",               // empty string
+            "ABCD EF",        // all letters in digit section
+            "1234 12",        // all digits in letter section
+        )
+
     }
-//    @Test
-//    fun `create company - invalid vihbId with 5 digits - validation error`() {
-//        val req = companyRequest(vihbId = "12345VIHB")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with 7 digits - validation error`() {
-//        val req = companyRequest(vihbId = "1234567VIHB")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with 3 letters - validation error`() {
-//        val req = companyRequest(vihbId = "123456VIH")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with 5 letters - validation error`() {
-//        val req = companyRequest(vihbId = "123456VIHBX")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with invalid letters - validation error`() {
-//        val req = companyRequest(vihbId = "123456ABCD")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with lowercase letters - validation error`() {
-//        val req = companyRequest(vihbId = "123456vihb")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with letters in digits section - validation error`() {
-//        val req = companyRequest(vihbId = "12345AVIHB")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
-//
-//    @Test
-//    fun `create company - invalid vihbId with special characters - validation error`() {
-//        val req = companyRequest(vihbId = "123456-VIH")
-//        securedMockMvc.post(
-//            "/companies",
-//            objectMapper.writeValueAsString(req)
-//        )
-//            .andExpect(status().isBadRequest)
-//            .andExpect(jsonPath("$.message").value("VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"))
-//    }
 }

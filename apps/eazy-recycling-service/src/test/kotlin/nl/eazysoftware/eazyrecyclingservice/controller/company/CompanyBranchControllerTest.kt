@@ -43,7 +43,7 @@ class CompanyBranchControllerTest @Autowired constructor(
                     streetName = "Main St",
                     buildingName = "HQ",
                     buildingNumber = "1",
-                    postalCode = "1234AB",
+                    postalCode = "1234 AB",
                     city = "Amsterdam",
                     country = "Nederland"
                 )

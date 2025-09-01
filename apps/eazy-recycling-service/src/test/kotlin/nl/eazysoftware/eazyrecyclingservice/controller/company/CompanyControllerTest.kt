@@ -47,7 +47,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
                     streetName = "Main St",
                     buildingName = "HQ",
                     buildingNumber = "1",
-                    postalCode = "1234AB",
+                    postalCode = "1234 AB",
                     city = "Amsterdam",
                     country = "Nederland"
                 )
@@ -97,7 +97,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Main St",
             buildingName = "HQ",
             buildingNumber = "1",
-            postalCode = "1234AB",
+            postalCode = "1234 AB",
             city = "Amsterdam",
             country = "Nederland"
         )
@@ -327,7 +327,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "123",
-            postalCode = "1111AA",
+            postalCode = "1111 AA",
             city = "Test City",
             country = "Nederland"
         )
@@ -404,7 +404,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "456",
-            postalCode = "2222BB",
+            postalCode = "2222 BB",
             city = "Test City",
             country = "Nederland"
         )
@@ -440,7 +440,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "789",
-            postalCode = "3333CC",
+            postalCode = "3333 CC",
             city = "Test City",
             country = "Nederland"
         )
@@ -475,7 +475,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Original Street",
             buildingName = "Original Building",
             buildingNumber = "100",
-            postalCode = "1000AA",
+            postalCode = "1000 AA",
             city = "Original City",
             country = "Nederland"
         )
@@ -492,7 +492,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Updated Street",
             buildingName = "Updated Building",
             buildingNumber = "200",
-            postalCode = "2000BB",
+            postalCode = "2000 BB",
             city = "Updated City",
             country = "Nederland"
         )
@@ -506,7 +506,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value("Updated Building"))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("200"))
-            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("2000BB"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("2000 BB"))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
     }
 
@@ -519,7 +519,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Test Street",
             buildingName = "Test Building",
             buildingNumber = "123",
-            postalCode = "1234AB",
+            postalCode = "1234 AB",
             city = "Test City",
             country = "Nederland"
         )
@@ -548,7 +548,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Test Street",
             buildingName = "Test Building",
             buildingNumber = "123",
-            postalCode = "1234AB",
+            postalCode = "1234 AB",
             city = "Test City",
             country = "Nederland"
         )
@@ -588,7 +588,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "300",
-            postalCode = "3000CC",
+            postalCode = "3000 CC",
             city = "Test City",
             country = "Nederland"
         )
@@ -605,7 +605,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Updated Street",
             buildingName = "Updated Building",
             buildingNumber = "400",
-            postalCode = "4000DD",
+            postalCode = "4000 DD",
             city = "Updated City",
             country = "Nederland"
         )
@@ -633,7 +633,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Original Street",
             buildingName = "Original Building",
             buildingNumber = "500",
-            postalCode = "5000EE",
+            postalCode = "5000 EE",
             city = "Original City",
             country = "Nederland"
         )
@@ -650,7 +650,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             streetName = "Updated Street",
             buildingName = null,
             buildingNumber = "600",
-            postalCode = "6000FF",
+            postalCode = "6000 FF",
             city = "Updated City",
             country = "Nederland"
         )
@@ -664,7 +664,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value(null))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("600"))
-            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000FF"))
+            .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000 FF"))
             .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
     }
 }
