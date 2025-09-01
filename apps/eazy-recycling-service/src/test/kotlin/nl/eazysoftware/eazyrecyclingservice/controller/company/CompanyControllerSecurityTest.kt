@@ -124,7 +124,7 @@ class CompanyControllerSecurityTest {
                     address = CompanyController.AddressRequest(
                         streetName = "Test Street",
                         buildingNumber = "123",
-                        postalCode = "1234AB",
+                        postalCode = "1234 AB",
                         city = "Test City"
                     )
                 )))
