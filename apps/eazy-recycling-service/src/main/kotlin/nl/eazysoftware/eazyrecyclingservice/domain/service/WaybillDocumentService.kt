@@ -1,5 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
@@ -74,7 +76,9 @@ class WaybillDocumentService(
 
 data class CreateSignatureRequest(
     val signature: String,
+    @field:Email
     val email: String,
+    @field:NotBlank
     val party: String,
 )
 

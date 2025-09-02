@@ -1,15 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport.signature
 
+import jakarta.validation.Valid
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CreateSignatureRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WaybillDocumentService
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @RestController
@@ -24,7 +20,7 @@ class SignatureController(
 
     @PreAuthorize(HAS_ANY_ROLE)
     @PostMapping("/signature")
-    fun saveSignature(@PathVariable id: UUID, @RequestBody request: CreateSignatureRequest) =
+    fun saveSignature(@PathVariable id: UUID, @Valid @RequestBody request: CreateSignatureRequest) =
         waybillDocumentService.saveSignature(id, request)
 
 }
