@@ -41,7 +41,7 @@ ingress:
 name: ers
 region: ams
 services:
-    http_port: 8080
+  - http_port: 8080
     image:
       registry: colossus92
       # After submitting the spec, App Platform replaces the values in the spec with encrypted values. Once the values are encrypted, you can safely store the spec in the app’s repo.
