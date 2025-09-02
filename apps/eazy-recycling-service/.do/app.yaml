@@ -70,7 +70,9 @@ services:
     http_port: 8080
     image:
       registry: colossus92
-      registry_credentials: ${{ secrets.GH_REGISTRY_CREDENTIALS }}
+      # After submitting the spec, App Platform replaces the values in the spec with encrypted values. Once the values are encrypted, you can safely store the spec in the app’s repo.
+      # https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/#deploy-container-using-the-apps-spec
+      registry_credentials: EV[1:PWh0bOoaZZ9yzzUZTNT7WfDQoVJ2ml5Y:d1BgPeXwL+yhvwFem0q80ok09ZVNd2Am/Y2i0ebFC7hWQUziYe/a6mKT5LdFFkuqu5y6Orqf0b2zx1WCtdmdyFRvOA==]
       registry_type: GHCR
       repository: eazy-recycling-service
       tag: main
