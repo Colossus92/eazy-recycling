@@ -1,0 +1,89 @@
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+domains:
+  - domain: ers.eazysoftware.nl
+    type: PRIMARY
+envs:
+  - key: VITE_SUPABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${{ env.SUPABASE_API_URL }}
+  - key: VITE_SUPABASE_ANON_KEY
+    scope: RUN_AND_BUILD_TIME
+    value: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+  - key: VITE_API_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${{ env.VITE_API_URL }}
+features:
+  - buildpack-stack=ubuntu-22
+ingress:
+  rules:
+    - component:
+        name: ers
+      match:
+        authority:
+          exact: ""
+        path:
+          prefix: /api
+    - component:
+        name: eazy-recycling-fe
+      match:
+        authority:
+          exact: ""
+        path:
+          prefix: /
+    - component:
+        name: eazy-recycling-fe
+        rewrite: /mobile.html
+      match:
+        authority:
+          exact: ""
+        path:
+          prefix: /mobile
+    - component:
+        name: eazy-recycling-fe
+        rewrite: /mobile.html
+      match:
+        authority:
+          exact: ""
+        path:
+          prefix: /mobile/*
+name: ers
+region: ams
+services:
+  - envs:
+      - key: SPRING_DATASOURCE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.qtnjbdjufwzbmdzndnku&password=VXU_kpk1qkm7mkb4djw
+      - key: SUPABASE_API_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ env.SUPABASE_API_URL }}
+      - key: SUPABASE_API_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ secrets.SUPABASE_API_SECRET }}
+      - key: SUPABASE_API_PUBLISHABLE
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ secrets.SUPABASE_API_PUBLISHABLE }}
+      - key: SUPABASE_API_JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        value: ${{ secrets.SUPABASE_API_JWT_SECRET }}
+    http_port: 8080
+    image:
+      registry: colossus92
+      registry_credentials: ${{ secrets.GITHUB_REGISTRY_CREDENTIALS }}
+      registry_type: GHCR
+      repository: eazy-recycling-service
+      tag: main
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    name: ers
+static_sites:
+  - build_command: npm run build
+    catchall_document: index.html
+    environment_slug: node-js
+    github:
+      branch: main
+      deploy_on_push: true
+      repo: Colossus92/eazy-recycling-fe
+    name: eazy-recycling-fe
+    source_dir: /
