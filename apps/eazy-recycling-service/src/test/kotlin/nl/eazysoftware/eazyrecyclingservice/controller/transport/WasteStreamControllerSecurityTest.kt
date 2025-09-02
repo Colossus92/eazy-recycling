@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.stream.Stream
 
 private const val PATH = "/waste-streams"
+private const val WASTE_STREAM_NUMBER = "08123ABCDEFG"
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -38,7 +39,7 @@ class WasteStreamControllerSecurityTest {
     @BeforeEach
     fun setup() {
         testWasteStreamDto = WasteStreamDto(
-            number = "TEST-001",
+            number = WASTE_STREAM_NUMBER,
             name = "Test Waste Stream"
         )
         wasteStreamRepository.save(testWasteStreamDto)
@@ -66,16 +67,16 @@ class WasteStreamControllerSecurityTest {
                 Arguments.of(PATH, "POST", "unauthorized_role", 403),
 
                 // PUT (update) waste stream - any authenticated role can access
-                Arguments.of("$PATH/TEST-001", "PUT", Roles.ADMIN, 200),
-                Arguments.of("$PATH/TEST-001", "PUT", Roles.PLANNER, 200),
-                Arguments.of("$PATH/TEST-001", "PUT", Roles.CHAUFFEUR, 200),
-                Arguments.of("$PATH/TEST-001", "PUT", "unauthorized_role", 403),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.ADMIN, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.PLANNER, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.CHAUFFEUR, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", "unauthorized_role", 403),
 
                 // DELETE waste stream - any authenticated role can access
-                Arguments.of("$PATH/TEST-001", "DELETE", Roles.ADMIN, 200),
-                Arguments.of("$PATH/TEST-001", "DELETE", Roles.PLANNER, 200),
-                Arguments.of("$PATH/TEST-001", "DELETE", Roles.CHAUFFEUR, 200),
-                Arguments.of("$PATH/TEST-001", "DELETE", "unauthorized_role", 403)
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.ADMIN, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.PLANNER, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.CHAUFFEUR, 200),
+                Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", "unauthorized_role", 403)
             )
         }
     }
@@ -92,10 +93,10 @@ class WasteStreamControllerSecurityTest {
             "GET" -> get(endpoint)
             "POST" -> post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"number":"NEW-001","name":"New Waste Stream"}""")
+                .content("""{"number":"12001ZYXWVUT","name":"New Waste Stream"}""")
             "PUT" -> put(endpoint)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"number":"TEST-001","name":"Updated Waste Stream"}""")
+                .content("""{"number":"$WASTE_STREAM_NUMBER","name":"Updated Waste Stream"}""")
             "DELETE" -> delete(endpoint)
             else -> throw IllegalArgumentException("Unsupported method: $method")
         }

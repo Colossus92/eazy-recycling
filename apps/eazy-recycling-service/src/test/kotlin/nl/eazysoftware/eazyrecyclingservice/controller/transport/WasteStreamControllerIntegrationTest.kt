@@ -15,9 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+
+private const val WASTE_STREAM_NUMBER = "08123ABCDEFG"
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,11 +51,11 @@ class WasteStreamControllerIntegrationTest {
     fun `should get all waste streams`() {
         // Given
         val wasteStreamDto1 = WasteStreamDto(
-            number = "WS-001",
+            number = WASTE_STREAM_NUMBER,
             name = "Plastic"
         )
         val wasteStreamDto2 = WasteStreamDto(
-            number = "WS-002",
+            number = "08123ZYXWVUT",
             name = "Paper"
         )
         wasteStreamRepository.saveAll(listOf(wasteStreamDto1, wasteStreamDto2))
@@ -66,9 +66,9 @@ class WasteStreamControllerIntegrationTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$").isArray)
             .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[?(@.number == 'WS-001')]").exists())
+            .andExpect(jsonPath("$[?(@.number == '08123ABCDEFG')]").exists())
             .andExpect(jsonPath("$[?(@.name == 'Plastic')]").exists())
-            .andExpect(jsonPath("$[?(@.number == 'WS-002')]").exists())
+            .andExpect(jsonPath("$[?(@.number == '08123ZYXWVUT')]").exists())
             .andExpect(jsonPath("$[?(@.name == 'Paper')]").exists())
     }
 
@@ -76,7 +76,7 @@ class WasteStreamControllerIntegrationTest {
     fun `should create waste stream`() {
         // Given
         val wasteStreamDto = WasteStreamDto(
-            number = "WS-003",
+            number = WASTE_STREAM_NUMBER,
             name = "Glass"
         )
 
@@ -87,13 +87,13 @@ class WasteStreamControllerIntegrationTest {
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.number").value("WS-003"))
+            .andExpect(jsonPath("$.number").value(WASTE_STREAM_NUMBER))
             .andExpect(jsonPath("$.name").value("Glass"))
 
         // Verify waste stream was saved in the database
-        val savedWasteStream = wasteStreamRepository.findById("WS-003")
+        val savedWasteStream = wasteStreamRepository.findById(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream).isPresent
-        assertThat(savedWasteStream.get().number).isEqualTo("WS-003")
+        assertThat(savedWasteStream.get().number).isEqualTo(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream.get().name).isEqualTo("Glass")
     }
 
@@ -101,30 +101,30 @@ class WasteStreamControllerIntegrationTest {
     fun `should update waste stream`() {
         // Given
         val originalWasteStreamDto = WasteStreamDto(
-            number = "WS-004",
+            number = WASTE_STREAM_NUMBER,
             name = "Metal"
         )
         wasteStreamRepository.save(originalWasteStreamDto)
 
         val updatedWasteStreamDto = WasteStreamDto(
-            number = "WS-004",
+            number = WASTE_STREAM_NUMBER,
             name = "Scrap Metal"
         )
 
         // When & Then
         securedMockMvc.put(
-            "/waste-streams/WS-004",
+            "/waste-streams/$WASTE_STREAM_NUMBER",
             objectMapper.writeValueAsString(updatedWasteStreamDto)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.number").value("WS-004"))
+            .andExpect(jsonPath("$.number").value(WASTE_STREAM_NUMBER))
             .andExpect(jsonPath("$.name").value("Scrap Metal"))
 
         // Verify waste stream was updated in the database
-        val savedWasteStream = wasteStreamRepository.findById("WS-004")
+        val savedWasteStream = wasteStreamRepository.findById(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream).isPresent
-        assertThat(savedWasteStream.get().number).isEqualTo("WS-004")
+        assertThat(savedWasteStream.get().number).isEqualTo(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream.get().name).isEqualTo("Scrap Metal")
     }
 
@@ -132,25 +132,25 @@ class WasteStreamControllerIntegrationTest {
     fun `should return error when updating waste stream with mismatched number`() {
         // Given
         val originalWasteStreamDto = WasteStreamDto(
-            number = "WS-005",
+            number = WASTE_STREAM_NUMBER,
             name = "Organic"
         )
         wasteStreamRepository.save(originalWasteStreamDto)
 
         val updatedWasteStreamDto = WasteStreamDto(
-            number = "WS-006", // Different number than the path variable
+            number = "08123ABCDEFGI", // Different number than the path variable
             name = "Updated Organic"
         )
 
         // When & Then
         securedMockMvc.put(
-            "/waste-streams/WS-005",
+            "/waste-streams/$WASTE_STREAM_NUMBER",
             objectMapper.writeValueAsString(updatedWasteStreamDto)
         )
             .andExpect(status().isBadRequest)
 
         // Verify waste stream was not updated in the database
-        val savedWasteStream = wasteStreamRepository.findById("WS-005")
+        val savedWasteStream = wasteStreamRepository.findById(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream).isPresent
         assertThat(savedWasteStream.get().name).isEqualTo("Organic")
     }
@@ -159,13 +159,13 @@ class WasteStreamControllerIntegrationTest {
     fun `should return not found when updating non-existent waste stream`() {
         // Given
         val nonExistentWasteStreamDto = WasteStreamDto(
-            number = "WS-999",
+            number = "12001ABCDEFG",
             name = "Non-existent"
         )
 
         // When & Then
         securedMockMvc.put(
-            "/waste-streams/WS-999",
+            "/waste-streams/12001ABCDEFG",
             objectMapper.writeValueAsString(nonExistentWasteStreamDto)
         )
             .andExpect(status().isNotFound)
@@ -175,17 +175,17 @@ class WasteStreamControllerIntegrationTest {
     fun `should delete waste stream`() {
         // Given
         val wasteStreamDto = WasteStreamDto(
-            number = "WS-007",
+            number = WASTE_STREAM_NUMBER,
             name = "Textile"
         )
         wasteStreamRepository.save(wasteStreamDto)
 
         // When & Then
-        securedMockMvc.delete("/waste-streams/WS-007")
+        securedMockMvc.delete("/waste-streams/$WASTE_STREAM_NUMBER")
             .andExpect(status().isOk)
 
         // Verify waste stream was deleted from the database
-        val deletedWasteStream = wasteStreamRepository.findById("WS-007")
+        val deletedWasteStream = wasteStreamRepository.findById(WASTE_STREAM_NUMBER)
         assertThat(deletedWasteStream).isEmpty
     }
     
@@ -193,13 +193,13 @@ class WasteStreamControllerIntegrationTest {
     fun `should return error when creating waste stream with existing number`() {
         // Given
         val existingWasteStreamDto = WasteStreamDto(
-            number = "WS-008",
+            number = WASTE_STREAM_NUMBER,
             name = "Existing Stream"
         )
         wasteStreamRepository.save(existingWasteStreamDto)
         
         val duplicateWasteStreamDto = WasteStreamDto(
-            number = "WS-008",
+            number = WASTE_STREAM_NUMBER,
             name = "Duplicate Stream"
         )
         
@@ -211,8 +211,24 @@ class WasteStreamControllerIntegrationTest {
             .andExpect(status().isBadRequest)
             
         // Verify original waste stream is unchanged
-        val savedWasteStream = wasteStreamRepository.findById("WS-008")
+        val savedWasteStream = wasteStreamRepository.findById(WASTE_STREAM_NUMBER)
         assertThat(savedWasteStream).isPresent
         assertThat(savedWasteStream.get().name).isEqualTo("Existing Stream")
+    }
+
+    @Test
+    fun `should return bad request when creating waste stream with invalid number`() {
+        // Given
+        val wasteStreamDto = WasteStreamDto(
+            number = "invalid_number",
+            name = "Invalid Stream"
+        )
+
+        // When & Then
+        securedMockMvc.post(
+            "/waste-streams",
+            objectMapper.writeValueAsString(wasteStreamDto)
+        )
+            .andExpect(status().isBadRequest)
     }
 }
