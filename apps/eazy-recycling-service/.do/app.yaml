@@ -4,16 +4,6 @@ alerts:
 domains:
   - domain: ers.eazysoftware.nl
     type: PRIMARY
-envs:
-  - key: VITE_SUPABASE_URL
-    scope: RUN_AND_BUILD_TIME
-    value: ${SUPABASE_API_URL}
-  - key: VITE_SUPABASE_ANON_KEY
-    scope: RUN_AND_BUILD_TIME
-    value: ${VITE_SUPABASE_ANON_KEY}
-  - key: VITE_API_URL
-    scope: RUN_AND_BUILD_TIME
-    value: ${VITE_API_URL}
 features:
   - buildpack-stack=ubuntu-22
 ingress:
@@ -51,22 +41,6 @@ ingress:
 name: ers
 region: ams
 services:
-  - envs:
-      - key: SPRING_DATASOURCE_URL
-        scope: RUN_AND_BUILD_TIME
-        value: jdbc:postgresql://aws-0-eu-central-1.pooler.supabase.com:5432/postgres?user=postgres.qtnjbdjufwzbmdzndnku&password=VXU_kpk1qkm7mkb4djw
-      - key: SUPABASE_API_URL
-        scope: RUN_AND_BUILD_TIME
-        value: ${SUPABASE_API_URL}
-      - key: SUPABASE_API_SECRET
-        scope: RUN_AND_BUILD_TIME
-        value: ${SUPABASE_API_SECRET}
-      - key: SUPABASE_API_PUBLISHABLE
-        scope: RUN_AND_BUILD_TIME
-        value: ${SUPABASE_API_PUBLISHABLE}
-      - key: SUPABASE_API_JWT_SECRET
-        scope: RUN_AND_BUILD_TIME
-        value: ${SUPABASE_API_JWT_SECRET}
     http_port: 8080
     image:
       registry: colossus92
