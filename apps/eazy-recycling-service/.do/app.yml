@@ -70,7 +70,7 @@ services:
     http_port: 8080
     image:
       registry: colossus92
-      registry_credentials: ${{ secrets.GITHUB_REGISTRY_CREDENTIALS }}
+      registry_credentials: ${{ secrets.GH_REGISTRY_CREDENTIALS }}
       registry_type: GHCR
       repository: eazy-recycling-service
       tag: main
