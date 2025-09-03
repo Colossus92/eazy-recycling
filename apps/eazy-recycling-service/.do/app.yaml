@@ -85,6 +85,10 @@ services:
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-1gb-fixed
     name: ers
+    log_destinations:
+      - name: Better Stack
+        logtail:
+          token: 4WUPyLjj2Vd4xsLMxrdwSCNg
 static_sites:
   - build_command: npm run build
     catchall_document: index.html
