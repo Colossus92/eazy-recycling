@@ -4,6 +4,19 @@ alerts:
 domains:
   - domain: ers.eazysoftware.nl
     type: PRIMARY
+envs:
+  - key: VITE_SUPABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:ztuW71lsKt2A2EnExuVMj9/uYSy3c6/5:vNB7mEBobLhBeWRahQb6Cm0yRIehkYX8g+LFB+oNVQz5s1BOBkOh9QGwHUzHioc3m7WAU9S0jFA=]
+  - key: VITE_SUPABASE_ANON_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:kL1KaIRH9WLColCW16xXnuObJFUh2cDA:lmNIVoKV8ATFuNXMyBi5uMg8dtpvs9/1zQ6xIK2xnprYInjsLxbLddFfGeyoEZENdldZpTq5jL9zKe6+YJgvJKTVWu+d+IFjpKJcfV3D6MFd34BwrwO6ySSfrE/aAs5LGhQbAw4aVhhewlVABZhEicw6TIrRow7oOtkbI53XFDGPlv9sCHkAoqwfWAOb/L22i6BNkTszrmvyeFkasEaFWd9v/JLlISBRmRJMlncR3UmTdHrNrgOPs+0QNy/82RcO+oiyOFT8bugpaY+Q6Ip4/apJ2FyCibEIqFRU33qW5mA=]
+  - key: VITE_API_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:D0IZTFnHR/cjqKgQJZHKC+2TUZS0pBhr:WOvAUSHuYORiB/2+Lx/dqVR72OaZsQ1FDcnOJ/36zIdz0Lv6GRJc6as7GXoZv2KhVou5MWBLpic=]
 features:
   - buildpack-stack=ubuntu-22
 ingress:
@@ -41,11 +54,30 @@ ingress:
 name: ers
 region: ams
 services:
-  - http_port: 8080
+  - envs:
+      - key: SPRING_DATASOURCE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:zzvyGr9Od7stKtoTxIgv4Wm4/VxV3qLb:q2HSjT+2veCvwKJA8Xluxl6e0lpBd3K+QYF+gfIcw6GQ8untSc2cM9hFnZkhEIFakuT30QUUptG68pzng3813nIRv3A1gdG3/EoMUBoP/PP0JxPjlBNo3fKlhVa+KRFQOcbqhI3e0H8yvpiWkLUo2V0C9li/c0bsIrYyqnTo1iy0NmyQv5+OFrA8TOrAPxSUZYvyE7Oy]
+      - key: SUPABASE_API_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:3AMLOqRMeYNc7TOJPrCrd9L4iTeCkrNC:hChxRrDJCFfpGqPBnOTpxMteL+bucXWZGkqOUdQan4yhjl7pveKJ2JFBCmjAkkMFTJYBjHNnXvg=]
+      - key: SUPABASE_API_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:P+9jdZUkpTORSS9Iwpnx5+MYqWb8smce:WuevNUI3/0VogjiUOva3Dj1dfa7aQpKXc018hIKlCwG8FL6RdRczUVkZ07SBGipc7c94yha4gZFfnlXqs3IGxmLy5zwTp/r3rUpVqNL3JvqNnoHkJeig9qxLFzXgr+ZSJJFy1EFI6H7+IaHQ7K3nMEUhPAtPoLqDu9ITlLYfR4FNGweDKjbUSqbj7wTxQqvYd8m97Mc8+FMbsH+8QeUDeiLrg1q7B5zROZUe85o2Vz7vTmWZdKQu9XapnbdCk3k46R2UPhXo/pmjZV8LRntEMWsc7DLOfqr/XuPfuAcPRsF/RzHAq1jjW4P8xA==]
+      - key: SUPABASE_API_PUBLISHABLE
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:OxzEx6a0Ihg1zTMawxMM1o5fWaLc6RRO:55rOq9ssAwyLTCkuBoA23GLcCt+vE/Noh7mD0GFUdK3SWmbsySCCgVhIeq3LAQZQFdXRDfLeMrt+rggrdQ79ThZ+xmsV1YV8x3Heow0vkoyeyOnujZmVb2y8qpBprYLOI5E8Y4RUuePJwakZMNFFSRotgiaO1KT/lcM/3PXtWft1OvDFge9itR6LmWdsiJGINU7+8rECe2terkaZb3zNkrduVGo9zlulWU+1mLJ7kcmTlU3QE+s0oH6Zkt27H7wHNBFL/1SGcKbVt2QOUXBDuaDF7ya7PuExqOOZ53bMaKQ=]
+      - key: SUPABASE_API_JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:VzrDUysiAw61qasWSzbEcQxIbyvV7fzf:2n48sexi5R/SDwXq8XJmot9zauBkdLkqSOYt1FQrycr7NjaGZSW+Ay/J5B7ExUaLigzYiefvZg1ii4efotB5xNa+KG3LPJzRfathqLOfGRSAqOzCcp3fqHxzIYNlFB33aQrmpbWt2Bs=]
+    http_port: 8080
     image:
       registry: colossus92
-      # After submitting the spec, App Platform replaces the values in the spec with encrypted values. Once the values are encrypted, you can safely store the spec in the app’s repo.
-      # https://docs.digitalocean.com/products/app-platform/how-to/deploy-from-container-images/#deploy-container-using-the-apps-spec
       registry_credentials: EV[1:PWh0bOoaZZ9yzzUZTNT7WfDQoVJ2ml5Y:d1BgPeXwL+yhvwFem0q80ok09ZVNd2Am/Y2i0ebFC7hWQUziYe/a6mKT5LdFFkuqu5y6Orqf0b2zx1WCtdmdyFRvOA==]
       registry_type: GHCR
       repository: eazy-recycling-service
