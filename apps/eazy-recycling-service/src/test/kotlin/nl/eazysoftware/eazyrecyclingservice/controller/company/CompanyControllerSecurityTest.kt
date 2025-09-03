@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController.CompanyRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -121,7 +122,7 @@ class CompanyControllerSecurityTest {
                     chamberOfCommerceId = "87654321",
                     vihbId = "654321VIHB",
                     name = "New Test Company",
-                    address = CompanyController.AddressRequest(
+                    address = AddressRequest(
                         streetName = "Test Street",
                         buildingNumber = "123",
                         postalCode = "1234 AB",

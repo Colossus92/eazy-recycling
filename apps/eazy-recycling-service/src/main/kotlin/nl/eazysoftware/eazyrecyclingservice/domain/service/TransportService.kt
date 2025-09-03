@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.AddressRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository

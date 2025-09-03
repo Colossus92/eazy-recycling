@@ -2,16 +2,17 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.CreateContainerRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class WasteContainerService(
@@ -70,10 +71,20 @@ class WasteContainerService(
             notes = container.notes,
         )
 
-        setLocationDetails(dto, container.location?.companyId, container.location?.address)
+        val address = container.location?.address?.let { toAddressDto(it) }
+        setLocationDetails(dto, container.location?.companyId, address)
 
         return dto
     }
+
+    private fun toAddressDto(address: AddressRequest): AddressDto = AddressDto(
+        streetName = address.streetName,
+        buildingName = address.buildingName,
+        buildingNumber = address.buildingNumber,
+        postalCode = address.postalCode,
+        city = address.city,
+        country = address.country
+    )
 
     private fun setLocationDetails(
         dto: WasteContainerDto,

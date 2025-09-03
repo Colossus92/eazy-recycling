@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
@@ -93,7 +94,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         chamberOfCommerceId = chamberOfCommerceId,
         vihbId = vihbId,
         name = name,
-        address = CompanyController.AddressRequest(
+        address = AddressRequest(
             streetName = "Main St",
             buildingName = "HQ",
             buildingNumber = "1",
@@ -323,7 +324,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for the company
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "123",
@@ -400,7 +401,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for company2
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "456",
@@ -436,7 +437,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for the company
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "789",
@@ -471,7 +472,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for the company
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Original Street",
             buildingName = "Original Building",
             buildingNumber = "100",
@@ -488,7 +489,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
 
         // Update the branch
-        val updateRequest = CompanyController.AddressRequest(
+        val updateRequest = AddressRequest(
             streetName = "Updated Street",
             buildingName = "Updated Building",
             buildingNumber = "200",
@@ -515,7 +516,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val nonExistentCompanyId = UUID.randomUUID()
         val nonExistentBranchId = UUID.randomUUID()
         
-        val updateRequest = CompanyController.AddressRequest(
+        val updateRequest = AddressRequest(
             streetName = "Test Street",
             buildingName = "Test Building",
             buildingNumber = "123",
@@ -544,7 +545,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
         val nonExistentBranchId = UUID.randomUUID()
         
-        val updateRequest = CompanyController.AddressRequest(
+        val updateRequest = AddressRequest(
             streetName = "Test Street",
             buildingName = "Test Building",
             buildingNumber = "123",
@@ -584,7 +585,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for company2
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Branch Street",
             buildingName = "Branch Building",
             buildingNumber = "300",
@@ -601,7 +602,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
 
         // Try to update the branch using company1's ID (should fail)
-        val updateRequest = CompanyController.AddressRequest(
+        val updateRequest = AddressRequest(
             streetName = "Updated Street",
             buildingName = "Updated Building",
             buildingNumber = "400",
@@ -629,7 +630,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
 
         // Create a branch for the company
-        val branchRequest = CompanyController.AddressRequest(
+        val branchRequest = AddressRequest(
             streetName = "Original Street",
             buildingName = "Original Building",
             buildingNumber = "500",
@@ -646,7 +647,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
 
         // Update the branch with null building name
-        val updateRequest = CompanyController.AddressRequest(
+        val updateRequest = AddressRequest(
             streetName = "Updated Street",
             buildingName = null,
             buildingNumber = "600",

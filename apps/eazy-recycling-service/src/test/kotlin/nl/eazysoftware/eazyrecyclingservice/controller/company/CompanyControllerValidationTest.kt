@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.ConstraintViolation
 import jakarta.validation.Validation
 import jakarta.validation.Validator
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.tuple
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +32,7 @@ class CompanyControllerValidationTest {
             validChamberOfCommerceId,
             "123456VIHB",
             "Company",
-            CompanyController.AddressRequest(
+            AddressRequest(
                 "Main St",
                 "",
                 "1",
@@ -50,7 +51,7 @@ class CompanyControllerValidationTest {
             invalidChamberOfCommerceId,
             "123456VIHB",
             "Company",
-            CompanyController.AddressRequest(
+            AddressRequest(
                 "Main St",
                 "",
                 "1",
@@ -101,7 +102,7 @@ class CompanyControllerValidationTest {
             "12345678",
             "123456VIHB",
             "Company",
-            CompanyController.AddressRequest(
+            AddressRequest(
                 "Main St",
                 "",
                 "1",
@@ -120,7 +121,7 @@ class CompanyControllerValidationTest {
             "12345678",
             "123456VIHB",
             "Company",
-            CompanyController.AddressRequest(
+            AddressRequest(
                 "Main St",
                 "",
                 "1",
@@ -138,7 +139,7 @@ class CompanyControllerValidationTest {
 
     companion object {
 
-        private val addressRequest = CompanyController.AddressRequest(
+        private val addressRequest = AddressRequest(
             "Main St",
             "",
             "1",

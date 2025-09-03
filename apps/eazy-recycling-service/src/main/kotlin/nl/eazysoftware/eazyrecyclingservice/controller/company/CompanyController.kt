@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -87,17 +88,5 @@ class CompanyController(
         val address: AddressRequest?,
     )
 
-    data class AddressRequest(
-        @field:NotBlank
-        val streetName: String,
-        val buildingName: String? = null,
-        @field:NotBlank
-        val buildingNumber: String,
-        @field:Pattern(regexp = "^\\d{4}\\s[A-Z]{2}$", message = "Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
-        val postalCode: String,
-        @field:NotBlank
-        val city: String,
-        @field:NotBlank
-        val country: String = "Nederland",
-    )
+
 }

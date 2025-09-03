@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -43,7 +44,7 @@ class CompanyServiceTest {
             chamberOfCommerceId = "12345678",
             vihbId = "VIHB123",
             name = "Test Company",
-            address = CompanyController.AddressRequest(
+            address = AddressRequest(
                 streetName = "Main St",
                 buildingNumber = "1",
                 postalCode = "1234AB",
@@ -77,7 +78,7 @@ class CompanyServiceTest {
             chamberOfCommerceId = "12345678",
             vihbId = "VIHB123",
             name = "Test Company",
-            address = CompanyController.AddressRequest(
+            address = AddressRequest(
                 streetName = "Main St",
                 buildingNumber = "1",
                 postalCode = "1234AB",
@@ -111,7 +112,7 @@ class CompanyServiceTest {
             chamberOfCommerceId = "12345678",
             vihbId = "VIHB123",
             name = "Test Company",
-            address = CompanyController.AddressRequest(
+            address = AddressRequest(
                 streetName = "Main St",
                 buildingNumber = "1",
                 postalCode = "1234AB",
@@ -263,7 +264,7 @@ class CompanyServiceTest {
             chamberOfCommerceId = "12345678",
             vihbId = "VIHB123",
             name = "Test Company",
-            address = CompanyController.AddressRequest(
+            address = AddressRequest(
                 streetName = "Main St",
                 buildingNumber = "1",
                 postalCode = "1234AB",

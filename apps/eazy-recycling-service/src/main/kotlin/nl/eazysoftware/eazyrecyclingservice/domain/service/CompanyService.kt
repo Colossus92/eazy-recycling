@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
@@ -88,7 +89,7 @@ class CompanyService(
                 || cause.constraintName?.contains("companies_vihb_number_key") == true)
     }
 
-    fun createBranch(companyId: UUID, branch: CompanyController.AddressRequest): CompanyBranchDto {
+    fun createBranch(companyId: UUID, branch: AddressRequest): CompanyBranchDto {
         // Check if a branch with the same postal code and building number already exists for this company
         if (companyBranchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
                 companyId,
@@ -129,7 +130,7 @@ class CompanyService(
         companyBranchRepository.deleteById(branchId)
     }
 
-    fun updateBranch(companyId: UUID, branchId: UUID, branchAddress: CompanyController.AddressRequest) {
+    fun updateBranch(companyId: UUID, branchId: UUID, branchAddress: AddressRequest) {
         val branch = companyBranchRepository.findById(branchId)
             .orElseThrow { EntityNotFoundException("Vestiging met id $branchId niet gevonden") }
 

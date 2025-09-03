@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -58,7 +59,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         postalCode: String = "5678CD",
         city: String = "Rotterdam",
         country: String = "Nederland"
-    ) = CompanyController.AddressRequest(
+    ) = AddressRequest(
         streetName = streetName,
         buildingName = buildingName,
         buildingNumber = buildingNumber,
