@@ -1,5 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import java.time.LocalDateTime
@@ -19,12 +22,14 @@ data class CreateWasteTransportRequest(
     override val pickupCompanyBranchId: UUID? = null,
     override val pickupStreet: String,
     override val pickupBuildingNumber: String,
+    @field:Pattern(regexp = "^\\d{4}\\s[A-Z]{2}$", message = "Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
     override val pickupPostalCode: String,
     override val pickupCity: String,
     override val deliveryCompanyId: UUID?,
     override val deliveryCompanyBranchId: UUID? = null,
     override val deliveryStreet: String,
     override val deliveryBuildingNumber: String,
+    @field:Pattern(regexp = "^\\d{4}\\s[A-Z]{2}$", message = "Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
     override val deliveryPostalCode: String,
     override val deliveryCity: String,
     override val truckId: String?,
@@ -32,11 +37,17 @@ data class CreateWasteTransportRequest(
     override val note: String,
     val consignorClassification: Int,
     val wasteStreamNumber: String?,
+    @Min(0)
     val weight: Int,
+    @NotBlank
     val unit: String,
+    @Min(0)
     val quantity: Int,
+    @NotBlank
     val goodsName: String,
+    @NotBlank
     val euralCode: String,
+    @NotBlank
     val processingMethodCode: String,
 ): CreateContainerTransportRequest( // Waste transport is also a container transport
     consignorPartyId = consignorPartyId,

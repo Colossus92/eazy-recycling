@@ -3,13 +3,13 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
@@ -188,7 +188,7 @@ class TransportControllerSecurityTest {
         address = AddressDto(
             streetName = "Test Street",
             buildingNumber = "1",
-            postalCode = "1234AB",
+            postalCode = "1234 AB",
             city = "Test City",
             country = "Test Country"
         )
@@ -199,7 +199,7 @@ class TransportControllerSecurityTest {
         address = AddressDto(
             streetName = "Test Street",
             buildingNumber = "1",
-            postalCode = "1234AB",
+            postalCode = "1234 AB",
             city = "Test City",
             country = "Test Country"
         )
@@ -217,12 +217,12 @@ class TransportControllerSecurityTest {
             pickupCompanyId = UUID.randomUUID(),
             pickupStreet = "Pickup Street",
             pickupBuildingNumber = "1",
-            pickupPostalCode = "1234AB",
+            pickupPostalCode = "1234 AB",
             pickupCity = "Pickup City",
             deliveryCompanyId = UUID.randomUUID(),
             deliveryStreet = "Delivery Street",
             deliveryBuildingNumber = "2",
-            deliveryPostalCode = "5678CD",
+            deliveryPostalCode = "5678 CD",
             deliveryCity = "Delivery City",
             truckId = "TRUCK-123",
             containerId = UUID.randomUUID(),
@@ -246,12 +246,12 @@ class TransportControllerSecurityTest {
             pickupCompanyId = UUID.randomUUID(),
             pickupStreet = "Pickup Street",
             pickupBuildingNumber = "1",
-            pickupPostalCode = "1234AB",
+            pickupPostalCode = "1234 AB",
             pickupCity = "Pickup City",
             deliveryCompanyId = UUID.randomUUID(),
             deliveryStreet = "Delivery Street",
             deliveryBuildingNumber = "2",
-            deliveryPostalCode = "5678CD",
+            deliveryPostalCode = "5678 CD",
             deliveryCity = "Delivery City",
             truckId = "TRUCK-123",
             containerId = UUID.randomUUID(),

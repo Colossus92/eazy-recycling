@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import jakarta.validation.Valid
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -44,13 +45,13 @@ class TransportController(
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PostMapping("/container")
-    fun createContainerTransport(@RequestBody request: CreateContainerTransportRequest): TransportDto {
+    fun createContainerTransport(@Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
         return transportService.createContainerTransport(request)
     }
 
     @PreAuthorize(HAS_ANY_ROLE)
     @PutMapping(path = ["/container/{id}"])
-    fun updateContainerTransport(@PathVariable id: UUID, @RequestBody request: CreateContainerTransportRequest): TransportDto {
+    fun updateContainerTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
         val transport = transportService.updateContainerTransport(id, request)
 
         checkAuthorization(transport)
@@ -60,13 +61,13 @@ class TransportController(
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PostMapping("/waste")
-    fun createWasteTransport(@RequestBody request: CreateWasteTransportRequest): TransportDto {
+    fun createWasteTransport(@Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
         return transportService.createWasteTransport(request)
     }
 
     @PreAuthorize(HAS_ANY_ROLE)
     @PutMapping(path = ["/waste/{id}"])
-    fun updateWasteTransport(@PathVariable id: UUID, @RequestBody request: CreateWasteTransportRequest): TransportDto {
+    fun updateWasteTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
         val transport = transportService.updateWasteTransport(id, request)
 
         checkAuthorization(transport)
