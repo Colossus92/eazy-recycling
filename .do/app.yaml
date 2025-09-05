@@ -29,14 +29,14 @@ ingress:
         path:
           prefix: /api
     - component:
-        name: react-frontend
+        name: eazy-recycling-fe
       match:
         authority:
           exact: ""
         path:
           prefix: /
     - component:
-        name: react-frontend
+        name: eazy-recycling-fe
         rewrite: /mobile.html
       match:
         authority:
@@ -44,7 +44,7 @@ ingress:
         path:
           prefix: /mobile
     - component:
-        name: react-frontend
+        name: eazy-recycling-fe
         rewrite: /mobile.html
       match:
         authority:
@@ -97,5 +97,5 @@ static_sites:
       branch: main
       deploy_on_push: true
       repo: Colossus92/eazy-recycling
-    name: react-frontend
+    name: eazy-recycling-fe
     source_dir: ./apps/react-frontend
