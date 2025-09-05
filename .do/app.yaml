@@ -1,6 +1,7 @@
 alerts:
   - rule: DEPLOYMENT_FAILED
   - rule: DOMAIN_FAILED
+  - rule: DEPLOYMENT_LIVE
 domains:
   - domain: ers.eazysoftware.nl
     type: PRIMARY
@@ -29,14 +30,14 @@ ingress:
         path:
           prefix: /api
     - component:
-        name: eazy-recycling-fe
+        name: react-frontend
       match:
         authority:
           exact: ""
         path:
           prefix: /
     - component:
-        name: eazy-recycling-fe
+        name: react-frontend
         rewrite: /mobile.html
       match:
         authority:
@@ -44,7 +45,7 @@ ingress:
         path:
           prefix: /mobile
     - component:
-        name: eazy-recycling-fe
+        name: react-frontend
         rewrite: /mobile.html
       match:
         authority:
@@ -97,6 +98,6 @@ static_sites:
       branch: main
       deploy_on_push: true
       repo: Colossus92/eazy-recycling
-    name: eazy-recycling-fe
+    name: react-frontend
     source_dir: ./apps/react-frontend
     output_dir: ./dist
