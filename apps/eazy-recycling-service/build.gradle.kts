@@ -7,8 +7,8 @@ plugins {
     kotlin("kapt") version "2.1.20"
     id("org.unbroken-dome.xjc") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
+    id("dev.nx.gradle.project-graph") version("0.1.4")
 }
-
 group = "nl.eazysoftware"
 version = "0.0.1-SNAPSHOT"
 
@@ -65,7 +65,7 @@ dependencies {
     implementation("org.apache.pdfbox:pdfbox:2.0.30")
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
-    
+
     // Environment variables
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
@@ -85,6 +85,12 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
     testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
+}
+
+allprojects {
+  apply {
+    plugin("dev.nx.gradle.project-graph")
+  }
 }
 
 kotlin {

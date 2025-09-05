@@ -1,1 +1,1 @@
-rootProject.name = "eazy-recycling-service"
+rootProject.name = "eazy-recycling"

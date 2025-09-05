@@ -75,5 +75,10 @@
   },
   "lint-staged": {
     "*.js": "eslint --fix"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "@eazy-recycling/eazy-recycling-service"
+    ]
   }
 }
