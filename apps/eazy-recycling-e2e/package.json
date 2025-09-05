@@ -1,0 +1,10 @@
+{
+  "name": "@eazy-recycling/eazy-recycling-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@eazy-recycling/eazy-recycling"
+    ]
+  }
+}
