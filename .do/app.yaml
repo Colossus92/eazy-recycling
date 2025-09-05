@@ -96,6 +96,6 @@ static_sites:
     github:
       branch: main
       deploy_on_push: true
-      repo: Colossus92/eazy-recycling-fe
-    name: eazy-recycling-fe
-    source_dir: /
+      repo: Colossus92/eazy-recycling
+    name: react-frontend
+    source_dir: ./apps/react-frontend

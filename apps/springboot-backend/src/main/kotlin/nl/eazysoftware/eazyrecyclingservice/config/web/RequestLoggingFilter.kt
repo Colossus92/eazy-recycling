@@ -25,7 +25,7 @@ class RequestLoggingFilter : Filter {
         val queryString = httpRequest.queryString ?: ""
         val headers = httpRequest.headerNames.toList().joinToString { "$it=${httpRequest.getHeader(it)}" }
 
-        logger.info("Incoming Request: Method=$method, URI=$uri, Query=$queryString, Body=$httpRequest Headers=[$headers]")
+        logger.info("Incoming Request: Method=$method, URI=$uri, Query=$queryString, Body=$httpRequest .Headers=[$headers]")
 
         chain.doFilter(request, response)
 
