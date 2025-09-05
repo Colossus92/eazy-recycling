@@ -1,0 +1,197 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ubl="urn:oasis:names:specification:ubl:schema:xsd:Waybill-2">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <Waybill xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns="urn:oasis:names:specification:ubl:schema:xsd:Waybill-2"
+                 xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+                 xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+                 xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
+                 xmlns:eba="http://ns.tln.nl/eba/schemas/1-0/" xsi:schemaLocation="urn:oasis:names:specification:ubl:schema:xsd:Waybill-2 http://docs.oasis-open.org/ubl/prd1-UBL-2.1/xsd/maindoc/UBL-Waybill-2.1.xsd http://ns.tln.nl/eba/schemas/1-0/ ..\..\..\schemas\1-0-1\EBA-Extensions.xsd">
+            <ext:UBLExtensions>
+                <ext:UBLExtension>
+                    <ext:ExtensionContent>
+                        <eba:ReplyAddress>
+                            <eba:Webservice>
+                                <eba:WebserviceEndPoint>https://www.organisatie.nl/EBAServicesEndPoint</eba:WebserviceEndPoint>
+                                <eba:Username>Username</eba:Username>
+                                <eba:Password>Password</eba:Password>
+                            </eba:Webservice>
+                        </eba:ReplyAddress>
+                    </ext:ExtensionContent>
+                </ext:UBLExtension>
+            </ext:UBLExtensions>
+            <cbc:ProfileID>urn:tln.nlip.org:profiles:waybill_profile:eba:basic:ver1.2</cbc:ProfileID>
+            <cbc:ID>BC216549658</cbc:ID>
+            <cbc:UUID>a5df87b9-796d-4938-8782-7d5e49ce1a60</cbc:UUID>
+            <cbc:Note>Pas op voor de hond!</cbc:Note>
+            <cac:Shipment>
+                <cbc:ID/>
+                <cac:Consignment>
+                    <cbc:ID/>
+                    <cbc:CarrierAssignedID/>
+                    <cbc:ConsigneeAssignedID/>
+                    <cbc:ConsignorAssignedID/>
+                    <cbc:BrokerAssignedID/>
+                    <cac:ConsigneeParty>
+                        <cac:PartyIdentification>
+                            <cbc:ID schemeAgencyName="KvK">03999990</cbc:ID>
+                        </cac:PartyIdentification>
+                        <cac:PartyName>
+                            <cbc:Name>O.N.T. Vanger</cbc:Name>
+                        </cac:PartyName>
+                        <cac:PostalAddress>
+                            <cbc:StreetName>Veerweg</cbc:StreetName>
+                            <cbc:BuildingNumber>4</cbc:BuildingNumber>
+                            <cbc:CityName>Waalwijk</cbc:CityName>
+                            <cbc:PostalZone>5145 NS</cbc:PostalZone>
+                            <cac:Country>
+                                <cbc:Name>Nederland</cbc:Name>
+                            </cac:Country>
+                        </cac:PostalAddress>
+                    </cac:ConsigneeParty>
+                    <cac:ConsignorParty>
+                        <cbc:IndustryClassificationCode>3</cbc:IndustryClassificationCode>
+                        <cac:PartyIdentification>
+                            <cbc:ID schemeAgencyName="VIHB">NB50003VIXX</cbc:ID>
+                        </cac:PartyIdentification>
+                        <cac:PartyName>
+                            <cbc:Name>A.F. Zender</cbc:Name>
+                        </cac:PartyName>
+                        <cac:PostalAddress>
+                            <cbc:StreetName>Parklaan</cbc:StreetName>
+                            <cbc:BuildingNumber>68</cbc:BuildingNumber>
+                            <cbc:InhouseMail>a</cbc:InhouseMail>
+                            <cbc:CityName>Raamsdonksveer</cbc:CityName>
+                            <cbc:PostalZone>4941 BC</cbc:PostalZone>
+                            <cac:Country>
+                                <cbc:Name>Nederland</cbc:Name>
+                            </cac:Country>
+                        </cac:PostalAddress>
+                    </cac:ConsignorParty>
+                    <cac:CarrierParty>
+                        <cac:PartyIdentification>
+                            <cbc:ID schemeAgencyName="VIHB">NB50004VIXX</cbc:ID>
+                        </cac:PartyIdentification>
+                        <cac:PartyName>
+                            <cbc:Name>V.E.R. Voerder</cbc:Name>
+                        </cac:PartyName>
+                        <cac:PostalAddress>
+                            <cbc:StreetName>Dillenburgstraat</cbc:StreetName>
+                            <cbc:BuildingNumber>232</cbc:BuildingNumber>
+                            <cbc:CityName>Eindhoven</cbc:CityName>
+                            <cbc:PostalZone>5652 AP</cbc:PostalZone>
+                            <cac:Country>
+                                <cbc:Name>Nederland</cbc:Name>
+                            </cac:Country>
+                        </cac:PostalAddress>
+                    </cac:CarrierParty>
+                </cac:Consignment>
+                <cac:GoodsItem>
+                    <cbc:ID>10M220000001</cbc:ID>
+                    <cbc:HazardousRiskIndicator>true</cbc:HazardousRiskIndicator>
+                    <cbc:NetNetWeightMeasure unitCode="KGM">1000</cbc:NetNetWeightMeasure>
+                    <cbc:Quantity>1</cbc:Quantity>
+                    <cac:Item>
+                        <cbc:Name>Grond</cbc:Name>
+                        <cac:CommodityClassification>
+                            <cbc:ItemClassificationCode>010105*</cbc:ItemClassificationCode>
+                        </cac:CommodityClassification>
+                        <cac:HazardousItem>
+                            <cbc:AdditionalInformation>ADR informatie hier plaatsen</cbc:AdditionalInformation>
+                        </cac:HazardousItem>
+                        <cac:AdditionalItemProperty>
+                            <cbc:Name>verpakkingsomschrijving</cbc:Name>
+                            <cbc:Value>Bulk</cbc:Value>
+                        </cac:AdditionalItemProperty>
+                        <cac:AdditionalItemProperty>
+                            <cbc:Name>verwerkingsmethode</cbc:Name>
+                            <cbc:Value>A.01</cbc:Value>
+                        </cac:AdditionalItemProperty>
+                        <cac:AdditionalItemProperty>
+                            <cbc:Name>route-inzameling</cbc:Name>
+                            <cbc:Value>true</cbc:Value>
+                        </cac:AdditionalItemProperty>
+                        <cac:AdditionalItemProperty>
+                            <cbc:Name>inzamelaarsregeling</cbc:Name>
+                            <cbc:Value>true</cbc:Value>
+                        </cac:AdditionalItemProperty>
+                    </cac:Item>
+                    <cac:GoodsItemContainer>
+                        <cbc:ID>C315</cbc:ID>
+                    </cac:GoodsItemContainer>
+                    <cac:Delivery>
+                        <cac:DeliveryLocation>
+                            <cbc:ID>01SK1</cbc:ID>
+                            <cbc:Description>Rijksweg A6 ter hoogte van hectometerpaal 102,1 Re</cbc:Description>
+                            <cbc:LocationTypeCode>Adres</cbc:LocationTypeCode>
+                            <cac:Address>
+                                <cbc:StreetName>Veerweg</cbc:StreetName>
+                                <cbc:BuildingName>Inrichting O.N.T. Vanger</cbc:BuildingName>
+                                <cbc:BuildingNumber>4</cbc:BuildingNumber>
+                                <cbc:InhouseMail>a</cbc:InhouseMail>
+                                <cbc:CityName>Waalwijk</cbc:CityName>
+                                <cbc:PostalZone>5145 NS</cbc:PostalZone>
+                            </cac:Address>
+                        </cac:DeliveryLocation>
+                        <cac:EstimatedDeliveryPeriod>
+                            <cbc:StartDate>2025-02-20</cbc:StartDate>
+                            <cbc:StartTime>16:50:00</cbc:StartTime>
+                            <cbc:EndDate>2025-02-20</cbc:EndDate>
+                            <cbc:EndTime>18:10:00</cbc:EndTime>
+                        </cac:EstimatedDeliveryPeriod>
+                    </cac:Delivery>
+                    <cac:Pickup>
+                        <cbc:ActualPickupDate>2025-02-20</cbc:ActualPickupDate>
+                        <cbc:ActualPickupTime>14:15:00</cbc:ActualPickupTime>
+                        <cac:PickupLocation>
+                            <cbc:Description>Route Enschede zuid</cbc:Description>
+                            <cbc:LocationTypeCode>Route</cbc:LocationTypeCode>
+                            <cac:Address>
+                                <cbc:StreetName>Stationsstraat</cbc:StreetName>
+                                <cbc:BuildingName>Bouwplaats BAM</cbc:BuildingName>
+                                <cbc:BuildingNumber>3</cbc:BuildingNumber>
+                                <cbc:InhouseMail>a</cbc:InhouseMail>
+                                <cbc:CityName>Amsterdam</cbc:CityName>
+                                <cbc:PostalZone>1012 JS</cbc:PostalZone>
+                            </cac:Address>
+                        </cac:PickupLocation>
+                        <cac:PickupParty>
+                            <cac:PartyIdentification>
+                                <cbc:ID schemeAgencyName="Amice">6982</cbc:ID>
+                            </cac:PartyIdentification>
+                            <cac:PartyName>
+                                <cbc:Name>I.N. Zamelaar</cbc:Name>
+                            </cac:PartyName>
+                            <cac:PostalAddress>
+                                <cbc:StreetName>Speelhuislaan</cbc:StreetName>
+                                <cbc:BuildingNumber>37</cbc:BuildingNumber>
+                                <cbc:CityName>Breda</cbc:CityName>
+                                <cbc:PostalZone>4815 CD</cbc:PostalZone>
+                                <cac:Country>
+                                    <cbc:Name>Nederland</cbc:Name>
+                                </cac:Country>
+                            </cac:PostalAddress>
+                        </cac:PickupParty>
+                    </cac:Pickup>
+                </cac:GoodsItem>
+                <cac:ShipmentStage>
+                    <cbc:PreCarriageIndicator>false</cbc:PreCarriageIndicator>
+                    <cbc:OnCarriageIndicator>false</cbc:OnCarriageIndicator>
+                    <cac:TransportMeans>
+                        <cbc:JourneyID>M22</cbc:JourneyID>
+                        <cac:RoadTransport>
+                            <cbc:LicensePlateID>BT-JP-88</cbc:LicensePlateID>
+                        </cac:RoadTransport>
+                        <cac:RailTransport>
+                            <cbc:TrainID>RW-13485</cbc:TrainID>
+                        </cac:RailTransport>
+                        <cac:MaritimeTransport>
+                            <cbc:VesselName>Animo</cbc:VesselName>
+                        </cac:MaritimeTransport>
+                    </cac:TransportMeans>
+                </cac:ShipmentStage>
+            </cac:Shipment>
+        </Waybill>
+    </soapenv:Body>
+</soapenv:Envelope>

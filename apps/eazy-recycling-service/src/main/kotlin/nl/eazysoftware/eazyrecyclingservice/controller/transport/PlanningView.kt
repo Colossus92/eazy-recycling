@@ -1,0 +1,48 @@
+package nl.eazysoftware.eazyrecyclingservice.controller.transport
+
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+
+
+data class PlanningView(
+    val dates: List<String>,
+    val transports: List<TransportsView>,
+)
+
+data class TransportsView(
+    val truck: String,
+    val transports: Map<String, List<TransportView>>
+)
+
+data class TransportView(
+    val pickupDate: String,
+    val deliveryDate: String?,
+    val id: String,
+    val truck: Truck?,
+    val originCity: String?,
+    val destinationCity: String?,
+    val driver: ProfileDto?,
+    val status: TransportDto.Status,
+    val displayNumber: String?,
+    val containerId: String?,
+    val transportType: TransportType,
+    val sequenceNumber: Int,
+) {
+
+    constructor(transportDto: TransportDto): this(
+        pickupDate = transportDto.pickupDateTime.toLocalDate().toString(),
+        deliveryDate = transportDto.deliveryDateTime?.toLocalDate()?.toString().takeIf { transportDto.deliveryDateTime != null },
+        id = transportDto.id.toString(),
+        truck =  transportDto.truck,
+        originCity = transportDto.pickupLocation.address.city,
+        destinationCity = transportDto.deliveryLocation.address.city,
+        driver = transportDto.driver,
+        status = transportDto.getStatus(),
+        displayNumber = transportDto.displayNumber,
+        containerId = transportDto.wasteContainer?.id,
+        transportType = transportDto.transportType,
+        sequenceNumber = transportDto.sequenceNumber,
+    )
+}
