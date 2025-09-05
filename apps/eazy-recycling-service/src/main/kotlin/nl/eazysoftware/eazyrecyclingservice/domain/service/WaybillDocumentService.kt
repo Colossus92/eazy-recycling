@@ -7,7 +7,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Signatur
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -44,22 +43,22 @@ class WaybillDocumentService(
         when (request.party) {
             "consignor" -> {
                 signatures.consignorEmail = request.email
-                signatures.consignorSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
+                signatures.consignorSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
             }
 
             "consignee" -> {
                 signatures.consigneeEmail = request.email
-                signatures.consigneeSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
+                signatures.consigneeSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
             }
 
             "carrier" -> {
                 signatures.carrierEmail = request.email
-                signatures.carrierSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
+                signatures.carrierSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
             }
 
             "pickup" -> {
                 signatures.pickupEmail = request.email
-                signatures.pickupSignedAt = ZonedDateTime.of(LocalDateTime.now(), ZoneId.of("Europe/Amsterdam"))
+                signatures.pickupSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
             }
 
             else -> throw IllegalArgumentException("Ongeldige partij: ${request.party}")
