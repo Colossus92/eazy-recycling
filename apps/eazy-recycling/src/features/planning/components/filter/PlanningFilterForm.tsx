@@ -1,0 +1,144 @@
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { toast } from 'react-toastify';
+import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
+import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
+import { CheckboxField } from '@/components/ui/form/CheckboxField.tsx';
+import { Tag } from '@/components/ui/tag/Tag.tsx';
+import { Button } from '@/components/ui/button/Button.tsx';
+import { Status } from '@/features/planning/hooks/usePlanning';
+
+export interface TransportPlanningFormValues {
+  driverId: string;
+  truckId: string;
+  isPlanned: boolean;
+  isFinished: boolean;
+  isUnplanned: boolean;
+  isInvoiced: boolean;
+}
+
+interface StatusFilterOptionProps {
+  formContext: UseFormReturn<TransportPlanningFormValues>;
+  status: 'INVOICED' | 'FINISHED' | 'UNPLANNED' | 'ERROR' | 'PLANNED';
+  fieldName: keyof TransportPlanningFormValues;
+}
+
+const StatusFilterOption = ({
+  fieldName,
+  formContext,
+  status,
+}: StatusFilterOptionProps) => {
+  return (
+    <div className="flex items-center self-stretch gap-2">
+      <CheckboxField
+        formHook={{
+          register: formContext.register,
+          name: fieldName,
+          errors: formContext.formState.errors,
+          control: formContext.control,
+        }}
+      >
+        <Tag status={status}></Tag>
+      </CheckboxField>
+    </div>
+  );
+};
+
+interface PlanningFilterFormProps {
+  closeDialog: () => void;
+  onSubmit: (values: TransportPlanningFormValues) => void;
+}
+
+export const PlanningFilterForm = ({
+  closeDialog,
+  onSubmit,
+}: PlanningFilterFormProps) => {
+  const formContext = useForm<TransportPlanningFormValues>({
+    defaultValues: {
+      driverId: '',
+      truckId: '',
+      isPlanned: false,
+      isFinished: false,
+      isUnplanned: false,
+      isInvoiced: false,
+    },
+  });
+
+  const handleApplyFilter = formContext.handleSubmit((data) => {
+    onSubmit(data);
+    closeDialog();
+    toast.success('Filters toegepast', {
+      className: 'bg-color-status-success-light text-color-text-secondary',
+      progressClassName: 'bg-color-status-success-primary',
+    });
+  });
+
+  return (
+    <>
+      <div className="relative mt-6 flex-1 px-4 sm:px-6">
+        <div className={'flex flex-col flex-1 items-start self-stretch gap-4'}>
+          <DriverSelectFormField
+            formHook={{
+              register: formContext.register,
+              name: 'driverId',
+              errors: formContext.formState.errors,
+              control: formContext.control,
+            }}
+          />
+          <TruckSelectFormField
+            formHook={{
+              register: formContext.register,
+              name: 'truckId',
+              errors: formContext.formState.errors,
+              control: formContext.control,
+            }}
+          />
+          <div className="flex flex-col items-start self-stretch gap-2">
+            <span className="text-caption-2">Status</span>
+            <StatusFilterOption
+              fieldName={'isUnplanned'}
+              formContext={formContext}
+              status={Status.UNPLANNED}
+            />
+            <StatusFilterOption
+              fieldName={'isPlanned'}
+              formContext={formContext}
+              status={Status.PLANNED}
+            />
+            <StatusFilterOption
+              fieldName={'isFinished'}
+              formContext={formContext}
+              status={Status.FINISHED}
+            />
+            <StatusFilterOption
+              fieldName={'isInvoiced'}
+              formContext={formContext}
+              status={Status.INVOICED}
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className={
+          'flex justify-end items-center self-stretch py-3 px-4 gap-4 border-t border-solid border-color-border-primary'
+        }
+      >
+        <div className={'flex-1'}>
+          <Button
+            variant={'secondary'}
+            label={'Reset'}
+            fullWidth={true}
+            onClick={() => formContext.reset()}
+          />
+        </div>
+        <div className={'flex-1'}>
+          <Button
+            variant={'primary'}
+            label={'Toepassen'}
+            fullWidth={true}
+            onClick={handleApplyFilter}
+          />
+        </div>
+      </div>
+    </>
+  );
+};

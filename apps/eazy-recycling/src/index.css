@@ -1,0 +1,83 @@
+@import "@fontsource/urbanist/400.css";
+@import "@fontsource/urbanist/500.css";
+@import "@fontsource/urbanist/600.css";
+@import "@fontsource/urbanist/700.css";
+
+@tailwind base;
+@layer base {
+    h1 {
+        @apply text-h1 font-heading text-color-text-primary;
+    }
+    h2 {
+        @apply text-h2 font-heading text-color-text-primary;
+    }
+    h3 {
+        @apply text-h3 font-heading text-color-text-primary;
+    }
+    h4 {
+        @apply text-h4 font-heading text-color-text-primary;
+    }
+    .subtitle-1 {
+        @apply text-subtitle-1 font-heading text-color-text-primary;
+    }
+    .subtitle-2 {
+        @apply text-subtitle-2 font-heading text-color-text-primary;
+    }
+    p {
+        @apply text-body-1 font-body text-color-text-primary;
+    }
+    .body-2 {
+        @apply text-body-2 font-body text-color-text-primary;
+    }
+    .button-font {
+        @apply text-button font-body text-color-text-primary;
+    }
+    .caption-1 {
+        @apply text-caption-1 font-body text-color-text-primary;
+    }
+    .caption-2 {
+        @apply text-caption-2 font-body text-color-text-primary;
+    }
+}
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --number-4: 4px;
+    --number-6: 6px;
+    --number-8: 8px;
+    --number-12: 12px;
+    --number-16: 16px;
+    --number-24: 24px;
+    --number-32: 32px;
+    --number-40: 40px;
+    --number-48: 48px;
+    --number-56: 56px;
+    --number-64: 64px;
+
+    --gray-0: #FFFFFFFF;
+    --gray-50: #F6F8F9FF;
+    --gray-100: #F2F4F7FF;
+    --gray-200: #E3E8F3FF;
+    --gray-300: #C8CFDCFF;
+    --gray-400: #9EA7B6FF;
+    --gray-500: #747E8CFF;
+    --gray-600: #616B7AFF;
+    --gray-700: #4A515BFF;
+    --gray-800: #3F4855FF;
+    --gray-900: #141414FF;
+    --gray-1000: #000000FF;
+    --green-50: #ECFDF3FF;
+    --green-500: #12B76AFF;
+    --green-700: #027A48FF;
+    --orange-50: #FFF6EDFF;
+    --red-50: #FEF3F2FF;
+    --red-500: #F87171FF;
+    --red-700: #F04438FF;
+    --orange-500: #FFA347FF;
+    --orange-700: #EE8013FF;
+    --blue-50: #F3F8FFFF;
+    --blue-100: #EBF3FFFF;
+    --blue-500: #1E77F8FF;
+    --blue-700: #1D6DE0FF;
+}

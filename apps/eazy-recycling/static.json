@@ -1,0 +1,17 @@
+{
+  "root": "dist",
+  "clean_urls": true,
+  "routes": {
+    "/mobile/**": "mobile.html",
+    "/**": "index.html"
+  },
+  "https_only": true,
+  "headers": {
+    "/**": {
+      "Cache-Control": "public, max-age=0, must-revalidate"
+    },
+    "/assets/**": {
+      "Cache-Control": "public, max-age=31536000, immutable"
+    }
+  }
+}

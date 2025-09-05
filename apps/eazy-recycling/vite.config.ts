@@ -1,41 +1,59 @@
-/// <reference types='vitest' />
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { type PluginOption } from 'vite';
+import svgr from 'vite-plugin-svgr';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
-export default defineConfig(() => ({
-  root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/eazy-recycling',
-  server: {
-    port: 4200,
-    host: 'localhost',
-  },
-  preview: {
-    port: 4300,
-    host: 'localhost',
-  },
-  plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
-  build: {
-    outDir: './dist',
-    emptyOutDir: true,
-    reportCompressedSize: true,
-    commonjsOptions: {
-      transformMixedEsModules: true,
-    },
-  },
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(), svgr(), tsconfigPaths(), visualizer() as PluginOption],
   test: {
-    name: '@eazy-recycling/eazy-recycling',
-    watch: false,
-    globals: true,
     environment: 'jsdom',
-    include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    reporters: ['default'],
-    coverage: {
-      reportsDirectory: './test-output/vitest/coverage',
-      provider: 'v8' as const,
+    globals: true,
+    setupFiles: './vitest.setup.ts',
+    // speed up since tests don't rely on css
+    // https://github.com/vitest-dev/vitest/blob/main/examples/react-testing-lib/vite.config.ts#L14-L16
+    css: false,
+  },
+  resolve: {
+    // Ensure SVG imports are properly resolved
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.svg'],
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        mobile: './mobile.html',
+      },
+      output: {
+        manualChunks: (id: string) => {
+          // Common chunks for both desktop and mobile
+          if (id.includes('node_modules/@supabase/supabase-js')) {
+            return 'supabase';
+          }
+          if (id.includes('node_modules/date-fns')) {
+            return 'date-fns';
+          }
+
+          // Separate chunks for shared components
+          if (
+            id.includes('/components/auth/') ||
+            id.includes('/components/common/')
+          ) {
+            return 'shared-components';
+          }
+
+          // Separate chunks for desktop and mobile
+          if (id.includes('/src/desktop/')) {
+            return 'desktop-app';
+          }
+          if (id.includes('/src/mobile/')) {
+            return 'mobile-app';
+          }
+          return undefined;
+        },
+      },
     },
   },
-}));
+});

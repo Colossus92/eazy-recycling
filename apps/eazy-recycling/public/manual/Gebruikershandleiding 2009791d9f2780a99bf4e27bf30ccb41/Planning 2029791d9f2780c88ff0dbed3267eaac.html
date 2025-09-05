@@ -1,0 +1,698 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><meta name="robots" content="noindex, nofollow" /><title>Planning</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+	margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Display", "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.highlight-default_background {
+	color: rgba(50, 48, 44, 1);
+}
+.highlight-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.highlight-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(115, 114, 110, 1);
+	fill: rgba(115, 114, 110, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(205, 60, 58, 1);
+	fill: rgba(205, 60, 58, 1);
+}
+.block-color-default_background {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray_background {
+	background: rgba(248, 248, 247, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(248, 243, 252, 1);
+}
+.block-color-pink_background {
+	background: rgba(252, 241, 246, 1);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-uiBlue { background-color: undefined; }
+.select-value-color-pink { background-color: rgba(225, 136, 179, 0.27); }
+.select-value-color-purple { background-color: rgba(168, 129, 197, 0.27); }
+.select-value-color-green { background-color: rgba(123, 183, 129, 0.27); }
+.select-value-color-gray { background-color: rgba(84, 72, 49, 0.15); }
+.select-value-color-translucentGray { background-color: undefined; }
+.select-value-color-orange { background-color: rgba(224, 124, 57, 0.27); }
+.select-value-color-brown { background-color: rgba(210, 162, 141, 0.35); }
+.select-value-color-red { background-color: rgba(244, 171, 159, 0.4); }
+.select-value-color-yellow { background-color: rgba(236, 191, 66, 0.39); }
+.select-value-color-blue { background-color: rgba(93, 165, 206, 0.27); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2029791d-9f27-80c8-8ff0-dbed3267eaac" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">🗓️</span></div><h1 class="page-title">Planning</h1><p class="page-description"></p></header><div class="page-body"><h3 id="2029791d-9f27-8040-9eff-c2acbf8cdfde" class=""><strong>Beheer van Afvaltransporten en Containertransporten</strong></h3><p id="2029791d-9f27-8029-8f6a-d84daba206b5" class="">Het planningssysteem van de Eazy Recycling Service stelt gebruikers in staat om afvaltransporten en containertransporten te plannen, bij te werken en te verwijderen. Het systeem is ontworpen om een wekelijks overzicht te bieden van alle geplande transporten, gegroepeerd per vrachtwagen.</p><figure id="21d9791d-9f27-8047-97bf-f22a29f846e5" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image.png"><img style="width:709.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image.png"/></a></figure><h2 id="2029791d-9f27-805d-a479-e8372df2e878" class=""><strong>Planningsoverzicht Bekijken</strong></h2><p id="2029791d-9f27-8096-b41b-eea1b8b0491d" class=""><strong>Weekplanning</strong></p><ul id="2029791d-9f27-80a0-9cc6-d9fe2de5deb4" class="bulleted-list"><li style="list-style-type:disc">De planning wordt weergegeven per week, beginnend met maandag als eerste dag.</li></ul><ul id="2029791d-9f27-80c2-996a-d01861cf62fd" class="bulleted-list"><li style="list-style-type:disc">U kunt een specifieke datum selecteren om de week te bekijken waarin deze datum valt.</li></ul><ul id="2029791d-9f27-80f0-ab30-c800dc86408f" class="bulleted-list"><li style="list-style-type:disc">Het systeem toont automatisch alle dagen van de betreffende week.</li></ul><p id="2029791d-9f27-8085-b845-f3581babd8af" class="">
+</p><p id="2029791d-9f27-805c-b57e-dc9257f8885c" class=""><strong>Transportstatussen</strong></p><p id="2029791d-9f27-80d4-a068-de405d3bcf5d" class="">Wat direct opvalt op de planning zijn de verschillende kleuren van de kaarten. De kleuren staan elk voor een status van een transport. Transporten hebben de volgende statussen die automatisch worden bepaald:</p><ul id="2029791d-9f27-809c-b2f9-d5fc1e12f8dc" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-yellow"><mark class="highlight-yellow_background"><strong>Ongepland</strong></mark></mark>: Wanneer er geen vrachtwagen of chauffeur is toegewezen.</li></ul><ul id="2029791d-9f27-8081-bc25-e31534a2f52a" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-blue"><mark class="highlight-blue_background">Gepland</mark></mark>: Wanneer een vrachtwagen en chauffeur zijn toegewezen, maar het transport nog niet is afgerond.</li></ul><ul id="2029791d-9f27-8083-813c-c590e7c4882e" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-teal"><mark class="highlight-teal_background">Afgerond</mark></mark>: Wanneer het transport volledig gepland was en de afleverdatum en -tijd zijn verstreken.</li></ul><ul id="2029791d-9f27-804b-8409-e2fdf5339af6" class="bulleted-list"><li style="list-style-type:disc"><mark class="highlight-gray"><mark class="highlight-gray_background">Gefactureerd</mark></mark>: Wanneer het transport is gefactureerd (handmatig te zetten).</li></ul><p id="2029791d-9f27-8014-9b59-f71509324d6f" class="">
+</p><p id="2029791d-9f27-8069-9685-cea4c8d8e6b4" class=""><strong>Filteropties</strong></p><figure id="21d9791d-9f27-805f-b72f-ee48a26cbf94" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%201.png"><img style="width:147px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%201.png"/></a></figure><p id="2029791d-9f27-8011-8182-d2dc137f642f" class="">U kunt de planning filteren op basis van:</p><ul id="2029791d-9f27-80cd-b2e4-f85fcac4841a" class="bulleted-list"><li style="list-style-type:disc"><strong>Vrachtwagen</strong>: Selecteer een specifieke vrachtwagen (op kenteken) om alleen transporten voor die vrachtwagen te zien.</li></ul><ul id="2029791d-9f27-804b-97f3-c2cbc2b72ede" class="bulleted-list"><li style="list-style-type:disc"><strong>Chauffeur</strong>: Filter op een specifieke chauffeur om alleen diens transporten te zien.</li></ul><ul id="2029791d-9f27-807e-b2ea-d3b6927cb4c3" class="bulleted-list"><li style="list-style-type:disc"><strong>Status</strong>: Filter op transportstatus (Niet gepland, Gepland, Afgerond, Gefactureerd).</li></ul><p id="2029791d-9f27-80cc-bba3-fe0fe0d9041f" class="">
+</p><p id="2029791d-9f27-8008-a143-d797f5c6cb13" class=""><strong>Weergave van Transporten</strong></p><p id="2029791d-9f27-803b-a33c-d325bb43cd3a" class="">Transporten worden in de planning als volgt weergegeven:</p><ul id="2029791d-9f27-8014-a565-e47126eecd5b" class="bulleted-list"><li style="list-style-type:disc">Gegroepeerd per vrachtwagen (kenteken)</li></ul><ul id="2029791d-9f27-8037-aae5-c96ab677fa1f" class="bulleted-list"><li style="list-style-type:disc">Gesorteerd op datum</li></ul><ul id="2029791d-9f27-80e8-80c7-c0c6ac72d0ff" class="bulleted-list"><li style="list-style-type:disc">Niet toegewezen transporten worden bovenaan getoond onder &quot;Niet toegewezen&quot;</li></ul><ul id="2029791d-9f27-804a-953d-e9e39bcc190b" class="bulleted-list"><li style="list-style-type:disc">Vrachtwagens zonder transporten worden onderaan de lijst weergegeven</li></ul><p id="2029791d-9f27-8043-903b-c9e652700631" class="">
+</p><h3 id="2029791d-9f27-8077-a303-ec3e5ca46630" class="">Meer details bekijken</h3><p id="2029791d-9f27-80f5-a40f-d1442a894237" class="">Om de planning overzichtelijk te houden staat er een minimum aan gegevens op de kaartjes op de planning. Er zijn meerdere manieren om “in te zoomen” op een transport:</p><p id="2029791d-9f27-80c2-9dc5-c2dca2e7a37f" class="">Zweef met uw muis over een kaartje, er verschijnt een pop-up met meer informatie:</p><figure id="2029791d-9f27-8075-88bf-c9ae807c63e7" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%202.png"><img style="width:709.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%202.png"/></a></figure><p id="2029791d-9f27-8062-9201-df58ad51f0d9" class="">
+</p><p id="2029791d-9f27-808c-9d86-f861617a7a0b" class="">Klik met uw muis op het kaartje, er verschijnt een venster aan de rechterkant van de planning met alle informatie:</p><figure id="2029791d-9f27-80a9-b098-c0581eaa0de4" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%203.png"><img style="width:2994px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%203.png"/></a></figure><h3 id="2029791d-9f27-80e3-bc5e-ca3145e9f65a" class="">Transporten verplaatsen</h3><p id="21d9791d-9f27-80e3-b624-c5815c964989" class="">Door de kaarten op het planbord te verslepen kunnen de transporten eenvoudig van datum, volgorde en/of vrachtwagen veranderd worden:</p><figure id="21d9791d-9f27-80df-ba20-d31e1c2c3311" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%204.png"><img style="width:370px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%204.png"/></a></figure><p id="21d9791d-9f27-80bf-b382-cb30a1454ce9" class="">Versleep het kaartje totdat je een blauw vlak ziet verschijnen op de plek waar je het transport wilt hebben. Nadat je het kaartje hebt losgelaten, is de planning aangepast!</p><h3 id="21d9791d-9f27-8069-9a6e-f3a6a0ec329b" class="">Van week wisselen</h3><p id="21d9791d-9f27-8024-a29f-c3fbc13c8336" class="">Op twee manieren kun je simpel van week wisselen:</p><figure id="21d9791d-9f27-80d3-8e7c-d53d9eb99ddb" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%205.png"><img style="width:320px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%205.png"/></a></figure><p id="21d9791d-9f27-80bb-8ed1-d3abcbd89a92" class="">Door op de &lt; en &gt; knoppen te klikken, ga je een week terug of vooruit.</p><figure id="21d9791d-9f27-8066-a6c6-db5fff3f7943" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%206.png"><img style="width:564px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%206.png"/></a></figure><p id="21d9791d-9f27-807a-bed5-d87b8a03a077" class="">Door op de maand te klikken verschijnt een datumprikker. Hier kun je een dag in de week selecteren die je wilt zien. </p><h2 id="2029791d-9f27-80db-a192-fb6ed3906508" class=""><strong>Beheer van Transporten</strong></h2><p id="2029791d-9f27-8098-a1d5-f6680437c1b7" class=""><strong>Nieuwe Transporten Aanmaken</strong></p><p id="2029791d-9f27-804d-8fce-c5a2401a3f2b" class="">Er zijn twee soorten transporten die u kunt aanmaken:</p><p id="2029791d-9f27-8027-be75-ff2f23ed57fb" class=""><strong>1. Containertransporten</strong></p><p id="2029791d-9f27-802f-81fc-c623f279723b" class="">Voor het verplaatsen, wisselen, legen of leveren van containers:</p><div id="2029791d-9f27-8025-9841-c8cbfd3a6c75" class="column-list"><div id="2029791d-9f27-80f5-a513-cec09cc06041" style="width:50%" class="column"><p id="2029791d-9f27-8091-b47c-ccb32b56d415" class=""><strong>Basisgegevens</strong><div class="indented"><ul id="2029791d-9f27-8031-8048-d09ec2f82844" class="bulleted-list"><li style="list-style-type:disc">Opdrachtgever</li></ul><ul id="2029791d-9f27-803d-9783-c28cb7eeea99" class="bulleted-list"><li style="list-style-type:disc">Transporteur</li></ul><ul id="2029791d-9f27-8031-aecd-d391898f73c2" class="bulleted-list"><li style="list-style-type:disc">Type transport: wisselen, afvoeren, legen, plaatsen</li></ul><p id="2029791d-9f27-80e5-90e7-effeccd054da" class="">
+</p></div></p></div><div id="2029791d-9f27-802e-90c5-e47008bf64d5" style="width:50%" class="column"><figure id="2029791d-9f27-805d-9d77-d4de02df646c" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%207.png"><img style="width:288px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%207.png"/></a></figure></div></div><div id="2029791d-9f27-8049-af34-fcbca717eb76" class="column-list"><div id="2029791d-9f27-806b-8f40-fd7503e4dcb0" style="width:50%" class="column"><p id="2029791d-9f27-80e3-a770-e9f7dd79d156" class=""><strong>Ophaal informatie</strong></p><ul id="2029791d-9f27-8091-b4cf-d8da27845114" class="bulleted-list"><li style="list-style-type:disc">Ophaal locatie<ul id="2029791d-9f27-80d3-9059-e1b0676bb683" class="bulleted-list"><li style="list-style-type:circle">Kies hier een bedrijf</li></ul><ul id="2029791d-9f27-8053-977b-ef79a5d2ef3a" class="bulleted-list"><li style="list-style-type:circle">Of vul zelf een adres in</li></ul></li></ul><ul id="2029791d-9f27-80dd-b05f-e5bc92b05619" class="bulleted-list"><li style="list-style-type:disc">Ophaal datum en tijd</li></ul><p id="2029791d-9f27-8030-a5b0-e4e7dc5642bd" class="">
+</p></div><div id="2029791d-9f27-80a9-814f-cdb3d53ad0d1" style="width:50%" class="column"><figure id="2029791d-9f27-80d7-b52d-f9a74f7166e2" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%208.png"><img style="width:331.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%208.png"/></a></figure></div></div><div id="2029791d-9f27-8085-a8af-c319bb6ba53e" class="column-list"><div id="2029791d-9f27-8013-b963-dfaf2f02a26c" style="width:50%" class="column"><p id="2029791d-9f27-8026-baac-d8f4d6a35292" class=""><strong>Aflever informatie</strong></p><ul id="2029791d-9f27-80bd-9b4a-e685567338d2" class="bulleted-list"><li style="list-style-type:disc">Afleverlocatie<ul id="2029791d-9f27-80fc-80eb-c2b0e70a59ca" class="bulleted-list"><li style="list-style-type:circle">Kies hier een bedrijf</li></ul><ul id="2029791d-9f27-8091-aaf4-f2b4b05d74f9" class="bulleted-list"><li style="list-style-type:circle">Of vul zelf een adres in</li></ul></li></ul><ul id="2029791d-9f27-805d-ae24-f2fd104339b2" class="bulleted-list"><li style="list-style-type:disc">Aflever datum en tijd</li></ul><p id="2029791d-9f27-80d0-bd19-edae802142df" class="">
+</p></div><div id="2029791d-9f27-8063-99e0-de1da76106f4" style="width:50%" class="column"><figure id="2029791d-9f27-806d-b323-e1e026d4fb86" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%209.png"><img style="width:331.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%209.png"/></a></figure></div></div><div id="2029791d-9f27-80b8-b2a0-e2a1d4f886e2" class="column-list"><div id="2029791d-9f27-809a-9216-e0aad8ab8c74" style="width:50%" class="column"><p id="2029791d-9f27-80d7-9595-e4e09ecca604" class=""><strong>Transport details</strong></p><ul id="2029791d-9f27-8082-a9fb-cd8b83d73caa" class="bulleted-list"><li style="list-style-type:disc">Vrachtwagen</li></ul><ul id="2029791d-9f27-8084-9c01-e018c81233e1" class="bulleted-list"><li style="list-style-type:disc">Chauffeur</li></ul><ul id="2029791d-9f27-8073-b764-eeaec2cea2ed" class="bulleted-list"><li style="list-style-type:disc">Container kenmerk: Koppeling naar een bestaande container</li></ul><ul id="2029791d-9f27-80d2-985d-d6219d785e5c" class="bulleted-list"><li style="list-style-type:disc">Aanvullende opmerkingen over het transport</li></ul><p id="2029791d-9f27-8087-8a02-eff7910abb2b" class="">
+</p></div><div id="2029791d-9f27-801e-8825-eba966c02371" style="width:50%" class="column"><figure id="2029791d-9f27-804a-b682-d30281098d89" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2010.png"><img style="width:331.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2010.png"/></a></figure></div></div><p id="2029791d-9f27-8015-957a-c9deaf2da0d8" class=""><strong>2. Afvaltransporten</strong></p><p id="2029791d-9f27-8061-92a8-cd98cde23248" class="">Voor het vervoeren van afval, inclusief afvalgegevens:</p><div id="2029791d-9f27-800e-9607-e4cef5287aad" class="column-list"><div id="2029791d-9f27-80e9-9289-fa9bad7660fc" style="width:50%" class="column"><p id="2029791d-9f27-8050-b747-d735bcc7dce5" class=""><strong>Alle gegevens van een containertransport</strong>, plus:<div class="indented"><ul id="2029791d-9f27-8030-a6ef-d0f884d10f22" class="bulleted-list"><li style="list-style-type:disc">Afvalstroomnummer</li></ul><ul id="2029791d-9f27-8016-bfb0-f303398a58a9" class="bulleted-list"><li style="list-style-type:disc">Euralcode</li></ul><ul id="2029791d-9f27-80a7-85ca-dbe4a7fcc5ca" class="bulleted-list"><li style="list-style-type:disc">Gewicht en eenheid</li></ul><ul id="2029791d-9f27-80ea-82b1-f3ecc0e90917" class="bulleted-list"><li style="list-style-type:disc">Hoeveelheid</li></ul><ul id="2029791d-9f27-80ab-955e-cd3474ee93ae" class="bulleted-list"><li style="list-style-type:disc">Naam van de goederen</li></ul><ul id="2029791d-9f27-807e-8bc8-fc1fe80d4b76" class="bulleted-list"><li style="list-style-type:disc">Afvalverwerkende partij</li></ul><ul id="2029791d-9f27-8003-8243-cc9a3e23d916" class="bulleted-list"><li style="list-style-type:disc">Afval aanbiedende partij</li></ul><p id="2029791d-9f27-80f4-a6c3-cbdf73b05484" class="">
+</p></div></p></div><div id="2029791d-9f27-8076-81ad-f449c4d2a599" style="width:50%" class="column"><figure id="2029791d-9f27-8051-93e7-cb95871bc6d3" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2011.png"><img style="width:709.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2011.png"/></a></figure><p id="2029791d-9f27-802f-b5bf-e1f77be76a51" class="">
+</p></div></div><p id="2029791d-9f27-80c9-b0a9-ff6b2ccab4d8" class="">
+</p><p id="2029791d-9f27-8029-88b6-fa586799ef44" class=""><strong>Transporten Wijzigen</strong></p><div id="2029791d-9f27-80a1-9882-d97c5026a88f" class="column-list"><div id="2029791d-9f27-80f1-9b8a-e99c57e43dbe" style="width:50%" class="column"><p id="2029791d-9f27-80d0-bd95-f28f4842f7db" class="">Op de pop-up of het venster aan de rechterkant met alle informatie, klikt up op het potlood icoon. Het transportformulier verschijnt, en u kunt hier aanpassingen op maken. Doorloop alle stappen, en klik uiteindelijk op “Aanpassen”.</p><p id="2029791d-9f27-806e-9dc2-f1c9e727ad68" class="">
+</p></div><div id="2029791d-9f27-803a-af28-c1a4cf4e02bb" style="width:50%" class="column"><figure id="2029791d-9f27-80da-8e75-dd9ab1898c57" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2012.png"><img style="width:331.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2012.png"/></a></figure></div></div><p id="2029791d-9f27-800d-96a5-f5bdccfbe924" class="">
+</p><p id="2029791d-9f27-80a0-86cb-cb7bc3fd2e18" class=""><strong>Transporten Verwijderen</strong></p><div id="2029791d-9f27-80de-9d19-d0df499551b5" class="column-list"><div id="2029791d-9f27-809c-ac84-ef4939913e2b" style="width:50%" class="column"><p id="2029791d-9f27-8061-b820-c0df796df9b1" class="">Op de pop-up of het venster aan de rechterkant met alle informatie, klikt up op het prullenbak icoon. U wordt gevraagd om het verwijderen te bevestigen, waar na bevestiging het transport is verwijderd.</p></div><div id="2029791d-9f27-8009-a858-d19b2f3588d6" style="width:50%" class="column"><figure id="2029791d-9f27-8062-b38e-cca651e13d06" class="image"><a href="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2013.png"><img style="width:331.984375px" src="Planning%202029791d9f2780c88ff0dbed3267eaac/image%2013.png"/></a></figure></div></div><p id="2029791d-9f27-806d-92d7-f82ec14c62d8" class="">
+</p></div></article><span class="sans" style="font-size:14px;padding-top:2em"></span></body></html>
