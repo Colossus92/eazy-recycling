@@ -5,7 +5,7 @@
   "nx": {
     "implicitDependencies": [
       "react-frontend",
-      "@eazy-recycling/eazy-recycling-service"
+      "springboot-backend"
     ]
   }
 }

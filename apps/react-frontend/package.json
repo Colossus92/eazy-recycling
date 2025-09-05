@@ -78,7 +78,7 @@
   },
   "nx": {
     "implicitDependencies": [
-      "@eazy-recycling/eazy-recycling-service"
+      "springboot-backend"
     ]
   }
 }

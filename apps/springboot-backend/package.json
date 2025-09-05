@@ -1,5 +1,5 @@
 {
-  "name": "@eazy-recycling/eazy-recycling-service",
+  "name": "springboot-backend",
   "version": "0.0.1",
   "private": true,
   "nx": {
