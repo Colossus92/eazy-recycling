@@ -91,13 +91,11 @@ services:
         logtail:
           token: 4WUPyLjj2Vd4xsLMxrdwSCNg
 static_sites:
-  - build_command: npm install && npm run build
+  - dockerfile_path: .apps/react-frontend/Dockerfile
     catchall_document: index.html
-    environment_slug: node-js
     github:
       branch: main
       deploy_on_push: true
       repo: Colossus92/eazy-recycling
     name: react-frontend
-    source_dir: ./apps/react-frontend
-    output_dir: ./dist
+    output_dir: ./apps/react-frontend/dist
