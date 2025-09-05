@@ -4,7 +4,7 @@
   "private": true,
   "nx": {
     "implicitDependencies": [
-      "@eazy-recycling/eazy-recycling-app",
+      "react-frontend",
       "@eazy-recycling/eazy-recycling-service"
     ]
   }
