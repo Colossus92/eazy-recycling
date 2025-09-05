@@ -117,6 +117,6 @@ docker tag your-image-name ghcr.io/your-github-username/your-repository-name:tag
 Push the tagged image to Github container registry:
 ```bash
 docker push ghcr.io/your-github-username/your-repository-name:tag
-```
+``` 
 
 
