@@ -4,7 +4,7 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/eazy-recycling-e2e"
+      "path": "./apps/e2e-test"
     },
     {
       "path": "./apps/react-frontend"

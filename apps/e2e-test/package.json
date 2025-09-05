@@ -1,5 +1,5 @@
 {
-  "name": "@eazy-recycling/eazy-recycling-e2e",
+  "name": "e2e-test",
   "version": "0.0.1",
   "private": true,
   "nx": {
