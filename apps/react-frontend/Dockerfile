@@ -20,7 +20,4 @@ RUN npx nx build react-frontend
 # The build output will be in apps/react-frontend/dist/
 # Digital Ocean will use this for static site deployment
 
-# Minimal export stage containing only the frontend build artifacts
-FROM scratch AS export
-COPY --from=builder /workspace/apps/react-frontend/dist/ .
 
