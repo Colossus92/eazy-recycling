@@ -136,3 +136,8 @@ tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
 tasks.withType<Jar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+// Configure bootRun to use local profile by default
+tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    args("--spring.profiles.active=local")
+}

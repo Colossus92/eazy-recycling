@@ -1,0 +1,15 @@
+{
+  "name": "springboot-backend",
+  "root": "apps/springboot-backend",
+  "targets": {
+    "bootrun": {
+      "dependsOn": ["build"]
+    },
+    "build": {
+      "continuous": true,
+      "options": {
+        "args": ["--continuous"]
+      }
+    }
+  }
+}

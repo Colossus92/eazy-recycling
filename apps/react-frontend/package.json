@@ -77,8 +77,10 @@
     "*.js": "eslint --fix"
   },
   "nx": {
-    "implicitDependencies": [
-      "springboot-backend"
-    ]
+    "targets": {
+      "dev": {
+        "dependsOn": ["springboot-backend:bootRun"]
+      }
+    }
   }
 }
