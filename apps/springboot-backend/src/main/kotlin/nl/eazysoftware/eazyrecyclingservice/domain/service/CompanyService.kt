@@ -52,8 +52,7 @@ class CompanyService(
 
             return companies.map { company ->
                 val companyBranches = branches.filter { it.companyId == company.id }
-                company.copy(branches = companyBranches,
-                  name = "Name")
+                company.copy(branches = companyBranches)
             }
         }
 
@@ -176,7 +175,7 @@ class CompanyService(
                     id = company.id!!,
                     chamberOfCommerceId = company.chamberOfCommerceId,
                     vihbId = company.vihbId,
-                    name = company.name,
+                    name = "company.name",
                     address = company.address,
                     updatedAt = company.updatedAt,
                 )
