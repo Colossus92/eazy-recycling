@@ -22,5 +22,5 @@ RUN npx nx build react-frontend
 
 # Minimal export stage containing only the frontend build artifacts
 FROM scratch AS export
-COPY --from=builder /workspace/apps/react-frontend/dist/ /dist
+COPY --from=builder /workspace/apps/react-frontend/dist/ .
 
