@@ -3,9 +3,9 @@
   "root": "apps/springboot-backend",
   "targets": {
     "bootRun": {
-      "dependsOn": ["build"]
+      "dependsOn": ["assemble"]
     },
-    "build": {
+    "assemble": {
       "continuous": true,
       "options": {
         "args": ["--continuous"]
