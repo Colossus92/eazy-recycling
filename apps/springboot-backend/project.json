@@ -2,7 +2,7 @@
   "name": "springboot-backend",
   "root": "apps/springboot-backend",
   "targets": {
-    "bootrun": {
+    "bootRun": {
       "dependsOn": ["build"]
     },
     "build": {
