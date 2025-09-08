@@ -98,4 +98,3 @@ static_sites:
       deploy_on_push: true
       repo: Colossus92/eazy-recycling
     name: react-frontend
-    output_dir: /
