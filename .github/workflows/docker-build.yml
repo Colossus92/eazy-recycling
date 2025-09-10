@@ -42,14 +42,6 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      # Set up Java for Gradle builds
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        if: steps.changes.outputs.build_required == 'true'
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
       # Install dependencies and setup Nx
       - name: Install dependencies
         if: steps.changes.outputs.build_required == 'true'
