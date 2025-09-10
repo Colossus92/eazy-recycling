@@ -5,7 +5,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.1.20"
     kotlin("kapt") version "2.1.20"
-    id("org.unbroken-dome.xjc") version "2.0.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
     id("dev.nx.gradle.project-graph") version("0.1.4")
 }
@@ -66,6 +65,9 @@ dependencies {
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
 
+    // Libs
+    implementation(project(":libs:eba-schema"))
+
     // Environment variables
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
@@ -103,13 +105,6 @@ allOpen {
     annotation("jakarta.persistence.Entity")
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
-}
-
-xjc {
-    xjcVersion.set("3.0")
-    srcDirName.set("${projectDir}/src/main/resources/schema/")
-    strictCheck.set(false)
-    extension.set(true)
 }
 
 kapt {

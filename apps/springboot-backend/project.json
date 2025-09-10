@@ -3,13 +3,22 @@
   "root": "apps/springboot-backend",
   "targets": {
     "bootRun": {
-      "dependsOn": ["assemble"]
+      "dependsOn": [
+        "assemble"
+      ]
     },
     "assemble": {
       "continuous": true,
       "options": {
-        "args": ["--continuous"]
+        "args": [
+          "--continuous"
+        ]
       }
+    },
+    "build": {
+      "dependsOn": [
+        "eba-schema:build"
+      ]
     }
   }
 }
