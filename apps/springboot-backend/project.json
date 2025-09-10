@@ -20,5 +20,8 @@
         "eba-schema:build"
       ]
     }
-  }
+  },
+  "implicitDependencies":[
+    "eba-schema"
+  ]
 }

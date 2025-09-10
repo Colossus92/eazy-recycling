@@ -3,10 +3,11 @@ plugins {
   id("org.unbroken-dome.xjc") version "2.0.0"
   id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
   id("dev.nx.gradle.project-graph") version("0.1.4")
+  `maven-publish`
 }
 
 group = "nl.eazysoftware"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 java {
   toolchain {
@@ -47,5 +48,23 @@ tasks.withType<Jar> {
 // Configure the compilation order properly
 tasks.named("compileJava") {
   dependsOn("xjcGenerate")
+}
+
+// Configure Maven publishing
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["java"])
+
+      groupId = "nl.eazysoftware"
+      artifactId = "eba-schema"
+      version = version
+    }
+  }
+}
+
+// Ensure build task publishes to local repository
+tasks.named("build") {
+  finalizedBy("publishToMavenLocal")
 }
 

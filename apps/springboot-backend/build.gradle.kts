@@ -9,7 +9,7 @@ plugins {
     id("dev.nx.gradle.project-graph") version("0.1.4")
 }
 group = "nl.eazysoftware"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 java {
     toolchain {
@@ -24,6 +24,7 @@ configurations {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
@@ -65,8 +66,8 @@ dependencies {
     // Code
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
 
-    // Libs
-    implementation(project(":libs:eba-schema"))
+    // EBA Schema Library
+    implementation("nl.eazysoftware:eba-schema:0.0.1")
 
     // Environment variables
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
