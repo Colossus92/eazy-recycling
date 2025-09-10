@@ -12,6 +12,7 @@
   "devDependencies": {
     "@eslint/js": "^9.8.0",
     "@nx/devkit": "21.4.1",
+    "@nx/docker": "^21.4.1",
     "@nx/eslint": "21.4.1",
     "@nx/eslint-plugin": "21.4.1",
     "@nx/gradle": "^21.4.1",
@@ -43,7 +44,7 @@
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
     "jiti": "2.4.2",
-    "jsdom": "~22.1.0" ,
+    "jsdom": "~22.1.0",
     "nx": "21.4.1",
     "postcss": "8.4.38",
     "prettier": "^2.6.2",

@@ -9,13 +9,18 @@ out-tsc
 node_modules
 
 # IDEs and editors
-/.idea
+.idea
 .project
 .classpath
 .c9/
 *.launch
 .settings/
 *.sublime-workspace
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
 
 # IDE - VSCode
 .vscode/*
@@ -46,3 +51,15 @@ Thumbs.db
 vite.config.*.timestamp*
 vitest.config.*.timestamp*
 test-output
+
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Kotlin ###
+.kotlin
+
+.env*
