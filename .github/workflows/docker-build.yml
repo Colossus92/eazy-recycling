@@ -55,11 +55,6 @@ jobs:
         if: steps.changes.outputs.build_required == 'true'
         run: npm ci
 
-      # Setup Nx Cloud (optional but recommended for caching)
-      - name: Setup Nx Cloud
-        if: steps.changes.outputs.build_required == 'true'
-        run: npx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="build"
-
       # Build using Nx (this will handle Gradle builds and Docker image creation)
       - name: Build with Nx
         if: steps.changes.outputs.build_required == 'true'
