@@ -19,6 +19,9 @@
       "dependsOn": [
         "eba-schema:build"
       ]
+    },
+    "docker:build": {
+      "dependsOn": ["build"]
     }
   },
   "implicitDependencies":[
