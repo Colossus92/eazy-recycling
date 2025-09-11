@@ -21,17 +21,13 @@
       ]
     },
     "ci-build": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/springboot-backend",
-        "commands": [
-          "./gradlew :build --continue"
-        ]
-      },
-      "dependsOn": [
-        "eba-schema:ci-build"
-      ],
-      "excludeDependsOn": false
+    "executor": "@nx/gradle:gradle",
+    "options": {
+      "taskName": ":bootJar",
+      "args": ["--continue"]
+    },
+    "dependsOn": ["eba-schema:build", "test"],
+    "excludeDependsOn": false
     },
     "docker:build": {
       "dependsOn": ["ci-build"],
