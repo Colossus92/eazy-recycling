@@ -5,9 +5,12 @@ import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), svgr(), tsconfigPaths(), visualizer() as PluginOption],
+  server: {
+    port: 5173,
+    open: true,
+  },
   test: {
     environment: 'jsdom',
     globals: true,
