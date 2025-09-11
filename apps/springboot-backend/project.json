@@ -26,6 +26,9 @@
         "taskName": ":build",
         "args": ["--continue"]
       },
+      "dependsOn": [
+        "eba-schema:build"
+      ],
       "excludeDependsOn": false
     },
     "docker:build": {
