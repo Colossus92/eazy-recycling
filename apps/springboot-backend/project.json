@@ -23,10 +23,9 @@
     "ci-build": {
     "executor": "@nx/gradle:gradle",
     "options": {
-      "taskName": "build",
-      "args": ["--continue"]
+      "taskName": ":bootJar"
     },
-    "dependsOn": ["eba-schema:build"],
+    "dependsOn": ["eba-schema:build", "test"],
     "excludeDependsOn": false
     },
     "docker:build": {
