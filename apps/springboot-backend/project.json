@@ -21,10 +21,12 @@
       ]
     },
     "ci-build": {
-      "executor": "@nx/gradle:gradle",
+      "executor": "nx:run-commands",
       "options": {
-        "taskName": ":build",
-        "args": ["--continue", "--debug"]
+        "cwd": "apps/springboot-backend",
+        "commands": [
+          "./gradlew :build --continue"
+        ]
       },
       "dependsOn": [
         "eba-schema:ci-build"
