@@ -7,6 +7,5 @@ supabase:
     secret: ${SUPABASE_API_SECRET:}
     publishable: ${SUPABASE_API_PUBLISHABLE:}
     jwt-secret: ${SUPABASE_API_JWT_SECRET:}
-
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
