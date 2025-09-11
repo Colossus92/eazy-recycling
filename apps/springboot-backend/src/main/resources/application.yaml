@@ -20,6 +20,7 @@ spring:
         schema-generation.scripts.create-target: schema.sql
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+
 # CORS Configuration
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:https://*.eazysoftware.nl}

@@ -21,7 +21,8 @@
       ]
     },
     "docker:build": {
-      "dependsOn": ["build"]
+      "dependsOn": ["build"],
+      "excludeDependsOn": false
     }
   },
   "implicitDependencies":[

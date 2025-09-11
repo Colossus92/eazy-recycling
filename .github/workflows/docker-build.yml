@@ -47,6 +47,16 @@ jobs:
         if: steps.changes.outputs.build_required == 'true'
         run: npm ci
 
+      # Debug: Check Java version and Gradle setup
+      - name: Debug Java and Gradle
+        if: steps.changes.outputs.build_required == 'true'
+        run: |
+          echo "Java version:"
+          java -version
+          echo "JAVA_HOME: $JAVA_HOME"
+          echo "Gradle wrapper permissions:"
+          ls -la apps/springboot-backend/gradlew
+
       # Build using Nx (this will handle Gradle builds and Docker image creation)
       - name: Build with Nx
         if: steps.changes.outputs.build_required == 'true'
