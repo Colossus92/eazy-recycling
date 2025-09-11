@@ -24,7 +24,7 @@
       "executor": "@nx/gradle:gradle",
       "options": {
         "taskName": ":build",
-        "args": ["--continue"]
+        "args": ["--continue", "--debug"]
       },
       "dependsOn": [
         "eba-schema:ci-build"
