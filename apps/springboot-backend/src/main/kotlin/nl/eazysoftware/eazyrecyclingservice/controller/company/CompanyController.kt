@@ -20,6 +20,12 @@ class CompanyController(
     val companyService: CompanyService,
 ) {
 
+    @GetMapping("/hello")
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    fun hello(): String {
+      return "Hello"
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
