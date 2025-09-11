@@ -81,6 +81,17 @@ jobs:
             docker push $tag
           done
 
+      - name: Log current folder contents recursively
+        run: |
+          echo "files"
+          find . -type f | head -50
+          echo "Directories:"
+          find . -type d | head -20
+          echo "Current directory contents (recursive):"
+          find . -type f -name "*.jar" -o -name "*.war" -o -name "Dockerfile" -o -name "docker-compose*" -o -name "*.yaml"
+          echo "Docker images:"
+          docker images | grep -E "(apps-springboot-backend|springboot-backend)" || echo "No matching images found"
+
       - name: Deploy the app
         uses: digitalocean/app_action/deploy@v2
         with:
