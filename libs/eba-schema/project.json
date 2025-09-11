@@ -1,4 +1,14 @@
 {
   "name": "eba-schema",
-  "root": "libs/eba-schema"
+  "root": "libs/eba-schema",
+  "targets": {
+    "ci-build": {
+      "executor": "@nx/gradle:gradle",
+      "options": {
+        "taskName": ":build",
+        "args": ["--continue"]
+      },
+      "excludeDependsOn": false
+    }
+  }
 }

@@ -27,7 +27,7 @@
         "args": ["--continue"]
       },
       "dependsOn": [
-        "eba-schema:build"
+        "eba-schema:ci-build"
       ],
       "excludeDependsOn": false
     },
