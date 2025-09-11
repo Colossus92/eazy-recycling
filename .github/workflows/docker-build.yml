@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     permissions:
       contents: read
       packages: write
@@ -33,6 +33,7 @@ jobs:
               - 'libs/eba-schema/**'
               - 'nx.json'
               - 'package.json'
+              - '.github/workflows/docker-build.yml'
 
       # Set up Node.js for Nx
       - name: Setup Node.js
@@ -41,6 +42,14 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        if: steps.changes.outputs.build_required == 'true'
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
 
       # Install dependencies and setup Nx
       - name: Install dependencies
