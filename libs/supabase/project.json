@@ -1,0 +1,113 @@
+{
+  "name": "supabase",
+  "root": "libs/supabase",
+  "sourceRoot": "libs/supabase",
+  "projectType": "library",
+  "targets": {
+    "start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase start",
+        "cwd": "libs/supabase"
+      },
+      "configurations": {
+        "fresh": {
+          "command": "supabase start --fresh",
+          "cwd": "libs/supabase"
+        }
+      }
+    },
+    "stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase stop",
+        "cwd": "libs/supabase"
+      }
+    },
+    "status": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase status",
+        "cwd": "libs/supabase"
+      }
+    },
+    "db:reset": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase db reset",
+        "cwd": "libs/supabase"
+      }
+    },
+    "db:push": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase db push",
+        "cwd": "libs/supabase"
+      }
+    },
+    "db:diff": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase db diff",
+        "cwd": "libs/supabase"
+      }
+    },
+    "migration:new": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase migration new",
+        "cwd": "libs/supabase"
+      }
+    },
+    "generate-types": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase gen types typescript --local > types/supabase.ts",
+        "cwd": "libs/supabase"
+      }
+    },
+    "generate-types:remote": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase gen types typescript --project-id $SUPABASE_PROJECT_ID > types/supabase.ts",
+        "cwd": "libs/supabase"
+      }
+    },
+    "link": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase link --project-ref $SUPABASE_PROJECT_REF",
+        "cwd": "libs/supabase"
+      }
+    },
+    "logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase logs",
+        "cwd": "libs/supabase"
+      }
+    },
+    "logs:db": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase logs db",
+        "cwd": "libs/supabase"
+      }
+    },
+    "functions:serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase functions serve",
+        "cwd": "libs/supabase"
+      }
+    },
+    "functions:deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "supabase functions deploy",
+        "cwd": "libs/supabase"
+      }
+    }
+  },
+  "tags": ["database", "supabase", "backend"]
+}
