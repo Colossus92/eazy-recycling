@@ -24,12 +24,19 @@ dependencies {
   implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
   implementation("org.glassfish.jaxb:jaxb-runtime:4.0.3")
   implementation("jakarta.validation:jakarta.validation-api:3.1.1")
+
+  testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
+  testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
 }
 
 kotlin {
   compilerOptions {
     freeCompilerArgs.addAll("-Xjsr305=strict")
   }
+}
+
+tasks.withType<Test> {
+  useJUnitPlatform()
 }
 
 xjc {

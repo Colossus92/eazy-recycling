@@ -2,6 +2,12 @@
   "name": "eba-schema",
   "root": "libs/eba-schema",
   "targets": {
+    "test": {
+      "executor": "@nx/gradle:gradle",
+      "options": {
+        "taskName": ":test"
+      }
+    },
     "ci-build": {
       "executor": "@nx/gradle:gradle",
       "options": {
