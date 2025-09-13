@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
@@ -21,69 +22,78 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 @Transactional
 class ProcessingMethodControllerIntegrationTest {
 
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+  @Autowired
+  private lateinit var mockMvc: MockMvc
 
-    private lateinit var securedMockMvc: SecuredMockMvc
+  private lateinit var securedMockMvc: SecuredMockMvc
 
-    @Autowired
-    private lateinit var processingMethodRepository: ProcessingMethodRepository
+  @Autowired
+  private lateinit var processingMethodRepository: ProcessingMethodRepository
 
-    private lateinit var testProcessingMethods: List<ProcessingMethod>
+  private lateinit var testProcessingMethods: List<ProcessingMethod>
 
-    @BeforeEach
-    fun setup() {
-        securedMockMvc = SecuredMockMvc(mockMvc)
+  @BeforeEach
+  fun setup() {
+    securedMockMvc = SecuredMockMvc(mockMvc)
 
-        // Create test processing methods
-        testProcessingMethods = listOf(
-            ProcessingMethod(
-                code = "R01",
-                description = "Use as fuel or other means to generate energy"
-            ),
-            ProcessingMethod(
-                code = "R02",
-                description = "Solvent reclamation/regeneration"
-            ),
-            ProcessingMethod(
-                code = "R03",
-                description = "Recycling/reclamation of organic substances which are not used as solvents"
-            )
-        )
+    // Create test processing methods
+    testProcessingMethods = listOf(
+      ProcessingMethod(
+        code = "R01",
+        description = "Use as fuel or other means to generate energy"
+      ),
+      ProcessingMethod(
+        code = "R02",
+        description = "Solvent reclamation/regeneration"
+      ),
+      ProcessingMethod(
+        code = "R03",
+        description = "Recycling/reclamation of organic substances which are not used as solvents"
+      )
+    )
 
-        processingMethodRepository.saveAll(testProcessingMethods)
-    }
+    processingMethodRepository.saveAll(testProcessingMethods)
+  }
 
-    @AfterEach
-    fun cleanup() {
-        processingMethodRepository.deleteAll()
-    }
+  @AfterEach
+  fun cleanup() {
+    processingMethodRepository.deleteAll()
+  }
 
-    @Test
-    fun `GET processing-methods should return all processing methods with 200 OK`() {
-        // When & Then
-        securedMockMvc.get("/processing-methods")
-            .andExpect(status().isOk)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.length()").value(testProcessingMethods.size))
-            .andExpect(jsonPath("$[0].code").value("R01"))
-            .andExpect(jsonPath("$[0].description").value("Use as fuel or other means to generate energy"))
-            .andExpect(jsonPath("$[1].code").value("R02"))
-            .andExpect(jsonPath("$[1].description").value("Solvent reclamation/regeneration"))
-            .andExpect(jsonPath("$[2].code").value("R03"))
-            .andExpect(jsonPath("$[2].description").value("Recycling/reclamation of organic substances which are not used as solvents"))
-    }
+  @Test
+  fun `GET processing-methods should return all processing methods with 200 OK`() {
+    // When & Then
+    securedMockMvc.get("/processing-methods")
+      .andExpect(status().isOk)
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.length()").value(testProcessingMethods.size))
+      .andExpect(jsonPath("$[0].code").value("R01"))
+      .andExpect(jsonPath("$[0].description").value("Use as fuel or other means to generate energy"))
+      .andExpect(jsonPath("$[1].code").value("R02"))
+      .andExpect(jsonPath("$[1].description").value("Solvent reclamation/regeneration"))
+      .andExpect(jsonPath("$[2].code").value("R03"))
+      .andExpect(jsonPath("$[2].description").value("Recycling/reclamation of organic substances which are not used as solvents"))
+  }
 
-    @Test
-    fun `GET processing-methods should return empty list when no processing methods exist`() {
-        // Given - clean up all processing methods
-        processingMethodRepository.deleteAll()
+  @Test
+  fun `GET processing-methods should return empty list when no processing methods exist`() {
+    // Given - clean up all processing methods
+    processingMethodRepository.deleteAll()
 
-        // When & Then
-        securedMockMvc.
-            get("/processing-methods")
-            .andExpect(status().isOk)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.length()").value(0))
-    }
+    // When & Then
+    securedMockMvc.get("/processing-methods")
+      .andExpect(status().isOk)
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.length()").value(0))
+  }
+
+  @Test
+  fun `GET processing-methods should return 401 Unauthorized when no authentication is provided`() {
+    // When & Then - using raw mockMvc without authentication
+    mockMvc.perform(
+      MockMvcRequestBuilders.get("/processing-methods")
+        .contentType(MediaType.APPLICATION_JSON)
+    )
+      .andExpect(status().isUnauthorized)
+  }
 }
