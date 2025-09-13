@@ -38,12 +38,6 @@ class TransportController(
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    @PostMapping("/waybill")
-    fun assignWaybillTransport(@RequestBody request: AssignWaybillTransportRequest): TransportDto {
-        return transportService.assignWaybillTransport(request.waybillId, request.licensePlate, request.driverId)
-    }
-
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PostMapping("/container")
     fun createContainerTransport(@Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
         return transportService.createContainerTransport(request)
@@ -88,9 +82,9 @@ class TransportController(
     @Transactional
     fun markTransportAsFinished(@PathVariable id: UUID, @RequestBody request: TransportFinishedRequest): TransportDto {
         val transport = transportService.getTransportById(id)
-        
+
         checkAuthorization(transport)
-        
+
         return transportService.markTransportAsFinished(id, request.hours)
     }
 

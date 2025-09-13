@@ -53,12 +53,6 @@ class TransportControllerSecurityTest {
                 Arguments.of("/transport", "GET", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport", "GET", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
-                // POST waybill transport - admin and planner can access
-                Arguments.of("/transport/waybill", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 200),
-                Arguments.of("/transport/waybill", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 200),
-                Arguments.of("/transport/waybill", "POST", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
-                Arguments.of("/transport/waybill", "POST", "unauthorized_role", UUID.randomUUID().toString(), 403),
-
                 // POST container transport - admin and planner can access
                 Arguments.of("/transport/container", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 200),
                 Arguments.of("/transport/container", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 200),
@@ -296,10 +290,6 @@ class TransportControllerSecurityTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createWasteTransportRequestJson())
 
-                    "/transport/waybill" -> post(actualEndpoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""{"waybillId":"${UUID.randomUUID()}","licensePlate":"ABC-123","driverId":"${UUID.randomUUID()}"}""")
-
                     else -> throw IllegalArgumentException("Unsupported endpoint: $endpoint")
                 }
             }
@@ -313,10 +303,6 @@ class TransportControllerSecurityTest {
                     actualEndpoint.contains("/transport/waste/") -> put(actualEndpoint)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(createWasteTransportRequestJson())
-
-                    actualEndpoint.contains("/transport/waybill") -> post(actualEndpoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""{"waybillId":"${UUID.randomUUID()}","licensePlate":"ABC-123","driverId":"${UUID.randomUUID()}"}""")
 
                     else -> throw IllegalArgumentException("Unsupported endpoint: $endpoint")
                 }

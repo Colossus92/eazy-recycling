@@ -75,7 +75,7 @@ class TransportControllerIntegrationTest {
     @BeforeEach
     fun setup() {
         securedMockMvc = SecuredMockMvc(mockMvc)
-        
+
         // Create test company
         testCompany = CompanyDto(
             name = "Test Company",
@@ -408,66 +408,6 @@ class TransportControllerIntegrationTest {
     }
 
     @Test
-    fun `should assign waybill transport`() {
-        // Given
-        val goodsItem = GoodsItemDto(
-            wasteStreamNumber = "WSN-Waybill",
-            netNetWeight = 800,
-            unit = "KG",
-            quantity = 1,
-            euralCode = "200201",
-            name = "Waybill Waste",
-            processingMethodCode = "A.02",
-        )
-
-        val goods = GoodsDto(
-            id = UUID.randomUUID().toString(),
-            goodsItem = goodsItem,
-            consigneeParty = testCompany,
-            pickupParty = testCompany,
-            consignorClassification = 2
-        )
-
-        val transport = TransportDto(
-            consignorParty = testCompany,
-            carrierParty = testCompany,
-            pickupCompany = testCompany,
-            pickupLocation = testLocation,
-            pickupDateTime = LocalDateTime.now().plusDays(1),
-            deliveryCompany = testCompany,
-            deliveryLocation = testLocation,
-            deliveryDateTime = LocalDateTime.now().plusDays(2),
-            transportType = TransportType.WASTE,
-            note = "Unassigned Waybill Transport",
-            goods = goods,
-            sequenceNumber = 1,
-        )
-        val savedTransport = transportRepository.save(transport)
-
-        val assignRequest = AssignWaybillTransportRequest(
-            licensePlate = testTruck.licensePlate,
-            waybillId = goods.uuid!!,
-            driverId = testDriver.id
-        )
-
-        // When & Then
-        securedMockMvc.post(
-            "/transport/waybill",
-            objectMapper.writeValueAsString(assignRequest)
-        )
-            .andExpect(status().isOk)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.truck.licensePlate").value(testTruck.licensePlate))
-            .andExpect(jsonPath("$.driver.id").value(testDriver.id.toString()))
-
-        // Verify transport was updated in the database
-        val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
-        assertThat(updatedTransport).isNotNull
-        assertThat(updatedTransport?.truck?.licensePlate).isEqualTo(testTruck.licensePlate)
-        assertThat(updatedTransport?.driver?.id).isEqualTo(testDriver.id)
-    }
-
-    @Test
     fun `should delete transport`() {
         // Given
         val transport = createTestTransport("Transport to Delete")
@@ -557,7 +497,7 @@ class TransportControllerIntegrationTest {
         val transport = createTestTransport("Another Driver's Transport")
         val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
         val request = TransportController.TransportFinishedRequest(hours = 1.5)
-        
+
         // Different user ID than the driver
         val differentUserId = UUID.randomUUID().toString()
 
@@ -583,7 +523,7 @@ class TransportControllerIntegrationTest {
         val transport = createTestTransport("Admin Access Transport")
         val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
         val request = TransportController.TransportFinishedRequest(hours = 4.0)
-        
+
         // Different user ID than the driver
         val adminUserId = UUID.randomUUID().toString()
 
@@ -609,7 +549,7 @@ class TransportControllerIntegrationTest {
         val transport = createTestTransport("Planner Access Transport")
         val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
         val request = TransportController.TransportFinishedRequest(hours = 2.75)
-        
+
         // Different user ID than the driver
         val plannerUserId = UUID.randomUUID().toString()
 

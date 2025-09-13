@@ -29,25 +29,12 @@ import java.util.*
 class TransportService(
     private val transportRepository: TransportRepository,
     private val locationRepository: LocationRepository,
-    private val companyRepository: CompanyRepository,
     private val companyBranchRepository: CompanyBranchRepository,
     private val entityManager: EntityManager,
     private val pdfGenerationClient: PdfGenerationClient,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
-
-    fun assignWaybillTransport(waybillId: UUID, licensePlate: String, driverId: UUID): TransportDto {
-        val transport = transportRepository.findByGoods_Uuid(waybillId)
-            ?: throw EntityNotFoundException("Waybill with id $waybillId not found")
-
-        return transportRepository.save(
-            transport.copy(
-                truck = entityManager.getReference(Truck::class.java, licensePlate),
-                driver = entityManager.getReference(ProfileDto::class.java, driverId),
-            )
-        )
-    }
 
     fun getAllTransports(): List<TransportDto> {
         return transportRepository.findAll()
@@ -139,7 +126,7 @@ class TransportService(
 
     /**
      * Validates that branch IDs belong to their respective company IDs
-     * 
+     *
      * @param pickupBranchId The ID of the pickup branch
      * @param pickupCompanyId The ID of the pickup company
      * @param deliveryBranchId The ID of the delivery branch
@@ -168,31 +155,6 @@ class TransportService(
                 throw IllegalArgumentException("Vestiging met id $companyBranchId is niet van bedrijf met id $companyId")
             }
         }
-    }
-
-    @Transactional
-    fun save(transportDto: TransportDto): TransportDto {
-        val consignor = findCompany(transportDto.consignorParty)
-        val carrier = findCompany(transportDto.carrierParty)
-
-        val updatedGoods = transportDto.goods?.let { goods ->
-            val consignee = findCompany(goods.consigneeParty)
-            val pickup = findCompany(goods.pickupParty)
-
-            goods.copy(
-                consigneeParty = consignee,
-                pickupParty = pickup
-            )
-        }
-
-        val updatedTransport = transportDto.copy(
-            goods = updatedGoods,
-            consignorParty = consignor,
-            carrierParty = carrier,
-            truck = entityManager.getReference(Truck::class.java, transportDto.truck?.licensePlate),
-        )
-
-        return entityManager.merge(updatedTransport)
     }
 
     fun updateContainerTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
@@ -264,12 +226,6 @@ class TransportService(
                 ),
                 id = UUID.randomUUID().toString()
             ).let { locationRepository.save(it) }
-    }
-
-
-    private fun findCompany(company: CompanyDto): CompanyDto {
-        return companyRepository.findByChamberOfCommerceIdAndVihbId(company.chamberOfCommerceId, company.vihbId)
-            ?: company
     }
 
     private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
