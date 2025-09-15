@@ -44,6 +44,7 @@ export const PasswordFormField = <TFieldValues extends FieldValues>({
         }}
         defaultValue={value}
         disabled={disabled}
+        data-test-id={formHook?.name}
       />
       {fieldError && (
         <span className="text-caption-1 text-color-status-error-dark">
