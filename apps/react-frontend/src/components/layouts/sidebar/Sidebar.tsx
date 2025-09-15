@@ -40,10 +40,13 @@ export const Sidebar = () => {
   );
 
   return (
-    <div className="h-full flex flex-col items-start shrink-0 border border-solid border-primary rounded-radius-lg group transition-all duration-300">
+    <div 
+      className="h-full flex flex-col items-start shrink-0 border border-solid border-primary rounded-radius-lg group transition-all duration-300"
+      data-testid="sidebar"
+    >
       <ErrorBoundary fallbackRender={fallbackRender}>
         <SidebarHeader collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        <div className="flex flex-col items-start gap-2 self-stretch p-4">
+        <div className="flex flex-col items-start gap-2 self-stretch p-4" data-testid="sidebar-nav">
           {navItems.map((item, key) => (
             <NavItem
               to={item.to}

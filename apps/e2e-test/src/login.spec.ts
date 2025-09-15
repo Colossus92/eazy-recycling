@@ -2,14 +2,17 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { PageFactory } from './utils/page-factory';
 import { testUsers, errorMessages } from './fixtures/test-data';
+import { PlanningPage } from './pages/PlanningPage';
 
 test.describe('Login Page', () => {
   let loginPage: LoginPage;
+  let planningPage: PlanningPage;
   let pageFactory: PageFactory;
 
   test.beforeEach(async ({ page }) => {
     pageFactory = new PageFactory(page);
     loginPage = pageFactory.createLoginPage();
+    planningPage = pageFactory.createPlanningPage();
     await loginPage.navigateToLogin();
   });
 
@@ -62,7 +65,6 @@ test.describe('Login Page', () => {
     const isSuccessful = await loginPage.isLoginSuccessful();
     expect(isSuccessful).toBe(true);
 
-    // You could add more specific assertions about which page the user lands on
-    // based on whether it's a mobile or desktop session
+    await planningPage.verifyPlanningLoaded();
   });
 });

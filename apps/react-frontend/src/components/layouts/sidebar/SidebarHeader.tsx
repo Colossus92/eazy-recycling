@@ -13,7 +13,10 @@ export const SidebarHeader = ({
   toggleSidebar,
 }: SidebarHeaderProps) => {
   return (
-    <div className="relative flex p-4 justify-between items-center self-stretch border-b border-solid border-b-primary">
+    <div
+      className="relative flex p-4 justify-between items-center self-stretch border-b border-solid border-b-primary"
+      data-testid="sidebar-header"
+    >
       <div className="flex items-center justify-center w-full gap-2 relative">
         {collapsed && (
           <>
@@ -27,6 +30,7 @@ export const SidebarHeader = ({
             <button
               onClick={toggleSidebar}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              data-testid="sidebar-expand-button"
             >
               <img
                 src={ArrowLineRight}
@@ -41,7 +45,10 @@ export const SidebarHeader = ({
         {!collapsed && (
           <>
             <Logo />
-            <button onClick={toggleSidebar}>
+            <button
+              onClick={toggleSidebar}
+              data-testid="sidebar-collapse-button"
+            >
               <img src={ArrowLineLeft} alt="Collapse" className="w-4 h-4" />
             </button>
           </>

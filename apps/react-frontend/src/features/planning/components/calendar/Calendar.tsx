@@ -17,7 +17,10 @@ export const Calendar = ({ filters }: CalendarProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div
+      className="flex flex-col h-full w-full"
+      data-testid="calendar-container"
+    >
       <CalendarToolbar date={date} setDate={setDate} />
       <div className="flex-1 w-full overflow-hidden">
         <CalendarGrid planning={planning} isLoading={isLoading} />

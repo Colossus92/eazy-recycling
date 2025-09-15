@@ -5,7 +5,7 @@ import { Page, Locator } from '@playwright/test';
  * for all page objects in the application.
  */
 export abstract class BasePage {
-  protected page: Page;
+  page: Page;
   protected url: string;
 
   constructor(page: Page, url: string) {

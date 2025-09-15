@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
+import { PlanningPage } from '../pages/PlanningPage';
 
 /**
  * Page Factory for creating page object instances
@@ -19,11 +20,14 @@ export class PageFactory {
     return new LoginPage(this.page);
   }
 
+  /**
+   * Create a PlanningPage instance
+   */
+  createPlanningPage(): PlanningPage {
+    return new PlanningPage(this.page);
+  }
+
   // Add more page creators as you build more Page Objects
-  // createDashboardPage(): DashboardPage {
-  //   return new DashboardPage(this.page);
-  // }
-  
   // createTruckPage(): TruckPage {
   //   return new TruckPage(this.page);
   // }
