@@ -7,7 +7,7 @@
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "supabase start",
+        "command": "supabase status > /dev/null 2>&1 || supabase start --yes",
         "cwd": "libs/supabase"
       },
       "configurations": {

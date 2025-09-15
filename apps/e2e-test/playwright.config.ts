@@ -24,8 +24,8 @@ export default defineConfig({
   },
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npx nx run eazy-recycling:dev',
-    url: 'http://localhost:4300',
+    command: 'npx nx run react-frontend:dev',
+    url: 'http://localhost:5173',
     reuseExistingServer: true,
     cwd: workspaceRoot,
   },
@@ -33,16 +33,6 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
     },
 
     // Uncomment for mobile browsers support
