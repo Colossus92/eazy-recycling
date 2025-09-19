@@ -6,12 +6,14 @@ interface DateTimeInputProps<T extends FieldValues> {
   title: string;
   formHook?: FormProps<T>;
   disabled?: boolean;
+  testId?: string;
 }
 
 export const DateTimeInput = <T extends FieldValues>({
   title,
   formHook,
   disabled = false,
+  testId,
 }: DateTimeInputProps<T>) => {
   const fieldError = formHook?.errors?.[formHook?.name]?.message?.toString();
   const baseClasses =
@@ -41,6 +43,7 @@ export const DateTimeInput = <T extends FieldValues>({
         <input
           aria-label="Date and time"
           type="datetime-local"
+          data-testid={testId}
           className={clsx(
             baseClasses,
             paddingClasses,

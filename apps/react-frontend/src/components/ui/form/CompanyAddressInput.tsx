@@ -22,6 +22,7 @@ interface CompanyAddressInputProps<T extends FieldValues> {
   fieldNames: FieldNames<T>;
   title?: string;
   includeBranches?: boolean;
+  testId?: string;
 }
 
 export const CompanyAddressInput = <T extends FieldValues>({
@@ -29,6 +30,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
   fieldNames,
   title = 'Huidige locatie',
   includeBranches = false,
+  testId,
 }: CompanyAddressInputProps<T>) => {
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies', includeBranches],
@@ -216,6 +218,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
           title={'Kies bedrijf (optioneel)'}
           placeholder={'Selecteer een bedrijf of vul zelf een adres in'}
           options={companyOptions}
+          testId={testId}
           formHook={{
             register,
             name: fieldNames.companyId,

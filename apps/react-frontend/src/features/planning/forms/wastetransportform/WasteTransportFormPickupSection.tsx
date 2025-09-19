@@ -23,6 +23,7 @@ export const WasteTransportFormPickupSection = () => {
         formContext={formContext}
         fieldNames={pickupFieldNames}
         title="Locatie van herkomst"
+        testId="pickup-company-address"
         includeBranches
       />
       <DateTimeInput
@@ -33,6 +34,7 @@ export const WasteTransportFormPickupSection = () => {
           rules: { required: 'Ophaal datum en tijd is verplicht' },
           errors: formContext.formState.errors,
         }}
+        testId="pickup-date-time"
       />
     </div>
   );

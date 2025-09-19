@@ -1,21 +1,24 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { PlanningPage } from './pages/PlanningPage';
+import { WasteTransportFormPage } from './pages/WasteTransportFormPage';
 import { PageFactory } from './utils/page-factory';
 import { testData, testUsers } from './fixtures/test-data';
 
 test.describe('Create New Waste Transport', () => {
   let loginPage: LoginPage;
   let planningPage: PlanningPage;
+  let wasteTransportFormPage: WasteTransportFormPage;
   let pageFactory: PageFactory;
 
   test.beforeEach(async ({ page }) => {
     pageFactory = new PageFactory(page);
     loginPage = pageFactory.createLoginPage();
     planningPage = pageFactory.createPlanningPage();
-    });
+    wasteTransportFormPage = pageFactory.createWasteTransportFormPage();
+  });
 
-  test('should create a new waste transport', async ({ page }) => {
+  test('should create a new waste transport', async () => {
     // Step 1: Login as planner
     await loginPage.navigateToLogin();
     await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
@@ -26,36 +29,33 @@ test.describe('Create New Waste Transport', () => {
     
     // Step 3: Click on the "New Waste Transport" button
     await planningPage.openWasteTransportForm();
-    await expect(page.locator('form')).toBeVisible();
-
-    // Step 4: Fill in the form
-    // Fill consignor party (sender)
-    await pickFromMultiselect(page, 'consignor-party-select', testData.customer.name);
-    // Select consignor classification (default is already selected, but let's explicitly select one)
-    const classificationType = 1; // 'ontdoener'
-    await page.locator(`[data-testid="consignor-classification-select-option-${classificationType}"]`).click();
     
-    await pickFromMultiselect(page, 'carrier-party-select', 'Eazy Recycling');
+    // Step 4: Verify the form is loaded
+    await wasteTransportFormPage.verifyFormLoaded();
 
-    await pickFromMultiselect(page, 'container-operation-select', 'Container wisselen');
+    // Step 5: Fill in the main section of the form
+    await wasteTransportFormPage.fillMainSection(
+      testData.customer.name,
+      1, // 'ontdoener'
+      'Eazy Recycling',
+      'Container wisselen'
+    );
 
-    // Step 5: Click on the "Volgende" button
-    await page.locator('button[data-testid="next-button"]').click();
+    // Step 6: Navigate to the next step
+    await wasteTransportFormPage.goToNextStep();
 
-    const ophaalInfoSpan = page.locator('span.subtitle-2:has-text("Ophaal info")');
-    await expect(ophaalInfoSpan).toBeVisible();
-    
+    // Step 7: Verify we're on the pickup info section
+    await wasteTransportFormPage.pickupSection.verifyPickupInfoSectionVisible();
 
+    await wasteTransportFormPage.pickupSection.fillPickupCompanyAddress(
+      testData.customer.name,
+    );
+
+    await wasteTransportFormPage.pickupSection.fillPickupDateTime(
+      '2025-09-20T10:00:00',
+    );
   });
 });
 
-async function pickFromMultiselect(page: Page, selectId: string, companyName: string) {
-  const consignorSelect = page.locator(`#${selectId}`);
-  await consignorSelect.click();
-  await page.keyboard.type(companyName.substring(0, 4));
-  // Select the option by its text content
-  const consignorOption = page.locator('.react-select__option').filter({ hasText: companyName });
-  await expect(consignorOption).toBeVisible();
-  await consignorOption.click();
-}
+// We've moved the pickFromMultiselect function to the WasteTransportFormComponent class
 
