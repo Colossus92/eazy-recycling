@@ -17,5 +17,6 @@ spring:
 
 supabase:
   api:
-    jwt-secret: super-secret-jwt-token-with-at-least-32-characters-long
     url: https://supabase.com
+    jwt-secret: super-secret-jwt-token-with-at-least-32-characters-long
+    jwt-issuer: http://localhost:54321/auth/v1
