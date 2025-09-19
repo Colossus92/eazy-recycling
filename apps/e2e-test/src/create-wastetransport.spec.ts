@@ -52,8 +52,10 @@ test.describe('Create New Waste Transport', () => {
     );
 
     await wasteTransportFormPage.pickupSection.fillPickupDateTime(
-      '2025-09-20T10:00:00',
+      '2025-09-20T10:00',
     );
+
+    await wasteTransportFormPage.goToNextStep();
   });
 });
 

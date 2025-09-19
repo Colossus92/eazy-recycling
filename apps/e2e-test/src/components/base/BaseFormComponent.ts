@@ -38,7 +38,8 @@ export abstract class BaseFormComponent {
    * Fill a date-time input field by test ID
    */
   async fillDateTimeByTestId(testId: string, dateTimeValue: string): Promise<void> {
-    await this.page.locator(`[data-testid="${testId}"]`).fill(dateTimeValue);
+    const locator = this.page.locator(`[data-testid="${testId}"]`);
+    await locator.click().then(() => locator.fill(dateTimeValue));
   }
   
   /**
