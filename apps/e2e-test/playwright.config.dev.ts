@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import { nxE2EPreset } from '@nx/playwright/preset';
 
 // For local development, we assume the application is already running
-const baseURL = process.env['BASE_URL'] || 'http://localhost:5174';
+const baseURL = process.env['BASE_URL'] || 'http://localhost:5173';
 
 /**
  * Development configuration for Playwright tests
@@ -17,7 +17,12 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
-  /* No webServer configuration - we assume the app is already running */
+  /* Explicitly disable webServer to prevent Docker from starting */
+  webServer: {
+        // command: 'npx run react-frontend:dev',
+        url: 'http://localhost:5173',
+        reuseExistingServer: true,
+  },
   projects: [
     {
       name: 'chromium',
