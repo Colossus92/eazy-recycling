@@ -22,7 +22,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set environment variables for e2e testing
-ENV VITE_API_URL=http://backend-e2e:8081
+ENV VITE_API_URL=http://localhost:8081
 ENV NODE_ENV=production
 
 # Build the application without running tests
@@ -45,7 +45,7 @@ RUN echo 'server { \
     } \
     location /api { \
         resolver 127.0.0.11 valid=30s; \
-        set $backend backend-e2e:8081; \
+        set $backend localhost:8081; \
         proxy_pass http://$backend; \
         proxy_set_header Host $host; \
         proxy_set_header X-Real-IP $remote_addr; \

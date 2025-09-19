@@ -68,6 +68,10 @@ services:
         scope: RUN_AND_BUILD_TIME
         type: SECRET
         value: EV[1:VzrDUysiAw61qasWSzbEcQxIbyvV7fzf:2n48sexi5R/SDwXq8XJmot9zauBkdLkqSOYt1FQrycr7NjaGZSW+Ay/J5B7ExUaLigzYiefvZg1ii4efotB5xNa+KG3LPJzRfathqLOfGRSAqOzCcp3fqHxzIYNlFB33aQrmpbWt2Bs=]
+      - key: SUPABASE_API_JWT_ISSUER
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:3AMLOqRMeYNc7TOJPrCrd9L4iTeCkrNC:hChxRrDJCFfpGqPBnOTpxMteL+bucXWZGkqOUdQan4yhjl7pveKJ2JFBCmjAkkMFTJYBjHNnXvg=]
     http_port: 8080
     image:
       registry: colossus92

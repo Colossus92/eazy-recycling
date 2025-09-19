@@ -31,8 +31,8 @@ class SecurityConfig {
     @Value("\${supabase.api.jwt-secret}")
     private lateinit var jwtSecret: String
 
-    @Value("\${supabase.api.url}")
-    private lateinit var supabaseUrl: String
+    @Value("\${supabase.api.jwt-issuer}")
+    private lateinit var supabaseJwtIssuer: String
 
     @Value("\${cors.allowed-origins}")
     private lateinit var allowedOrigins: String
@@ -91,14 +91,13 @@ class SecurityConfig {
 
     @Bean
     fun jwtDecoder(): JwtDecoder {
-        logger.info("JWT Secret: $jwtSecret")
         val secretBytes: ByteArray = jwtSecret.toByteArray(StandardCharsets.UTF_8)
         val hmacKey: SecretKey = SecretKeySpec(secretBytes, "HMACSHA256")
 
         val jwtDecoder = NimbusJwtDecoder.withSecretKey(hmacKey).build()
 
         jwtDecoder.setJwtValidator(
-            JwtValidators.createDefaultWithIssuer("$supabaseUrl/auth/v1")
+            JwtValidators.createDefaultWithIssuer(supabaseJwtIssuer)
         )
 
         return jwtDecoder
