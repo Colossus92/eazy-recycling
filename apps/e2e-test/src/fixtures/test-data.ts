@@ -28,6 +28,9 @@ export const testData = {
     address: 'Teststraat 123',
     city: 'Amsterdam',
     postalCode: '1000 AA'
+  },
+  customer: {
+    name: 'King Customer'
   }
 };
 

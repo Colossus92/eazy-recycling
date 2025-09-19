@@ -96,6 +96,10 @@ export class PlanningPage extends BasePage {
     await this.sidebar.navigateToUsers();
   }
 
+  async openWasteTransportForm(): Promise<void> {
+    await this.page.locator('[data-testid="new-waste-transport-button"]').click();
+  }
+
   /**
    * Test sidebar collapse/expand functionality
    */

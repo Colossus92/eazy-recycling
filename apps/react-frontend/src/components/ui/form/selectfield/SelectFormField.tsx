@@ -24,6 +24,7 @@ interface SelectFormFieldProps<TFieldValues extends FieldValues> {
   value?: FieldPathValue<TFieldValues, FieldPath<TFieldValues>>;
   disabled?: boolean;
   isMulti?: boolean;
+  testId?: string;
   formHook: {
     register: UseFormRegister<TFieldValues>;
     name: Path<TFieldValues>;
@@ -40,6 +41,7 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
   value,
   disabled = false,
   isMulti = false,
+  testId,
   formHook,
 }: SelectFormFieldProps<TFieldValues>) => {
   const { name, rules, errors, control } = formHook;
@@ -66,6 +68,7 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
             isClearable={true}
             classNamePrefix="react-select"
             noOptionsMessage={() => 'Geen opties beschikbaar'}
+            id={testId || `select-${name}`}
             className={clsx(
               'w-full text-body-1',
               disabled

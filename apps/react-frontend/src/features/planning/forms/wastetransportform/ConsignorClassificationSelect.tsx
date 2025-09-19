@@ -11,6 +11,7 @@ import { Controller } from 'react-hook-form';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 
 interface ConsignorClassificationSelectProps<TFieldValues extends FieldValues> {
+  testId?: string;
   formHook: {
     register: UseFormRegister<TFieldValues>;
     name: Path<TFieldValues>;
@@ -29,6 +30,7 @@ const consignorTypes = [
 
 export const ConsignorClassificationSelect = ({
   formHook,
+  testId = 'consignor-classification-select',
 }: ConsignorClassificationSelectProps<WasteTransportFormValues>) => {
   const { name, rules, errors, control } = formHook;
 
@@ -54,6 +56,7 @@ export const ConsignorClassificationSelect = ({
                   >
                     <Radio
                       value={type.value}
+                      data-testid={`${testId}-option-${type.value}`}
                       className="h-5 w-5 cursor-pointer rounded-full border border-gray-300 bg-white"
                     >
                       {({ checked }) => (

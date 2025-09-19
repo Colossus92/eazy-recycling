@@ -43,6 +43,7 @@ export const WasteTransportMainSection = () => {
         title={'Afzender'}
         placeholder={'Selecteer een afzender'}
         options={companyOptions}
+        testId="consignor-party-select"
         formHook={{
           register: register,
           name: 'consignorPartyId',
@@ -64,6 +65,7 @@ export const WasteTransportMainSection = () => {
         title={'Vervoerder'}
         placeholder={'Selecteer een vervoerder'}
         options={companyOptions}
+        testId="carrier-party-select"
         formHook={{
           register: register,
           name: 'carrierPartyId',
@@ -76,6 +78,7 @@ export const WasteTransportMainSection = () => {
         title={'Type transport'}
         placeholder={'Selecteer het type transport'}
         options={containerOperationOptions}
+        testId="container-operation-select"
         formHook={{
           register: register,
           name: 'containerOperation',

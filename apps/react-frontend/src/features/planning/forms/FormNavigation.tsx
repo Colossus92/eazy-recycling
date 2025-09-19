@@ -48,6 +48,7 @@ export const FormNavigation = ({
             onClick={onNext}
             fullWidth={true}
             disabled={isSubmitting}
+            data-testid="submit-button"
           />
         ) : (
           <Button
@@ -58,6 +59,7 @@ export const FormNavigation = ({
             iconPosition={'right'}
             fullWidth={true}
             disabled={isSubmitting}
+            data-testid="next-button"
           />
         )}
       </div>
