@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+/* eslint-disable playwright/expect-expect */
+import { test } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { PlanningPage } from './pages/PlanningPage';
 import { WasteTransportFormPage } from './pages/WasteTransportFormPage';
@@ -40,24 +41,33 @@ test.describe('Create New Waste Transport', () => {
       'Eazy Recycling',
       'Container wisselen'
     );
-
-    // Step 6: Navigate to the next step
     await wasteTransportFormPage.goToNextStep();
 
-    // Step 7: Verify we're on the pickup info section
+    // Step 6: Fill in the pickup section
     await wasteTransportFormPage.pickupSection.verifyPickupInfoSectionVisible();
-
     await wasteTransportFormPage.pickupSection.fillPickupCompanyAddress(
       testData.customer.name,
     );
-
-    await wasteTransportFormPage.pickupSection.fillPickupDateTime(
-      '2025-09-20T10:00',
-    );
-
+    await wasteTransportFormPage.pickupSection.fillPickupDateTime(getWednesdayDateAt('10:00'));
     await wasteTransportFormPage.goToNextStep();
+
+    // Step 7: Fill in the delivery section
+    await wasteTransportFormPage.deliverySection.verifyDeliveryInfoSectionVisible();
+    await wasteTransportFormPage.deliverySection.selectFromReactSelect('consignee-party-select', 'Eazy Recycling');
+    await wasteTransportFormPage.deliverySection.fillDeliveryCompanyAddress(
+      'Eazy Recycling',
+    );
+    await wasteTransportFormPage.deliverySection.fillDeliveryDateTime(getWednesdayDateAt('14:00'));
+    await wasteTransportFormPage.goToNextStep();
+
+    // Step 8: Fill in the waste section
+    await wasteTransportFormPage.goodsSection.verifyWasteDetailsSectionVisible();
+
   });
 });
 
-// We've moved the pickFromMultiselect function to the WasteTransportFormComponent class
-
+function getWednesdayDateAt(time: string): string {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long' }) === 'Wednesday'
+        ? new Date().toISOString().split('T')[0] + 'T' + time
+        : new Date(new Date().setDate(new Date().getDate() + (3 - new Date().getDay()))).toISOString().split('T')[0] + 'T' + time;
+}
