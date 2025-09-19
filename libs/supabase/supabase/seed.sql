@@ -53,6 +53,11 @@ VALUES ('00000000-0000-0000-0000-000000000000',
 INSERT INTO "public"."trucks" ("license_plate", "brand", "model", "updated_at") VALUES
 	('86-BVB-6', 'Scania', 'Haakarm', '2025-09-19 10:56:08.866574+00');
 
+INSERT INTO "public"."companies" ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "updated_at", "building_name", "building_number", "country") VALUES
+	('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '12345678', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', '2025-09-19 11:22:15.258406+00', NULL, '8', 'Nederland'),
+	('b6d76e22-998b-4842-826d-8d42853e87a5', 'King Customer', '87654321', 'Coolsingel', '3011 AD', ' Rotterdam', NULL, '2025-09-19 11:23:33.417513+00', NULL, '40', 'Nederland');
+
+
 insert into public.eural (code, description)
 values ('16 01 17', 'ferrometalen'),
        ('16 01 18', 'non-ferrometalen'),
