@@ -127,6 +127,16 @@ Migrations are automatically applied when you start your local Supabase instance
 supabase db push
 ```
 
+### Exporting Data
+
+To export data from your local Supabase database to an SQL file:
+
+```bash
+supabase db dump --local --data-only -f data.sql
+```
+
+This command exports only the data (not the schema) from your local database to a file named `data.sql`.
+
 ### Verifying Migrations
 
 To verify your migrations without applying them:
