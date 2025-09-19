@@ -11,6 +11,16 @@ export class WasteTransportDeliverySectionComponent extends BaseFormComponent {
   }
   
   /**
+   * Fill the delivery section of the waste transport form
+   */
+  async fillDeliverySection(deliveryCompanyAddress: string, deliveryDateTime: string): Promise<void> {
+    await this.verifyDeliveryInfoSectionVisible();
+    await this.selectFromReactSelect('consignee-party-select', 'Eazy Recycling');
+    await this.fillDeliveryCompanyAddress(deliveryCompanyAddress);
+    await this.fillDeliveryDateTime(deliveryDateTime);
+  }
+
+  /**
    * Verify that we're on the delivery info section
    */
   async verifyDeliveryInfoSectionVisible(): Promise<void> {

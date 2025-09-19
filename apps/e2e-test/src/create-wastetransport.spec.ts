@@ -51,12 +51,10 @@ test.describe('Create New Waste Transport', () => {
     await wasteTransportFormPage.goToNextStep();
 
     // Step 7: Fill in the delivery section
-    await wasteTransportFormPage.deliverySection.verifyDeliveryInfoSectionVisible();
-    await wasteTransportFormPage.deliverySection.selectFromReactSelect('consignee-party-select', 'Eazy Recycling');
-    await wasteTransportFormPage.deliverySection.fillDeliveryCompanyAddress(
-      'Eazy Recycling',
+    await wasteTransportFormPage.fillDeliverySection(
+      testData.customer.name,
+      getWednesdayDateAt('14:00'),
     );
-    await wasteTransportFormPage.deliverySection.fillDeliveryDateTime(getWednesdayDateAt('14:00'));
     await wasteTransportFormPage.goToNextStep();
 
     // Step 8: Fill in the waste section

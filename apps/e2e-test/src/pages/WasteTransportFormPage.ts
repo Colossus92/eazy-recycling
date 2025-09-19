@@ -64,6 +64,13 @@ export class WasteTransportFormPage extends BasePage {
   async fillPickupSection(pickupCompanyAddress: string, pickupDateTime: string): Promise<void> {
     await this.pickupSection.fillPickupSection(pickupCompanyAddress, pickupDateTime);
   }
+
+  /**
+   * Fill the delivery section of the waste transport form
+   */
+  async fillDeliverySection(deliveryCompanyAddress: string, deliveryDateTime: string): Promise<void> {
+    await this.deliverySection.fillDeliverySection(deliveryCompanyAddress, deliveryDateTime);
+  }
   
   /**
    * Navigate to the next step in the form
