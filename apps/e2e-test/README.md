@@ -15,7 +15,7 @@ The **Page Object Model** is a design pattern that creates an object-oriented cl
 
 ## Folder Structure
 
-```
+```text
 apps/e2e-test/src/
 ├── pages/                    # Page Object Model classes
 │   ├── base/
