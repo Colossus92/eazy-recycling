@@ -34,12 +34,14 @@ export const PlanningPage = () => {
               icon={ShippingContainer}
               label={'Nieuw Container Transport'}
               onClick={() => setIsContainerTransportFormOpen(true)}
+              data-testid="new-container-transport-button"
             />
             <Button
               variant={'primary'}
               icon={BxRecycle}
               label={'Nieuw Afval Transport'}
               onClick={() => setIsWasteTransportFormOpen(true)}
+              data-testid="new-waste-transport-button"
             />
           </ContentTitleBar>
           <div className="flex-1 flex flex-col items-start self-stretch h-full">

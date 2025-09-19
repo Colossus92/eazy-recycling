@@ -50,6 +50,9 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '',
         '');
 
+INSERT INTO "public"."trucks" ("license_plate", "brand", "model", "updated_at") VALUES
+	('86-BVB-6', 'Scania', 'Haakarm', '2025-09-19 10:56:08.866574+00');
+
 insert into public.eural (code, description)
 values ('16 01 17', 'ferrometalen'),
        ('16 01 18', 'non-ferrometalen'),
