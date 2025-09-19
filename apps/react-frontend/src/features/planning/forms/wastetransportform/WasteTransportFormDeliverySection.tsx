@@ -36,6 +36,7 @@ export const WasteTransportFormDeliverySection = () => {
         title={'Ontvanger'}
         placeholder={'Selecteer een ontvanger'}
         options={companyOptions}
+        testId='consignee-party-select'
         formHook={{
           register: formContext.register,
           name: 'consigneePartyId',
@@ -49,10 +50,12 @@ export const WasteTransportFormDeliverySection = () => {
         fieldNames={deliveryFieldnames}
         title="Locatie van bestemming"
         includeBranches
+        testId='delivery-company-address'
       />
 
       <DateTimeInput
         title={'Aflever datum en tijd'}
+        testId='delivery-date-time'
         formHook={{
           register: formContext.register,
           name: 'deliveryDateTime',
