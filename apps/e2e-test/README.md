@@ -181,8 +181,12 @@ For reliable element selection, add `data-test-id` attributes to your React comp
 
 ## Running Tests
 
+### Standard Test Execution (with Docker Compose)
+
+By default, the tests will spin up the required Docker containers using docker-compose:
+
 ```bash
-# Run all tests
+# Run all tests (will start Docker containers)
 npx playwright test
 
 # Run tests in headed mode (with browser UI)
@@ -195,15 +199,34 @@ npx playwright test login.spec.ts
 npx playwright test --debug
 ```
 
-## Future Enhancements
+### Development Mode (Against Running Docker)
 
-1. **Add more Page Objects** for other pages in the application
-2. **Implement API helpers** for backend testing
-3. **Add visual regression testing** capabilities
-4. **Create test utilities** for database setup/cleanup
-5. **Implement parallel test execution** strategies
+For faster development cycles, you can run tests against an already running Docker environment:
 
-## Troubleshooting
+```bash
+# First, start the Docker environment (if not already running)
+./scripts/start-e2e-dev.sh
+
+# Run tests against existing Docker environment (won't tear down containers)
+npm run e2e:dev
+
+# Run tests with UI against existing Docker environment
+npm run e2e:dev:ui
+
+# Run specific test file against existing Docker environment
+npm run e2e:dev -- login.spec.ts
+
+# When you're completely done, stop the Docker environment
+./scripts/stop-e2e-dev.sh
+```
+
+This approach skips the Docker container startup/teardown process, making the test cycle much faster during development. The development mode:
+
+1. Uses a custom Playwright configuration (`playwright.config.dev.ts`) that doesn't include webServer startup
+2. Uses a special global teardown that doesn't shut down Docker containers
+3. Sets the `PLAYWRIGHT_TEARDOWN=false` environment variable as an extra safety measure
+
+All these measures ensure your Docker containers remain running between test runs for faster development.
 
 ### Common Issues
 

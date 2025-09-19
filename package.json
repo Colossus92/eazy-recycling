@@ -2,7 +2,10 @@
   "name": "@eazy-recycling/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "e2e:dev": "PLAYWRIGHT_TEARDOWN=false nx run e2e-test:e2e --config=playwright.config.dev.ts",
+    "e2e:dev:ui": "PLAYWRIGHT_TEARDOWN=false nx run e2e-test:e2e --config=playwright.config.dev.ts --ui"
+  },
   "private": true,
   "dependencies": {
     "react": "^18.3.1",

@@ -31,6 +31,43 @@ To see all available targets to run for a project, run:
 npx nx show project eazy-recycling
 ```
 
+## E2E Testing
+
+### Standard E2E Testing
+
+Run the E2E tests with Docker containers automatically started and stopped:
+
+```sh
+npx nx e2e e2e-test
+```
+
+### Development E2E Testing
+
+For faster development cycles, you can run tests against an already running Docker environment:
+
+```sh
+# First, start the Docker environment
+./scripts/start-e2e-dev.sh
+
+# Then run tests without starting/stopping Docker
+npm run e2e:dev
+
+# Run with Playwright UI
+npm run e2e:dev:ui
+
+# Run a specific test file
+npm run e2e:dev -- create-wastetransport.spec.ts
+
+# When finished, stop the Docker environment
+./scripts/stop-e2e-dev.sh
+```
+
+The development mode is configured to prevent Docker containers from being torn down between test runs, using multiple safety measures:
+
+- Custom Playwright configuration without webServer startup
+- Special global teardown that preserves containers
+- Environment variable protection (`PLAYWRIGHT_TEARDOWN=false`)
+
 These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
 
 [More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
