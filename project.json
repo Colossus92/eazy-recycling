@@ -1,0 +1,28 @@
+{
+  "name": "eazy-recycling",
+  "$schema": "node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "targets": {
+    "e2e-up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f docker-compose.e2e.yml up -d --build",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "e2e-down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f docker-compose.e2e.yml down",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "e2e-logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose -f docker-compose.e2e.yml logs -f",
+        "cwd": "{workspaceRoot}"
+      }
+    }
+  }
+}

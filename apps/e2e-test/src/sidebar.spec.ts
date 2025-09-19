@@ -63,7 +63,7 @@ test.describe('Dashboard with Sidebar Navigation', () => {
 
     // Navigate back to Planning
     await planningPage.sidebar.navigateToPlanning();
-    expect(planningPage.page.url()).toBe('http://localhost:5173/');
+    await expect(planningPage.page).toHaveURL('/');
   });
 
   test('should collapse and expand sidebar correctly', async () => {
