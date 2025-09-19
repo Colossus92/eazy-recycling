@@ -88,42 +88,42 @@ test.describe('Login Tests', () => {
 
 1. **Create the page class** extending `BasePage`:
 
-```typescript
-import { Page, Locator } from '@playwright/test';
-import { BasePage } from './base/BasePage';
+    ```typescript
+    import { Page, Locator } from '@playwright/test';
+    import { BasePage } from './base/BasePage';
 
-export class DashboardPage extends BasePage {
-  private readonly welcomeMessage: Locator;
-  private readonly navigationMenu: Locator;
+    export class DashboardPage extends BasePage {
+      private readonly welcomeMessage: Locator;
+      private readonly navigationMenu: Locator;
 
-  constructor(page: Page) {
-    super(page, '/dashboard');
-    this.welcomeMessage = page.locator('[data-testid="welcome-message"]');
-    this.navigationMenu = page.locator('[data-testid="nav-menu"]');
-  }
+      constructor(page: Page) {
+        super(page, '/dashboard');
+        this.welcomeMessage = page.locator('[data-testid="welcome-message"]');
+        this.navigationMenu = page.locator('[data-testid="nav-menu"]');
+      }
 
-  async verifyDashboardLoaded(): Promise<void> {
-    await this.waitForElement(this.welcomeMessage);
-    await this.waitForElement(this.navigationMenu);
-  }
-}
-```
+      async verifyDashboardLoaded(): Promise<void> {
+        await this.waitForElement(this.welcomeMessage);
+        await this.waitForElement(this.navigationMenu);
+      }
+    }
+    ```
 
 2. **Add to PageFactory**:
 
-```typescript
-createDashboardPage(): DashboardPage {
-  return new DashboardPage(this.page);
-}
-```
+    ```typescript
+    createDashboardPage(page: Page): DashboardPage {
+      return new DashboardPage(this.page);
+    }
+    ```
 
 3. **Use in tests**:
 
-```typescript
-const dashboardPage = pageFactory.createDashboardPage();
-await dashboardPage.goto();
-await dashboardPage.verifyDashboardLoaded();
-```
+    ```typescript
+    const dashboardPage = pageFactory.createDashboardPage();
+    await dashboardPage.goto();
+    await dashboardPage.verifyDashboardLoaded();
+    ```
 
 ## Best Practices
 
