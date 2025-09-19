@@ -9,6 +9,15 @@ export class WasteTransportPickupSectionComponent extends BaseFormComponent {
   constructor(page: Page) {
     super(page);
   }
+
+  /**
+   * Fill the pickup section of the waste transport form
+   */
+  async fillPickupSection(pickupCompanyAddress: string, pickupDateTime: string): Promise<void> {
+    await this.verifyPickupInfoSectionVisible();
+    await this.fillPickupCompanyAddress(pickupCompanyAddress);
+    await this.fillPickupDateTime(pickupDateTime);
+  }
   
   /**
    * Verify that we're on the pickup info section

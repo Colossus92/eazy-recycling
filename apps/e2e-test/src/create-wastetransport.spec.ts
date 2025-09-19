@@ -44,11 +44,10 @@ test.describe('Create New Waste Transport', () => {
     await wasteTransportFormPage.goToNextStep();
 
     // Step 6: Fill in the pickup section
-    await wasteTransportFormPage.pickupSection.verifyPickupInfoSectionVisible();
-    await wasteTransportFormPage.pickupSection.fillPickupCompanyAddress(
+    await wasteTransportFormPage.fillPickupSection(
       testData.customer.name,
+      getWednesdayDateAt('10:00'),
     );
-    await wasteTransportFormPage.pickupSection.fillPickupDateTime(getWednesdayDateAt('10:00'));
     await wasteTransportFormPage.goToNextStep();
 
     // Step 7: Fill in the delivery section
