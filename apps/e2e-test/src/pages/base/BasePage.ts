@@ -24,7 +24,7 @@ export abstract class BasePage {
    * Wait for the page to be loaded
    */
   async waitForPageLoad(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**
@@ -73,7 +73,7 @@ export abstract class BasePage {
    * Wait for navigation to complete
    */
   async waitForNavigation(): Promise<void> {
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForLoadState('domcontentloaded');
   }
 
   /**

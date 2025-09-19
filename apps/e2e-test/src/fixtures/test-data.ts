@@ -3,15 +3,15 @@
  */
 export const testUsers = {
   validUser: {
-    email: 'peter@planner.nl',
-    password: '2@Supabase'
+    email: 'planner@eazyrecycling.nl',
+    password: 'password123'
   },
   invalidUser: {
     email: 'invalid@example.com',
     password: 'wrongpassword'
   },
   adminUser: {
-    email: 'calvin@eazysoftware.nl',
+    email: 'admin@eazyrecycling.nl',
     password: 'password123'
   },
 };
