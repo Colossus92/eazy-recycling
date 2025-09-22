@@ -91,6 +91,8 @@ export class WasteTransportFormPage extends BasePage {
    */
   async submitForm(): Promise<void> {
     await this.submitButton.click();
+    // Wait for the form to be detached from the DOM (form closed/submitted)
+    await expect(this.formContainer).toBeHidden({ timeout: 5000 });
   }
   
   /**

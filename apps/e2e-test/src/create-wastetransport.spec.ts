@@ -1,5 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { PlanningPage } from './pages/PlanningPage';
 import { WasteTransportFormPage } from './pages/WasteTransportFormPage';
@@ -63,6 +63,8 @@ test.describe('Create New Waste Transport', () => {
 
     await wasteTransportFormPage.detailsSection.fillTransportDetails();
     await wasteTransportFormPage.submitForm();
+
+    await planningPage.verifyPlanningLoaded();
   });
 });
 
