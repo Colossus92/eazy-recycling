@@ -48,6 +48,23 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '',
         '',
         '',
+        ''),
+        ('00000000-0000-0000-0000-000000000000',
+        uuid_generate_v4(),
+        'authenticated',
+        'authenticated',
+        'chauffeur@eazyrecycling.nl',
+        crypt('password123', gen_salt('bf')),
+        current_timestamp,
+        current_timestamp,
+        current_timestamp,
+        '{"provider":"email","providers":["email"]}',
+        jsonb_build_object('first_name', 'Sjaak', 'last_name', 'Chauffeur', 'roles', array ['chauffeur']),
+        current_timestamp,
+        current_timestamp,
+        '',
+        '',
+        '',
         '');
 
 INSERT INTO "public"."trucks" ("license_plate", "brand", "model", "updated_at") VALUES
@@ -121,3 +138,6 @@ VALUES ('A.01', 'Bewaren'),
        ('F.07', 'Verbranden met terugwinnen energie (bijstoken)'),
        ('G.01', 'Direct storten'),
        ('G.02', 'Immobiliseren');
+
+INSERT INTO "public"."waste_stream" ("number", "name") VALUES
+	('087970000135', 'ijzer en staal');
