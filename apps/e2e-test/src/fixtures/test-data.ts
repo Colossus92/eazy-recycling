@@ -20,11 +20,8 @@ export const testData = {
   truck: {
     displayName: 'Scania Haakarm 86-BVB-6',
   },
-  company: {
-    name: 'Test Recycling BV',
-    address: 'Teststraat 123',
-    city: 'Amsterdam',
-    postalCode: '1000 AA'
+  tenant: {
+    name: 'Eazy Recycling',
   },
   customer: {
     name: 'King Customer'

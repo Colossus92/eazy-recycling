@@ -38,7 +38,7 @@ test.describe('Create New Waste Transport', () => {
     await wasteTransportFormPage.fillMainSection(
       testData.customer.name,
       1, // 'ontdoener'
-      'Eazy Recycling',
+      testData.tenant.name,
       'Container wisselen'
     );
     await wasteTransportFormPage.goToNextStep();
@@ -52,7 +52,7 @@ test.describe('Create New Waste Transport', () => {
 
     // Step 7: Fill in the delivery section
     await wasteTransportFormPage.fillDeliverySection(
-      testData.customer.name,
+      testData.tenant.name,
       getWednesdayDateAt('14:00'),
     );
     await wasteTransportFormPage.goToNextStep();
