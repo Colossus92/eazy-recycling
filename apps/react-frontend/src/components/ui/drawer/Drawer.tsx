@@ -61,6 +61,7 @@ export const Drawer = ({
                         variant="icon"
                         iconPosition="right"
                         onClick={onDelete}
+                        data-testid="drawer-delete-button"
                       />
                     )}
                     <Button

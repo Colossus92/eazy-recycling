@@ -83,6 +83,7 @@ test.describe('Create New Waste Transport', () => {
 
     // Start the waybill download
     await planningPage.downloadWaybill(wasteTransportDisplayNumber as string);
+    await planningPage.deleteTransport(wasteTransportDisplayNumber as string);
   });
 });
 

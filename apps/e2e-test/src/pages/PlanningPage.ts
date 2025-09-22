@@ -130,6 +130,9 @@ export class PlanningPage extends BasePage {
    * Open the transport details drawer for a specific transport
    */
   async openDetailsDrawerFor(displayNumber: string): Promise<void> {
+    if (await this.transportDetailsDrawer.isDrawerVisible()) {
+      await this.transportDetailsDrawer.closeDrawer();
+    }
     await this.clickPlanningCardByDisplayNumber(displayNumber);
     await this.transportDetailsDrawer.verifyDrawerVisible();
   }
@@ -176,6 +179,13 @@ export class PlanningPage extends BasePage {
     if (!success) {
       throw new Error(`Failed to download waybill after ${maxRetries} attempts. Last error: ${lastError?.message}`);
     }
+  }
+
+  async deleteTransport(displayNumber: string): Promise<void> {
+    await this.openDetailsDrawerFor(displayNumber);
+    await this.transportDetailsDrawer.deleteTransport();
+    const planningCard = this.page.locator(`text=${displayNumber}`).first();
+    await expect(planningCard).not.toBeVisible({ timeout: 5000 });
   }
 
   /**

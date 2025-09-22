@@ -19,12 +19,14 @@ export class TransportDetailsDrawerComponent extends BaseComponent {
   private readonly drawerContent: Locator;
   private readonly waybillDownloadButton: Locator;
   private readonly closeButton: Locator;
+  private readonly deleteButton: Locator;
   
   constructor(page: Page) {
     super(page);
     this.drawerContent = page.locator('[data-testid="transport-details-drawer-content"]');
     this.waybillDownloadButton = page.locator('[data-testid="waybill-download-button"]');
     this.closeButton = page.locator('button[data-testid="close-drawer-button"]');
+    this.deleteButton = page.locator('button[data-testid="drawer-delete-button"]');
   }
 
   /**
@@ -32,6 +34,10 @@ export class TransportDetailsDrawerComponent extends BaseComponent {
    */
   async verifyDrawerVisible(): Promise<void> {
     await expect(this.drawerContent).toBeVisible({ timeout: 5000 });
+  }
+
+  async isDrawerVisible(): Promise<boolean> {
+    return await this.drawerContent.isVisible();
   }
 
   /**
@@ -47,6 +53,12 @@ export class TransportDetailsDrawerComponent extends BaseComponent {
     } else {
       console.log('Drawer already closed, no action needed');
     }
+  }
+
+  async deleteTransport(): Promise<void> {
+    await this.deleteButton.click();
+    await expect(this.page.locator('h4:has-text("Transport verwijderen")')).toBeVisible();
+    await this.page.locator('button:has-text("Verwijderen")').click();
   }
 
   /**
