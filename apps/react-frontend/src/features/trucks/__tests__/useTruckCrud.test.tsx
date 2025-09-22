@@ -4,13 +4,13 @@ import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useTruckCrud } from '../useTruckCrud';
 import { trucks as initialTrucks } from '../../../testing/mocks/mockTrucks';
-import { Truck } from '@/types/api';
+import { Truck } from '@/api/client/models/truck.ts';
 
 // Mock the truckService
-vi.mock('@/api/truckService.ts', () => {
+vi.mock('@/api/services/truckService.ts', () => {
   return {
     truckService: {
-      list: vi
+      getAll: vi
         .fn()
         .mockImplementation(() => Promise.resolve([...initialTrucks])),
       create: vi.fn().mockImplementation((truck) => {
@@ -27,7 +27,7 @@ vi.mock('@/api/truckService.ts', () => {
         }
         return Promise.resolve(truck);
       }),
-      remove: vi.fn().mockImplementation((licensePlate) => {
+      delete: vi.fn().mockImplementation((licensePlate) => {
         const index = initialTrucks.findIndex(
           (t) => t.licensePlate === licensePlate
         );

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DeleteResponse, Truck } from '@/types/api.ts';
-import { truckService } from '@/api/truckService.ts';
+import { Truck } from '@/api/client/models/truck.ts';
+import { truckService } from '@/api/services/truckService.ts';
 
 export function useTruckCrud() {
   const queryClient = useQueryClient();
@@ -11,7 +11,7 @@ export function useTruckCrud() {
     isLoading,
   } = useQuery<Truck[]>({
     queryKey: ['trucks'],
-    queryFn: () => truckService.list(),
+    queryFn: () => truckService.getAll(),
   });
   const [query, setQuery] = useState<string>('');
   const displayedTrucks = useMemo(
@@ -19,8 +19,8 @@ export function useTruckCrud() {
       trucks.filter((truck) => {
         return (
           truck.licensePlate.toLowerCase().includes(query.toLowerCase()) ||
-          truck.brand.toLowerCase().includes(query.toLowerCase()) ||
-          truck.model.toLowerCase().includes(query.toLowerCase())
+          truck.brand?.toLowerCase().includes(query.toLowerCase()) ||
+          truck.model?.toLowerCase().includes(query.toLowerCase())
         );
       }),
     [trucks, query]
@@ -39,13 +39,11 @@ export function useTruckCrud() {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: Truck) => truckService.remove(item.licensePlate),
-    onSuccess: (response: DeleteResponse) => {
-      if (response.success) {
-        queryClient
-          .invalidateQueries({ queryKey: ['trucks'] })
-          .then(() => setDeleting(undefined));
-      }
+    mutationFn: (item: Truck) => truckService.delete(item.licensePlate),
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ['trucks'] })
+        .then(() => setDeleting(undefined));
     },
   });
 

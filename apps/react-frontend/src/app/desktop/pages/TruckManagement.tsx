@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { Truck } from '@/types/api.ts';
+import { Truck } from '@/api/client/models/truck';
 import { Column } from '@/features/crud/ContentTable.tsx';
 import { TruckForm } from '@/features/trucks/TruckForm.tsx';
 import { CrudPage } from '@/features/crud/CrudPage.tsx';

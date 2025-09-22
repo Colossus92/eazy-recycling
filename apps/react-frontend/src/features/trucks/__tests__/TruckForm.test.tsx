@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { TruckForm } from '../TruckForm';
-import { Truck } from '@/types/api';
+import { Truck } from '@/api/client/models/truck';
 
 vi.mock('@/hooks/useErrorHandling.tsx', () => ({
   useErrorHandling: () => ({
@@ -53,6 +53,8 @@ describe('TruckForm', () => {
       brand: 'Volvo',
       model: 'FH16',
       licensePlate: 'AB-123-C',
+      updatedAt: new Date().toISOString(),
+      displayName: 'Volvo FH16',
     };
 
     render(
@@ -165,6 +167,8 @@ describe('TruckForm', () => {
       brand: 'Volvo',
       model: 'FH16',
       licensePlate: 'AB-123-C',
+      updatedAt: new Date().toISOString(),
+      displayName: 'Volvo FH16',
     };
 
     render(

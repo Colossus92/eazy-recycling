@@ -10,8 +10,8 @@ import {
   Option,
   SelectFormField,
 } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Truck } from '@/types/api.ts';
-import { truckService } from '@/api/truckService.ts';
+import { Truck } from '@/api/client/models/truck.ts';
+import { truckService } from '@/api/services/truckService.ts';
 
 interface TruckSelectFormFieldProps<TFieldValues extends FieldValues> {
   formHook: {
@@ -27,7 +27,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
 }: TruckSelectFormFieldProps<T>) => {
   const { data: trucks = [] } = useQuery<Truck[]>({
     queryKey: ['trucks'],
-    queryFn: () => truckService.list(),
+    queryFn: () => truckService.getAll(),
   });
 
   const truckOptions: Option[] = trucks.map((truck) => ({
