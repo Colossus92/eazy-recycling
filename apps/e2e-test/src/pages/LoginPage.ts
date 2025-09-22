@@ -109,4 +109,8 @@ export class LoginPage extends BasePage {
   async getLoginButtonText(): Promise<string> {
     return await this.loginButton.textContent() || '';
   }
+
+  async waitForButtonEnabled(): Promise<void> {
+    await expect(this.loginButton).toBeEnabled();
+  }
 }

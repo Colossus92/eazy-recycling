@@ -40,6 +40,10 @@ test.describe('Login Page', () => {
     // Attempt login with invalid credentials
     await loginPage.login(testUsers.invalidUser.email, testUsers.invalidUser.password);
 
+    // Wait until button is not in pending state anymore
+    await loginPage.waitForButtonEnabled();
+
+
     // Verify error message is displayed
     const errorMessage = await loginPage.getErrorMessage();
     expect(errorMessage).toBe(errorMessages.login.invalidCredentials);
