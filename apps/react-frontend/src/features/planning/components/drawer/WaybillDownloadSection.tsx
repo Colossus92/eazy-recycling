@@ -127,6 +127,7 @@ export const WaybillDownloadSection = ({
         onClick={handleDirectDownload}
         disabled={isDownloading}
         className="flex items-center self-stretch flex-1 gap-2 py-2 pl-2 pr-3 border border-solid border-color-border-primary rounded-radius-md bg-color-surface-primary hover:bg-color-surface-secondary disabled:cursor-not-allowed transition-colors"
+        data-testid="waybill-download-button"
       >
         <div className="flex size-10 justify-center items-center border border-solid border-color-border-primary rounded-radius-sm bg-color-surface-secondary">
           <FilePdf className={'size-[25px] text-color-text-secondary'} />

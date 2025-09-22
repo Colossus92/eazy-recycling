@@ -131,6 +131,10 @@ export class PlanningPage extends BasePage {
     await this.transportDetailsDrawer.verifyDrawerVisible();
   }
 
+  async downloadWaybill(): Promise<void> {
+    await this.transportDetailsDrawer.downloadWaybill();
+  }
+
   /**
    * Test sidebar collapse/expand functionality
    */
