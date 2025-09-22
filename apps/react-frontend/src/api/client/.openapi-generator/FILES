@@ -1,5 +1,3 @@
-.gitignore
-.npmignore
 api.ts
 apis/company-controller-api.ts
 apis/driver-controller-api.ts
@@ -15,7 +13,6 @@ apis/waste-stream-controller-api.ts
 base.ts
 common.ts
 configuration.ts
-git_push.sh
 index.ts
 models/address-dto.ts
 models/address-request.ts

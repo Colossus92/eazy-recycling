@@ -11,9 +11,7 @@
         "additionalProperties": {
           "apiPackage": "apis",
           "modelPackage": "models",
-          "withSeparateModelsAndApi": "true",
-          "apiDocs": "false",
-          "modelDocs": "false"
+          "withSeparateModelsAndApi": "true"
         }
       }
     }

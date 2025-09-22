@@ -24,5 +24,6 @@
 
 # Ignore all documentation files
 docs/
-
-*.md
+.gitignore
+.npmignore
+git_push.sh
