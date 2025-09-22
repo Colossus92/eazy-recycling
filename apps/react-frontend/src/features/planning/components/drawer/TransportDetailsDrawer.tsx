@@ -92,6 +92,7 @@ export const TransportDetailsDrawer = ({
       {!isLoading && data && (
         <div
           className={'flex flex-col flex-1 self-stretch items-start p-4 gap-6'}
+          data-testid='transport-details-drawer-content'
         >
           <div className={'flex flex-col items-start self-stretch gap-3'}>
             <div

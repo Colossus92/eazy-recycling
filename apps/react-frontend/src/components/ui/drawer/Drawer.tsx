@@ -26,7 +26,7 @@ export const Drawer = ({
 }: DrawerProps) => {
   return (
     <Dialog open={isOpen} onClose={setIsOpen} className="relative z-10">
-      <div className="fixed inset-0" />
+      <div className="fixed inset-0"/>
 
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
