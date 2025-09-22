@@ -21,16 +21,16 @@ export const testData = {
     displayName: 'Scania Haakarm 86-BVB-6',
   },
   tenant: {
-    name: 'Eazy Recycling',
+    name: 'Eazy Recycling'
   },
   customer: {
     name: 'King Customer'
   },
   driver: {
-    name: 'Sjaak Chauffeur',
+    name: 'Sjaak Chauffeur'
   },
   container: {
-    displayName: '40M001',
+    displayName: '40M001'
   }
 };
 

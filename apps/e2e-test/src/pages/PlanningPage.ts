@@ -1,6 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './base/BasePage';
 import { SidebarComponent } from '../components/SidebarComponent';
+import { TransportDetailsDrawerComponent } from '../components/TransportDetailsDrawerComponent';
 
 /**
  * Page Object Model for the Dashboard/Planning Page
@@ -13,6 +14,10 @@ export class PlanningPage extends BasePage {
   // Page-specific elements
   private readonly pageTitle: Locator;
   private readonly mainContent: Locator;
+  private readonly newWasteTransportButton: Locator;
+  
+  // Components
+  public readonly transportDetailsDrawer: TransportDetailsDrawerComponent;
 
   constructor(page: Page) {
     super(page, '/');
@@ -23,6 +28,10 @@ export class PlanningPage extends BasePage {
     // Initialize page-specific locators
     this.pageTitle = page.locator('h3').first(); // Adjust based on actual page structure
     this.mainContent = page.locator('[data-testid="calendar-container"]'); // Adjust based on actual page structure
+    this.newWasteTransportButton = page.locator('[data-testid="new-waste-transport-button"]');
+    
+    // Initialize components
+    this.transportDetailsDrawer = new TransportDetailsDrawerComponent(page);
   }
 
   /**
@@ -97,7 +106,24 @@ export class PlanningPage extends BasePage {
   }
 
   async openWasteTransportForm(): Promise<void> {
-    await this.page.locator('[data-testid="new-waste-transport-button"]').click();
+    await this.newWasteTransportButton.click();
+  }
+  
+  /**
+   * Find and click on a planning card by its display number
+   */
+  async clickPlanningCardByDisplayNumber(displayNumber: string): Promise<void> {
+    const planningCard = this.page.locator(`text=${displayNumber}`).first();
+    await expect(planningCard).toBeVisible({ timeout: 5000 });
+    await planningCard.click();
+  }
+  
+  /**
+   * Verify that a planning card with the given display number exists
+   */
+  async verifyPlanningCardExists(displayNumber: string): Promise<void> {
+    const planningCard = this.page.locator(`text=${displayNumber}`).first();
+    await expect(planningCard).toBeVisible({ timeout: 5000 });
   }
 
   /**
