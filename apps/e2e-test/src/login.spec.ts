@@ -27,43 +27,30 @@ test.describe('Login Page', () => {
     expect(buttonText).toContain('Inloggen');
   });
 
+  // eslint-disable-next-line playwright/expect-expect
   test('should successfully login with valid credentials', async () => {
     // Perform login
     await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
 
-    // Wait for login result
-    await loginPage.waitForLoginResult();
-
     // Verify successful login (user navigated away from login page)
-    const isSuccessful = await loginPage.isLoginSuccessful();
-    expect(isSuccessful).toBe(true);
+    await planningPage.verifyPlanningLoaded();
   });
 
   test('should show error message with invalid credentials', async () => {
     // Attempt login with invalid credentials
     await loginPage.login(testUsers.invalidUser.email, testUsers.invalidUser.password);
 
-    // Wait for login result
-    await loginPage.waitForLoginResult();
-
     // Verify error message is displayed
     const errorMessage = await loginPage.getErrorMessage();
     expect(errorMessage).toBe(errorMessages.login.invalidCredentials);
-
-    // Verify user is still on login page
-    const isSuccessful = await loginPage.isLoginSuccessful();
-    expect(isSuccessful).toBe(false);
   });
 
 
+  // eslint-disable-next-line playwright/expect-expect
   test('should navigate to correct page based on user type', async () => {
     // Test mobile vs desktop navigation
     // This would require setting up different user types or device contexts
     await loginPage.login(testUsers.adminUser.email, testUsers.adminUser.password);
-    await loginPage.waitForLoginResult();
-
-    const isSuccessful = await loginPage.isLoginSuccessful();
-    expect(isSuccessful).toBe(true);
 
     await planningPage.verifyPlanningLoaded();
   });

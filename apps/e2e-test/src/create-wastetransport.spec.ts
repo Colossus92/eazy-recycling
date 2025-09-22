@@ -28,7 +28,6 @@ test.describe('Create New Waste Transport', () => {
     // Step 1: Login as planner
     await loginPage.navigateToLogin();
     await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
-    await loginPage.waitForLoginResult();
     
     // Step 2: Verify we're on the planning page
     await planningPage.verifyPlanningLoaded();

@@ -17,13 +17,10 @@ test.describe('Dashboard with Sidebar Navigation', () => {
     // Login first to access dashboard
     await loginPage.navigateToLogin();
     await loginPage.login(testUsers.validUser.email, testUsers.validUser.password);
-    await loginPage.waitForLoginResult();
+    await planningPage.verifyPlanningLoaded();
   });
 
   test('should display sidebar and navigate to dashboard', async () => {
-    // Verify we're on the dashboard
-    await planningPage.verifyPlanningLoaded();
-
     // Verify sidebar is visible and functional
     await planningPage.sidebar.verifySidebarVisible();
 
@@ -32,8 +29,6 @@ test.describe('Dashboard with Sidebar Navigation', () => {
   });
 
   test('should show correct navigation items for regular user', async () => {
-    await planningPage.verifyPlanningLoaded();
-
     // Verify regular user navigation (no admin items)
     await planningPage.verifyRegularUserAccess();
 
@@ -42,8 +37,6 @@ test.describe('Dashboard with Sidebar Navigation', () => {
   });
 
   test('should navigate between different sections using sidebar', async () => {
-    await planningPage.verifyPlanningLoaded();
-
     // Navigate to Containers - navigation method now includes waiting for active state
     await planningPage.navigateToContainers();
     // The active state is already verified in the navigation method, but we can still check URL
@@ -66,16 +59,13 @@ test.describe('Dashboard with Sidebar Navigation', () => {
     await expect(planningPage.page).toHaveURL('/');
   });
 
+  // eslint-disable-next-line playwright/expect-expect
   test('should collapse and expand sidebar correctly', async () => {
-    await planningPage.verifyPlanningLoaded();
-
     // Test sidebar toggle functionality
     await planningPage.testSidebarToggle();
   });
 
   test('should maintain sidebar state across navigation', async () => {
-    await planningPage.verifyPlanningLoaded();
-
     // Collapse sidebar
     await planningPage.sidebar.collapseSidebar();
     expect(await planningPage.sidebar.isCollapsed()).toBe(true);
@@ -92,8 +82,6 @@ test.describe('Dashboard with Sidebar Navigation', () => {
   });
 
   test('should display correct visible navigation items', async () => {
-    await planningPage.verifyPlanningLoaded();
-
     // Get all visible nav items
     const visibleItems = await planningPage.sidebar.getVisibleNavItems();
 

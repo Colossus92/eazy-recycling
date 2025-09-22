@@ -64,19 +64,7 @@ export class LoginPage extends BasePage {
     await this.fillPassword(password);
     await this.clickLogin();
   }
-
-  /**
-   * Wait for login to complete (either success or error)
-   */
-  async waitForLoginResult(): Promise<void> {
-    // Wait for either navigation (success) or error message (failure)
-    await Promise.race([
-      this.page.waitForURL('/', { timeout: 5000 }),
-      this.page.waitForURL('/mobile', { timeout: 5000 }),
-      this.formError.waitFor({ state: 'visible', timeout: 5000 })
-    ]);
-  }
-
+  
   /**
    * Check if login was successful (user navigated away from login page)
    */
