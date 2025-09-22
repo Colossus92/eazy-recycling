@@ -126,6 +126,11 @@ export class PlanningPage extends BasePage {
     await expect(planningCard).toBeVisible({ timeout: 5000 });
   }
 
+  async openDetailsDrawerFor(displayNumber: string): Promise<void> {
+    await this.clickPlanningCardByDisplayNumber(displayNumber);
+    await this.transportDetailsDrawer.verifyDrawerVisible();
+  }
+
   /**
    * Test sidebar collapse/expand functionality
    */

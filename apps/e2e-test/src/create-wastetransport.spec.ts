@@ -1,4 +1,3 @@
-/* eslint-disable playwright/expect-expect */
 import { expect, test } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
 import { PlanningPage } from './pages/PlanningPage';
@@ -82,9 +81,7 @@ test.describe('Create New Waste Transport', () => {
     // Verify that we have a display number before proceeding
     expect(wasteTransportDisplayNumber, 'Waste transport display number should be extracted').toBeTruthy();
     
-    // Click on the planning card with our display number and verify the drawer opens
-    await planningPage.clickPlanningCardByDisplayNumber(wasteTransportDisplayNumber as string);
-    await planningPage.transportDetailsDrawer.verifyDrawerVisible();
+    await planningPage.openDetailsDrawerFor(wasteTransportDisplayNumber as string);
   });
 });
 
