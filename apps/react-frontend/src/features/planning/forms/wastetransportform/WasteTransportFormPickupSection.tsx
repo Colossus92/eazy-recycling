@@ -1,4 +1,5 @@
 import { useFormContext } from 'react-hook-form';
+import { useMemo } from 'react';
 import {
   CompanyAddressInput,
   FieldNames,
@@ -8,14 +9,14 @@ import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTran
 
 export const WasteTransportFormPickupSection = () => {
   const formContext = useFormContext<WasteTransportFormValues>();
-  const pickupFieldNames: FieldNames<WasteTransportFormValues> = {
+  const pickupFieldNames = useMemo<FieldNames<WasteTransportFormValues>>(() => ({
     companyId: 'pickupCompanyId',
     branchId: 'pickupCompanyBranchId',
     street: 'pickupStreet',
     buildingNumber: 'pickupBuildingNumber',
     postalCode: 'pickupPostalCode',
     city: 'pickupCity',
-  };
+  }), []);
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>

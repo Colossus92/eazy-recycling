@@ -1,5 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import {
   CompanyAddressInput,
   FieldNames,
@@ -17,18 +18,19 @@ export const WasteTransportFormDeliverySection = () => {
     queryFn: () => companyService.list(),
   });
 
-  const companyOptions = companies.map((company) => ({
+  const companyOptions = useMemo(() => companies.map((company) => ({
     value: company.id || '',
     label: company.name,
-  }));
-  const deliveryFieldnames: FieldNames<WasteTransportFormValues> = {
+  })), [companies]);
+  
+  const deliveryFieldnames = useMemo<FieldNames<WasteTransportFormValues>>(() => ({
     companyId: 'deliveryCompanyId',
     branchId: 'deliveryCompanyBranchId',
     street: 'deliveryStreet',
     buildingNumber: 'deliveryBuildingNumber',
     postalCode: 'deliveryPostalCode',
     city: 'deliveryCity',
-  };
+  }), []);
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>

@@ -127,7 +127,6 @@ export const CompanyAddressInput = <T extends FieldValues>({
     fieldNames.branchId,
     setValue,
     hasCompanySelected,
-    fieldNames,
   ]);
 
   // Auto-select headquarters when company with branches is selected but no branch is specified
@@ -151,7 +150,6 @@ export const CompanyAddressInput = <T extends FieldValues>({
     fieldNames.branchId,
     setValue,
     includeBranches,
-    fieldNames,
   ]);
 
   // Handle address loading based on company/branch selection
