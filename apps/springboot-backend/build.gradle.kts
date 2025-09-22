@@ -7,6 +7,7 @@ plugins {
     kotlin("kapt") version "2.1.20"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
     id("dev.nx.gradle.project-graph") version("0.1.4")
+    id("org.springdoc.openapi-gradle-plugin") version("1.9.0")
 }
 group = "nl.eazysoftware"
 version = "0.0.1"
@@ -76,6 +77,9 @@ dependencies {
     implementation("org.mapstruct:mapstruct:1.6.3")
     kapt("org.mapstruct:mapstruct-processor:1.6.3")
 
+    // Documentation
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+
     // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
@@ -112,6 +116,14 @@ kapt {
     correctErrorTypes = true
 }
 
+openApi {
+  apiDocsUrl.set("http://localhost:8080/v3/api-docs.yaml")
+  outputDir.set(file("../../docs/openapi"))
+  outputFileName.set("spec.yaml")
+  customBootRun {
+    args.set(listOf("--spring.profiles.active=test"))
+  }
+}
 tasks.withType<Test> {
     useJUnitPlatform()
 }

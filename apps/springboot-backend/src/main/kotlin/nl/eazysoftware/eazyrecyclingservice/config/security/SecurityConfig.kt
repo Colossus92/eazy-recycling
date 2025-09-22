@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.config.security
 
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,8 +25,6 @@ import javax.crypto.spec.SecretKeySpec
 @EnableMethodSecurity
 class SecurityConfig {
 
-    private val logger = LoggerFactory.getLogger(SecurityConfig::class.java)
-
     @Value("\${supabase.api.jwt-secret}")
     private lateinit var jwtSecret: String
 
@@ -44,6 +41,7 @@ class SecurityConfig {
             .csrf { it.disable() }
             .authorizeHttpRequests { authorize ->
                 authorize
+                    .requestMatchers("/v3/api-docs.yaml").permitAll()
                     .requestMatchers("/actuator/**").permitAll() // Allow health checks and error pages
                     .anyRequest().authenticated() // All other requests just require authentication (any role)
             }
@@ -74,10 +72,10 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        
+
         val origins = allowedOrigins.split(",").map { it.trim() }
         configuration.allowedOriginPatterns = origins
-        
+
         // Set default values for other CORS settings since you simplified the config
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")
