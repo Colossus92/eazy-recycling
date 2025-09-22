@@ -23,7 +23,7 @@ export const SidebarHeader = ({
             {/* Logo icon (shown when not hovering) */}
             <img
               src={LogoIcon}
-              alt="Logo"
+              alt="icon-logo"
               className="w-8 h-8 opacity-100 group-hover:opacity-0 transition-opacity duration-200"
             />
             {/* Arrow icon (shown on hover when collapsed) */}
