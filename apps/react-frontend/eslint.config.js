@@ -5,6 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import importPlugin from 'eslint-plugin-import';
 import eslintPluginPrettier from 'eslint-plugin-prettier';
+import path from 'path';
 
 export default tseslint.config(
     {ignores: ['dist', 'node_modules']},
@@ -15,6 +16,11 @@ export default tseslint.config(
         languageOptions: {
             ecmaVersion: 2021,
             globals: globals.browser,
+            parser: tseslint.parser,
+            parserOptions: {
+                project: './tsconfig.json',
+                tsconfigRootDir: path.resolve(__dirname),
+            },
         },
         plugins: {
             'react-hooks': reactHooks,
