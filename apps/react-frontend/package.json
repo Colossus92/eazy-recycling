@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
+    "@openapitools/openapi-generator-cli": "^2.23.4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
@@ -79,7 +80,9 @@
   "nx": {
     "targets": {
       "dev": {
-        "dependsOn": ["springboot-backend:bootRun"]
+        "dependsOn": [
+          "springboot-backend:bootRun"
+        ]
       }
     }
   }

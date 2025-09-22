@@ -1,0 +1,1680 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /waste-streams/{number}:
+    put:
+      tags:
+      - waste-stream-controller
+      operationId: updateWasteStream
+      parameters:
+      - name: number
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteStreamDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamDto"
+    delete:
+      tags:
+      - waste-stream-controller
+      operationId: deleteWasteStream
+      parameters:
+      - name: number
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /users/{id}:
+    get:
+      tags:
+      - user-controller
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+    put:
+      tags:
+      - user-controller
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+      - user-controller
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /users/{id}/profile:
+    put:
+      tags:
+      - user-controller
+      operationId: updateProfile
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /trucks/{licensePlate}:
+    get:
+      tags:
+      - truck-controller
+      operationId: getTruckByLicensePlate
+      parameters:
+      - name: licensePlate
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Truck"
+    put:
+      tags:
+      - truck-controller
+      operationId: updateTruck
+      parameters:
+      - name: licensePlate
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Truck"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Truck"
+    delete:
+      tags:
+      - truck-controller
+      operationId: deleteTruck
+      parameters:
+      - name: licensePlate
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+  /transport/waste/{id}:
+    put:
+      tags:
+      - transport-controller
+      operationId: updateWasteTransport
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWasteTransportRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+  /transport/container/{id}:
+    put:
+      tags:
+      - transport-controller
+      operationId: updateContainerTransport
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContainerTransportRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+  /planning/reorder:
+    put:
+      tags:
+      - planning-controller
+      operationId: reorderTransports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransportReorderRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PlanningView"
+  /containers/{id}:
+    get:
+      tags:
+      - waste-container-controller
+      operationId: getContainerByLicensePlate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteContainer"
+    put:
+      tags:
+      - waste-container-controller
+      operationId: updateContainer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteContainer"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteContainer"
+    delete:
+      tags:
+      - waste-container-controller
+      operationId: deleteContainer
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: No Content
+  /companies/{id}:
+    get:
+      tags:
+      - company-controller
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyDto"
+    put:
+      tags:
+      - company-controller
+      operationId: updateCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyDto"
+    delete:
+      tags:
+      - company-controller
+      operationId: deleteCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
+  /companies/{companyId}/branches/{branchId}:
+    put:
+      tags:
+      - company-controller
+      operationId: updateBranch
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: branchId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+      - company-controller
+      operationId: deleteBranch
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: branchId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: No Content
+  /waste-streams:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: getWasteStreams
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteStreamDto"
+    post:
+      tags:
+      - waste-stream-controller
+      operationId: createWasteStream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteStreamDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamDto"
+  /users:
+    get:
+      tags:
+      - user-controller
+      operationId: getAllUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+    post:
+      tags:
+      - user-controller
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /trucks:
+    get:
+      tags:
+      - truck-controller
+      operationId: getAllTrucks
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Truck"
+    post:
+      tags:
+      - truck-controller
+      operationId: createTruck
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Truck"
+        required: true
+      responses:
+        "201":
+          description: Created
+  /transport/{id}/waybill/signature:
+    post:
+      tags:
+      - signature-controller
+      operationId: saveSignature
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSignatureRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SignatureStatusView"
+  /transport/{id}/finished:
+    post:
+      tags:
+      - transport-controller
+      operationId: markTransportAsFinished
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransportFinishedRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+  /transport/waste:
+    post:
+      tags:
+      - transport-controller
+      operationId: createWasteTransport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWasteTransportRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+  /transport/container:
+    post:
+      tags:
+      - transport-controller
+      operationId: createContainerTransport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContainerTransportRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+  /containers:
+    get:
+      tags:
+      - waste-container-controller
+      operationId: getAllContainers
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteContainer"
+    post:
+      tags:
+      - waste-container-controller
+      operationId: createContainer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContainerRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+  /companies:
+    get:
+      tags:
+      - company-controller
+      operationId: getCompanies
+      parameters:
+      - name: includeBranches
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CompanyResponse"
+    post:
+      tags:
+      - company-controller
+      operationId: createCompany
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyDto"
+  /companies/{id}/branches:
+    post:
+      tags:
+      - company-controller
+      operationId: createBranch
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddressRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyBranchDto"
+  /users/drivers:
+    get:
+      tags:
+      - driver-controller
+      operationId: getAllDrivers
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+  /transport:
+    get:
+      tags:
+      - transport-controller
+      operationId: getAllTransports
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransportDto"
+  /transport/{id}:
+    get:
+      tags:
+      - transport-controller
+      operationId: getTransportById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
+    delete:
+      tags:
+      - transport-controller
+      operationId: deleteTransport
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: No Content
+  /transport/{id}/waybill/signature-status:
+    get:
+      tags:
+      - signature-controller
+      operationId: getSignatureStatuses
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SignatureStatusView"
+  /processing-methods:
+    get:
+      tags:
+      - processing-method-controller
+      operationId: getProcessingMethods
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessingMethod"
+  /planning/{pickupDate}:
+    get:
+      tags:
+      - planning-controller
+      operationId: getPlanningByDate
+      parameters:
+      - name: pickupDate
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: truckId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: driverId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PlanningView"
+  /planning/driver/{driverId}:
+    get:
+      tags:
+      - planning-controller
+      operationId: getPlanningByDriver
+      parameters:
+      - name: driverId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: startDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: endDate
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DriverPlanningItem"
+  /eural:
+    get:
+      tags:
+      - eural-controller
+      operationId: getEural
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Eural"
+components:
+  schemas:
+    WasteStreamDto:
+      type: object
+      properties:
+        number:
+          type: string
+          maxLength: 12
+          minLength: 12
+        name:
+          type: string
+          minLength: 1
+      required:
+      - name
+      - number
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+      - email
+      - firstName
+      - lastName
+      - roles
+    Truck:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        displayName:
+          type: string
+      required:
+      - displayName
+      - licensePlate
+      - updatedAt
+    CreateWasteTransportRequest:
+      type: object
+      properties:
+        consigneePartyId:
+          type: string
+        pickupPartyId:
+          type: string
+        consignorPartyId:
+          type: string
+          format: uuid
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryDateTime:
+          type: string
+          format: date-time
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        driverId:
+          type: string
+          format: uuid
+        carrierPartyId:
+          type: string
+          format: uuid
+        pickupCompanyId:
+          type: string
+          format: uuid
+        pickupCompanyBranchId:
+          type: string
+          format: uuid
+        pickupStreet:
+          type: string
+        pickupBuildingNumber:
+          type: string
+        pickupPostalCode:
+          type: string
+          pattern: "^\\d{4}\\s[A-Z]{2}$"
+        pickupCity:
+          type: string
+        deliveryCompanyId:
+          type: string
+          format: uuid
+        deliveryCompanyBranchId:
+          type: string
+          format: uuid
+        deliveryStreet:
+          type: string
+        deliveryBuildingNumber:
+          type: string
+        deliveryPostalCode:
+          type: string
+          pattern: "^\\d{4}\\s[A-Z]{2}$"
+        deliveryCity:
+          type: string
+        truckId:
+          type: string
+        containerId:
+          type: string
+          format: uuid
+        note:
+          type: string
+        consignorClassification:
+          type: integer
+          format: int32
+        wasteStreamNumber:
+          type: string
+        weight:
+          type: integer
+          format: int32
+          minimum: 0
+        unit:
+          type: string
+          minLength: 1
+        quantity:
+          type: integer
+          format: int32
+          minimum: 0
+        goodsName:
+          type: string
+          minLength: 1
+        euralCode:
+          type: string
+          minLength: 1
+        processingMethodCode:
+          type: string
+          minLength: 1
+      required:
+      - carrierPartyId
+      - consigneePartyId
+      - consignorClassification
+      - consignorPartyId
+      - containerOperation
+      - deliveryBuildingNumber
+      - deliveryCity
+      - deliveryPostalCode
+      - deliveryStreet
+      - euralCode
+      - goodsName
+      - note
+      - pickupBuildingNumber
+      - pickupCity
+      - pickupDateTime
+      - pickupPartyId
+      - pickupPostalCode
+      - pickupStreet
+      - processingMethodCode
+      - quantity
+      - transportType
+      - unit
+      - weight
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingName:
+          type: string
+        buildingNumber:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+    CompanyBranchDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        company:
+          $ref: "#/components/schemas/CompanyDto"
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - address
+      - company
+      - updatedAt
+    CompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - address
+      - name
+      - updatedAt
+    GoodsDto:
+      type: object
+      properties:
+        id:
+          type: string
+        uuid:
+          type: string
+          format: uuid
+        goodsItem:
+          $ref: "#/components/schemas/GoodsItemDto"
+        consignorClassification:
+          type: integer
+          format: int32
+        consigneeParty:
+          $ref: "#/components/schemas/CompanyDto"
+        pickupParty:
+          $ref: "#/components/schemas/CompanyDto"
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - consigneeParty
+      - consignorClassification
+      - goodsItem
+      - id
+      - pickupParty
+    GoodsItemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        wasteStreamNumber:
+          type: string
+        netNetWeight:
+          type: integer
+          format: int32
+        unit:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        name:
+          type: string
+        euralCode:
+          type: string
+        processingMethodCode:
+          type: string
+      required:
+      - euralCode
+      - name
+      - netNetWeight
+      - processingMethodCode
+      - quantity
+      - unit
+    LocationDto:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        locationTypeCode:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+      required:
+      - address
+      - id
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoleDto"
+      required:
+      - id
+      - roles
+    TransportDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDto"
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        pickupCompany:
+          $ref: "#/components/schemas/CompanyDto"
+        pickupCompanyBranch:
+          $ref: "#/components/schemas/CompanyBranchDto"
+        pickupLocation:
+          $ref: "#/components/schemas/LocationDto"
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryCompany:
+          $ref: "#/components/schemas/CompanyDto"
+        deliveryCompanyBranch:
+          $ref: "#/components/schemas/CompanyBranchDto"
+        deliveryLocation:
+          $ref: "#/components/schemas/LocationDto"
+        deliveryDateTime:
+          type: string
+          format: date-time
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
+        wasteContainer:
+          $ref: "#/components/schemas/WasteContainerDto"
+        truck:
+          $ref: "#/components/schemas/Truck"
+        driver:
+          $ref: "#/components/schemas/ProfileDto"
+        note:
+          type: string
+        goods:
+          $ref: "#/components/schemas/GoodsDto"
+        transportHours:
+          type: number
+          format: double
+        updatedAt:
+          type: string
+          format: date-time
+        sequenceNumber:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
+          - INVOICED
+      required:
+      - carrierParty
+      - consignorParty
+      - deliveryLocation
+      - note
+      - pickupDateTime
+      - pickupLocation
+      - sequenceNumber
+      - status
+      - transportType
+    UserRoleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        userId:
+          type: string
+          format: uuid
+        role:
+          type: string
+      required:
+      - role
+    WasteContainerDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        id:
+          type: string
+        company:
+          $ref: "#/components/schemas/CompanyDto"
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        notes:
+          type: string
+      required:
+      - id
+    CreateContainerTransportRequest:
+      type: object
+      properties:
+        consignorPartyId:
+          type: string
+          format: uuid
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryDateTime:
+          type: string
+          format: date-time
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
+        driverId:
+          type: string
+          format: uuid
+        carrierPartyId:
+          type: string
+          format: uuid
+        pickupCompanyId:
+          type: string
+          format: uuid
+        pickupCompanyBranchId:
+          type: string
+          format: uuid
+        pickupStreet:
+          type: string
+        pickupBuildingNumber:
+          type: string
+        pickupPostalCode:
+          type: string
+        pickupCity:
+          type: string
+        deliveryCompanyId:
+          type: string
+          format: uuid
+        deliveryCompanyBranchId:
+          type: string
+          format: uuid
+        deliveryStreet:
+          type: string
+        deliveryBuildingNumber:
+          type: string
+        deliveryPostalCode:
+          type: string
+        deliveryCity:
+          type: string
+        truckId:
+          type: string
+        containerId:
+          type: string
+          format: uuid
+        note:
+          type: string
+      required:
+      - carrierPartyId
+      - consignorPartyId
+      - containerOperation
+      - deliveryBuildingNumber
+      - deliveryCity
+      - deliveryPostalCode
+      - deliveryStreet
+      - note
+      - pickupBuildingNumber
+      - pickupCity
+      - pickupDateTime
+      - pickupPostalCode
+      - pickupStreet
+      - transportType
+    TransportReorderRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        licensePlate:
+          type: string
+        transportIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - date
+      - licensePlate
+      - transportIds
+    PlanningView:
+      type: object
+      properties:
+        dates:
+          type: array
+          items:
+            type: string
+        transports:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportsView"
+      required:
+      - dates
+      - transports
+    TransportView:
+      type: object
+      properties:
+        pickupDate:
+          type: string
+        deliveryDate:
+          type: string
+        id:
+          type: string
+        truck:
+          $ref: "#/components/schemas/Truck"
+        originCity:
+          type: string
+        destinationCity:
+          type: string
+        driver:
+          $ref: "#/components/schemas/ProfileDto"
+        status:
+          type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
+          - INVOICED
+        displayNumber:
+          type: string
+        containerId:
+          type: string
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        sequenceNumber:
+          type: integer
+          format: int32
+      required:
+      - id
+      - pickupDate
+      - sequenceNumber
+      - status
+      - transportType
+    TransportsView:
+      type: object
+      properties:
+        truck:
+          type: string
+        transports:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/TransportView"
+      required:
+      - transports
+      - truck
+    ContainerLocation:
+      type: object
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        companyName:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+    WasteContainer:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        id:
+          type: string
+        location:
+          $ref: "#/components/schemas/ContainerLocation"
+        notes:
+          type: string
+      required:
+      - id
+      - uuid
+    AddressRequest:
+      type: object
+      properties:
+        streetName:
+          type: string
+          minLength: 1
+        buildingName:
+          type: string
+        buildingNumber:
+          type: string
+          minLength: 1
+        postalCode:
+          type: string
+          pattern: "^\\d{4}\\s[A-Z]{2}$"
+        city:
+          type: string
+          minLength: 1
+        country:
+          type: string
+          minLength: 1
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    CreateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}$"
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        roles:
+          type: array
+          items:
+            type: string
+          minItems: 1
+      required:
+      - email
+      - firstName
+      - lastName
+      - password
+      - roles
+    CreateSignatureRequest:
+      type: object
+      properties:
+        signature:
+          type: string
+        email:
+          type: string
+          format: email
+        party:
+          type: string
+          minLength: 1
+      required:
+      - email
+      - party
+      - signature
+    SignatureStatusView:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+        consignorSigned:
+          type: boolean
+        carrierSigned:
+          type: boolean
+        consigneeSigned:
+          type: boolean
+        pickupSigned:
+          type: boolean
+      required:
+      - carrierSigned
+      - consigneeSigned
+      - consignorSigned
+      - pickupSigned
+      - transportId
+    TransportFinishedRequest:
+      type: object
+      properties:
+        hours:
+          type: number
+          format: double
+      required:
+      - hours
+    CreateContainerRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        location:
+          $ref: "#/components/schemas/ContainerLocation"
+        notes:
+          type: string
+      required:
+      - id
+    CompanyRequest:
+      type: object
+      properties:
+        chamberOfCommerceId:
+          type: string
+          pattern: "^$|^[\\d]{8}$"
+        vihbId:
+          type: string
+          pattern: "^$|^[0-9]{6}[VIHBX]{4}$"
+        name:
+          type: string
+          minLength: 1
+        address:
+          $ref: "#/components/schemas/AddressRequest"
+      required:
+      - name
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        lastSignInAt:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - roles
+    ProcessingMethod:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
+    DriverPlanningItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryDateTime:
+          type: string
+          format: date-time
+        pickupLocation:
+          $ref: "#/components/schemas/LocationDto"
+        deliveryLocation:
+          $ref: "#/components/schemas/LocationDto"
+        containerId:
+          type: string
+        status:
+          type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
+          - INVOICED
+      required:
+      - deliveryLocation
+      - pickupDateTime
+      - pickupLocation
+      - status
+    Eural:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
+    CompanyBranchResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        companyId:
+          type: string
+          format: uuid
+      required:
+      - address
+      - companyId
+      - id
+    CompanyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        updatedAt:
+          type: string
+          format: date-time
+        branches:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompanyBranchResponse"
+      required:
+      - address
+      - branches
+      - id
+      - name
+      - updatedAt
