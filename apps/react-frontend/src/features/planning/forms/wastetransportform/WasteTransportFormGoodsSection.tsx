@@ -126,7 +126,6 @@ export const WasteTransportFormGoodsSection = () => {
             title={'Gebruikelijke benaming'}
             placeholder={'Gebruikelijke benaming afvalstof'}
             disabled={isGoodsNameDisabled}
-            testId='goods-name-textfield'
             formHook={{
               register: formContext.register,
               name: 'goodsName',

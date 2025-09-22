@@ -37,7 +37,6 @@ export const TextFormField = <TFieldValues extends FieldValues>({
       <span className="text-subtitle-2">{title}</span>
       <TextInput
         placeholder={placeholder}
-        data-testid={testId}
         formHook={{
           register: formHook?.register,
           name: formHook?.name,
@@ -46,7 +45,7 @@ export const TextFormField = <TFieldValues extends FieldValues>({
         }}
         defaultValue={value}
         disabled={disabled}
-        data-testid={formHook?.name}
+        data-testid={testId || formHook?.name}
       />
       {fieldError && (
         <span className="text-caption-1 text-color-status-error-dark">
