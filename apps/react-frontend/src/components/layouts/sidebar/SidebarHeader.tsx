@@ -1,4 +1,4 @@
-import LogoIcon from '@/assets/MediumLogo.svg';
+import LogoIcon from '@/assets/logo-icon.png';
 import ArrowLineRight from '@/assets/icons/ArrowLineRight.svg';
 import ArrowLineLeft from '@/assets/icons/ArrowLineLeft.svg';
 import { Logo } from '@/components/ui/Logo';
@@ -17,9 +17,9 @@ export const SidebarHeader = ({
       className="relative flex p-4 justify-between items-center self-stretch border-b border-solid border-b-primary"
       data-testid="sidebar-header"
     >
-      <div className="flex items-center justify-center w-full gap-2 relative">
+      
         {collapsed && (
-          <>
+          <div className="flex items-center justify-center w-full gap-2 relative">
             {/* Logo icon (shown when not hovering) */}
             <img
               src={LogoIcon}
@@ -38,12 +38,12 @@ export const SidebarHeader = ({
                 className="w-4 h-4"
               />
             </button>
-          </>
+          </div>
         )}
 
         {/* Full logo and text (when not collapsed) */}
         {!collapsed && (
-          <>
+          <div className="flex items-center justify-between w-full gap-2 relative">
             <Logo />
             <button
               onClick={toggleSidebar}
@@ -51,9 +51,8 @@ export const SidebarHeader = ({
             >
               <img src={ArrowLineLeft} alt="Collapse" className="w-4 h-4" />
             </button>
-          </>
+          </div>
         )}
       </div>
-    </div>
   );
 };
