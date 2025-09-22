@@ -69,6 +69,7 @@ export const Drawer = ({
                       variant="icon"
                       iconPosition="right"
                       onClick={() => setIsOpen(false)}
+                      data-testid="close-drawer-button"
                     />
                   </div>
                 </div>

@@ -126,13 +126,56 @@ export class PlanningPage extends BasePage {
     await expect(planningCard).toBeVisible({ timeout: 5000 });
   }
 
+  /**
+   * Open the transport details drawer for a specific transport
+   */
   async openDetailsDrawerFor(displayNumber: string): Promise<void> {
     await this.clickPlanningCardByDisplayNumber(displayNumber);
     await this.transportDetailsDrawer.verifyDrawerVisible();
   }
 
-  async downloadWaybill(): Promise<void> {
-    await this.transportDetailsDrawer.downloadWaybill();
+  /**
+   * Download the waybill from the transport details drawer with retry logic
+   * Will attempt to download up to 3 times if it fails
+   */
+  async downloadWaybill(displayNumber: string, maxRetries = 3): Promise<void> {
+    let attempts = 0;
+    let success = false;
+    let lastError: Error | null = null;
+    
+    while (attempts < maxRetries && !success) {
+      attempts++;
+      try {
+        console.log(`Attempt ${attempts} of ${maxRetries} to download waybill for transport ${displayNumber}`);
+        
+        // Open the transport details drawer
+        await this.openDetailsDrawerFor(displayNumber);
+        
+        // Try to download the waybill
+        await this.transportDetailsDrawer.downloadWaybill();
+        
+        // If we get here, the download was successful
+        success = true;
+        console.log(`Successfully downloaded waybill on attempt ${attempts}`);
+      } catch (error) {
+        // Cast the error to Error type safely
+        lastError = error instanceof Error ? error : new Error(String(error));
+        console.log(`Attempt ${attempts} failed: ${lastError.message}`);
+        
+        // Close the drawer if it's open before retrying
+          await this.transportDetailsDrawer.closeDrawer();
+          console.log('Closed drawer before retrying');
+          
+          // Add a small delay before retrying - using a safer approach than waitForTimeout
+          // This gives the UI time to settle before the next attempt
+          await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+    
+    // If all attempts failed, throw the last error
+    if (!success) {
+      throw new Error(`Failed to download waybill after ${maxRetries} attempts. Last error: ${lastError?.message}`);
+    }
   }
 
   /**

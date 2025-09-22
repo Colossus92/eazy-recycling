@@ -18,11 +18,13 @@ const expectSizeGreaterThan100Kb = async (stream: Readable) => {
 export class TransportDetailsDrawerComponent extends BaseComponent {
   private readonly drawerContent: Locator;
   private readonly waybillDownloadButton: Locator;
+  private readonly closeButton: Locator;
   
   constructor(page: Page) {
     super(page);
     this.drawerContent = page.locator('[data-testid="transport-details-drawer-content"]');
     this.waybillDownloadButton = page.locator('[data-testid="waybill-download-button"]');
+    this.closeButton = page.locator('button[data-testid="close-drawer-button"]');
   }
 
   /**
@@ -32,13 +34,47 @@ export class TransportDetailsDrawerComponent extends BaseComponent {
     await expect(this.drawerContent).toBeVisible({ timeout: 5000 });
   }
 
+  /**
+   * Close the transport details drawer
+   */
+  async closeDrawer(): Promise<void> {
+    // Check if the drawer is visible before trying to close it
+    const isVisible = await this.drawerContent.isVisible();
+    if (isVisible) {
+      await this.closeButton.click();
+      await expect(this.drawerContent).toBeHidden({ timeout: 5000 });
+      console.log('Transport details drawer closed');
+    } else {
+      console.log('Drawer already closed, no action needed');
+    }
+  }
+
+  /**
+   * Click the waybill download button and verify the downloaded file
+   * Note: This method only clicks the download button. The caller should handle
+   * waiting for network requests if needed.
+   */
   async downloadWaybill(): Promise<void> {
-    this.page.on('download', download => download.path().then(console.log));
-    const downloadPromise = this.page.waitForEvent('download');
-    await this.waybillDownloadButton.click();
-    const download = await downloadPromise;
-    const stream = await download.createReadStream();
+    // Set up download handling
+    this.page.on('download', download => download.path().then(path => {
+      console.log(`Waybill downloaded to: ${path}`);
+    }));
     
+    // Wait for the download event
+    const downloadPromise = this.page.waitForEvent('download');
+    
+    // Click the download button
+    await expect(this.waybillDownloadButton).toBeVisible();
+    await this.waybillDownloadButton.click();
+    console.log('Clicked on waybill download button');
+    
+    // Wait for the download to start
+    const download = await downloadPromise;
+    console.log(`Download started: ${download.suggestedFilename()}`);
+    
+    // Verify the downloaded file size
+    const stream = await download.createReadStream();
     await expectSizeGreaterThan100Kb(stream);
+    console.log('Waybill file size verification passed');
   }
 }

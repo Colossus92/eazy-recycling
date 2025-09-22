@@ -80,11 +80,9 @@ test.describe('Create New Waste Transport', () => {
     
     // Verify that we have a display number before proceeding
     expect(wasteTransportDisplayNumber, 'Waste transport display number should be extracted').toBeTruthy();
-    await planningPage.page.waitForTimeout(10000);
-    await planningPage.openDetailsDrawerFor(wasteTransportDisplayNumber as string);
-    await planningPage.downloadWaybill();
 
-    
+    // Start the waybill download
+    await planningPage.downloadWaybill(wasteTransportDisplayNumber as string);
   });
 });
 
