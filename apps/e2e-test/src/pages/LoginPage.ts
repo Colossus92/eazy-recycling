@@ -20,8 +20,8 @@ export class LoginPage extends BasePage {
     // Initialize locators
     this.welcomeTitle = page.locator('h3:has-text("Welkom bij Eazy Recycling")');
     this.welcomeSubtitle = page.locator('text=Voer uw inloggegevens in');
-    this.emailField = page.locator('[data-test-id="email"]');
-    this.passwordField = page.locator('[data-test-id="password"]');
+    this.emailField = page.locator('[data-testid="email"]');
+    this.passwordField = page.locator('[data-testid="password"]');
     this.loginButton = page.locator('button[type="submit"]');
     this.formError = page.locator('.text-color-status-error-dark');
   }

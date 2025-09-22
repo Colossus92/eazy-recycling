@@ -19,8 +19,6 @@ export class WasteTransportFormComponent {
     // Initialize form container and navigation buttons
     this.formContainer = page.locator('form');
     this.nextButton = page.locator('button[data-testid="next-button"]');
-    this.backButton = page.locator('button[data-testid="back-button"]');
-    this.cancelButton = page.locator('button[data-testid="cancel-button"]');
   }
   
   /**

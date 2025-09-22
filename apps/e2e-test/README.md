@@ -129,7 +129,7 @@ test.describe('Login Tests', () => {
 
 ### 1. Element Selection Strategy
 
-- **Prefer `data-test-id` attributes** for test-specific element identification
+- **Prefer `data-testid` attributes** for test-specific element identification
 - Use semantic selectors (text content, roles) for stable elements
 - Avoid CSS classes and complex selectors that may change
 
@@ -161,18 +161,18 @@ test.describe('Login Tests', () => {
 
 ## Data Test IDs
 
-For reliable element selection, add `data-test-id` attributes to your React components:
+For reliable element selection, add `data-testid` attributes to your React components:
 
 ```tsx
 // In your React components
 <input 
-  data-test-id="email-field"
+  data-testid="email-field"
   type="email" 
   {...props} 
 />
 
 <button 
-  data-test-id="login-button"
+  data-testid="login-button"
   type="submit"
 >
   Login
@@ -230,7 +230,7 @@ All these measures ensure your Docker containers remain running between test run
 
 ### Common Issues
 
-1. **Element not found**: Ensure `data-test-id` attributes are added to components
+1. **Element not found**: Ensure `data-testid` attributes are added to components
 2. **Timing issues**: Use proper wait strategies instead of fixed delays
 3. **Test flakiness**: Implement robust wait conditions and error handling
 

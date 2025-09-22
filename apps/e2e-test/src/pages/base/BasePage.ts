@@ -42,31 +42,31 @@ export abstract class BasePage {
   }
 
   /**
-   * Fill form field by data-test-id
+   * Fill form field by data-testid
    */
   async fillFieldByTestId(testId: string, value: string): Promise<void> {
-    await this.page.fill(`[data-test-id="${testId}"]`, value);
+    await this.page.fill(`[data-testid="${testId}"]`, value);
   }
 
   /**
-   * Click element by data-test-id
+   * Click element by data-testid
    */
   async clickByTestId(testId: string): Promise<void> {
-    await this.page.click(`[data-test-id="${testId}"]`);
+    await this.page.click(`[data-testid="${testId}"]`);
   }
 
   /**
-   * Get text content by data-test-id
+   * Get text content by data-testid
    */
   async getTextByTestId(testId: string): Promise<string> {
-    return await this.page.textContent(`[data-test-id="${testId}"]`) || '';
+    return await this.page.textContent(`[data-testid="${testId}"]`) || '';
   }
 
   /**
-   * Check if element is visible by data-test-id
+   * Check if element is visible by data-testid
    */
   async isVisibleByTestId(testId: string): Promise<boolean> {
-    return await this.page.isVisible(`[data-test-id="${testId}"]`);
+    return await this.page.isVisible(`[data-testid="${testId}"]`);
   }
 
   /**

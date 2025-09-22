@@ -26,12 +26,36 @@ export abstract class BaseFormComponent {
     await expect(option).toBeVisible();
     await option.click();
   }
+
+  /**
+   * Helper method to select from Headless UI Combobox component
+   */
+  async selectFromCombobox(comboboxTestId: string, optionText: string): Promise<void> {
+    const comboboxElement = this.page.locator(`[data-testid="${comboboxTestId}"]`);
+    await comboboxElement.click();
+    
+    // Type part of the option text to filter
+    await this.page.keyboard.type(optionText.substring(0, 4));
+    
+    // Wait for the option to be visible and click it
+    const option = this.page.locator(`[role="option"]`).filter({ hasText: optionText });
+    await expect(option).toBeVisible();
+    await option.click();
+  }
   
   /**
    * Fill a text input field by test ID
    */
   async fillInputByTestId(testId: string, value: string): Promise<void> {
     await this.page.locator(`[data-testid="${testId}"]`).fill(value);
+  }
+
+
+  /**
+   * Fill a text input field by locator
+   */
+  async fillInputByLocator(locator: string, value: string): Promise<void> {
+    await this.page.locator(locator).fill(value);
   }
   
   /**

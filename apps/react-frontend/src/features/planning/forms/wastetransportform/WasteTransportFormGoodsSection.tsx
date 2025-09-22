@@ -83,6 +83,7 @@ export const WasteTransportFormGoodsSection = () => {
         title={'Ontdoener'}
         placeholder={'Selecteer een ontdoener'}
         options={companyOptions}
+        testId='pickup-party-select'
         formHook={{
           register: formContext.register,
           name: 'pickupPartyId',
@@ -103,6 +104,7 @@ export const WasteTransportFormGoodsSection = () => {
               label: `${ws.number} - ${ws.name}`,
               displayValue: ws.number,
             }))}
+            testId='waste-stream-number-combobox'
             formHook={{
               register: formContext.register,
               name: 'wasteStreamNumber',
@@ -124,6 +126,7 @@ export const WasteTransportFormGoodsSection = () => {
             title={'Gebruikelijke benaming'}
             placeholder={'Gebruikelijke benaming afvalstof'}
             disabled={isGoodsNameDisabled}
+            testId='goods-name-textfield'
             formHook={{
               register: formContext.register,
               name: 'goodsName',
@@ -138,6 +141,7 @@ export const WasteTransportFormGoodsSection = () => {
             title={'Euralcode'}
             placeholder={'Selecteer een euralcode'}
             options={euralOptions}
+            testId='eural-code-select'
             formHook={{
               register: formContext.register,
               name: 'euralCode',
@@ -152,6 +156,7 @@ export const WasteTransportFormGoodsSection = () => {
             title={'Verwerkingsmethode'}
             placeholder={'Selecteer een verwerkingsmethode'}
             options={processingMethodOptions}
+            testId='processing-method-select'
             formHook={{
               register: formContext.register,
               name: 'processingMethodCode',

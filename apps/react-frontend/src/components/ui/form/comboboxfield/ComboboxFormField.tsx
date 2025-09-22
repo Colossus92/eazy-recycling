@@ -40,6 +40,7 @@ interface ComboboxFormFieldProps<TFieldValues extends FieldValues> {
   };
   getFilteredItems?: (query: string, items: ComboboxItem[]) => ComboboxItem[];
   displayValue?: (id: string, items: ComboboxItem[]) => string;
+  testId?: string;
 }
 
 export const ComboboxFormField = <TFieldValues extends FieldValues>({
@@ -51,6 +52,7 @@ export const ComboboxFormField = <TFieldValues extends FieldValues>({
   formHook,
   getFilteredItems,
   displayValue,
+  testId,
 }: ComboboxFormFieldProps<TFieldValues>) => {
   const { name, rules, errors, control } = formHook;
   const error = errors[name]?.message as string;
@@ -100,6 +102,7 @@ export const ComboboxFormField = <TFieldValues extends FieldValues>({
                           ? 'border-color-status-error-dark'
                           : 'border-color-border-primary focus:border-color-primary hover:bg-color-brand-light hover:border-color-brand-dark'
                     )}
+                    data-testid={testId}
                     placeholder={placeholder}
                     onChange={(event) => setQuery(event.target.value)}
                     displayValue={(id: string) =>

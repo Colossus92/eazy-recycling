@@ -11,6 +11,7 @@ import { WasteTransportDetailsSectionComponent } from '../components/WasteTransp
  * This page is accessible from the Planning page
  */
 export class WasteTransportFormPage extends BasePage {
+  
   // Form components for each section
   public readonly mainSection: WasteTransportMainSectionComponent;
   public readonly pickupSection: WasteTransportPickupSectionComponent;
@@ -70,6 +71,10 @@ export class WasteTransportFormPage extends BasePage {
    */
   async fillDeliverySection(deliveryCompanyAddress: string, deliveryDateTime: string): Promise<void> {
     await this.deliverySection.fillDeliverySection(deliveryCompanyAddress, deliveryDateTime);
+  }
+
+  async fillGoodsSection(pickupPartyName: string ) {
+    await this.goodsSection.fillWasteSection(pickupPartyName);
   }
   
   /**

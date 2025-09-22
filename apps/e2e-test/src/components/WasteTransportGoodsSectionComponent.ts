@@ -6,6 +6,7 @@ import { BaseFormComponent } from './base/BaseFormComponent';
  * Maps to WasteTransportFormGoodsSection.tsx in the React codebase
  */
 export class WasteTransportGoodsSectionComponent extends BaseFormComponent {
+  
   constructor(page: Page) {
     super(page);
   }
@@ -17,15 +18,16 @@ export class WasteTransportGoodsSectionComponent extends BaseFormComponent {
     const afvalDetailsSpan = this.page.locator('span.subtitle-2:has-text("Afval details")');
     await expect(afvalDetailsSpan).toBeVisible();
   }
-  
-  /**
-   * Fill the waste details
-   */
-  async fillWasteDetails(wasteType: string, wasteWeight: string): Promise<void> {
-    // Select waste type
-    await this.selectFromReactSelect('waste-type-select', wasteType);
+
+  async fillWasteSection(pickupPartyName: string) {
+    await this.verifyWasteDetailsSectionVisible();
+    await this.selectFromReactSelect('pickup-party-select', pickupPartyName);
+    await this.selectFromCombobox('waste-stream-number-combobox', '087970000135 - ijzer en staal');
+    await this.selectFromReactSelect('eural-code-select', '16 01 17 - ferrometalen');
+    await this.selectFromReactSelect('processing-method-select', 'A.02 - Overslag / Opbulken');
+    await this.fillInputByLocator('[name="weight"]', '100');
+    await this.fillInputByLocator('[name="quantity"]', '2');
+    await expect(this.page.locator('[data-testid="goodsName"]')).toHaveValue('ijzer en staal');
     
-    // Fill waste weight
-    await this.fillInputByTestId('waste-weight-input', wasteWeight);
   }
 }

@@ -13,6 +13,7 @@ interface TextFormFieldProps<TFieldValues extends FieldValues> {
   value?: string;
   formHook?: FormProps<TFieldValues>;
   disabled?: boolean;
+  testId?: string;
 }
 
 export interface FormProps<TFieldValues extends FieldValues> {
@@ -28,6 +29,7 @@ export const TextFormField = <TFieldValues extends FieldValues>({
   formHook,
   value,
   disabled,
+  testId,
 }: TextFormFieldProps<TFieldValues>) => {
   const fieldError = formHook?.errors?.[formHook?.name]?.message?.toString();
   return (
@@ -35,6 +37,7 @@ export const TextFormField = <TFieldValues extends FieldValues>({
       <span className="text-subtitle-2">{title}</span>
       <TextInput
         placeholder={placeholder}
+        data-testid={testId}
         formHook={{
           register: formHook?.register,
           name: formHook?.name,
@@ -43,7 +46,7 @@ export const TextFormField = <TFieldValues extends FieldValues>({
         }}
         defaultValue={value}
         disabled={disabled}
-        data-test-id={formHook?.name}
+        data-testid={formHook?.name}
       />
       {fieldError && (
         <span className="text-caption-1 text-color-status-error-dark">
