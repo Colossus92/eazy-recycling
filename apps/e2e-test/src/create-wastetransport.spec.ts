@@ -61,9 +61,8 @@ test.describe('Create New Waste Transport', () => {
     await wasteTransportFormPage.fillGoodsSection(testData.customer.name);
     await wasteTransportFormPage.goToNextStep();
 
-
-    await wasteTransportFormPage.detailsSection.verifyTransportDetailsSectionVisible();
-    
+    await wasteTransportFormPage.detailsSection.fillTransportDetails();
+    await wasteTransportFormPage.submitForm();
   });
 });
 

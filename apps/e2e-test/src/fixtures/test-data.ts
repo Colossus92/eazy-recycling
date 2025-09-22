@@ -18,10 +18,7 @@ export const testUsers = {
 
 export const testData = {
   truck: {
-    licensePlate: 'AB-123-CD',
-    brand: 'Mercedes',
-    model: 'Actros',
-    year: 2023
+    displayName: 'Scania Haakarm 86-BVB-6',
   },
   company: {
     name: 'Test Recycling BV',
@@ -31,6 +28,12 @@ export const testData = {
   },
   customer: {
     name: 'King Customer'
+  },
+  driver: {
+    name: 'Sjaak Chauffeur',
+  },
+  container: {
+    displayName: '40M001',
   }
 };
 

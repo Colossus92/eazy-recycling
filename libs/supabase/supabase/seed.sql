@@ -141,3 +141,6 @@ VALUES ('A.01', 'Bewaren'),
 
 INSERT INTO "public"."waste_stream" ("number", "name") VALUES
 	('087970000135', 'ijzer en staal');
+
+INSERT INTO "public"."waste_containers" ("uuid", "id", "type", "created_at", "updated_at", "location_company_id", "street_name", "postal_code", "city", "building_number", "building_name", "country", "notes") VALUES
+	('3eb0e01e-155c-4e0a-9162-3f4d14d0f13f', '40M001', NULL, '2025-09-22 08:04:13.247323+00', '2025-09-22 08:04:13.247323+00', NULL, '', '', '', '', NULL, 'Nederland', '');

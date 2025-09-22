@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { BaseFormComponent } from './base/BaseFormComponent';
+import { testData } from '../fixtures/test-data';
 
 /**
  * Component for interacting with the details section of the waste transport form
@@ -21,8 +22,10 @@ export class WasteTransportDetailsSectionComponent extends BaseFormComponent {
   /**
    * Fill the transport details
    */
-  async fillTransportDetails(notes: string): Promise<void> {
-    // Fill notes
-    await this.fillInputByTestId('transport-notes', notes);
+  async fillTransportDetails(): Promise<void> {
+    await this.selectFromReactSelect('truck-select', testData.truck.displayName);
+    await this.selectFromReactSelect('driver-select', testData.driver.name);
+    await this.selectFromReactSelect('container-select', testData.container.displayName);
+    await this.fillInputByTestId('transport-notes', 'Twee bakken wisselen');
   }
 }

@@ -20,6 +20,7 @@ interface TextAreaFormFieldProps<TFieldValues extends FieldValues> {
     rules?: RegisterOptions<TFieldValues>;
     errors: FieldErrors;
   };
+  testId?: string;
 }
 
 export const TextAreaFormField = <TFieldValues extends FieldValues>({
@@ -29,6 +30,7 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
   disabled = false,
   rows = 5,
   formHook,
+  testId,
 }: TextAreaFormFieldProps<TFieldValues>) => {
   const { register, name, rules, errors } = formHook;
   const error = errors[name]?.message as string;
@@ -54,6 +56,7 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
         defaultValue={value}
         disabled={disabled}
         rows={rows}
+        data-testid={testId}
         {...register(name, rules)}
       />
     </div>

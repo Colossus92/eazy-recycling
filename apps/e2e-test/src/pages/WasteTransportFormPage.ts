@@ -22,6 +22,7 @@ export class WasteTransportFormPage extends BasePage {
   // Form navigation elements
   private readonly formContainer: Locator;
   private readonly nextButton: Locator;
+  private readonly submitButton: Locator;
   private readonly backButton: Locator;
   private readonly cancelButton: Locator;
   private readonly stepper: Locator;
@@ -33,6 +34,7 @@ export class WasteTransportFormPage extends BasePage {
     // Initialize form navigation elements
     this.formContainer = page.locator('form');
     this.nextButton = page.locator('button[data-testid="next-button"]');
+    this.submitButton = page.locator('button[data-testid="submit-button"]');
     this.backButton = page.locator('button[data-testid="back-button"]');
     this.cancelButton = page.locator('button[data-testid="cancel-button"]');
     this.stepper = page.locator('.stepper');
@@ -82,6 +84,13 @@ export class WasteTransportFormPage extends BasePage {
    */
   async goToNextStep(): Promise<void> {
     await this.nextButton.click();
+  }
+
+  /**
+   * Submit the form
+   */
+  async submitForm(): Promise<void> {
+    await this.submitButton.click();
   }
   
   /**

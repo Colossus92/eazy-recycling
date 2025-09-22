@@ -49,6 +49,7 @@ export const TransportFormDetailsSection = () => {
         title={'Container (optioneel)'}
         placeholder={'Selecteer een container'}
         options={containerOptions}
+        testId='container-select'
         formHook={{
           register: register,
           name: 'containerId',
@@ -59,6 +60,7 @@ export const TransportFormDetailsSection = () => {
       <TextAreaFormField
         title={'Opmerkingen (optioneel)'}
         placeholder={'Plaats opmerkingen'}
+        testId='transport-notes'
         formHook={{
           register,
           name: 'note',

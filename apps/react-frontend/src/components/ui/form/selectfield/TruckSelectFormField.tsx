@@ -40,6 +40,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
       title={'Vrachtwagen (optioneel)'}
       placeholder={'Selecteer een vrachtwagen'}
       options={truckOptions}
+      testId='truck-select'
       formHook={{
         register: formHook.register,
         name: formHook.name,
