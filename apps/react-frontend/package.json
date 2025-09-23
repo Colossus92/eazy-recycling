@@ -76,14 +76,5 @@
   },
   "lint-staged": {
     "*.js": "eslint --fix"
-  },
-  "nx": {
-    "targets": {
-      "dev": {
-        "dependsOn": [
-          "springboot-backend:bootRun"
-        ]
-      }
-    }
   }
 }

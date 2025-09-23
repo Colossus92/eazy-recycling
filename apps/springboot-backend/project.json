@@ -2,20 +2,6 @@
   "name": "springboot-backend",
   "root": "apps/springboot-backend",
   "targets": {
-    "bootRun": {
-      "dependsOn": [
-        "assemble",
-        "supabase:start"
-      ]
-    },
-    "assemble": {
-      "continuous": true,
-      "options": {
-        "args": [
-          "--continuous"
-        ]
-      }
-    },
     "build": {
       "dependsOn": [
         "eba-schema:build"
