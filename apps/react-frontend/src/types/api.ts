@@ -44,11 +44,6 @@ export type WasteContainer = {
   notes?: string;
 };
 
-export type Eural = {
-  code: string;
-  description: string;
-};
-
 export type ProcessingMethod = {
   code: string;
   description: string;

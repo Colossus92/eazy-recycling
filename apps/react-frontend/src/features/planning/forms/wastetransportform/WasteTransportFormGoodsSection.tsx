@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company, Eural, ProcessingMethod, WasteStream } from '@/types/api.ts';
+import { Company, ProcessingMethod, WasteStream } from '@/types/api.ts';
 import { companyService } from '@/api/companyService.ts.tsx';
 import { NumberFormField } from '@/components/ui/form/NumberFormField.tsx';
-import { euralService } from '@/api/euralService.ts';
 import { processingMethodService } from '@/api/processingMethodService';
 import { wasteStreamService } from '@/api/wasteStreamService';
 import { ComboboxFormField } from '@/components/ui/form/comboboxfield/ComboboxFormField';
+import { euralService } from '@/api/services/euralService';
+import { Eural } from '@/api/client';
 
 export const WasteTransportFormGoodsSection = () => {
   const formContext = useFormContext<WasteTransportFormValues>();
@@ -22,7 +23,7 @@ export const WasteTransportFormGoodsSection = () => {
   });
   const { data: eurals = [] } = useQuery<Eural[]>({
     queryKey: ['eurals'],
-    queryFn: () => euralService.list(),
+    queryFn: () => euralService.getAll(),
   });
   const { data: processingMethods = [] } = useQuery<ProcessingMethod[]>({
     queryKey: ['processingMethods'],
