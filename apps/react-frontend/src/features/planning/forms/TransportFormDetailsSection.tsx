@@ -4,8 +4,8 @@ import {
   Option,
   SelectFormField,
 } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { WasteContainer } from '@/types/api.ts';
-import { containerService } from '@/api/containerService.ts';
+import { WasteContainer } from '@/api/client';
+import { containerService } from '@/api/services/containerService';
 import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
@@ -20,7 +20,7 @@ export const TransportFormDetailsSection = () => {
   } = useFormContext<ContainerTransportFormValues | WasteTransportFormValues>();
   const { data: wastecontainers = [] } = useQuery<WasteContainer[]>({
     queryKey: ['containers'],
-    queryFn: () => containerService.list(),
+    queryFn: () => containerService.getAll(),
   });
 
   const containerOptions: Option[] = wastecontainers.map((container) => ({

@@ -1,11 +1,22 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { getWasteContainerLocation, WasteContainer } from '@/types/api.ts';
+import { WasteContainer } from '@/api/client';
 import { Column } from '@/features/crud/ContentTable.tsx';
 import { CrudPage } from '@/features/crud/CrudPage.tsx';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import { useWasteContainerCrud } from '@/features/containers/useWasteContainerCrud.ts';
 import { WasteContainerForm } from '@/features/containers/WasteContainerForm.tsx';
+
+export function getWasteContainerLocation(container: WasteContainer): string {
+  if (container.location?.companyName) {
+    return `${container.location.companyName}, ${container.location.address?.city}`;
+  }
+  if (container.location?.address) {
+    const address = container.location.address;
+    return `${address.streetName} ${address.buildingNumber}, ${address.city}`;
+  }
+  return '';
+}
 
 export const ContainerManagement = () => {
   const {

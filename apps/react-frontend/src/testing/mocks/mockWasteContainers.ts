@@ -1,4 +1,4 @@
-import { WasteContainer } from '@/types/api';
+import { WasteContainer } from '@/api/client';
 
 export const wasteContainers: WasteContainer[] = [
   {

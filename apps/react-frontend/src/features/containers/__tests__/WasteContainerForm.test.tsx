@@ -127,7 +127,7 @@ describe('WasteContainerForm', () => {
       mockContainer.id
     );
 
-    if (mockContainer.location.address) {
+    if (mockContainer.location?.address) {
       expect(screen.getByPlaceholderText('Vul straatnaam in')).toHaveValue(
         mockContainer.location.address.streetName
       );

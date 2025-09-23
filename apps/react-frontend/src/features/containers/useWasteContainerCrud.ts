@@ -1,19 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { DeleteResponse, WasteContainer } from '@/types/api.ts';
-import { containerService } from '@/api/containerService.ts';
+import { WasteContainer, CreateContainerRequest } from '@/api/client';
+import { containerService } from '@/api/services/containerService';
 
 function filter(container: WasteContainer, query: string) {
   return (
     container.id.toLowerCase().includes(query.toLowerCase()) ||
-    container.location.companyName
+    container.location?.companyName
       ?.toLowerCase()
       .includes(query.toLowerCase()) ||
-    container.location.address?.streetName
-      .toLowerCase()
+    container.location?.address?.streetName
+      ?.toLowerCase()
       .includes(query.toLowerCase()) ||
-    container.location.address?.city
-      .toLowerCase()
+    container.location?.address?.city
+      ?.toLowerCase()
       .includes(query.toLowerCase()) ||
     container.notes?.toLowerCase().includes(query.toLowerCase())
   );
@@ -23,7 +23,7 @@ export const useWasteContainerCrud = () => {
   const queryClient = useQueryClient();
   const { data: containers = [], error } = useQuery<WasteContainer[]>({
     queryKey: ['containers'],
-    queryFn: () => containerService.list(),
+    queryFn: () => containerService.getAll(),
   });
   const [query, setQuery] = useState<string>('');
   const displayedContainers = useMemo(
@@ -40,8 +40,7 @@ export const useWasteContainerCrud = () => {
   );
 
   const createMutation = useMutation({
-    mutationFn: (item: Omit<WasteContainer, 'id'>) =>
-      containerService.create(item),
+    mutationFn: (item: CreateContainerRequest) => containerService.create(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['containers'] })
@@ -50,18 +49,16 @@ export const useWasteContainerCrud = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: WasteContainer) => containerService.remove(item),
-    onSuccess: (response: DeleteResponse) => {
-      if (response.success) {
-        queryClient
-          .invalidateQueries({ queryKey: ['containers'] })
-          .then(() => setDeleting(undefined));
-      }
+    mutationFn: (container: WasteContainer) => containerService.delete(container.id),
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ['containers'] })
+        .then(() => setDeleting(undefined));
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: (item: WasteContainer) => containerService.update(item),
+    mutationFn: (container: WasteContainer) => containerService.update(container),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['containers'] })
@@ -69,9 +66,20 @@ export const useWasteContainerCrud = () => {
     },
   });
 
-  const create = async (item: Omit<WasteContainer, 'id'>): Promise<void> => {
+  const create = async (item: Omit<WasteContainer, 'id'> | CreateContainerRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
-      createMutation.mutate(item, {
+      // Workaround to accept the Omit type
+      const createRequest: CreateContainerRequest = 'id' in item 
+        ? item as CreateContainerRequest
+        : {
+            // If we're getting an Omit<WasteContainer, 'id'>, we need to add an id
+            // This should not happen in practice as the form always provides an id
+            id: '',
+            location: item.location,
+            notes: item.notes
+          };
+      
+      createMutation.mutate(createRequest, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });

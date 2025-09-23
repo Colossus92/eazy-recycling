@@ -70,15 +70,4 @@ export function toUser(data: UserFormValues) {
   } as User;
 }
 
-export function getWasteContainerLocation(container: WasteContainer): string {
-  if (container.location.companyName) {
-    return `${container.location.companyName}, ${container.location.address?.city}`;
-  }
-  if (container.location.address) {
-    const address = container.location.address;
-    return `${address.streetName} ${address.buildingNumber}, ${address.city}`;
-  }
-  return '';
-}
-
 export type DeleteResponse = { success: boolean };

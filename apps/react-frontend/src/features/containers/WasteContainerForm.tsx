@@ -3,7 +3,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { Company, WasteContainer } from '@/types/api.ts';
+import { Company } from '@/types/api.ts';
+import { WasteContainer } from '@/api/client';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { ErrorDialog } from '@/components/ui/dialog/ErrorDialog.tsx';
@@ -38,24 +39,32 @@ function toWasteContainer(
   const container: WasteContainer = {
     uuid: data.uuid || crypto.randomUUID(),
     id: data.id,
-    location: {},
+    location: {
+      address: {
+        streetName: data.street,
+        buildingNumber: data.houseNumber,
+        postalCode: data.postalCode || '',
+        city: data.city,
+      }
+    },
     notes: data.notes,
   };
 
   if (data.companyId) {
     const company = companies.find((c) => c.id === data.companyId);
     if (company) {
-      container.location.companyId = company.id;
-      container.location.companyName = company.name;
+      container.location = {
+        companyId: company.id,
+        companyName: company.name,
+        address: {
+          streetName: data.street,
+          buildingNumber: data.houseNumber,
+          postalCode: data.postalCode || '',
+          city: data.city,
+        }
+      };
     }
   }
-
-  container.location.address = {
-    streetName: data.street,
-    buildingNumber: data.houseNumber,
-    postalCode: data.postalCode || '',
-    city: data.city,
-  };
 
   return container;
 }
@@ -90,11 +99,11 @@ export const WasteContainerForm = ({
       ? {
           uuid: wasteContainer.uuid,
           id: wasteContainer.id,
-          companyId: wasteContainer.location.companyId,
-          street: wasteContainer.location.address?.streetName,
-          houseNumber: wasteContainer.location.address?.buildingNumber,
-          postalCode: wasteContainer.location.address?.postalCode,
-          city: wasteContainer.location.address?.city,
+          companyId: wasteContainer?.location?.companyId,
+          street: wasteContainer?.location?.address?.streetName,
+          houseNumber: wasteContainer?.location?.address?.buildingNumber,
+          postalCode: wasteContainer?.location?.address?.postalCode,
+          city: wasteContainer?.location?.address?.city,
           notes: wasteContainer.notes,
         }
       : {
@@ -185,7 +194,7 @@ export const WasteContainerForm = ({
                   errors,
                   control,
                 }}
-                value={wasteContainer?.location.companyId}
+                value={wasteContainer?.location?.companyId}
               />
 
               {hasCompanySelected && (
@@ -207,7 +216,7 @@ export const WasteContainerForm = ({
                   name: 'street',
                   errors,
                 }}
-                value={wasteContainer?.location.address?.streetName}
+                value={wasteContainer?.location?.address?.streetName}
                 disabled={hasCompanySelected}
               />
 
@@ -219,7 +228,7 @@ export const WasteContainerForm = ({
                   name: 'houseNumber',
                   errors,
                 }}
-                value={wasteContainer?.location.address?.buildingNumber}
+                value={wasteContainer?.location?.address?.buildingNumber}
                 disabled={hasCompanySelected}
               />
             </div>
@@ -230,7 +239,7 @@ export const WasteContainerForm = ({
                 setValue={setValue}
                 errors={errors}
                 name="postalCode"
-                value={wasteContainer?.location.address?.postalCode}
+                value={wasteContainer?.location?.address?.postalCode}
                 required={false}
                 disabled={hasCompanySelected}
               />
@@ -243,7 +252,7 @@ export const WasteContainerForm = ({
                   name: 'city',
                   errors,
                 }}
-                value={wasteContainer?.location.address?.city}
+                value={wasteContainer?.location?.address?.city}
                 disabled={hasCompanySelected}
               />
             </div>

@@ -4,13 +4,13 @@ import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useWasteContainerCrud } from '../useWasteContainerCrud';
 import { wasteContainers as initialContainers } from '../../../testing/mocks/mockWasteContainers';
-import { WasteContainer } from '@/types/api';
+import { WasteContainer, CreateContainerRequest } from '@/api/client';
 
 // Mock the containerService
-vi.mock('@/api/containerService.ts', () => {
+vi.mock('@/api/services/containerService', () => {
   return {
     containerService: {
-      list: vi
+      getAll: vi
         .fn()
         .mockImplementation(() => Promise.resolve([...initialContainers])),
       create: vi.fn().mockImplementation((container) => {
@@ -27,9 +27,9 @@ vi.mock('@/api/containerService.ts', () => {
         }
         return Promise.resolve(container);
       }),
-      remove: vi.fn().mockImplementation((container) => {
+      delete: vi.fn().mockImplementation((id) => {
         const index = initialContainers.findIndex(
-          (c) => c.uuid === container.uuid
+          (c) => c.id === id
         );
         if (index !== -1) {
           initialContainers.splice(index, 1);
@@ -98,12 +98,12 @@ describe('useWasteContainerCrud', () => {
     expect(result.current.displayedContainers.length).toBeGreaterThan(0);
     result.current.displayedContainers.forEach((container) => {
       expect(
-        container.location.companyName?.toLowerCase().includes('green') ||
+        container.location?.companyName?.toLowerCase().includes('green') ||
           container.notes?.toLowerCase().includes('green') ||
-          container.location.address?.streetName
-            .toLowerCase()
+          container.location?.address?.streetName
+            ?.toLowerCase()
             .includes('green') ||
-          container.location.address?.city.toLowerCase().includes('green')
+          container.location?.address?.city?.toLowerCase().includes('green')
       ).toBeTruthy();
     });
 
@@ -114,7 +114,7 @@ describe('useWasteContainerCrud', () => {
 
     expect(result.current.displayedContainers.length).toBeGreaterThan(0);
     result.current.displayedContainers.forEach((container) => {
-      expect(container.location.address?.city.toLowerCase()).toBe('amsterdam');
+      expect(container.location?.address?.city?.toLowerCase()).toBe('amsterdam');
     });
 
     // Search by notes
@@ -161,8 +161,8 @@ describe('useWasteContainerCrud', () => {
   });
 
   it('create(newItem) adds new container', async () => {
-    const newItem: Omit<WasteContainer, 'id'> = {
-      uuid: 'test-uuid-123',
+    const newItem: CreateContainerRequest = {
+      id: 'CONT-NEW',
       location: {
         companyName: 'New Company',
         address: {
@@ -199,9 +199,9 @@ describe('useWasteContainerCrud', () => {
     expect(result.current.displayedContainers).toContainEqual(
       expect.objectContaining({
         location: expect.objectContaining({
-          companyName: newItem.location.companyName,
+          companyName: newItem.location?.companyName,
           address: expect.objectContaining({
-            city: newItem.location.address?.city,
+            city: newItem.location?.address?.city,
           }),
         }),
         notes: newItem.notes,
@@ -210,7 +210,7 @@ describe('useWasteContainerCrud', () => {
   });
 
   it('update(item) updates an existing container', async () => {
-    const target = { ...initialContainers[0], notes: 'Updated notes' };
+    const target: WasteContainer = { ...initialContainers[0], notes: 'Updated notes' };
     const { result } = renderHook(() => useWasteContainerCrud(), { wrapper });
 
     // Wait for initial data to load
