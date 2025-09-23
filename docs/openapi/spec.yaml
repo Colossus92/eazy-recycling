@@ -5,6 +5,8 @@ info:
 servers:
 - url: http://localhost:8080
   description: Generated server url
+security:
+- bearerAuth: []
 paths:
   /waste-streams/{number}:
     put:
@@ -1678,3 +1680,10 @@ components:
       - id
       - name
       - updatedAt
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: Authorization
+      in: header
+      scheme: bearer
+      bearerFormat: JWT

@@ -58,6 +58,10 @@ export const PlanningControllerApiAxiosParamCreator = function (configuration?: 
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
             if (truckId !== undefined) {
                 localVarQueryParameter['truckId'] = truckId;
             }
@@ -109,6 +113,10 @@ export const PlanningControllerApiAxiosParamCreator = function (configuration?: 
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
             if (startDate !== undefined) {
                 localVarQueryParameter['startDate'] = (startDate as any instanceof Date) ?
                     (startDate as any).toISOString().substring(0,10) :
@@ -152,6 +160,10 @@ export const PlanningControllerApiAxiosParamCreator = function (configuration?: 
             const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
