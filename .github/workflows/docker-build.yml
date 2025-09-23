@@ -30,9 +30,11 @@ jobs:
               - 'apps/springboot-backend/.dockerignore'
               - 'apps/springboot-backend/Dockerfile'
               - 'apps/springboot-backend/build.gradle.kts'
+              - 'apps/react-frontend/**'
               - 'libs/eba-schema/**'
               - 'nx.json'
               - 'package.json'
+              - 'package-lock.json'
               - '.github/workflows/docker-build.yml'
 
       # Set up Node.js for Nx

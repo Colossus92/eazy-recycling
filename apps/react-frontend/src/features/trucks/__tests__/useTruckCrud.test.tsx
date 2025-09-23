@@ -114,6 +114,8 @@ describe('useTruckCrud', () => {
       licensePlate: 'NEW123',
       brand: 'TestBrand',
       model: 'X1',
+      updatedAt: new Date().toISOString(),
+      displayName: 'TestBrand X1',
     };
     const { result } = renderHook(() => useTruckCrud(), { wrapper });
 
@@ -141,6 +143,8 @@ describe('useTruckCrud', () => {
         licensePlate: newItem.licensePlate,
         brand: newItem.brand,
         model: newItem.model,
+        updatedAt: newItem.updatedAt,
+        displayName: newItem.displayName,
       })
     );
   });
