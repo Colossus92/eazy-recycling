@@ -27,9 +27,9 @@ vi.mock('@/api/services/containerService', () => {
         }
         return Promise.resolve(container);
       }),
-      delete: vi.fn().mockImplementation((id) => {
+      delete: vi.fn().mockImplementation((uuid) => {
         const index = initialContainers.findIndex(
-          (c) => c.id === id
+          (c) => c.uuid === uuid
         );
         if (index !== -1) {
           initialContainers.splice(index, 1);

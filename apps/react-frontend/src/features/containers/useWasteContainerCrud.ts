@@ -49,7 +49,7 @@ export const useWasteContainerCrud = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (container: WasteContainer) => containerService.delete(container.id),
+    mutationFn: (container: WasteContainer) => containerService.delete(container.uuid),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['containers'] })
