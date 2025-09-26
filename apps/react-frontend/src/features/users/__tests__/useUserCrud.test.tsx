@@ -3,11 +3,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useUserCrud } from '../useUserCrud';
-import { User } from '@/types/api';
+import { CreateUserRequest } from '@/api/client';
+import { User } from '@/api/services/userService.ts';
 
 // Mock the userService
-vi.mock('@/api/userService.ts', () => {
-  const initialUsers = [
+vi.mock('@/api/services/userService.ts', () => {
+  const initialUsers: User[] = [
     {
       id: 'user-1',
       firstName: 'John',
@@ -36,22 +37,29 @@ vi.mock('@/api/userService.ts', () => {
 
   const users = [...initialUsers];
 
+  // Mock the API client responses
   return {
     userService: {
-      list: vi.fn().mockImplementation(() => Promise.resolve([...users])),
-      create: vi.fn().mockImplementation((user) => {
-        const newUser = { ...user, id: `user-${users.length + 1}` };
+      getAll: vi.fn().mockImplementation(() => Promise.resolve([...users])),
+      create: vi.fn().mockImplementation((user: Omit<CreateUserRequest, 'id'>) => {
+        const newUser = { ...user, id: `user-${users.length + 1}` } as User;
         users.push(newUser);
         return Promise.resolve(newUser);
       }),
-      update: vi.fn().mockImplementation((user) => {
+      update: vi.fn().mockImplementation((user: User) => {
         const index = users.findIndex((u) => u.id === user.id);
         if (index !== -1) {
-          users[index] = user;
+          users[index] = {
+            ...users[index],
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            roles: user.roles,
+          };
         }
-        return Promise.resolve(user);
+        return Promise.resolve(users[index]);
       }),
-      remove: vi.fn().mockImplementation((id) => {
+      delete: vi.fn().mockImplementation((id: string) => {
         const index = users.findIndex((u) => u.id === id);
         if (index !== -1) {
           users.splice(index, 1);
@@ -116,7 +124,7 @@ describe('useUserCrud', () => {
     });
 
     expect(result.current.displayedUsers.length).toBe(1);
-    expect(result.current.displayedUsers[0].firstName.toLowerCase()).toContain(
+    expect(result.current.displayedUsers[0]?.firstName?.toLowerCase()).toContain(
       'jane'
     );
 
@@ -126,7 +134,7 @@ describe('useUserCrud', () => {
     });
 
     expect(result.current.displayedUsers.length).toBe(1);
-    expect(result.current.displayedUsers[0].lastName.toLowerCase()).toContain(
+    expect(result.current.displayedUsers[0]?.lastName?.toLowerCase()).toContain(
       'smith'
     );
 
@@ -136,7 +144,7 @@ describe('useUserCrud', () => {
     });
 
     expect(result.current.displayedUsers.length).toBe(1);
-    expect(result.current.displayedUsers[0].email.toLowerCase()).toContain(
+    expect(result.current.displayedUsers[0]?.email?.toLowerCase()).toContain(
       'bob.johnson'
     );
 
@@ -185,12 +193,12 @@ describe('useUserCrud', () => {
 
     const initialLength = result.current.displayedUsers.length;
 
-    const newUser: Omit<User, 'id'> = {
+    const newUser: CreateUserRequest = {
       firstName: 'Test',
       lastName: 'User',
       email: 'test.user@example.com',
       roles: ['planner'],
-      lastSignInAt: new Date().toISOString(),
+      password: 'password'
     };
 
     await act(async () => {
@@ -222,10 +230,13 @@ describe('useUserCrud', () => {
       expect(result.current.displayedUsers.length).toBeGreaterThan(0)
     );
 
-    const userToUpdate = {
-      ...result.current.displayedUsers[0],
+    const originalUser = result.current.displayedUsers[0];
+    const userToUpdate: User = {
+      ...originalUser,
       firstName: 'Updated',
       lastName: 'Name',
+      email: originalUser.email || '',
+      roles: originalUser.roles || [],
     };
 
     await act(async () => {
@@ -298,12 +309,12 @@ describe('useUserCrud', () => {
       .spyOn(result.current, 'create')
       .mockRejectedValueOnce(mockError);
 
-    const newUser: Omit<User, 'id'> = {
+    const newUser: CreateUserRequest = {
       firstName: 'Test',
       lastName: 'User',
       email: 'test.user@example.com',
       roles: ['planner'],
-      lastSignInAt: new Date().toISOString(),
+      password: 'password',
     };
 
     // Attempt to create and expect it to fail
@@ -329,7 +340,14 @@ describe('useUserCrud', () => {
       .spyOn(result.current, 'update')
       .mockRejectedValueOnce(mockError);
 
-    const userToUpdate = result.current.displayedUsers[0];
+    const originalUser = result.current.displayedUsers[0];
+    const userToUpdate: User = {
+      ...originalUser,
+      firstName: 'Updated',
+      lastName: 'Name',
+      email: originalUser.email || '',
+      roles: originalUser.roles || [],
+    };
 
     // Attempt to update and expect it to fail
     await expect(result.current.update(userToUpdate)).rejects.toThrow(

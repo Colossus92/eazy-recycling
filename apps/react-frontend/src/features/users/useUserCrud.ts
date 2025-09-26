@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { DeleteResponse, User } from '@/types/api.ts';
-import { userService } from '@/api/userService.ts';
+import { userService, User } from '@/api/services/userService.ts';
+import { CreateUserRequest } from '@/api/client';
 
 export function useUserCrud() {
   const queryClient = useQueryClient();
@@ -11,16 +11,16 @@ export function useUserCrud() {
     isLoading,
   } = useQuery<User[]>({
     queryKey: ['users'],
-    queryFn: () => userService.list(),
+    queryFn: () => userService.getAll(),
   });
   const [query, setQuery] = useState<string>('');
   const displayedUsers = useMemo(
     () =>
       users.filter((users) => {
         return (
-          users.email.toLowerCase().includes(query.toLowerCase()) ||
-          users.firstName.toLowerCase().includes(query.toLowerCase()) ||
-          users.lastName.toLowerCase().includes(query.toLowerCase())
+          users.email?.toLowerCase().includes(query.toLowerCase()) ||
+          users.firstName?.toLowerCase().includes(query.toLowerCase()) ||
+          users.lastName?.toLowerCase().includes(query.toLowerCase())
         );
       }),
     [users, query]
@@ -30,7 +30,7 @@ export function useUserCrud() {
   const [deleting, setDeleting] = useState<User | undefined>(undefined);
 
   const createMutation = useMutation({
-    mutationFn: (item: Omit<User, 'id'>) => userService.create(item),
+    mutationFn: (item: Omit<CreateUserRequest, 'id'>) => userService.create(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['users'] })
@@ -39,14 +39,11 @@ export function useUserCrud() {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: User) => userService.remove(item.id),
-    onSuccess: (response: DeleteResponse) => {
-      if (response.success) {
-        queryClient
-          .invalidateQueries({ queryKey: ['users'] })
-          .then(() => setDeleting(undefined));
-      }
-    },
+    mutationFn: (item: User) => userService.delete(item.id),
+    onSuccess: () =>
+      queryClient
+        .invalidateQueries({ queryKey: ['users'] })
+        .then(() => setDeleting(undefined)),
   });
 
   const updateMutation = useMutation({
@@ -59,7 +56,7 @@ export function useUserCrud() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (item: User) => userService.updateProfile(item),
+    mutationFn: (item: User) => userService.update(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['users'] })
@@ -67,7 +64,7 @@ export function useUserCrud() {
     },
   });
 
-  const create = async (item: Omit<User, 'id'>): Promise<void> => {
+  const create = async (item: Omit<CreateUserRequest, 'id'>): Promise<void> => {
     return new Promise((resolve, reject) => {
       createMutation.mutate(item, {
         onSuccess: () => resolve(),

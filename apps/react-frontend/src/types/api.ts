@@ -1,5 +1,3 @@
-import { UserFormValues } from '@/features/users/UserForm.tsx';
-
 export type Truck = {
   licensePlate: string;
   model: string;
@@ -48,26 +46,5 @@ export type ProcessingMethod = {
   code: string;
   description: string;
 };
-
-export type User = {
-  id: string;
-  email: string;
-  roles: string[];
-  lastSignInAt: string;
-  firstName: string;
-  lastName: string;
-};
-
-export function toUser(data: UserFormValues) {
-  return {
-    id: data.id,
-    email: data.email,
-    roles: data.roles,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    password: data.password,
-    lastSignInAt: data.lastSignInAt,
-  } as User;
-}
 
 export type DeleteResponse = { success: boolean };

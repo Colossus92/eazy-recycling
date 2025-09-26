@@ -8,7 +8,7 @@ import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { UserFormValues } from '@/features/users/UserForm.tsx';
-import { toUser, User } from '@/types/api.ts';
+import { toUser, User } from '@/api/services/userService.ts';
 import { ErrorDialog } from '@/components/ui/dialog/ErrorDialog.tsx';
 import { supabase } from '@/api/supabaseClient.tsx';
 import { useUserCrud } from '@/features/users/useUserCrud.ts';

@@ -41,6 +41,19 @@ vi.mock('react-router-dom', async () => {
 // Create a mock update function that we can control in tests
 const mockUpdate = vi.fn().mockImplementation((user) => Promise.resolve(user));
 
+// Mock the toUser function
+vi.mock('@/api/services/userService.ts', () => ({
+  toUser: (data: any) => ({
+    id: data.id,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    roles: data.roles,
+    lastSignInAt: data.lastSignInAt,
+  }),
+  User: undefined,
+}));
+
 // Mock the useUserCrud hook
 vi.mock('@/features/users/useUserCrud.ts', () => ({
   useUserCrud: () => ({

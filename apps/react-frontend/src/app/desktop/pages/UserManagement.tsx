@@ -5,9 +5,10 @@ import { CrudPage } from '@/features/crud/CrudPage.tsx';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import IdentificationCard from '@/assets/icons/IdentificationCard.svg?react';
 import { useUserCrud } from '@/features/users/useUserCrud.ts';
-import { User } from '@/types/api.ts';
 import { UserForm } from '@/features/users/UserForm.tsx';
 import { formatDateString } from '@/utils/dateUtils.ts';
+import { User } from '@/api/services/userService.ts';
+import { CreateUserRequest } from '@/api/client';
 
 export const UserManagement = () => {
   const queryClient = useQueryClient();
@@ -77,7 +78,7 @@ export const UserManagement = () => {
           open: isAdding,
           onClose: () => setIsAdding(false),
           onSave: (data) => {
-            return create(data);
+            return create(data as CreateUserRequest);
           },
         },
         update: {
@@ -85,7 +86,8 @@ export const UserManagement = () => {
           item: editing,
           onClose: () => setEditing(undefined),
           onSave: (data) => {
-            return update(data);
+            // We know this is a User because we're in the update dialog
+            return update(data as User);
           },
         },
         delete: {
@@ -104,9 +106,15 @@ export const UserManagement = () => {
         onDelete: setDeleting,
         onEdit: setEditing,
       }}
-      renderForm={(close, onSubmit, itemToEdit) => (
-        <UserForm onCancel={close} onSubmit={onSubmit} user={itemToEdit} />
-      )}
+      renderForm={(close, onSubmit, itemToEdit) => {
+        // Create a properly typed onSubmit function that can handle both User and CreateUserRequest
+        const typedOnSubmit = (data: User | CreateUserRequest) => {
+          onSubmit(data as any);
+        };
+        return (
+          <UserForm onCancel={close} onSubmit={typedOnSubmit} user={itemToEdit} />
+        );
+      }}
       renderEmptyState={(open) => (
         <EmptyState
           icon={IdentificationCard}

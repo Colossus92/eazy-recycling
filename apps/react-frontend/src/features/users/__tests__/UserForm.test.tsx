@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UserForm } from '../UserForm';
-import { User } from '@/types/api';
+import { User } from '@/api/services/userService';
 
 // Mock the ErrorDialog component
 vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({

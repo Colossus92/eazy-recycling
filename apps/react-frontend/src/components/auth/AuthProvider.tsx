@@ -4,7 +4,7 @@ import { lazy } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { supabase } from '@/api/supabaseClient.tsx';
 import { AuthContext } from '@/components/auth/AuthContext.ts';
-import { User } from '@/types/api.ts';
+import { User } from '@/api/services/userService.ts';
 
 const LoginPage = lazy(() => import('../../app/desktop/pages/LoginPage.tsx'));
 

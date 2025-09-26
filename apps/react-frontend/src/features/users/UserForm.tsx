@@ -3,17 +3,18 @@ import { FormEvent } from 'react';
 import Avatar from 'react-avatar';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { toUser, User } from '@/types/api.ts';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { PasswordFormField } from '@/components/ui/form/PasswordFormField.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { User } from '@/api/services/userService.ts';
+import { CreateUserRequest } from '@/api/client';
 
 interface UserFormProps {
   onCancel: () => void;
-  onSubmit: (data: User) => void;
+  onSubmit: (data: User | CreateUserRequest) => void;
   user?: User;
 }
 
@@ -50,9 +51,29 @@ export const UserForm = ({ onCancel, onSubmit, user }: UserFormProps) => {
 
   const submitForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await handleSubmit(async (data) => {
+    await handleSubmit(async (data: UserFormValues) => {
       try {
-        await onSubmit(toUser(data));
+        if (isEditing && user) {
+          // For editing existing users
+          const updatedUser: User = {
+            ...user,
+            email: data.email || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            roles: data.roles || []
+          };
+          await onSubmit(updatedUser);
+        } else {
+          // For new users, create a CreateUserRequest object
+          const createUserRequest: CreateUserRequest = {
+            email: data.email || '',
+            firstName: data.firstName || '',
+            lastName: data.lastName || '',
+            password: data.password || '',
+            roles: data.roles || []
+          };
+          await onSubmit(createUserRequest);
+        }
         onCancel(); // Only close the form if submission was successful
       } catch (error) {
         handleError(error);

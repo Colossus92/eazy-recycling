@@ -10,8 +10,7 @@ import {
   Option,
   SelectFormField,
 } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { User } from '@/types/api.ts';
-import { userService } from '@/api/userService.ts';
+import { userService, User } from '@/api/services/userService';
 
 interface DriverSelectFormFieldProps<TFieldValues extends FieldValues> {
   formHook: {
