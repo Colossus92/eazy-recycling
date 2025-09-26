@@ -2,12 +2,12 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { CompanyBranch } from '@/types/api.ts';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { CompanyBranch } from '@/api/services/companyService';
 
 interface CompanyBranchFormProps {
   onCancel: () => void;
@@ -27,6 +27,7 @@ export interface CompanyBranchFormValues extends FieldValues {
 
 function toCompanyBranch(data: CompanyBranchFormValues): CompanyBranch {
   const companyBranch: CompanyBranch = {
+    id: data.id || '',
     address: {
       streetName: data.street,
       buildingNumber: data.houseNumber,
@@ -35,10 +36,6 @@ function toCompanyBranch(data: CompanyBranchFormValues): CompanyBranch {
     },
     companyId: data.companyId,
   };
-
-  if (data.id) {
-    companyBranch.id = data.id;
-  }
 
   return companyBranch;
 }

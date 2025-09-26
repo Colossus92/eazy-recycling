@@ -2,7 +2,7 @@ import { CompanyBranchForm } from './CompanyBranchForm.tsx';
 import { useCompanyBranchCrud } from './useCompanyBranchCrud.ts';
 import { ErrorDialog } from '@/components/ui/dialog/ErrorDialog.tsx';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
-import { Company, CompanyBranch } from '@/types/api.ts';
+import { Company, CompanyBranch } from '@/api/services/companyService';
 
 interface BranchManagementHandlers {
   handleAddBranch: (company: Company) => void;

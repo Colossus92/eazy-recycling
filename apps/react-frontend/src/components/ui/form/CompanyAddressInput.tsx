@@ -2,10 +2,9 @@ import { FieldValues, Path, UseFormReturn } from 'react-hook-form';
 import { useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PostalCodeFormField } from './PostalCodeFormField';
-import { companyService } from '@/api/companyService.ts.tsx';
+import { companyService, Company } from '@/api/services/companyService.ts';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { Company } from '@/types/api.ts';
 
 export interface FieldNames<T extends FieldValues> {
   companyId: Path<T>;
@@ -34,7 +33,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
 }: CompanyAddressInputProps<T>) => {
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies', includeBranches],
-    queryFn: () => companyService.list(includeBranches),
+    queryFn: () => companyService.getAll(includeBranches),
     refetchOnMount: false,
   });
   const {
@@ -163,7 +162,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
       const selectedBranch = selectedCompany.branches.find(
         (branch) => branch.id === watchBranchId
       );
-      if (selectedBranch) {
+      if (selectedBranch && selectedBranch.address && selectedBranch.address.streetName && selectedBranch.address.buildingNumber && selectedBranch.address.postalCode && selectedBranch.address.city) {
         setValue(
           fieldNames.street,
           mapToFormValue(selectedBranch.address.streetName)
@@ -182,7 +181,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
     }
 
     // Otherwise, use company address (headquarter)
-    if (selectedCompany) {
+    if (selectedCompany && selectedCompany.address && selectedCompany.address.streetName && selectedCompany.address.buildingNumber && selectedCompany.address.postalCode && selectedCompany.address.city) {
       setValue(
         fieldNames.street,
         mapToFormValue(selectedCompany.address.streetName)

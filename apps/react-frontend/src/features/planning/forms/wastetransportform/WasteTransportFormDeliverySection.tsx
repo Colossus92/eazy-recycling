@@ -8,14 +8,13 @@ import {
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput.tsx';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company } from '@/types/api.ts';
-import { companyService } from '@/api/companyService.ts.tsx';
+import { companyService, Company } from '@/api/services/companyService.ts';
 
 export const WasteTransportFormDeliverySection = () => {
   const formContext = useFormContext<WasteTransportFormValues>();
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(),
+    queryFn: () => companyService.getAll(),
   });
 
   const companyOptions = useMemo(() => companies.map((company) => ({

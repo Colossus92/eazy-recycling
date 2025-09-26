@@ -3,14 +3,13 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { Company } from '@/types/api.ts';
 import { WasteContainer } from '@/api/client';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { ErrorDialog } from '@/components/ui/dialog/ErrorDialog.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField.tsx';
-import { companyService } from '@/api/companyService.ts';
+import { companyService, Company } from '@/api/services/companyService.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
 
@@ -79,7 +78,7 @@ export const WasteContainerForm = ({
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(),
+    queryFn: () => companyService.getAll(),
   });
 
   const companyOptions = companies.map((company) => ({
@@ -122,10 +121,10 @@ export const WasteContainerForm = ({
     if (hasCompanySelected) {
       const company = companies.find((c) => c.id === watchCompanyId);
       if (company) {
-        setValue('street', company.address.streetName);
-        setValue('houseNumber', company.address.buildingNumber);
-        setValue('postalCode', company.address.postalCode);
-        setValue('city', company.address.city);
+        setValue('street', company.address.streetName || '');
+        setValue('houseNumber', company.address.buildingNumber || '');
+        setValue('postalCode', company.address.postalCode || '');
+        setValue('city', company.address.city || '');
       }
     } else {
       if (!wasteContainer) {

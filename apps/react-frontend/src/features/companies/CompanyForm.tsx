@@ -2,7 +2,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { Company } from '@/types/api.ts';
+import { Company } from '@/api/services/companyService';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
@@ -29,20 +29,19 @@ export interface CompanyFormValues extends FieldValues {
 
 function toCompany(data: CompanyFormValues): Company {
   const company: Company = {
+    id: data.id || '',
     address: {
       streetName: data.street,
       buildingNumber: data.houseNumber,
       postalCode: data.postalCode,
       city: data.city,
     },
-    chamberOfCommerceId: data.chamberOfCommerceId?.trim() || null,
+    chamberOfCommerceId: data.chamberOfCommerceId?.trim() || undefined,
     name: data.name,
-    vihbId: data.vihbId?.trim() || null,
+    vihbId: data.vihbId?.trim() || undefined,
+    updatedAt: new Date().toISOString(),
+    branches: [],
   };
-
-  if (data.id) {
-    company.id = data.id;
-  }
 
   return company;
 }

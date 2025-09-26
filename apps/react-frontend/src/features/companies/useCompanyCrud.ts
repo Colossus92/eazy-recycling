@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Company, DeleteResponse } from '@/types/api.ts';
-import { companyService } from '@/api/companyService.ts';
+import { companyService, Company } from '@/api/services/companyService.ts';
 
 export const useCompanyCrud = () => {
   const queryClient = useQueryClient();
@@ -11,7 +10,7 @@ export const useCompanyCrud = () => {
     isLoading,
   } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(true),
+    queryFn: () => companyService.getAll(true),
   });
   const [query, setQuery] = useState<string>('');
   const displayedCompanies = useMemo<Company[]>(
@@ -51,16 +50,14 @@ export const useCompanyCrud = () => {
         .invalidateQueries({ queryKey: ['companies'] })
         .then(() => setEditing(undefined));
     },
-  });
+  });``
 
   const removeMutation = useMutation({
-    mutationFn: (item: Company) => companyService.remove(item),
-    onSuccess: (response: DeleteResponse) => {
-      if (response.success) {
+    mutationFn: (item: Company) => companyService.delete(item.id),
+    onSuccess: () => {
         queryClient
           .invalidateQueries({ queryKey: ['companies'] })
           .then(() => setDeleting(undefined));
-      }
     },
   });
 

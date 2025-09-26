@@ -1,8 +1,7 @@
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company } from '@/types/api.ts';
-import { companyService } from '@/api/companyService.ts.tsx';
+import { companyService, Company } from '@/api/services/companyService.ts';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 
 export const ContainerTransportMainSection = () => {
@@ -13,7 +12,7 @@ export const ContainerTransportMainSection = () => {
   } = useFormContext<ContainerTransportFormValues>();
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(),
+    queryFn: () => companyService.getAll(),
   });
 
   const companyOptions = companies.map((company) => ({

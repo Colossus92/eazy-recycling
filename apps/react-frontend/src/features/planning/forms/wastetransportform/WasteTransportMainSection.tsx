@@ -2,8 +2,7 @@ import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { ConsignorClassificationSelect } from './ConsignorClassificationSelect';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company } from '@/types/api.ts';
-import { companyService } from '@/api/companyService.ts.tsx';
+import { companyService, Company } from '@/api/services/companyService.ts';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 
 export const WasteTransportMainSection = () => {
@@ -14,7 +13,7 @@ export const WasteTransportMainSection = () => {
   } = useFormContext<WasteTransportFormValues>();
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(),
+    queryFn: () => companyService.getAll(),
   });
 
   const companyOptions = companies.map((company) => ({

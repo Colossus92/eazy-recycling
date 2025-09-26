@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CompanyForm } from '../CompanyForm';
+import { Company } from '@/api/services/companyService';
 
 // Mock the ErrorDialog component
 vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({
@@ -16,7 +17,7 @@ vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({
 }));
 
 // Create mock companies for testing
-const mockCompanies = [
+const mockCompanies: Company[] = [
   {
     id: 'comp-1',
     name: 'Acme Recycling',
@@ -28,6 +29,8 @@ const mockCompanies = [
     },
     chamberOfCommerceId: '12345678',
     vihbId: '123456VIHB',
+    updatedAt: new Date().toISOString(),
+    branches: [],
   },
   {
     id: 'comp-2',
@@ -40,6 +43,8 @@ const mockCompanies = [
     },
     chamberOfCommerceId: '87654321',
     vihbId: '654321VIHB',
+    updatedAt: new Date().toISOString(),
+    branches: [],
   },
 ];
 
@@ -277,7 +282,7 @@ describe('CompanyForm', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('submits form with empty optional fields as null', async () => {
+  it('submits form with empty optional fields as undefined', async () => {
     render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
       wrapper,
     });
@@ -306,7 +311,7 @@ describe('CompanyForm', () => {
     const submitButton = screen.getByTestId('submit-button');
     await userEvent.click(submitButton);
 
-    // Check if onSubmit was called with null values for optional fields
+    // Check if onSubmit was called with undefined values for optional fields
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledTimes(1);
       expect(mockOnSubmit).toHaveBeenCalledWith(
@@ -318,8 +323,10 @@ describe('CompanyForm', () => {
             postalCode: '1234 ZZ',
             city: 'Test City',
           }),
-          chamberOfCommerceId: null,
-          vihbId: null,
+          chamberOfCommerceId: undefined,
+          vihbId: undefined,
+          updatedAt: expect.any(String),
+          branches: expect.any(Array),
         })
       );
     });
@@ -328,7 +335,7 @@ describe('CompanyForm', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('submits form with whitespace-only optional fields as null', async () => {
+  it('submits form with whitespace-only optional fields as undefined', async () => {
     render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
       wrapper,
     });
@@ -365,14 +372,16 @@ describe('CompanyForm', () => {
     const submitButton = screen.getByTestId('submit-button');
     await userEvent.click(submitButton);
 
-    // Check if onSubmit was called with null values for whitespace-only fields
+    // Check if onSubmit was called with undefined values for whitespace-only fields
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledTimes(1);
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'Test Company',
-          chamberOfCommerceId: null,
-          vihbId: null,
+          chamberOfCommerceId: undefined,
+          vihbId: undefined,
+          updatedAt: expect.any(String),
+          branches: expect.any(Array),
         })
       );
     });
@@ -381,18 +390,18 @@ describe('CompanyForm', () => {
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('handles edit mode with existing null values', async () => {
-    const companyWithNulls = {
+  it('handles edit mode with existing undefined values', async () => {
+    const companyWithUndefined = {
       ...mockCompanies[0],
-      chamberOfCommerceId: null,
-      vihbId: null,
+      chamberOfCommerceId: undefined,
+      vihbId: undefined,
     };
 
     render(
       <CompanyForm
         onCancel={mockOnCancel}
         onSubmit={mockOnSubmit}
-        company={companyWithNulls}
+        company={companyWithUndefined}
       />,
       { wrapper }
     );
@@ -400,11 +409,11 @@ describe('CompanyForm', () => {
     // Wait for form to load with existing data
     await waitFor(() => {
       expect(screen.getByPlaceholderText('Vul bedrijfsnaam in')).toHaveValue(
-        companyWithNulls.name
+        companyWithUndefined.name
       );
     });
 
-    // Check that optional fields are empty when null
+    // Check that optional fields are empty when undefined
     expect(screen.getByPlaceholderText('Vul Kvk nummer in')).toHaveValue('');
     expect(screen.getByPlaceholderText('Vul VIHB-nummer in')).toHaveValue('');
 
@@ -412,15 +421,17 @@ describe('CompanyForm', () => {
     const submitButton = screen.getByTestId('submit-button');
     await userEvent.click(submitButton);
 
-    // Check if onSubmit was called with null values preserved
+    // Check if onSubmit was called with undefined values preserved
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledTimes(1);
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
-          id: companyWithNulls.id,
-          name: companyWithNulls.name,
-          chamberOfCommerceId: null,
-          vihbId: null,
+          id: companyWithUndefined.id,
+          name: companyWithUndefined.name,
+          chamberOfCommerceId: undefined,
+          vihbId: undefined,
+          updatedAt: expect.any(String),
+          branches: expect.any(Array),
         })
       );
     });

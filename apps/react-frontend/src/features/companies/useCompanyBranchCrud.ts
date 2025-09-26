@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { companyService } from '@/api/companyService.ts';
-import { Company, CompanyBranch } from '@/types/api.ts';
+import { companyService, Company, CompanyBranch } from '@/api/services/companyService.ts';
 import { getErrorMessage } from '@/utils/error';
 
 export const useCompanyBranchCrud = () => {

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { CrudPage } from '@/features/crud/CrudPage.tsx';
 import { useCompanyCrud } from '@/features/companies/useCompanyCrud.ts';
-import { Company, CompanyBranch } from '@/types/api.ts';
+import { Company, CompanyBranch } from '@/api/services/companyService';
 import { Column, ExpandableConfig } from '@/features/crud/ContentTable.tsx';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';

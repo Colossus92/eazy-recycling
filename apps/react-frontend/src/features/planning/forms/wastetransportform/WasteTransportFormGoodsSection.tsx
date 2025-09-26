@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company } from '@/types/api.ts';
-import { companyService } from '@/api/companyService.ts.tsx';
+import { companyService, Company } from '@/api/services/companyService.ts';
 import { NumberFormField } from '@/components/ui/form/NumberFormField.tsx';
 import { processingMethodService } from '@/api/services/processingMethodService';
 import { ProcessingMethod } from '@/api/client';
@@ -20,7 +19,7 @@ export const WasteTransportFormGoodsSection = () => {
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.list(),
+    queryFn: () => companyService.getAll(),
   });
   const { data: eurals = [] } = useQuery<Eural[]>({
     queryKey: ['eurals'],

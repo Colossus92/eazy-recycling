@@ -2,11 +2,12 @@ import { act, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { Company } from '@/api/services/companyService';
 import { useCompanyCrud } from '../useCompanyCrud';
 
 // Mock the containerService
-vi.mock('@/api/companyService.ts', () => {
-  const initialCompanies = [
+vi.mock('@/api/services/companyService.ts', () => {
+  const initialCompanies: Company[] = [
     {
       id: 'comp-1',
       name: 'Acme Recycling',
@@ -18,6 +19,8 @@ vi.mock('@/api/companyService.ts', () => {
       },
       chamberOfCommerceId: 'KVK123456',
       vihbId: 'VIHB789',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
     },
     {
       id: 'comp-2',
@@ -30,6 +33,8 @@ vi.mock('@/api/companyService.ts', () => {
       },
       chamberOfCommerceId: 'KVK654321',
       vihbId: 'VIHB987',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
     },
     {
       id: 'comp-3',
@@ -42,6 +47,8 @@ vi.mock('@/api/companyService.ts', () => {
       },
       chamberOfCommerceId: 'KVK789012',
       vihbId: 'VIHB345',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
     },
   ];
 
@@ -49,7 +56,7 @@ vi.mock('@/api/companyService.ts', () => {
 
   return {
     companyService: {
-      list: vi.fn().mockImplementation(() => Promise.resolve([...companies])),
+      getAll: vi.fn().mockImplementation(() => Promise.resolve([...companies])),
       create: vi.fn().mockImplementation((company) => {
         const newCompany = { ...company, id: `comp-${companies.length + 1}` };
         companies.push(newCompany);
@@ -62,13 +69,13 @@ vi.mock('@/api/companyService.ts', () => {
         }
         return Promise.resolve(company);
       }),
-      remove: vi.fn().mockImplementation((company) => {
-        const index = companies.findIndex((c) => c.id === company.id);
+      delete: vi.fn().mockImplementation((id) => {
+        const index = companies.findIndex((c) => c.id === id);
         if (index !== -1) {
           companies.splice(index, 1);
-          return Promise.resolve({ success: true });
+          return Promise.resolve();
         }
-        return Promise.resolve({ success: false });
+        return Promise.reject(new Error('Company not found'));
       }),
     },
   };
@@ -130,7 +137,7 @@ describe('useCompanyCrud', () => {
 
     expect(result.current.displayedCompanies.length).toBe(1);
     expect(
-      result.current.displayedCompanies[0].address.streetName.toLowerCase()
+      result.current.displayedCompanies[0]?.address?.streetName?.toLowerCase()
     ).toContain('eco');
 
     // Search by chamber of commerce ID
@@ -206,7 +213,7 @@ describe('useCompanyCrud', () => {
       },
       chamberOfCommerceId: 'KVK999999',
       vihbId: 'VIHB999',
-    };
+    } as Omit<Company, 'id'>;
 
     await act(async () => {
       await result.current.create(newCompany);
@@ -321,7 +328,7 @@ describe('useCompanyCrud', () => {
       },
       chamberOfCommerceId: 'KVK999999',
       vihbId: 'VIHB999',
-    };
+    } as Omit<Company, 'id'>;
 
     // Attempt to create and expect it to fail
     await expect(result.current.create(newCompany)).rejects.toThrow(

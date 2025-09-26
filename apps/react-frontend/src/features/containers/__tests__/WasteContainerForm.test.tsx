@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { wasteContainers } from '../../../testing/mocks/mockWasteContainers';
 import { WasteContainerForm } from '../WasteContainerForm';
-import { Company } from '@/types/api';
+import { Company } from '@/api/services/companyService';
 
 // Mock the ErrorDialog component
 vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({
@@ -18,7 +18,7 @@ vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({
 }));
 
 // Mock the companyService
-vi.mock('@/api/companyService.ts', () => {
+vi.mock('@/api/services/companyService.ts', () => {
   const mockCompanies: Company[] = [
     {
       id: 'comp-1',
@@ -31,6 +31,8 @@ vi.mock('@/api/companyService.ts', () => {
       },
       chamberOfCommerceId: 'KVK123456',
       vihbId: 'VIHB789',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
     },
     {
       id: 'comp-2',
@@ -43,12 +45,14 @@ vi.mock('@/api/companyService.ts', () => {
       },
       chamberOfCommerceId: 'KVK654321',
       vihbId: 'VIHB987',
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
     },
   ];
 
   return {
     companyService: {
-      list: vi.fn().mockResolvedValue(mockCompanies),
+      getAll: vi.fn().mockResolvedValue(mockCompanies),
     },
   };
 });
