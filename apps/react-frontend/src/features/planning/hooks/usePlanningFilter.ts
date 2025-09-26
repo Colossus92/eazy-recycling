@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { PlanningFilterParams } from '@/api/planningService.ts';
-import { Status } from '@/features/planning/hooks/usePlanning';
+import { PlanningFilterParams } from '@/api/services/planningService';
+import { DriverPlanningItemStatusEnum } from '@/api/client';
 import { TransportPlanningFormValues } from '@/features/planning/components/filter/PlanningFilterForm';
 
 const defaultFilters: PlanningFilterParams = {
@@ -16,10 +16,10 @@ export const usePlanningFilter = () => {
   const applyFilterFormValues = (values: TransportPlanningFormValues) => {
     const statuses: string[] = [];
 
-    if (values.isPlanned) statuses.push(Status.PLANNED);
-    if (values.isFinished) statuses.push(Status.FINISHED);
-    if (values.isUnplanned) statuses.push(Status.UNPLANNED);
-    if (values.isInvoiced) statuses.push(Status.INVOICED);
+    if (values.isPlanned) statuses.push(DriverPlanningItemStatusEnum.Planned);
+    if (values.isFinished) statuses.push(DriverPlanningItemStatusEnum.Finished);
+    if (values.isUnplanned) statuses.push(DriverPlanningItemStatusEnum.Unplanned);
+    if (values.isInvoiced) statuses.push(DriverPlanningItemStatusEnum.Invoiced);
 
     setFilters({
       driverId: values.driverId || undefined,

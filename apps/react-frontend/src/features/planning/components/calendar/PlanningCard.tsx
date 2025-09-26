@@ -3,12 +3,13 @@ import { Popover, PopoverButton } from '@headlessui/react';
 import { useRef, useState } from 'react';
 import { DeleteTransportDialog } from '../DeleteTransportDialog';
 import { useTransportDeletion } from '../../hooks/useTransportDeletion';
-import { Status, PlanningItem } from '@/features/planning/hooks/usePlanning';
+import { PlanningItem } from '@/features/planning/hooks/usePlanning';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import { PlanningCardPopover } from '@/features/planning/components/calendar/PlanningCardPopover.tsx';
 import { ContainerTransportForm } from '@/features/planning/forms/containertransportform/ContainerTransportForm.tsx';
 import { WasteTransportForm } from '@/features/planning/forms/wastetransportform/WasteTransportForm.tsx';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
+import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 interface PlanningCardProps {
   transport: PlanningItem;
@@ -38,15 +39,15 @@ export const PlanningCard = ({
   const isDoubleClickRef = useRef(false);
   const colors = new Map([
     [
-      Status.UNPLANNED,
+      DriverPlanningItemStatusEnum.Unplanned,
       'border-color-status-warning-primary bg-color-status-warning-light',
     ],
-    [Status.PLANNED, 'border-color-brand-primary bg-color-status-info-light'],
+    [DriverPlanningItemStatusEnum.Planned, 'border-color-brand-primary bg-color-status-info-light'],
     [
-      Status.FINISHED,
+      DriverPlanningItemStatusEnum.Finished,
       'border-color-status-success-primary bg-color-status-success-light',
     ],
-    [Status.INVOICED, 'border-color-text-disabled bg-color-surface-background'],
+    [DriverPlanningItemStatusEnum.Invoiced, 'border-color-text-disabled bg-color-surface-background'],
   ]);
 
   const truncateCity = (cityName: string) => {
@@ -166,12 +167,12 @@ export const PlanningCard = ({
           setIsDrawerOpen={setIsDrawerOpen}
           transportId={transport.id}
           onEdit={
-            transport.status === Status.FINISHED
+            transport.status === DriverPlanningItemStatusEnum.Finished
               ? undefined
               : () => setIsFormOpen(true)
           }
           onDelete={
-            transport.status === Status.FINISHED
+            transport.status === DriverPlanningItemStatusEnum.Finished
               ? undefined
               : () => confirmDelete(transport)
           }

@@ -3,7 +3,7 @@ import { format, isSameDay, addWeeks, subWeeks } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
-import { DriverPlanningItem } from '@/api/planningService';
+import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 
 interface MobilePlanningCalendarProps {
   weekStart: Date;

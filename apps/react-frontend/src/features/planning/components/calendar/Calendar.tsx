@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { CalendarToolbar } from '@/features/planning/components/calendar/CalendarToolbar.tsx';
 import { CalendarGrid } from '@/features/planning/components/calendar/CalendarGrid.tsx';
 import { usePlanning } from '@/features/planning/hooks/usePlanning';
-import { PlanningFilterParams } from '@/api/planningService.ts';
+import { PlanningFilterParams } from '@/api/services/planningService.ts';
 
 interface CalendarProps {
   filters: PlanningFilterParams;

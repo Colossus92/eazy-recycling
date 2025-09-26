@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import {
   PlanningFilterParams,
   planningService,
-} from '@/api/planningService.ts';
+} from '@/api/services/planningService.ts';
 import { Truck } from '@/types/api.ts';
+import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 interface Driver {
   firstName: string;
@@ -19,18 +20,11 @@ export interface PlanningItem {
   originCity: string;
   destinationCity: string;
   driver: Driver;
-  status: Status;
+  status: DriverPlanningItemStatusEnum;
   truck?: Truck;
   containerId?: string;
   transportType: string;
   sequenceNumber: number;
-}
-
-export enum Status {
-  FINISHED = 'FINISHED',
-  PLANNED = 'PLANNED',
-  UNPLANNED = 'UNPLANNED',
-  INVOICED = 'INVOICED',
 }
 
 export interface Planning {

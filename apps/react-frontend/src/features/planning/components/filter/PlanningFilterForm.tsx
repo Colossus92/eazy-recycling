@@ -5,7 +5,7 @@ import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSele
 import { CheckboxField } from '@/components/ui/form/CheckboxField.tsx';
 import { Tag } from '@/components/ui/tag/Tag.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
-import { Status } from '@/features/planning/hooks/usePlanning';
+import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 export interface TransportPlanningFormValues {
   driverId: string;
@@ -18,7 +18,7 @@ export interface TransportPlanningFormValues {
 
 interface StatusFilterOptionProps {
   formContext: UseFormReturn<TransportPlanningFormValues>;
-  status: 'INVOICED' | 'FINISHED' | 'UNPLANNED' | 'ERROR' | 'PLANNED';
+  status: DriverPlanningItemStatusEnum;
   fieldName: keyof TransportPlanningFormValues;
 }
 
@@ -97,22 +97,22 @@ export const PlanningFilterForm = ({
             <StatusFilterOption
               fieldName={'isUnplanned'}
               formContext={formContext}
-              status={Status.UNPLANNED}
+              status={DriverPlanningItemStatusEnum.Unplanned}
             />
             <StatusFilterOption
               fieldName={'isPlanned'}
               formContext={formContext}
-              status={Status.PLANNED}
+              status={DriverPlanningItemStatusEnum.Planned}
             />
             <StatusFilterOption
               fieldName={'isFinished'}
               formContext={formContext}
-              status={Status.FINISHED}
+              status={DriverPlanningItemStatusEnum.Finished}
             />
             <StatusFilterOption
               fieldName={'isInvoiced'}
               formContext={formContext}
-              status={Status.INVOICED}
+              status={DriverPlanningItemStatusEnum.Invoiced}
             />
           </div>
         </div>

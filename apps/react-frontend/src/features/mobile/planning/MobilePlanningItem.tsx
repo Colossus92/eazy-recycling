@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DriverPlanningItem } from '@/api/planningService';
+import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 import CaretDown from '@/assets/icons/CaretDown.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import { PlanningCard } from '@/features/mobile/planning/PlanningCard';

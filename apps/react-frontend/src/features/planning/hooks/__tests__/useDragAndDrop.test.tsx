@@ -4,12 +4,14 @@ import { renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { DropResult } from '@hello-pangea/dnd';
 import { useDragAndDrop } from '../useDragAndDrop';
-import { Planning, Status } from '../usePlanning';
+import { Planning } from '../usePlanning';
 import { toastService } from '@/components/ui/toast/toastService';
-import { planningService } from '@/api/planningService';
+import { planningService } from '@/api/services/planningService';
+import { DriverPlanningItemStatusEnum } from '@/api/client';
+import { TransportViewTransportTypeEnum } from '@/api/client/models/transport-view';
 
 // Mock dependencies
-vi.mock('@/api/planningService', () => {
+vi.mock('@/api/services/planningService', () => {
   return {
     planningService: {
       reorder: vi.fn(),
@@ -48,18 +50,18 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '01-VBT-8',
               brand: 'DAF',
-              model: 'XC200',
+              model: 'XC200'
             },
             originCity: 'Bunnik',
             destinationCity: 'Bergschenhoek',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts',
+              lastName: 'Posts'
             },
-            status: Status.FINISHED,
+            status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0011',
             containerId: '40M001',
-            transportType: 'CONTAINER',
+            transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 0,
           },
         ],
@@ -80,14 +82,14 @@ const mockPlanning: Planning = {
             },
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts',
+              lastName: 'Posts'
             },
             originCity: 'Bunnik',
             destinationCity: 'Bergschenhoek',
-            status: Status.UNPLANNED,
+            status: DriverPlanningItemStatusEnum.Unplanned,
             displayNumber: '25-0009',
             containerId: '40M001',
-            transportType: 'CONTAINER',
+            transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 0,
           },
           {
@@ -103,12 +105,12 @@ const mockPlanning: Planning = {
             destinationCity: 'Bunnik',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts',
+              lastName: 'Posts'
             },
-            status: Status.FINISHED,
+            status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0010',
             containerId: undefined,
-            transportType: 'CONTAINER',
+            transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 2,
           },
         ],
@@ -126,12 +128,12 @@ const mockPlanning: Planning = {
             destinationCity: 'Bunnik',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts',
+              lastName: 'Posts'
             },
-            status: Status.FINISHED,
+            status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0008',
             containerId: '40M001',
-            transportType: 'WASTE',
+            transportType: TransportViewTransportTypeEnum.Waste,
             sequenceNumber: 0,
           },
         ],
@@ -167,10 +169,40 @@ describe('useDragAndDrop', () => {
   });
 
   it('should handle drag and drop within the same date/truck', async () => {
-    // Mock successful API response
+    // Mock successful API response with a properly typed Planning object
     vi.mocked(planningService.reorder).mockResolvedValue({
       ...mockPlanning,
       dates: mockPlanning.dates,
+      transports: mockPlanning.transports.map(t => ({
+        truck: t.truck,
+        transports: Object.fromEntries(
+          Object.entries(t.transports).map(([date, items]) => [
+            date,
+            items.map(item => ({
+              id: item.id,
+              pickupDate: item.pickupDate,
+              deliveryDate: item.deliveryDate,
+              displayNumber: item.displayNumber || '',
+              originCity: item.originCity || '',
+              destinationCity: item.destinationCity || '',
+              driver: {
+                firstName: item.driver?.firstName || '',
+                lastName: item.driver?.lastName || ''
+              },
+              status: item.status,
+              truck: item.truck ? {
+                licensePlate: item.truck.licensePlate,
+                brand: item.truck.brand || '',
+                model: item.truck.model || ''
+              } : undefined,
+              containerId: item.containerId,
+              transportType: typeof item.transportType === 'string' ? 
+                item.transportType : String(item.transportType),
+              sequenceNumber: item.sequenceNumber
+            }))
+          ])
+        )
+      }))
     });
 
     const { result } = renderHook(
@@ -208,10 +240,39 @@ describe('useDragAndDrop', () => {
   });
 
   it('should handle drag and drop between different trucks on same date', async () => {
-    // Mock successful API response
+    // Mock successful API response with a properly typed Planning object
     vi.mocked(planningService.reorder).mockResolvedValue({
-      ...mockPlanning,
       dates: mockPlanning.dates,
+      transports: mockPlanning.transports.map(t => ({
+        truck: t.truck,
+        transports: Object.fromEntries(
+          Object.entries(t.transports).map(([date, items]) => [
+            date,
+            items.map(item => ({
+              id: item.id,
+              pickupDate: item.pickupDate,
+              deliveryDate: item.deliveryDate,
+              displayNumber: item.displayNumber || '',
+              originCity: item.originCity || '',
+              destinationCity: item.destinationCity || '',
+              driver: {
+                firstName: item.driver?.firstName || '',
+                lastName: item.driver?.lastName || ''
+              },
+              status: item.status,
+              truck: item.truck ? {
+                licensePlate: item.truck.licensePlate,
+                brand: item.truck.brand || '',
+                model: item.truck.model || ''
+              } : undefined,
+              containerId: item.containerId,
+              transportType: typeof item.transportType === 'string' ? 
+                item.transportType : String(item.transportType),
+              sequenceNumber: item.sequenceNumber
+            }))
+          ])
+        )
+      }))
     });
 
     const { result } = renderHook(
@@ -250,10 +311,39 @@ describe('useDragAndDrop', () => {
   });
 
   it('should handle drag and drop between different dates', async () => {
-    // Mock successful API response
+    // Mock successful API response with a properly typed Planning object
     vi.mocked(planningService.reorder).mockResolvedValue({
-      ...mockPlanning,
       dates: mockPlanning.dates,
+      transports: mockPlanning.transports.map(t => ({
+        truck: t.truck,
+        transports: Object.fromEntries(
+          Object.entries(t.transports).map(([date, items]) => [
+            date,
+            items.map(item => ({
+              id: item.id,
+              pickupDate: item.pickupDate,
+              deliveryDate: item.deliveryDate,
+              displayNumber: item.displayNumber || '',
+              originCity: item.originCity || '',
+              destinationCity: item.destinationCity || '',
+              driver: {
+                firstName: item.driver?.firstName || '',
+                lastName: item.driver?.lastName || ''
+              },
+              status: item.status,
+              truck: item.truck ? {
+                licensePlate: item.truck.licensePlate,
+                brand: item.truck.brand || '',
+                model: item.truck.model || ''
+              } : undefined,
+              containerId: item.containerId,
+              transportType: typeof item.transportType === 'string' ? 
+                item.transportType : String(item.transportType),
+              sequenceNumber: item.sequenceNumber
+            }))
+          ])
+        )
+      }))
     });
 
     const { result } = renderHook(

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
-import { planningService } from '@/api/planningService';
+import { planningService } from '@/api/services/planningService';
 
 interface UseDriverPlanningProps {
   driverId: string;

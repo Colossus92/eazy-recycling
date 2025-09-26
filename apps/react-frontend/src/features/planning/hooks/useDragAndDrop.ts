@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DropResult } from '@hello-pangea/dnd';
 import { useQueryClient } from '@tanstack/react-query';
 import { Planning } from '@/features/planning/hooks/usePlanning';
-import { planningService } from '@/api/planningService';
+import { planningService } from '@/api/services/planningService';
 import { toastService } from '@/components/ui/toast/toastService';
 
 interface UseDragAndDropProps {

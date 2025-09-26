@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { MobilePlanningItem } from './MobilePlanningItem';
-import { DriverPlanningItem } from '@/api/planningService';
+import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 
 interface MobilePlanningItemsProps {
   isLoading: boolean;

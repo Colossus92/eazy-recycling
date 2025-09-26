@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Status } from '@/features/planning/hooks/usePlanning';
-import { DriverPlanningItem } from '@/api/planningService';
+import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
+import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
@@ -27,15 +27,15 @@ export const PlanningCard = ({
   };
   const colors = new Map([
     [
-      Status.UNPLANNED,
+      DriverPlanningItemStatusEnum.Unplanned,
       'border-color-status-warning-primary bg-color-status-warning-light',
     ],
-    [Status.PLANNED, 'border-color-brand-primary bg-color-status-info-light'],
+    [DriverPlanningItemStatusEnum.Planned, 'border-color-brand-primary bg-color-status-info-light'],
     [
-      Status.FINISHED,
+      DriverPlanningItemStatusEnum.Finished,
       'border-color-status-success-primary bg-color-status-success-light',
     ],
-    [Status.INVOICED, 'border-color-text-disabled bg-color-surface-background'],
+    [DriverPlanningItemStatusEnum.Invoiced, 'border-color-text-disabled bg-color-surface-background'],
   ]);
 
   const deliveryAddress =

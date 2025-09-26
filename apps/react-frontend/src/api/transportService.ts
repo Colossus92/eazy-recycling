@@ -1,7 +1,7 @@
 import { http } from '@/api/http.ts';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
-import { Status } from '@/features/planning/hooks/usePlanning';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
+import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 export const transportService = {
   deleteTransport: async (id: string) =>
@@ -146,7 +146,7 @@ export interface Transport {
   driver: DriverDetail | null;
   goods: Goods | null;
   updatedAt: string;
-  status: Status;
+  status: DriverPlanningItemStatusEnum;
   note?: string;
   transportHours: number | null;
 }
