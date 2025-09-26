@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Company, WasteStream } from '@/types/api.ts';
+import { Company } from '@/types/api.ts';
 import { companyService } from '@/api/companyService.ts.tsx';
 import { NumberFormField } from '@/components/ui/form/NumberFormField.tsx';
 import { processingMethodService } from '@/api/services/processingMethodService';
 import { ProcessingMethod } from '@/api/client';
-import { wasteStreamService } from '@/api/wasteStreamService';
+import { wasteStreamService, WasteStream } from '@/api/services/wasteStreamService';
 import { ComboboxFormField } from '@/components/ui/form/comboboxfield/ComboboxFormField';
 import { euralService } from '@/api/services/euralService';
 import { Eural } from '@/api/client';
@@ -32,7 +32,7 @@ export const WasteTransportFormGoodsSection = () => {
   });
   const { data: wasteStreams = [] } = useQuery<WasteStream[]>({
     queryKey: ['wasteStreams'],
-    queryFn: () => wasteStreamService.list(),
+    queryFn: () => wasteStreamService.getAll(),
   });
 
   // Watch for changes in wasteStreamNumber and update goodsName accordingly

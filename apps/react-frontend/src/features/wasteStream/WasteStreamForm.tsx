@@ -2,7 +2,7 @@ import { FieldValues, useForm } from 'react-hook-form';
 import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
-import { WasteStream } from '@/types/api.ts';
+import { WasteStream } from '@/api/services/wasteStreamService';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';

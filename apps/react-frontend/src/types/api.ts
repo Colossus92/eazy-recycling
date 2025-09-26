@@ -4,11 +4,6 @@ export type Truck = {
   brand: string;
 };
 
-export type WasteStream = {
-  number: string;
-  name: string;
-};
-
 export type Company = {
   id?: string;
   name: string;
@@ -29,22 +24,6 @@ export type Address = {
   buildingNumber: string;
   postalCode: string;
   city: string;
-};
-
-export type WasteContainer = {
-  uuid: string;
-  id: string;
-  location: {
-    companyId?: string;
-    companyName?: string;
-    address?: Address;
-  };
-  notes?: string;
-};
-
-export type ProcessingMethod = {
-  code: string;
-  description: string;
 };
 
 export type DeleteResponse = { success: boolean };

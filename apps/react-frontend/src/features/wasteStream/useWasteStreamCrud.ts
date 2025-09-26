@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { DeleteResponse, WasteStream } from '@/types/api.ts';
-import { wasteStreamService } from '@/api/wasteStreamService';
+import { wasteStreamService, WasteStream } from '@/api/services/wasteStreamService';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -11,7 +10,7 @@ export function useWasteStreamCrud() {
     isLoading,
   } = useQuery<WasteStream[]>({
     queryKey: ['wasteStreams'],
-    queryFn: () => wasteStreamService.list(),
+    queryFn: () => wasteStreamService.getAll(),
   });
   const [query, setQuery] = useState<string>('');
   const displayedWasteStreams = useMemo(
@@ -39,13 +38,11 @@ export function useWasteStreamCrud() {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: WasteStream) => wasteStreamService.remove(item.number),
-    onSuccess: (response: DeleteResponse) => {
-      if (response.success) {
-        queryClient
-          .invalidateQueries({ queryKey: ['wasteStreams'] })
-          .then(() => setDeleting(undefined));
-      }
+    mutationFn: (item: WasteStream) => wasteStreamService.delete(item.number),
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ['wasteStreams'] })
+        .then(() => setDeleting(undefined));
     },
   });
 

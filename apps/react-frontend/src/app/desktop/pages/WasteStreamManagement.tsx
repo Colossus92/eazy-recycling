@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { WasteStream } from '@/types/api.ts';
+import { WasteStream } from '@/api/services/wasteStreamService.ts';
 import { Column } from '@/features/crud/ContentTable.tsx';
 import { CrudPage } from '@/features/crud/CrudPage.tsx';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
