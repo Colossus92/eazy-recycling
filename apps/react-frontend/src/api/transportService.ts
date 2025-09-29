@@ -4,8 +4,6 @@ import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTran
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 export const transportService = {
-  deleteTransport: async (id: string) =>
-    await http.delete<void>(`/transport/${id}`),
 
   getTransportById: async (id: string): Promise<Transport> => {
     const response = await http.get<Transport>(`/transport/${id}`);

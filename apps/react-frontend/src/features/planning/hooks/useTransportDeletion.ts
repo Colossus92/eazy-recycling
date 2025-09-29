@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { transportService } from '@/api/transportService.ts';
+import { transportService } from '@/api/services/transportService';
 import { PlanningItem } from '@/features/planning/hooks/usePlanning';
 
 export const useTransportDeletion = () => {
