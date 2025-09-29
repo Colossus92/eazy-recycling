@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Transport, transportService } from '@/api/transportService';
+import { transportService } from '@/api/services/transportService';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
+import { TransportDto } from '@/api/client/models/transport-dto';
 
 type LocationState = {
-  transport: Transport;
+  transport: TransportDto;
 };
 
 export const MobileReportFinishedPage = () => {
@@ -24,8 +25,7 @@ export const MobileReportFinishedPage = () => {
   const queryClient = useQueryClient();
 
   const reportFinishedMutation = useMutation({
-    mutationFn: (hours: number) =>
-      transportService.reportFinished(state.transport.id, hours),
+    mutationFn: (hours: number) => transportService.reportFinished(state.transport.id!, { hours }),
     onSuccess: (updatedTransport) => {
       queryClient.setQueryData(
         ['transport', state.transport.id],

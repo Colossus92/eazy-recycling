@@ -20,13 +20,6 @@ export const transportService = {
     );
     return response.data;
   },
-
-  reportFinished: async (id: string, hours: number) => {
-    const response = await http.post<Transport>(`/transport/${id}/finished`, {
-      hours: hours,
-    });
-    return response.data;
-  },
 };
 
 export interface Address {
