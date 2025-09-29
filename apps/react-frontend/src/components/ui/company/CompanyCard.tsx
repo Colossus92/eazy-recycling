@@ -1,11 +1,11 @@
 import { format } from 'date-fns';
 import { JdenticonAvatar } from '../icon/JdenticonAvatar';
-import { Address } from '@/types/api';
+import { AddressDto } from '@/api/client';
 
 interface CompanyCardProps {
   companyName?: string;
   dateTime?: string;
-  address: Address;
+  address: AddressDto;
 }
 
 export const CompanyCard = ({

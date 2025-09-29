@@ -1,17 +1,167 @@
-import { TransportControllerApi, TransportFinishedRequest } from "../client"
+import { TransportControllerApi, TransportDto, TransportFinishedRequest } from "../client"
 import { apiInstance } from "./apiInstance"
-import { CreateContainerTransportRequest } from "../client/models/create-container-transport-request"
-import { CreateWasteTransportRequest } from "../client/models/create-waste-transport-request"
+import { CreateContainerTransportRequest, CreateContainerTransportRequestContainerOperationEnum } from "../client/models/create-container-transport-request"
+import { CreateWasteTransportRequest, CreateWasteTransportRequestContainerOperationEnum } from "../client/models/create-waste-transport-request"
+import { ContainerTransportFormValues } from "@/features/planning/hooks/useContainerTransportForm"
+import { WasteTransportFormValues } from "@/features/planning/hooks/useWasteTransportForm"
+import { format } from 'date-fns';
 
 
 const transportApi = new TransportControllerApi(apiInstance.config)
 
 export const transportService = {
     deleteTransport: (id: string) => transportApi.deleteTransport(id),
-    getTransportById: (id: string) => transportApi.getTransportById(id),
+    getTransportById: (id: string) => transportApi.getTransportById(id).then((response) => response.data),
     updateContainerTransport: (id: string, data: CreateContainerTransportRequest) => transportApi.updateContainerTransport(id, data),
     createContainerTransport: (data: CreateContainerTransportRequest) => transportApi.createContainerTransport(data),
     createWasteTransport: (data: CreateWasteTransportRequest) => transportApi.createWasteTransport(data),
     updateWasteTransport: (id: string, data: CreateWasteTransportRequest) => transportApi.updateWasteTransport(id, data),
     reportFinished: (id: string, data: TransportFinishedRequest) => transportApi.markTransportAsFinished(id, data),
+}
+
+export const formValuesToCreateContainerTransportRequest = (formValues: ContainerTransportFormValues) => {
+    const request: CreateContainerTransportRequest = {
+        consignorPartyId: formValues.consignorPartyId,
+        carrierPartyId: formValues.carrierPartyId,
+        containerOperation: formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
+        pickupCompanyId: formValues.pickupCompanyId,
+        pickupCompanyBranchId: formValues.pickupCompanyBranchId,
+        pickupStreet: formValues.pickupStreet,
+        pickupBuildingNumber: formValues.pickupBuildingNumber,
+        pickupPostalCode: formValues.pickupPostalCode,
+        pickupCity: formValues.pickupCity,
+        pickupDateTime: formValues.pickupDateTime,
+        deliveryCompanyId: formValues.deliveryCompanyId,
+        deliveryCompanyBranchId: formValues.deliveryCompanyBranchId,
+        deliveryStreet: formValues.deliveryStreet,
+        deliveryBuildingNumber: formValues.deliveryBuildingNumber,
+        deliveryPostalCode: formValues.deliveryPostalCode,
+        deliveryCity: formValues.deliveryCity,
+        deliveryDateTime: formValues.deliveryDateTime,
+        truckId: formValues.truckId,
+        driverId: formValues.driverId,
+        containerId: formValues.containerId,
+        note: formValues.note || '',
+        transportType: "CONTAINER"
+    }
+    return request
+}
+
+export const transportDtoToContainerTransportFormValues = (dto: TransportDto) => {
+    const formValues: ContainerTransportFormValues = {
+        consignorPartyId: dto.consignorParty?.id || '',
+        carrierPartyId: dto.carrierParty?.id || '',
+        containerOperation: dto.containerOperation || '',
+        pickupCompanyId: dto.pickupCompany?.id || '',
+        pickupCompanyBranchId: dto.pickupCompanyBranch?.id || '',
+        pickupStreet: dto.pickupLocation.address.streetName || '',
+        pickupBuildingNumber: dto.pickupLocation.address.buildingNumber || '',
+        pickupPostalCode: dto.pickupLocation.address.postalCode || '',
+        pickupCity: dto.pickupLocation.address.city || '',
+        pickupDateTime: format(
+            new Date(dto.pickupDateTime),
+            "yyyy-MM-dd'T'HH:mm"
+          ),
+        deliveryCompanyId: dto.deliveryCompany?.id || '',
+        deliveryCompanyBranchId: dto.deliveryCompanyBranch?.id || '',
+        deliveryStreet: dto.deliveryLocation.address.streetName || '',
+        deliveryBuildingNumber: dto.deliveryLocation.address.buildingNumber || '',
+        deliveryPostalCode: dto.deliveryLocation.address.postalCode || '',
+        deliveryCity: dto.deliveryLocation.address.city || '',
+        deliveryDateTime: dto.deliveryDateTime
+                ? format(new Date(dto.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
+                : undefined,
+        truckId: dto.truck?.licensePlate || '',
+        driverId: dto.driver?.id || '',
+        containerId: dto.wasteContainer?.uuid || '',
+        note: dto.note,
+        transportType: dto.transportType
+    }
+    return formValues
+}
+
+export const formValuesToCreateWasteTransportRequest = (formValues: WasteTransportFormValues) => {
+    const request: CreateWasteTransportRequest = {
+        consignorPartyId: formValues.consignorPartyId,
+        carrierPartyId: formValues.carrierPartyId,
+        containerOperation: formValues.containerOperation as CreateWasteTransportRequestContainerOperationEnum,
+        pickupCompanyId: formValues.pickupCompanyId,
+        pickupCompanyBranchId: formValues.pickupCompanyBranchId,
+        pickupStreet: formValues.pickupStreet,
+        pickupBuildingNumber: formValues.pickupBuildingNumber,
+        pickupPostalCode: formValues.pickupPostalCode,
+        pickupCity: formValues.pickupCity,
+        pickupDateTime: formValues.pickupDateTime,
+        deliveryCompanyId: formValues.deliveryCompanyId,
+        deliveryCompanyBranchId: formValues.deliveryCompanyBranchId,
+        deliveryStreet: formValues.deliveryStreet,
+        deliveryBuildingNumber: formValues.deliveryBuildingNumber,
+        deliveryPostalCode: formValues.deliveryPostalCode,
+        deliveryCity: formValues.deliveryCity,
+        deliveryDateTime: formValues.deliveryDateTime,
+        truckId: formValues.truckId,
+        driverId: formValues.driverId,
+        containerId: formValues.containerId,
+        note: formValues.note || '',
+        transportType: "WASTE",
+        consigneePartyId: formValues.consigneePartyId,
+        pickupPartyId: formValues.pickupPartyId,
+        consignorClassification: formValues.consignorClassification,
+        wasteStreamNumber: formValues.wasteStreamNumber,
+        weight: formValues.weight,
+        unit: formValues.unit,
+        quantity: formValues.quantity,
+        goodsName: formValues.goodsName,
+        euralCode: formValues.euralCode,
+        processingMethodCode: formValues.processingMethodCode,
+    }
+    return request
+}
+
+export const transportDtoToWasteTransportFormValues = (dto: TransportDto) => {
+    const goods = dto.goods;
+
+    const formValues: WasteTransportFormValues = {
+        consignorPartyId: dto.consignorParty?.id || '',
+        carrierPartyId: dto.carrierParty?.id || '',
+        containerOperation: dto.containerOperation || '',
+        pickupCompanyId: dto.pickupCompany?.id || '',
+        pickupCompanyBranchId: dto.pickupCompanyBranch?.id || '',
+        pickupStreet: dto.pickupLocation.address.streetName || '',
+        pickupBuildingNumber: dto.pickupLocation.address.buildingNumber || '',
+        pickupPostalCode: dto.pickupLocation.address.postalCode || '',
+        pickupCity: dto.pickupLocation.address.city || '',
+        pickupDateTime: format(
+            new Date(dto.pickupDateTime),
+            "yyyy-MM-dd'T'HH:mm"
+          ),
+        deliveryCompanyId: dto.deliveryCompany?.id || '',
+        deliveryCompanyBranchId: dto.deliveryCompanyBranch?.id || '',
+        deliveryStreet: dto.deliveryLocation.address.streetName || '',
+        deliveryBuildingNumber: dto.deliveryLocation.address.buildingNumber || '',
+        deliveryPostalCode: dto.deliveryLocation.address.postalCode || '',
+        deliveryCity: dto.deliveryLocation.address.city || '',
+        deliveryDateTime: dto.deliveryDateTime
+                ? format(new Date(dto.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
+                : undefined,
+        truckId: dto.truck?.licensePlate || '',
+        driverId: dto.driver?.id || '',
+        containerId: dto.wasteContainer?.uuid || '',
+        note: dto.note,
+        transportType: dto.transportType,
+
+
+      // Goods data
+      consignorClassification: goods?.consignorClassification || 0,
+      consigneePartyId: goods?.consigneeParty.id || '',
+      pickupPartyId: goods?.pickupParty.id || '',
+      wasteStreamNumber: goods?.goodsItem.wasteStreamNumber || '',
+      weight: goods?.goodsItem.netNetWeight || 0,
+      unit: goods?.goodsItem.unit || '',
+      quantity: goods?.goodsItem.quantity || 0,
+      goodsName: goods?.goodsItem.name || '',
+      euralCode: goods?.goodsItem.euralCode || '',
+      processingMethodCode: goods?.goodsItem.processingMethodCode || '',
+    }
+    return formValues
 }

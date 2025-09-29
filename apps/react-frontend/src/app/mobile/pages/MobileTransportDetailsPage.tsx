@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useState, lazy, Suspense } from 'react';
-import { transportService } from '@/api/transportService';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
@@ -12,6 +11,7 @@ import { Tag } from '@/components/ui/tag/Tag';
 import { MobileTabBar } from '@/components/ui/mobile/MobileTabBar';
 import { Button } from '@/components/ui/button/Button';
 import { ReportFinishedComponent } from '@/features/mobile/planning/ReportFinishedComponent';
+import { transportService } from '@/api/services/transportService';
 
 const MobileTransportDetailsTab = lazy(
   () => import('@/features/mobile/planning/MobileTransportDetails')

@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { SignatureStatusTag } from './SignatureStatusTag';
-import { Transport } from '@/api/transportService';
 import Pen from '@/assets/icons/Pen.svg?react';
 import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar';
 import { useSignatureStatus } from '@/features/mobile/hooks/useSignatureStatus';
+import { TransportDto } from '@/api/client/models/transport-dto';
 
 interface SignaturesTabProps {
-  transport: Transport;
+  transport: TransportDto;
 }
 
 const SignaturesTab = ({ transport }: SignaturesTabProps) => {
@@ -17,7 +17,7 @@ const SignaturesTab = ({ transport }: SignaturesTabProps) => {
     totalSignatures,
     collectedSignatures,
     progressPercentage,
-  } = useSignatureStatus({ transportId: transport.id });
+  } = useSignatureStatus({ transportId: transport.id!! });
 
   const navigateToSignatureFor = (
     path: 'consignor' | 'pickup' | 'carrier' | 'consignee'

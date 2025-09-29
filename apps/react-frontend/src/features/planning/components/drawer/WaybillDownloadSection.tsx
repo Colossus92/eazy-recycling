@@ -4,7 +4,7 @@ import { supabase } from '@/api/supabaseClient';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
 
 interface WaybillDownloadSectionProps {
-  transportId: string;
+  transportId?: string;
 }
 
 interface WaybillInfo {

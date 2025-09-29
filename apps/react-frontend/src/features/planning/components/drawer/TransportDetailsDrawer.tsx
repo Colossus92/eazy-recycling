@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useEffect } from 'react';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
-import { transportService } from '@/api/transportService';
+import { transportService } from '@/api/services/transportService';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';

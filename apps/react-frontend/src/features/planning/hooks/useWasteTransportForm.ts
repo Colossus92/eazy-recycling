@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { transportService } from '@/api/transportService.ts';
+import { formValuesToCreateWasteTransportRequest, transportDtoToWasteTransportFormValues, transportService } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
-import { transportDataService } from '@/features/planning/transportDataService.ts';
 
 export interface WasteTransportFormValues {
   consignorPartyId: string;
@@ -100,8 +99,7 @@ export function useWasteTransportForm(
     queryKey: ['transport', transportId],
     queryFn: async () => {
       const response = await transportService.getTransportById(transportId!);
-      const formValues =
-        transportDataService.apiToWasteTransportFormValues(response);
+      const formValues = transportDtoToWasteTransportFormValues(response);
       formContext.reset(formValues);
 
       return response;
@@ -113,10 +111,11 @@ export function useWasteTransportForm(
   });
   const mutation = useMutation({
     mutationFn: async (data: WasteTransportFormValues) => {
+      const request = formValuesToCreateWasteTransportRequest(data);
       if (!!data && transportId) {
-        return transportService.updateWasteTransport(transportId, data);
+        return transportService.updateWasteTransport(transportId, request);
       } else {
-        return transportService.createWasteTransport(data);
+        return transportService.createWasteTransport(request);
       }
     },
     onSuccess: async () => {

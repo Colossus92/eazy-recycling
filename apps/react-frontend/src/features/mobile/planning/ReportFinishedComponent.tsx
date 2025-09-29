@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { Transport } from '@/api/transportService';
+import { TransportDto } from '@/api/client/models/transport-dto';
 import { Button } from '@/components/ui/button/Button';
 import BxTimeFive from '@/assets/icons/BxTimeFive.svg?react';
 
 interface ReportFinishedComponentProps {
-  transport: Transport;
+  transport: TransportDto;
 }
 
 export const ReportFinishedComponent = ({

@@ -1,4 +1,4 @@
-import { Transport } from '@/api/transportService';
+import { TransportDto } from '@/api/client/models/transport-dto';
 import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import { CompanyCard } from '@/components/ui/company/CompanyCard';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
@@ -9,7 +9,7 @@ import Warning from '@/assets/icons/Warning.svg?react';
 import { WaybillDownloadSection } from '@/features/planning/components/drawer/WaybillDownloadSection';
 
 interface MobileTransportDetailsProps {
-  transport: Transport;
+  transport: TransportDto;
 }
 
 const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {

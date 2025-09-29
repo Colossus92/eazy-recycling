@@ -1,14 +1,7 @@
 import { http } from '@/api/http.ts';
-import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
-import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
 export const transportService = {
-
-  getTransportById: async (id: string): Promise<Transport> => {
-    const response = await http.get<Transport>(`/transport/${id}`);
-    return response.data;
-  },
 
   getSignatureStatus: async (id: string): Promise<SignatureStatusView> => {
     const response = await http.get<SignatureStatusView>(
@@ -25,41 +18,6 @@ export const transportService = {
       `/transport/${id}/waybill/signature`,
       data
     );
-    return response.data;
-  },
-
-  updateContainerTransport: async (
-    id: string,
-    data: ContainerTransportFormValues
-  ) => {
-    data.transportType = 'CONTAINER';
-    const response = await http.put<Transport>(
-      `/transport/container/${id}`,
-      data
-    );
-    return response.data;
-  },
-
-  createContainerTransport: async (data: ContainerTransportFormValues) => {
-    data.transportType = 'CONTAINER';
-    const response = await http.post<{ id: string }>(
-      '/transport/container',
-      data
-    );
-    return response.data;
-  },
-
-  createWasteTransport: async (data: WasteTransportFormValues) => {
-    data.unit = 'kg';
-    data.transportType = 'WASTE';
-    const response = await http.post<{ id: string }>('/transport/waste', data);
-    return response.data;
-  },
-
-  updateWasteTransport: async (id: string, data: WasteTransportFormValues) => {
-    data.unit = 'kg';
-    data.transportType = 'WASTE';
-    const response = await http.put<Transport>(`/transport/waste/${id}`, data);
     return response.data;
   },
 

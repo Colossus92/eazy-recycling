@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { transportService } from '@/api/transportService.ts';
+import { formValuesToCreateContainerTransportRequest, transportDtoToContainerTransportFormValues, transportService } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
-import { transportDataService } from '@/features/planning/transportDataService.ts';
 
 export interface ContainerTransportFormValues {
   consignorPartyId: string;
@@ -68,9 +67,7 @@ export function useContainerTransportForm(
     queryKey: ['transport', transportId],
     queryFn: async () => {
       const response = await transportService.getTransportById(transportId!);
-      const formValues =
-        transportDataService.apiToContainerTransportFormValues(response);
-      console.log('Form values, ', formValues);
+      const formValues = transportDtoToContainerTransportFormValues(response);
       formContext.reset(formValues);
 
       return response;
@@ -82,10 +79,11 @@ export function useContainerTransportForm(
   });
   const mutation = useMutation({
     mutationFn: async (data: ContainerTransportFormValues) => {
+
       if (!!data && transportId) {
-        return transportService.updateContainerTransport(transportId, data);
+        return transportService.updateContainerTransport(transportId, formValuesToCreateContainerTransportRequest(data));
       } else {
-        return transportService.createContainerTransport(data);
+        return transportService.createContainerTransport(formValuesToCreateContainerTransportRequest(data));
       }
     },
     onSuccess: () => {
