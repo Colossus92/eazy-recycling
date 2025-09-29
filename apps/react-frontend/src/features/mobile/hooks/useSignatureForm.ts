@@ -7,13 +7,11 @@ import {
   useForm,
 } from 'react-hook-form';
 import SignatureCanvas from 'react-signature-canvas';
-import {
-  CreateSignatureRequest,
-  transportService,
-} from '@/api/transportService';
+import { CreateSignatureRequest } from '@/api/client/models/create-signature-request';
 import { supabase } from '@/api/supabaseClient';
 import { toastService } from '@/components/ui/toast/toastService';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
+import { signatureService } from '@/api/services/signatureService';
 
 interface SignatureFormValues extends FieldValues {
   email: string;
@@ -116,13 +114,13 @@ export const useSignatureForm = (
       try {
         setIsSubmitting(true);
 
-        const signatureData: CreateSignatureRequest = {
+        const signatureRequest: CreateSignatureRequest = {
           signature: signatureCanvasRef.current!.toDataURL('image/png'),
           email: data.email,
           party: type,
         };
 
-        await transportService.createSignature(id, signatureData);
+        await signatureService.saveSignature(id, signatureRequest);
 
         toastService.success('Handtekening succesvol opgeslagen');
 

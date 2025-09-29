@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { SignatureStatusView, transportService } from '@/api/transportService';
+import { signatureService } from '@/api/services/signatureService';
+import { SignatureStatusView } from '@/api/client/models/signature-status-view';
 
 interface UseSignatureStatusProps {
   transportId: string;
@@ -10,7 +11,7 @@ export const useSignatureStatus = ({
 }: UseSignatureStatusProps) => {
   const { data, isLoading, error, refetch } = useQuery<SignatureStatusView>({
     queryKey: ['signatureStatus', transportId],
-    queryFn: () => transportService.getSignatureStatus(transportId),
+    queryFn: () => signatureService.getSignatureStatus(transportId),
     enabled: !!transportId,
   });
 

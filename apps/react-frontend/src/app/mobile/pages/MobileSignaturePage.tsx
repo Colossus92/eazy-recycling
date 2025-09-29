@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import SignatureCanvas from 'react-signature-canvas';
-import { Transport } from '@/api/transportService';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { SignatureFormField } from '@/components/ui/form/SignatureFormField';
@@ -11,9 +10,10 @@ import { SignatureStatusTag } from '@/features/mobile/planning/SignatureStatusTa
 import { useSignatureForm } from '@/features/mobile/hooks/useSignatureForm';
 import { useSignatureStatus } from '@/features/mobile/hooks/useSignatureStatus';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
+import { TransportDto } from '@/api/client/models/transport-dto';
 
 type LocationState = {
-  transport: Transport;
+  transport: TransportDto;
 };
 
 export const MobileSignaturePage = () => {
