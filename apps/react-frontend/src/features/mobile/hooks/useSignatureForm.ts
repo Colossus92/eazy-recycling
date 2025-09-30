@@ -58,7 +58,7 @@ export const useSignatureForm = (
       try {
         const { data, error } = await supabase.storage
           .from('waybills')
-          .download(`/signatures/${id}/${type}.png`);
+          .download(`signatures/${id}/${type}.png`);
 
         if (error) {
           console.log('Signature not found or error loading:', error);
@@ -94,7 +94,7 @@ export const useSignatureForm = (
         URL.revokeObjectURL(signatureUrl);
       }
     };
-  }, [id, type, signatureCanvasRef, signatureUrl]);
+  }, [id, type, signatureCanvasRef]);
 
   const submitForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
