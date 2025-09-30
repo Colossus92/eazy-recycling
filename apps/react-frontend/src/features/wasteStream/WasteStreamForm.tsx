@@ -80,6 +80,7 @@ export const WasteStreamForm = ({
               errors,
             }}
             value={wasteStream?.number}
+            disabled={isEditing}
           />
           <div className="flex items-start self-stretch gap-4">
             <TextFormField
