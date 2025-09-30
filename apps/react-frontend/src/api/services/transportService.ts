@@ -109,7 +109,7 @@ export const formValuesToCreateWasteTransportRequest = (formValues: WasteTranspo
         consignorClassification: formValues.consignorClassification,
         wasteStreamNumber: formValues.wasteStreamNumber,
         weight: formValues.weight,
-        unit: formValues.unit,
+        unit: "kg",
         quantity: formValues.quantity,
         goodsName: formValues.goodsName,
         euralCode: formValues.euralCode,
