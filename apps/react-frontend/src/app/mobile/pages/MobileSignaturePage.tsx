@@ -144,6 +144,7 @@ export const MobileSignaturePage = () => {
                 variant="secondary"
                 size="medium"
                 label="Annuleren"
+                type="button"
                 onClick={navigateBack}
                 fullWidth
               />
