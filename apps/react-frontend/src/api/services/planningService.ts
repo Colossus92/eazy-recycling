@@ -3,6 +3,7 @@ import { Truck } from "@/types/api";
 import { PlanningControllerApi } from "../client";
 import { apiInstance } from "./apiInstance";
 import { PlanningView } from "../client/models/planning-view";
+import { Driver } from "@/features/planning/hooks/usePlanning";
 
 export interface PlanningFilterParams {
     driverId?: string;
@@ -38,11 +39,13 @@ const mapPlanningViewToPlanning = (planningView: PlanningView): Planning => {
                                 };
                             }
                             
-                            // Create a properly typed driver object
-                            const driver = {
-                                firstName: item.driver?.firstName || '',
-                                lastName: item.driver?.lastName || ''
-                            };
+                            let driver: Driver | undefined = undefined;
+                            if (item.driver) {
+                                driver = {
+                                    firstName: item.driver.firstName || '',
+                                    lastName: item.driver.lastName || ''
+                                };
+                            }
                             
                             return {
                                 id: item.id,

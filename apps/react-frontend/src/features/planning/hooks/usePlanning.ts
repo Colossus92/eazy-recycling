@@ -6,7 +6,7 @@ import {
 import { Truck } from '@/types/api.ts';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
-interface Driver {
+export interface Driver {
   firstName: string;
   lastName: string;
   avatar?: string;
@@ -19,7 +19,7 @@ export interface PlanningItem {
   id: string;
   originCity: string;
   destinationCity: string;
-  driver: Driver;
+  driver?: Driver;
   status: DriverPlanningItemStatusEnum;
   truck?: Truck;
   containerId?: string;
