@@ -34,6 +34,7 @@ else
   
   if [ $attempt -eq $max_attempts ]; then
     echo "❌ Backend health check timed out"
+    exit 1
   fi
   
   # Check if frontend is accessible
@@ -42,6 +43,7 @@ else
     echo "  ✅ Frontend is accessible"
   else
     echo "  ⚠️ Frontend may not be ready yet"
+    exit 1
   fi
 fi
 
