@@ -6,10 +6,12 @@ FROM base AS deps
 WORKDIR /app
 
 # Copy package files from frontend
-COPY package*.json ./
+COPY package.json ./
 
 # Install all dependencies (including dev dependencies for build)
-RUN npm ci && npm cache clean --force
+# Note: Using npm install instead of npm ci because this is a workspace package
+# without its own package-lock.json (lock file is at monorepo root)
+RUN npm install --legacy-peer-deps && npm cache clean --force
 
 # Build stage
 FROM base AS builder
