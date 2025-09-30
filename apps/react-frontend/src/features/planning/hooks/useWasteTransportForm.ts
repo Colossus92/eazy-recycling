@@ -66,6 +66,7 @@ export const fieldsToValidate: Array<Array<keyof WasteTransportFormValues>> = [
 
   // Step 2: Delivery section fields
   [
+    'consigneePartyId',
     'deliveryCompanyId',
     'deliveryCompanyBranchId',
     'deliveryStreet',
