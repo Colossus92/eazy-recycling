@@ -14,6 +14,10 @@ export const testUsers = {
     email: 'admin@eazyrecycling.nl',
     password: 'password123'
   },
+  driverUser: {
+    email: 'chauffeur@eazyrecycling.nl',
+    password: 'password123'
+  }
 };
 
 export const testData = {
