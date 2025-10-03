@@ -9,7 +9,7 @@ export const MasterdataManagement = () => {
     <ContentContainer title={"Masterdata"}>
       <div className="flex-1 flex flex-col items-start self-stretch gap-4 rounded-b-radius-lg border-color-border-primary overflow-hidden">
 
-        <TabGroup className="w-full h-full">
+        <TabGroup className="w-full">
           <TabList>
             <Tab label="Eural Codes" />
             <Tab label="Verwerkingsmethodes" />

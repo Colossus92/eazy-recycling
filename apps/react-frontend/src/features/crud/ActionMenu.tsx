@@ -27,7 +27,7 @@ export const ActionMenu = <T,>({
 }: ActionMenuProps<T>) => {
   return (
     <Menu>
-      <MenuButton className="p-2 hover:bg-color-surface-secondary focus:outline-none rounded">
+      <MenuButton className="hover:bg-color-surface-secondary focus:outline-none rounded">
         <DotsThreeVertical className="w-5 h-5 text-color-text-secondary" />
       </MenuButton>
       <MenuItems

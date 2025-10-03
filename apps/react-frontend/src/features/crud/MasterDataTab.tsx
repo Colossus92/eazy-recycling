@@ -6,11 +6,57 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { ActionMenu } from './ActionMenu';
 import { PaginationRow } from './pagination/PaginationRow';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
+import { Eural } from '@/api/client';
+
+export type Column<T> = {
+    key: keyof T;
+    label: string;
+    accessor?: (value: T) => string | ReactNode;
+};
+
+export interface CrudDataProps<T> {
+    items: T[];
+    columns: Column<T>[];
+    setQuery: (value: string) => void;
+}
 
 export const MasterDataTab = <T,>() => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+
+
+    const data: CrudDataProps<Eural> = {
+        columns: [
+            { key: "code", label: "Code" },
+            { key: "description", label: "Beschrijving" },
+        ],
+        items: [
+            { code: "1", description: "Beschrijving" },
+            { code: "2", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+            { code: "3", description: "Beschrijving" },
+        ],
+        setQuery: () => { },
+    }
 
     return (
         <TabPanel className={"flex flex-col items-start self-stretch flex-1 gap-4"}>
@@ -23,35 +69,40 @@ export const MasterDataTab = <T,>() => {
                 />
             </ContentTitleBar>
             <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
-                <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary h-full overflow-y-auto">
+                <div className="flex flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
                     <table className="w-full table-fixed border-collapse">
                         <colgroup>
-                            <col key="code" className={'w-[calc((100%-64px)/2)]'} />
-                            <col key="description" className={'w-[calc((100%-64px)/2)]'} />
+                            {data.columns.map((col) => (
+                                <col key={String(col.key)} className={'w-[calc((100%-64px)/3)]'} />
+                            ))}
+                            <col className="w-[64px]" />
                         </colgroup>
                         <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary ">
                             <tr className="text-subtitle-1">
-                                <th className={'px-4 py-3 text-left'} key={"Code"}>
-                                    Code
-                                </th>
-                                <th className={'px-4 py-3 text-left'} key={"Beschrijving"}>
-                                    Beschrijving
-                                </th>
+                                {data.columns.map((col) => (
+                                    <th className={'px-4 py-3 text-left'} key={String(col.key)}>
+                                        {col.label}
+                                    </th>
+                                ))}
                                 <th className="px-4 py-3"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className="text-body-2 border-b border-solid border-color-border-primary">
-                                <td className="p-4" key={String("code")}></td>
-                                <td className="p-4" key={String("description")}></td>
-                                <td className="p-4 text-center">
-                                    <ActionMenu<T>
+                            {data.items
+                            .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                            .map((item, index) => (
+                                <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
+                                    <td className="p-4">{item.code}</td>
+                                    <td className="p-4">{item.description}</td>
+                                    <td className="p-4 text-center">
+                                        <ActionMenu<Eural>
                                         onEdit={() => { }}
                                         onDelete={() => { }}
-                                        item={{} as T}
+                                        item={item}
                                     />
                                 </td>
                             </tr>
+                        ))}
                         </tbody>
                         <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
                             <tr className="text-body-2 bg-color-surface-primary">
@@ -61,7 +112,7 @@ export const MasterDataTab = <T,>() => {
                                         setPage={setPage}
                                         rowsPerPage={rowsPerPage}
                                         setRowsPerPage={setRowsPerPage}
-                                        numberOfResults={0}
+                                        numberOfResults={data.items.length}
                                     />
                                 </td>
                             </tr>
