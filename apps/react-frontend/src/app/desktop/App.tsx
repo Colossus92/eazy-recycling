@@ -36,7 +36,7 @@ export const App = () => {
   return (
     <Provider>
       <DesktopAccessCheck>
-        <div className="flex items-start h-screen w-screen overflow-hidden pt-2 pb-2 pl-2 bg-color-surface-backround">
+        <div className="flex items-start h-screen w-screen overflow-hidden pt-2 pb-2 pl-2 bg-color-surface-background">
           <Sidebar />
           <Routes>
             <Route path="/" element={<PlanningPage />} />
