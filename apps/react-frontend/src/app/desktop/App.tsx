@@ -11,6 +11,7 @@ const ContainerManagement = lazy(() => import('./pages/ContainerManagement'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
 const TruckManagement = lazy(() => import('./pages/TruckManagement'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
+const MasterdataManagement = lazy(() => import('./pages/MasterdataManagement.tsx'));
 const ProfileManagement = lazy(() => import('./pages/ProfileManagement'));
 
 const DesktopAccessCheck = ({ children }: { children: React.ReactNode }) => {
@@ -48,6 +49,14 @@ export const App = () => {
               element={
                 <ProtectedRoute requiredRole="admin">
                   <UserManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/masterdata"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <MasterdataManagement />
                 </ProtectedRoute>
               }
             />

@@ -5,6 +5,7 @@ import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 import IdentificationCard from '@/assets/icons/IdentificationCard.svg?react';
+import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
 import { NavItem } from '@/components/layouts/sidebar/NavItem.tsx';
 import { SidebarHeader } from '@/components/layouts/sidebar/SidebarHeader.tsx';
@@ -30,6 +31,12 @@ export const Sidebar = () => {
       icon: IdentificationCard,
       label: 'Gebruikersbeheer',
       to: '/users',
+      requiredRole: 'admin',
+    },
+    {
+      icon: ArchiveBook,
+      label: 'Masterdata',
+      to: '/masterdata',
       requiredRole: 'admin',
     },
   ];
