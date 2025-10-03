@@ -4,9 +4,21 @@ import { euralService } from "@/api/services/euralService";
 import { DataTableProps } from "./MasterDataTab";
 import { Eural } from "@/api/client";
 import { Column } from "./MasterDataTab";
+import { useMemo } from "react";
 
 export const EuralCodeTab = () => {
     const [items, setItems] = useState<Eural[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const displayedEurals = useMemo(
+        () => items.filter((item) => {
+            return (
+                item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+        }
+        ),
+        [items, searchQuery]
+    );
 
     const columns: Column<Eural>[] = [
         { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
@@ -15,8 +27,7 @@ export const EuralCodeTab = () => {
 
     const data: DataTableProps<Eural> = {
         columns,
-        items: items,
-        setQuery: () => { },
+        items: displayedEurals,
     };
 
     useEffect(() => {
@@ -27,8 +38,7 @@ export const EuralCodeTab = () => {
         fetchEuralCodes();
     }, []);
 
-
     return (
-        <MasterDataTab data={data} />
+        <MasterDataTab data={data} searchQuery={(query) => setSearchQuery(query)} />
     )
 }

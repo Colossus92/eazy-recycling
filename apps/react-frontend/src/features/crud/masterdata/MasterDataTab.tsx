@@ -18,20 +18,20 @@ export type Column<T> = {
 export interface DataTableProps<T> {
     items: T[];
     columns: Column<T>[];
-    setQuery: (value: string) => void;
 }
 
 export interface MasterDataTabProps<T> {
     data: DataTableProps<T>;
+    searchQuery: (query: string) => void;
 }
 
-export const MasterDataTab = <T,>({data}: MasterDataTabProps<T>) => {
+export const MasterDataTab = <T,>({data, searchQuery}: MasterDataTabProps<T>) => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     return (
         <TabPanel className={"flex flex-col items-start self-stretch flex-1 gap-4"}>
-            <ContentTitleBar setQuery={() => { }}>
+            <ContentTitleBar setQuery={searchQuery}>
                 <Button
                     variant={'primary'}
                     icon={Plus}
