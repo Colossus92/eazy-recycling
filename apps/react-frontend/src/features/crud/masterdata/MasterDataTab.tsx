@@ -4,8 +4,8 @@ import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { TabPanel } from "@headlessui/react";
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { ActionMenu } from './ActionMenu';
-import { PaginationRow } from './pagination/PaginationRow';
+import { ActionMenu } from '../ActionMenu';
+import { PaginationRow } from '../pagination/PaginationRow';
 import { ReactNode, useState } from 'react';
 import { Eural } from '@/api/client';
 
@@ -13,50 +13,22 @@ export type Column<T> = {
     key: keyof T;
     label: string;
     accessor?: (value: T) => string | ReactNode;
+    width: string;
 };
 
-export interface CrudDataProps<T> {
+export interface DataTableProps<T> {
     items: T[];
     columns: Column<T>[];
     setQuery: (value: string) => void;
 }
 
-export const MasterDataTab = <T,>() => {
+export interface MasterDataTabProps<T> {
+    data: DataTableProps<T>;
+}
+
+export const MasterDataTab = <T,>({data}: MasterDataTabProps<T>) => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-
-
-    const data: CrudDataProps<Eural> = {
-        columns: [
-            { key: "code", label: "Code" },
-            { key: "description", label: "Beschrijving" },
-        ],
-        items: [
-            { code: "1", description: "Beschrijving" },
-            { code: "2", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-            { code: "3", description: "Beschrijving" },
-        ],
-        setQuery: () => { },
-    }
 
     return (
         <TabPanel className={"flex flex-col items-start self-stretch flex-1 gap-4"}>
@@ -73,9 +45,9 @@ export const MasterDataTab = <T,>() => {
                     <table className="w-full h-full table-fixed border-collapse">
                         <colgroup>
                             {data.columns.map((col) => (
-                                <col key={String(col.key)} className={'w-[calc((100%-64px)/3)]'} />
+                                <col key={String(col.key)} style={{ width: `${col.width}%` }} />
                             ))}
-                            <col className="w-[64px]" />
+                            <col style={{ width: '63px' }} />
                         </colgroup>
                         <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary ">
                             <tr className="text-subtitle-1">

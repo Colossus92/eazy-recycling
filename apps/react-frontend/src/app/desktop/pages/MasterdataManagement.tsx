@@ -1,7 +1,7 @@
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
-import { MasterDataTab } from '@/features/crud/MasterDataTab';
+import { EuralCodeTab } from '@/features/crud/masterdata/EuralCodeTab';
 
 export const MasterdataManagement = () => {
 
@@ -25,7 +25,7 @@ export const MasterdataManagement = () => {
       h-full
       -mt-[2px]
       ">
-            <MasterDataTab />
+            <EuralCodeTab />
             <TabPanel>Content 2</TabPanel>
             <TabPanel>Content 3</TabPanel>
             <TabPanel>Content 4</TabPanel>
