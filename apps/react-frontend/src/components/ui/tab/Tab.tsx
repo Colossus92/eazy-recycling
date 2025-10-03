@@ -16,8 +16,10 @@ export const Tab = ({ label, disabled = false }: TabProps) => {
                     className={clsx(
                         "h-10 py-3 px-5 transition-colors text-button font-semibold rounded-t-radius-lg",
                         selected && [
-                            "border-x border-t border-color-border-primary",
-                            "text-color-brand-primary"
+                            "border-x border-t border-b border-t-color-border-primary border-x-color-border-primary",
+                            "border-b-color-surface-primary",
+                            "text-color-brand-primary",
+                            "bg-color-surface-primary",
                         ],
                         hover && !disabled && !selected && [
                             "text-color-brand-primary",
