@@ -6,7 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { ActionMenu } from '../ActionMenu';
 import { PaginationRow } from '../pagination/PaginationRow';
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 
 export type Column<T> = {
     key: keyof T;
@@ -23,9 +23,10 @@ export interface DataTableProps<T> {
 export interface MasterDataTabProps<T> {
     data: DataTableProps<T>;
     searchQuery: (query: string) => void;
+    openAddForm: () => void;
 }
 
-export const MasterDataTab = <T,>({data, searchQuery}: MasterDataTabProps<T>) => {
+export const MasterDataTab = <T,>({data, searchQuery, openAddForm}: MasterDataTabProps<T>) => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -36,7 +37,7 @@ export const MasterDataTab = <T,>({data, searchQuery}: MasterDataTabProps<T>) =>
                     variant={'primary'}
                     icon={Plus}
                     label={'Voeg toe'}
-                    onClick={() => { }}
+                    onClick={openAddForm}
                 />
             </ContentTitleBar>
             <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
