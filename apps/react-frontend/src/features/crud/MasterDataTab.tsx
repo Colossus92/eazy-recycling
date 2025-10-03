@@ -69,8 +69,8 @@ export const MasterDataTab = <T,>() => {
                 />
             </ContentTitleBar>
             <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
-                <div className="flex flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
-                    <table className="w-full table-fixed border-collapse">
+                <div className="flex flex-col flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto  rounded-b-radius-lg">
+                    <table className="w-full h-full table-fixed border-collapse">
                         <colgroup>
                             {data.columns.map((col) => (
                                 <col key={String(col.key)} className={'w-[calc((100%-64px)/3)]'} />
