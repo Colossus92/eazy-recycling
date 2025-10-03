@@ -9,8 +9,8 @@ export const EuralCodeTab = () => {
     const [items, setItems] = useState<Eural[]>([]);
 
     const columns: Column<Eural>[] = [
-        { key: "code", label: "Code", width: "20" },
-        { key: "description", label: "Beschrijving", width: "80" },
+        { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
+        { key: "description", label: "Beschrijving", width: "80", accessor: (item) => item.description },
     ];
 
     const data: DataTableProps<Eural> = {

@@ -7,12 +7,11 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { ActionMenu } from '../ActionMenu';
 import { PaginationRow } from '../pagination/PaginationRow';
 import { ReactNode, useState } from 'react';
-import { Eural } from '@/api/client';
 
 export type Column<T> = {
     key: keyof T;
     label: string;
-    accessor?: (value: T) => string | ReactNode;
+    accessor: (value: T) => string;
     width: string;
 };
 
@@ -64,10 +63,13 @@ export const MasterDataTab = <T,>({data}: MasterDataTabProps<T>) => {
                             .slice((page - 1) * rowsPerPage, page * rowsPerPage)
                             .map((item, index) => (
                                 <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
-                                    <td className="p-4">{item.code}</td>
-                                    <td className="p-4">{item.description}</td>
+                                    {data.columns.map((col) => (
+                                        <td className="p-4" key={String(col.key)}>
+                                            {col.accessor(item)}
+                                        </td>
+                                    ))}
                                     <td className="p-4 text-center">
-                                        <ActionMenu<Eural>
+                                        <ActionMenu<T>
                                         onEdit={() => { }}
                                         onDelete={() => { }}
                                         item={item}
