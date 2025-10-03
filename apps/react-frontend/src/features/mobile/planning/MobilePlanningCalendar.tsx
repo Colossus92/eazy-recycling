@@ -74,7 +74,7 @@ export const MobilePlanningCalendar = ({
             >
               {!isSameDay(date, selectedDate) ? (
                 <div className="flex flex-col justify-center items-center p-2 cursor-pointer">
-                  <span className="text-body-2">{date.getDate()}</span>
+                  <span className="text-body-2" data-testid="calendar-day-option">{date.getDate()}</span>
                   {driverPlanning &&
                     format(date, 'yyyy-MM-dd') in driverPlanning && (
                       <div className="w-[5px] h-[5px] rounded-full bg-color-brand-primary"></div>
@@ -82,7 +82,7 @@ export const MobilePlanningCalendar = ({
                 </div>
               ) : (
                 <div className="flex flex-col justify-center items-center p-2 min-w-[40px] min-h-[40px] border border-color-brand-primary rounded-full bg-color-brand-primary cursor-pointer">
-                  <span className="text-body-2 text-color-text-invert-primary">
+                  <span className="text-body-2 text-color-text-invert-primary" data-testid="calendar-day-option">
                     {date.getDate()}
                   </span>
                   {driverPlanning &&

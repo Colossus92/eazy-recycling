@@ -3,6 +3,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { PlanningPage } from '../pages/PlanningPage';
 import { WasteTransportFormPage } from '../pages/WasteTransportFormPage';
 import { MobileHomePage } from '../pages/MobileHomePage';
+import { MobileTransportDetailsPage } from '../pages/MobileTransportDetailsPage';
 
 /**
  * Page Factory for creating page object instances
@@ -41,5 +42,12 @@ export class PageFactory {
    */
   createMobileHomePage(): MobileHomePage {
     return new MobileHomePage(this.page);
+  }
+
+  /**
+   * Create a MobileTransportDetailsPage instance
+   */
+  createMobileTransportDetailsPage(): MobileTransportDetailsPage {
+    return new MobileTransportDetailsPage(this.page);
   }
 }

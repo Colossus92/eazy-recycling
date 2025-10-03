@@ -13,6 +13,7 @@ interface PlanningCardProps {
 export const PlanningCard = ({
   transport,
   selectedDate,
+  ...props
 }: PlanningCardProps) => {
   const navigate = useNavigate();
 
@@ -49,6 +50,7 @@ export const PlanningCard = ({
     <div
       className={`flex flex-col items-start self-stretch pl-1 gap-1 border-solid border-l-4 rounded-radius-md ${colors.get(transport.status)} cursor-pointer`}
       onClick={handleCardClick}
+      {...props}
     >
       <div
         className={

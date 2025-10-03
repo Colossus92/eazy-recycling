@@ -22,6 +22,7 @@ export const MobilePlanningItem = ({
     <div className="flex flex-col items-start self-stretch gap-4 p-4 bg-color-surface-primary border border-solid border-color-border-primary rounded-radius-md">
       <div
         className="flex items-center gap-2 w-full cursor-pointer"
+        data-testid="truck-option"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
         {isCollapsed ? (
@@ -37,6 +38,7 @@ export const MobilePlanningItem = ({
             key={itemIndex}
             transport={transport}
             selectedDate={selectedDate}
+            data-testid={transport.displayNumber}
           />
         ))}
     </div>

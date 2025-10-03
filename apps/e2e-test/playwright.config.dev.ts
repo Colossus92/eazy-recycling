@@ -19,7 +19,7 @@ export default defineConfig({
   },
   /* Explicitly disable webServer to prevent Docker from starting */
   webServer: {
-        // command: 'npx run react-frontend:dev',
+        command: 'echo "Using existing server"',
         url: 'http://localhost:5173',
         reuseExistingServer: true,
   },

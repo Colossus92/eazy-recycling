@@ -20,4 +20,15 @@ export class MobileHomePage extends BasePage {
     await expect(this.pageTitle).toBeVisible();
     await expect(this.pageTitle).toHaveText('Planning');
   }
+
+  async navigateToWednesdaysTransportList(): Promise<void> {
+    const wednesday = this.page.getByTestId('calendar-day-option').filter({ hasText: '1' });
+    await expect(wednesday).toBeVisible();
+    await wednesday.click();
+  }
+
+  async openTransportDetails(displayNumber: string): Promise<void> {
+    await this.page.getByTestId('truck-option').filter({ hasText: '86-BVB-6' }).click();
+    await this.page.getByTestId(displayNumber).click();
+  }
 }
