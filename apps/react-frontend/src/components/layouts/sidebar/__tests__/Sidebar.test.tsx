@@ -32,7 +32,7 @@ describe('Sidebar', () => {
 
     expect(screen.getByAltText('full-logo')).toBeInTheDocument();
     // All 5 navigation items should be visible
-    expect(screen.getAllByRole('link')).toHaveLength(6);
+    expect(screen.getAllByRole('link')).toHaveLength(7);
     expect(screen.getByText('Gebruikersbeheer')).toBeInTheDocument();
   });
 

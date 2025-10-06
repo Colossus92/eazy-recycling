@@ -64,7 +64,7 @@ export const EuralCodeTab = () => {
 }
 
 const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean, setIsOpen: (value: boolean) => void, onCancel: () => void; onSubmit: (eural: Eural) => void }) => {
-    const { handleError, ErrorDialogComponent } = useErrorHandling();
+    const { ErrorDialogComponent } = useErrorHandling();
     const {
         register,
         handleSubmit,
