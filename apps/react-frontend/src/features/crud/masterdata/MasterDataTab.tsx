@@ -31,7 +31,7 @@ export const MasterDataTab = <T,>({data, searchQuery, openAddForm}: MasterDataTa
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     return (
-        <TabPanel className={"flex flex-col items-start self-stretch flex-1 gap-4"}>
+        <TabPanel className={"flex-1 flex flex-col items-start self-stretch gap-4 overflow-hidden"}>
             <ContentTitleBar setQuery={searchQuery}>
                 <Button
                     variant={'primary'}
@@ -41,15 +41,15 @@ export const MasterDataTab = <T,>({data, searchQuery, openAddForm}: MasterDataTa
                 />
             </ContentTitleBar>
             <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
-                <div className="flex flex-col flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto  rounded-b-radius-lg">
-                    <table className="w-full h-full table-fixed border-collapse">
+                <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
+                    <table className="w-full table-fixed border-collapse">
                         <colgroup>
                             {data.columns.map((col) => (
                                 <col key={String(col.key)} style={{ width: `${col.width}%` }} />
                             ))}
                             <col style={{ width: '63px' }} />
                         </colgroup>
-                        <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary ">
+                        <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
                             <tr className="text-subtitle-1">
                                 {data.columns.map((col) => (
                                     <th className={'px-4 py-3 text-left'} key={String(col.key)}>

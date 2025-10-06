@@ -46,7 +46,7 @@ export const ContentTable = <T, S = T>({
           ))}
           <col className="w-[64px]" />
         </colgroup>
-        <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary ">
+        <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
           <tr className="text-subtitle-1">
             {data.columns.map((col) => (
               <th className={'px-4 py-3 text-left'} key={String(col.key)}>
