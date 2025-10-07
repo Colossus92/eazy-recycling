@@ -219,6 +219,43 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TransportDto"
+  /processing-methods/{code}:
+    put:
+      tags:
+      - processing-method-controller
+      operationId: updateProcessingMethod
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessingMethod"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    delete:
+      tags:
+      - processing-method-controller
+      operationId: deleteProcessingMethod
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
   /planning/reorder:
     put:
       tags:
@@ -603,6 +640,37 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TransportDto"
+  /processing-methods:
+    get:
+      tags:
+      - processing-method-controller
+      operationId: getProcessingMethods
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProcessingMethod"
+    post:
+      tags:
+      - processing-method-controller
+      operationId: createProcessingMethod
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessingMethod"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProcessingMethod"
   /eural:
     get:
       tags:
@@ -803,20 +871,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SignatureStatusView"
-  /processing-methods:
-    get:
-      tags:
-      - processing-method-controller
-      operationId: getProcessingMethods
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ProcessingMethod"
   /planning/{pickupDate}:
     get:
       tags:
@@ -1386,6 +1440,16 @@ components:
       - pickupPostalCode
       - pickupStreet
       - transportType
+    ProcessingMethod:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
     TransportReorderRequest:
       type: object
       properties:
@@ -1650,16 +1714,6 @@ components:
       required:
       - id
       - roles
-    ProcessingMethod:
-      type: object
-      properties:
-        code:
-          type: string
-        description:
-          type: string
-      required:
-      - code
-      - description
     DriverPlanningItem:
       type: object
       properties:

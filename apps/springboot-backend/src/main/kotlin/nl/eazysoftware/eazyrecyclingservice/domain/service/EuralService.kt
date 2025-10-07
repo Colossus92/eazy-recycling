@@ -25,7 +25,7 @@ class EuralService(
     }
 
     euralRepository.findByIdOrNull(code)
-      ?: throw IllegalArgumentException("Euralcode $code niet gevonden.")
+      ?: throw IllegalArgumentException("Euralcode $code niet gevonden. Maak een nieuwe euralcode aan indien nodig.")
 
     return euralRepository.save(eural)
   }

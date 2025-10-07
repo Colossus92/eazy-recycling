@@ -1,26 +1,26 @@
 import { MasterDataTab } from "../MasterDataTab"
 import { DataTableProps } from "../MasterDataTab";
-import { Eural } from "@/api/client";
+import { ProcessingMethod } from "@/api/client";
 import { Column } from "../MasterDataTab";
-import { useEuralCodeCrud } from "@/features/crud/masterdata/eural/useEuralCode";
+import { useProcessingMethodsCrud } from "@/features/crud/masterdata/processingmethods/useProcessingMethods";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
-import { EuralForm } from "./EuralForm";
+import { EuralForm } from "../eural/EuralForm";
 import { EmptyState } from "../../EmptyState";
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 
-export const EuralCodeTab = () => {
+export const ProcessingMethodsTab = () => {
     const {
         read,
         form,
         deletion,
-    } = useEuralCodeCrud();
+    } = useProcessingMethodsCrud();
 
-    const columns: Column<Eural>[] = [
+    const columns: Column<ProcessingMethod>[] = [
         { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
         { key: "description", label: "Beschrijving", width: "80", accessor: (item) => item.description },
     ];
 
-    const data: DataTableProps<Eural> = {
+    const data: DataTableProps<ProcessingMethod> = {
         columns,
         items: read.items,
     };
