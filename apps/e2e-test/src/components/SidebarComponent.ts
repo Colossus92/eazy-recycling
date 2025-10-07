@@ -36,7 +36,6 @@ export class SidebarComponent {
     this.planningNavItem = page.locator('[data-testid="nav-item-planning"]');
     this.containersNavItem = page.locator('[data-testid="nav-item-containerbeheer"]');
     this.crmNavItem = page.locator('[data-testid="nav-item-crm"]');
-    this.trucksNavItem = page.locator('[data-testid="nav-item-vrachtwagenbeheer"]');
     this.wasteStreamsNavItem = page.locator('[data-testid="nav-item-afvalstroombeheer"]');
     this.usersNavItem = page.locator('[data-testid="nav-item-gebruikersbeheer"]');
   }

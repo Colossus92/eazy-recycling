@@ -9,7 +9,6 @@ import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
 const ContainerManagement = lazy(() => import('./pages/ContainerManagement'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
-const TruckManagement = lazy(() => import('./pages/TruckManagement'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
 const MasterdataManagement = lazy(() => import('./pages/MasterdataManagement.tsx'));
 const ProfileManagement = lazy(() => import('./pages/ProfileManagement'));
@@ -42,7 +41,6 @@ export const App = () => {
             <Route path="/" element={<PlanningPage />} />
             <Route path="/containers" element={<ContainerManagement />} />
             <Route path="/crm" element={<CompanyManagement />} />
-            <Route path="/trucks" element={<TruckManagement />} />
             <Route path="/waste-streams" element={<WasteStreamManagement />} />
             <Route
               path="/users"

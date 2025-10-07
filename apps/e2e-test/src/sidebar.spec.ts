@@ -89,8 +89,8 @@ test.describe('Dashboard with Sidebar Navigation', () => {
     expect(visibleItems).toContain('Planning');
     expect(visibleItems).toContain('Containerbeheer');
     expect(visibleItems).toContain('CRM');
-    expect(visibleItems).toContain('Vrachtwagenbeheer');
     expect(visibleItems).toContain('Afvalstroombeheer');
     expect(visibleItems).not.toContain('Gebruikersbeheer');
+    expect(visibleItems).not.toContain('Masterdata');
   });
 });

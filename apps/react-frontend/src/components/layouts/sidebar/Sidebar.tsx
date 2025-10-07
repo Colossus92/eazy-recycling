@@ -3,7 +3,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
-import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 import IdentificationCard from '@/assets/icons/IdentificationCard.svg?react';
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
@@ -25,7 +24,6 @@ export const Sidebar = () => {
     { icon: CalendarDots, label: 'Planning', to: '/' },
     { icon: ShippingContainer, label: 'Containerbeheer', to: '/containers' },
     { icon: BuildingOffice, label: 'CRM', to: '/crm' },
-    { icon: TruckTrailer, label: 'Vrachtwagenbeheer', to: '/trucks' },
     { icon: BxRecycle, label: 'Afvalstroombeheer', to: '/waste-streams' },
     {
       icon: IdentificationCard,
