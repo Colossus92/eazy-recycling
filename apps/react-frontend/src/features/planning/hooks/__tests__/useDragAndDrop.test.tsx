@@ -56,7 +56,9 @@ const createMockPlanningResponse = (basePlanning: Planning): Planning => {
             truck: item.truck ? {
               licensePlate: item.truck.licensePlate,
               brand: item.truck.brand || '',
-              model: item.truck.model || ''
+              model: item.truck.model || '',
+              updatedAt: item.truck.updatedAt,
+              displayName: item.truck.displayName
             } : undefined,
             containerId: item.containerId,
             transportType: typeof item.transportType === 'string' ? 
@@ -92,7 +94,9 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '01-VBT-8',
               brand: 'DAF',
-              model: 'XC200'
+              model: 'XC200',
+              updatedAt: '2025-06-06',
+              displayName: '01-VBT-8'
             },
             originCity: 'Bunnik',
             destinationCity: 'Bergschenhoek',
@@ -121,6 +125,8 @@ const mockPlanning: Planning = {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
               model: 'TGX',
+              updatedAt: '2025-06-04',
+              displayName: '11-DJ-12'
             },
             driver: {
               firstName: 'Pieter',
@@ -142,6 +148,8 @@ const mockPlanning: Planning = {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
               model: 'TGX',
+              updatedAt: '2025-06-04',
+              displayName: '11-DJ-12'
             },
             originCity: 'Bergschenhoek',
             destinationCity: 'Bunnik',
@@ -165,6 +173,8 @@ const mockPlanning: Planning = {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
               model: 'TGX',
+              updatedAt: '2025-06-05',
+              displayName: '11-DJ-12'
             },
             originCity: 'Bergschenhoek',
             destinationCity: 'Bunnik',

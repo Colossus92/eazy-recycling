@@ -1,5 +1,5 @@
 import { Planning, PlanningItem } from "@/features/planning/hooks/usePlanning";
-import { PlanningControllerApi, Truck } from "../client";
+import { PlanningControllerApi } from "../client";
 import { apiInstance } from "./apiInstance";
 import { PlanningView } from "../client/models/planning-view";
 import { Driver } from "@/features/planning/hooks/usePlanning";
