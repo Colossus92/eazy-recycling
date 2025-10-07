@@ -1,0 +1,13 @@
+{
+  "name": "react-frontend",
+  "root": "apps/react-frontend",
+  "targets": {
+    "generate-client": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run generate:client",
+        "cwd": "apps/react-frontend"
+      }
+    }
+  }
+}

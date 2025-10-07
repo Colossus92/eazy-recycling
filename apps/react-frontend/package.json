@@ -10,7 +10,8 @@
     "lint": "eslint . ",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "test": "vitest"
+    "test": "vitest",
+    "generate:client": "npx @openapitools/openapi-generator-cli generate"
   },
   "dependencies": {
     "@fontsource/urbanist": "^5.2.5",
