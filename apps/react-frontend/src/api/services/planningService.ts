@@ -1,6 +1,5 @@
 import { Planning, PlanningItem } from "@/features/planning/hooks/usePlanning";
-import { Truck } from "@/types/api";
-import { PlanningControllerApi } from "../client";
+import { PlanningControllerApi, Truck } from "../client";
 import { apiInstance } from "./apiInstance";
 import { PlanningView } from "../client/models/planning-view";
 import { Driver } from "@/features/planning/hooks/usePlanning";
@@ -28,17 +27,7 @@ const mapPlanningViewToPlanning = (planningView: PlanningView): Planning => {
                 transports: Object.fromEntries(
                     Object.entries(transportView.transports).map(([date, transportItems]) => {
                         // Map each transport item to a PlanningItem
-                        const planningItems: PlanningItem[] = transportItems.map(item => {
-                            // Create a properly typed truck object if it exists
-                            let truckData: Truck | undefined = undefined;
-                            if (item.truck) {
-                                truckData = {
-                                    licensePlate: item.truck.licensePlate,
-                                    brand: item.truck.brand || '',
-                                    model: item.truck.model || ''
-                                };
-                            }
-                            
+                        const planningItems: PlanningItem[] = transportItems.map(item => {                          
                             let driver: Driver | undefined = undefined;
                             if (item.driver) {
                                 driver = {
@@ -56,7 +45,7 @@ const mapPlanningViewToPlanning = (planningView: PlanningView): Planning => {
                                 destinationCity: item.destinationCity || '',
                                 driver: driver,
                                 status: item.status,
-                                truck: truckData,
+                                truck: item.truck,
                                 containerId: item.containerId,
                                 transportType: typeof item.transportType === 'string' ? 
                                     item.transportType : 

@@ -3,8 +3,8 @@ import {
   PlanningFilterParams,
   planningService,
 } from '@/api/services/planningService.ts';
-import { Truck } from '@/types/api.ts';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
+import { Truck } from '@/api/client/models';
 
 export interface Driver {
   firstName: string;

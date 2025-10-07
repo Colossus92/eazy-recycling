@@ -7,11 +7,12 @@ import { ContentTitleBar } from './ContentTitleBar.tsx';
 import { AdditionalAction } from './ActionMenu.tsx';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog.tsx';
-import { DeleteResponse } from '@/types/api.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
 import Plus from '@/assets/icons/Plus.svg?react';
+
+export type DeleteResponse = { success: boolean };
 
 interface CrudPageProps<T, S = T> {
   title: string;
