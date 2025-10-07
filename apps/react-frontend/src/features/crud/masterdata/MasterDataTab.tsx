@@ -13,7 +13,7 @@ import { ErrorThrowingComponent } from './ErrorThrowingComponent';
 export type Column<T> = {
     key: keyof T;
     label: string;
-    accessor: (value: T) => string;
+    accessor: (value: T) => string | undefined;
     width: string;
 };
 
