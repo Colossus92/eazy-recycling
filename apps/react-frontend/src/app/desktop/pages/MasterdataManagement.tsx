@@ -1,23 +1,24 @@
 import { ContentContainer } from '@/components/layouts/ContentContainer';
-import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { TabGroup, TabList, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
 import { EuralCodeTab } from '@/features/crud/masterdata/eural/EuralCodeTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import React from 'react';
 
 export const MasterdataManagement = () => {
-  const tabs: {name: string, panel: ReactNode}[] = [
-    {name: "Eural Codes", panel: <EuralCodeTab />},
-    {name: "Verwerkingsmethodes", panel: <ProcessingMethodsTab />}
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  
+  const tabs: {name: string, component: () => ReactNode}[] = [
+    {name: "Eural Codes", component: () => <EuralCodeTab key={`eural-${selectedIndex}`} />},
+    {name: "Verwerkingsmethodes", component: () => <ProcessingMethodsTab key={`processing-${selectedIndex}`} />}
   ]
-
 
   return (
     <ContentContainer title={"Masterdata"}>
       <div className="flex-1 flex flex-col items-start self-stretch gap-4 rounded-b-radius-lg border-color-border-primary overflow-hidden">
 
-        <TabGroup className="w-full flex-1 flex flex-col min-h-0">
+        <TabGroup selectedIndex={selectedIndex} onChange={setSelectedIndex} className="w-full flex-1 flex flex-col min-h-0">
           <TabList className="relative z-10">
             {
               tabs.map((tab) => (
@@ -35,7 +36,7 @@ export const MasterdataManagement = () => {
       -mt-[2px]
       ">
             {
-              tabs.map((tab, index) => <React.Fragment key={index}>{tab.panel}</React.Fragment>)
+              tabs.map((tab, index) => <React.Fragment key={index}>{tab.component()}</React.Fragment>)
             }
           </TabPanels>
         </TabGroup>

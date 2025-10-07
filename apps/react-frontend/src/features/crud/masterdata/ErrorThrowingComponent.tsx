@@ -4,7 +4,6 @@ export const ErrorThrowingComponent = ({
 }: {
     error?: Error | null;
 }) => {
-    console.log(JSON.stringify(error))
     if (error) {
         throw error;
     }

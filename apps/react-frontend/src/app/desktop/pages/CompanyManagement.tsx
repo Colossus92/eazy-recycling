@@ -66,8 +66,6 @@ export const CompanyManagement = () => {
       return company.branches || [];
     },
     renderSubItem: (branch: CompanyBranch, columns: Column<Company>[]) => {
-      console.log('branch, ', branch);
-
       const handleEditBranch = (branch: CompanyBranch) => {
         const company = displayedCompanies.find(
           (c) => c.id === branch.companyId

@@ -39,7 +39,6 @@ export const MobileReportFinishedPage = () => {
   });
 
   const onSubmit = (data: { hours: number }) => {
-    console.log('Form submitted:', data);
     reportFinishedMutation.mutate(data.hours);
   };
   const {
