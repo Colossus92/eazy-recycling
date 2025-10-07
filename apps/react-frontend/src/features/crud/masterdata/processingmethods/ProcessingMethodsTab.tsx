@@ -4,9 +4,9 @@ import { ProcessingMethod } from "@/api/client";
 import { Column } from "../MasterDataTab";
 import { useProcessingMethodsCrud } from "@/features/crud/masterdata/processingmethods/useProcessingMethods";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
-import { EuralForm } from "../eural/EuralForm";
 import { EmptyState } from "../../EmptyState";
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
+import { ProcessingMethodForm } from "./ProcessingMethodForm";
 
 export const ProcessingMethodsTab = () => {
     const {
@@ -36,7 +36,7 @@ export const ProcessingMethodsTab = () => {
                 renderEmptyState={(open) => (
                     <EmptyState
                         icon={ArchiveBook}
-                        text={'Geen eural codes gevonden'}
+                        text={'Geen vewerkingsmethodes gevonden'}
                         onClick={open}
                     />
                 )}
@@ -44,9 +44,9 @@ export const ProcessingMethodsTab = () => {
                 errorHandling={read.errorHandling}
             />
             {/*
-                Form to add or delete eural codes
+                Form to add or delete processing methods
              */}
-            <EuralForm
+            <ProcessingMethodForm
                 isOpen={form.isOpen}
                 setIsOpen={form.close}
                 onCancel={form.close}
@@ -54,7 +54,7 @@ export const ProcessingMethodsTab = () => {
                 initialData={form.item}
             />
             {/*
-                Dialog to confirm deletion of eural codes
+                Dialog to confirm deletion of processing methods
              */}
             <DeleteDialog
                 isOpen={Boolean(deletion.item)}
@@ -63,8 +63,8 @@ export const ProcessingMethodsTab = () => {
                     deletion.item &&
                     deletion.confirm(deletion.item)
                 }
-                title={"Euralcode verwijderen"}
-                description={`Weet u zeker dat u euralcode met code ${deletion.item?.code} wilt verwijderen?`}
+                title={"Vewerkingsmethode verwijderen"}
+                description={`Weet u zeker dat u verwerkingsmethode met code ${deletion.item?.code} wilt verwijderen?`}
             />
         </>
     )
