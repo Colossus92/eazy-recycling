@@ -60,10 +60,12 @@ export const useEuralCodeCrud = () => {
     };
 
     return {
-        error,
-        setSearchQuery,
-        isLoading,
-        displayedEurals,
+        read: {
+            items: displayedEurals,
+            setSearchQuery,
+            isLoading,
+            error,
+        },
         creation: {
             isOpen: isFormOpen,
             open: () => setIsFormOpen(true),

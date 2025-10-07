@@ -16,8 +16,7 @@ import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
 
 export const EuralCodeTab = () => {
     const { 
-        displayedEurals, 
-        setSearchQuery, 
+        read,
         creation,
         deletion,
      } = useEuralCodeCrud();
@@ -29,14 +28,14 @@ export const EuralCodeTab = () => {
 
     const data: DataTableProps<Eural> = {
         columns,
-        items: displayedEurals,
+        items: read.items,
     };
 
     return (
         <>
             <MasterDataTab
                 data={data}
-                searchQuery={(query) => setSearchQuery(query)}
+                searchQuery={(query) => read.setSearchQuery(query)}
                 openAddForm={creation.open}
                 removeAction={(item) => deletion.initiate(item)}
             />
