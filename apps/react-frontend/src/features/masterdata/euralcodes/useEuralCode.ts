@@ -10,7 +10,6 @@ export const useEuralCodeCrud = () => {
         queryKey: ['eurals'],
         queryFn: () => euralService.getAll(),
     });
-    const [isAdding, setIsAdding] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<Eural | undefined>(undefined)
 
@@ -29,8 +28,7 @@ export const useEuralCodeCrud = () => {
         mutationFn: (item: Omit<Eural, 'id'>) => euralService.create(item),
         onSuccess: () => {
             queryClient
-                .invalidateQueries({ queryKey: ['eurals'] })
-                .then(() => setIsAdding(false));
+                .invalidateQueries({ queryKey: ['eurals'] });
         },
     });
 
@@ -63,12 +61,15 @@ export const useEuralCodeCrud = () => {
 
     return {
         error,
-        create,
         setSearchQuery,
         isLoading,
         displayedEurals,
-        isFormOpen,
-        setIsFormOpen,
+        creation: {
+            isOpen: isFormOpen,
+            open: () => setIsFormOpen(true),
+            close: () => setIsFormOpen(false),
+            confirm: create,
+        },
         deletion: {
             item: itemToDelete,
             initiate: setItemToDelete,

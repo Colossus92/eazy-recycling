@@ -18,9 +18,7 @@ export const EuralCodeTab = () => {
     const { 
         displayedEurals, 
         setSearchQuery, 
-        create, 
-        isFormOpen, 
-        setIsFormOpen,
+        creation,
         deletion,
      } = useEuralCodeCrud();
 
@@ -39,14 +37,14 @@ export const EuralCodeTab = () => {
             <MasterDataTab
                 data={data}
                 searchQuery={(query) => setSearchQuery(query)}
-                openAddForm={() => setIsFormOpen(true)}
+                openAddForm={creation.open}
                 removeAction={(item) => deletion.initiate(item)}
             />
             <EuralForm
-                isOpen={isFormOpen}
-                setIsOpen={setIsFormOpen}
-                onCancel={() => setIsFormOpen(false)}
-                onSubmit={create}
+                isOpen={creation.isOpen}
+                setIsOpen={creation.close}
+                onCancel={creation.close}
+                onSubmit={creation.confirm}
             />
             <DeleteDialog
                       isOpen={Boolean(deletion.item)}
@@ -67,6 +65,7 @@ const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean,
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm<Eural>();
 
@@ -78,6 +77,7 @@ const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean,
                     code: data.code,
                     description: data.description,
                 });
+                reset(); // Clear the form after successful submission
                 onCancel(); // Only close the form if submission was successful
             } catch (error) {
                 handleError(error);
