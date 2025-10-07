@@ -1,11 +1,11 @@
-import { MasterDataTab } from "./MasterDataTab"
-import { DataTableProps } from "./MasterDataTab";
+import { MasterDataTab } from "../MasterDataTab"
+import { DataTableProps } from "../MasterDataTab";
 import { Eural } from "@/api/client";
-import { Column } from "./MasterDataTab";
+import { Column } from "../MasterDataTab";
 import { useEuralCodeCrud } from "@/features/masterdata/euralcodes/useEuralCode";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
 import { EuralForm } from "./EuralForm";
-import { EmptyState } from "../EmptyState";
+import { EmptyState } from "../../EmptyState";
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 
 export const EuralCodeTab = () => {

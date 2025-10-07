@@ -1,7 +1,7 @@
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
-import { EuralCodeTab } from '@/features/crud/masterdata/EuralCodeTab';
+import { EuralCodeTab } from '@/features/crud/masterdata/eural/EuralCodeTab';
 
 export const MasterdataManagement = () => {
 
