@@ -13,4 +13,8 @@ class EuralService(
         return euralRepository.findAll()
     }
 
+    fun createEural(eural: Eural): Eural {
+      return euralRepository.save(eural)
+    }
+
 }

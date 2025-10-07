@@ -566,6 +566,37 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/TransportDto"
+  /eural:
+    get:
+      tags:
+      - eural-controller
+      operationId: getEural
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Eural"
+    post:
+      tags:
+      - eural-controller
+      operationId: createEural
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Eural"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Eural"
   /containers:
     get:
       tags:
@@ -821,20 +852,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
-  /eural:
-    get:
-      tags:
-      - eural-controller
-      operationId: getEural
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Eural"
 components:
   schemas:
     WasteStreamDto:
@@ -1539,6 +1556,16 @@ components:
           format: double
       required:
       - hours
+    Eural:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
     CreateContainerRequest:
       type: object
       properties:
@@ -1628,16 +1655,6 @@ components:
       - pickupDateTime
       - pickupLocation
       - status
-    Eural:
-      type: object
-      properties:
-        code:
-          type: string
-        description:
-          type: string
-      required:
-      - code
-      - description
     CompanyBranchResponse:
       type: object
       properties:
