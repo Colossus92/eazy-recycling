@@ -7,7 +7,6 @@ import { Sidebar } from '@/components/layouts/sidebar/Sidebar.tsx';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
 
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
-const ContainerManagement = lazy(() => import('./pages/ContainerManagement'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
 const MasterdataManagement = lazy(() => import('./pages/MasterdataManagement.tsx'));
@@ -39,7 +38,6 @@ export const App = () => {
           <Sidebar />
           <Routes>
             <Route path="/" element={<PlanningPage />} />
-            <Route path="/containers" element={<ContainerManagement />} />
             <Route path="/crm" element={<CompanyManagement />} />
             <Route path="/waste-streams" element={<WasteStreamManagement />} />
             <Route
