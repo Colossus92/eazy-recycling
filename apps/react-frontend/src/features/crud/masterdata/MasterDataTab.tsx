@@ -6,7 +6,9 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { ActionMenu } from '../ActionMenu';
 import { PaginationRow } from '../pagination/PaginationRow';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
+import { ClipLoader } from 'react-spinners';
+import { ErrorThrowingComponent } from './ErrorThrowingComponent';
 
 export type Column<T> = {
     key: keyof T;
@@ -26,9 +28,15 @@ export interface MasterDataTabProps<T> {
     openAddForm: () => void;
     editAction: (item: T) => void;
     removeAction: (item: T) => void;
+    renderEmptyState: (onClick: () => void) => ReactNode;
+    isLoading: boolean;
+    errorHandling: {
+        error: Error | null;
+        reset: () => void;
+    };
 }
 
-export const MasterDataTab = <T,>({data, searchQuery, openAddForm, editAction, removeAction}: MasterDataTabProps<T>) => {
+export const MasterDataTab = <T,>({ data, searchQuery, openAddForm, editAction, removeAction, renderEmptyState, isLoading, errorHandling }: MasterDataTabProps<T>) => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -42,60 +50,75 @@ export const MasterDataTab = <T,>({data, searchQuery, openAddForm, editAction, r
                     onClick={openAddForm}
                 />
             </ContentTitleBar>
-            <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
-                <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
-                    <table className="w-full table-fixed border-collapse">
-                        <colgroup>
-                            {data.columns.map((col) => (
-                                <col key={String(col.key)} style={{ width: `${col.width}%` }} />
-                            ))}
-                            <col style={{ width: '63px' }} />
-                        </colgroup>
-                        <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
-                            <tr className="text-subtitle-1">
+            <ErrorBoundary fallbackRender={fallbackRender} onReset={errorHandling.reset}>
+                <ErrorThrowingComponent error={errorHandling.error} />
+                {data.items.length === 0 ? (
+                    isLoading ? (
+                        <div className="flex justify-center items-center h-24 w-full">
+                            <ClipLoader
+                                size={20}
+                                color={'text-color-text-invert-primary'}
+                                aria-label="Laad spinner"
+                            />
+                        </div>
+                    ) : renderEmptyState ? (
+                        renderEmptyState(openAddForm)
+                    ) : null
+                ) : (
+                    <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
+                        <table className="w-full table-fixed border-collapse">
+                            <colgroup>
                                 {data.columns.map((col) => (
-                                    <th className={'px-4 py-3 text-left'} key={String(col.key)}>
-                                        {col.label}
-                                    </th>
+                                    <col key={String(col.key)} style={{ width: `${col.width}%` }} />
                                 ))}
-                                <th className="px-4 py-3"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.items
-                            .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                            .map((item, index) => (
-                                <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
+                                <col style={{ width: '63px' }} />
+                            </colgroup>
+                            <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
+                                <tr className="text-subtitle-1">
                                     {data.columns.map((col) => (
-                                        <td className="p-4" key={String(col.key)}>
-                                            {col.accessor(item)}
-                                        </td>
+                                        <th className={'px-4 py-3 text-left'} key={String(col.key)}>
+                                            {col.label}
+                                        </th>
                                     ))}
-                                    <td className="p-4 text-center">
-                                        <ActionMenu<T>
-                                        onEdit={editAction}
-                                        onDelete={removeAction}
-                                        item={item}
-                                    />
-                                </td>
-                            </tr>
-                        ))}
-                        </tbody>
-                        <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
-                            <tr className="text-body-2 bg-color-surface-primary">
-                                <td colSpan={3} className="p-4">
-                                    <PaginationRow
-                                        page={page}
-                                        setPage={setPage}
-                                        rowsPerPage={rowsPerPage}
-                                        setRowsPerPage={setRowsPerPage}
-                                        numberOfResults={data.items.length}
-                                    />
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                                    <th className="px-4 py-3"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.items
+                                    .slice((page - 1) * rowsPerPage, page * rowsPerPage)
+                                    .map((item, index) => (
+                                        <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
+                                            {data.columns.map((col) => (
+                                                <td className="p-4" key={String(col.key)}>
+                                                    {col.accessor(item)}
+                                                </td>
+                                            ))}
+                                            <td className="p-4 text-center">
+                                                <ActionMenu<T>
+                                                    onEdit={editAction}
+                                                    onDelete={removeAction}
+                                                    item={item}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                            <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
+                                <tr className="text-body-2 bg-color-surface-primary">
+                                    <td colSpan={3} className="p-4">
+                                        <PaginationRow
+                                            page={page}
+                                            setPage={setPage}
+                                            rowsPerPage={rowsPerPage}
+                                            setRowsPerPage={setRowsPerPage}
+                                            numberOfResults={data.items.length}
+                                        />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                )}
             </ErrorBoundary>
         </TabPanel>
     )

@@ -85,14 +85,17 @@ export const useEuralCodeCrud = () => {
         });
     };
 
-    console.log(JSON.stringify(itemToEdit))
-
     return {
         read: {
             items: displayedEurals,
             setSearchQuery,
             isLoading,
-            error,
+            errorHandling: {
+                error,
+                reset: () => {
+                    queryClient.invalidateQueries({ queryKey: ['eurals'] });
+                },
+            },
         },
         form: {
             isOpen: isFormOpen,
@@ -106,7 +109,6 @@ export const useEuralCodeCrud = () => {
                 setIsFormOpen(true);
             },
             close: () => {
-                setItemToDelete(undefined);
                 setItemToEdit(undefined);
                 setIsFormOpen(false);
             },
