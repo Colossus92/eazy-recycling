@@ -852,6 +852,20 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
+  /eural/{code}:
+    delete:
+      tags:
+      - eural-controller
+      operationId: deleteEural
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
 components:
   schemas:
     WasteStreamDto:

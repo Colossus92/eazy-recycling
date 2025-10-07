@@ -6,15 +6,16 @@ import org.springframework.stereotype.Service
 
 @Service
 class EuralService(
-    private val euralRepository: EuralRepository
+  private val euralRepository: EuralRepository
 ) {
 
-    fun getEurals(): List<Eural> {
-        return euralRepository.findAll()
-    }
+  fun getEurals() =
+    euralRepository.findAll()
 
-    fun createEural(eural: Eural): Eural {
-      return euralRepository.save(eural)
-    }
+  fun createEural(eural: Eural) =
+    euralRepository.save(eural)
+
+  fun deleteEural(code: String) =
+    euralRepository.deleteById(code)
 
 }

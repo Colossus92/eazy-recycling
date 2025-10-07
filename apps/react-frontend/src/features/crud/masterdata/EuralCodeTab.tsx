@@ -12,9 +12,17 @@ import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 import { useForm } from "react-hook-form";
 import { useErrorHandling } from "@/hooks/useErrorHandling";
 import { useEuralCodeCrud } from "@/features/masterdata/euralcodes/useEuralCode";
+import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
 
 export const EuralCodeTab = () => {
-    const { displayedEurals, setSearchQuery, create, isFormOpen, setIsFormOpen } = useEuralCodeCrud();
+    const { 
+        displayedEurals, 
+        setSearchQuery, 
+        create, 
+        isFormOpen, 
+        setIsFormOpen,
+        deletion,
+     } = useEuralCodeCrud();
 
     const columns: Column<Eural>[] = [
         { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
@@ -32,6 +40,7 @@ export const EuralCodeTab = () => {
                 data={data}
                 searchQuery={(query) => setSearchQuery(query)}
                 openAddForm={() => setIsFormOpen(true)}
+                removeAction={(item) => deletion.initiate(item)}
             />
             <EuralForm
                 isOpen={isFormOpen}
@@ -39,6 +48,16 @@ export const EuralCodeTab = () => {
                 onCancel={() => setIsFormOpen(false)}
                 onSubmit={create}
             />
+            <DeleteDialog
+                      isOpen={Boolean(deletion.item)}
+                      setIsOpen={deletion.cancel}
+                      onDelete={() =>
+                        deletion.item &&
+                        deletion.confirm(deletion.item)
+                      }
+                      title={"Euralcode verwijderen"}
+                      description={`Weet u zeker dat u euralcode met code ${deletion.item?.code} wilt verwijderen?`}
+                    />
         </>
     )
 }
