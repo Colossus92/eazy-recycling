@@ -3,7 +3,7 @@ import { euralService } from "@/api/services/euralService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 
-export const useEuralCodeCrud = () => {
+export const useEuralCodesCrud = () => {
     const queryClient = useQueryClient();
     const [searchQuery, setSearchQuery] = useState('');
     const { data: eurals = [], error, isLoading } = useQuery({

@@ -9,7 +9,7 @@ import { FormTopBar } from "@/components/ui/form/FormTopBar";
 import { TextFormField } from "@/components/ui/form/TextFormField";
 import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 
-interface EuralFormProps {
+interface EuralCodeFormProps {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     onCancel: () => void;
@@ -17,7 +17,7 @@ interface EuralFormProps {
     initialData?: Eural;
 }
 
-export const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: EuralFormProps) => {
+export const EuralCodeForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: EuralCodeFormProps) => {
     const { handleError, ErrorDialogComponent } = useErrorHandling();
     const {
         register,

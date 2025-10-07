@@ -2,18 +2,18 @@ import { MasterDataTab } from "../MasterDataTab"
 import { DataTableProps } from "../MasterDataTab";
 import { Eural } from "@/api/client";
 import { Column } from "../MasterDataTab";
-import { useEuralCodeCrud } from "@/features/crud/masterdata/eural/useEuralCode";
+import { useEuralCodesCrud } from "@/features/crud/masterdata/euralcodes/useEuralCodes";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
-import { EuralForm } from "./EuralForm";
+import { EuralCodeForm } from "./EuralCodeForm";
 import { EmptyState } from "../../EmptyState";
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 
-export const EuralCodeTab = () => {
+export const EuralCodesTab = () => {
     const {
         read,
         form,
         deletion,
-    } = useEuralCodeCrud();
+    } = useEuralCodesCrud();
 
     const columns: Column<Eural>[] = [
         { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
@@ -46,7 +46,7 @@ export const EuralCodeTab = () => {
             {/*
                 Form to add or delete eural codes
              */}
-            <EuralForm
+            <EuralCodeForm
                 isOpen={form.isOpen}
                 setIsOpen={form.close}
                 onCancel={form.close}

@@ -1,7 +1,7 @@
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { TabGroup, TabList, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
-import { EuralCodeTab } from '@/features/crud/masterdata/eural/EuralCodeTab';
+import { EuralCodesTab } from '@/features/crud/masterdata/euralcodes/EuralCodeTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
 import { ReactNode, useState } from 'react';
 import React from 'react';
@@ -10,7 +10,7 @@ export const MasterdataManagement = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   
   const tabs: {name: string, component: () => ReactNode}[] = [
-    {name: "Eural Codes", component: () => <EuralCodeTab key={`eural-${selectedIndex}`} />},
+    {name: "Eural Codes", component: () => <EuralCodesTab key={`eural-${selectedIndex}`} />},
     {name: "Verwerkingsmethodes", component: () => <ProcessingMethodsTab key={`processing-${selectedIndex}`} />}
   ]
 
