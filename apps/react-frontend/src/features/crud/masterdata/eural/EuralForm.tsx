@@ -67,6 +67,7 @@ export const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }
                                     rules: { required: 'Code is verplicht' },
                                     errors,
                                 }}
+                                disabled={Boolean(initialData?.code)}
                             />
                             <TextFormField
                                 title={'Beschrijving'}
