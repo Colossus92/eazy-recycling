@@ -237,6 +237,43 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PlanningView"
+  /eural/{code}:
+    put:
+      tags:
+      - eural-controller
+      operationId: updateEural
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Eural"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Eural"
+    delete:
+      tags:
+      - eural-controller
+      operationId: deleteEural
+      parameters:
+      - name: code
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
   /containers/{id}:
     get:
       tags:
@@ -852,20 +889,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
-  /eural/{code}:
-    delete:
-      tags:
-      - eural-controller
-      operationId: deleteEural
-      parameters:
-      - name: code
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
 components:
   schemas:
     WasteStreamDto:
@@ -1450,6 +1473,16 @@ components:
       required:
       - transports
       - truck
+    Eural:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
     ContainerLocation:
       type: object
       properties:
@@ -1570,16 +1603,6 @@ components:
           format: double
       required:
       - hours
-    Eural:
-      type: object
-      properties:
-        code:
-          type: string
-        description:
-          type: string
-      required:
-      - code
-      - description
     CreateContainerRequest:
       type: object
       properties:

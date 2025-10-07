@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,5 +18,16 @@ class EuralService(
 
   fun deleteEural(code: String) =
     euralRepository.deleteById(code)
+
+  fun updateEural(code: String, eural: Eural): Eural {
+    if (eural.code != code) {
+      throw IllegalArgumentException("De code van de euralcode kan niet gewijzigd worden.")
+    }
+
+    euralRepository.findByIdOrNull(code)
+      ?: throw IllegalArgumentException("Euralcode $code niet gevonden.")
+
+    return euralRepository.save(eural)
+  }
 
 }
