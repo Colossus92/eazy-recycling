@@ -8,19 +8,34 @@
       ]
     },
     "ci-build": {
-    "executor": "@nx/gradle:gradle",
-    "options": {
-      "taskName": ":bootJar"
-    },
-    "dependsOn": ["eba-schema:build", "test"],
-    "excludeDependsOn": false
+      "executor": "@nx/gradle:gradle",
+      "inputs": [
+        "default",
+        "{workspaceRoot}/gradle.properties",
+        "{workspaceRoot}/settings.gradle.kts",
+        "^production"
+      ],
+      "outputs": [
+        "{projectRoot}/build/libs/app.jar",
+        "{projectRoot}/build/classes"
+      ],
+      "options": {
+        "taskName": ":bootJar"
+      },
+      "dependsOn": ["eba-schema:build", "test"],
+      "excludeDependsOn": false
     },
     "docker:build": {
+      "inputs": [
+        "{projectRoot}/Dockerfile",
+        "{projectRoot}/.dockerignore",
+        "{projectRoot}/build/libs/app.jar"
+      ],
       "dependsOn": ["ci-build"],
       "excludeDependsOn": false
     }
   },
-  "implicitDependencies":[
+  "implicitDependencies": [
     "eba-schema"
   ]
 }

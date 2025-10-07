@@ -11,7 +11,12 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/src/test/**/*"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml",
+      "{workspaceRoot}/.github/workflows/docker-build.yml",
+      "{workspaceRoot}/gradle.properties",
+      "{workspaceRoot}/settings.gradle.kts"
+    ]
   },
   "nxCloudId": "68c29a72a47dae82c74e2a06",
   "plugins": [

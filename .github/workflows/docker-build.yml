@@ -61,7 +61,9 @@ jobs:
       # Build using Nx (this will handle Gradle builds and Docker image creation)
       - name: Build with Nx
         if: steps.changes.outputs.build_required == 'true'
-        run: npx nx docker:build springboot-backend
+        env:
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: "0"
+        run: npx nx docker:build springboot-backend --skip-nx-cache=false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226
