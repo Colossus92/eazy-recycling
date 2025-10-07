@@ -31,6 +31,45 @@ export const EuralControllerApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
+         * @param {Eural} eural 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createEural: async (eural: Eural, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'eural' is not null or undefined
+            assertParamExists('createEural', 'eural', eural)
+            const localVarPath = `/eural`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(eural, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -74,6 +113,18 @@ export const EuralControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {Eural} eural 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createEural(eural: Eural, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Eural>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createEural(eural, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['EuralControllerApi.createEural']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -95,6 +146,15 @@ export const EuralControllerApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
+         * @param {Eural} eural 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createEural(eural: Eural, options?: RawAxiosRequestConfig): AxiosPromise<Eural> {
+            return localVarFp.createEural(eural, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -111,6 +171,17 @@ export const EuralControllerApiFactory = function (configuration?: Configuration
  * @extends {BaseAPI}
  */
 export class EuralControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {Eural} eural 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EuralControllerApi
+     */
+    public createEural(eural: Eural, options?: RawAxiosRequestConfig) {
+        return EuralControllerApiFp(this.configuration).createEural(eural, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {*} [options] Override http request option.

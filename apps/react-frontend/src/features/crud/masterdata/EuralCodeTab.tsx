@@ -1,10 +1,8 @@
 import { MasterDataTab } from "./MasterDataTab"
-import { useEffect, useState } from "react";
-import { euralService } from "@/api/services/euralService";
+import { FormEvent } from "react";
 import { DataTableProps } from "./MasterDataTab";
 import { Eural } from "@/api/client";
 import { Column } from "./MasterDataTab";
-import { useMemo } from "react";
 import { FormDialog } from "@/components/ui/dialog/FormDialog";
 import { ErrorBoundary } from "react-error-boundary";
 import { fallbackRender } from "@/utils/fallbackRender";
@@ -13,25 +11,10 @@ import { TextFormField } from "@/components/ui/form/TextFormField";
 import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 import { useForm } from "react-hook-form";
 import { useErrorHandling } from "@/hooks/useErrorHandling";
+import { useEuralCodeCrud } from "@/features/masterdata/euralcodes/useEuralCode";
 
 export const EuralCodeTab = () => {
-    const [items, setItems] = useState<Eural[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isFormOpen, setIsFormOpen] = useState(false);
-
-    const displayedEurals = useMemo(
-        () => items.filter((item) => {
-            return (
-                item.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.description.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-        }
-        ),
-        [items, searchQuery]
-    );
-    const onSubmit = async (eural: Eural) => {
-        setItems([...items, eural]);
-    };
+    const { displayedEurals, setSearchQuery, create, isFormOpen, setIsFormOpen } = useEuralCodeCrud();
 
     const columns: Column<Eural>[] = [
         { key: "code", label: "Code", width: "20", accessor: (item) => item.code },
@@ -43,14 +26,6 @@ export const EuralCodeTab = () => {
         items: displayedEurals,
     };
 
-    useEffect(() => {
-        const fetchEuralCodes = async () => {
-            const euralCodes = await euralService.getAll();
-            setItems(euralCodes);
-        };
-        fetchEuralCodes();
-    }, []);
-
     return (
         <>
             <MasterDataTab
@@ -58,25 +33,45 @@ export const EuralCodeTab = () => {
                 searchQuery={(query) => setSearchQuery(query)}
                 openAddForm={() => setIsFormOpen(true)}
             />
-            <EuralForm isOpen={isFormOpen} setIsOpen={setIsFormOpen} onCancel={() => setIsFormOpen(false)} onSubmit={onSubmit} />
+            <EuralForm
+                isOpen={isFormOpen}
+                setIsOpen={setIsFormOpen}
+                onCancel={() => setIsFormOpen(false)}
+                onSubmit={create}
+            />
         </>
     )
 }
 
 const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean, setIsOpen: (value: boolean) => void, onCancel: () => void; onSubmit: (eural: Eural) => void }) => {
-    const { ErrorDialogComponent } = useErrorHandling();
+    const { handleError, ErrorDialogComponent } = useErrorHandling();
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm<Eural>();
 
+    const submitForm = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        await handleSubmit(async (data) => {
+            try {
+                await onSubmit({
+                    code: data.code,
+                    description: data.description,
+                });
+                onCancel(); // Only close the form if submission was successful
+            } catch (error) {
+                handleError(error);
+            }
+        })();
+    };
+
     return (
         <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
             <ErrorBoundary fallbackRender={fallbackRender}>
                 <form
                     className="flex flex-col items-center self-stretch"
-                    onSubmit={(e) => handleSubmit(onSubmit)(e)}
+                    onSubmit={(e) => submitForm(e)}
                 >
                     <FormTopBar title={"Eural code toevoegen"} onClick={onCancel} />
                     <div className="flex flex-col items-center self-stretch p-4 gap-4">
