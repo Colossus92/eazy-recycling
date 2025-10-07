@@ -3,6 +3,7 @@ import { Tab } from '@/components/ui/tab/Tab';
 import { EuralCodesTab } from '@/features/crud/masterdata/euralcodes/EuralCodeTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
 import { TrucksTab } from '@/features/crud/masterdata/trucks/EuralCodeTab';
+import { WasteContainersTab } from '@/features/crud/masterdata/wastecontainers/WasteContainerTab';
 import { TabGroup, TabList, TabPanels } from '@headlessui/react';
 import React, { ReactNode, useState } from 'react';
 
@@ -10,9 +11,10 @@ export const MasterdataManagement = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   
   const tabs: {name: string, component: () => ReactNode}[] = [
+    {name: "Vrachtwagens", component: () => <TrucksTab key={`truck-${selectedIndex}`} />},
+    {name: "Containers", component: () => <WasteContainersTab key={`wastecontainer-${selectedIndex}`} />},
     {name: "Eural Codes", component: () => <EuralCodesTab key={`eural-${selectedIndex}`} />},
     {name: "Verwerkingsmethodes", component: () => <ProcessingMethodsTab key={`processing-${selectedIndex}`} />},
-    {name: "Vrachtwagens", component: () => <TrucksTab key={`truck-${selectedIndex}`} />},
   ]
 
   return (
