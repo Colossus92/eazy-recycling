@@ -24,10 +24,11 @@ export interface MasterDataTabProps<T> {
     data: DataTableProps<T>;
     searchQuery: (query: string) => void;
     openAddForm: () => void;
+    editAction: (item: T) => void;
     removeAction: (item: T) => void;
 }
 
-export const MasterDataTab = <T,>({data, searchQuery, openAddForm, removeAction}: MasterDataTabProps<T>) => {
+export const MasterDataTab = <T,>({data, searchQuery, openAddForm, editAction, removeAction}: MasterDataTabProps<T>) => {
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -72,7 +73,7 @@ export const MasterDataTab = <T,>({data, searchQuery, openAddForm, removeAction}
                                     ))}
                                     <td className="p-4 text-center">
                                         <ActionMenu<T>
-                                        onEdit={() => { }}
+                                        onEdit={editAction}
                                         onDelete={removeAction}
                                         item={item}
                                     />

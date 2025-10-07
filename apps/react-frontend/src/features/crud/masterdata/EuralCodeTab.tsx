@@ -17,7 +17,7 @@ import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
 export const EuralCodeTab = () => {
     const { 
         read,
-        creation,
+        form,
         deletion,
      } = useEuralCodeCrud();
 
@@ -36,14 +36,16 @@ export const EuralCodeTab = () => {
             <MasterDataTab
                 data={data}
                 searchQuery={(query) => read.setSearchQuery(query)}
-                openAddForm={creation.open}
+                openAddForm={form.openForCreate}
+                editAction={(item) => form.openForEdit(item)}
                 removeAction={(item) => deletion.initiate(item)}
             />
             <EuralForm
-                isOpen={creation.isOpen}
-                setIsOpen={creation.close}
-                onCancel={creation.close}
-                onSubmit={creation.confirm}
+                isOpen={form.isOpen}
+                setIsOpen={form.close}
+                onCancel={form.close}
+                onSubmit={form.submit}
+                initialData={form.item}
             />
             <DeleteDialog
                       isOpen={Boolean(deletion.item)}
@@ -59,14 +61,29 @@ export const EuralCodeTab = () => {
     )
 }
 
-const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean, setIsOpen: (value: boolean) => void, onCancel: () => void; onSubmit: (eural: Eural) => void }) => {
+interface EuralFormProps {
+    isOpen: boolean;
+    setIsOpen: (value: boolean) => void;
+    onCancel: () => void;
+    onSubmit: (eural: Eural) => void;
+    initialData?: Eural;
+}
+
+const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: EuralFormProps) => {
     const { handleError, ErrorDialogComponent } = useErrorHandling();
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
-    } = useForm<Eural>();
+    } = useForm<Eural>({
+        values: initialData,
+    });
+
+    const cancel = () => {
+        reset({code: '', description: ''});
+        onCancel();
+    }
 
     const submitForm = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -76,8 +93,7 @@ const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean,
                     code: data.code,
                     description: data.description,
                 });
-                reset(); // Clear the form after successful submission
-                onCancel(); // Only close the form if submission was successful
+                cancel();
             } catch (error) {
                 handleError(error);
             }
@@ -91,7 +107,7 @@ const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean,
                     className="flex flex-col items-center self-stretch"
                     onSubmit={(e) => submitForm(e)}
                 >
-                    <FormTopBar title={"Eural code toevoegen"} onClick={onCancel} />
+                    <FormTopBar title={initialData ? "Eural code bewerken" : "Eural code toevoegen"} onClick={cancel} />
                     <div className="flex flex-col items-center self-stretch p-4 gap-4">
                         <div className="flex items-start self-stretch gap-4">
                             <TextFormField
@@ -116,7 +132,7 @@ const EuralForm = ({ isOpen, setIsOpen, onCancel, onSubmit }: { isOpen: boolean,
                             />
                         </div>
                     </div>
-                    <FormActionButtons onClick={onCancel} item={undefined} />
+                    <FormActionButtons onClick={cancel} item={undefined} />
                 </form>
                 <ErrorDialogComponent />
             </ErrorBoundary>

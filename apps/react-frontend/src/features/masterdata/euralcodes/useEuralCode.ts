@@ -11,6 +11,7 @@ export const useEuralCodeCrud = () => {
         queryFn: () => euralService.getAll(),
     });
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [itemToEdit, setItemToEdit] = useState<Eural | undefined>(undefined);
     const [itemToDelete, setItemToDelete] = useState<Eural | undefined>(undefined)
 
     const displayedEurals = useMemo(
@@ -28,7 +29,11 @@ export const useEuralCodeCrud = () => {
         mutationFn: (item: Omit<Eural, 'id'>) => euralService.create(item),
         onSuccess: () => {
             queryClient
-                .invalidateQueries({ queryKey: ['eurals'] });
+                .invalidateQueries({ queryKey: ['eurals'] })
+                .then(() => {
+                    setItemToEdit(undefined);
+                    setIsFormOpen(false);
+                });
         },
     });
 
@@ -59,6 +64,29 @@ export const useEuralCodeCrud = () => {
         });
     };
 
+    const updateMutation = useMutation({
+        mutationFn: (item: Eural) => euralService.update(item.code, item),
+        onSuccess: () => {
+            queryClient
+                .invalidateQueries({ queryKey: ['eurals'] })
+                .then(() => {
+                    setItemToEdit(undefined);
+                    setIsFormOpen(false);
+                });
+        },
+    });
+
+    const update = async (item: Eural): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            updateMutation.mutate(item, {
+                onSuccess: () => resolve(),
+                onError: (error) => reject(error),
+            });
+        });
+    };
+
+    console.log(JSON.stringify(itemToEdit))
+
     return {
         read: {
             items: displayedEurals,
@@ -66,11 +94,29 @@ export const useEuralCodeCrud = () => {
             isLoading,
             error,
         },
-        creation: {
+        form: {
             isOpen: isFormOpen,
-            open: () => setIsFormOpen(true),
-            close: () => setIsFormOpen(false),
-            confirm: create,
+            item: itemToEdit,
+            openForCreate: () => {
+                setItemToEdit(undefined);
+                setIsFormOpen(true);
+            },
+            openForEdit: (item: Eural) => {
+                setItemToEdit(item);
+                setIsFormOpen(true);
+            },
+            close: () => {
+                setItemToDelete(undefined);
+                setItemToEdit(undefined);
+                setIsFormOpen(false);
+            },
+            submit: async (item: Eural) => {
+                if (itemToEdit) {
+                    return update(item);
+                } else {
+                    return create(item);
+                }
+            },
         },
         deletion: {
             item: itemToDelete,
