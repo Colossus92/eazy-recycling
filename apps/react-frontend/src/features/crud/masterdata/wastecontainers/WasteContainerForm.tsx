@@ -72,7 +72,6 @@ function toWasteContainer(
 }
 
 export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: WasteContainerFormProps) => {
-    console.log(JSON.stringify(initialData))
     const { handleError, ErrorDialogComponent } = useErrorHandling();
     const {
         register,

@@ -335,5 +335,130 @@ describe('WasteContainerForm Tests', () => {
       // This is expected behavior with the current implementation
       expect(mockOnCancel).toHaveBeenCalledTimes(2);
     });
+
+    it('fills in and disables address fields when a company is selected', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <WasteContainerForm
+          isOpen={true}
+          setIsOpen={vi.fn()}
+          onCancel={mockOnCancel}
+          onSubmit={mockOnSubmit}
+        />,
+        { wrapper }
+      );
+
+      // Wait for companies to load
+      await waitFor(() => {
+        expect(companyService.getAll).toHaveBeenCalled();
+      });
+
+      // Get address fields
+      const streetInput = screen.getByPlaceholderText('Vul straatnaam in') as HTMLInputElement;
+      const houseNumberInput = screen.getByPlaceholderText('Vul huisnummer in') as HTMLInputElement;
+      const postalCodeInput = screen.getByPlaceholderText('Vul postcode in') as HTMLInputElement;
+      const cityInput = screen.getByPlaceholderText('Vul Plaats in') as HTMLInputElement;
+
+      // Initially, address fields should be enabled and empty
+      expect(streetInput).not.toBeDisabled();
+      expect(houseNumberInput).not.toBeDisabled();
+      expect(postalCodeInput).not.toBeDisabled();
+      expect(cityInput).not.toBeDisabled();
+
+      // Select a company using React Select
+      const selectInput = screen.getByText('Selecteer een bedrijf of vul zelf een adres in');
+      await user.click(selectInput);
+
+      // Wait for options to appear and click the first company
+      const companyOption = await screen.findByText('Test Company A');
+      await user.click(companyOption);
+
+      // Wait for address fields to be filled and disabled
+      await waitFor(() => {
+        expect(streetInput).toHaveValue('Main Street');
+        expect(houseNumberInput).toHaveValue('123');
+        expect(postalCodeInput).toHaveValue('1234 AB');
+        expect(cityInput).toHaveValue('Amsterdam');
+      });
+
+      // Verify address fields are disabled
+      expect(streetInput).toBeDisabled();
+      expect(houseNumberInput).toBeDisabled();
+      expect(postalCodeInput).toBeDisabled();
+      expect(cityInput).toBeDisabled();
+
+      // Verify the helper text is shown
+      expect(
+        screen.getByText('Adresgegevens worden automatisch ingevuld op basis van het geselecteerde bedrijf')
+      ).toBeInTheDocument();
+    });
+
+    it('keeps address fields filled but enables them when company is deselected', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <WasteContainerForm
+          isOpen={true}
+          setIsOpen={vi.fn()}
+          onCancel={mockOnCancel}
+          onSubmit={mockOnSubmit}
+        />,
+        { wrapper }
+      );
+
+      // Wait for companies to load
+      await waitFor(() => {
+        expect(companyService.getAll).toHaveBeenCalled();
+      });
+
+      // Get address fields
+      const streetInput = screen.getByPlaceholderText('Vul straatnaam in') as HTMLInputElement;
+      const houseNumberInput = screen.getByPlaceholderText('Vul huisnummer in') as HTMLInputElement;
+      const postalCodeInput = screen.getByPlaceholderText('Vul postcode in') as HTMLInputElement;
+      const cityInput = screen.getByPlaceholderText('Vul Plaats in') as HTMLInputElement;
+
+      // Select a company
+      const selectInput = screen.getByText('Selecteer een bedrijf of vul zelf een adres in');
+      await user.click(selectInput);
+
+      const companyOption = await screen.findByText('Test Company B');
+      await user.click(companyOption);
+
+      // Wait for address fields to be filled
+      await waitFor(() => {
+        expect(streetInput).toHaveValue('Second Street');
+        expect(houseNumberInput).toHaveValue('456');
+        expect(postalCodeInput).toHaveValue('5678 CD');
+        expect(cityInput).toHaveValue('Rotterdam');
+        expect(streetInput).toBeDisabled();
+      });
+
+      // Now deselect the company by clicking the clear indicator (X)
+      const clearIndicator = document.querySelector('.react-select__clear-indicator');
+      if (!clearIndicator) {
+        throw new Error('Clear indicator not found');
+      }
+      await user.click(clearIndicator as HTMLElement);
+
+      // Wait for fields to become enabled
+      await waitFor(() => {
+        expect(streetInput).not.toBeDisabled();
+        expect(houseNumberInput).not.toBeDisabled();
+        expect(postalCodeInput).not.toBeDisabled();
+        expect(cityInput).not.toBeDisabled();
+      });
+
+      // Verify address fields still contain the company address values
+      expect(streetInput).toHaveValue('Second Street');
+      expect(houseNumberInput).toHaveValue('456');
+      expect(postalCodeInput).toHaveValue('5678 CD');
+      expect(cityInput).toHaveValue('Rotterdam');
+
+      // Verify the helper text is no longer shown
+      expect(
+        screen.queryByText('Adresgegevens worden automatisch ingevuld op basis van het geselecteerde bedrijf')
+      ).not.toBeInTheDocument();
+    });
   });
 });
