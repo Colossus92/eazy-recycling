@@ -84,6 +84,8 @@ Replace `<your-supabase-url>` and `<your-supabase-anon-key>` with the values fro
 
 ## Test Policy
 
+This project prioritizes **pragmatic testing over full coverage**. We focus on high-risk, high-logic areas while leveraging TypeScript strict mode, ESLint, and OpenAPI-generated clients to catch many issues at compile time. Simple renderings and basic integration hooks don't require exhaustive tests—this approach enables rapid iteration and quick bug fixes without sacrificing quality.
+
 ### 1. Static Check
 
 - **TypeScript**: `strict: true` enabled, no `any` unless justified
