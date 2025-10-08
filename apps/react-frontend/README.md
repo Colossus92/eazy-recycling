@@ -11,10 +11,8 @@ This template is designed to help you kickstart your projects with best practice
 - **React**: A powerful library for building user interfaces.
 - **TypeScript**: Type-safe development for scalable, maintainable projects.
 - **Tailwind CSS**: Utility-first CSS framework for rapid UI development.
-- **Tailwind UI**: Pre-built, accessible components for beautiful UI designs.
 - **ESLint**: Enforces code quality and consistency.
 - **Prettier**: Opinionated code formatter for consistent styling.
-- **Husky**: Git hooks for pre-commit linting and formatting.
 - **Supabase**  Postgres database, Authentication, instant APIs, Edge Functions, Realtime subscriptions, Storage
 
 ---
@@ -71,51 +69,44 @@ Run Prettier:
 npm run format
 ```
 ---
-### Git Hooks (Husky)
-
-Pre-commit hooks ensure code quality:
-•	Linting: Automatically checks for linting issues.
-•	Formatting: Automatically formats code before committing.
-
-To install Husky hooks:
-```bash
-npx husky install
-```
-
-## Tailwind CSS & Tailwind UI
-* Modify tailwind.config.js to customize the theme or extend default configurations.
-* Use pre-built components from [Tailwind UI](https://tailwindui.com/components), subscription required.
-
-## Supabase integration
-Supabase is an open-source backend-as-a-service that provides a suite of tools to build scalable and secure applications. It is often referred to as an open-source alternative to Firebase. Supabase offers the following key features:
-* Database: A PostgreSQL database with instant APIs. 
-* Authentication: User management and authentication using email, social logins, and more. 
-* Storage: Scalable file storage for images, videos, and other assets. 
-* Edge Functions: Serverless functions for custom backend logic. 
-* Real-time Updates: Live data synchronization for apps needing real-time functionality.
-
-### Supabase in this template
-This React template comes pre-integrated with Supabase for user authentication and session management. It uses an AuthProvider to manage authentication throughout the app, making it easy to:
-* Log users in and out.
-* Access the current user session anywhere in the application.
-* Display a login screen for unauthenticated users.
-
 
 ### Configuration
 
-To set up Supabase for this template, follow these steps:
-
-### 1. Create a Supabase Project
-1.	Go to Supabase.
-2.	Create a new project and take note of the API URL and Anon Key from your project settings.
-
-### 2. Add Environment Variables
 Create a .env.local file in the root of your project with the following contents:
-```
+
+```env
 VITE_SUPABASE_URL=<your-supabase-url>
 VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 ```
-Replace <your-supabase-url> and <your-supabase-anon-key> with the values from your Supabase project settings.
-## Contributing
 
-Contributions are welcome! Feel free to submit a pull request or open an issue for suggestions or bug reports.
+Replace `<your-supabase-url>` and `<your-supabase-anon-key>` with the values from your Supabase project settings.
+
+---
+
+## Test Policy
+
+### 1. Static Check
+
+- **TypeScript**: `strict: true` enabled, no `any` unless justified
+- **ESLint**: Rules enforced for hooks, exhaustive deps, and no-floating-promises
+- **Pre-commit**: `lint-staged` runs `tsc --noEmit`, `eslint`, and `prettier`
+
+### 2. Unit Tests
+
+- **What to test**: Currency/weight math, parsing, mappers, permission checks, complex hook logic that's pure
+- **How**: Vitest; no React render if not needed
+- **Don't**: Snapshot massive objects; assert behavior and edge cases instead
+
+### 3. Component/Integration Tests
+
+- **What to test**: Components/pages with real providers (router, QueryClient, theme, auth)
+- **How**: React Testing Library (RTL) to test user behavior: "fill, click, sees X", not internal state
+- **HTTP mocking**: Mock service layer methods (not MSW) since we use OpenAPI-generated clients; return realistic payloads and failure cases
+- **Form testing**: Assert validation messages, disabled/enabled buttons, submit payload shape
+- **Guideline**: One test per user story (e.g., "User can create invoice"), including happy path + 1–2 failure states
+
+### 4. End-to-End Tests
+
+- **Tool**: Playwright against deployed preview or local full stack
+- **Scope**: Keep count small and stable—login, create/edit core entity, checkout/payment (if applicable)
+- **Reliability**: Capture trace on failure, retry flaky tests once, mark E2E as required in CI for main
