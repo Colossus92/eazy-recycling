@@ -167,7 +167,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                     className="flex flex-col items-center self-stretch"
                     onSubmit={(e) => submitForm(e)}
                 >
-                    <FormTopBar title={initialData ? "Vrachtwagen bewerken" : "Vrachtwagen toevoegen"} onClick={cancel} />
+                    <FormTopBar title={initialData ? "Container bewerken" : "Container toevoegen"} onClick={cancel} />
                     <div className="flex flex-col items-center self-stretch p-4 gap-4">
                         <TextFormField
                             title={'Containerkenmerk'}

@@ -86,7 +86,7 @@ describe('WasteContainerForm Tests', () => {
       );
 
       // Verify form is in add mode
-      expect(screen.getByText('Vrachtwagen toevoegen')).toBeInTheDocument();
+      expect(screen.getByText('Container toevoegen')).toBeInTheDocument();
 
       // Fill in the form
       const idInput = screen.getByPlaceholderText('Vul kenmerk in');
@@ -181,7 +181,7 @@ describe('WasteContainerForm Tests', () => {
       );
 
       // Verify form is in edit mode
-      expect(screen.getByText('Vrachtwagen bewerken')).toBeInTheDocument();
+      expect(screen.getByText('Container bewerken')).toBeInTheDocument();
 
       // Verify id field is disabled in edit mode
       const idInput = screen.getByPlaceholderText('Vul kenmerk in');
@@ -261,7 +261,7 @@ describe('WasteContainerForm Tests', () => {
         { wrapper }
       );
 
-      expect(screen.getByText('Vrachtwagen toevoegen')).toBeInTheDocument();
+      expect(screen.getByText('Container toevoegen')).toBeInTheDocument();
       expect(screen.getByText('Containerkenmerk')).toBeInTheDocument();
       expect(screen.getByText('Huidige locatie')).toBeInTheDocument();
       expect(screen.getByTestId('cancel-button')).toBeInTheDocument();
@@ -293,7 +293,7 @@ describe('WasteContainerForm Tests', () => {
         { wrapper }
       );
 
-      expect(screen.getByText('Vrachtwagen bewerken')).toBeInTheDocument();
+      expect(screen.getByText('Container bewerken')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Vul kenmerk in')).toHaveValue('CONT-004');
       expect(screen.getByPlaceholderText('Vul straatnaam in')).toHaveValue('Edit Street');
     });
