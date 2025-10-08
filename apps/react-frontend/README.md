@@ -1,7 +1,6 @@
-# React + TypeScript + Vite Template
+# Eazy Recycling Frontend
 
-A highly opinionated project template for efficient and consistent development. 
-This template is designed to help you kickstart your projects with best practices and a clean, organized setup.
+This is the frontend for Eazy Recycling. It is a React application that uses TypeScript and Vite. Follow the below directions for setup and development.
 
 ---
 
