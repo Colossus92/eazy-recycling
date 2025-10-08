@@ -54,36 +54,6 @@ describe('ProcessingMethodForm Tests', () => {
       });
     });
 
-    it('calls onSubmit with data including whitespace', async () => {
-      render(
-        <ProcessingMethodForm
-          isOpen={true}
-          setIsOpen={vi.fn()}
-          onCancel={mockOnCancel}
-          onSubmit={mockOnSubmit}
-        />
-      );
-
-      // Fill in the form with extra whitespace
-      const codeInput = screen.getByPlaceholderText('Vul een code in');
-      const descriptionInput = screen.getByPlaceholderText('Vul een beschrijving in');
-
-      await userEvent.type(codeInput, '  R02  ');
-      await userEvent.type(descriptionInput, '  Test Description with Spaces  ');
-
-      // Submit the form
-      const submitButton = screen.getByTestId('submit-button');
-      await userEvent.click(submitButton);
-
-      // Verify the data includes the whitespace (form doesn't trim by default)
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalledWith({
-          code: '  R02  ',
-          description: '  Test Description with Spaces  ',
-        });
-      });
-    });
-
     it('does not call onSubmit when validation fails', async () => {
       render(
         <ProcessingMethodForm

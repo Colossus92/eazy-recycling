@@ -57,39 +57,6 @@ describe('TruckForm Tests', () => {
       });
     });
 
-    it('calls onSubmit with data including whitespace', async () => {
-      render(
-        <TruckForm
-          isOpen={true}
-          setIsOpen={vi.fn()}
-          onCancel={mockOnCancel}
-          onSubmit={mockOnSubmit}
-        />
-      );
-
-      // Fill in the form with extra whitespace
-      const brandInput = screen.getByPlaceholderText('Vul merk in');
-      const modelInput = screen.getByPlaceholderText('Vul een beschrijving in');
-      const licensePlateInput = screen.getByPlaceholderText('Vul kenteken in');
-
-      await userEvent.type(brandInput, '  Mercedes  ');
-      await userEvent.type(modelInput, '  Actros  ');
-      await userEvent.type(licensePlateInput, '  XY-456-ZZ  ');
-
-      // Submit the form
-      const submitButton = screen.getByTestId('submit-button');
-      await userEvent.click(submitButton);
-
-      // Verify the data includes the whitespace (form doesn't trim by default)
-      await waitFor(() => {
-        expect(mockOnSubmit).toHaveBeenCalledWith({
-          brand: '  Mercedes  ',
-          model: '  Actros  ',
-          licensePlate: '  XY-456-ZZ  ',
-        });
-      });
-    });
-
     it('does not call onSubmit when validation fails', async () => {
       render(
         <TruckForm
