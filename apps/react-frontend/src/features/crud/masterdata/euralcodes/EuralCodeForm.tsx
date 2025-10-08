@@ -11,13 +11,12 @@ import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 
 interface EuralCodeFormProps {
     isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
     onCancel: () => void;
     onSubmit: (eural: Eural) => void;
     initialData?: Eural;
 }
 
-export const EuralCodeForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: EuralCodeFormProps) => {
+export const EuralCodeForm = ({ isOpen, onCancel, onSubmit, initialData }: EuralCodeFormProps) => {
     const { handleError, ErrorDialogComponent } = useErrorHandling();
     const {
         register,
@@ -49,7 +48,7 @@ export const EuralCodeForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialDa
     };
 
     return (
-        <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+        <FormDialog isOpen={isOpen} setIsOpen={cancel}>
             <ErrorBoundary fallbackRender={fallbackRender}>
                 <form
                     className="flex flex-col items-center self-stretch"

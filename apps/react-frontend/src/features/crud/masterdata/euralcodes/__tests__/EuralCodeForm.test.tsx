@@ -85,7 +85,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockSubmitWithApi}
         />,
@@ -153,7 +152,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockSubmitWithApi}
         />,
@@ -213,7 +211,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockSubmitWithApi}
         />,
@@ -253,7 +250,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
         />,
@@ -307,7 +303,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockSubmitWithApi}
           initialData={existingEural}
@@ -358,7 +353,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
         />,
@@ -381,7 +375,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
           initialData={existingEural}
@@ -395,12 +388,9 @@ describe('EuralCodeForm Integration Tests', () => {
     });
 
     it('calls onCancel when cancel button is clicked', async () => {
-      // Note: In the actual implementation, both setIsOpen and onCancel are set to the same function (form.close)
-      // This causes the function to be called twice: once by cancel() and once by Dialog's onClose
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={mockOnCancel}  // Same function as onCancel, matching real usage
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
         />,
@@ -411,6 +401,7 @@ describe('EuralCodeForm Integration Tests', () => {
       await userEvent.click(cancelButton);
 
       // Called twice: once by cancel() function, once by Dialog's onClose handler
+      // This is expected behavior with the current implementation
       expect(mockOnCancel).toHaveBeenCalledTimes(2);
     });
 
@@ -418,7 +409,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={mockOnCancel}  // Same function as onCancel, matching real usage
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
         />,
@@ -429,6 +419,7 @@ describe('EuralCodeForm Integration Tests', () => {
       await userEvent.click(closeButton);
 
       // Called twice: once by cancel() function, once by Dialog's onClose handler
+      // This is expected behavior with the current implementation
       expect(mockOnCancel).toHaveBeenCalledTimes(2);
     });
 
@@ -436,7 +427,6 @@ describe('EuralCodeForm Integration Tests', () => {
       render(
         <EuralCodeForm
           isOpen={true}
-          setIsOpen={mockOnCancel}  // Same function as onCancel, matching real usage
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
         />,
@@ -459,6 +449,7 @@ describe('EuralCodeForm Integration Tests', () => {
       await userEvent.click(cancelButton);
 
       // Called twice: once by cancel() function, once by Dialog's onClose handler
+      // This is expected behavior with the current implementation
       expect(mockOnCancel).toHaveBeenCalledTimes(2);
     });
   });

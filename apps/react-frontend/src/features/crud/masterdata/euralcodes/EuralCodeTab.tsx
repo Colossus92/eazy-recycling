@@ -48,7 +48,6 @@ export const EuralCodesTab = () => {
              */}
             <EuralCodeForm
                 isOpen={form.isOpen}
-                setIsOpen={form.close}
                 onCancel={form.close}
                 onSubmit={form.submit}
                 initialData={form.item}
