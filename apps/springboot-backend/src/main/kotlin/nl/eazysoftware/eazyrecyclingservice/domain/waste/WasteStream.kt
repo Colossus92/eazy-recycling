@@ -57,9 +57,15 @@ data class WasteStream(
       "Als er RouteInzameling of InzamelaarsRegeling wordt toegepast dan moet de inzamelaar zijn gevuld"
     }
 
+    require(consignorParty is Consignor.Company || collectionType == WasteCollectionType.DEFAULT) {
+      "Als de ontdoener een particulier is dan mag route inzameling en inzamelaarsregeling niet worden toegepast"
+    }
+
     require(wasteStreamNumber.number.toString().substring(0, 5) == destinationLocation.processorPartyId.number.toString()) {
       "De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst."
     }
+
+
   }
 }
 

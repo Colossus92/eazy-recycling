@@ -217,6 +217,25 @@ class WasteStreamTest {
     assertThat(exception.message).isEqualTo("De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst.")
   }
 
+  @ParameterizedTest
+  @EnumSource(value = WasteCollectionType::class, mode = EnumSource.Mode.EXCLUDE, names = ["DEFAULT"])
+  fun `when the consignor is a person, the collection type should be DEFAULT`(collectionType: WasteCollectionType) {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      WasteStream(
+        wasteStreamNumber = wasteStreamNumber(),
+        wasteType = wasteType(),
+        collectionType = collectionType,
+        originLocation = OriginLocation.NoOriginLocation,
+        destinationLocation = destinationLocation(),
+        consignorParty = Consignor.Person,
+        pickupParty = companyId(),
+        collectorParty = companyId(),
+      )
+    }
+
+    assertThat(exception.message).isEqualTo("Als de ontdoener een particulier is dan mag route inzameling en inzamelaarsregeling niet worden toegepast")
+  }
+
   @Nested
   inner class DutchAddress {
     @Test
