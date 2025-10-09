@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
 import java.util.UUID
 import kotlin.test.assertFailsWith
@@ -365,6 +366,15 @@ class WasteStreamTest {
       }
       assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang staan, maar is: 123456")
     }
+  }
+
+  @ParameterizedTest
+  @CsvSource("12345678901", "1234567890123")
+  fun `a waste stream number should be exactly 12 characters long`(value: String) {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      WasteStreamNumber(value.toLong())
+    }
+    assertThat(exception.message).isEqualTo("Een afvalstroomnummer dient 12 tekens lang te zijn")
   }
 
   private fun wasteStreamNumber(): WasteStreamNumber = WasteStreamNumber(123456789012)
