@@ -38,6 +38,9 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+**/.structurizr/**
+docs/c4/workspace.json
+
 
 # System Files
 .DS_Store
