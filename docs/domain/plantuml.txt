@@ -1,0 +1,120 @@
+@startuml
+class WasteStream {
+  number: WasteStreamNumber
+  waste: Waste
+  isRouteCollection: boolean
+  isCollectorScheme: boolean
+  consignorParty: Company
+  consigneeParty: Company
+  dealerParty: Company
+  collectorParty: Company
+  brokerParty: Company
+  waste: Waste
+}
+
+class Waste {
+  name: String
+  euralCode: EuralCode
+  processingMethod: ProcessingMethod
+}
+
+WasteStream ||--|| Waste
+
+class WeightTicket {
+  id: WeightTicketId
+  id: OrderId
+  'transporteur
+  carrierParty: Company
+  'opdrachtgever
+  consignorParty: Company
+  'afnemer
+  consigneeParty: Company
+  'leverancier
+  pickupParty: Company
+  truck: Truck
+  driver: Driver
+  goods: List<Goods>
+  'Small comment printed on the weight ticket
+  reclamation: String
+  note: Note
+  loadingAddress: Address
+  unloadingAddress: Address
+  status: WeightTicketStatus
+  createdAt: DateTime
+  updatedAt: DateTime?
+  weightedAt: DateTime
+}
+
+WeightTicket ||--o{ Goods
+
+class Goods {
+  id: Long
+  waste: WasteStream
+  weight: Weight
+}
+
+Goods ||--|| WasteStream
+
+class Order {
+  id: OrderId
+  consignorParty: Company
+  extraOrderLines: OrderLine
+  note: Note
+  loadingAddress: Address
+  unloadingAddress: Address
+  status: OrderStatus
+  createdAt: DateTime
+  updatedAt: DateTime?
+}
+
+
+
+Order ||--o{ WeightTicket
+Order ||--o{ Transport
+
+class Invoice {
+  id: OrderId
+  consignorParty: Company
+  invoiceLInes: List<InvoiceLine>
+  note: Note
+  type: InvoiceType
+  status: InvoiceStatus
+  createdAt: DateTime
+  updatedAt: DateTime?
+}
+
+Order ||--o| Invoice
+
+class Transport {
+    id: OrderId
+    ...
+}
+
+Transport ||--o{ WasteStream
+
+
+class Company {
+   id : CompanyId
+   address : Address
+   postalAddress: Address
+   email: String
+   phone: PhoneNumber
+   mobilePhone: PhoneNumber
+   chamberOfCommerceId: ChamberOfCommerceId
+   taxId: TaxId
+   vihbNumber: VihbNumber
+   number: Integer
+   creditorId: ExactId
+   debtorId: ExactId
+   contactPerson: ContactPerson
+   projectLocations: List<ProjectLocation>
+   deletedAt: DateTime?
+}
+
+Company ||--o{ ProjectLocation
+class ProjectLocation {
+   name: String
+   address: Address
+   deletedAt: DateTime?
+}
+@enduml
