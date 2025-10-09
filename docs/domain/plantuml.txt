@@ -9,7 +9,6 @@ class WasteStream {
   dealerParty: Company
   collectorParty: Company
   brokerParty: Company
-  waste: Waste
 }
 
 class Waste {
