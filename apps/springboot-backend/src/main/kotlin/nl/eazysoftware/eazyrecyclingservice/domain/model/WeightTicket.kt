@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model
 
-import io.github.jan.supabase.auth.user.UserInfo
 import nl.eazysoftware.eazyrecyclingservice.domain.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Person

@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
 data class WasteStream(
-  val number: WasteStreamNumber,
+  val wasteStreamNumber: WasteStreamNumber,
   val wasteType: WasteType,
   val collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
   val originLocation: OriginLocation,
@@ -35,13 +35,13 @@ data class WasteStream(
     require(collectorParty == null || brokerParty == null) {
       "Een afvalstroomnummer kan niet zowel een handelaar als een bemiddelaar hebben"
     }
-    
-    // Origin location validation: either has location with default collection + company, 
+
+    // Origin location validation: either has location with default collection + company,
     // or no location with non-default collection or person
     val hasOriginLocation = originLocation !is OriginLocation.NoOriginLocation
     val isDefaultCollection = collectionType == WasteCollectionType.DEFAULT
     val isCompanyConsignor = consignorParty is Consignor.Company
-    
+
     require(
       (hasOriginLocation && isDefaultCollection && isCompanyConsignor) ||
       (!hasOriginLocation && (!isDefaultCollection || !isCompanyConsignor))
@@ -51,6 +51,14 @@ data class WasteStream(
       } else {
         "Locatie van herkomst is verplicht bij normale inzameling en zakelijke ontdoener"
       }
+    }
+
+    require( collectionType == WasteCollectionType.DEFAULT || collectorParty != null) {
+      "Als er RouteInzameling of InzamelaarsRegeling wordt toegepast dan moet de inzamelaar zijn gevuld"
+    }
+
+    require(wasteStreamNumber.number.toString().substring(0, 5) == destinationLocation.processorPartyId.number.toString()) {
+      "De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst."
     }
   }
 }

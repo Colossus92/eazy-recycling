@@ -18,7 +18,7 @@ class WasteStreamTest {
   fun `wasteStream with proximity description can be initialized`() {
     assertDoesNotThrow {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.ProximityDescription(
@@ -37,7 +37,7 @@ class WasteStreamTest {
   fun `waste stream with Dutch address can be initialized`() {
     assertDoesNotThrow {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.DutchAddress(
@@ -55,13 +55,14 @@ class WasteStreamTest {
   fun `waste stream with no origin location can be initialized for route collection`() {
     assertDoesNotThrow {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.ROUTE,
         originLocation = OriginLocation.NoOriginLocation,
         destinationLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
+        collectorParty = companyId(),
       )
     }
   }
@@ -70,7 +71,7 @@ class WasteStreamTest {
   fun `a waste stream cannot have both a collector and broker`() {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.DutchAddress(
@@ -92,7 +93,7 @@ class WasteStreamTest {
   fun `a waste stream should have a origin location when default collection and company consignor`() {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.NoOriginLocation,
@@ -110,7 +111,24 @@ class WasteStreamTest {
   fun `a waste stream should have no origin location when non-default collection`(collectionType: WasteCollectionType) {
     assertDoesNotThrow {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
+        wasteType = wasteType(),
+        collectionType = collectionType,
+        originLocation = OriginLocation.NoOriginLocation,
+        destinationLocation = destinationLocation(),
+        consignorParty = Consignor.Company(companyId()),
+        pickupParty = companyId(),
+        collectorParty = companyId(),
+      )
+    }
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = WasteCollectionType::class, mode = EnumSource.Mode.EXCLUDE, names = ["DEFAULT"])
+  fun `a waste stream should have a collectorParty when non-default collection`(collectionType: WasteCollectionType) {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      WasteStream(
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
         originLocation = OriginLocation.NoOriginLocation,
@@ -119,13 +137,15 @@ class WasteStreamTest {
         pickupParty = companyId(),
       )
     }
+
+    assertThat(exception.message).isEqualTo("Als er RouteInzameling of InzamelaarsRegeling wordt toegepast dan moet de inzamelaar zijn gevuld")
   }
 
   @Test
   fun `a waste stream should have no origin location when person consignor`() {
     assertDoesNotThrow {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.NoOriginLocation,
@@ -141,7 +161,7 @@ class WasteStreamTest {
   fun `a waste stream can't have origin location with non-default collection`(collectionType: WasteCollectionType) {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
         originLocation = OriginLocation.DutchAddress(
@@ -161,7 +181,7 @@ class WasteStreamTest {
   fun `a waste stream can't have origin location with person consignor`() {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        number = wasteStreamNumber(),
+        wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         originLocation = OriginLocation.DutchAddress(
@@ -175,6 +195,26 @@ class WasteStreamTest {
     }
 
     assertThat(exception.message).isEqualTo("Locatie van herkomst is alleen toegestaan bij normale inzameling en zakelijke ontdoener")
+  }
+
+  @Test
+  fun `the first five numbers of a waste stream number should be equal to the processorPartyId`() {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      WasteStream(
+        wasteStreamNumber = WasteStreamNumber(12346678912),
+        wasteType = wasteType(),
+        collectionType = WasteCollectionType.DEFAULT,
+        originLocation = OriginLocation.DutchAddress(
+          DutchPostalCode("1234 AB"),
+          "Stad",
+        ),
+        destinationLocation = destinationLocation(),
+        consignorParty = Consignor.Company(companyId()),
+        pickupParty = companyId(),
+      )
+    }
+
+    assertThat(exception.message).isEqualTo("De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst.")
   }
 
   @Nested
