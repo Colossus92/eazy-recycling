@@ -201,7 +201,7 @@ class WasteStreamTest {
   fun `the first five numbers of a waste stream number should be equal to the processorPartyId`() {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        wasteStreamNumber = WasteStreamNumber("12346678912"),
+        wasteStreamNumber = WasteStreamNumber("123466789012"),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
@@ -355,7 +355,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         ProcessorPartyId("1234")
       }
-      assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang staan, maar is: 1234")
+      assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang zijn, maar is: 1234")
     }
 
     @Test
@@ -363,7 +363,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         ProcessorPartyId("123456")
       }
-      assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang staan, maar is: 123456")
+      assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang zijn, maar is: 123456")
     }
   }
 

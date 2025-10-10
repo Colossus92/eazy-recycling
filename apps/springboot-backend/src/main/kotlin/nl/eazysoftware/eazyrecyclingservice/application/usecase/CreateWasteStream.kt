@@ -40,7 +40,7 @@ class CreateWasteStreamService(
 
   @Transactional
   override fun handle(cmd: CreateWasteStreamCommand): CreateWasteStreamResult {
-    require(!wasteStreamRepo.existsById(cmd.wasteStreamNumber)) {
+    check(!wasteStreamRepo.existsById(cmd.wasteStreamNumber)) {
       "Afvalstroom met nummer ${cmd.wasteStreamNumber.number} bestaat al"
     }
 

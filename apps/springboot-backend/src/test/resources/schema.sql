@@ -9,6 +9,7 @@ create table if not exists companies (
                            name varchar(255),
                            postal_code varchar(255),
                            street_name varchar(255),
+                           processor_id text,
                            vihb_id varchar(255) unique,
                            primary key (id)
 );
@@ -183,7 +184,30 @@ create table if not exists processing_methods (
                                   description text not null
 );
 
-create table if not exists waste_stream (
+create table if not exists waste_streams (
                                   number text not null,
-                                  name text not null
+                                  name text not null,
+                                  eural_code text not null,
+                                  processing_method_code text not null,
+                                  waste_collection_type text not null,
+                                  pickup_location_id text,
+                                  consignor_party_id uuid not null,
+                                  pickup_party_id uuid not null,
+                                  dealer_party_id uuid,
+                                  collector_party_id uuid,
+                                  broker_party_id uuid,
+                                  processor_party_id text
+);
+
+
+create table if not exists pickup_locations (
+                                 id text not null,
+                                 created_at timestamp with time zone not null default now(),
+                                 location_type text not null,
+                                 building_number text,
+                                 building_number_addition text,
+                                 country text,
+                                 proximity_description text,
+                                 city text,
+                                 postal_code text
 );
