@@ -8,43 +8,6 @@ servers:
 security:
 - bearerAuth: []
 paths:
-  /waste-streams/{number}:
-    put:
-      tags:
-      - waste-stream-controller
-      operationId: updateWasteStream
-      parameters:
-      - name: number
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WasteStreamDto"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WasteStreamDto"
-    delete:
-      tags:
-      - waste-stream-controller
-      operationId: deleteWasteStream
-      parameters:
-      - name: number
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
   /users/{id}:
     get:
       tags:
@@ -234,7 +197,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProcessingMethod"
+              $ref: "#/components/schemas/ProcessingMethodDto"
         required: true
       responses:
         "200":
@@ -469,6 +432,24 @@ paths:
       responses:
         "204":
           description: No Content
+  /weight-tickets:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWeightTicketRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateWeightTicketResponse"
   /waste-streams:
     get:
       tags:
@@ -482,24 +463,24 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WasteStreamDto"
+                  $ref: "#/components/schemas/WasteStreamListView"
     post:
       tags:
       - waste-stream-controller
-      operationId: createWasteStream
+      operationId: create_1
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WasteStreamDto"
+              $ref: "#/components/schemas/CreateWasteStreamRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/WasteStreamDto"
+                $ref: "#/components/schemas/CreateWasteStreamResponse"
   /users:
     get:
       tags:
@@ -653,7 +634,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ProcessingMethod"
+                  $ref: "#/components/schemas/ProcessingMethodDto"
     post:
       tags:
       - processing-method-controller
@@ -662,7 +643,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProcessingMethod"
+              $ref: "#/components/schemas/ProcessingMethodDto"
         required: true
       responses:
         "200":
@@ -670,7 +651,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ProcessingMethod"
+                $ref: "#/components/schemas/ProcessingMethodDto"
   /eural:
     get:
       tags:
@@ -945,19 +926,6 @@ paths:
                       $ref: "#/components/schemas/DriverPlanningItem"
 components:
   schemas:
-    WasteStreamDto:
-      type: object
-      properties:
-        number:
-          type: string
-          maxLength: 12
-          minLength: 12
-        name:
-          type: string
-          minLength: 1
-      required:
-      - name
-      - number
     UpdateUserRequest:
       type: object
       properties:
@@ -1129,6 +1097,9 @@ components:
           type: string
         country:
           type: string
+      required:
+      - buildingNumber
+      - postalCode
     CompanyBranchDto:
       type: object
       properties:
@@ -1155,6 +1126,8 @@ components:
         chamberOfCommerceId:
           type: string
         vihbId:
+          type: string
+        processorId:
           type: string
         name:
           type: string
@@ -1440,7 +1413,7 @@ components:
       - pickupPostalCode
       - pickupStreet
       - transportType
-    ProcessingMethod:
+    ProcessingMethodDto:
       type: object
       properties:
         code:
@@ -1598,6 +1571,202 @@ components:
       - country
       - postalCode
       - streetName
+    CreateWeightTicketRequest:
+      type: object
+      properties:
+        carrierParty:
+          type: string
+          format: uuid
+        consignorParty:
+          type: string
+          format: uuid
+        consigneeParty:
+          type: string
+          format: uuid
+        pickupParty:
+          type: string
+          format: uuid
+        truckId:
+          type: string
+        goods:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoodsRequest"
+        reclamation:
+          type: string
+        note:
+          type: string
+        loadingAddress:
+          $ref: "#/components/schemas/AddressRequest"
+        unloadingAddress:
+          $ref: "#/components/schemas/AddressRequest"
+      required:
+      - carrierParty
+      - consigneeParty
+      - consignorParty
+      - goods
+      - loadingAddress
+      - pickupParty
+      - reclamation
+      - truckId
+      - unloadingAddress
+    GoodsRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+          pattern: "^[0-9]+$"
+        netWeight:
+          type: number
+          format: double
+        unit:
+          type: string
+      required:
+      - netWeight
+      - unit
+      - wasteStreamNumber
+    CreateWeightTicketResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+      required:
+      - id
+    CompanyConsignor:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorRequest"
+      - type: object
+        properties:
+          companyId:
+            type: string
+            format: uuid
+      required:
+      - companyId
+    ConsignorRequest:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    CreateWasteStreamRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+          pattern: "^[0-9]{12}$"
+        name:
+          type: string
+          minLength: 1
+        euralCode:
+          type: string
+          minLength: 1
+        processingMethodCode:
+          type: string
+          minLength: 1
+        collectionType:
+          type: string
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+        processorPartyId:
+          type: string
+          pattern: "^[0-9]{5}$"
+        consignorParty:
+          oneOf:
+          - $ref: "#/components/schemas/CompanyConsignor"
+          - $ref: "#/components/schemas/PersonConsignor"
+        pickupParty:
+          type: string
+          format: uuid
+        dealerParty:
+          type: string
+          format: uuid
+        collectorParty:
+          type: string
+          format: uuid
+        brokerParty:
+          type: string
+          format: uuid
+      required:
+      - collectionType
+      - consignorParty
+      - euralCode
+      - name
+      - pickupLocation
+      - pickupParty
+      - processingMethodCode
+      - processorPartyId
+      - wasteStreamNumber
+    DutchAddressRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          buildingNumber:
+            type: string
+            minLength: 1
+          buildingNumberAddition:
+            type: string
+          postalCode:
+            type: string
+            minLength: 1
+            pattern: "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$"
+          country:
+            type: string
+            minLength: 1
+      required:
+      - buildingNumber
+      - country
+      - postalCode
+    NoPickupLocationRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+    PersonConsignor:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorRequest"
+    PickupLocationRequest:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    ProximityDescriptionRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          description:
+            type: string
+            minLength: 1
+          postalCodeDigits:
+            type: string
+            minLength: 1
+            pattern: "^[0-9]{4}$"
+          city:
+            type: string
+            minLength: 1
+          country:
+            type: string
+            minLength: 1
+      required:
+      - city
+      - country
+      - description
+      - postalCodeDigits
+    CreateWasteStreamResponse:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+      required:
+      - wasteStreamNumber
     CreateUserRequest:
       type: object
       properties:
@@ -1693,7 +1862,37 @@ components:
         address:
           $ref: "#/components/schemas/AddressRequest"
       required:
+      - address
       - name
+    WasteStreamListView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        wasteName:
+          type: string
+        euralCode:
+          type: string
+        processingMethodCode:
+          type: string
+        consignorPartyChamberOfCommerceId:
+          type: string
+        consignorPartyName:
+          type: string
+        pickupLocationPostalCode:
+          type: string
+        pickupLocationNumber:
+          type: string
+        deliveryLocationPostalCode:
+          type: string
+        deliveryLocationNumber:
+          type: string
+      required:
+      - consignorPartyName
+      - euralCode
+      - processingMethodCode
+      - wasteName
+      - wasteStreamNumber
     UserResponse:
       type: object
       properties:
