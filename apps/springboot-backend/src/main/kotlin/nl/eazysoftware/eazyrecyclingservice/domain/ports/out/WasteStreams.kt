@@ -12,6 +12,8 @@ interface WasteStreams {
 
   fun deleteAll()
 
+  fun deleteByNumber(wasteStreamNumber: WasteStreamNumber)
+
   fun save(wasteStreamDto: WasteStreamDto)
 
   fun existsById(wasteStreamNumber: WasteStreamNumber): Boolean

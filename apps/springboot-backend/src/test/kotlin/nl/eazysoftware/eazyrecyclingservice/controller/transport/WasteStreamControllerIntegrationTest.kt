@@ -129,4 +129,25 @@ class WasteStreamControllerIntegrationTest {
       .andExpect(status().isConflict)
   }
 
+  @Test
+  fun `can delete created waste stream`() {
+    // Given
+    val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id!!,
+      number = WASTE_STREAM_NUMBER,
+      name = "Glass"
+    )
+    securedMockMvc.post(
+      "/waste-streams",
+      objectMapper.writeValueAsString(wasteStreamDto)
+    )
+      .andExpect(status().isCreated)
+
+    // When & Then
+    securedMockMvc.delete(
+      "/waste-streams/${WASTE_STREAM_NUMBER}"
+    )
+      .andExpect(status().isNoContent)
+  }
+
 }

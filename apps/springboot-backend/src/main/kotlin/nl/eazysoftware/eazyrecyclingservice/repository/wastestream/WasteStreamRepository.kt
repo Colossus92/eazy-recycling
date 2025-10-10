@@ -27,6 +27,10 @@ class WasteStreamRepository(
     jpaRepository.deleteAll()
   }
 
+  override fun deleteByNumber(wasteStreamNumber: WasteStreamNumber) {
+    jpaRepository.deleteById(wasteStreamNumber.number)
+  }
+
   override fun save(wasteStreamDto: WasteStreamDto) {
     jpaRepository.save(wasteStreamDto)
   }

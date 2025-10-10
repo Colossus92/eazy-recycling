@@ -124,11 +124,11 @@ class WasteStreamControllerSecurityTest {
 //        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.CHAUFFEUR, 200),
 //        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", "unauthorized_role", 403),
 //
-//        // DELETE waste stream - any authenticated role can access
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.ADMIN, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.PLANNER, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.CHAUFFEUR, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", "unauthorized_role", 403)
+        // DELETE waste stream - any authenticated role can access
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.ADMIN, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.PLANNER, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.CHAUFFEUR, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", "unauthorized_role", 403)
       )
     }
   }
