@@ -85,7 +85,7 @@ class CompanyController(
         @field:NotBlank
         val name: String,
         @field:Valid
-        val address: AddressRequest?,
+        val address: AddressRequest,
     )
 
 

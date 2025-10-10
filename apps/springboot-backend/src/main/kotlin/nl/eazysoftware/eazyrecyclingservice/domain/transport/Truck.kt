@@ -3,14 +3,19 @@ package nl.eazysoftware.eazyrecyclingservice.domain.transport
 import java.time.ZonedDateTime
 
 data class Truck(
-  val licensePlate: String,
+  val licensePlate: LicensePlate,
   val brand: String,
   val description: String,
   val updatedAt: ZonedDateTime?
 ) {
   init {
-      require(licensePlate.isNotBlank()) { "Het kenteken is verplicht" }
       require(brand.isNotBlank()) { "Het merk is verplicht" }
       require(description.isNotBlank()) { "De beschrijving is verplicht" }
+  }
+}
+
+data class LicensePlate(val value: String) {
+  init {
+    require(value.isNotBlank()) { "Het kenteken is verplicht" }
   }
 }

@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ProcessingMethodService
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,11 +25,11 @@ class ProcessingMethodController(
     processingMethodService.findAll()
 
   @PostMapping
-  fun createProcessingMethod(@RequestBody processingMethod: ProcessingMethod) =
+  fun createProcessingMethod(@RequestBody processingMethod: ProcessingMethodDto) =
     processingMethodService.create(processingMethod)
 
   @PutMapping("/{code}")
-  fun updateProcessingMethod(@PathVariable code: String, @RequestBody processingMethod: ProcessingMethod) =
+  fun updateProcessingMethod(@PathVariable code: String, @RequestBody processingMethod: ProcessingMethodDto) =
     processingMethodService.update(code, processingMethod)
 
   @DeleteMapping("/{code}")

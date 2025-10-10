@@ -26,12 +26,12 @@ class CompanyService(
             chamberOfCommerceId = company.chamberOfCommerceId,
             vihbId = company.vihbId,
             address = AddressDto(
-                streetName = company.address?.streetName,
-                buildingName = company.address?.buildingName,
-                buildingNumber = company.address?.buildingNumber,
-                postalCode = company.address?.postalCode,
-                city = company.address?.city,
-                country = company.address?.country
+                streetName = company.address.streetName,
+                buildingName = company.address.buildingName,
+                buildingNumber = company.address.buildingNumber,
+                postalCode = company.address.postalCode,
+                city = company.address.city,
+                country = company.address.country
             ),
         )
         try {

@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.domain.address
 
 data class Address(
   val streetName: String,
-  val houseNumber: String,
-  val houseNumberAddition: String? = null,
+  val buildingNumber: String,
+  val buildingNumberAddition: String? = null,
   val postalCode: DutchPostalCode,
   val city: String,
   val country: String = "Nederland",
@@ -12,7 +12,7 @@ data class Address(
     require(!streetName.isBlank()){
       "Straatnaam moet een waarde hebben."
     }
-    require(!houseNumber.isBlank()){
+    require(!buildingNumber.isBlank()){
       "Huisnummer moet een waarde hebben."
     }
     require(!city.isBlank()){

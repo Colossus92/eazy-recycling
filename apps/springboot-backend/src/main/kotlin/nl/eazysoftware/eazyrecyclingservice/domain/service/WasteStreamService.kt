@@ -1,13 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteStreamRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
 import org.springframework.stereotype.Service
 
 @Service
 class WasteStreamService(
-    private val wasteStreamRepository: WasteStreamRepository
+    private val wasteStreamRepository: WasteStreamJpaRepository
 ) {
 
     fun getWasteStreams(): List<WasteStreamDto> {

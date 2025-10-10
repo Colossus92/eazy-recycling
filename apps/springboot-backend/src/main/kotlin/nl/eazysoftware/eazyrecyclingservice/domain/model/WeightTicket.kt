@@ -1,40 +1,33 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model
 
-import nl.eazysoftware.eazyrecyclingservice.domain.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Person
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
-import nl.eazysoftware.eazyrecyclingservice.domain.transport.Truck
+import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Goods
 import java.time.ZonedDateTime
 
-class WeightTicket(
+data class WeightTicket(
   val id: WeightTicketId,
-//  val orderId: OrderId
-  carrierParty: CompanyId,
-  consignorParty: CompanyId,
-  consigneeParty: CompanyId,
-  pickupParty: CompanyId,
-  truck: Truck,
-  driver: Person,
-  goods: List<Goods>,
+  // TODO: add val id: OrderId
+  val carrierParty: CompanyId,
+  val consignorParty: CompanyId,
+  val truck: LicensePlate?,
+  val goods: List<Goods>,
+
   /**
    * Small not for display on a printed weight ticket
    */
-  reclamation: String,
+  val reclamation: String?,
+
   /**
    * Larger note, not displayed on a printed weight ticket
    */
-  note: Note?,
-  loadingAddress: Address,
-  unloadingAddress: Address,
-  status: WeightTicketStatus,
-  createdAt: ZonedDateTime,
-  updatedAt: ZonedDateTime?,
-  weightedAt: ZonedDateTime
-) {
-
-}
+  val note: Note?,
+  val status: WeightTicketStatus = WeightTicketStatus.DRAFT,
+  val createdAt: ZonedDateTime,
+  val updatedAt: ZonedDateTime?,
+  val weightedAt: ZonedDateTime
+)
 
 enum class WeightTicketStatus {
   DRAFT,

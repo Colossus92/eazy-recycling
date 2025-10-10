@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +30,7 @@ class ProcessingMethodControllerIntegrationTest {
   @Autowired
   private lateinit var processingMethodRepository: ProcessingMethodRepository
 
-  private lateinit var testProcessingMethods: List<ProcessingMethod>
+  private lateinit var testProcessingMethods: List<ProcessingMethodDto>
 
   @BeforeEach
   fun setup() {
@@ -38,15 +38,15 @@ class ProcessingMethodControllerIntegrationTest {
 
     // Create test processing methods
     testProcessingMethods = listOf(
-      ProcessingMethod(
+      ProcessingMethodDto(
         code = "R01",
         description = "Use as fuel or other means to generate energy"
       ),
-      ProcessingMethod(
+      ProcessingMethodDto(
         code = "R02",
         description = "Solvent reclamation/regeneration"
       ),
-      ProcessingMethod(
+      ProcessingMethodDto(
         code = "R03",
         description = "Recycling/reclamation of organic substances which are not used as solvents"
       )

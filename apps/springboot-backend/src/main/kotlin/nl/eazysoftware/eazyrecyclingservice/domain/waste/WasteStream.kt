@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
-import nl.eazysoftware.eazyrecyclingservice.domain.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
@@ -8,8 +7,8 @@ data class WasteStream(
   val wasteStreamNumber: WasteStreamNumber,
   val wasteType: WasteType,
   val collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
-  val originLocation: OriginLocation,
-  val destinationLocation: DestinationLocation,
+  val pickupLocation: PickupLocation,
+  val deliveryLocation: DeliveryLocation,
   /**
    * Dutch: Afzender
    */
@@ -38,15 +37,15 @@ data class WasteStream(
 
     // Origin location validation: either has location with default collection + company,
     // or no location with non-default collection or person
-    val hasOriginLocation = originLocation !is OriginLocation.NoOriginLocation
+    val hasPickupLocation = pickupLocation !is PickupLocation.NoPickupLocation
     val isDefaultCollection = collectionType == WasteCollectionType.DEFAULT
     val isCompanyConsignor = consignorParty is Consignor.Company
 
     require(
-      (hasOriginLocation && isDefaultCollection && isCompanyConsignor) ||
-      (!hasOriginLocation && (!isDefaultCollection || !isCompanyConsignor))
+      (hasPickupLocation && isDefaultCollection && isCompanyConsignor) ||
+      (!hasPickupLocation && (!isDefaultCollection || !isCompanyConsignor))
     ) {
-      if (hasOriginLocation) {
+      if (hasPickupLocation) {
         "Locatie van herkomst is alleen toegestaan bij normale inzameling en zakelijke ontdoener"
       } else {
         "Locatie van herkomst is verplicht bij normale inzameling en zakelijke ontdoener"
@@ -61,7 +60,7 @@ data class WasteStream(
       "Als de ontdoener een particulier is dan mag route inzameling en inzamelaarsregeling niet worden toegepast"
     }
 
-    require(wasteStreamNumber.number.toString().substring(0, 5) == destinationLocation.processorPartyId.number.toString()) {
+    require(wasteStreamNumber.number.toString().substring(0, 5) == deliveryLocation.processorPartyId.number.toString()) {
       "De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst."
     }
 
@@ -79,7 +78,7 @@ sealed interface Consignor {
  *
  * According to the Dutch regulations, also a foreign address is allowed, but this is currently not supported.
  */
-sealed interface OriginLocation {
+sealed interface PickupLocation {
 
   /**
    * Variant 1: Dutch address with full postal code
@@ -87,12 +86,12 @@ sealed interface OriginLocation {
    */
   data class DutchAddress(
     val postalCode: DutchPostalCode,
-    val houseNumber: String,
-    val houseNumberAddition: String? = null,
+    val buildingNumber: String,
+    val buildingNumberAddition: String? = null,
     val country: String = "Nederland"
-  ) : OriginLocation {
+  ) : PickupLocation {
     init {
-      require(houseNumber.isNotBlank()) { "Het huisnummer is verplicht" }
+      require(buildingNumber.isNotBlank()) { "Het huisnummer is verplicht" }
       require(country == "Nederland") { "Het land dient Nederland te zijn, maar was: $country" }
     }
   }
@@ -104,35 +103,34 @@ sealed interface OriginLocation {
   data class ProximityDescription(
     val postalCodeDigits: String,
     val city: String,
-    val proximityDescription: String,
+    val description: String,
     val country: String = "Nederland"
-  ) : OriginLocation {
+  ) : PickupLocation {
     init {
       require(postalCodeDigits.matches(Regex("\\d{4}"))) {
         "Voor een nabijheidsbeschrijving moet de postcode alleen vier cijfers bevatten, maar was: $postalCodeDigits"
       }
       require(city.isNotBlank()) { "De stad moet een waarde hebben" }
-      require(proximityDescription.isNotBlank()) { "De nabijheidsbeschrijving is verplicht" }
+      require(description.isNotBlank()) { "De nabijheidsbeschrijving is verplicht" }
     }
   }
 
   /**
    * Variant 3: No origin location for route collection, collectors scheme, or private disposers
    */
-  data object NoOriginLocation : OriginLocation
+  data object NoPickupLocation : PickupLocation
 }
 
-data class DestinationLocation(
+data class DeliveryLocation(
   val processorPartyId: ProcessorPartyId,
-  val addressDto: Address,
 )
 
 data class ProcessorPartyId(
-  val number: Int
+  val number: String
 ) {
   init {
-    require(number.toString().length == 5) {
-      "Het verwerkersnummer moet exact 5 tekens lang staan, maar is: $number"
+    require(number.length == 5) {
+      "Het verwerkersnummer moet exact 5 tekens lang zijn, maar is: $number"
     }
   }
 }
@@ -145,5 +143,11 @@ enum class WasteCollectionType {
 }
 
 data class WasteStreamNumber(
-  val number: Long,
-)
+  val number: String,
+) {
+  init {
+    require(number.length == 12) {
+      "Een afvalstroomnummer dient 12 tekens lang te zijn"
+    }
+  }
+}

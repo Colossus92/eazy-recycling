@@ -6,7 +6,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "processing_methods")
-data class ProcessingMethod(
+data class ProcessingMethodDto(
     @Id
     val code: String,
     val description: String,

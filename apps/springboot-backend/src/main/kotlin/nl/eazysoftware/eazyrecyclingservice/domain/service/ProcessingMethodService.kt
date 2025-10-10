@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -10,13 +10,13 @@ class ProcessingMethodService(
   private val processingMethodRepository: ProcessingMethodRepository
 ) {
 
-  fun findAll(): List<ProcessingMethod> =
+  fun findAll(): List<ProcessingMethodDto> =
     processingMethodRepository.findAll()
 
-  fun create(processingMethod: ProcessingMethod) =
+  fun create(processingMethod: ProcessingMethodDto) =
     processingMethodRepository.save(processingMethod)
 
-  fun update(code: String, processingMethod: ProcessingMethod): Any {
+  fun update(code: String, processingMethod: ProcessingMethodDto): Any {
     if (code != processingMethod.code) {
       throw IllegalArgumentException("De code van de verwerkingsmethode kan niet gewijzigd worden.")
     }

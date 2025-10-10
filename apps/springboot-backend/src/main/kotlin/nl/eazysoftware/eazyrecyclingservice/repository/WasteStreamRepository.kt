@@ -1,6 +1,37 @@
 package nl.eazysoftware.eazyrecyclingservice.repository
 
+import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamMapper
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Repository
 
-interface WasteStreamRepository: JpaRepository<WasteStreamDto, String>
+interface WasteStreamJpaRepository: JpaRepository<WasteStreamDto, String>
+
+
+@Repository
+class WasteStreamRepository(
+  private val jpaRepository: WasteStreamJpaRepository,
+  private val wasteStreamMapper: WasteStreamMapper,
+): WasteStreams {
+  override fun findByNumber(wasteStreamNumber: WasteStreamNumber): WasteStream {
+    return jpaRepository.findByIdOrNull(wasteStreamNumber.number)
+      ?.let {  wasteStreamMapper.toDomain(it) }
+      ?: throw EntityNotFoundException("Geen afvalstroom met nummer $wasteStreamNumber gevonden")
+  }
+
+  override fun deleteAll() {
+    jpaRepository.deleteAll()
+  }
+
+  override fun saveAll(wasteStreams: List<WasteStreamDto>) {
+    jpaRepository.saveAll(wasteStreams)
+  }
+
+  override fun save(wasteStreamDto: WasteStreamDto) =
+    jpaRepository.save(wasteStreamDto)
+}

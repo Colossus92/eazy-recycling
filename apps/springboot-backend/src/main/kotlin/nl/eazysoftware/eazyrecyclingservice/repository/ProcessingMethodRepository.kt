@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository
 
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface ProcessingMethodRepository: JpaRepository<ProcessingMethod, String>
+interface ProcessingMethodRepository: JpaRepository<ProcessingMethodDto, String>

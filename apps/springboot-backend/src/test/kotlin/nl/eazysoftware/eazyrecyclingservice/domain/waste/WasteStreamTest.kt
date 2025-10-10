@@ -22,12 +22,12 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.ProximityDescription(
+        pickupLocation = PickupLocation.ProximityDescription(
           "1234",
           "Stad",
           "Nabijheidsbeschrijving"
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -41,11 +41,11 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.DutchAddress(
+        pickupLocation = PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -59,8 +59,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.ROUTE,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
         collectorParty = companyId(),
@@ -75,11 +75,11 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.DutchAddress(
+        pickupLocation = PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
         brokerParty = companyId(),
@@ -97,8 +97,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -115,8 +115,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
         collectorParty = companyId(),
@@ -132,8 +132,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -149,8 +149,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
       )
@@ -165,11 +165,11 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        originLocation = OriginLocation.DutchAddress(
+        pickupLocation = PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "123"
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -185,11 +185,11 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.DutchAddress(
+        pickupLocation = PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "123"
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
       )
@@ -202,14 +202,14 @@ class WasteStreamTest {
   fun `the first five numbers of a waste stream number should be equal to the processorPartyId`() {
     val exception = assertFailsWith<IllegalArgumentException> {
       WasteStream(
-        wasteStreamNumber = WasteStreamNumber(12346678912),
+        wasteStreamNumber = WasteStreamNumber("12346678912"),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        originLocation = OriginLocation.DutchAddress(
+        pickupLocation = PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
-        destinationLocation = destinationLocation(),
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
       )
@@ -226,8 +226,8 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        originLocation = OriginLocation.NoOriginLocation,
-        destinationLocation = destinationLocation(),
+        pickupLocation = PickupLocation.NoPickupLocation,
+        deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
         collectorParty = companyId(),
@@ -242,7 +242,7 @@ class WasteStreamTest {
     @Test
     fun `a dutch address can't have a blank house number`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.DutchAddress(
+        PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           ""
         )
@@ -253,7 +253,7 @@ class WasteStreamTest {
     @Test
     fun `a dutch address must have Nederland as country`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.DutchAddress(
+        PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "123",
           country = "Belgium"
@@ -265,10 +265,10 @@ class WasteStreamTest {
     @Test
     fun `a dutch address can have a house number addition`() {
       assertDoesNotThrow {
-        OriginLocation.DutchAddress(
+        PickupLocation.DutchAddress(
           DutchPostalCode("1234 AB"),
           "123",
-          houseNumberAddition = "A"
+          buildingNumberAddition = "A"
         )
       }
     }
@@ -279,7 +279,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a dutch postal code`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "1234 AB",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -291,7 +291,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with 3 digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "123",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -303,7 +303,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with 5 digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "12345",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -315,7 +315,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with a letter`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "1234a",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -327,7 +327,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a blank city`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "1234",
           "",
           "Nabijheidsbeschrijving"
@@ -339,7 +339,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a blank proximity description`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        OriginLocation.ProximityDescription(
+        PickupLocation.ProximityDescription(
           "1234",
           "Stad",
           ""
@@ -354,7 +354,7 @@ class WasteStreamTest {
     @Test
     fun `a processor party id can't have four digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        ProcessorPartyId(1234)
+        ProcessorPartyId("1234")
       }
       assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang staan, maar is: 1234")
     }
@@ -362,7 +362,7 @@ class WasteStreamTest {
     @Test
     fun `a processor party id can't have six digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        ProcessorPartyId(123456)
+        ProcessorPartyId("123456")
       }
       assertThat(exception.message).isEqualTo("Het verwerkersnummer moet exact 5 tekens lang staan, maar is: 123456")
     }
@@ -372,12 +372,12 @@ class WasteStreamTest {
   @CsvSource("12345678901", "1234567890123")
   fun `a waste stream number should be exactly 12 characters long`(value: String) {
     val exception = assertFailsWith<IllegalArgumentException> {
-      WasteStreamNumber(value.toLong())
+      WasteStreamNumber(value)
     }
     assertThat(exception.message).isEqualTo("Een afvalstroomnummer dient 12 tekens lang te zijn")
   }
 
-  private fun wasteStreamNumber(): WasteStreamNumber = WasteStreamNumber(123456789012)
+  private fun wasteStreamNumber(): WasteStreamNumber = WasteStreamNumber("123456789012")
 
   private fun wasteType(): WasteType = WasteType(
     "koper",
@@ -387,15 +387,7 @@ class WasteStreamTest {
 
   private fun companyId(): CompanyId = CompanyId(UUID.randomUUID())
 
-  private fun destinationLocation(): DestinationLocation = DestinationLocation(
-    ProcessorPartyId(12345),
-    Address(
-      streetName = "straatnaam",
-      houseNumber = "1",
-      houseNumberAddition = null,
-      postalCode = DutchPostalCode("1234 AB"),
-      city = "city",
-      country = "country"
-    )
+  private fun destinationLocation(): DeliveryLocation = DeliveryLocation(
+    ProcessorPartyId("12345"),
   )
 }

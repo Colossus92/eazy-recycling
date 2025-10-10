@@ -23,6 +23,10 @@ data class CompanyDto(
 
     @Column(unique = true, nullable = true)
     val vihbId: String? = null,
+
+    @Column(name = "processor_id", unique = true, nullable = true)
+    val processorId: String? = null,
+
     val name: String,
     @Embedded
     val address: AddressDto,
