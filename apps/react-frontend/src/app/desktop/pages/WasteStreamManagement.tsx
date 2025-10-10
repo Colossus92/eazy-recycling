@@ -1,97 +1,74 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { WasteStream } from '@/api/services/wasteStreamService.ts';
-import { Column } from '@/features/crud/ContentTable.tsx';
-import { CrudPage } from '@/features/crud/CrudPage.tsx';
-import { EmptyState } from '@/features/crud/EmptyState.tsx';
+import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
+import Plus from '@/assets/icons/Plus.svg?react';
+import { ContentContainer } from '@/components/layouts/ContentContainer';
+import { Button } from '@/components/ui/button/Button';
+import { Column, ContentTable } from '@/features/crud/ContentTable.tsx';
+import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
+import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { useWasteStreamCrud } from '@/features/wasteStream/useWasteStreamCrud.ts';
-import { WasteStreamForm } from '@/features/wasteStream/WasteStreamForm';
+import { fallbackRender } from '@/utils/fallbackRender';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ClipLoader } from 'react-spinners';
 
 export const WasteStreamManagement = () => {
-  const queryClient = useQueryClient();
   const {
     displayedWasteStreams,
     setQuery,
-    isAdding,
-    setIsAdding,
-    setEditing,
-    setDeleting,
-    editing,
-    deleting,
-    create,
-    update,
-    remove,
     error,
     isLoading,
   } = useWasteStreamCrud();
 
-  const columns: Column<WasteStream>[] = [
-    { key: 'number', label: 'Afvalstroomnummer' },
-    { key: 'name', label: 'Gebruikelijke benaming' },
+  const columns: Column<WasteStreamListView>[] = [
+    { key: 'wasteStreamNumber', label: 'Afvalstroomnummer' },
+    { key: 'wasteName', label: 'Gebruikelijke benaming' },
   ];
 
   return (
-    <CrudPage<WasteStream>
-      title={'Afvalstroombeheer'}
-      data={{
-        items: displayedWasteStreams,
-        columns,
-        setQuery,
-      }}
-      dialogs={{
-        add: {
-          open: isAdding,
-          onClose: () => setIsAdding(false),
-          onSave: (data) => {
-            return create(data);
-          },
-        },
-        update: {
-          open: !!editing,
-          item: editing,
-          onClose: () => setEditing(undefined),
-          onSave: (data) => {
-            return update(data);
-          },
-        },
-        delete: {
-          title: 'Afvalstroomnummer verwijderen',
-          description: `Weet u zeker dat u afvalstroom met nummer ${deleting?.number} wilt verwijderen?`,
-          open: !!deleting,
-          item: deleting,
-          onClose: () => setDeleting(undefined),
-          onConfirm: (data) => {
-            return remove(data);
-          },
-        },
-      }}
-      actions={{
-        onAdd: setIsAdding,
-        onDelete: setDeleting,
-        onEdit: setEditing,
-      }}
-      renderForm={(close, onSubmit, itemToEdit) => (
-        <WasteStreamForm
-          onCancel={close}
-          onSubmit={onSubmit}
-          wasteStream={itemToEdit}
-        />
-      )}
-      renderEmptyState={(open) => (
-        <EmptyState
-          icon={BxRecycle}
-          text={'Geen afvalstroomnummers gevonden'}
-          onClick={open}
-        />
-      )}
-      error={error}
-      onReset={() => {
-        queryClient
-          .invalidateQueries({ queryKey: ['wasteStreams'] })
-          .catch(() => {});
-      }}
-      isLoading={isLoading}
-    />
+    <>
+      <ContentContainer title={"Afvalstroomnummers"}>
+        <div className="flex-1 flex flex-col items-start self-stretch pt-4 gap-4 border border-solid rounded-radius-xl border-color-border-primary bg-color-surface-primary overflow-hidden">
+          <ContentTitleBar setQuery={setQuery}>
+            <Button
+              variant={'primary'}
+              icon={Plus}
+              label={'Voeg toe'}
+              onClick={() => {}}
+            />
+          </ContentTitleBar>
+          {displayedWasteStreams.length === 0 && !error ? (
+            isLoading ? (
+              <div className="flex justify-center items-center h-24 w-full">
+                <ClipLoader
+                  size={20}
+                  color={'text-color-text-invert-primary'}
+                  aria-label="Laad spinner"
+                />
+              </div>
+            ) : (
+              <EmptyState
+                icon={BxRecycle}
+                text="Geen afvalstromen gevonden"
+                onClick={() => {}}
+              />
+            )
+          ) : (
+            <ErrorBoundary fallbackRender={fallbackRender} onReset={() => {}}>
+              <ContentTable<WasteStreamListView>
+                data={{
+                  items: displayedWasteStreams,
+                  columns,
+                  setQuery,
+                }}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                isLoading={isLoading}
+              />
+            </ErrorBoundary>
+          )}
+        </div>
+      </ContentContainer>
+    </>
   );
 };
 
