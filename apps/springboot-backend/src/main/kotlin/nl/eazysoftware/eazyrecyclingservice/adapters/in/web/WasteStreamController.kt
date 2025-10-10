@@ -2,9 +2,11 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.WasteStreamCommand
@@ -43,6 +45,17 @@ class WasteStreamController(
   @GetMapping
   fun getWasteStreams(): List<WasteStreamListView> {
     return wasteStreamService.getWasteStreams()
+  }
+
+  @GetMapping("/{wasteStreamNumber}")
+  fun getWasteStreamByNumber(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String
+  ): WasteStreamDetailView {
+    return wasteStreamService.getWasteStreamByNumber(WasteStreamNumber(wasteStreamNumber))
+      ?: throw EntityNotFoundException("Afvalstroom met nummer $wasteStreamNumber niet gevonden")
   }
 
   @PutMapping("/{wasteStreamNumber}")

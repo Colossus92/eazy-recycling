@@ -48,8 +48,8 @@ object TestWasteStreamFactory {
   fun createTestWasteStreamDto(
     number: String = "WS" + UUID.randomUUID().toString().substring(0, 8),
     name: String = "Test Waste Stream",
-    euralCode: Eural = Eural(code = "20 01 01", description = "Paper and cardboard"),
-    processingMethod: ProcessingMethodDto = ProcessingMethodDto(code = "R1", description = "Recycling"),
+    euralCode: Eural = Eural(code = "16 01 17", description = "Paper and cardboard"),
+    processingMethod: ProcessingMethodDto = ProcessingMethodDto(code = "A.01", description = "Recycling"),
     wasteCollectionType: String = "CONTAINER",
     pickupLocation: PickupLocationDto = createTestPickupLocationDto(),
     processorPartyId: CompanyDto = createTestCompany(),

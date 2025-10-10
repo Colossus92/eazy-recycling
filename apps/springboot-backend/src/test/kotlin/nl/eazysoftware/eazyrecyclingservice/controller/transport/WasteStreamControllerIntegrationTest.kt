@@ -130,6 +130,32 @@ class WasteStreamControllerIntegrationTest {
   }
 
   @Test
+  fun `can get waste stream by number with full details`() {
+    // Given
+    val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id!!,
+      number = WASTE_STREAM_NUMBER,
+      name = "Glass"
+    )
+    securedMockMvc.post(
+      "/waste-streams",
+      objectMapper.writeValueAsString(wasteStreamDto)
+    )
+      .andExpect(status().isCreated)
+
+    // When & Then
+    securedMockMvc.get("/waste-streams/${WASTE_STREAM_NUMBER}")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$.wasteStreamNumber").value(WASTE_STREAM_NUMBER))
+      .andExpect(jsonPath("$.wasteType.name").value("Glass"))
+      .andExpect(jsonPath("$.wasteType.euralCode.code").exists())
+      .andExpect(jsonPath("$.wasteType.processingMethod.code").exists())
+      .andExpect(jsonPath("$.consignorParty.type").value("company"))
+      .andExpect(jsonPath("$.pickupParty.name").exists())
+      .andExpect(jsonPath("$.deliveryLocation.processor.name").exists())
+  }
+
+  @Test
   fun `can update created waste stream`() {
     // Given
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(

@@ -108,6 +108,12 @@ class WasteStreamControllerSecurityTest {
         Arguments.of(PATH, "GET", Roles.CHAUFFEUR, 200),
         Arguments.of(PATH, "GET", "unauthorized_role", 403),
 
+        // GET waste stream by number - any authenticated role can access
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "GET", Roles.ADMIN, 200),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "GET", Roles.PLANNER, 200),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "GET", Roles.CHAUFFEUR, 200),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "GET", "unauthorized_role", 403),
+
         // POST (create) waste stream - any authenticated role can access
         Arguments.of(PATH, "POST", Roles.ADMIN, 201),
         Arguments.of(PATH, "POST", Roles.PLANNER, 201),
