@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface CreateWasteStream {
-  fun handle(cmd: CreateWasteStreamCommand): CreateWasteStreamResult
+  fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult
 }
 
 /**
  * Command for creating a waste stream.
  * This follows the hexagonal architecture pattern where the command contains domain objects.
  */
-data class CreateWasteStreamCommand(
+data class WasteStreamCommand(
   val wasteStreamNumber: WasteStreamNumber,
   val wasteType: WasteType,
   val collectionType: WasteCollectionType,
@@ -39,7 +39,7 @@ class CreateWasteStreamService(
 ) : CreateWasteStream {
 
   @Transactional
-  override fun handle(cmd: CreateWasteStreamCommand): CreateWasteStreamResult {
+  override fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult {
     check(!wasteStreamRepo.existsById(cmd.wasteStreamNumber)) {
       "Afvalstroom met nummer ${cmd.wasteStreamNumber.number} bestaat al"
     }

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStream
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStreamCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.WasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.UpdateWasteStream
@@ -35,7 +35,7 @@ class WasteStreamController(
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  fun create(@Valid @RequestBody request: CreateWasteStreamRequest): CreateWasteStreamResponse {
+  fun create(@Valid @RequestBody request: WasteStreamRequest): CreateWasteStreamResponse {
     val result = createWasteStream.handle(request.toCommand())
     return CreateWasteStreamResponse(wasteStreamNumber = result.wasteStreamNumber.number)
   }
@@ -52,7 +52,7 @@ class WasteStreamController(
     @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
     @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
     wasteStreamNumber: String,
-    @Valid @RequestBody request: CreateWasteStreamRequest
+    @Valid @RequestBody request: WasteStreamRequest
   ) {
     require(wasteStreamNumber == request.wasteStreamNumber) {
       "Afvalstroomnummer in path moet overeenkomen met afvalstroomnummer in body"
@@ -72,7 +72,7 @@ class WasteStreamController(
   }
 }
 
-data class CreateWasteStreamRequest(
+data class WasteStreamRequest(
   @field:Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
   @field:Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer 12 cijfers bevatten")
   val wasteStreamNumber: String,
@@ -105,8 +105,8 @@ data class CreateWasteStreamRequest(
 
   val brokerParty: UUID? = null
 ) {
-  fun toCommand(): CreateWasteStreamCommand {
-    return CreateWasteStreamCommand(
+  fun toCommand(): WasteStreamCommand {
+    return WasteStreamCommand(
       wasteStreamNumber = WasteStreamNumber(wasteStreamNumber),
       wasteType = WasteType(
         name = name,

@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.ConsignorRequest
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.CreateWasteStreamRequest
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WasteStreamRequest
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory.createTestCompany
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteCollectionType
@@ -28,8 +28,8 @@ object TestWasteStreamFactory {
     dealerParty: UUID? = null,
     collectorParty: UUID? = null,
     brokerParty: UUID? = null
-  ): CreateWasteStreamRequest {
-    return CreateWasteStreamRequest(
+  ): WasteStreamRequest {
+    return WasteStreamRequest(
       wasteStreamNumber = number,
       name = name,
       euralCode = euralCode,

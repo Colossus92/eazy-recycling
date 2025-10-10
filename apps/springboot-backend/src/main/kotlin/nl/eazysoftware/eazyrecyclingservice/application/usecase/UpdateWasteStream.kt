@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface UpdateWasteStream {
-    fun handle(cmd: CreateWasteStreamCommand)
+    fun handle(cmd: WasteStreamCommand)
 }
 
 @Service
@@ -17,7 +17,7 @@ class UpdateWasteStreamService(
 ) : UpdateWasteStream {
 
     @Transactional
-    override fun handle(cmd: CreateWasteStreamCommand) {
+    override fun handle(cmd: WasteStreamCommand) {
         check(wasteStreamRepo.existsById(cmd.wasteStreamNumber)) {
             "Afvalstroom met nummer ${cmd.wasteStreamNumber.number} bestaat niet"
         }
