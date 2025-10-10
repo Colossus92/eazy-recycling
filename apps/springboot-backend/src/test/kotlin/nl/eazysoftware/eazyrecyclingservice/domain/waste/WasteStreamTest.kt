@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
-import nl.eazysoftware.eazyrecyclingservice.domain.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import org.assertj.core.api.Assertions.assertThat
@@ -10,7 +9,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
-import java.util.UUID
+import java.util.*
 import kotlin.test.assertFailsWith
 
 class WasteStreamTest {

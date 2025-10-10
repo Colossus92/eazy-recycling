@@ -4,25 +4,12 @@ import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.DeliveryLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.EuralCode
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation.*
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteCollectionType
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStream
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteType
-import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 @Component
 class WasteStreamMapper(

@@ -7,9 +7,9 @@ import java.util.*
 @Table(name = "pickup_locations")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "location_type", discriminatorType = DiscriminatorType.STRING)
-open class PickupLocationDto(
+class PickupLocationDto(
   @Id
-  open val id: String = UUID.randomUUID().toString()
+  val id: String = UUID.randomUUID().toString()
 ) {
   @Entity
   @DiscriminatorValue("DUTCH_ADDRESS")

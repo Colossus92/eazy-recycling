@@ -60,7 +60,7 @@ data class WasteStream(
       "Als de ontdoener een particulier is dan mag route inzameling en inzamelaarsregeling niet worden toegepast"
     }
 
-    require(wasteStreamNumber.number.toString().substring(0, 5) == deliveryLocation.processorPartyId.number.toString()) {
+    require(wasteStreamNumber.number.substring(0, 5) == deliveryLocation.processorPartyId.number) {
       "De eerste 5 posities van het Afvalstroomnummer moeten gelijk zijn aan de LocatieOntvangst."
     }
 
