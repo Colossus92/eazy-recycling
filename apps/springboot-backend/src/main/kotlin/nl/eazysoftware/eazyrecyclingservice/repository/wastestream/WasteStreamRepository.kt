@@ -31,7 +31,8 @@ class WasteStreamRepository(
     jpaRepository.deleteById(wasteStreamNumber.number)
   }
 
-  override fun save(wasteStreamDto: WasteStreamDto) {
-    jpaRepository.save(wasteStreamDto)
+  override fun save(wasteStream: WasteStream) {
+    val dto = wasteStreamMapper.toDto(wasteStream)
+    jpaRepository.save(dto)
   }
 }

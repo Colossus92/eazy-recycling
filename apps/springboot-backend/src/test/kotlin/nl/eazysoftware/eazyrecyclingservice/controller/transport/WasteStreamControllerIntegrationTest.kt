@@ -130,6 +130,31 @@ class WasteStreamControllerIntegrationTest {
   }
 
   @Test
+  fun `can update created waste stream`() {
+    // Given
+    val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id!!,
+      number = WASTE_STREAM_NUMBER,
+      name = "Glass"
+    )
+    securedMockMvc.post(
+      "/waste-streams",
+      objectMapper.writeValueAsString(wasteStreamDto)
+    )
+      .andExpect(status().isCreated)
+
+    // When
+    val updatedRequest = wasteStreamDto.copy(name = "Updated Glass")
+
+    // Then
+    securedMockMvc.put(
+      "/waste-streams/${WASTE_STREAM_NUMBER}",
+      objectMapper.writeValueAsString(updatedRequest)
+    )
+      .andExpect(status().isNoContent)
+  }
+
+  @Test
   fun `can delete created waste stream`() {
     // Given
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(

@@ -4,15 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.TestInstance
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -45,7 +41,7 @@ class WasteStreamControllerSecurityTest {
   private lateinit var objectMapper: ObjectMapper
 
   @Autowired
-  private lateinit var wasteStreamRepository: WasteStreams
+  private lateinit var wasteStreamRepository: WasteStreamJpaRepository
 
   private lateinit var testWasteStreamDto: WasteStreamDto
 
@@ -118,12 +114,12 @@ class WasteStreamControllerSecurityTest {
         Arguments.of(PATH, "POST", Roles.CHAUFFEUR, 201),
         Arguments.of(PATH, "POST", "unauthorized_role", 403),
 
-//        // PUT (update) waste stream - any authenticated role can access
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.ADMIN, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.PLANNER, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.CHAUFFEUR, 200),
-//        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", "unauthorized_role", 403),
-//
+        // PUT (update) waste stream - any authenticated role can access
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.ADMIN, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.PLANNER, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", Roles.CHAUFFEUR, 204),
+        Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "PUT", "unauthorized_role", 403),
+
         // DELETE waste stream - any authenticated role can access
         Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.ADMIN, 204),
         Arguments.of("$PATH/$WASTE_STREAM_NUMBER", "DELETE", Roles.PLANNER, 204),
@@ -156,9 +152,18 @@ class WasteStreamControllerSecurityTest {
           .content(objectMapper.writeValueAsString(wasteStreamRequest))
       }
 
-      "PUT" -> put(endpoint)
-        .contentType(MediaType.APPLICATION_JSON)
-        .content("""{"number":"$WASTE_STREAM_NUMBER","name":"Updated Waste Stream"}""")
+      "PUT" -> {
+        val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+          companyId = consignorCompany.id!!,
+          number = WASTE_STREAM_NUMBER,
+          name = "Updated Waste Stream",
+          processorPartyId = "12345",
+          pickupParty = pickupCompany.id!!
+        )
+        put(endpoint)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(wasteStreamRequest))
+      }
 
       "DELETE" -> delete(endpoint)
       else -> throw IllegalArgumentException("Unsupported method: $method")

@@ -57,8 +57,7 @@ class CreateWasteStreamService(
       brokerParty = cmd.brokerParty
     )
 
-    val dto = wasteStreamMapper.toDto(wasteStream)
-    wasteStreamRepo.save(dto)
+    wasteStreamRepo.save(wasteStream)
 
     return CreateWasteStreamResult(
       wasteStreamNumber = wasteStream.wasteStreamNumber

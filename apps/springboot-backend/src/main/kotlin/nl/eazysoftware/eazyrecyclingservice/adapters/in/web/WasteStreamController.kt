@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStrea
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStreamCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.UpdateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -28,6 +29,7 @@ import java.util.UUID
 class WasteStreamController(
   private val wasteStreamService: WasteStreamService,
   private val createWasteStream: CreateWasteStream,
+  private val updateWasteStream: UpdateWasteStream,
   private val deleteWasteStream: DeleteWasteStream,
 ) {
 
@@ -41,6 +43,21 @@ class WasteStreamController(
   @GetMapping
   fun getWasteStreams(): List<WasteStreamListView> {
     return wasteStreamService.getWasteStreams()
+  }
+
+  @PutMapping("/{wasteStreamNumber}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun update(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String,
+    @Valid @RequestBody request: CreateWasteStreamRequest
+  ) {
+    require(wasteStreamNumber == request.wasteStreamNumber) {
+      "Afvalstroomnummer in path moet overeenkomen met afvalstroomnummer in body"
+    }
+    updateWasteStream.handle(request.toCommand())
   }
 
   @DeleteMapping("/{wasteStreamNumber}")
