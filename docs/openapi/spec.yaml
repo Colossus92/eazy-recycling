@@ -9,6 +9,24 @@ security:
 - bearerAuth: []
 paths:
   /waste-streams/{wasteStreamNumber}:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: getWasteStreamByNumber
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamDetailView"
     put:
       tags:
       - waste-stream-controller
@@ -1928,6 +1946,184 @@ components:
       - processingMethodCode
       - wasteName
       - wasteStreamNumber
+    AddressView:
+      type: object
+      properties:
+        street:
+          type: string
+        houseNumber:
+          type: string
+        houseNumberAddition:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+      required:
+      - city
+      - country
+      - houseNumber
+      - postalCode
+      - street
+    CompanyConsignorView:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorView"
+      - type: object
+        properties:
+          company:
+            $ref: "#/components/schemas/CompanyView"
+      required:
+      - company
+    CompanyView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressView"
+      required:
+      - address
+      - id
+      - name
+    ConsignorView:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    DeliveryLocationView:
+      type: object
+      properties:
+        processorPartyId:
+          type: string
+        processor:
+          $ref: "#/components/schemas/CompanyView"
+      required:
+      - processorPartyId
+    DutchAddressView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          postalCode:
+            type: string
+          buildingNumber:
+            type: string
+          buildingNumberAddition:
+            type: string
+          country:
+            type: string
+      required:
+      - buildingNumber
+      - country
+      - postalCode
+    EuralCodeView:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+    PersonConsignorView:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorView"
+    PickupLocationView:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    ProcessingMethodView:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+    ProximityDescriptionView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          postalCodeDigits:
+            type: string
+          city:
+            type: string
+          description:
+            type: string
+          country:
+            type: string
+      required:
+      - city
+      - country
+      - description
+      - postalCodeDigits
+    WasteStreamDetailView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        wasteType:
+          $ref: "#/components/schemas/WasteTypeView"
+        collectionType:
+          type: string
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
+        deliveryLocation:
+          $ref: "#/components/schemas/DeliveryLocationView"
+        consignorParty:
+          oneOf:
+          - $ref: "#/components/schemas/CompanyConsignorView"
+          - $ref: "#/components/schemas/PersonConsignorView"
+        pickupParty:
+          $ref: "#/components/schemas/CompanyView"
+        dealerParty:
+          $ref: "#/components/schemas/CompanyView"
+        collectorParty:
+          $ref: "#/components/schemas/CompanyView"
+        brokerParty:
+          $ref: "#/components/schemas/CompanyView"
+      required:
+      - collectionType
+      - consignorParty
+      - deliveryLocation
+      - pickupParty
+      - wasteStreamNumber
+      - wasteType
+    WasteTypeView:
+      type: object
+      properties:
+        name:
+          type: string
+        euralCode:
+          $ref: "#/components/schemas/EuralCodeView"
+        processingMethod:
+          $ref: "#/components/schemas/ProcessingMethodView"
+      required:
+      - euralCode
+      - name
+      - processingMethod
     UserResponse:
       type: object
       properties:
