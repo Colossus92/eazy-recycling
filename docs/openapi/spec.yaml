@@ -8,6 +8,41 @@ servers:
 security:
 - bearerAuth: []
 paths:
+  /waste-streams/{wasteStreamNumber}:
+    put:
+      tags:
+      - waste-stream-controller
+      operationId: update
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteStreamRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+      - waste-stream-controller
+      operationId: delete
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "204":
+          description: No Content
   /users/{id}:
     get:
       tags:
@@ -472,7 +507,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateWasteStreamRequest"
+              $ref: "#/components/schemas/WasteStreamRequest"
         required: true
       responses:
         "201":
@@ -926,6 +961,133 @@ paths:
                       $ref: "#/components/schemas/DriverPlanningItem"
 components:
   schemas:
+    CompanyConsignor:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorRequest"
+      - type: object
+        properties:
+          companyId:
+            type: string
+            format: uuid
+      required:
+      - companyId
+    ConsignorRequest:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    DutchAddressRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          buildingNumber:
+            type: string
+            minLength: 1
+          buildingNumberAddition:
+            type: string
+          postalCode:
+            type: string
+            minLength: 1
+            pattern: "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$"
+          country:
+            type: string
+            minLength: 1
+      required:
+      - buildingNumber
+      - country
+      - postalCode
+    NoPickupLocationRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+    PersonConsignor:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorRequest"
+    PickupLocationRequest:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    ProximityDescriptionRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          description:
+            type: string
+            minLength: 1
+          postalCodeDigits:
+            type: string
+            minLength: 1
+            pattern: "^[0-9]{4}$"
+          city:
+            type: string
+            minLength: 1
+          country:
+            type: string
+            minLength: 1
+      required:
+      - city
+      - country
+      - description
+      - postalCodeDigits
+    WasteStreamRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+          pattern: "^[0-9]{12}$"
+        name:
+          type: string
+          minLength: 1
+        euralCode:
+          type: string
+          minLength: 1
+        processingMethodCode:
+          type: string
+          minLength: 1
+        collectionType:
+          type: string
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+        processorPartyId:
+          type: string
+          pattern: "^[0-9]{5}$"
+        consignorParty:
+          oneOf:
+          - $ref: "#/components/schemas/CompanyConsignor"
+          - $ref: "#/components/schemas/PersonConsignor"
+        pickupParty:
+          type: string
+          format: uuid
+        dealerParty:
+          type: string
+          format: uuid
+        collectorParty:
+          type: string
+          format: uuid
+        brokerParty:
+          type: string
+          format: uuid
+      required:
+      - collectionType
+      - consignorParty
+      - euralCode
+      - name
+      - pickupLocation
+      - pickupParty
+      - processingMethodCode
+      - processorPartyId
+      - wasteStreamNumber
     UpdateUserRequest:
       type: object
       properties:
@@ -1633,133 +1795,6 @@ components:
           format: int32
       required:
       - id
-    CompanyConsignor:
-      allOf:
-      - $ref: "#/components/schemas/ConsignorRequest"
-      - type: object
-        properties:
-          companyId:
-            type: string
-            format: uuid
-      required:
-      - companyId
-    ConsignorRequest:
-      discriminator:
-        propertyName: type
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    CreateWasteStreamRequest:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-          pattern: "^[0-9]{12}$"
-        name:
-          type: string
-          minLength: 1
-        euralCode:
-          type: string
-          minLength: 1
-        processingMethodCode:
-          type: string
-          minLength: 1
-        collectionType:
-          type: string
-        pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
-        processorPartyId:
-          type: string
-          pattern: "^[0-9]{5}$"
-        consignorParty:
-          oneOf:
-          - $ref: "#/components/schemas/CompanyConsignor"
-          - $ref: "#/components/schemas/PersonConsignor"
-        pickupParty:
-          type: string
-          format: uuid
-        dealerParty:
-          type: string
-          format: uuid
-        collectorParty:
-          type: string
-          format: uuid
-        brokerParty:
-          type: string
-          format: uuid
-      required:
-      - collectionType
-      - consignorParty
-      - euralCode
-      - name
-      - pickupLocation
-      - pickupParty
-      - processingMethodCode
-      - processorPartyId
-      - wasteStreamNumber
-    DutchAddressRequest:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationRequest"
-      - type: object
-        properties:
-          buildingNumber:
-            type: string
-            minLength: 1
-          buildingNumberAddition:
-            type: string
-          postalCode:
-            type: string
-            minLength: 1
-            pattern: "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$"
-          country:
-            type: string
-            minLength: 1
-      required:
-      - buildingNumber
-      - country
-      - postalCode
-    NoPickupLocationRequest:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationRequest"
-    PersonConsignor:
-      allOf:
-      - $ref: "#/components/schemas/ConsignorRequest"
-    PickupLocationRequest:
-      discriminator:
-        propertyName: type
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    ProximityDescriptionRequest:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationRequest"
-      - type: object
-        properties:
-          description:
-            type: string
-            minLength: 1
-          postalCodeDigits:
-            type: string
-            minLength: 1
-            pattern: "^[0-9]{4}$"
-          city:
-            type: string
-            minLength: 1
-          country:
-            type: string
-            minLength: 1
-      required:
-      - city
-      - country
-      - description
-      - postalCodeDigits
     CreateWasteStreamResponse:
       type: object
       properties:
