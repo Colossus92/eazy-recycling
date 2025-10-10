@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamListView } from '@/api/client';
 import { WasteStreamDto } from '@/api/client/models/waste-stream-dto';
+import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -30,7 +31,7 @@ export function useWasteStreamCrud() {
   const [deleting, setDeleting] = useState<WasteStreamDto | undefined>(undefined);
 
   const createMutation = useMutation({
-    mutationFn: (item: Omit<WasteStream, 'id'>) =>
+    mutationFn: (item: WasteStreamRequest) =>
       wasteStreamService.create(item),
     onSuccess: () => {
       queryClient
@@ -40,7 +41,7 @@ export function useWasteStreamCrud() {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: WasteStream) => wasteStreamService.delete(item.number),
+    mutationFn: (item: WasteStreamDto) => wasteStreamService.delete(item.number),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
@@ -49,7 +50,7 @@ export function useWasteStreamCrud() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (item: WasteStream) => wasteStreamService.update(item),
+    mutationFn: (item: WasteStreamRequest) => wasteStreamService.update(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
@@ -57,7 +58,7 @@ export function useWasteStreamCrud() {
     },
   });
 
-  const create = async (item: Omit<WasteStream, 'id'>): Promise<void> => {
+  const create = async (item: WasteStreamRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       createMutation.mutate(item, {
         onSuccess: () => resolve(),
@@ -66,7 +67,7 @@ export function useWasteStreamCrud() {
     });
   };
 
-  const update = async (item: WasteStream): Promise<void> => {
+  const update = async (item: WasteStreamRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       updateMutation.mutate(item, {
         onSuccess: () => resolve(),
@@ -75,7 +76,7 @@ export function useWasteStreamCrud() {
     });
   };
 
-  const remove = async (item: WasteStream): Promise<void> => {
+  const remove = async (item: WasteStreamDto): Promise<void> => {
     return new Promise((resolve, reject) => {
       removeMutation.mutate(item, {
         onSuccess: () => resolve(),
