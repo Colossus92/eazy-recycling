@@ -4,7 +4,6 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.ConsignorRequest
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.CreateWasteStreamRequest
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory.createTestCompany
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
