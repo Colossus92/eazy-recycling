@@ -92,7 +92,7 @@ Migrations are SQL scripts that modify your database schema in a controlled way.
 To create a new migration:
 
 ```bash
-supabase migration new <migration_name>
+supabase db diff --use-migra -f <migration_name>
 ```
 
 This will create a new timestamped SQL file in the `supabase/migrations` directory.
