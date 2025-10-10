@@ -3,9 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteStreamJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -21,7 +19,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 private const val WASTE_STREAM_NUMBER = "08123ABCDEFG"
 
-//TODO enable again
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
