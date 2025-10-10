@@ -22,7 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { ProcessingMethod } from '../models';
+import type { ProcessingMethodDto } from '../models';
 /**
  * ProcessingMethodControllerApi - axios parameter creator
  * @export
@@ -31,13 +31,13 @@ export const ProcessingMethodControllerApiAxiosParamCreator = function (configur
     return {
         /**
          * 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createProcessingMethod: async (processingMethod: ProcessingMethod, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'processingMethod' is not null or undefined
-            assertParamExists('createProcessingMethod', 'processingMethod', processingMethod)
+        createProcessingMethod: async (processingMethodDto: ProcessingMethodDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'processingMethodDto' is not null or undefined
+            assertParamExists('createProcessingMethod', 'processingMethodDto', processingMethodDto)
             const localVarPath = `/processing-methods`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -61,7 +61,7 @@ export const ProcessingMethodControllerApiAxiosParamCreator = function (configur
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(processingMethod, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(processingMethodDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -141,15 +141,15 @@ export const ProcessingMethodControllerApiAxiosParamCreator = function (configur
         /**
          * 
          * @param {string} code 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProcessingMethod: async (code: string, processingMethod: ProcessingMethod, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateProcessingMethod: async (code: string, processingMethodDto: ProcessingMethodDto, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'code' is not null or undefined
             assertParamExists('updateProcessingMethod', 'code', code)
-            // verify required parameter 'processingMethod' is not null or undefined
-            assertParamExists('updateProcessingMethod', 'processingMethod', processingMethod)
+            // verify required parameter 'processingMethodDto' is not null or undefined
+            assertParamExists('updateProcessingMethod', 'processingMethodDto', processingMethodDto)
             const localVarPath = `/processing-methods/{code}`
                 .replace(`{${"code"}}`, encodeURIComponent(String(code)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -174,7 +174,7 @@ export const ProcessingMethodControllerApiAxiosParamCreator = function (configur
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(processingMethod, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(processingMethodDto, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -193,12 +193,12 @@ export const ProcessingMethodControllerApiFp = function(configuration?: Configur
     return {
         /**
          * 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createProcessingMethod(processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProcessingMethod>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createProcessingMethod(processingMethod, options);
+        async createProcessingMethod(processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProcessingMethodDto>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProcessingMethod(processingMethodDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProcessingMethodControllerApi.createProcessingMethod']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -220,7 +220,7 @@ export const ProcessingMethodControllerApiFp = function(configuration?: Configur
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getProcessingMethods(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProcessingMethod>>> {
+        async getProcessingMethods(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProcessingMethodDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getProcessingMethods(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProcessingMethodControllerApi.getProcessingMethods']?.[localVarOperationServerIndex]?.url;
@@ -229,12 +229,12 @@ export const ProcessingMethodControllerApiFp = function(configuration?: Configur
         /**
          * 
          * @param {string} code 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateProcessingMethod(code: string, processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProcessingMethod(code, processingMethod, options);
+        async updateProcessingMethod(code: string, processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProcessingMethod(code, processingMethodDto, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProcessingMethodControllerApi.updateProcessingMethod']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -251,12 +251,12 @@ export const ProcessingMethodControllerApiFactory = function (configuration?: Co
     return {
         /**
          * 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createProcessingMethod(processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig): AxiosPromise<ProcessingMethod> {
-            return localVarFp.createProcessingMethod(processingMethod, options).then((request) => request(axios, basePath));
+        createProcessingMethod(processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig): AxiosPromise<ProcessingMethodDto> {
+            return localVarFp.createProcessingMethod(processingMethodDto, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -272,18 +272,18 @@ export const ProcessingMethodControllerApiFactory = function (configuration?: Co
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getProcessingMethods(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProcessingMethod>> {
+        getProcessingMethods(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProcessingMethodDto>> {
             return localVarFp.getProcessingMethods(options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @param {string} code 
-         * @param {ProcessingMethod} processingMethod 
+         * @param {ProcessingMethodDto} processingMethodDto 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateProcessingMethod(code: string, processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig): AxiosPromise<object> {
-            return localVarFp.updateProcessingMethod(code, processingMethod, options).then((request) => request(axios, basePath));
+        updateProcessingMethod(code: string, processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig): AxiosPromise<object> {
+            return localVarFp.updateProcessingMethod(code, processingMethodDto, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -297,13 +297,13 @@ export const ProcessingMethodControllerApiFactory = function (configuration?: Co
 export class ProcessingMethodControllerApi extends BaseAPI {
     /**
      * 
-     * @param {ProcessingMethod} processingMethod 
+     * @param {ProcessingMethodDto} processingMethodDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessingMethodControllerApi
      */
-    public createProcessingMethod(processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig) {
-        return ProcessingMethodControllerApiFp(this.configuration).createProcessingMethod(processingMethod, options).then((request) => request(this.axios, this.basePath));
+    public createProcessingMethod(processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig) {
+        return ProcessingMethodControllerApiFp(this.configuration).createProcessingMethod(processingMethodDto, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -330,13 +330,13 @@ export class ProcessingMethodControllerApi extends BaseAPI {
     /**
      * 
      * @param {string} code 
-     * @param {ProcessingMethod} processingMethod 
+     * @param {ProcessingMethodDto} processingMethodDto 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ProcessingMethodControllerApi
      */
-    public updateProcessingMethod(code: string, processingMethod: ProcessingMethod, options?: RawAxiosRequestConfig) {
-        return ProcessingMethodControllerApiFp(this.configuration).updateProcessingMethod(code, processingMethod, options).then((request) => request(this.axios, this.basePath));
+    public updateProcessingMethod(code: string, processingMethodDto: ProcessingMethodDto, options?: RawAxiosRequestConfig) {
+        return ProcessingMethodControllerApiFp(this.configuration).updateProcessingMethod(code, processingMethodDto, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

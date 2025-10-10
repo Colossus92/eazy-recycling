@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProcessingMethodForm } from '../ProcessingMethodForm';
-import { ProcessingMethod } from '@/api/client';
+import { ProcessingMethodDto as ProcessingMethod } from '@/api/client';
 
 describe('ProcessingMethodForm Tests', () => {
   const mockOnCancel = vi.fn();

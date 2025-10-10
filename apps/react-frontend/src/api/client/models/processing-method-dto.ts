@@ -13,39 +13,24 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { AddressRequest } from './address-request';
 
 /**
  * 
  * @export
- * @interface CompanyRequest
+ * @interface ProcessingMethodDto
  */
-export interface CompanyRequest {
+export interface ProcessingMethodDto {
     /**
      * 
      * @type {string}
-     * @memberof CompanyRequest
+     * @memberof ProcessingMethodDto
      */
-    'chamberOfCommerceId'?: string;
+    'code': string;
     /**
      * 
      * @type {string}
-     * @memberof CompanyRequest
+     * @memberof ProcessingMethodDto
      */
-    'vihbId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CompanyRequest
-     */
-    'name': string;
-    /**
-     * 
-     * @type {AddressRequest}
-     * @memberof CompanyRequest
-     */
-    'address': AddressRequest;
+    'description': string;
 }
 

@@ -46,6 +46,12 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
+    'processorId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
     'name': string;
     /**
      * 

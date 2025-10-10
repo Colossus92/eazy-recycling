@@ -37,7 +37,7 @@ export interface AddressDto {
      * @type {string}
      * @memberof AddressDto
      */
-    'buildingNumber'?: string;
+    'buildingNumber': string;
     /**
      * 
      * @type {string}
@@ -49,7 +49,7 @@ export interface AddressDto {
      * @type {string}
      * @memberof AddressDto
      */
-    'postalCode'?: string;
+    'postalCode': string;
     /**
      * 
      * @type {string}

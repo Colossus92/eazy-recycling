@@ -25,4 +25,5 @@ export * from './apis/truck-controller-api';
 export * from './apis/user-controller-api';
 export * from './apis/waste-container-controller-api';
 export * from './apis/waste-stream-controller-api';
+export * from './apis/weight-ticket-controller-api';
 

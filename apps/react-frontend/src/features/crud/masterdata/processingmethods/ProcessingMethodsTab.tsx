@@ -1,6 +1,6 @@
 import { MasterDataTab } from "../MasterDataTab"
 import { DataTableProps } from "../MasterDataTab";
-import { ProcessingMethod } from "@/api/client";
+import { ProcessingMethodDto as ProcessingMethod } from "@/api/client";
 import { Column } from "../MasterDataTab";
 import { useProcessingMethodsCrud } from "@/features/crud/masterdata/processingmethods/useProcessingMethods";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";

@@ -1,4 +1,4 @@
-import { ProcessingMethod, ProcessingMethodControllerApi } from "../client";
+import { ProcessingMethodDto as ProcessingMethod, ProcessingMethodControllerApi } from "../client";
 import { apiInstance } from "./apiInstance";
 
 

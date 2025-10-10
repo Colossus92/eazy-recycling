@@ -7,8 +7,8 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { companyService, Company } from '@/api/services/companyService.ts';
 import { NumberFormField } from '@/components/ui/form/NumberFormField.tsx';
 import { processingMethodService } from '@/api/services/processingMethodService';
-import { ProcessingMethod } from '@/api/client';
-import { wasteStreamService, WasteStream } from '@/api/services/wasteStreamService';
+import { ProcessingMethodDto as ProcessingMethod, WasteStreamListView } from '@/api/client';
+import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { ComboboxFormField } from '@/components/ui/form/comboboxfield/ComboboxFormField';
 import { euralService } from '@/api/services/euralService';
 import { Eural } from '@/api/client';
@@ -29,7 +29,7 @@ export const WasteTransportFormGoodsSection = () => {
     queryKey: ['processingMethods'],
     queryFn: () => processingMethodService.getAll(),
   });
-  const { data: wasteStreams = [] } = useQuery<WasteStream[]>({
+  const { data: wasteStreams = [] } = useQuery<WasteStreamListView[]>({
     queryKey: ['wasteStreams'],
     queryFn: () => wasteStreamService.getAll(),
   });
@@ -39,10 +39,10 @@ export const WasteTransportFormGoodsSection = () => {
     const subscription = formContext.watch((value, { name }) => {
       if (name === 'wasteStreamNumber' && value.wasteStreamNumber) {
         const selectedWasteStream = wasteStreams.find(
-          (ws) => ws.number === value.wasteStreamNumber
+          (ws) => ws.wasteStreamNumber === value.wasteStreamNumber
         );
         if (selectedWasteStream) {
-          formContext.setValue('goodsName', selectedWasteStream.name);
+          formContext.setValue('goodsName', selectedWasteStream.wasteName);
           setIsGoodsNameDisabled(true);
         }
       } else if (name === 'wasteStreamNumber' && !value.wasteStreamNumber) {
@@ -55,10 +55,10 @@ export const WasteTransportFormGoodsSection = () => {
     const currentValue = formContext.getValues('wasteStreamNumber');
     if (currentValue) {
       const selectedWasteStream = wasteStreams.find(
-        (ws) => ws.number === currentValue
+        (ws) => ws.wasteStreamNumber === currentValue
       );
       if (selectedWasteStream) {
-        formContext.setValue('goodsName', selectedWasteStream.name);
+        formContext.setValue('goodsName', selectedWasteStream.wasteName);
         setIsGoodsNameDisabled(true);
       }
     }
@@ -101,9 +101,9 @@ export const WasteTransportFormGoodsSection = () => {
             title="Afvalstroomnummer"
             placeholder="Selecteer een afvalstroomnummer"
             items={wasteStreams.map((ws) => ({
-              id: ws.number,
-              label: `${ws.number} - ${ws.name}`,
-              displayValue: ws.number,
+              id: ws.wasteStreamNumber,
+              label: `${ws.wasteStreamNumber} - ${ws.wasteName}`,
+              displayValue: ws.wasteStreamNumber,
             }))}
             testId='waste-stream-number-combobox'
             formHook={{

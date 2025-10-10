@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { wasteStreamService, WasteStream } from '@/api/services/wasteStreamService';
+import { wasteStreamService } from '@/api/services/wasteStreamService';
+import { WasteStreamListView } from '@/api/client';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -8,7 +9,7 @@ export function useWasteStreamCrud() {
     data: wasteStreams = [],
     error,
     isLoading,
-  } = useQuery<WasteStream[]>({
+  } = useQuery<WasteStreamListView[]>({
     queryKey: ['wasteStreams'],
     queryFn: () => wasteStreamService.getAll(),
   });
@@ -17,8 +18,8 @@ export function useWasteStreamCrud() {
     () =>
       wasteStreams.filter((wasteStream) => {
         return (
-          wasteStream.number.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.name.toLowerCase().includes(query.toLowerCase())
+          wasteStream.wasteStreamNumber.toLowerCase().includes(query.toLowerCase()) ||
+          wasteStream.wasteStreamNumber.toLowerCase().includes(query.toLowerCase())
         );
       }),
     [wasteStreams, query]

@@ -13,39 +13,30 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { AddressRequest } from './address-request';
 
 /**
  * 
  * @export
- * @interface CompanyRequest
+ * @interface GoodsRequest
  */
-export interface CompanyRequest {
+export interface GoodsRequest {
     /**
      * 
      * @type {string}
-     * @memberof CompanyRequest
+     * @memberof GoodsRequest
      */
-    'chamberOfCommerceId'?: string;
+    'wasteStreamNumber': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GoodsRequest
+     */
+    'netWeight': number;
     /**
      * 
      * @type {string}
-     * @memberof CompanyRequest
+     * @memberof GoodsRequest
      */
-    'vihbId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CompanyRequest
-     */
-    'name': string;
-    /**
-     * 
-     * @type {AddressRequest}
-     * @memberof CompanyRequest
-     */
-    'address': AddressRequest;
+    'unit': string;
 }
 

@@ -1,4 +1,4 @@
-import { ProcessingMethod } from "@/api/client";
+import { ProcessingMethodDto as ProcessingMethod } from "@/api/client";
 import { FormDialog } from "@/components/ui/dialog/FormDialog";
 import { useErrorHandling } from "@/hooks/useErrorHandling";
 import { FormEvent } from "react";

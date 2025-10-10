@@ -1,4 +1,4 @@
-import { ProcessingMethod } from "@/api/client/models";
+import { ProcessingMethodDto as ProcessingMethod } from "@/api/client/models";
 import { processingMethodService } from "@/api/services/processingMethodService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
