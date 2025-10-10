@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 
 @Entity
-@Table(name = "waste_stream")
+@Table(name = "waste_streams")
 data class WasteStreamDto(
   @Id
   @Column(name = "number")
@@ -32,8 +32,9 @@ data class WasteStreamDto(
   /**
    * Five digits indicating the processing party, which is the party to wich the goods are delivered.
    */
-  @Column(name = "processor_party_id", nullable = false)
-  val processorPartyId: String,
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "processor_party_id", referencedColumnName = "processor_id", nullable = false)
+  val processorParty: CompanyDto,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "consignor_party_id", referencedColumnName = "id", nullable = false)

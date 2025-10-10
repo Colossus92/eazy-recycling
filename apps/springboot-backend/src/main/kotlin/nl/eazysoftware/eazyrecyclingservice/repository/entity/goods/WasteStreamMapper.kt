@@ -6,18 +6,26 @@ import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation.*
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
+import org.hibernate.Hibernate
 import org.springframework.stereotype.Component
 
 @Component
 class WasteStreamMapper(
   @PersistenceContext private var entityManager: EntityManager,
   private var pickupLocationRepository: PickupLocationRepository,
+  private var companyRepository: CompanyRepository,
 ) {
 
   fun toDomain(dto: WasteStreamDto): WasteStream {
+    val processorPartyId = dto.processorParty.processorId
+      ?.let { ProcessorPartyId(it) }
+      ?: throw IllegalArgumentException("Verwerkersnummer is verplicht voor een geldig afvalstroomnummer, maar ${dto.processorParty.name} heeft geen vewerkersnummer")
+    val actualPickupLocation = Hibernate.unproxy(dto.pickupLocation, PickupLocationDto::class.java)
+
     return WasteStream(
       wasteStreamNumber = WasteStreamNumber(dto.number),
       wasteType = WasteType(
@@ -26,24 +34,24 @@ class WasteStreamMapper(
         processingMethod = ProcessingMethod("A01")
       ),
       collectionType = WasteCollectionType.valueOf(dto.wasteCollectionType),
-      pickupLocation = when (val location = dto.pickupLocation) {
+      pickupLocation = when (actualPickupLocation) {
         is PickupLocationDto.DutchAddressDto -> DutchAddress(
-          postalCode = DutchPostalCode(location.postalCode),
-          buildingNumber = location.buildingNumber,
-          buildingNumberAddition = location.buildingNumberAddition,
-          country = location.country,
+          postalCode = DutchPostalCode(actualPickupLocation.postalCode),
+          buildingNumber = actualPickupLocation.buildingNumber,
+          buildingNumberAddition = actualPickupLocation.buildingNumberAddition,
+          country = actualPickupLocation.country,
         )
         is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
-          description = location.description,
-          postalCodeDigits = location.postalCode,
-          city = location.city,
-          country = location.country
+          description = actualPickupLocation.description,
+          postalCodeDigits = actualPickupLocation.postalCode,
+          city = actualPickupLocation.city,
+          country = actualPickupLocation.country
         )
         is PickupLocationDto.NoPickupLocationDto -> NoPickupLocation
-        else -> throw IllegalArgumentException("Ongeldige herkomstlocatie")
+        else -> throw IllegalArgumentException("Ongeldige herkomstlocatie: ${actualPickupLocation::class.simpleName}")
       },
       deliveryLocation = DeliveryLocation(
-        processorPartyId = ProcessorPartyId(dto.processorPartyId),
+        processorPartyId = processorPartyId
       ),
       consignorParty = Consignor.Company(
         CompanyId(dto.consignorParty.id!!)
@@ -70,8 +78,12 @@ class WasteStreamMapper(
         is ProximityDescription -> createProximity(location)
         is NoPickupLocation -> PickupLocationDto.NoPickupLocationDto()
       },
-      processorPartyId = domain.deliveryLocation.processorPartyId.number,
-      consignorParty = entityManager.getReference(CompanyDto::class.java, domain.consignorParty),
+      processorParty = companyRepository.findByProcessorId(domain.deliveryLocation.processorPartyId.number)
+        ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.deliveryLocation.processorPartyId.number}"),
+      consignorParty = when (val consignor = domain.consignorParty) {
+        is Consignor.Company -> entityManager.getReference(CompanyDto::class.java, consignor.id.uuid)
+        is Consignor.Person -> throw IllegalArgumentException("Person consignor is not yet supported in persistence layer")
+      },
       pickupParty = entityManager.getReference(CompanyDto::class.java, domain.pickupParty.uuid),
       dealerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       collectorParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
@@ -90,14 +102,18 @@ class WasteStreamMapper(
     )
   }
 
-  private fun findOrCreateLocation(address: DutchAddress) =
-    pickupLocationRepository.findDutchAddressByPostalCodeAndBuildingNumber(
+  private fun findOrCreateLocation(address: DutchAddress): PickupLocationDto.DutchAddressDto {
+    return pickupLocationRepository.findDutchAddressByPostalCodeAndBuildingNumber(
       address.postalCode.value,
       address.buildingNumber
-    )
-      ?: PickupLocationDto.DutchAddressDto(
+    ) ?: run {
+      val newLocation = PickupLocationDto.DutchAddressDto(
         buildingNumber = address.buildingNumber,
+        buildingNumberAddition = address.buildingNumberAddition,
         postalCode = address.postalCode.value,
         country = address.country
       )
+      pickupLocationRepository.save(newLocation)
+    }
+  }
 }

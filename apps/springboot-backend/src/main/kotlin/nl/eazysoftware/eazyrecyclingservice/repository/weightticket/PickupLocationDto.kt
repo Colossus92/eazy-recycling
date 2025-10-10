@@ -18,7 +18,7 @@ class PickupLocationDto(
     @Column(name = "building_number", nullable = false)
     var buildingNumber: String = "",
 
-    @Column(name = "house_number_addition")
+    @Column(name = "building_number_addition")
     var buildingNumberAddition: String? = null,
 
     @Column(name = "postal_code", nullable = false)

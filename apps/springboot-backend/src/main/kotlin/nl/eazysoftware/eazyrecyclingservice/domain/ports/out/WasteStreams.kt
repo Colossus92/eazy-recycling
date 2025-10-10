@@ -12,7 +12,9 @@ interface WasteStreams {
 
   fun deleteAll()
 
-  fun saveAll(wasteStreams: List<WasteStreamDto>)
+  fun saveAll(wasteStreams: List<WasteStreamDto>) // TODO accept domain object
 
   fun save(wasteStreamDto: WasteStreamDto): WasteStreamDto //TODO return domain object
+
+  fun existsById(wasteStreamNumber: WasteStreamNumber): Boolean
 }
