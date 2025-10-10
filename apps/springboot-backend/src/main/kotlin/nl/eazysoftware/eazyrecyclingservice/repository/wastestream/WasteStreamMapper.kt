@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.repository.entity.goods
+package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
@@ -8,6 +8,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
 import org.hibernate.Hibernate

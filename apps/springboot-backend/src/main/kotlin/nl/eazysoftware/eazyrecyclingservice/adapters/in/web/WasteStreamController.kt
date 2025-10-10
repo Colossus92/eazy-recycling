@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
@@ -13,7 +14,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamService
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation.*
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -36,18 +36,8 @@ class WasteStreamController(
   }
 
   @GetMapping
-  fun getWasteStreams(): List<WasteStreamDto> {
+  fun getWasteStreams(): List<WasteStreamListView> {
     return wasteStreamService.getWasteStreams()
-  }
-
-  @PutMapping("/{number}")
-  fun updateWasteStream(@PathVariable number: String, @Valid @RequestBody wasteStreamDto: WasteStreamDto): WasteStreamDto {
-    return wasteStreamService.updateWasteStream(number, wasteStreamDto)
-  }
-
-  @DeleteMapping("/{number}")
-  fun deleteWasteStream(@PathVariable number: String) {
-    return wasteStreamService.deleteWasteStream(number)
   }
 }
 

@@ -1,32 +1,16 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
-import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteStreamJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWasteStreams
+import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import org.springframework.stereotype.Service
 
 @Service
 class WasteStreamService(
-    private val wasteStreamRepository: WasteStreamJpaRepository
+    private val getAllWasteStreams: GetAllWasteStreams
 ) {
 
-    fun getWasteStreams(): List<WasteStreamDto> {
-        return wasteStreamRepository.findAll()
-    }
-
-    fun deleteWasteStream(wasteStreamNumber: String) {
-        wasteStreamRepository.deleteById(wasteStreamNumber)
-    }
-
-    fun updateWasteStream(number: String, wasteStreamDto: WasteStreamDto): WasteStreamDto {
-        if (wasteStreamDto.number != number) {
-            throw IllegalArgumentException("Nieuw afvalstroomnummer moet overeen komen met bestaande nummer $number")
-        }
-
-        wasteStreamRepository.findById(number)
-            .orElseThrow { EntityNotFoundException("Geen afvalstroom met nummer $number gevonden") }
-
-        return wasteStreamRepository.save(wasteStreamDto)
+    fun getWasteStreams(): List<WasteStreamListView> {
+        return getAllWasteStreams.execute()
     }
 
 }

@@ -5,7 +5,7 @@ import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -57,7 +57,9 @@ class WasteStreamControllerIntegrationTest {
     // Execute in a separate committed transaction
     transactionTemplate.execute {
       // Create and save company fresh (not detached)
-      testCompany = companyRepository.save(TestCompanyFactory.createTestCompany())
+      testCompany = companyRepository.save(TestCompanyFactory.createTestCompany(
+        processorId = "12345"
+      ))
     }
   }
 

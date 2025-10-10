@@ -1,7 +1,9 @@
-package nl.eazysoftware.eazyrecyclingservice.repository.entity.goods
+package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 
 @Entity

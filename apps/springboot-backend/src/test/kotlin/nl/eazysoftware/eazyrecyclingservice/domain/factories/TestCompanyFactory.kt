@@ -8,14 +8,17 @@ object TestCompanyFactory {
 
 
   fun createTestCompany(
-    id: UUID? = null,  // null = let JPA generate it
-    processorId: String = "12345"
+    id: UUID? = null,
+    chamberOfCommerceId: String? = "12345678",
+    vihbId: String? = "987654VIHB",
+    processorId: String? = null,
+    name: String = "Test Company"
   ): CompanyDto {
     return CompanyDto(
       id = id,
-      name = "Test Company",
-      chamberOfCommerceId = "12345678",
-      vihbId = "VIHB123",
+      name = name,
+      chamberOfCommerceId = chamberOfCommerceId,
+      vihbId = vihbId,
       processorId = processorId,
       address = AddressDto(
         streetName = "Test Street",

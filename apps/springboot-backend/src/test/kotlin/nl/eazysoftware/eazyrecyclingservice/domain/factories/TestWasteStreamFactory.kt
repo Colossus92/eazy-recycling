@@ -8,7 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import java.util.*
 

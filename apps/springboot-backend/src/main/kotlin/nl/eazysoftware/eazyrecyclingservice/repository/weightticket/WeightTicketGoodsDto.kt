@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import java.math.BigDecimal
 
 @Entity

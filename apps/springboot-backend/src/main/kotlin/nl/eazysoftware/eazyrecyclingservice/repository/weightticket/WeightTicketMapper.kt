@@ -9,7 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Goods
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.WasteStreamMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamMapper
 import org.springframework.stereotype.Component
 
 @Component
