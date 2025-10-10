@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamListView } from '@/api/client';
+import { WasteStreamDto } from '@/api/client/models/waste-stream-dto';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -25,8 +26,8 @@ export function useWasteStreamCrud() {
     [wasteStreams, query]
   );
   const [isAdding, setIsAdding] = useState(false);
-  const [editing, setEditing] = useState<WasteStream | undefined>(undefined);
-  const [deleting, setDeleting] = useState<WasteStream | undefined>(undefined);
+  const [editing, setEditing] = useState<WasteStreamDto | undefined>(undefined);
+  const [deleting, setDeleting] = useState<WasteStreamDto | undefined>(undefined);
 
   const createMutation = useMutation({
     mutationFn: (item: Omit<WasteStream, 'id'>) =>

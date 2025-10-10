@@ -29,9 +29,6 @@ models/create-container-request.ts
 models/create-container-transport-request.ts
 models/create-signature-request.ts
 models/create-user-request.ts
-models/create-waste-stream-request-consignor-party.ts
-models/create-waste-stream-request-pickup-location.ts
-models/create-waste-stream-request.ts
 models/create-waste-stream-response.ts
 models/create-waste-transport-request.ts
 models/create-weight-ticket-request.ts
@@ -64,3 +61,6 @@ models/user-role-dto.ts
 models/waste-container-dto.ts
 models/waste-container.ts
 models/waste-stream-list-view.ts
+models/waste-stream-request-consignor-party.ts
+models/waste-stream-request-pickup-location.ts
+models/waste-stream-request.ts
