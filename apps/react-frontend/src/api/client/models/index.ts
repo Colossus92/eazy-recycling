@@ -33,6 +33,8 @@ export * from './location-dto';
 export * from './no-pickup-location-request';
 export * from './person-consignor';
 export * from './person-consignor-view';
+export * from './pickup-company-request';
+export * from './pickup-company-view';
 export * from './pickup-location-request';
 export * from './pickup-location-view';
 export * from './planning-view';

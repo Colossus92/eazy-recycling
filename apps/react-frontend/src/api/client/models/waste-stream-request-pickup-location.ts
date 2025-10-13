@@ -21,12 +21,15 @@ import type { DutchAddressRequest } from './dutch-address-request';
 import type { NoPickupLocationRequest } from './no-pickup-location-request';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { PickupCompanyRequest } from './pickup-company-request';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { ProximityDescriptionRequest } from './proximity-description-request';
 
 /**
  * @type WasteStreamRequestPickupLocation
  * @export
  */
-export type WasteStreamRequestPickupLocation = DutchAddressRequest | NoPickupLocationRequest | ProximityDescriptionRequest;
+export type WasteStreamRequestPickupLocation = DutchAddressRequest | NoPickupLocationRequest | PickupCompanyRequest | ProximityDescriptionRequest;
 
 

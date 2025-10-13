@@ -18,18 +18,12 @@
 import type { CompanyView } from './company-view';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { DutchAddressView } from './dutch-address-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PickupCompanyView } from './pickup-company-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ProximityDescriptionView } from './proximity-description-view';
+import type { PickupLocationView } from './pickup-location-view';
 
 /**
- * @type WasteStreamDetailViewPickupLocation
+ * @type PickupCompanyView
  * @export
  */
-export type WasteStreamDetailViewPickupLocation = DutchAddressView | PickupCompanyView | ProximityDescriptionView;
+export type PickupCompanyView = PickupLocationView;
 
 

@@ -1032,6 +1032,16 @@ components:
     PersonConsignor:
       allOf:
       - $ref: "#/components/schemas/ConsignorRequest"
+    PickupCompanyRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          companyId:
+            type: string
+            format: uuid
+      required:
+      - companyId
     PickupLocationRequest:
       discriminator:
         propertyName: type
@@ -1081,6 +1091,7 @@ components:
           oneOf:
           - $ref: "#/components/schemas/DutchAddressRequest"
           - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/PickupCompanyRequest"
           - $ref: "#/components/schemas/ProximityDescriptionRequest"
         processorPartyId:
           type: string
@@ -2063,6 +2074,15 @@ components:
     PersonConsignorView:
       allOf:
       - $ref: "#/components/schemas/ConsignorView"
+    PickupCompanyView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          company:
+            $ref: "#/components/schemas/CompanyView"
+      required:
+      - company
     PickupLocationView:
       discriminator:
         propertyName: type
@@ -2110,6 +2130,7 @@ components:
         pickupLocation:
           oneOf:
           - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/PickupCompanyView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
         deliveryLocation:
           $ref: "#/components/schemas/DeliveryLocationView"

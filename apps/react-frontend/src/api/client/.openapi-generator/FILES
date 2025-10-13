@@ -51,6 +51,8 @@ models/location-dto.ts
 models/no-pickup-location-request.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
+models/pickup-company-request.ts
+models/pickup-company-view.ts
 models/pickup-location-request.ts
 models/pickup-location-view.ts
 models/planning-view.ts
