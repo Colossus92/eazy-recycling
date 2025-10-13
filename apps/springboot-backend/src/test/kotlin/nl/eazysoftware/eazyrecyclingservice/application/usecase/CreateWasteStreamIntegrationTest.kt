@@ -6,13 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import org.junit.After
-import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -43,18 +38,14 @@ class CreateWasteStreamIntegrationTest {
   @BeforeAll
   fun setupOnce() {
     // Execute in a separate committed transaction
-    createCompany("12345")
-  }
-
-  private fun createCompany(processorId: String) {
     transactionTemplate.execute {
       // Create and save company fresh (not detached)
       testCompany = companyRepository.save(
         TestCompanyFactory.createTestCompany(
-          processorId = processorId
+          processorId = "12345"
         )
       )
-      }
+    }
   }
 
   @AfterAll

@@ -4,19 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
-import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory.randomWasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -119,7 +112,7 @@ class WasteStreamControllerIntegrationTest {
       companyId = testCompany.id!!,
       name = "Glass"
     )
-    
+
     // When - create first waste stream
     val result1 = securedMockMvc.post(
       "/waste-streams",
@@ -127,7 +120,7 @@ class WasteStreamControllerIntegrationTest {
     )
       .andExpect(status().isCreated)
       .andReturn()
-    
+
     val number1 = objectMapper.readTree(result1.response.contentAsString).get("wasteStreamNumber").asText()
 
     // When - create second waste stream (should get next sequential number)
@@ -137,9 +130,9 @@ class WasteStreamControllerIntegrationTest {
     )
       .andExpect(status().isCreated)
       .andReturn()
-    
+
     val number2 = objectMapper.readTree(result2.response.contentAsString).get("wasteStreamNumber").asText()
-    
+
     // Then - numbers should be sequential
     assertThat(number1).isNotEqualTo(number2)
     assertThat(number1.substring(0, 5)).isEqualTo(number2.substring(0, 5)) // Same processor prefix
@@ -158,7 +151,7 @@ class WasteStreamControllerIntegrationTest {
     )
       .andExpect(status().isCreated)
       .andReturn()
-    
+
     val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
       .get("wasteStreamNumber").asText()
 
@@ -187,7 +180,7 @@ class WasteStreamControllerIntegrationTest {
     )
       .andExpect(status().isCreated)
       .andReturn()
-    
+
     val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
       .get("wasteStreamNumber").asText()
 
@@ -215,7 +208,7 @@ class WasteStreamControllerIntegrationTest {
     )
       .andExpect(status().isCreated)
       .andReturn()
-    
+
     val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
       .get("wasteStreamNumber").asText()
 
