@@ -121,6 +121,12 @@ sealed interface PickupLocation {
    * Variant 3: No origin location for route collection, collectors scheme, or private disposers
    */
   data object NoPickupLocation : PickupLocation
+
+  /**
+   * Variant 4: Company location reference
+   * References a company's address as the pickup location
+   */
+  data class PickupCompany(val companyId: CompanyId) : PickupLocation
 }
 
 data class DeliveryLocation(

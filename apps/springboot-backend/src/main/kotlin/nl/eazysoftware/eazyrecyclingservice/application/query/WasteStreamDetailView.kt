@@ -40,7 +40,8 @@ data class ProcessingMethodView(
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = PickupLocationView.DutchAddressView::class, name = "dutch_address"),
-    JsonSubTypes.Type(value = PickupLocationView.ProximityDescriptionView::class, name = "proximity")
+    JsonSubTypes.Type(value = PickupLocationView.ProximityDescriptionView::class, name = "proximity"),
+    JsonSubTypes.Type(value = PickupLocationView.PickupCompanyView::class, name = "company")
 )
 sealed class PickupLocationView {
     data class DutchAddressView(
@@ -57,6 +58,10 @@ sealed class PickupLocationView {
         val city: String,
         val description: String,
         val country: String
+    ) : PickupLocationView()
+
+    data class PickupCompanyView(
+        val company: CompanyView
     ) : PickupLocationView()
 }
 

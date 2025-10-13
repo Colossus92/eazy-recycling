@@ -49,4 +49,11 @@ class PickupLocationDto(
   @Entity
   @DiscriminatorValue("NO_PICKUP")
   class NoPickupLocationDto() : PickupLocationDto("NO_PICKUP")
+
+  @Entity
+  @DiscriminatorValue("COMPANY")
+  class PickupCompanyDto(
+    @Column(name = "company_id")
+    var companyId: UUID
+  ) : PickupLocationDto()
 }

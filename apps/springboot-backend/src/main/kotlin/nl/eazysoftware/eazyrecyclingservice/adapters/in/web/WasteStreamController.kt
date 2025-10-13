@@ -165,6 +165,7 @@ sealed class ConsignorRequest {
 @JsonSubTypes(
   JsonSubTypes.Type(value = PickupLocationRequest.DutchAddressRequest::class, name = "dutch_address"),
   JsonSubTypes.Type(value = PickupLocationRequest.ProximityDescriptionRequest::class, name = "proximity"),
+  JsonSubTypes.Type(value = PickupLocationRequest.PickupCompanyRequest::class, name = "company"),
   JsonSubTypes.Type(value = PickupLocationRequest.NoPickupLocationRequest::class, name = "none")
 )
 sealed class PickupLocationRequest {
@@ -219,6 +220,14 @@ sealed class PickupLocationRequest {
       postalCodeDigits = postalCodeDigits,
       city = city,
       country = country
+    )
+  }
+
+  data class PickupCompanyRequest(
+    val companyId: UUID
+  ) : PickupLocationRequest() {
+    override fun toDomain() = PickupLocation.PickupCompany(
+      companyId = CompanyId(companyId)
     )
   }
 

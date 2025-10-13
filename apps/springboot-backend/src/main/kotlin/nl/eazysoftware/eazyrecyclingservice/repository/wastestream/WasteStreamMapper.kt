@@ -51,6 +51,9 @@ class WasteStreamMapper(
           city = actualPickupLocation.city,
           country = actualPickupLocation.country
         )
+        is PickupLocationDto.PickupCompanyDto -> PickupCompany(
+          companyId = CompanyId(actualPickupLocation.companyId)
+        )
         is PickupLocationDto.NoPickupLocationDto -> NoPickupLocation
         else -> throw IllegalArgumentException("Ongeldige herkomstlocatie: ${actualPickupLocation::class.simpleName}")
       },
@@ -80,6 +83,7 @@ class WasteStreamMapper(
       pickupLocation = when (val location = domain.pickupLocation) {
         is DutchAddress -> findOrCreateLocation(location)
         is ProximityDescription -> createProximity(location)
+        is PickupCompany -> createPickupCompany(location)
         is NoPickupLocation -> PickupLocationDto.NoPickupLocationDto()
       },
       processorParty = companyRepository.findByProcessorId(domain.deliveryLocation.processorPartyId.number)
@@ -121,5 +125,13 @@ class WasteStreamMapper(
       )
       pickupLocationRepository.save(newLocation)
     }
+  }
+
+  private fun createPickupCompany(
+    domain: PickupCompany
+  ): PickupLocationDto.PickupCompanyDto {
+    return PickupLocationDto.PickupCompanyDto(
+      companyId = domain.companyId.uuid
+    )
   }
 }

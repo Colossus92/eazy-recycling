@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStrea
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
+import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -96,24 +97,33 @@ class WasteStreamQueryRepository(
   }
 
   private fun mapPickupLocation(location: PickupLocationDto): PickupLocationView? {
-    return when (location) {
+    return when (val dto = Hibernate.unproxy(location)) {
       is PickupLocationDto.DutchAddressDto ->
         PickupLocationView.DutchAddressView(
-          streetName = location.streetName,
-          postalCode = location.postalCode,
-          buildingNumber = location.buildingNumber,
-          buildingNumberAddition = location.buildingNumberAddition,
-          city = location.city,
-          country = location.country
+          streetName = dto.streetName,
+          postalCode = dto.postalCode,
+          buildingNumber = dto.buildingNumber,
+          buildingNumberAddition = dto.buildingNumberAddition,
+          city = dto.city,
+          country = dto.country
         )
 
       is PickupLocationDto.ProximityDescriptionDto ->
         PickupLocationView.ProximityDescriptionView(
-          postalCodeDigits = location.postalCode,
-          city = location.city,
-          description = location.description,
-          country = location.country
+          postalCodeDigits = dto.postalCode,
+          city = dto.city,
+          description = dto.description,
+          country = dto.country
         )
+
+      is PickupLocationDto.PickupCompanyDto -> {
+        val company = entityManager.find(CompanyDto::class.java, dto.companyId)
+        company?.let {
+          PickupLocationView.PickupCompanyView(
+            company = mapCompany(it)
+          )
+        }
+      }
 
       else -> null
     }
