@@ -3,10 +3,8 @@ alerts:
   - rule: DOMAIN_FAILED
   - rule: DEPLOYMENT_LIVE
 domains:
-- domain: app.eazyrecycling.nl
-  type: PRIMARY
 - domain: ers.eazysoftware.nl
-  type: ALIAS
+  type: PRIMARY
 envs:
   - key: VITE_SUPABASE_URL
     scope: RUN_AND_BUILD_TIME
@@ -69,15 +67,15 @@ services:
       - key: SUPABASE_API_JWT_SECRET
         scope: RUN_AND_BUILD_TIME
         type: SECRET
-        value: EV[1:VzrDUysiAw61qasWSzbEcQxIbyvV7fzf:2n48sexi5R/SDwXq8XJmot9zauBkdLkqSOYt1FQrycr7NjaGZSW+Ay/J5B7ExUaLigzYiefvZg1ii4efotB5xNa+KG3LPJzRfathqLOfGRSAqOzCcp3fqHxzIYNlFB33aQrmpbWt2Bs=]
+        value: EV[1:voTkuMo1CTVn+j7F+dQ9+WAqv7dZenV3:dcESB7mIINe8rZZE2pZKwA/48Ewsk6PtXQekX4+DlzJQPBXYefEeMrag/XoL5UJyI61lxZ/LQLhvCHAOx6m2ghYHupCWjkXaGAgxqDuqSVedbD5X92dF7Epu+TglX0EY3KOCsq12bwk=]
       - key: SUPABASE_API_JWT_ISSUER
         scope: RUN_AND_BUILD_TIME
         type: SECRET
-        value: EV[1:3AMLOqRMeYNc7TOJPrCrd9L4iTeCkrNC:hChxRrDJCFfpGqPBnOTpxMteL+bucXWZGkqOUdQan4yhjl7pveKJ2JFBCmjAkkMFTJYBjHNnXvg=]
+        value: EV[1:waLtD+OdVWcbMu3eYYGwhpO4xiqH2v7H:QjrrNw1GVvHlVOlo5l4bv8KC/xkeOMONjYrfPxJf1898ZUhTtaI+hm+y9NBw/XDE9WfjETfz+SCRcQ+p0eZfEA==]
     http_port: 8080
     image:
       registry: colossus92
-      registry_credentials: EV[1:PWh0bOoaZZ9yzzUZTNT7WfDQoVJ2ml5Y:d1BgPeXwL+yhvwFem0q80ok09ZVNd2Am/Y2i0ebFC7hWQUziYe/a6mKT5LdFFkuqu5y6Orqf0b2zx1WCtdmdyFRvOA==]
+      registry_credentials: EV[1:5G3jADfm9vTKcbRt8jENfDBZu0CjGxek:r6LusnSQcoo0Znh4mdEoPK0Bp0QNOkFXJizMGbDp3p7NdkjJN/xMLuC9Q7yXfxXNhASNUr1bG17T7Zu+VV02ePKtGw==]
       registry_type: GHCR
       repository: eazy-recycling
       tag: main
