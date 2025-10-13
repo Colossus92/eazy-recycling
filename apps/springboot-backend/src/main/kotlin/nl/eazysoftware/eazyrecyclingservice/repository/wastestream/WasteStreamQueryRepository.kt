@@ -4,17 +4,23 @@ import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.COMPANY
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.DUTCH_ADDRESS
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.NO_PICKUP
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.PROXIMITY_DESC
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 @Repository
 class WasteStreamQueryRepository(
   private val entityManager: EntityManager,
   private val jpaRepository: WasteStreamJpaRepository,
-  private val deleteWasteStream: DeleteWasteStream
+  private val companyRepository: CompanyRepository
 ) : GetAllWasteStreams, GetWasteStreamByNumber {
 
   override fun execute(): List<WasteStreamListView> {
@@ -24,13 +30,13 @@ class WasteStreamQueryRepository(
                 ws.name,
                 e.code,
                 pm.code,
-                c.chamber_of_commerce_id,
                 c.name,
-                pl.postal_code,
+                pl.location_type,
                 pl.street_name,
                 pl.building_number,
+                pl.proximity_description,
                 pl.city,
-                dc.postal_code,
+                pl.company_id,
                 dc.street_name,
                 dc.building_number,
                 dc.city
@@ -52,17 +58,24 @@ class WasteStreamQueryRepository(
         wasteName = columns[1] as String,
         euralCode = columns[2] as String,
         processingMethodCode = columns[3] as String,
-        consignorPartyChamberOfCommerceId = columns[4] as String?,
-        consignorPartyName = columns[5] as String,
-        pickupLocationPostalCode = columns[6] as String?,
-        pickupLocationStreetName = columns[7] as String?,
-        pickupLocationNumber = columns[8] as String?,
-        pickupLocationCity = columns[9] as String?,
-        deliveryLocationPostalCode = columns[10] as String?,
-        deliveryLocationStreetName = columns[11] as String,
-        deliveryLocationNumber = columns[12] as String?,
-        deliveryLocationCity = columns[13] as String,
+        consignorPartyName = columns[4] as String,
+        pickupLocation = formatPickupLocation(columns),
+        deliveryLocation = "${columns[11]} ${columns[12]}, ${columns[13]}",
       )
+    }
+  }
+
+  private fun formatPickupLocation(columns: Array<*>): String {
+    return when (val locationType: String = columns[5] as String) {
+      DUTCH_ADDRESS -> "${columns[6]} ${columns[7]}, ${columns[9]}"
+      PROXIMITY_DESC -> "${columns[8]}, ${columns[9]}"
+      COMPANY -> {
+        val companyId = columns[10] as UUID
+        val company = companyRepository.findByIdOrNull(companyId) ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
+        "${company.name}, ${company.address.city}"
+      }
+      NO_PICKUP -> "Geen herkomstlocatie"
+      else -> throw IllegalStateException("Unexpected pickup location type: $locationType")
     }
   }
 

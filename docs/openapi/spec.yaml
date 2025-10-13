@@ -1943,32 +1943,17 @@ components:
           type: string
         processingMethodCode:
           type: string
-        consignorPartyChamberOfCommerceId:
-          type: string
         consignorPartyName:
           type: string
-        pickupLocationStreetName:
+        pickupLocation:
           type: string
-        pickupLocationPostalCode:
-          type: string
-        pickupLocationNumber:
-          type: string
-        pickupLocationCity:
-          type: string
-        deliveryLocationStreetName:
-          type: string
-        deliveryLocationPostalCode:
-          type: string
-        deliveryLocationNumber:
-          type: string
-        deliveryLocationCity:
+        deliveryLocation:
           type: string
       required:
       - consignorPartyName
-      - deliveryLocationCity
-      - deliveryLocationStreetName
+      - deliveryLocation
       - euralCode
-      - pickupLocationCity
+      - pickupLocation
       - processingMethodCode
       - wasteName
       - wasteStreamNumber
