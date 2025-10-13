@@ -8,7 +8,7 @@ import { ActionMenu } from '../ActionMenu';
 import { PaginationRow } from '../pagination/PaginationRow';
 import { ReactNode, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
-import { ErrorThrowingComponent } from './ErrorThrowingComponent';
+import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 
 export type Column<T> = {
     key: keyof T;

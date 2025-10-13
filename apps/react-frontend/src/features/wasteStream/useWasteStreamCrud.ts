@@ -35,7 +35,7 @@ export function useWasteStreamCrud() {
   );
   const [isAdding, setIsAdding] = useState(false);
   const [editing, setEditing] = useState<WasteStreamDto | undefined>(undefined);
-  const [deleting, setDeleting] = useState<WasteStreamDto | undefined>(undefined);
+  const [itemToDelete, setItemToDelete] = useState<WasteStreamListView | undefined>(undefined);
 
   const createMutation = useMutation({
     mutationFn: (item: WasteStreamRequest) =>
@@ -48,11 +48,11 @@ export function useWasteStreamCrud() {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (item: WasteStreamDto) => wasteStreamService.delete(item.number),
+    mutationFn: (number: string) => wasteStreamService.delete(number),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
-        .then(() => setDeleting(undefined));
+        .then(() => setItemToDelete(undefined));
     },
   });
 
@@ -83,9 +83,9 @@ export function useWasteStreamCrud() {
     });
   };
 
-  const remove = async (item: WasteStreamDto): Promise<void> => {
+  const remove = async (number: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      removeMutation.mutate(item, {
+      removeMutation.mutate(number, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -99,11 +99,14 @@ export function useWasteStreamCrud() {
     setIsAdding,
     editing,
     setEditing,
-    deleting,
-    setDeleting,
     create,
     update,
-    remove,
+    deletion: {
+      item: itemToDelete,
+      initiate: setItemToDelete,
+      confirm: remove,
+      cancel: () => setItemToDelete(undefined),
+    },
     error,
     isLoading,
   };
