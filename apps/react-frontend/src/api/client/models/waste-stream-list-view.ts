@@ -61,6 +61,12 @@ export interface WasteStreamListView {
      * @type {string}
      * @memberof WasteStreamListView
      */
+    'pickupLocationStreetName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
     'pickupLocationPostalCode'?: string;
     /**
      * 
@@ -73,6 +79,18 @@ export interface WasteStreamListView {
      * @type {string}
      * @memberof WasteStreamListView
      */
+    'pickupLocationCity': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
+    'deliveryLocationStreetName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
     'deliveryLocationPostalCode'?: string;
     /**
      * 
@@ -80,5 +98,11 @@ export interface WasteStreamListView {
      * @memberof WasteStreamListView
      */
     'deliveryLocationNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
+    'deliveryLocationCity': string;
 }
 

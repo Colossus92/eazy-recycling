@@ -89,6 +89,7 @@ sealed interface PickupLocation {
     val postalCode: DutchPostalCode,
     val buildingNumber: String,
     val buildingNumberAddition: String? = null,
+    val city: String,
     val country: String = "Nederland"
   ) : PickupLocation {
     init {

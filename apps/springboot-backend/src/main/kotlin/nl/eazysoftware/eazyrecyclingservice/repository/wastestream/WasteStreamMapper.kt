@@ -42,6 +42,7 @@ class WasteStreamMapper(
           postalCode = DutchPostalCode(actualPickupLocation.postalCode),
           buildingNumber = actualPickupLocation.buildingNumber,
           buildingNumberAddition = actualPickupLocation.buildingNumberAddition,
+          city = actualPickupLocation.city,
           country = actualPickupLocation.country,
         )
         is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
@@ -115,6 +116,7 @@ class WasteStreamMapper(
         buildingNumber = address.buildingNumber,
         buildingNumberAddition = address.buildingNumberAddition,
         postalCode = address.postalCode.value,
+        city = address.city,
         country = address.country
       )
       pickupLocationRepository.save(newLocation)

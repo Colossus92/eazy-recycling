@@ -1002,6 +1002,9 @@ components:
       - $ref: "#/components/schemas/PickupLocationRequest"
       - type: object
         properties:
+          streetName:
+            type: string
+            minLength: 1
           buildingNumber:
             type: string
             minLength: 1
@@ -1011,13 +1014,18 @@ components:
             type: string
             minLength: 1
             pattern: "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$"
+          city:
+            type: string
+            minLength: 1
           country:
             type: string
             minLength: 1
       required:
       - buildingNumber
+      - city
       - country
       - postalCode
+      - streetName
     NoPickupLocationRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
@@ -1932,17 +1940,28 @@ components:
           type: string
         consignorPartyName:
           type: string
+        pickupLocationStreetName:
+          type: string
         pickupLocationPostalCode:
           type: string
         pickupLocationNumber:
+          type: string
+        pickupLocationCity:
+          type: string
+        deliveryLocationStreetName:
           type: string
         deliveryLocationPostalCode:
           type: string
         deliveryLocationNumber:
           type: string
+        deliveryLocationCity:
+          type: string
       required:
       - consignorPartyName
+      - deliveryLocationCity
+      - deliveryLocationStreetName
       - euralCode
+      - pickupLocationCity
       - processingMethodCode
       - wasteName
       - wasteStreamNumber
@@ -2018,18 +2037,24 @@ components:
       - $ref: "#/components/schemas/PickupLocationView"
       - type: object
         properties:
+          streetName:
+            type: string
           postalCode:
             type: string
           buildingNumber:
             type: string
           buildingNumberAddition:
             type: string
+          city:
+            type: string
           country:
             type: string
       required:
       - buildingNumber
+      - city
       - country
       - postalCode
+      - streetName
     EuralCodeView:
       type: object
       properties:

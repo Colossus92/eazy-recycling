@@ -27,6 +27,9 @@ class PickupLocationDto(
     var postalCode: String,
 
     @Column
+    var city: String,
+
+    @Column
     var country: String,
   ) : PickupLocationDto()
 

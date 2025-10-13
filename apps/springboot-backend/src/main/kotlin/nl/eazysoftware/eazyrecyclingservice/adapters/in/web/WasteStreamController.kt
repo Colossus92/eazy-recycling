@@ -192,6 +192,9 @@ sealed class PickupLocationRequest {
     @field:Pattern(regexp = "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$", message = "Postcode moet het formaat 1234AB of 1234 AB hebben")
     val postalCode: String,
 
+    @field:NotBlank(message = "Woonplaats is verplicht")
+    val city: String,
+
     @field:NotBlank(message = "Land is verplicht")
     val country: String
   ) : PickupLocationRequest() {
@@ -200,6 +203,7 @@ sealed class PickupLocationRequest {
       postalCode = DutchPostalCode(postalCode),
       buildingNumber = buildingNumber,
       buildingNumberAddition = buildingNumberAddition,
+      city = city,
       country = country
     )
   }

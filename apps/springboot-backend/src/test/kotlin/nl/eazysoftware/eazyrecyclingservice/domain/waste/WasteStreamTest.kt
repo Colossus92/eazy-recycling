@@ -43,7 +43,8 @@ class WasteStreamTest {
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
-          "Stad",
+          "2",
+          city = "Test City",
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -78,7 +79,8 @@ class WasteStreamTest {
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
-          "Stad",
+          "2",
+          city = "Test City",
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -168,8 +170,9 @@ class WasteStreamTest {
         collectionType = collectionType,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "123"
+          postalCode =  DutchPostalCode("1234 AB"),
+          buildingNumber = "123",
+          city = "Test city",
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -189,8 +192,9 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "123"
+          postalCode =  DutchPostalCode("1234 AB"),
+          buildingNumber = "123",
+          city = "Test city",
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
@@ -210,8 +214,9 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "Stad",
+          postalCode =  DutchPostalCode("1234 AB"),
+          buildingNumber = "123",
+          city = "Test city",
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -248,8 +253,9 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          ""
+          postalCode = DutchPostalCode("1234 AB"),
+          buildingNumber = "",
+          city = "Test city",
         )
       }
       assertThat(exception.message).isEqualTo("Het huisnummer is verplicht")
@@ -262,7 +268,8 @@ class WasteStreamTest {
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
-          country = "Belgium"
+          country = "Belgium",
+          city = "Test city"
         )
       }
       assertThat(exception.message).isEqualTo("Het land dient Nederland te zijn, maar was: Belgium")
@@ -275,7 +282,8 @@ class WasteStreamTest {
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
-          buildingNumberAddition = "A"
+          buildingNumberAddition = "A",
+          city = "Test city"
         )
       }
     }

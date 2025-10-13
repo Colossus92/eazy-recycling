@@ -91,6 +91,7 @@ object TestWasteStreamFactory {
       buildingNumber = "42",
       buildingNumberAddition = "A",
       postalCode = "1234AB",
+      city = "Test City",
       country = "Netherlands"
     )
   }
@@ -101,6 +102,7 @@ object TestWasteStreamFactory {
       buildingNumber = "42",
       buildingNumberAddition = "A",
       postalCode = "1234AB",
+      city = "Test City",
       country = "Nederland"
     )
   }

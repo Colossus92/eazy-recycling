@@ -48,6 +48,7 @@ sealed class PickupLocationView {
         val postalCode: String,
         val buildingNumber: String,
         val buildingNumberAddition: String?,
+        val city: String,
         val country: String
     ) : PickupLocationView()
 
