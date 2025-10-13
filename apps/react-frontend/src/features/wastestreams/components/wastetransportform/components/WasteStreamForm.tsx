@@ -68,7 +68,7 @@ export const WasteStreamForm = ({
             >
               <FormTopBar
                 title={
-                  data ? 'Afvalstroomnummer bewerken' : 'Nieuw Afvalstroomnummer'
+                  data ? `Afvalstroomnummer ${data.wasteStreamNumber}` : 'Nieuw Afvalstroomnummer'
                 }
                 onClick={onCancel}
               />
