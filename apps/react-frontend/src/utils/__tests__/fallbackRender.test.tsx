@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fallbackRender } from '../fallbackRender';
 
 describe('fallbackRender', () => {
@@ -59,7 +59,7 @@ describe('fallbackRender', () => {
     expect(retryButton).toBeInTheDocument();
   });
 
-  it('should call resetErrorBoundary when retry button is clicked', () => {
+  it('should call resetErrorBoundary when retry button is clicked', async () => {
     render(
       fallbackRender({
         error: mockError,
@@ -70,7 +70,9 @@ describe('fallbackRender', () => {
     const retryButton = screen.getByRole('button', { name: 'Probeer opnieuw' });
     fireEvent.click(retryButton);
 
-    expect(mockResetErrorBoundary).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(mockResetErrorBoundary).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('should render button with primary variant', () => {
@@ -137,7 +139,7 @@ describe('fallbackRender', () => {
     expect(button).toBeInTheDocument();
   });
 
-  it('should handle multiple clicks on retry button', () => {
+  it('should handle multiple clicks on retry button', async () => {
     render(
       fallbackRender({
         error: mockError,
@@ -151,7 +153,9 @@ describe('fallbackRender', () => {
     fireEvent.click(retryButton);
     fireEvent.click(retryButton);
 
-    expect(mockResetErrorBoundary).toHaveBeenCalledTimes(3);
+    await waitFor(() => {
+      expect(mockResetErrorBoundary).toHaveBeenCalledTimes(3);
+    });
   });
 
   it('should render with correct text content structure', () => {
