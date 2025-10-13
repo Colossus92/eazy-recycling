@@ -28,8 +28,9 @@ export const WasteStreamForm = ({
     formContext,
     fieldsToValidate,
     mutation,
+    resetForm
   } = useWasteStreamForm(wasteStreamNumber, () => setIsOpen(false));
-  const { step, navigateToStep, next, back, reset, isSubmitting } =
+  const { step, navigateToStep, next, back, reset: resetStepper, isSubmitting } =
     useFormStepNavigation({
       formContext,
       fieldsToValidate,
@@ -41,7 +42,8 @@ export const WasteStreamForm = ({
     });
 
   const onCancel = () => {
-    reset();
+    resetForm();
+    resetStepper();
     setIsOpen(false);
   };
 

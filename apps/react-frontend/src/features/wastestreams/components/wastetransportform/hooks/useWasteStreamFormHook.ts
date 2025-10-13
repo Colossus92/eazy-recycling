@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
-import { 
-    WasteStreamDetailView, 
-    WasteStreamDetailViewConsignorParty, 
+import {
+    WasteStreamDetailView,
+    WasteStreamDetailViewConsignorParty,
     CompanyView,
-    WasteStreamRequest, 
+    WasteStreamRequest,
 } from '@/api/client';
 import { wasteStreamService } from '@/api/services/wasteStreamService.ts';
 
@@ -43,7 +43,7 @@ export const fieldsToValidate: Array<Array<keyof WasteStreamFormValues>> = [
         'pickupBuildingNumber',
         'pickupPostalCode',
         'pickupCity',
-                /**
+        /**
          * Verwerker
          */
         'processorPartyId',
@@ -74,7 +74,22 @@ export function useWasteStreamForm(
         },
         enabled: !!wasteStreamNumber,
     });
-    const formContext = useForm<WasteStreamFormValues>();
+    const formContext = useForm<WasteStreamFormValues>({
+        defaultValues: {
+            consignorPartyId: '',
+            pickupPartyId: '',
+            pickupCompanyId: '',
+            pickupCompanyBranchId: '',
+            pickupStreet: '',
+            pickupBuildingNumber: '',
+            pickupPostalCode: '',
+            pickupCity: '',
+            processorPartyId: '',
+            goodsName: '',
+            processingMethodCode: '',
+            euralCode: '',
+        }
+    });
     const mutation = useMutation({
         mutationFn: async (data: WasteStreamFormValues) => {
             const request = formValuesToCreateWasteStreamRequest(data);
@@ -90,6 +105,21 @@ export function useWasteStreamForm(
             toastService.success(
                 !data ? 'Afvalstroomnummer aangemaakt' : 'Afvalstroomnummer bijgewerkt'
             );
+            resetForm();
+
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        onError: (error) => {
+            console.error('Error submitting form:', error);
+            toastService.error(
+                `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het afvalstroomnummer`
+            );
+        },
+    });
+
+    const resetForm = () => {
             formContext.reset({
                 consignorPartyId: '',
                 pickupPartyId: '',
@@ -104,18 +134,7 @@ export function useWasteStreamForm(
                 processingMethodCode: '',
                 euralCode: '',
             });
-
-            if (onSuccess) {
-                onSuccess();
-            }
-        },
-        onError: (error) => {
-            console.error('Error submitting form:', error);
-            toastService.error(
-                `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het afvalstroomnummer`
-            );
-        },
-    });
+    };
 
     return {
         formContext,
@@ -123,6 +142,7 @@ export function useWasteStreamForm(
         mutation,
         data,
         isLoading,
+        resetForm
     };
 }
 

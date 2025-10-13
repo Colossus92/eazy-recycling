@@ -24,12 +24,8 @@ export function useWasteStreamCrud() {
           wasteStream.wasteStreamNumber.toLowerCase().includes(query.toLowerCase()) ||
           wasteStream.wasteName.toLowerCase().includes(query.toLowerCase()) ||
           wasteStream.consignorPartyName.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.pickupLocationStreetName?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.pickupLocationNumber?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.pickupLocationCity?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.deliveryLocationStreetName?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.deliveryLocationNumber?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.deliveryLocationCity?.toLowerCase().includes(query.toLowerCase())
+          wasteStream.pickupLocation?.toLowerCase().includes(query.toLowerCase()) ||
+          wasteStream.deliveryLocation?.toLowerCase().includes(query.toLowerCase())
         );
       }),
     [wasteStreams, query]
