@@ -32,8 +32,8 @@ export const WasteStreamManagement = () => {
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, width: '14%' },
     { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, width: '14%' },
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'pickupLocationPostalCode', label: 'Herkomstlocatie', accessor: (item) => `${item.pickupLocationStreetName} ${item.pickupLocationNumber}, ${item.pickupLocationCity}`, width: '29%' },
-    { key: 'deliveryLocationPostalCode', label: 'Bestemmingslocatie', accessor: (item) => `${item.deliveryLocationStreetName} ${item.deliveryLocationNumber}, ${item.deliveryLocationCity}`, width: '29%' },
+    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, width: '29%' },
+    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, width: '29%' },
   ];
 
   return (

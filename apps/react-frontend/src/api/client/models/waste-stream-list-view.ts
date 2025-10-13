@@ -49,60 +49,18 @@ export interface WasteStreamListView {
      * @type {string}
      * @memberof WasteStreamListView
      */
-    'consignorPartyChamberOfCommerceId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
     'consignorPartyName': string;
     /**
      * 
      * @type {string}
      * @memberof WasteStreamListView
      */
-    'pickupLocationStreetName'?: string;
+    'pickupLocation': string;
     /**
      * 
      * @type {string}
      * @memberof WasteStreamListView
      */
-    'pickupLocationPostalCode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'pickupLocationNumber'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'pickupLocationCity': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'deliveryLocationStreetName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'deliveryLocationPostalCode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'deliveryLocationNumber'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamListView
-     */
-    'deliveryLocationCity': string;
+    'deliveryLocation': string;
 }
 

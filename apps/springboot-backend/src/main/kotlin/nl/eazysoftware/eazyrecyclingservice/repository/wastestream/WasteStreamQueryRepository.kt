@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -14,7 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocati
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
 @Repository
 class WasteStreamQueryRepository(
