@@ -7,6 +7,13 @@ export function fallbackRender({
   error: Error;
   resetErrorBoundary: () => void;
 }) {
+  const handleReset = () => {
+    // Use setTimeout to ensure the reset happens after the current event loop
+    setTimeout(() => {
+      resetErrorBoundary();
+    }, 0);
+  };
+
   return (
     <div
       role="alert"
@@ -15,7 +22,7 @@ export function fallbackRender({
       <p>Er is iets fout gegaan:</p>
       <pre style={{ color: 'red' }}>{error.message}</pre>
       <Button
-        onClick={resetErrorBoundary}
+        onClick={handleReset}
         variant="primary"
         label="Probeer opnieuw"
       />

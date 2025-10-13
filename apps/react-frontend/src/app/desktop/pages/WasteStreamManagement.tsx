@@ -48,24 +48,25 @@ export const WasteStreamManagement = () => {
               onClick={form.openForCreate}
             />
           </ContentTitleBar>
-          <ErrorBoundary fallbackRender={fallbackRender} onReset={read.errorHandling.reset}>
+          <ErrorBoundary 
+            fallbackRender={fallbackRender} 
+            onReset={read.errorHandling.reset}
+          >
             <ErrorThrowingComponent error={read.errorHandling.error} />
-            {read.items.length === 0 ? (
-              read.isLoading ? (
-                <div className="flex justify-center items-center h-24 w-full">
-                  <ClipLoader
-                    size={20}
-                    color={'text-color-text-invert-primary'}
-                    aria-label="Laad spinner"
-                  />
-                </div>
-              ) : (
-                <EmptyState
-                  icon={BxRecycle}
-                  text="Geen afvalstromen gevonden"
-                  onClick={form.openForCreate}
+            {read.isFetching ? (
+              <div className="flex justify-center items-center h-24 w-full">
+                <ClipLoader
+                  size={20}
+                  color={'text-color-text-invert-primary'}
+                  aria-label="Laad spinner"
                 />
-              )
+              </div>
+            ) : read.items.length === 0 ? (
+              <EmptyState
+                icon={BxRecycle}
+                text="Geen afvalstromen gevonden"
+                onClick={form.openForCreate}
+              />
             ) : (
               <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">
                 <table className="w-full table-fixed border-collapse">

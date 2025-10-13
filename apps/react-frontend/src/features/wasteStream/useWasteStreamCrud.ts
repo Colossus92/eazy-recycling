@@ -10,7 +10,7 @@ export function useWasteStreamCrud() {
   const {
     data: wasteStreams = [],
     error,
-    isLoading,
+    isFetching,
   } = useQuery<WasteStreamListView[]>({
     queryKey: ['wasteStreams'],
     queryFn: () => wasteStreamService.getAll(),
@@ -97,11 +97,11 @@ export function useWasteStreamCrud() {
     read: {
       items: displayedWasteStreams,
       setQuery,
-      isLoading,
+      isFetching,
       errorHandling: {
         error,
         reset: () => {
-          queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
+          queryClient.resetQueries({ queryKey: ['wasteStreams'] });
         },
       },
     },
