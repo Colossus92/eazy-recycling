@@ -22,6 +22,9 @@ export const WasteStreamManagement = () => {
   const columns: Column<WasteStreamListView>[] = [
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer' },
     { key: 'wasteName', label: 'Gebruikelijke benaming' },
+    { key: 'consignorPartyName', label: 'Afzender' },
+    { key: 'pickupLocationPostalCode', label: 'Herkomstlocatie' },
+    { key: 'deliveryLocationPostalCode', label: 'Bestemmingslocatie' },
   ];
 
   return (
