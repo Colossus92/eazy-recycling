@@ -10,6 +10,7 @@ import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { useWasteStreamCrud } from '@/features/wasteStream/useWasteStreamCrud.ts';
+import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -25,13 +26,7 @@ type Column<T> = {
 export const WasteStreamManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const {
-    displayedWasteStreams,
-    setQuery,
-    deletion,
-    error,
-    isLoading,
-  } = useWasteStreamCrud();
+  const {read, form, deletion } = useWasteStreamCrud();
 
   const columns: Column<WasteStreamListView>[] = [
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, width: '14%' },
@@ -45,18 +40,18 @@ export const WasteStreamManagement = () => {
     <>
       <ContentContainer title={"Afvalstroomnummers"}>
         <div className="flex-1 flex flex-col items-start self-stretch pt-4 gap-4 border border-solid rounded-radius-xl border-color-border-primary bg-color-surface-primary overflow-hidden">
-          <ContentTitleBar setQuery={setQuery}>
+          <ContentTitleBar setQuery={read.setQuery}>
             <Button
               variant={'primary'}
               icon={Plus}
               label={'Voeg toe'}
-              onClick={() => { }}
+              onClick={form.openForCreate}
             />
           </ContentTitleBar>
-          <ErrorBoundary fallbackRender={fallbackRender} onReset={() => { }}>
-            <ErrorThrowingComponent error={error} />
-            {displayedWasteStreams.length === 0 ? (
-              isLoading ? (
+          <ErrorBoundary fallbackRender={fallbackRender} onReset={read.errorHandling.reset}>
+            <ErrorThrowingComponent error={read.errorHandling.error} />
+            {read.items.length === 0 ? (
+              read.isLoading ? (
                 <div className="flex justify-center items-center h-24 w-full">
                   <ClipLoader
                     size={20}
@@ -68,7 +63,7 @@ export const WasteStreamManagement = () => {
                 <EmptyState
                   icon={BxRecycle}
                   text="Geen afvalstromen gevonden"
-                  onClick={() => { }}
+                  onClick={form.openForCreate}
                 />
               )
             ) : (
@@ -91,7 +86,7 @@ export const WasteStreamManagement = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedWasteStreams
+                    {read.items
                       .slice((page - 1) * rowsPerPage, page * rowsPerPage)
                       .map((item, index) => (
                         <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
@@ -102,7 +97,7 @@ export const WasteStreamManagement = () => {
                           ))}
                           <td className="p-4 text-center">
                             <ActionMenu<WasteStreamListView>
-                              onEdit={() => { }}
+                              onEdit={form.openForEdit}
                               onDelete={(wasteStream) => deletion.initiate(wasteStream)}
                               item={item}
                             />
@@ -118,7 +113,7 @@ export const WasteStreamManagement = () => {
                           setPage={setPage}
                           rowsPerPage={rowsPerPage}
                           setRowsPerPage={setRowsPerPage}
-                          numberOfResults={displayedWasteStreams.length}
+                          numberOfResults={read.items.length}
                         />
                       </td>
                     </tr>
@@ -141,6 +136,11 @@ export const WasteStreamManagement = () => {
         }
         title={"Afvalstroomnummer verwijderen"}
         description={`Weet u zeker dat u afvalstroomnummer met code ${deletion.item?.wasteStreamNumber} wilt verwijderen?`}
+      />
+      <WasteStreamForm
+        isOpen={form.isOpen}
+        setIsOpen={form.close}
+        wasteStreamNumber={form.item?.wasteStreamNumber}
       />
     </>
   );

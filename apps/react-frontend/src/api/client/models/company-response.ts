@@ -61,6 +61,12 @@ export interface CompanyResponse {
      * @type {string}
      * @memberof CompanyResponse
      */
+    'processorId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyResponse
+     */
     'updatedAt': string;
     /**
      * 

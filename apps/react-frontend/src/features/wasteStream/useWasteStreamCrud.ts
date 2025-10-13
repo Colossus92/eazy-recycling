@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
-import { WasteStreamListView } from '@/api/client';
-import { WasteStreamDto } from '@/api/client/models/waste-stream-dto';
+import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
+import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -15,6 +15,7 @@ export function useWasteStreamCrud() {
     queryKey: ['wasteStreams'],
     queryFn: () => wasteStreamService.getAll(),
   });
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [query, setQuery] = useState<string>('');
   const displayedWasteStreams = useMemo(
     () =>
@@ -34,7 +35,7 @@ export function useWasteStreamCrud() {
     [wasteStreams, query]
   );
   const [isAdding, setIsAdding] = useState(false);
-  const [editing, setEditing] = useState<WasteStreamDto | undefined>(undefined);
+  const [itemToEdit, setItemToEdit] = useState<WasteStreamDetailView | undefined>(undefined);
   const [itemToDelete, setItemToDelete] = useState<WasteStreamListView | undefined>(undefined);
 
   const createMutation = useMutation({
@@ -61,7 +62,7 @@ export function useWasteStreamCrud() {
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
-        .then(() => setEditing(undefined));
+        .then(() => setItemToEdit(undefined));
     },
   });
 
@@ -93,21 +94,46 @@ export function useWasteStreamCrud() {
   };
 
   return {
-    displayedWasteStreams,
-    setQuery,
-    isAdding,
-    setIsAdding,
-    editing,
-    setEditing,
-    create,
-    update,
+    read: {
+      items: displayedWasteStreams,
+      setQuery,
+      isLoading,
+      errorHandling: {
+        error,
+        reset: () => {
+          queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
+        },
+      },
+    },
+    form: {
+      isOpen: isFormOpen,
+      item: itemToEdit,
+      openForCreate: () => {
+        setItemToEdit(undefined);
+        setIsFormOpen(true);
+      },
+      openForEdit: async (item: WasteStreamListView) => {
+        const wasteStreamDetails = await wasteStreamService.getByNumber(item.wasteStreamNumber);
+        setItemToEdit(wasteStreamDetails);
+        setIsFormOpen(true);
+      },
+      close: () => {
+        setItemToEdit(undefined);
+        setIsFormOpen(false);
+      },
+      submit: async (item: CreateWasteStreamRequest) => {
+        if (itemToEdit) {
+          return update(item);
+        } else {
+          return create(item);
+        }
+      },
+    },
     deletion: {
       item: itemToDelete,
       initiate: setItemToDelete,
       confirm: remove,
       cancel: () => setItemToDelete(undefined),
     },
-    error,
-    isLoading,
   };
 }
