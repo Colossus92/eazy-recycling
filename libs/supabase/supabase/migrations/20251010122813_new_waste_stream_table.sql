@@ -1,5 +1,3 @@
-create sequence "public"."transport_seq_25";
-
 revoke delete on table "public"."waste_stream" from "anon";
 
 revoke insert on table "public"."waste_stream" from "anon";
