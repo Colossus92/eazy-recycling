@@ -157,11 +157,9 @@ const wasteStreamDetailsToFormValues = (wasteStreamDetails: WasteStreamDetailVie
  * Converts form values to WasteStreamRequest for create/update operations
  */
 const formValuesToCreateWasteStreamRequest = (
-    formValues: WasteStreamFormValues,
-    wasteStreamNumber?: string
+    formValues: WasteStreamFormValues
 ): WasteStreamRequest => {
     return {
-        wasteStreamNumber: wasteStreamNumber || '',
         name: formValues.goodsName,
         euralCode: formValues.euralCode,
         processingMethodCode: formValues.processingMethodCode,

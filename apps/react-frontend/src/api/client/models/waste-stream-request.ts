@@ -31,12 +31,6 @@ export interface WasteStreamRequest {
      * @type {string}
      * @memberof WasteStreamRequest
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteStreamRequest
-     */
     'name': string;
     /**
      * 

@@ -34,7 +34,6 @@ export function useWasteStreamCrud() {
       }),
     [wasteStreams, query]
   );
-  const [isAdding, setIsAdding] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<WasteStreamDetailView | undefined>(undefined);
   const [itemToDelete, setItemToDelete] = useState<WasteStreamListView | undefined>(undefined);
 
@@ -44,7 +43,6 @@ export function useWasteStreamCrud() {
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
-        .then(() => setIsAdding(false));
     },
   });
 
