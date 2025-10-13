@@ -64,7 +64,7 @@ export function useWasteStreamForm(
 ) {
     const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
-        queryKey: ['wasteStream', wasteStreamNumber],
+        queryKey: ['wasteStreams', wasteStreamNumber],
         queryFn: async () => {
             const response = await wasteStreamService.getByNumber(wasteStreamNumber!);
             const formValues = wasteStreamDetailsToFormValues(response);
@@ -77,15 +77,15 @@ export function useWasteStreamForm(
     const formContext = useForm<WasteStreamFormValues>();
     const mutation = useMutation({
         mutationFn: async (data: WasteStreamFormValues) => {
-            const request = formValuesToCreateWasteStreamRequest(data, wasteStreamNumber);
+            const request = formValuesToCreateWasteStreamRequest(data);
             if (!!data && wasteStreamNumber) {
-                return wasteStreamService.update(request);
+                return wasteStreamService.update(wasteStreamNumber, request);
             } else {
                 return wasteStreamService.create(request);
             }
         },
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ['wasteStream'] });
+            await queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
 
             toastService.success(
                 !data ? 'Afvalstroomnummer aangemaakt' : 'Afvalstroomnummer bijgewerkt'
