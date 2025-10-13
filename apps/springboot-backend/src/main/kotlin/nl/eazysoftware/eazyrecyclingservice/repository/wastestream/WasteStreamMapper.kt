@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMe
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
 import org.hibernate.Hibernate
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
@@ -130,8 +131,11 @@ class WasteStreamMapper(
   private fun createPickupCompany(
     domain: PickupCompany
   ): PickupLocationDto.PickupCompanyDto {
-    return PickupLocationDto.PickupCompanyDto(
-      companyId = domain.companyId.uuid
-    )
+    val company = companyRepository.findByIdOrNull(domain.companyId.uuid)
+      ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")
+
+    return pickupLocationRepository.findCompanyByCompanyId(company.id) ?: run {
+      pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(companyId = domain.companyId.uuid))
+    }
   }
 }

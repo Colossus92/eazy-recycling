@@ -10,7 +10,7 @@ data class WasteStreamListView(
     val pickupLocationStreetName: String?,
     val pickupLocationPostalCode: String?,
     val pickupLocationNumber: String?,
-    val pickupLocationCity: String,
+    val pickupLocationCity: String?,
     val deliveryLocationStreetName: String,
     val deliveryLocationPostalCode: String?,
     val deliveryLocationNumber: String?,

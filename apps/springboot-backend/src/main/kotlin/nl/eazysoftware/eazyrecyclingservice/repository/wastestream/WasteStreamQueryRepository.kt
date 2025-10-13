@@ -57,7 +57,7 @@ class WasteStreamQueryRepository(
         pickupLocationPostalCode = columns[6] as String?,
         pickupLocationStreetName = columns[7] as String?,
         pickupLocationNumber = columns[8] as String?,
-        pickupLocationCity = columns[9] as String,
+        pickupLocationCity = columns[9] as String?,
         deliveryLocationPostalCode = columns[10] as String?,
         deliveryLocationStreetName = columns[11] as String,
         deliveryLocationNumber = columns[12] as String?,

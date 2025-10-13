@@ -56,7 +56,8 @@ export function useWasteStreamCrud() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (item: WasteStreamRequest) => wasteStreamService.update(item),
+    mutationFn: ({ wasteStreamNumber, item }: { wasteStreamNumber: string; item: WasteStreamRequest }) => 
+      wasteStreamService.update(wasteStreamNumber, item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
@@ -73,9 +74,9 @@ export function useWasteStreamCrud() {
     });
   };
 
-  const update = async (item: WasteStreamRequest): Promise<void> => {
+  const update = async (wasteStreamNumber: string, item: WasteStreamRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
-      updateMutation.mutate(item, {
+      updateMutation.mutate({wasteStreamNumber, item }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -121,7 +122,7 @@ export function useWasteStreamCrud() {
       },
       submit: async (item: CreateWasteStreamRequest) => {
         if (itemToEdit) {
-          return update(item);
+          return update(itemToEdit.wasteStreamNumber, item);
         } else {
           return create(item);
         }

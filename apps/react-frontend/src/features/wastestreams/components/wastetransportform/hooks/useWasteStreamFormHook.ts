@@ -5,7 +5,7 @@ import {
     WasteStreamDetailView, 
     WasteStreamDetailViewConsignorParty, 
     CompanyView,
-    WasteStreamRequest 
+    WasteStreamRequest, 
 } from '@/api/client';
 import { wasteStreamService } from '@/api/services/wasteStreamService.ts';
 
@@ -64,7 +64,7 @@ export function useWasteStreamForm(
 ) {
     const queryClient = useQueryClient();
     const { data, isLoading } = useQuery({
-        queryKey: ['wasteStreams', wasteStreamNumber],
+        queryKey: ['wasteStream', wasteStreamNumber],
         queryFn: async () => {
             const response = await wasteStreamService.getByNumber(wasteStreamNumber!);
             const formValues = wasteStreamDetailsToFormValues(response);
@@ -149,16 +149,21 @@ const resolveConsignorCompany = (
 
 const wasteStreamDetailsToFormValues = (wasteStreamDetails: WasteStreamDetailView): WasteStreamFormValues => {
     const consignorCompany = resolveConsignorCompany(wasteStreamDetails.consignorParty);
-    
+    const pickupLocation = wasteStreamDetails.pickupLocation as any;
+
+    // Determine if pickupLocation is a company or dutch_address
+    const isCompanyPickup = pickupLocation?.type === 'company';
+    const pickupAddress = isCompanyPickup ? pickupLocation?.company?.address : pickupLocation;
+
     return {
         consignorPartyId: consignorCompany?.id || '',
         pickupPartyId: wasteStreamDetails.pickupParty.id,
-        pickupCompanyId: wasteStreamDetails.pickupLocation?.type,
+        pickupCompanyId: isCompanyPickup ? pickupLocation?.company?.id : undefined,
         pickupCompanyBranchId: (wasteStreamDetails as any).pickupCompanyBranchId,
-        pickupStreet: (wasteStreamDetails.pickupLocation as any)?.street || '',
-        pickupBuildingNumber: (wasteStreamDetails.pickupLocation as any)?.buildingNumber || '',
-        pickupPostalCode: (wasteStreamDetails.pickupLocation as any)?.postalCode || '',
-        pickupCity: (wasteStreamDetails.pickupLocation as any)?.city || '',
+        pickupStreet: pickupAddress?.streetName || pickupAddress?.street || '',
+        pickupBuildingNumber: pickupAddress?.buildingNumber || pickupAddress?.houseNumber || '',
+        pickupPostalCode: pickupAddress?.postalCode || '',
+        pickupCity: pickupAddress?.city || '',
         processorPartyId: wasteStreamDetails.deliveryLocation.processorPartyId || '',
         goodsName: wasteStreamDetails.wasteType.name,
         processingMethodCode: wasteStreamDetails.wasteType.processingMethod.code,
@@ -172,19 +177,27 @@ const wasteStreamDetailsToFormValues = (wasteStreamDetails: WasteStreamDetailVie
 const formValuesToCreateWasteStreamRequest = (
     formValues: WasteStreamFormValues
 ): WasteStreamRequest => {
-    return {
-        name: formValues.goodsName,
-        euralCode: formValues.euralCode,
-        processingMethodCode: formValues.processingMethodCode,
-        collectionType: 'DEFAULT',
-        pickupLocation: {
+    // Determine pickupLocation type based on whether pickupCompanyId is specified
+    const pickupLocation = formValues.pickupCompanyId
+        ? {
+            type: 'company',
+            companyId: formValues.pickupCompanyId
+        }
+        : {
             type: 'dutch_address',
             streetName: formValues.pickupStreet,
             buildingNumber: formValues.pickupBuildingNumber,
             postalCode: formValues.pickupPostalCode,
             city: formValues.pickupCity,
             country: 'Nederland'
-        } as any,
+        };
+
+    return {
+        name: formValues.goodsName,
+        euralCode: formValues.euralCode,
+        processingMethodCode: formValues.processingMethodCode,
+        collectionType: 'DEFAULT',
+        pickupLocation: pickupLocation as any,
         processorPartyId: formValues.processorPartyId,
         consignorParty: {
             type: 'company',

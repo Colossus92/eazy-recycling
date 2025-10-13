@@ -49,7 +49,7 @@ export const PostalCodeFormField = <T extends FieldValues>({
         rules: {
           required: required ? 'Postcode is verplicht' : undefined,
           pattern: {
-            value: /^\d{4}\s[A-Z]{2}$/,
+            value: /^\d{4}\s?[A-Z]{2}$/,
             message: 'Postcode moet het formaat 1234 AB hebben',
           },
         },
