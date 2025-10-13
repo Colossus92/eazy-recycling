@@ -38,6 +38,7 @@ class WasteStreamMapper(
       collectionType = WasteCollectionType.valueOf(dto.wasteCollectionType),
       pickupLocation = when (actualPickupLocation) {
         is PickupLocationDto.DutchAddressDto -> DutchAddress(
+          streetName = actualPickupLocation.streetName,
           postalCode = DutchPostalCode(actualPickupLocation.postalCode),
           buildingNumber = actualPickupLocation.buildingNumber,
           buildingNumberAddition = actualPickupLocation.buildingNumberAddition,
@@ -110,6 +111,7 @@ class WasteStreamMapper(
       address.buildingNumber
     ) ?: run {
       val newLocation = PickupLocationDto.DutchAddressDto(
+        streetName = address.streetName,
         buildingNumber = address.buildingNumber,
         buildingNumberAddition = address.buildingNumberAddition,
         postalCode = address.postalCode.value,

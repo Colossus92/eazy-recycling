@@ -85,6 +85,7 @@ sealed interface PickupLocation {
    * Requires: NL + postal code (4 digits + 2 letters) + house number
    */
   data class DutchAddress(
+    val streetName: String,
     val postalCode: DutchPostalCode,
     val buildingNumber: String,
     val buildingNumberAddition: String? = null,

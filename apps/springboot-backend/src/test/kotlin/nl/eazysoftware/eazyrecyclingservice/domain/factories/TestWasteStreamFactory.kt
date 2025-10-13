@@ -14,6 +14,16 @@ import java.util.*
 
 object TestWasteStreamFactory {
 
+  fun randomWasteStreamNumber(): String {
+    val chars = ('0'..'9')
+    val sb = StringBuilder()
+    repeat(7) {
+        val randomChar = chars.random()
+        sb.append(randomChar)
+    }
+    return "12345$sb"
+  }
+
   fun createTestWasteStreamRequest(
     companyId: UUID,
     number: String = "123456789012",
@@ -77,6 +87,7 @@ object TestWasteStreamFactory {
 
   private fun createTestPickupLocationDto(): PickupLocationDto {
     return PickupLocationDto.DutchAddressDto(
+      streetName = "Test Street",
       buildingNumber = "42",
       buildingNumberAddition = "A",
       postalCode = "1234AB",
@@ -86,6 +97,7 @@ object TestWasteStreamFactory {
 
   private fun createTestPickupLocation(): PickupLocationRequest {
     return PickupLocationRequest.DutchAddressRequest(
+      streetName = "Test Street",
       buildingNumber = "42",
       buildingNumberAddition = "A",
       postalCode = "1234AB",

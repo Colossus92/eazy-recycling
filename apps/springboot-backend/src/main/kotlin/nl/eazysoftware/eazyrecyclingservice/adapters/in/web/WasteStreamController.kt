@@ -179,6 +179,10 @@ sealed class PickupLocationRequest {
   abstract fun toDomain(): PickupLocation
 
   data class DutchAddressRequest(
+
+    @field:NotBlank(message = "Straatnaam is verplicht")
+    val streetName: String,
+
     @field:NotBlank(message = "Huisnummer is verplicht")
     val buildingNumber: String,
 
@@ -192,6 +196,7 @@ sealed class PickupLocationRequest {
     val country: String
   ) : PickupLocationRequest() {
     override fun toDomain() = DutchAddress(
+      streetName = streetName,
       postalCode = DutchPostalCode(postalCode),
       buildingNumber = buildingNumber,
       buildingNumberAddition = buildingNumberAddition,

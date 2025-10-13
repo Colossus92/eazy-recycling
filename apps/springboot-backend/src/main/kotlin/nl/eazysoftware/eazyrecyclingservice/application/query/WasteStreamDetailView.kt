@@ -44,6 +44,7 @@ data class ProcessingMethodView(
 )
 sealed class PickupLocationView {
     data class DutchAddressView(
+        val streetName: String,
         val postalCode: String,
         val buildingNumber: String,
         val buildingNumberAddition: String?,

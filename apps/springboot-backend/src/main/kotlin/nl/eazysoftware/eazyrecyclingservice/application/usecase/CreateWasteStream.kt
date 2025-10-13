@@ -3,7 +3,6 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
-import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamMapper
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -35,7 +34,6 @@ data class CreateWasteStreamResult(
 @Service
 class CreateWasteStreamService(
   private val wasteStreamRepo: WasteStreams,
-  private val wasteStreamMapper: WasteStreamMapper
 ) : CreateWasteStream {
 
   @Transactional

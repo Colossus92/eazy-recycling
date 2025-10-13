@@ -14,31 +14,33 @@ class PickupLocationDto(
   @Entity
   @DiscriminatorValue("DUTCH_ADDRESS")
   class DutchAddressDto(
+    @Column(name = "street_name")
+    var streetName: String,
 
-    @Column(name = "building_number", nullable = false)
-    var buildingNumber: String = "",
+    @Column(name = "building_number")
+    var buildingNumber: String,
 
     @Column(name = "building_number_addition")
-    var buildingNumberAddition: String? = null,
+    var buildingNumberAddition: String?,
 
-    @Column(name = "postal_code", nullable = false)
-    var postalCode: String = "",
+    @Column(name = "postal_code")
+    var postalCode: String,
 
-    @Column(nullable = false)
-    var country: String = "",
+    @Column
+    var country: String,
   ) : PickupLocationDto()
 
   @Entity
   @DiscriminatorValue("PROXIMITY_DESC")
   class ProximityDescriptionDto(
-    @Column(name = "proximity_description", nullable = false)
-    var description: String = "",
-    @Column(name = "postal_code", nullable = false)
-    var postalCode: String = "",
-    @Column(name = "city", nullable = false)
-    var city: String = "",
-    @Column(name = "country", nullable = false)
-    var country: String = "",
+    @Column(name = "proximity_description")
+    var description: String,
+    @Column(name = "postal_code")
+    var postalCode: String,
+    @Column(name = "city")
+    var city: String,
+    @Column(name = "country")
+    var country: String,
   ) : PickupLocationDto()
 
   @Entity

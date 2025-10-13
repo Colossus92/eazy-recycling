@@ -41,6 +41,7 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
@@ -75,6 +76,7 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
@@ -165,6 +167,7 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = collectionType,
         pickupLocation = PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123"
         ),
@@ -185,6 +188,7 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123"
         ),
@@ -205,6 +209,7 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "Stad",
         ),
@@ -242,6 +247,7 @@ class WasteStreamTest {
     fun `a dutch address can't have a blank house number`() {
       val exception = assertFailsWith<IllegalArgumentException> {
         PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           ""
         )
@@ -253,6 +259,7 @@ class WasteStreamTest {
     fun `a dutch address must have Nederland as country`() {
       val exception = assertFailsWith<IllegalArgumentException> {
         PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
           country = "Belgium"
@@ -265,6 +272,7 @@ class WasteStreamTest {
     fun `a dutch address can have a house number addition`() {
       assertDoesNotThrow {
         PickupLocation.DutchAddress(
+          streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
           buildingNumberAddition = "A"

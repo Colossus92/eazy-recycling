@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -23,8 +24,10 @@ class WasteStreamQueryRepository(
                 c.chamber_of_commerce_id,
                 c.name,
                 pl.postal_code,
+                pl.street_name,
                 pl.building_number,
                 dc.postal_code,
+                dc.street_name,
                 dc.building_number
             FROM waste_streams ws
             JOIN eural e ON ws.eural_code = e.code
@@ -47,17 +50,19 @@ class WasteStreamQueryRepository(
                 consignorPartyChamberOfCommerceId = columns[4] as String?,
                 consignorPartyName = columns[5] as String,
                 pickupLocationPostalCode = columns[6] as String?,
-                pickupLocationNumber = columns[7] as String?,
-                deliveryLocationPostalCode = columns[8] as String?,
-                deliveryLocationNumber = columns[9] as String?
+                pickupLocationStreetName = columns[7] as String?,
+                pickupLocationNumber = columns[8] as String?,
+                deliveryLocationPostalCode = columns[9] as String?,
+                deliveryLocationStreetName = columns[10] as String,
+                deliveryLocationNumber = columns[11] as String?
             )
         }
     }
 
     override fun execute(wasteStreamNumber: WasteStreamNumber): WasteStreamDetailView? {
-        val wasteStream = jpaRepository.findById(wasteStreamNumber.number).orElse(null) ?: return null
+      val wasteStream = jpaRepository.findByIdOrNull(wasteStreamNumber.number) ?: return null
 
-        return WasteStreamDetailView(
+      return WasteStreamDetailView(
             wasteStreamNumber = wasteStream.number,
             wasteType = WasteTypeView(
                 name = wasteStream.name,
@@ -71,7 +76,7 @@ class WasteStreamQueryRepository(
                 )
             ),
             collectionType = wasteStream.wasteCollectionType,
-            pickupLocation = wasteStream.pickupLocation?.let { mapPickupLocation(it) },
+            pickupLocation = mapPickupLocation(wasteStream.pickupLocation),
             deliveryLocation = DeliveryLocationView(
                 processorPartyId = wasteStream.processorParty.processorId!!,
                 processor = mapCompany(wasteStream.processorParty)
@@ -88,6 +93,7 @@ class WasteStreamQueryRepository(
         return when (location) {
             is PickupLocationDto.DutchAddressDto ->
                 PickupLocationView.DutchAddressView(
+                    streetName = location.streetName,
                     postalCode = location.postalCode,
                     buildingNumber = location.buildingNumber,
                     buildingNumberAddition = location.buildingNumberAddition,
