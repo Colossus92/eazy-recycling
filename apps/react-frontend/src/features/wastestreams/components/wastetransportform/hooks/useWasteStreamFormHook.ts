@@ -170,7 +170,7 @@ const formValuesToCreateWasteStreamRequest = (
             buildingNumber: formValues.pickupBuildingNumber,
             postalCode: formValues.pickupPostalCode,
             city: formValues.pickupCity,
-            country: 'NL'
+            country: 'Nederland'
         } as any,
         processorPartyId: formValues.processorPartyId,
         consignorParty: {
