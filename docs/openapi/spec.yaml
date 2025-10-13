@@ -1066,9 +1066,6 @@ components:
     WasteStreamRequest:
       type: object
       properties:
-        wasteStreamNumber:
-          type: string
-          pattern: "^[0-9]{12}$"
         name:
           type: string
           minLength: 1
@@ -1113,7 +1110,6 @@ components:
       - pickupParty
       - processingMethodCode
       - processorPartyId
-      - wasteStreamNumber
     UpdateUserRequest:
       type: object
       properties:
