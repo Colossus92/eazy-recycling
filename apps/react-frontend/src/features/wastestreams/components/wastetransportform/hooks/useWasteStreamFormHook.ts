@@ -90,7 +90,20 @@ export function useWasteStreamForm(
             toastService.success(
                 !data ? 'Afvalstroomnummer aangemaakt' : 'Afvalstroomnummer bijgewerkt'
             );
-            formContext.reset();
+            formContext.reset({
+                consignorPartyId: '',
+                pickupPartyId: '',
+                pickupCompanyId: '',
+                pickupCompanyBranchId: '',
+                pickupStreet: '',
+                pickupBuildingNumber: '',
+                pickupPostalCode: '',
+                pickupCity: '',
+                processorPartyId: '',
+                goodsName: '',
+                processingMethodCode: '',
+                euralCode: '',
+            });
 
             if (onSuccess) {
                 onSuccess();
