@@ -2230,6 +2230,8 @@ components:
           type: string
         address:
           $ref: "#/components/schemas/AddressDto"
+        processorId:
+          type: string
         updatedAt:
           type: string
           format: date-time
