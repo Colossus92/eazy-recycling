@@ -58,6 +58,11 @@ jobs:
         if: steps.changes.outputs.build_required == 'true'
         run: npm ci
 
+      # Reset NX cache to ensure clean build
+      - name: Reset NX cache
+        if: steps.changes.outputs.build_required == 'true'
+        run: npx nx reset
+
       # Build using Nx (this will handle Gradle builds and Docker image creation)
       - name: Build with Nx
         if: steps.changes.outputs.build_required == 'true'
