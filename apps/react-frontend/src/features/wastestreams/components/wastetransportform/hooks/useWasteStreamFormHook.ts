@@ -163,7 +163,7 @@ const formValuesToCreateWasteStreamRequest = (
         name: formValues.goodsName,
         euralCode: formValues.euralCode,
         processingMethodCode: formValues.processingMethodCode,
-        collectionType: 'DEFAULT', // Default value, adjust as needed
+        collectionType: 'DEFAULT',
         pickupLocation: {
             type: 'dutch_address',
             streetName: formValues.pickupStreet,
