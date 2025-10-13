@@ -166,7 +166,6 @@ class WasteStreamControllerSecurityTest {
       "POST" -> {
         val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
           companyId = consignorCompany.id!!,
-          number = randomWasteStreamNumber(),
           name = "New Waste Stream",
           processorPartyId = "12345",
           pickupParty = pickupCompany.id!!
@@ -179,7 +178,6 @@ class WasteStreamControllerSecurityTest {
       "PUT" -> {
         val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
           companyId = consignorCompany.id!!,
-          number = testWasteStreamDto.number,
           name = "Updated Waste Stream",
           processorPartyId = "12345",
           pickupParty = pickupCompany.id!!

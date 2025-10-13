@@ -67,10 +67,7 @@ class WasteStreamController(
     wasteStreamNumber: String,
     @Valid @RequestBody request: WasteStreamRequest
   ) {
-    require(wasteStreamNumber == request.wasteStreamNumber) {
-      "Afvalstroomnummer in path moet overeenkomen met afvalstroomnummer in body"
-    }
-    updateWasteStream.handle(request.toCommand())
+    updateWasteStream.handle(WasteStreamNumber(wasteStreamNumber), request.toCommand())
   }
 
   @DeleteMapping("/{wasteStreamNumber}")
@@ -86,10 +83,6 @@ class WasteStreamController(
 }
 
 data class WasteStreamRequest(
-  @field:Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
-  @field:Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer 12 cijfers bevatten")
-  val wasteStreamNumber: String,
-
   @field:NotBlank(message = "Naam is verplicht")
   val name: String,
 
@@ -120,7 +113,6 @@ data class WasteStreamRequest(
 ) {
   fun toCommand(): WasteStreamCommand {
     return WasteStreamCommand(
-      wasteStreamNumber = WasteStreamNumber(wasteStreamNumber),
       wasteType = WasteType(
         name = name,
         euralCode = EuralCode(euralCode),

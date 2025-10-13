@@ -86,66 +86,81 @@ class WasteStreamControllerIntegrationTest {
   @Test
   fun `should create waste stream`() {
     // Given
-    val wasteStreamNumber = randomWasteStreamNumber()
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id!!,
-      number = wasteStreamNumber,
       name = "Glass"
     )
 
     // When & Then
-    securedMockMvc.post(
+    val result = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.wasteStreamNumber").value(wasteStreamNumber))
+      .andExpect(jsonPath("$.wasteStreamNumber").exists())
+      .andReturn()
+
+    // Extract the generated waste stream number from response
+    val response = objectMapper.readTree(result.response.contentAsString)
+    val generatedNumber = response.get("wasteStreamNumber").asText()
 
     // Verify waste stream was saved in the database
-    val savedWasteStream = wasteStreamRepository.findById(wasteStreamNumber)
+    val savedWasteStream = wasteStreamRepository.findById(generatedNumber)
     assertThat(savedWasteStream).isPresent
-    assertThat(savedWasteStream.get().number).isEqualTo(wasteStreamNumber)
+    assertThat(savedWasteStream.get().number).isEqualTo(generatedNumber)
     assertThat(savedWasteStream.get().name).isEqualTo("Glass")
   }
 
   @Test
-  fun `should fail when duplicate waste stream`() {
-    // Given
-    val wasteStreamNumber = randomWasteStreamNumber()
+  fun `should not fail when creating multiple waste streams for same processor`() {
+    // Given - waste stream numbers are now auto-generated sequentially
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id!!,
-      number = wasteStreamNumber,
       name = "Glass"
     )
-    securedMockMvc.post(
+    
+    // When - create first waste stream
+    val result1 = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
+      .andReturn()
+    
+    val number1 = objectMapper.readTree(result1.response.contentAsString).get("wasteStreamNumber").asText()
 
-    // When & Then
-    securedMockMvc.post(
+    // When - create second waste stream (should get next sequential number)
+    val result2 = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
-      .andExpect(status().isConflict)
+      .andExpect(status().isCreated)
+      .andReturn()
+    
+    val number2 = objectMapper.readTree(result2.response.contentAsString).get("wasteStreamNumber").asText()
+    
+    // Then - numbers should be sequential
+    assertThat(number1).isNotEqualTo(number2)
+    assertThat(number1.substring(0, 5)).isEqualTo(number2.substring(0, 5)) // Same processor prefix
   }
 
   @Test
   fun `can get waste stream by number with full details`() {
-    val wasteStreamNumber = randomWasteStreamNumber()
-    // Given
+    // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id!!,
-      number = wasteStreamNumber,
       name = "Glass"
     )
-    securedMockMvc.post(
+    val createResult = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
+      .andReturn()
+    
+    val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
 
     // When & Then
     securedMockMvc.get("/waste-streams/${wasteStreamNumber}")
@@ -161,18 +176,20 @@ class WasteStreamControllerIntegrationTest {
 
   @Test
   fun `can update created waste stream`() {
-    // Given
-    val wasteStreamNumber = randomWasteStreamNumber()
+    // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id!!,
-      number = wasteStreamNumber,
       name = "Glass"
     )
-    securedMockMvc.post(
+    val createResult = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
+      .andReturn()
+    
+    val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
 
     // When
     val updatedRequest = wasteStreamDto.copy(name = "Updated Glass")
@@ -187,18 +204,20 @@ class WasteStreamControllerIntegrationTest {
 
   @Test
   fun `can delete created waste stream`() {
-    // Given
-    val wasteStreamNumber = randomWasteStreamNumber()
+    // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id!!,
-      number = wasteStreamNumber,
       name = "Glass"
     )
-    securedMockMvc.post(
+    val createResult = securedMockMvc.post(
       "/waste-streams",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
+      .andReturn()
+    
+    val wasteStreamNumber = objectMapper.readTree(createResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
 
     // When & Then
     securedMockMvc.delete(

@@ -15,7 +15,6 @@ interface CreateWasteStream {
  * This follows the hexagonal architecture pattern where the command contains domain objects.
  */
 data class WasteStreamCommand(
-  val wasteStreamNumber: WasteStreamNumber,
   val wasteType: WasteType,
   val collectionType: WasteCollectionType,
   val pickupLocation: PickupLocation,
@@ -34,16 +33,18 @@ data class CreateWasteStreamResult(
 @Service
 class CreateWasteStreamService(
   private val wasteStreamRepo: WasteStreams,
+  private val numberGenerator: WasteStreamNumberGenerator = WasteStreamNumberGenerator(),
 ) : CreateWasteStream {
 
   @Transactional
   override fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult {
-    check(!wasteStreamRepo.existsById(cmd.wasteStreamNumber)) {
-      "Afvalstroom met nummer ${cmd.wasteStreamNumber.number} bestaat al"
-    }
+    // Generate the next sequential waste stream number for this processor
+    val processorId = cmd.deliveryLocation.processorPartyId
+    val highestExisting = wasteStreamRepo.findHighestNumberForProcessor(processorId)
+    val wasteStreamNumber = numberGenerator.generateNext(processorId, highestExisting)
 
     val wasteStream = WasteStream(
-      wasteStreamNumber = cmd.wasteStreamNumber,
+      wasteStreamNumber = wasteStreamNumber,
       wasteType = cmd.wasteType,
       collectionType = cmd.collectionType,
       pickupLocation = cmd.pickupLocation,

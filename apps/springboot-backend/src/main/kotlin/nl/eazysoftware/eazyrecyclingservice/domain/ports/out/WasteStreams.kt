@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
@@ -17,4 +18,13 @@ interface WasteStreams {
   fun save(wasteStream: WasteStream)
 
   fun existsById(wasteStreamNumber: WasteStreamNumber): Boolean
+  
+  /**
+   * Finds the highest waste stream number for a given processor.
+   * Used for generating sequential waste stream numbers.
+   * 
+   * @param processorId The processor party ID (5 digits)
+   * @return The highest WasteStreamNumber for this processor, or null if none exist
+   */
+  fun findHighestNumberForProcessor(processorId: ProcessorPartyId): WasteStreamNumber?
 }

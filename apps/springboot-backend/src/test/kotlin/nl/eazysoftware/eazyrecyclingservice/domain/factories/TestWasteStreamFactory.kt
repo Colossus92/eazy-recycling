@@ -26,7 +26,6 @@ object TestWasteStreamFactory {
 
   fun createTestWasteStreamRequest(
     companyId: UUID,
-    number: String = "123456789012",
     name: String = "Test Waste Stream",
     euralCode: String = "16 01 17",
     processingMethod: String = "A.01",
@@ -40,7 +39,6 @@ object TestWasteStreamFactory {
     brokerParty: UUID? = null
   ): WasteStreamRequest {
     return WasteStreamRequest(
-      wasteStreamNumber = number,
       name = name,
       euralCode = euralCode,
       processingMethodCode = processingMethod,
