@@ -79,7 +79,7 @@ services:
       registry: colossus92
       registry_credentials: EV[1:PWh0bOoaZZ9yzzUZTNT7WfDQoVJ2ml5Y:d1BgPeXwL+yhvwFem0q80ok09ZVNd2Am/Y2i0ebFC7hWQUziYe/a6mKT5LdFFkuqu5y6Orqf0b2zx1WCtdmdyFRvOA==]
       registry_type: GHCR
-      repository: eazy-recycling-service
+      repository: eazy-recycling
       tag: main
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-1gb-fixed
