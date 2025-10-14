@@ -9,12 +9,13 @@ import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
-import { useWasteStreamCrud } from '@/features/wasteStream/useWasteStreamCrud.ts';
+import { useWasteStreamCrud } from '@/features/wastestreams/hooks/useWasteStreamCrud';
 import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
+import { WasteStreamStatusTag } from '@/features/wastestreams/components/WasteStreamStatusTag';
 
 type Column<T> = {
   key: keyof T;
@@ -32,8 +33,9 @@ export const WasteStreamManagement = () => {
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, width: '14%' },
     { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, width: '14%' },
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, width: '29%' },
-    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, width: '29%' },
+    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, width: '25%' },
+    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, width: '25%' },
+    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status}  />, width: '8%' },
   ];
 
   return (

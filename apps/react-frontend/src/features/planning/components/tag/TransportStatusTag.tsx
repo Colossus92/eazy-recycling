@@ -1,19 +1,16 @@
-import clsx from 'clsx';
+import { Tag, TagColor } from '@/components/ui/tag/Tag';
 
 interface TransportStatusTagProps {
   status: 'INVOICED' | 'FINISHED' | 'UNPLANNED' | 'ERROR' | 'PLANNED';
 }
 
 export const TransportStatusTag = ({ status }: TransportStatusTagProps) => {
-  const baseClasses =
-    'inline-flex py-1 px-2 justify-center items-center gap-1 rounded-radius-xs text-subtitle-2 font-urbanist';
-  const statusClasses = {
-    INVOICED: 'bg-[#EAEDF2] text-color-text-secondary',
-    FINISHED: 'bg-color-status-success-light text-color-status-success-primary',
-    UNPLANNED:
-      'bg-color-status-warning-light text-color-status-warning-primary',
-    ERROR: 'bg-color-status-error-light text-color-status-error-dark',
-    PLANNED: 'bg-color-brand-light-hover text-color-status-info-dark',
+  const color = {
+    INVOICED: TagColor.GRAY,
+    FINISHED: TagColor.GREEN,
+    UNPLANNED: TagColor.YELLOW,
+    ERROR: TagColor.RED,
+    PLANNED: TagColor.BLUE,
   }[status];
 
   const text = {
@@ -23,5 +20,5 @@ export const TransportStatusTag = ({ status }: TransportStatusTagProps) => {
     ERROR: 'Foutmelding',
     PLANNED: 'Gepland',
   }[status];
-  return <div className={clsx(baseClasses, statusClasses)}>{text}</div>;
+  return <Tag color={color} text={text} />;
 };
