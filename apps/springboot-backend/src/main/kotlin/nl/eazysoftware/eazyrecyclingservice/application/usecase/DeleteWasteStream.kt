@@ -24,7 +24,7 @@ class DeleteWasteStreamService(
     val wasteStream = wasteStreamRepo.findByNumber(cmd.wasteStreamNumber)
       ?: throw EntityNotFoundException("Afvalstroom met nummer ${cmd.wasteStreamNumber.number} bestaat niet")
 
-    wasteStream.putInactive()
+    wasteStream.delete()
     wasteStreamRepo.save(wasteStream)
   }
 }

@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
+import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,12 +17,10 @@ class UpdateWasteStreamService(
 
     @Transactional
     override fun handle(wasteStreamNumber: WasteStreamNumber, cmd: WasteStreamCommand) {
-        check(wasteStreamRepo.existsById(wasteStreamNumber)) {
-            "Afvalstroom met nummer ${wasteStreamNumber.number} bestaat niet"
-        }
+        val wasteStream = wasteStreamRepo.findByNumber(wasteStreamNumber)
+            ?: throw EntityNotFoundException("Afvalstroom met nummer ${wasteStreamNumber.number} bestaat niet")
 
-        val wasteStream = WasteStream(
-            wasteStreamNumber = wasteStreamNumber,
+        wasteStream.update(
             wasteType = cmd.wasteType,
             collectionType = cmd.collectionType,
             pickupLocation = cmd.pickupLocation,

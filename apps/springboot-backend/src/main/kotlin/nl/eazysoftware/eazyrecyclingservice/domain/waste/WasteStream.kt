@@ -4,38 +4,56 @@ import kotlinx.datetime.Clock
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import kotlinx.datetime.Instant
 
-data class WasteStream(
+class WasteStream(
   val wasteStreamNumber: WasteStreamNumber,
-  val wasteType: WasteType,
-  val collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
-  val pickupLocation: PickupLocation,
-  val deliveryLocation: DeliveryLocation,
+  var wasteType: WasteType,
+  var collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
+  var pickupLocation: PickupLocation,
+  var deliveryLocation: DeliveryLocation,
   /**
    * Dutch: Afzender
    */
-  val consignorParty: Consignor,
+  var consignorParty: Consignor,
   /**
    * Dutch: Ontdoener
    */
-  val pickupParty: CompanyId,
+  var pickupParty: CompanyId,
   /**
    * Dutch: Handelaar
    */
-  val dealerParty: CompanyId? = null,
+  var dealerParty: CompanyId? = null,
   /**
    * Dutch: Inzamelaar
    */
-  val collectorParty: CompanyId? = null,
+  var collectorParty: CompanyId? = null,
   /**
    * Dutch: Bemiddelaar
    */
-  val brokerParty: CompanyId? = null,
+  var brokerParty: CompanyId? = null,
 
-  val lastActivityAt: Instant = Clock.System.now(),
+  var lastActivityAt: Instant = Clock.System.now(),
 
   var status: WasteStreamStatus = WasteStreamStatus.DRAFT,
 ) {
   init {
+    validateBusinessRules(
+      collectionType = collectionType,
+      pickupLocation = pickupLocation,
+      deliveryLocation = deliveryLocation,
+      consignorParty = consignorParty,
+      collectorParty = collectorParty,
+      brokerParty = brokerParty
+    )
+  }
+
+  private fun validateBusinessRules(
+    collectionType: WasteCollectionType,
+    pickupLocation: PickupLocation,
+    deliveryLocation: DeliveryLocation,
+    consignorParty: Consignor,
+    collectorParty: CompanyId?,
+    brokerParty: CompanyId?
+  ) {
     require(collectorParty == null || brokerParty == null) {
       "Een afvalstroomnummer kan niet zowel een handelaar als een bemiddelaar hebben"
     }
@@ -57,7 +75,7 @@ data class WasteStream(
       }
     }
 
-    require( collectionType == WasteCollectionType.DEFAULT || collectorParty != null) {
+    require(collectionType == WasteCollectionType.DEFAULT || collectorParty != null) {
       "Als er RouteInzameling of InzamelaarsRegeling wordt toegepast dan moet de inzamelaar zijn gevuld"
     }
 
@@ -74,7 +92,73 @@ data class WasteStream(
     return EffectiveStatusPolicy.compute(status, lastActivityAt, Clock.System.now())
   }
 
-  fun putInactive() {
+  /**
+   * Updates the waste stream with new values.
+   * Only allowed when status is DRAFT.
+   *
+   * @throws IllegalStateException if the waste stream is not in DRAFT status
+   */
+  fun update(
+    wasteType: WasteType,
+    collectionType: WasteCollectionType,
+    pickupLocation: PickupLocation,
+    deliveryLocation: DeliveryLocation,
+    consignorParty: Consignor,
+    pickupParty: CompanyId,
+    dealerParty: CompanyId?,
+    collectorParty: CompanyId?,
+    brokerParty: CompanyId?
+  ) {
+    check(status == WasteStreamStatus.DRAFT) {
+      "Afvalstroom kan alleen worden gewijzigd als de status DRAFT is. Huidige status: $status"
+    }
+
+    // Validate new state before applying changes
+    validateBusinessRules(
+      collectionType = collectionType,
+      pickupLocation = pickupLocation,
+      deliveryLocation = deliveryLocation,
+      consignorParty = consignorParty,
+      collectorParty = collectorParty,
+      brokerParty = brokerParty
+    )
+
+    // Apply changes
+    this.wasteType = wasteType
+    this.collectionType = collectionType
+    this.pickupLocation = pickupLocation
+    this.deliveryLocation = deliveryLocation
+    this.consignorParty = consignorParty
+    this.pickupParty = pickupParty
+    this.dealerParty = dealerParty
+    this.collectorParty = collectorParty
+    this.brokerParty = brokerParty
+    this.lastActivityAt = Clock.System.now()
+  }
+
+  /**
+   * Activates the waste stream.
+   * Only allowed when status is DRAFT.
+   *
+   * @throws IllegalStateException if the waste stream is not in DRAFT status
+   */
+  fun activate() {
+    check(status == WasteStreamStatus.DRAFT) {
+      "Afvalstroom kan alleen worden geactiveerd vanuit DRAFT status. Huidige status: $status"
+    }
+    status = WasteStreamStatus.ACTIVE
+  }
+
+  /**
+   * Marks the waste stream as deleted (inactive).
+   * Can be called from DRAFT or ACTIVE status.
+   *
+   * @throws IllegalStateException if the waste stream is already INACTIVE
+   */
+  fun delete() {
+    check(status != WasteStreamStatus.INACTIVE) {
+      "Afvalstroom is al inactief en kan niet opnieuw worden verwijderd"
+    }
     status = WasteStreamStatus.INACTIVE
   }
 }

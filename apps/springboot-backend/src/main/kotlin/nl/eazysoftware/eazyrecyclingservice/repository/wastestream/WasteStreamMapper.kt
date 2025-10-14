@@ -36,7 +36,7 @@ class WasteStreamMapper(
       wasteType = WasteType(
         name = dto.name,
         euralCode = EuralCode(dto.euralCode.code),
-        processingMethod = ProcessingMethod("A01")
+        processingMethod = ProcessingMethod(dto.processingMethodCode.code)
       ),
       collectionType = WasteCollectionType.valueOf(dto.wasteCollectionType),
       pickupLocation = when (actualPickupLocation) {
