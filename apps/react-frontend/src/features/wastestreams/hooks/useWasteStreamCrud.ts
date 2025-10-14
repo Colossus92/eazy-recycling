@@ -4,7 +4,7 @@ import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
 import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
-import { WasteStreamFilterFormValues } from '../components/filter/PlanningFilterForm';
+import { WasteStreamFilterFormValues } from '../components/filter/WasteStreamFilterForm';
 
 interface WasteStreamFilterParams {
     statuses?: string[];
@@ -26,6 +26,12 @@ export function useWasteStreamCrud() {
   const [itemToDelete, setItemToDelete] = useState<WasteStreamListView | undefined>(undefined);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState<WasteStreamFilterParams>({statuses: undefined});
+  const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WasteStreamFilterFormValues>({
+    isDraft: false,
+    isActive: false,
+    isInactive: false,
+    isExpired: false,
+  });
   const displayedWasteStreams = useMemo(
     () => {
       console.log(JSON.stringify(filters))
@@ -58,7 +64,7 @@ export function useWasteStreamCrud() {
     if (values.isInactive) statuses.push('INACTIVE');
     if (values.isExpired) statuses.push('EXPIRED');
 
-
+    setCurrentFilterFormValues(values);
     setFilters({
       statuses: statuses.length > 0 ? statuses : undefined,
     });
@@ -129,6 +135,7 @@ export function useWasteStreamCrud() {
         isFilterOpen,
         setIsFilterOpen,
         applyFilterFormValues,
+        currentFormValues: currentFilterFormValues,
       },
       errorHandling: {
         error,

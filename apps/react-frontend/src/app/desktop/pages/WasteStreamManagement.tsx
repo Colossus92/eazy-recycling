@@ -17,7 +17,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { Drawer } from '@/components/ui/drawer/Drawer';
-import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/PlanningFilterForm';
+import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/WasteStreamFilterForm';
 
 type Column<T> = {
   key: keyof T;
@@ -158,6 +158,7 @@ export const WasteStreamManagement = () => {
         <WasteStreamFilterForm
           onSubmit={read.filter.applyFilterFormValues}
           closeDialog={() => read.filter.setIsFilterOpen(false)}
+          currentValues={read.filter.currentFormValues}
         />
       </Drawer>
     </>

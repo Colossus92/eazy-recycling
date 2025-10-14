@@ -3,6 +3,7 @@ import { CheckboxField } from '@/components/ui/form/CheckboxField.tsx';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '../WasteStreamStatusTag';
+import { useEffect } from 'react';
 
 export interface WasteStreamFilterFormValues {
   isDraft: boolean;
@@ -41,20 +42,22 @@ const StatusFilterOption = ({
 interface WasteStreamFilterFormProps {
   closeDialog: () => void;
   onSubmit: (values: WasteStreamFilterFormValues) => void;
+  currentValues: WasteStreamFilterFormValues;
 }
 
 export const WasteStreamFilterForm = ({
   closeDialog,
   onSubmit,
+  currentValues,
 }: WasteStreamFilterFormProps) => {
   const formContext = useForm<WasteStreamFilterFormValues>({
-    defaultValues: {
-      isDraft: false,
-      isActive: false,
-      isInactive: false,
-      isExpired: false,
-    },
+    defaultValues: currentValues,
   });
+
+  // Reset form with current values when they change (e.g., when drawer reopens)
+  useEffect(() => {
+    formContext.reset(currentValues);
+  }, [currentValues, formContext]);
 
   const handleApplyFilter = formContext.handleSubmit((data) => {
     onSubmit(data);
@@ -66,7 +69,12 @@ export const WasteStreamFilterForm = ({
   });
 
   const handleReset = () => {
-    formContext.reset();
+    formContext.reset({
+      isDraft: false,
+      isActive: false,
+      isInactive: false,
+      isExpired: false,
+    });
     handleApplyFilter();
   };
 
