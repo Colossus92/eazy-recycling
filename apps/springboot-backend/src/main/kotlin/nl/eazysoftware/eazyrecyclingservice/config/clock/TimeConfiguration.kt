@@ -15,22 +15,18 @@ import java.time.ZoneId
  * This affects all java.time operations, Hibernate, and Jackson serialization.
  */
 object TimeConfiguration {
-    /**
-     * UTC timezone for all domain calculations and storage.
-     * Use this for calendar arithmetic (adding years, months, days).
-     */
-    val DOMAIN_TIMEZONE: TimeZone = TimeZone.Companion.UTC
+  /**
+   * UTC timezone for all domain calculations and storage.
+   * Use this for calendar arithmetic (adding years, months, days).
+   */
+  val DOMAIN_TIMEZONE: TimeZone = TimeZone.UTC
 
-    /**
-     * Display timezone for user-facing timestamps (frontend, reports, logs).
-     * Europe/Amsterdam handles CET (UTC+1) and CEST (UTC+2) automatically.
-     *
-     * Use this when converting UTC timestamps to local time for display purposes.
-     */
-    val DISPLAY_TIMEZONE: ZoneId = ZoneId.of("Europe/Amsterdam")
 
-    /**
-     * Kotlinx.datetime version of display timezone for conversions.
-     */
-    val DISPLAY_TIMEZONE_KX: TimeZone = TimeZone.Companion.of("Europe/Amsterdam")
+  /**
+   * Display timezone for user-facing timestamps (frontend, reports, logs).
+   * Europe/Amsterdam handles CET (UTC+1) and CEST (UTC+2) automatically.
+   *
+   * Use this when converting UTC timestamps to local time for display purposes.
+   */
+  val DISPLAY_TIMEZONE_KX: TimeZone = TimeZone.of("Europe/Amsterdam")
 }

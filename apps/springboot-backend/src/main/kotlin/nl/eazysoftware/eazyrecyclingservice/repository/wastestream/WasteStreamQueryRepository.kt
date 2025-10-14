@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.Clock
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.EffectiveStatusPolicy
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamStatus
@@ -69,7 +70,7 @@ class WasteStreamQueryRepository(
         consignorPartyName = columns[4] as String,
         pickupLocation = formatPickupLocation(columns),
         deliveryLocation = "${columns[11]} ${columns[12]}, ${columns[13]}",
-        lastActivityAt = lastActivityAt.toKotlinInstant(),
+        lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
         status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(status), lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
       )
     }
@@ -117,7 +118,7 @@ class WasteStreamQueryRepository(
       collectorParty = wasteStream.collectorParty?.let { mapCompany(it) },
       brokerParty = wasteStream.brokerParty?.let { mapCompany(it) },
       status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(wasteStream.status), wasteStream.lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
-      lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant()
+      lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant().toDisplayTime()
     )
   }
 
