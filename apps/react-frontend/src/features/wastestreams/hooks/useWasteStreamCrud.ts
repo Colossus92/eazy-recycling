@@ -4,6 +4,8 @@ import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
 import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
+import { WasteStreamFilterParams } from '@/features/wastestreams/components/filter/useWasteStreamFilter';
+import { WasteStreamFilterFormValues } from '../components/filter/PlanningFilterForm';
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
@@ -17,21 +19,48 @@ export function useWasteStreamCrud() {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [query, setQuery] = useState<string>('');
-  const displayedWasteStreams = useMemo(
-    () =>
-      wasteStreams.filter((wasteStream) => {
-        return (
-          wasteStream.wasteStreamNumber.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.wasteName.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.consignorPartyName.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.pickupLocation?.toLowerCase().includes(query.toLowerCase()) ||
-          wasteStream.deliveryLocation?.toLowerCase().includes(query.toLowerCase())
-        );
-      }),
-    [wasteStreams, query]
-  );
   const [itemToEdit, setItemToEdit] = useState<WasteStreamDetailView | undefined>(undefined);
   const [itemToDelete, setItemToDelete] = useState<WasteStreamListView | undefined>(undefined);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<WasteStreamFilterParams>({statuses: undefined});
+  const displayedWasteStreams = useMemo(
+    () => {
+      console.log(JSON.stringify(filters))
+      console.log(JSON.stringify(wasteStreams))
+      return wasteStreams.filter((wasteStream) => {
+        // Apply search query filter (OR logic for different fields)
+        const matchesQuery = query === '' || (
+          wasteStream.wasteStreamNumber.toLowerCase().includes(query.toLowerCase()) 
+          || wasteStream.wasteName.toLowerCase().includes(query.toLowerCase()) 
+          || wasteStream.consignorPartyName.toLowerCase().includes(query.toLowerCase()) 
+          || wasteStream.pickupLocation?.toLowerCase().includes(query.toLowerCase()) 
+          || wasteStream.deliveryLocation?.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        // Apply status filter (AND logic - must match if filter is active)
+        const matchesStatusFilter = !filters.statuses || filters.statuses.includes(wasteStream.status);
+        
+        return matchesQuery && matchesStatusFilter;
+      })
+    },
+    [wasteStreams, query, filters]
+  );
+
+
+  const applyFilterFormValues = (values: WasteStreamFilterFormValues) => {
+    const statuses: string[] = [];
+
+    if (values.isDraft) statuses.push('DRAFT');
+    if (values.isActive) statuses.push('ACTIVE');
+    if (values.isInactive) statuses.push('INACTIVE');
+    if (values.isExpired) statuses.push('EXPIRED');
+
+
+    setFilters({
+      statuses: statuses.length > 0 ? statuses : undefined,
+    });
+  };
+
 
   const createMutation = useMutation({
     mutationFn: (item: WasteStreamRequest) =>
@@ -52,7 +81,7 @@ export function useWasteStreamCrud() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ wasteStreamNumber, item }: { wasteStreamNumber: string; item: WasteStreamRequest }) => 
+    mutationFn: ({ wasteStreamNumber, item }: { wasteStreamNumber: string; item: WasteStreamRequest }) =>
       wasteStreamService.update(wasteStreamNumber, item),
     onSuccess: () => {
       queryClient
@@ -72,7 +101,7 @@ export function useWasteStreamCrud() {
 
   const update = async (wasteStreamNumber: string, item: WasteStreamRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
-      updateMutation.mutate({wasteStreamNumber, item }, {
+      updateMutation.mutate({ wasteStreamNumber, item }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -93,6 +122,11 @@ export function useWasteStreamCrud() {
       items: displayedWasteStreams,
       setQuery,
       isFetching,
+      filter: {
+        isFilterOpen,
+        setIsFilterOpen,
+        applyFilterFormValues,
+      },
       errorHandling: {
         error,
         reset: () => {

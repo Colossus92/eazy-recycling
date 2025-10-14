@@ -16,6 +16,8 @@ import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
+import { Drawer } from '@/components/ui/drawer/Drawer';
+import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/PlanningFilterForm';
 
 type Column<T> = {
   key: keyof T;
@@ -43,7 +45,7 @@ export const WasteStreamManagement = () => {
     <>
       <ContentContainer title={"Afvalstroomnummers"}>
         <div className="flex-1 flex flex-col items-start self-stretch pt-4 gap-4 border border-solid rounded-radius-xl border-color-border-primary bg-color-surface-primary overflow-hidden">
-          <ContentTitleBar setQuery={read.setQuery}>
+          <ContentTitleBar setQuery={read.setQuery} setIsFilterOpen={read.filter.setIsFilterOpen}>
             <Button
               variant={'primary'}
               icon={Plus}
@@ -100,13 +102,13 @@ export const WasteStreamManagement = () => {
                             </td>
                           ))}
                           <td className="p-4 text-center">
-                            { item.status !== 'INACTIVE' && item.status !== 'EXPIRED' &&
+                            {item.status !== 'INACTIVE' && item.status !== 'EXPIRED' &&
                               <ActionMenu<WasteStreamListView>
                                 onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
                                 onDelete={(wasteStream) => deletion.initiate(wasteStream)}
                                 item={item}
                               />
-                              }
+                            }
                           </td>
                         </tr>
                       ))}
@@ -148,6 +150,16 @@ export const WasteStreamManagement = () => {
         setIsOpen={form.close}
         wasteStreamNumber={form.item?.wasteStreamNumber}
       />
+      <Drawer
+        title={'Afvalstroomnummer filter'}
+        isOpen={read.filter.isFilterOpen}
+        setIsOpen={read.filter.setIsFilterOpen}
+      >
+        <WasteStreamFilterForm
+          onSubmit={read.filter.applyFilterFormValues}
+          closeDialog={() => read.filter.setIsFilterOpen(false)}
+        />
+      </Drawer>
     </>
   );
 };
