@@ -1,6 +1,6 @@
 import { Tag, TagColor } from '@/components/ui/tag/Tag';
 
-interface WasteStreamStatusTagProps {
+export interface WasteStreamStatusTagProps {
   status: 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
 }
 

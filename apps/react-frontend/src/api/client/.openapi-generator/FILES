@@ -47,6 +47,9 @@ models/goods-dto.ts
 models/goods-item-dto.ts
 models/goods-request.ts
 models/index.ts
+models/local-date-time.ts
+models/local-date.ts
+models/local-time.ts
 models/location-dto.ts
 models/no-pickup-location-request.ts
 models/person-consignor-view.ts

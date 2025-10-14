@@ -15,12 +15,13 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
-import { WasteStreamStatusTag } from '@/features/wastestreams/components/WasteStreamStatusTag';
+import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
 
 type Column<T> = {
   key: keyof T;
   label: string;
-  accessor: (value: T) => string | undefined;
+  accessor: (value: T) => React.ReactNode;
+  title: (value: T) => string | undefined;
   width: string;
 };
 
@@ -30,12 +31,12 @@ export const WasteStreamManagement = () => {
   const {read, form, deletion } = useWasteStreamCrud();
 
   const columns: Column<WasteStreamListView>[] = [
-    { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, width: '14%' },
-    { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, width: '14%' },
-    { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, width: '25%' },
-    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, width: '25%' },
-    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status}  />, width: '8%' },
+    { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, title: (item) => item.wasteStreamNumber, width: '14%' },
+    { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, title: (item) => item.wasteName, width: '14%' },
+    { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
+    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, title: (item) => item.pickupLocation, width: '25%' },
+    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, title: (item) => item.deliveryLocation, width: '25%' },
+    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status as WasteStreamStatusTagProps['status']}  />, title: (item) => item.status, width: '8%' },
   ];
 
   return (
@@ -94,7 +95,7 @@ export const WasteStreamManagement = () => {
                       .map((item, index) => (
                         <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
                           {columns.map((col) => (
-                            <td className="p-4 truncate" key={String(col.key)} title={col.accessor(item)}>
+                            <td className="p-4 truncate" key={String(col.key)} title={col.title(item)}>
                               {col.accessor(item)}
                             </td>
                           ))}

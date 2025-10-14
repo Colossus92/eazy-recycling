@@ -21,6 +21,9 @@ import type { CompanyView } from './company-view';
 import type { DeliveryLocationView } from './delivery-location-view';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { LocalDateTime } from './local-date-time';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WasteStreamDetailViewConsignorParty } from './waste-stream-detail-view-consignor-party';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -95,5 +98,17 @@ export interface WasteStreamDetailView {
      * @memberof WasteStreamDetailView
      */
     'brokerParty'?: CompanyView;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamDetailView
+     */
+    'status': string;
+    /**
+     * 
+     * @type {LocalDateTime}
+     * @memberof WasteStreamDetailView
+     */
+    'lastActivityAt': LocalDateTime;
 }
 

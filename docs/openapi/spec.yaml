@@ -1932,6 +1932,164 @@ components:
       required:
       - address
       - name
+    LocalDate:
+      type: object
+      properties:
+        value:
+          type: string
+          format: date
+          writeOnly: true
+        year:
+          type: integer
+          format: int32
+        dayOfMonth:
+          type: integer
+          format: int32
+        month:
+          type: string
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+        dayOfWeek:
+          type: string
+          enum:
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          - SUNDAY
+        dayOfYear:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
+        monthNumber:
+          type: integer
+          format: int32
+      required:
+      - dayOfMonth
+      - dayOfWeek
+      - dayOfYear
+      - month
+      - monthNumber
+      - value$kotlinx_datetime
+      - year
+    LocalDateTime:
+      type: object
+      properties:
+        value:
+          type: string
+          format: date-time
+          writeOnly: true
+        time:
+          $ref: "#/components/schemas/LocalTime"
+        year:
+          type: integer
+          format: int32
+        dayOfMonth:
+          type: integer
+          format: int32
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        month:
+          type: string
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+        dayOfWeek:
+          type: string
+          enum:
+          - MONDAY
+          - TUESDAY
+          - WEDNESDAY
+          - THURSDAY
+          - FRIDAY
+          - SATURDAY
+          - SUNDAY
+        dayOfYear:
+          type: integer
+          format: int32
+        date:
+          $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
+        monthNumber:
+          type: integer
+          format: int32
+        nanosecond:
+          type: integer
+          format: int32
+      required:
+      - date
+      - dayOfMonth
+      - dayOfWeek
+      - dayOfYear
+      - hour
+      - minute
+      - month
+      - monthNumber
+      - nanosecond
+      - second
+      - time
+      - value$kotlinx_datetime
+      - year
+    LocalTime:
+      type: object
+      properties:
+        value:
+          type: string
+          writeOnly: true
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+        nanosecond:
+          type: integer
+          format: int32
+      required:
+      - hour
+      - minute
+      - nanosecond
+      - second
+      - value$kotlinx_datetime
     WasteStreamListView:
       type: object
       properties:
@@ -1949,12 +2107,18 @@ components:
           type: string
         deliveryLocation:
           type: string
+        status:
+          type: string
+        lastActivityAt:
+          $ref: "#/components/schemas/LocalDateTime"
       required:
       - consignorPartyName
       - deliveryLocation
       - euralCode
+      - lastActivityAt
       - pickupLocation
       - processingMethodCode
+      - status
       - wasteName
       - wasteStreamNumber
     AddressView:
@@ -2131,11 +2295,17 @@ components:
           $ref: "#/components/schemas/CompanyView"
         brokerParty:
           $ref: "#/components/schemas/CompanyView"
+        status:
+          type: string
+        lastActivityAt:
+          $ref: "#/components/schemas/LocalDateTime"
       required:
       - collectionType
       - consignorParty
       - deliveryLocation
+      - lastActivityAt
       - pickupParty
+      - status
       - wasteStreamNumber
       - wasteType
     WasteTypeView:

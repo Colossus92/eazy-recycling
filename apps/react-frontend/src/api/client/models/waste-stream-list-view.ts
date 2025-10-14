@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { LocalDateTime } from './local-date-time';
 
 /**
  * 
@@ -62,5 +65,17 @@ export interface WasteStreamListView {
      * @memberof WasteStreamListView
      */
     'deliveryLocation': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
+    'status': string;
+    /**
+     * 
+     * @type {LocalDateTime}
+     * @memberof WasteStreamListView
+     */
+    'lastActivityAt': LocalDateTime;
 }
 
