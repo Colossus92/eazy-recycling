@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.config
+package nl.eazysoftware.eazyrecyclingservice.config.clock
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,6 +10,6 @@ class ClockConfig {
 
     @Bean
     fun clock(): Clock {
-        return Clock.system(ZoneId.of("CET"))
+        return Clock.system(ZoneId.of("UTC"))
     }
 }

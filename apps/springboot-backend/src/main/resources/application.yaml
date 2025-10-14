@@ -19,6 +19,7 @@ spring:
         schema-generation.scripts.action: create
         schema-generation.scripts.create-target: schema.sql
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc.time_zone: UTC
 
 # CORS Configuration
 cors:

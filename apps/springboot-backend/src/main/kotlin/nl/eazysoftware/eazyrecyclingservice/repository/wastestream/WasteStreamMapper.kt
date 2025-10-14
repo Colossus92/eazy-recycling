@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
+import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
@@ -12,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -68,6 +70,8 @@ class WasteStreamMapper(
       dealerParty = dto.dealerParty?.let { CompanyId(it.id!!) },
       collectorParty = dto.collectorParty?.let { CompanyId(it.id!!) },
       brokerParty = dto.brokerParty?.let { CompanyId(it.id!!) },
+      lastActivityAt = dto.lastActivityAt.toKotlinInstant(),
+      status = WasteStreamStatus.valueOf(dto.status)
     )
   }
 
@@ -97,6 +101,8 @@ class WasteStreamMapper(
       dealerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       collectorParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       brokerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
+      lastActivityAt = domain.lastActivityAt.toJavaInstant(),
+      status = domain.status.name
     )
   }
 

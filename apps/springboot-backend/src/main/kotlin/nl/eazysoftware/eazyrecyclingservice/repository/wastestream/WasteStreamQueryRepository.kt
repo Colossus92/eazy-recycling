@@ -1,8 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
+import kotlinx.datetime.Clock
+import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.EffectiveStatusPolicy
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
@@ -13,6 +17,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocati
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.time.Instant
 import java.util.*
 
 @Repository
@@ -38,7 +43,9 @@ class WasteStreamQueryRepository(
                 pl.company_id,
                 dc.street_name,
                 dc.building_number,
-                dc.city
+                dc.city,
+                ws.status,
+                ws.last_activity_at
             FROM waste_streams ws
             JOIN eural e ON ws.eural_code = e.code
             JOIN processing_methods pm ON ws.processing_method_code = pm.code
@@ -52,6 +59,8 @@ class WasteStreamQueryRepository(
 
     return results.map { row ->
       val columns = row as Array<*>
+      val status = columns[14] as String
+      val lastActivityAt = columns[15] as Instant
       WasteStreamListView(
         wasteStreamNumber = columns[0] as String,
         wasteName = columns[1] as String,
@@ -60,6 +69,8 @@ class WasteStreamQueryRepository(
         consignorPartyName = columns[4] as String,
         pickupLocation = formatPickupLocation(columns),
         deliveryLocation = "${columns[11]} ${columns[12]}, ${columns[13]}",
+        lastActivityAt = lastActivityAt.toKotlinInstant(),
+        status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(status), lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
       )
     }
   }
@@ -104,7 +115,9 @@ class WasteStreamQueryRepository(
       pickupParty = mapCompany(wasteStream.pickupParty),
       dealerParty = wasteStream.dealerParty?.let { mapCompany(it) },
       collectorParty = wasteStream.collectorParty?.let { mapCompany(it) },
-      brokerParty = wasteStream.brokerParty?.let { mapCompany(it) }
+      brokerParty = wasteStream.brokerParty?.let { mapCompany(it) },
+      status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(wasteStream.status), wasteStream.lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
+      lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant()
     )
   }
 

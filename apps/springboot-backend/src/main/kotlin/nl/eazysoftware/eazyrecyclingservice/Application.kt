@@ -6,9 +6,18 @@ import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+import java.util.TimeZone
+import jakarta.annotation.PostConstruct
 
 @SpringBootApplication
-class Application
+class Application {
+    
+    @PostConstruct
+    fun init() {
+        // Set JVM default timezone to UTC for consistency
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
+    }
+}
 
 fun main(args: Array<String>) {
     runApplication<Application>(*args)
