@@ -28,7 +28,7 @@ type Column<T> = {
 export const WasteStreamManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const {read, form, deletion } = useWasteStreamCrud();
+  const { read, form, deletion } = useWasteStreamCrud();
 
   const columns: Column<WasteStreamListView>[] = [
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, title: (item) => item.wasteStreamNumber, width: '14%' },
@@ -36,7 +36,7 @@ export const WasteStreamManagement = () => {
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
     { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, title: (item) => item.pickupLocation, width: '25%' },
     { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, title: (item) => item.deliveryLocation, width: '25%' },
-    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status as WasteStreamStatusTagProps['status']}  />, title: (item) => item.status, width: '8%' },
+    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status as WasteStreamStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
   ];
 
   return (
@@ -51,8 +51,8 @@ export const WasteStreamManagement = () => {
               onClick={form.openForCreate}
             />
           </ContentTitleBar>
-          <ErrorBoundary 
-            fallbackRender={fallbackRender} 
+          <ErrorBoundary
+            fallbackRender={fallbackRender}
             onReset={read.errorHandling.reset}
           >
             <ErrorThrowingComponent error={read.errorHandling.error} />
@@ -100,11 +100,13 @@ export const WasteStreamManagement = () => {
                             </td>
                           ))}
                           <td className="p-4 text-center">
-                            <ActionMenu<WasteStreamListView>
-                              onEdit={form.openForEdit}
-                              onDelete={(wasteStream) => deletion.initiate(wasteStream)}
-                              item={item}
-                            />
+                            { item.status !== 'INACTIVE' && item.status !== 'EXPIRED' &&
+                              <ActionMenu<WasteStreamListView>
+                                onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
+                                onDelete={(wasteStream) => deletion.initiate(wasteStream)}
+                                item={item}
+                              />
+                              }
                           </td>
                         </tr>
                       ))}

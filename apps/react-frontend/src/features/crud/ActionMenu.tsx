@@ -13,7 +13,7 @@ export interface AdditionalAction<T> {
 }
 
 interface ActionMenuProps<T> {
-  onEdit: (item: T) => void;
+  onEdit?: (item: T) => void;
   onDelete: (item: T) => void;
   item: T;
   additionalActions?: AdditionalAction<T>[];
@@ -53,7 +53,7 @@ export const ActionMenu = <T,>({
         ))}
 
         {/* Standard edit action */}
-        <MenuItem>
+        {onEdit && <MenuItem>
           <div
             className={
               'flex flex-col items-start self-stretch p-2 border-b border-solid border-color-border-primary'
@@ -65,7 +65,7 @@ export const ActionMenu = <T,>({
               onClick={() => onEdit(item)}
             />
           </div>
-        </MenuItem>
+        </MenuItem>}
 
         {/* Standard delete action */}
         <MenuItem>
