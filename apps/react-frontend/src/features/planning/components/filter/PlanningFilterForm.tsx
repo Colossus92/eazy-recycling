@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
 import { CheckboxField } from '@/components/ui/form/CheckboxField.tsx';
-import { Tag } from '@/components/ui/tag/Tag.tsx';
+import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import { Button } from '@/components/ui/button/Button.tsx';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 
@@ -37,7 +37,7 @@ const StatusFilterOption = ({
           control: formContext.control,
         }}
       >
-        <Tag status={status}></Tag>
+        <TransportStatusTag status={status}></TransportStatusTag>
       </CheckboxField>
     </div>
   );

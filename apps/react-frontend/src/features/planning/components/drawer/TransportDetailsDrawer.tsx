@@ -11,7 +11,7 @@ import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
 import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
-import { Tag } from '@/components/ui/tag/Tag';
+import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
 import Warning from '@/assets/icons/Warning.svg?react';
 import PhRecycleLight from '@/assets/icons/PhRecycleLight.svg?react';
@@ -121,7 +121,7 @@ export const TransportDetailsDrawer = ({
                     Status
                   </span>
                 </div>
-                <Tag status={data.status} />
+                <TransportStatusTag status={data.status} />
               </div>
               <div className={'flex items-center gap-2 self-stretch'}>
                 <div className="flex items-center flex-1 gap-2">

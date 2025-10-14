@@ -1,10 +1,10 @@
 import clsx from 'clsx';
 
-interface TagProps {
+interface TransportStatusTagProps {
   status: 'INVOICED' | 'FINISHED' | 'UNPLANNED' | 'ERROR' | 'PLANNED';
 }
 
-export const Tag = ({ status }: TagProps) => {
+export const TransportStatusTag = ({ status }: TransportStatusTagProps) => {
   const baseClasses =
     'inline-flex py-1 px-2 justify-center items-center gap-1 rounded-radius-xs text-subtitle-2 font-urbanist';
   const statusClasses = {

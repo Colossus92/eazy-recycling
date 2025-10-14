@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.config.clock
 
 import kotlinx.datetime.TimeZone
-import java.time.ZoneId
 
 /**
  * Centralized time configuration for the application.

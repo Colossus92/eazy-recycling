@@ -7,7 +7,7 @@ import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import CheckCircleOutline from '@/assets/icons/CheckCircleOutline.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
-import { Tag } from '@/components/ui/tag/Tag';
+import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import { MobileTabBar } from '@/components/ui/mobile/MobileTabBar';
 import { Button } from '@/components/ui/button/Button';
 import { ReportFinishedComponent } from '@/features/mobile/planning/ReportFinishedComponent';
@@ -100,7 +100,7 @@ export const MobileTransportDetailsPage = () => {
                   Status
                 </span>
               </div>
-              <Tag status={transport.status}></Tag>
+              <TransportStatusTag status={transport.status}></TransportStatusTag>
             </div>
             <div className="flex items-center self-stretch gap-2">
               <div className="flex items-center flex-1 gap-2">

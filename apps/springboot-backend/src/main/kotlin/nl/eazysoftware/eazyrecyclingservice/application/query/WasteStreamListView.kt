@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 
 data class WasteStreamListView(

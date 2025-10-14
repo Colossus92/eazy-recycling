@@ -8,7 +8,7 @@ import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import { Button } from '@/components/ui/button/Button.tsx';
-import { Tag } from '@/components/ui/tag/Tag.tsx';
+import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 
 interface PlanningCardPopoverProps {
@@ -148,7 +148,7 @@ export const PlanningCardPopover = ({
             <CheckCircle
               className={'w-5 h-5 text-color-text-secondary flex-shrink-0'}
             />
-            <Tag status={transport.status} />
+            <TransportStatusTag status={transport.status} />
           </div>
           <div className={'flex items-center gap-2 self-stretch'}>
             <ShippingContainer
