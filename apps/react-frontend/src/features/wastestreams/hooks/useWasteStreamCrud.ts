@@ -4,8 +4,11 @@ import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
 import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
-import { WasteStreamFilterParams } from '@/features/wastestreams/components/filter/useWasteStreamFilter';
 import { WasteStreamFilterFormValues } from '../components/filter/PlanningFilterForm';
+
+interface WasteStreamFilterParams {
+    statuses?: string[];
+}
 
 export function useWasteStreamCrud() {
   const queryClient = useQueryClient();
