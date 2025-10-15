@@ -19,11 +19,11 @@ import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wast
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/WasteStreamFilterForm';
 
-type Column<T> = {
-  key: keyof T;
+type Column = {
+  key: keyof WasteStreamListView;
   label: string;
-  accessor: (value: T) => React.ReactNode;
-  title: (value: T) => string | undefined;
+  accessor: (value: WasteStreamListView) => React.ReactNode;
+  title: (value: WasteStreamListView) => string | undefined;
   width: string;
 };
 
@@ -32,7 +32,7 @@ export const WasteStreamManagement = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { read, form, deletion } = useWasteStreamCrud();
 
-  const columns: Column<WasteStreamListView>[] = [
+  const columns: Column[] = [
     { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, title: (item) => item.wasteStreamNumber, width: '14%' },
     { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, title: (item) => item.wasteName, width: '14%' },
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
