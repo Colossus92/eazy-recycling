@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.application.usecase
+package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface CreateWeightTicket {
-  fun handle(cmd: CreateWeightTicketCommand): WeightTicketResult
+  fun handle(cmd: WeightTicketCommand): WeightTicketResult
 }
 
 /**
  * Command for creating a weight ticket.
  * Contains GoodsCommand with only waste stream reference - full WasteStream will be fetched in the service.
  */
-data class CreateWeightTicketCommand(
+data class WeightTicketCommand(
   val consignorParty: Consignor,
   val carrierParty: CompanyId?,
   val truckLicensePlate: LicensePlate?,
@@ -35,7 +35,7 @@ class CreateWeightTicketService(
 ) : CreateWeightTicket {
 
   @Transactional
-  override fun handle(cmd: CreateWeightTicketCommand): WeightTicketResult {
+  override fun handle(cmd: WeightTicketCommand): WeightTicketResult {
     val id = weightTicketRepo.nextId()
 
     val ticket = WeightTicket(

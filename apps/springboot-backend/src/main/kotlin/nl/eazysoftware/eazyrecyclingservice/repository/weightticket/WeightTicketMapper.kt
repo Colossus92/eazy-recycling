@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component
 @Component
 class WeightTicketMapper(
   private val companyRepository: CompanyRepository,
-  private val wasteStreamMapper: WasteStreamMapper,
 ) {
 
   fun toDomain(dto: WeightTicketDto): WeightTicket {
@@ -38,10 +37,9 @@ class WeightTicketMapper(
   fun toDto(domain: WeightTicket): WeightTicketDto {
     val carrierParty = domain.carrierParty?.uuid
       ?.let { companyRepository.findByIdOrNull(it) ?: throw IllegalStateException("Transporteur niet gevonden: ${it}") }
-
-    val consignorParty = when (domain.consignorParty) {
-      is Consignor.Company -> companyRepository.findByIdOrNull(domain.consignorParty.id.uuid)
-        ?: throw IllegalArgumentException("Opdrachtgever niet gevonden: ${domain.consignorParty.id.uuid}")
+    val consignorParty = when (val consignor = domain.consignorParty) {
+      is Consignor.Company -> companyRepository.findByIdOrNull(consignor.id.uuid)
+        ?: throw IllegalArgumentException("Opdrachtgever niet gevonden: ${consignor.id.uuid}")
 
       Consignor.Person -> throw IllegalArgumentException("Particuliere opdrachtgever wordt nog niet ondersteund.")
     }

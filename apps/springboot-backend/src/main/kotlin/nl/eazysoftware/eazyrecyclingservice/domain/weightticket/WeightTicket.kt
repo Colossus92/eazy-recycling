@@ -9,14 +9,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
 
 class WeightTicket(
   val id: WeightTicketId,
-  val consignorParty: Consignor,
+  var consignorParty: Consignor,
   var status: WeightTicketStatus = WeightTicketStatus.DRAFT,
-  val carrierParty: CompanyId?,
-  val truckLicensePlate: LicensePlate?,
-  val reclamation: String?,
-  val note: Note?,
+  var carrierParty: CompanyId?,
+  var truckLicensePlate: LicensePlate?,
+  var reclamation: String?,
+  var note: Note?,
   val createdAt: Instant = Clock.System.now(),
-  val updatedAt: Instant? = null,
+  var updatedAt: Instant? = null,
   val weightedAt: Instant? = null,
 ) {
   fun delete() {
@@ -30,6 +30,24 @@ class WeightTicket(
       "Weegbon is al verwerkt en kan niet worden geannuleerd"
     }
     this.status = WeightTicketStatus.CANCELLED
+  }
+
+  fun update(
+    carrierParty: CompanyId? = this.carrierParty,
+    consignorParty: Consignor = this.consignorParty,
+    truckLicensePlate: LicensePlate? = this.truckLicensePlate,
+    reclamation: String? = this.reclamation,
+    note: Note? = this.note,
+  ) {
+    check(status == WeightTicketStatus.DRAFT) {
+      "Weegbon kan alleen worden gewijzigd als de status concept is."
+    }
+    this.carrierParty = carrierParty
+    this.consignorParty = consignorParty
+    this.truckLicensePlate = truckLicensePlate
+    this.reclamation = reclamation
+    this.note = note
+    this.updatedAt = Clock.System.now()
   }
 }
 

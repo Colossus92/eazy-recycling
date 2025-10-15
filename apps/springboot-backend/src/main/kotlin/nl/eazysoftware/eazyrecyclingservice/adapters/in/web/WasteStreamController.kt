@@ -2,17 +2,16 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWasteStream
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.WasteStreamCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStream
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWasteStreamCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.UpdateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.DeleteWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.DeleteWasteStreamCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.UpdateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId

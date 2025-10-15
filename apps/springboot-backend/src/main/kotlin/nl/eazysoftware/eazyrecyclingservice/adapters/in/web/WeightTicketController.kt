@@ -1,11 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
+import jakarta.validation.Valid
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicketCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.DeleteWeightTicketCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.WeightTicketCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.DeleteWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.DeleteWeightTicketCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.UpdateWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
@@ -20,6 +22,7 @@ import java.util.*
 class WeightTicketController(
   private val create: CreateWeightTicket,
   private val weightTicketService: WeightTicketService,
+  private val updateWeightTicket: UpdateWeightTicket,
   private val deleteWeightTicket: DeleteWeightTicket,
 ) {
   @PostMapping
@@ -42,6 +45,16 @@ class WeightTicketController(
     return weightTicketService.getWeightTicketByNumber(WeightTicketId(weightTicketId))
   }
 
+  @PutMapping("/{weightTicketId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun update(
+    @PathVariable
+    weightTicketId: Long,
+    @Valid @RequestBody request: WeightTicketRequest
+  ) {
+    updateWeightTicket.handle(WeightTicketId(weightTicketId), request.toCommand())
+  }
+
   @DeleteMapping("/{weightTicketId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun delete(
@@ -59,9 +72,8 @@ data class WeightTicketRequest(
   val reclamation: String?,
   val note: String?,
 ) {
-  fun toCommand(): CreateWeightTicketCommand {
-    // map ids to value objects here
-    return CreateWeightTicketCommand(
+  fun toCommand(): WeightTicketCommand {
+    return WeightTicketCommand(
       carrierParty = carrierParty?.let { CompanyId(it) },
       consignorParty = consignorParty.toDomain(),
       truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },

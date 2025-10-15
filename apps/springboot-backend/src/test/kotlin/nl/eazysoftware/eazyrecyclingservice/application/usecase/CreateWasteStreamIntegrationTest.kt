@@ -1,5 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
+import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
@@ -133,24 +136,24 @@ class CreateWasteStreamIntegrationTest {
 
   private fun createTestCommand(processorId: ProcessorPartyId): WasteStreamCommand {
     return WasteStreamCommand(
-      wasteType = WasteType(
-        name = "Test Waste",
-        euralCode = EuralCode("010101"),
-        processingMethod = ProcessingMethod("R01")
-      ),
-      collectionType = WasteCollectionType.DEFAULT,
-      pickupLocation = PickupLocation.DutchAddress(
-        streetName = "Test Street",
-        postalCode = nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode("1234AB"),
-        buildingNumber = "1",
-        city = "Test City"
-      ),
-      deliveryLocation = DeliveryLocation(processorPartyId = processorId),
-      consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
-      pickupParty = CompanyId(UUID.randomUUID()),
-      dealerParty = null,
-      collectorParty = null,
-      brokerParty = null
+        wasteType = WasteType(
+            name = "Test Waste",
+            euralCode = EuralCode("010101"),
+            processingMethod = ProcessingMethod("R01")
+        ),
+        collectionType = WasteCollectionType.DEFAULT,
+        pickupLocation = PickupLocation.DutchAddress(
+            streetName = "Test Street",
+            postalCode = DutchPostalCode("1234AB"),
+            buildingNumber = "1",
+            city = "Test City"
+        ),
+        deliveryLocation = DeliveryLocation(processorPartyId = processorId),
+        consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
+        pickupParty = CompanyId(UUID.randomUUID()),
+        dealerParty = null,
+        collectorParty = null,
+        brokerParty = null
     )
   }
 }

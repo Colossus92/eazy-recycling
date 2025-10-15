@@ -8,6 +8,59 @@ servers:
 security:
 - bearerAuth: []
 paths:
+  /weight-tickets/{weightTicketId}:
+    get:
+      tags:
+      - weight-ticket-controller
+      operationId: getWeightTicketByNumber
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WeightTicketDetailView"
+    put:
+      tags:
+      - weight-ticket-controller
+      operationId: update
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WeightTicketRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
+    delete:
+      tags:
+      - weight-ticket-controller
+      operationId: delete
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
   /waste-streams/{wasteStreamNumber}:
     get:
       tags:
@@ -30,7 +83,7 @@ paths:
     put:
       tags:
       - waste-stream-controller
-      operationId: update
+      operationId: update_1
       parameters:
       - name: wasteStreamNumber
         in: path
@@ -50,7 +103,7 @@ paths:
     delete:
       tags:
       - waste-stream-controller
-      operationId: delete
+      operationId: delete_1
       parameters:
       - name: wasteStreamNumber
         in: path
@@ -838,39 +891,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CompanyBranchDto"
-  /weight-tickets/{weightTicketId}:
-    get:
-      tags:
-      - weight-ticket-controller
-      operationId: getWeightTicketByNumber
-      parameters:
-      - name: weightTicketId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WeightTicketDetailView"
-    delete:
-      tags:
-      - weight-ticket-controller
-      operationId: delete_1
-      parameters:
-      - name: weightTicketId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "204":
-          description: No Content
   /users/drivers:
     get:
       tags:
@@ -1043,6 +1063,27 @@ components:
           type: string
       required:
       - type
+    PersonConsignor:
+      allOf:
+      - $ref: "#/components/schemas/ConsignorRequest"
+    WeightTicketRequest:
+      type: object
+      properties:
+        carrierParty:
+          type: string
+          format: uuid
+        consignorParty:
+          oneOf:
+          - $ref: "#/components/schemas/CompanyConsignor"
+          - $ref: "#/components/schemas/PersonConsignor"
+        truckLicensePlate:
+          type: string
+        reclamation:
+          type: string
+        note:
+          type: string
+      required:
+      - consignorParty
     DutchAddressRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
@@ -1075,9 +1116,6 @@ components:
     NoPickupLocationRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
-    PersonConsignor:
-      allOf:
-      - $ref: "#/components/schemas/ConsignorRequest"
     PickupCompanyRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
@@ -1812,24 +1850,6 @@ components:
       - country
       - postalCode
       - streetName
-    WeightTicketRequest:
-      type: object
-      properties:
-        carrierParty:
-          type: string
-          format: uuid
-        consignorParty:
-          oneOf:
-          - $ref: "#/components/schemas/CompanyConsignor"
-          - $ref: "#/components/schemas/PersonConsignor"
-        truckLicensePlate:
-          type: string
-        reclamation:
-          type: string
-        note:
-          type: string
-      required:
-      - consignorParty
     CreateWeightTicketResponse:
       type: object
       properties:

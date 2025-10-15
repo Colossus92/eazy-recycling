@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.application.usecase
+package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
