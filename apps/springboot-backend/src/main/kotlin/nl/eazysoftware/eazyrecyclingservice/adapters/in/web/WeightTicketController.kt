@@ -10,7 +10,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -25,7 +24,7 @@ class WeightTicketController(
 ) {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  fun create(@RequestBody body: CreateWeightTicketRequest): CreateWeightTicketResponse {
+  fun create(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
     val result = create.handle(body.toCommand())
     return CreateWeightTicketResponse(id = result.id.number)
   }
@@ -53,19 +52,19 @@ class WeightTicketController(
   }
 }
 
-data class CreateWeightTicketRequest(
-  val carrierParty: UUID,
+data class WeightTicketRequest(
+  val carrierParty: UUID?,
   val consignorParty: ConsignorRequest,
-  val truckLicensePlate: String,
-  val reclamation: String,
+  val truckLicensePlate: String?,
+  val reclamation: String?,
   val note: String?,
 ) {
   fun toCommand(): CreateWeightTicketCommand {
     // map ids to value objects here
     return CreateWeightTicketCommand(
-      carrierParty = CompanyId(carrierParty),
+      carrierParty = carrierParty?.let { CompanyId(it) },
       consignorParty = consignorParty.toDomain(),
-      truckLicensePlate = LicensePlate(truckLicensePlate),
+      truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },
       reclamation = reclamation,
       note = note?.let { Note(it) },
     )

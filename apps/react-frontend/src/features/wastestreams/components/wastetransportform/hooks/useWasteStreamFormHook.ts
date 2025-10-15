@@ -3,11 +3,11 @@ import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import {
     WasteStreamDetailView,
-    WasteStreamDetailViewConsignorParty,
     CompanyView,
     WasteStreamRequest,
 } from '@/api/client';
 import { wasteStreamService } from '@/api/services/wasteStreamService.ts';
+import { WasteStreamDetailViewConsignorParty } from '@/api/client/models/waste-stream-detail-view-consignor-party';
 
 export interface WasteStreamFormValues {
     /**

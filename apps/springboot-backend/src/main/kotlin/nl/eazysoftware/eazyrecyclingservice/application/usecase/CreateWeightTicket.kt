@@ -5,14 +5,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.Clock
 
 interface CreateWeightTicket {
   fun handle(cmd: CreateWeightTicketCommand): WeightTicketResult

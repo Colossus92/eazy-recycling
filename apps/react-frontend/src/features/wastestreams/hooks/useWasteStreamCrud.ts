@@ -76,16 +76,7 @@ export function useWasteStreamCrud() {
       queryClient
         .invalidateQueries({ queryKey: ['wasteStreams'] })
     },
-  });
-
-  const removeMutation = useMutation({
-    mutationFn: (number: string) => wasteStreamService.delete(number),
-    onSuccess: () => {
-      queryClient
-        .invalidateQueries({ queryKey: ['wasteStreams'] })
-        .then(() => setItemToDelete(undefined));
-    },
-  });
+  }); 
 
   const updateMutation = useMutation({
     mutationFn: ({ wasteStreamNumber, item }: { wasteStreamNumber: string; item: WasteStreamRequest }) =>

@@ -9,6 +9,7 @@ import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
+import { WeightTicketForm } from '@/features/weighttickets/components/weightticketform/WeightTicketForm';
 import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
 import { useWeightTicketCrud } from '@/features/weighttickets/hooks/useWeightTicketCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -136,6 +137,11 @@ export const WeightTicketManagement = () => {
         }
         title={"Weegbon verwijderen"}
         description={`Weet u zeker dat u weegbon met nummer ${deletion.item?.id} wilt verwijderen?`}
+      />
+      <WeightTicketForm
+        isOpen={form.isOpen}
+        setIsOpen={form.close}
+        weightTicketNumber={form.item?.id}
       />
     </>
   );

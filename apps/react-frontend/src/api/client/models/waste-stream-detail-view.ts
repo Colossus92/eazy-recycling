@@ -24,13 +24,13 @@ import type { DeliveryLocationView } from './delivery-location-view';
 import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WasteStreamDetailViewConsignorParty } from './waste-stream-detail-view-consignor-party';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { WasteStreamDetailViewPickupLocation } from './waste-stream-detail-view-pickup-location';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WasteTypeView } from './waste-type-view';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
 
 /**
  * 
@@ -70,10 +70,10 @@ export interface WasteStreamDetailView {
     'deliveryLocation': DeliveryLocationView;
     /**
      * 
-     * @type {WasteStreamDetailViewConsignorParty}
+     * @type {WeightTicketDetailViewConsignorParty}
      * @memberof WasteStreamDetailView
      */
-    'consignorParty': WasteStreamDetailViewConsignorParty;
+    'consignorParty': WeightTicketDetailViewConsignorParty;
     /**
      * 
      * @type {CompanyView}
