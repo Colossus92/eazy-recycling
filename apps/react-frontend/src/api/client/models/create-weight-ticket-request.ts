@@ -15,10 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { AddressRequest } from './address-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { GoodsRequest } from './goods-request';
+import type { WasteStreamRequestConsignorParty } from './waste-stream-request-consignor-party';
 
 /**
  * 
@@ -34,34 +31,16 @@ export interface CreateWeightTicketRequest {
     'carrierParty': string;
     /**
      * 
-     * @type {string}
+     * @type {WasteStreamRequestConsignorParty}
      * @memberof CreateWeightTicketRequest
      */
-    'consignorParty': string;
+    'consignorParty': WasteStreamRequestConsignorParty;
     /**
      * 
      * @type {string}
      * @memberof CreateWeightTicketRequest
      */
-    'consigneeParty': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateWeightTicketRequest
-     */
-    'pickupParty': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateWeightTicketRequest
-     */
-    'truckId': string;
-    /**
-     * 
-     * @type {Array<GoodsRequest>}
-     * @memberof CreateWeightTicketRequest
-     */
-    'goods': Array<GoodsRequest>;
+    'truckLicensePlate': string;
     /**
      * 
      * @type {string}
@@ -74,17 +53,5 @@ export interface CreateWeightTicketRequest {
      * @memberof CreateWeightTicketRequest
      */
     'note'?: string;
-    /**
-     * 
-     * @type {AddressRequest}
-     * @memberof CreateWeightTicketRequest
-     */
-    'loadingAddress': AddressRequest;
-    /**
-     * 
-     * @type {AddressRequest}
-     * @memberof CreateWeightTicketRequest
-     */
-    'unloadingAddress': AddressRequest;
 }
 

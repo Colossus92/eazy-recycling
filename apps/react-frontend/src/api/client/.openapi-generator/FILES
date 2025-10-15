@@ -45,7 +45,6 @@ models/eural-code-view.ts
 models/eural.ts
 models/goods-dto.ts
 models/goods-item-dto.ts
-models/goods-request.ts
 models/index.ts
 models/local-date-time.ts
 models/local-date.ts
@@ -84,3 +83,4 @@ models/waste-stream-request-consignor-party.ts
 models/waste-stream-request-pickup-location.ts
 models/waste-stream-request.ts
 models/waste-type-view.ts
+models/weight-ticket-list-view.ts

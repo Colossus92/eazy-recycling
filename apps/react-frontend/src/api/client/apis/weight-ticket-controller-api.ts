@@ -25,6 +25,8 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 import type { CreateWeightTicketRequest } from '../models';
 // @ts-ignore
 import type { CreateWeightTicketResponse } from '../models';
+// @ts-ignore
+import type { WeightTicketListView } from '../models';
 /**
  * WeightTicketControllerApi - axios parameter creator
  * @export
@@ -70,6 +72,39 @@ export const WeightTicketControllerApiAxiosParamCreator = function (configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWeightTickets: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/weight-tickets`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -92,6 +127,17 @@ export const WeightTicketControllerApiFp = function(configuration?: Configuratio
             const localVarOperationServerBasePath = operationServerMap['WeightTicketControllerApi.create']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getWeightTickets(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WeightTicketListView>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWeightTickets(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WeightTicketControllerApi.getWeightTickets']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -110,6 +156,14 @@ export const WeightTicketControllerApiFactory = function (configuration?: Config
          */
         create(createWeightTicketRequest: CreateWeightTicketRequest, options?: RawAxiosRequestConfig): AxiosPromise<CreateWeightTicketResponse> {
             return localVarFp.create(createWeightTicketRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getWeightTickets(options?: RawAxiosRequestConfig): AxiosPromise<Array<WeightTicketListView>> {
+            return localVarFp.getWeightTickets(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -130,6 +184,16 @@ export class WeightTicketControllerApi extends BaseAPI {
      */
     public create(createWeightTicketRequest: CreateWeightTicketRequest, options?: RawAxiosRequestConfig) {
         return WeightTicketControllerApiFp(this.configuration).create(createWeightTicketRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WeightTicketControllerApi
+     */
+    public getWeightTickets(options?: RawAxiosRequestConfig) {
+        return WeightTicketControllerApiFp(this.configuration).getWeightTickets(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
