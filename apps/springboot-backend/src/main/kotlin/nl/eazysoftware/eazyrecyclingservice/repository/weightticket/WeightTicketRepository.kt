@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
-interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, Int> {
+interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, Long> {
 
     @Query(value = "SELECT nextval('weight_tickets_id_seq')", nativeQuery = true)
     fun getNextSequenceValue(): Long
@@ -21,7 +21,7 @@ class WeightTicketRepository(
 
     override fun nextId(): WeightTicketId {
         val nextValue = jpaRepository.getNextSequenceValue()
-        return WeightTicketId(nextValue.toInt())
+        return WeightTicketId(nextValue)
     }
 
     override fun save(aggregate: WeightTicket): WeightTicket {

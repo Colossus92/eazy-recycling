@@ -1,28 +1,32 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
-import jakarta.validation.constraints.Pattern
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.*
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicketCommand
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
+import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/weight-tickets")
 class WeightTicketController(
-  private val create: CreateWeightTicket
+  private val create: CreateWeightTicket,
+  private val weightTicketService: WeightTicketService,
 ) {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@RequestBody body: CreateWeightTicketRequest): CreateWeightTicketResponse {
     val result = create.handle(body.toCommand())
     return CreateWeightTicketResponse(id = result.id.number)
+  }
+
+  @GetMapping
+  fun getWeightTickets(): List<WeightTicketListView> {
+    return weightTicketService.getAllWeightTickets()
   }
 }
 
@@ -45,4 +49,4 @@ data class CreateWeightTicketRequest(
   }
 }
 
-data class CreateWeightTicketResponse(val id: Int)
+data class CreateWeightTicketResponse(val id: Long)

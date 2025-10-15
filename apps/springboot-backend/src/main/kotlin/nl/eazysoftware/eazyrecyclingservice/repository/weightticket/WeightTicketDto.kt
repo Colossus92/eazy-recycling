@@ -8,7 +8,7 @@ import java.time.Instant
 data class WeightTicketDto(
   @Id
   @Column(name = "id")
-  val id: Int,
+  val id: Long,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "consignor_party_id", nullable = false)

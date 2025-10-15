@@ -486,6 +486,19 @@ paths:
         "204":
           description: No Content
   /weight-tickets:
+    get:
+      tags:
+      - weight-ticket-controller
+      operationId: getWeightTickets
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeightTicketListView"
     post:
       tags:
       - weight-ticket-controller
@@ -1773,59 +1786,26 @@ components:
           type: string
           format: uuid
         consignorParty:
+          oneOf:
+          - $ref: "#/components/schemas/CompanyConsignor"
+          - $ref: "#/components/schemas/PersonConsignor"
+        truckLicensePlate:
           type: string
-          format: uuid
-        consigneeParty:
-          type: string
-          format: uuid
-        pickupParty:
-          type: string
-          format: uuid
-        truckId:
-          type: string
-        goods:
-          type: array
-          items:
-            $ref: "#/components/schemas/GoodsRequest"
         reclamation:
           type: string
         note:
           type: string
-        loadingAddress:
-          $ref: "#/components/schemas/AddressRequest"
-        unloadingAddress:
-          $ref: "#/components/schemas/AddressRequest"
       required:
       - carrierParty
-      - consigneeParty
       - consignorParty
-      - goods
-      - loadingAddress
-      - pickupParty
       - reclamation
-      - truckId
-      - unloadingAddress
-    GoodsRequest:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-          pattern: "^[0-9]+$"
-        netWeight:
-          type: number
-          format: double
-        unit:
-          type: string
-      required:
-      - netWeight
-      - unit
-      - wasteStreamNumber
+      - truckLicensePlate
     CreateWeightTicketResponse:
       type: object
       properties:
         id:
           type: integer
-          format: int32
+          format: int64
       required:
       - id
     CreateWasteStreamResponse:
@@ -1932,6 +1912,27 @@ components:
       required:
       - address
       - name
+    WeightTicketListView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        consignorPartyName:
+          type: string
+        note:
+          type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - COMPLETED
+          - INVOICED
+          - CANCELLED
+      required:
+      - consignorPartyName
+      - id
+      - status
     LocalDate:
       type: object
       properties:
@@ -1973,12 +1974,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2041,15 +2042,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2079,11 +2080,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute

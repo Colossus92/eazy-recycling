@@ -29,5 +29,5 @@ enum class WeightTicketStatus {
 }
 
 data class WeightTicketId(
-  val number: Int
+  val number: Long
 )
