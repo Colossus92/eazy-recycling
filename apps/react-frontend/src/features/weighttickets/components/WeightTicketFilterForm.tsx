@@ -2,20 +2,20 @@ import { Button } from '@/components/ui/button/Button.tsx';
 import { CheckboxField } from '@/components/ui/form/CheckboxField.tsx';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '../WasteStreamStatusTag';
 import { useEffect } from 'react';
+import { WeightTicketStatusTag, WeightTicketStatusTagProps } from './WeightTicketStatusTag';
 
-export interface WasteStreamFilterFormValues {
+export interface WeightTicketFilterFormValues {
   isDraft: boolean;
-  isActive: boolean;
-  isInactive: boolean;
-  isExpired: boolean;
+  isCompleted: boolean;
+  isInvoice: boolean;
+  isCancelled: boolean;
 }
 
 interface StatusFilterOptionProps {
-  formContext: UseFormReturn<WasteStreamFilterFormValues>;
-  status: WasteStreamStatusTagProps['status'];
-  fieldName: keyof WasteStreamFilterFormValues;
+  formContext: UseFormReturn<WeightTicketFilterFormValues>;
+  status: WeightTicketStatusTagProps['status'];
+  fieldName: keyof WeightTicketFilterFormValues;
 }
 
 const StatusFilterOption = ({
@@ -33,24 +33,24 @@ const StatusFilterOption = ({
           control: formContext.control,
         }}
       >
-        <WasteStreamStatusTag status={status}></WasteStreamStatusTag>
+        <WeightTicketStatusTag status={status}></WeightTicketStatusTag>
       </CheckboxField>
     </div>
   );
 };
 
-interface WasteStreamFilterFormProps {
+interface WeightTicketFilterFormProps {
   closeDialog: () => void;
-  onSubmit: (values: WasteStreamFilterFormValues) => void;
-  currentValues: WasteStreamFilterFormValues;
+  onSubmit: (values: WeightTicketFilterFormValues) => void;
+  currentValues: WeightTicketFilterFormValues;
 }
 
-export const WasteStreamFilterForm = ({
+export const WeightTicketFilterForm = ({
   closeDialog,
   onSubmit,
   currentValues,
-}: WasteStreamFilterFormProps) => {
-  const formContext = useForm<WasteStreamFilterFormValues>({
+}: WeightTicketFilterFormProps) => {
+  const formContext = useForm<WeightTicketFilterFormValues>({
     defaultValues: currentValues,
   });
 
@@ -71,9 +71,9 @@ export const WasteStreamFilterForm = ({
   const handleReset = () => {
     formContext.reset({
       isDraft: false,
-      isActive: false,
-      isInactive: false,
-      isExpired: false,
+      isCompleted: false,
+      isInvoice: false,
+      isCancelled: false,
     });
     handleApplyFilter();
   };
@@ -90,19 +90,19 @@ export const WasteStreamFilterForm = ({
               status={'DRAFT'}
             />
             <StatusFilterOption
-              fieldName={'isActive'}
+              fieldName={'isCompleted'}
               formContext={formContext}
-              status={'ACTIVE'}
+              status={'COMPLETED'}
             />
             <StatusFilterOption
-              fieldName={'isInactive'}
+              fieldName={'isInvoice'}
               formContext={formContext}
-              status={'INACTIVE'}
+              status={'INVOICED'}
             />
             <StatusFilterOption
-              fieldName={'isExpired'}
+              fieldName={'isCancelled'}
               formContext={formContext}
-              status={'EXPIRED'}
+              status={'CANCELLED'}
             />
           </div>
         </div>

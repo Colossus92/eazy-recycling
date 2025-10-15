@@ -17,7 +17,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { Drawer } from '@/components/ui/drawer/Drawer';
-import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/WasteStreamFilterForm';
+import { WasteStreamFilterForm } from '@/features/wastestreams/components/WasteStreamFilterForm';
 
 type Column = {
   key: keyof WasteStreamListView;

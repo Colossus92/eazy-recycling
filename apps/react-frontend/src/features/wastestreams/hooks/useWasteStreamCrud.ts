@@ -4,7 +4,7 @@ import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
 import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
-import { WasteStreamFilterFormValues } from '../components/filter/WasteStreamFilterForm';
+import { WasteStreamFilterFormValues } from '../components/WasteStreamFilterForm';
 
 interface WasteStreamFilterParams {
     statuses?: string[];

@@ -5,10 +5,12 @@ import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Button } from '@/components/ui/button/Button';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
+import { Drawer } from '@/components/ui/drawer/Drawer';
 import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
+import { WeightTicketFilterForm } from '@/features/weighttickets/components/WeightTicketFilterForm';
 import { WeightTicketForm } from '@/features/weighttickets/components/weightticketform/WeightTicketForm';
 import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
 import { useWeightTicketCrud } from '@/features/weighttickets/hooks/useWeightTicketCrud';
@@ -143,6 +145,17 @@ export const WeightTicketManagement = () => {
         setIsOpen={form.close}
         weightTicketNumber={form.item?.id}
       />
+      <Drawer
+        title={'Weegbon filter'}
+        isOpen={read.filter.isFilterOpen}
+        setIsOpen={read.filter.setIsFilterOpen}
+      >
+        <WeightTicketFilterForm
+          onSubmit={read.filter.applyFilterFormValues}
+          closeDialog={() => read.filter.setIsFilterOpen(false)}
+          currentValues={read.filter.currentFormValues}
+        />
+      </Drawer>
     </>
   );
 };

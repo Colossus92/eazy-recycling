@@ -2,6 +2,7 @@ import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView } fro
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import { WeightTicketFilterFormValues } from '../components/WeightTicketFilterForm';
 
 interface WeightTicketFilterParams {
   statuses?: string[];
@@ -21,8 +22,14 @@ export function useWeightTicketCrud() {
   const [query, setQuery] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<WeightTicketDetailView | undefined>(undefined);
-  const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [itemToDelete, setItemToDelete] = useState<WeightTicketListView | undefined>(undefined);
+  const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
+  const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
+    isDraft: false,
+    isCompleted: false,
+    isInvoice: false,
+    isCancelled: false,
+  });
 
   const displayedWeightTickets = useMemo(
     () => {
@@ -43,6 +50,20 @@ export function useWeightTicketCrud() {
     [weightTickets, query, filters]
   );
 
+  const applyFilterFormValues = (values: WeightTicketFilterFormValues) => {
+    const statuses: string[] = [];
+
+    if (values.isDraft) statuses.push('DRAFT');
+    if (values.isCompleted) statuses.push('ACTIVE');
+    if (values.isInvoice) statuses.push('INACTIVE');
+    if (values.isCancelled) statuses.push('CANCELLED');
+
+    setCurrentFilterFormValues(values);
+    setFilters({
+      statuses: statuses.length > 0 ? statuses : undefined,
+    });
+  };
+
   const createMutation = useMutation({
     mutationFn: (item: WeightTicketRequest) =>
       weightTicketService.create(item),
@@ -53,7 +74,7 @@ export function useWeightTicketCrud() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({weightTicketNumber, item}: {weightTicketNumber: number; item: WeightTicketRequest}) =>
+    mutationFn: ({ weightTicketNumber, item }: { weightTicketNumber: number; item: WeightTicketRequest }) =>
       weightTicketService.update(weightTicketNumber, item),
     onSuccess: () => {
       queryClient
@@ -107,6 +128,8 @@ export function useWeightTicketCrud() {
       filter: {
         isFilterOpen,
         setIsFilterOpen,
+        applyFilterFormValues,
+        currentFormValues: currentFilterFormValues,
       },
       errorHandling: {
         error,
