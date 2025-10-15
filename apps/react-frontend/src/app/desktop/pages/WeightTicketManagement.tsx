@@ -133,10 +133,7 @@ export const WeightTicketManagement = () => {
       <DeleteDialog
         isOpen={Boolean(deletion.item)}
         setIsOpen={deletion.cancel}
-        onDelete={() =>
-          deletion.item &&
-          deletion.confirm(deletion.item.id)
-        }
+        onDelete={() => deletion.item && deletion.confirm(deletion.item.id)}
         title={"Weegbon verwijderen"}
         description={`Weet u zeker dat u weegbon met nummer ${deletion.item?.id} wilt verwijderen?`}
       />

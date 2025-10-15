@@ -1,13 +1,14 @@
 import { Description, Dialog, DialogPanel } from '@headlessui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button/Button.tsx';
+import { ErrorDialog } from './ErrorDialog';
 import X from '@/assets/icons/X.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
 
 interface DeleteDialogProps<T> {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  onDelete: () => void;
+  onDelete: () => void | Promise<void>;
   title: string;
   description: string;
   item?: T;
@@ -20,6 +21,8 @@ export const DeleteDialog = <T,>({
   title,
   description,
 }: DeleteDialogProps<T>) => {
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+
   useEffect(() => {
     if (isOpen) {
       const timeoutId = setTimeout(() => {
@@ -34,6 +37,15 @@ export const DeleteDialog = <T,>({
       return () => clearTimeout(timeoutId);
     }
   }, [isOpen]);
+
+  const handleDelete = async () => {
+    try {
+      await onDelete();
+    } catch (error: any) {
+      const apiErrorMessage = error?.response?.data?.message || error?.message || 'Er is een onbekende fout opgetreden';
+      setErrorMessage(apiErrorMessage);
+    }
+  };
 
   return (
     <Dialog
@@ -72,7 +84,7 @@ export const DeleteDialog = <T,>({
             <Button
               icon={TrashSimple}
               variant={'destructive'}
-              onClick={() => onDelete()}
+              onClick={handleDelete}
               label={'Verwijderen'}
               autoFocus
               data-delete-button="true"
@@ -80,6 +92,11 @@ export const DeleteDialog = <T,>({
           </div>
         </DialogPanel>
       </div>
+      <ErrorDialog
+        isOpen={Boolean(errorMessage)}
+        setIsOpen={() => setErrorMessage(undefined)}
+        errorMessage={errorMessage || ''}
+      />
     </Dialog>
   );
 };
