@@ -5,6 +5,7 @@ import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import IdentificationCard from '@/assets/icons/IdentificationCard.svg?react';
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
 import { NavItem } from '@/components/layouts/sidebar/NavItem.tsx';
 import { SidebarHeader } from '@/components/layouts/sidebar/SidebarHeader.tsx';
 import { useAuth } from '@/components/auth/useAuthHook.ts';
@@ -23,6 +24,7 @@ export const Sidebar = () => {
     { icon: CalendarDots, label: 'Planning', to: '/' },
     { icon: BuildingOffice, label: 'CRM', to: '/crm' },
     { icon: BxRecycle, label: 'Afvalstroombeheer', to: '/waste-streams' },
+    { icon: Scale, label: 'Weegbonnen', to: '/weight-tickets' },
     {
       icon: IdentificationCard,
       label: 'Gebruikersbeheer',

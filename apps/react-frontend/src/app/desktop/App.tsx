@@ -5,6 +5,7 @@ import WasteStreamManagement from './pages/WasteStreamManagement.tsx';
 import { useMobileHook } from '@/hooks/useMobileHook.ts';
 import { Sidebar } from '@/components/layouts/sidebar/Sidebar.tsx';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
+import WeightTicketManagement from './pages/WeightTicketManagement.tsx';
 
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
@@ -40,6 +41,7 @@ export const App = () => {
             <Route path="/" element={<PlanningPage />} />
             <Route path="/crm" element={<CompanyManagement />} />
             <Route path="/waste-streams" element={<WasteStreamManagement />} />
+            <Route path="/weight-tickets" element={<WeightTicketManagement />} />
             <Route
               path="/users"
               element={
