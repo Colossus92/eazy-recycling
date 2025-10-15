@@ -88,6 +88,15 @@ export function useWasteStreamCrud() {
     },
   });
 
+  const removeMutation = useMutation({
+    mutationFn: (number: string) => wasteStreamService.delete(number),
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ['wasteStreams'] })
+        .then(() => setItemToDelete(undefined));
+    },
+  });
+
   const create = async (item: WasteStreamRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       createMutation.mutate(item, {

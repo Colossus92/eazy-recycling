@@ -1,4 +1,4 @@
-import { CreateWeightTicketRequest, WeightTicketListView } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -45,7 +45,7 @@ export function useWeightTicketCrud() {
 
 
   const createMutation = useMutation({
-    mutationFn: (item: CreateWeightTicketRequest) =>
+    mutationFn: (item: WeightTicketRequest) =>
       weightTicketService.create(item),
     onSuccess: () => {
       queryClient

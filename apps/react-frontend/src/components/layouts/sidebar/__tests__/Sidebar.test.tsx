@@ -32,7 +32,7 @@ describe('Sidebar', () => {
 
     expect(screen.getByAltText('full-logo')).toBeInTheDocument();
     // All 5 navigation items should be visible
-    expect(screen.getAllByRole('link')).toHaveLength(5);
+    expect(screen.getAllByRole('link')).toHaveLength(6);
     expect(screen.getByText('Gebruikersbeheer')).toBeInTheDocument();
     expect(screen.getByText('Masterdata')).toBeInTheDocument();
   });
@@ -49,7 +49,7 @@ describe('Sidebar', () => {
 
     expect(screen.getByAltText('full-logo')).toBeInTheDocument();
     // Only 3 navigation items should be visible (without Gebruikersbeheer)
-    expect(screen.getAllByRole('link')).toHaveLength(3);
+    expect(screen.getAllByRole('link')).toHaveLength(4);
     expect(screen.queryByText('Gebruikersbeheer')).not.toBeInTheDocument();
   });
 });
