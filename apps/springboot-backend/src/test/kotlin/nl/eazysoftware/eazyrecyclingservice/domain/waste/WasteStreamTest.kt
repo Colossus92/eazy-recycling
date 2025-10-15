@@ -1,5 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import org.assertj.core.api.Assertions.assertThat
@@ -36,20 +38,7 @@ class WasteStreamTest {
   @Test
   fun `waste stream with Dutch address can be initialized`() {
     assertDoesNotThrow {
-      WasteStream(
-        wasteStreamNumber = wasteStreamNumber(),
-        wasteType = wasteType(),
-        collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.DutchAddress(
-          streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "2",
-          city = "Test City",
-        ),
-        deliveryLocation = destinationLocation(),
-        consignorParty = Consignor.Company(companyId()),
-        pickupParty = companyId(),
-      )
+      wasteStream()
     }
   }
 
@@ -108,6 +97,96 @@ class WasteStreamTest {
     }
 
     assertThat(exception.message).isEqualTo("Locatie van herkomst is verplicht bij normale inzameling en zakelijke ontdoener")
+  }
+
+  @Test
+  fun `a waste stream should be expired if last activity is more than five years ago`() {
+    val status = wasteStream(
+      status = WasteStreamStatus.ACTIVE,
+      lastActivityAt = Instant.DISTANT_PAST,
+    ).getEffectiveStatus()
+
+    assertThat(status).isEqualTo(EffectiveStatus.EXPIRED)
+  }
+
+  @Test
+  fun `a waste stream is set to inactive when deleted`() {
+    val wasteStream = wasteStream()
+
+    wasteStream.delete()
+
+    assertThat(wasteStream.status).isEqualTo(WasteStreamStatus.INACTIVE)
+  }
+
+  @Test
+  fun `a waste stream should not be deletable when already set to inactive`() {
+    val wasteStream = wasteStream(
+      status = WasteStreamStatus.INACTIVE,
+    )
+
+    val exception = assertFailsWith<IllegalStateException> {
+      wasteStream.delete()
+    }
+
+    assertThat(exception.message).isEqualTo("Afvalstroom is al inactief en kan niet opnieuw worden verwijderd")
+  }
+
+  @Test
+  fun `a waste stream is set to active when activated`() {
+    val wasteStream = wasteStream(
+      status = WasteStreamStatus.DRAFT,
+    )
+
+    wasteStream.activate()
+
+    assertThat(wasteStream.status).isEqualTo(WasteStreamStatus.ACTIVE)
+  }
+
+  @Test
+  fun `a waste stream should not be activatable when not in draft status`() {
+    val wasteStream = wasteStream(
+      status = WasteStreamStatus.ACTIVE,
+    )
+
+    val exception = assertFailsWith<IllegalStateException> {
+      wasteStream.activate()
+    }
+
+    assertThat(exception.message).isEqualTo("Afvalstroom kan alleen worden geactiveerd vanuit DRAFT status. Huidige status: ACTIVE")
+  }
+
+  @Test
+  fun `a waste stream can be updated when in draft status`() {
+    val wasteStream = wasteStream(
+      status = WasteStreamStatus.DRAFT,
+    )
+    val newWasteType = WasteType(
+      "aluminium",
+      EuralCode("16 07 09"),
+      ProcessingMethod("A.02"),
+    )
+
+    wasteStream.update(
+      wasteType = newWasteType,
+    )
+
+    assertThat(wasteStream.wasteType).isEqualTo(newWasteType)
+  }
+
+  @Test
+  fun `a waste stream should not be updatable when not in draft status`() {
+    val wasteStream = wasteStream(
+      status = WasteStreamStatus.ACTIVE,
+    )
+
+    val exception = assertFailsWith<IllegalStateException> {
+      wasteStream.update(
+        wasteType = wasteType(),
+        collectionType = WasteCollectionType.DEFAULT,
+      )
+    }
+
+    assertThat(exception.message).isEqualTo("Afvalstroom kan alleen worden gewijzigd als de status DRAFT is. Huidige status: ACTIVE")
   }
 
   @ParameterizedTest
@@ -391,6 +470,26 @@ class WasteStreamTest {
     }
     assertThat(exception.message).isEqualTo("Een afvalstroomnummer dient 12 tekens lang te zijn")
   }
+
+  private fun wasteStream(
+    status: WasteStreamStatus = WasteStreamStatus.ACTIVE,
+    lastActivityAt: Instant = Clock.System.now(),
+  ): WasteStream = WasteStream(
+    wasteStreamNumber = wasteStreamNumber(),
+    wasteType = wasteType(),
+    collectionType = WasteCollectionType.DEFAULT,
+    pickupLocation = PickupLocation.DutchAddress(
+      streetName = "Stadstraat",
+      DutchPostalCode("1234 AB"),
+      "2",
+      city = "Test City",
+    ),
+    deliveryLocation = destinationLocation(),
+    consignorParty = Consignor.Company(companyId()),
+    pickupParty = companyId(),
+    status = status,
+    lastActivityAt = lastActivityAt,
+  )
 
   private fun wasteStreamNumber(): WasteStreamNumber = WasteStreamNumber("123456789012")
 

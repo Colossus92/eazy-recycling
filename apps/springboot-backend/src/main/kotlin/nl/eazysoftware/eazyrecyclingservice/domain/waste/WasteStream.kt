@@ -95,19 +95,20 @@ class WasteStream(
   /**
    * Updates the waste stream with new values.
    * Only allowed when status is DRAFT.
+   * Parameters default to current field values, allowing partial updates.
    *
    * @throws IllegalStateException if the waste stream is not in DRAFT status
    */
   fun update(
-    wasteType: WasteType,
-    collectionType: WasteCollectionType,
-    pickupLocation: PickupLocation,
-    deliveryLocation: DeliveryLocation,
-    consignorParty: Consignor,
-    pickupParty: CompanyId,
-    dealerParty: CompanyId?,
-    collectorParty: CompanyId?,
-    brokerParty: CompanyId?
+    wasteType: WasteType = this.wasteType,
+    collectionType: WasteCollectionType = this.collectionType,
+    pickupLocation: PickupLocation = this.pickupLocation,
+    deliveryLocation: DeliveryLocation = this.deliveryLocation,
+    consignorParty: Consignor = this.consignorParty,
+    pickupParty: CompanyId = this.pickupParty,
+    dealerParty: CompanyId? = this.dealerParty,
+    collectorParty: CompanyId? = this.collectorParty,
+    brokerParty: CompanyId? = this.brokerParty
   ) {
     check(status == WasteStreamStatus.DRAFT) {
       "Afvalstroom kan alleen worden gewijzigd als de status DRAFT is. Huidige status: $status"
