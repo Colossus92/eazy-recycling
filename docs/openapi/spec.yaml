@@ -507,7 +507,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateWeightTicketRequest"
+              $ref: "#/components/schemas/WeightTicketRequest"
         required: true
       responses:
         "201":
@@ -1812,7 +1812,7 @@ components:
       - country
       - postalCode
       - streetName
-    CreateWeightTicketRequest:
+    WeightTicketRequest:
       type: object
       properties:
         carrierParty:
@@ -1829,10 +1829,7 @@ components:
         note:
           type: string
       required:
-      - carrierParty
       - consignorParty
-      - reclamation
-      - truckLicensePlate
     CreateWeightTicketResponse:
       type: object
       properties:

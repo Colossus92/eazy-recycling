@@ -23,10 +23,10 @@ interface CreateWeightTicket {
  * Contains GoodsCommand with only waste stream reference - full WasteStream will be fetched in the service.
  */
 data class CreateWeightTicketCommand(
-  val carrierParty: CompanyId,
   val consignorParty: Consignor,
+  val carrierParty: CompanyId?,
   val truckLicensePlate: LicensePlate?,
-  val reclamation: String,
+  val reclamation: String?,
   val note: Note?,
 )
 
