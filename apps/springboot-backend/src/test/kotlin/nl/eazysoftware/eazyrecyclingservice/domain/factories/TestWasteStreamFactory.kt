@@ -5,11 +5,13 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WasteStreamRequest
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory.createTestCompany
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
+import java.time.Instant
 import java.util.*
 
 object TestWasteStreamFactory {
@@ -79,7 +81,9 @@ object TestWasteStreamFactory {
       pickupParty = pickupParty,
       dealerParty = dealerParty,
       collectorParty = collectorParty,
-      brokerParty = brokerParty
+      brokerParty = brokerParty,
+      lastActivityAt = Instant.now(),
+      status = WasteStreamStatus.DRAFT.name
     )
   }
 

@@ -196,7 +196,9 @@ create table if not exists waste_streams (
                                   dealer_party_id uuid,
                                   collector_party_id uuid,
                                   broker_party_id uuid,
-                                  processor_party_id text
+                                  processor_party_id text,
+                                  status text,
+                                  last_activity_at timestamp with time zone not null default now()
 );
 
 
