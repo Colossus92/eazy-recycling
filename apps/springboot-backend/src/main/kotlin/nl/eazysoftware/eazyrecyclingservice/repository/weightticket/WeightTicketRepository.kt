@@ -1,15 +1,15 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, Int> {
 
-    @Query(value = "SELECT nextval('weight_ticket_id_seq')", nativeQuery = true)
+    @Query(value = "SELECT nextval('weight_tickets_id_seq')", nativeQuery = true)
     fun getNextSequenceValue(): Long
 }
 

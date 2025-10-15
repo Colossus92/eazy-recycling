@@ -1,15 +1,17 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WeightTicketStatus
+import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Goods
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamMapper
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
@@ -21,61 +23,42 @@ class WeightTicketMapper(
   fun toDomain(dto: WeightTicketDto): WeightTicket {
     return WeightTicket(
       id = WeightTicketId(dto.id),
-      carrierParty = CompanyId(dto.carrierParty.id!!),
-      consignorParty = CompanyId(dto.consignorParty.id!!),
-      truck = dto.truckLicensePlate?.let { LicensePlate(it) },
-      goods = dto.goods.map { weightTicketGoodsDto ->
-        Goods(
-          id = weightTicketGoodsDto.id!!,
-          waste = wasteStreamMapper.toDomain(weightTicketGoodsDto.wasteStream),
-          weight = Weight(
-            weightTicketGoodsDto.weight,
-            Weight.WeightUnit.valueOf(weightTicketGoodsDto.unit)
-          )
-        )
-      },
+      carrierParty = dto.carrierParty?.id?.let { CompanyId(it) },
+      consignorParty = Consignor.Company(CompanyId(dto.consignorParty.id!!)),
+      truckLicensePlate = dto.truckLicensePlate?.let { LicensePlate(it) },
       reclamation = dto.reclamation,
       note = dto.note?.let { Note(it) },
       status = toDomainStatus(dto.status),
-      createdAt = dto.createdAt,
-      updatedAt = dto.updatedAt,
-      weightedAt = dto.weightedAt
+      createdAt = dto.createdAt.toKotlinInstant(),
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      weightedAt = dto.weightedAt?.toKotlinInstant()
     )
   }
 
   fun toDto(domain: WeightTicket): WeightTicketDto {
-    val carrierParty = companyRepository.findById(domain.carrierParty.uuid)
-      .orElseThrow { IllegalStateException("Transporteur niet gevonden: ${domain.carrierParty.uuid}") }
+    val carrierParty = domain.carrierParty?.uuid
+      ?.let { companyRepository.findByIdOrNull(it) ?: throw IllegalStateException("Transporteur niet gevonden: ${it}") }
 
-    val consignorParty = companyRepository.findById(domain.consignorParty.uuid)
-      .orElseThrow { IllegalStateException("Opdrachtgever niet gevonden: ${domain.consignorParty.uuid}") }
+    val consignorParty = when (domain.consignorParty) {
+      is Consignor.Company -> companyRepository.findByIdOrNull(domain.consignorParty.id.uuid)
+        ?: throw IllegalArgumentException("Opdrachtgever niet gevonden: ${domain.consignorParty.id.uuid}")
+
+      Consignor.Person -> throw IllegalArgumentException("Particuliere opdrachtgever wordt nog niet ondersteund.")
+    }
 
     // Step 1: Create the parent DTO without goods
     val weightTicketDto = WeightTicketDto(
       id = domain.id.number,
       consignorParty = consignorParty,
-      goods = mutableListOf(),
       carrierParty = carrierParty,
-      truckLicensePlate = domain.truck?.value,
+      truckLicensePlate = domain.truckLicensePlate?.value,
       reclamation = domain.reclamation,
       note = domain.note?.description,
       status = toDtoStatus(domain.status),
-      createdAt = domain.createdAt,
-      updatedAt = domain.updatedAt,
-      weightedAt = domain.weightedAt
+      createdAt = domain.createdAt.toJavaInstant(),
+      updatedAt = domain.updatedAt?.toJavaInstant(),
+      weightedAt = domain.weightedAt?.toJavaInstant()
     )
-
-    // Step 2: Create goods with reference to the parent and add them to the collection
-    val goodsDtos = domain.goods.map { goods ->
-      WeightTicketGoodsDto(
-        id = goods.id,
-        weightTicket = weightTicketDto,
-        wasteStream = wasteStreamMapper.toDto(goods.waste),
-        weight = goods.weight.value,
-        unit = goods.weight.unit.name
-      )
-    }
-    weightTicketDto.goods.addAll(goodsDtos)
 
     return weightTicketDto
   }
@@ -83,8 +66,8 @@ class WeightTicketMapper(
   private fun toDomainStatus(dto: WeightTicketStatusDto): WeightTicketStatus {
     return when (dto) {
       WeightTicketStatusDto.DRAFT -> WeightTicketStatus.DRAFT
-      WeightTicketStatusDto.PROCESSED -> WeightTicketStatus.PROCESSED
       WeightTicketStatusDto.COMPLETED -> WeightTicketStatus.COMPLETED
+      WeightTicketStatusDto.INVOICED -> WeightTicketStatus.INVOICED
       WeightTicketStatusDto.CANCELLED -> WeightTicketStatus.CANCELLED
     }
   }
@@ -92,8 +75,8 @@ class WeightTicketMapper(
   private fun toDtoStatus(domain: WeightTicketStatus): WeightTicketStatusDto {
     return when (domain) {
       WeightTicketStatus.DRAFT -> WeightTicketStatusDto.DRAFT
-      WeightTicketStatus.PROCESSED -> WeightTicketStatusDto.PROCESSED
       WeightTicketStatus.COMPLETED -> WeightTicketStatusDto.COMPLETED
+      WeightTicketStatus.INVOICED -> WeightTicketStatusDto.INVOICED
       WeightTicketStatus.CANCELLED -> WeightTicketStatusDto.CANCELLED
     }
   }

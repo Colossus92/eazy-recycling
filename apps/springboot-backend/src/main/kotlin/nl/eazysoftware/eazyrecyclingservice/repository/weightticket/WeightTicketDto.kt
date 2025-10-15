@@ -2,10 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import java.time.ZonedDateTime
-
+import java.time.Instant
 @Entity
-@Table(name = "weight_ticket")
+@Table(name = "weight_tickets")
 data class WeightTicketDto(
   @Id
   @Column(name = "id")
@@ -15,12 +14,9 @@ data class WeightTicketDto(
   @JoinColumn(name = "consignor_party_id", nullable = false)
   val consignorParty: CompanyDto,
 
-  @OneToMany(mappedBy = "weightTicket", cascade = [CascadeType.ALL], orphanRemoval = true)
-  val goods: MutableList<WeightTicketGoodsDto> = mutableListOf(),
-
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "carrier_party_id", nullable = false)
-  val carrierParty: CompanyDto,
+  @JoinColumn(name = "carrier_party_id")
+  val carrierParty: CompanyDto?,
 
   @Column(name = "truck_license_plate")
   val truckLicensePlate: String?,
@@ -36,18 +32,18 @@ data class WeightTicketDto(
   val status: WeightTicketStatusDto = WeightTicketStatusDto.DRAFT,
 
   @Column(name = "created_at", nullable = false)
-  val createdAt: ZonedDateTime,
+  val createdAt: Instant,
 
   @Column(name = "updated_at")
-  val updatedAt: ZonedDateTime?,
+  val updatedAt: Instant?,
 
-  @Column(name = "weighted_at", nullable = false)
-  val weightedAt: ZonedDateTime
+  @Column(name = "weighted_at")
+  val weightedAt: Instant?
 )
 
 enum class WeightTicketStatusDto {
   DRAFT,
-  PROCESSED,
   COMPLETED,
-  CANCELLED
+  INVOICED,
+  CANCELLED,
 }
