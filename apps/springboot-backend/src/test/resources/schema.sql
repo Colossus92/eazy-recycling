@@ -212,5 +212,6 @@ create table if not exists pickup_locations (
                                  country text,
                                  proximity_description text,
                                  city text,
-                                 postal_code text
+                                 postal_code text,
+                                 company_id uuid
 );

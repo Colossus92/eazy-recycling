@@ -11,7 +11,7 @@ object TestCompanyFactory {
     id: UUID? = null,
     chamberOfCommerceId: String? = "12345678",
     vihbId: String? = "987654VIHB",
-    processorId: String? = null,
+    processorId: String? = "12345",
     name: String = "Test Company"
   ): CompanyDto {
     return CompanyDto(
