@@ -55,7 +55,6 @@ class WasteStreamController(
     wasteStreamNumber: String
   ): WasteStreamDetailView {
     return wasteStreamService.getWasteStreamByNumber(WasteStreamNumber(wasteStreamNumber))
-      ?: throw EntityNotFoundException("Afvalstroom met nummer $wasteStreamNumber niet gevonden")
   }
 
   @PutMapping("/{wasteStreamNumber}")

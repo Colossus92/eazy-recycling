@@ -1,15 +1,24 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.EntityManager
+import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.application.query.ConsignorView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWeightTickets
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketByNumber
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
 class WeightTicketQueryRepository(
     private val entityManager: EntityManager,
-) : GetAllWeightTickets {
+    private val jpaRepository: WeightTicketJpaRepository,
+) : GetAllWeightTickets, GetWeightTicketByNumber {
 
   override fun execute(): List<WeightTicketListView> {
     val query = """
@@ -35,5 +44,22 @@ class WeightTicketQueryRepository(
         note = columns[3] as String,
       )
     }
+  }
+
+  override fun execute(weightTicketid: WeightTicketId): WeightTicketDetailView? {
+    val weightTicket = jpaRepository.findByIdOrNull(weightTicketid.number) ?: return null
+
+    return WeightTicketDetailView(
+      id = weightTicket.id,
+      consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(weightTicket.consignorParty)),
+      status = weightTicket.status.name,
+      note = weightTicket.note,
+      createdAt = weightTicket.createdAt.toKotlinInstant().toDisplayTime(),
+      updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),
+      weightedAt = weightTicket.weightedAt?.toKotlinInstant()?.toDisplayTime(),
+      carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },
+      truckLicensePlate = weightTicket.truckLicensePlate,
+      reclamation = weightTicket.reclamation,
+    )
   }
 }

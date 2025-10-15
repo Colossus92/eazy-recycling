@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.waste.EffectiveStatusPolicy
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.COMPANY
@@ -110,13 +111,13 @@ class WasteStreamQueryRepository(
       pickupLocation = mapPickupLocation(wasteStream.pickupLocation),
       deliveryLocation = DeliveryLocationView(
         processorPartyId = wasteStream.processorParty.processorId!!,
-        processor = mapCompany(wasteStream.processorParty)
+        processor = CompanyViewMapper.map(wasteStream.processorParty)
       ),
-      consignorParty = ConsignorView.CompanyConsignorView(mapCompany(wasteStream.consignorParty)),
-      pickupParty = mapCompany(wasteStream.pickupParty),
-      dealerParty = wasteStream.dealerParty?.let { mapCompany(it) },
-      collectorParty = wasteStream.collectorParty?.let { mapCompany(it) },
-      brokerParty = wasteStream.brokerParty?.let { mapCompany(it) },
+      consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(wasteStream.consignorParty)),
+      pickupParty = CompanyViewMapper.map(wasteStream.pickupParty),
+      dealerParty = wasteStream.dealerParty?.let { CompanyViewMapper.map(it) },
+      collectorParty = wasteStream.collectorParty?.let { CompanyViewMapper.map(it) },
+      brokerParty = wasteStream.brokerParty?.let { CompanyViewMapper.map(it) },
       status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(wasteStream.status), wasteStream.lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
       lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant().toDisplayTime()
     )
@@ -146,30 +147,12 @@ class WasteStreamQueryRepository(
         val company = entityManager.find(CompanyDto::class.java, dto.companyId)
         company?.let {
           PickupLocationView.PickupCompanyView(
-            company = mapCompany(it)
+            company = CompanyViewMapper.map(it)
           )
         }
       }
 
       else -> null
     }
-  }
-
-  private fun mapCompany(company: CompanyDto): CompanyView {
-    return CompanyView(
-      id = company.id!!,
-      name = company.name,
-      chamberOfCommerceId = company.chamberOfCommerceId,
-      vihbId = company.vihbId,
-      processorId = company.processorId,
-      address = AddressView(
-        street = company.address.streetName ?: "",
-        houseNumber = company.address.buildingNumber,
-        houseNumberAddition = null,
-        postalCode = company.address.postalCode,
-        city = company.address.city ?: "",
-        country = company.address.country ?: ""
-      )
-    )
   }
 }

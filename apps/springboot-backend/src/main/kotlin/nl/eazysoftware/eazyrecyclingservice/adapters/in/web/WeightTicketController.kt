@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.CreateWeightTicketCommand
@@ -32,6 +33,14 @@ class WeightTicketController(
   @GetMapping
   fun getWeightTickets(): List<WeightTicketListView> {
     return weightTicketService.getAllWeightTickets()
+  }
+
+  @GetMapping("/{weightTicketId}")
+  fun getWeightTicketByNumber(
+    @PathVariable
+    weightTicketId: Long
+  ): WeightTicketDetailView {
+    return weightTicketService.getWeightTicketByNumber(WeightTicketId(weightTicketId))
   }
 
   @DeleteMapping("/{weightTicketId}")
