@@ -10,7 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
 class WeightTicket(
   val id: WeightTicketId,
   val consignorParty: Consignor,
-  val status: WeightTicketStatus = WeightTicketStatus.DRAFT,
+  var status: WeightTicketStatus = WeightTicketStatus.DRAFT,
   val carrierParty: CompanyId?,
   val truckLicensePlate: LicensePlate?,
   val reclamation: String?,
@@ -19,6 +19,18 @@ class WeightTicket(
   val updatedAt: Instant? = null,
   val weightedAt: Instant? = null,
 ) {
+  fun delete() {
+    check(status != WeightTicketStatus.CANCELLED) {
+      "Weegbon is al geannuleerd en kan niet opnieuw worden geannuleerd"
+    }
+    check(status != WeightTicketStatus.INVOICED) {
+      "Weegbon is al gefactureerd en kan niet worden geannuleerd"
+    }
+    check(status != WeightTicketStatus.COMPLETED) {
+      "Weegbon is al verwerkt en kan niet worden geannuleerd"
+    }
+    this.status = WeightTicketStatus.CANCELLED
+  }
 }
 
 enum class WeightTicketStatus {

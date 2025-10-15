@@ -4,6 +4,7 @@ import Scale from '@/assets/icons/Scale.svg?react';
 import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Button } from '@/components/ui/button/Button';
+import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
 import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
@@ -26,7 +27,7 @@ type Column = {
 export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { read, form } = useWeightTicketCrud();
+  const { read, form, deletion } = useWeightTicketCrud();
 
   const columns: Column[] = [
     { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
@@ -126,6 +127,16 @@ export const WeightTicketManagement = () => {
           </ErrorBoundary>
         </div>
       </ContentContainer>
+      <DeleteDialog
+        isOpen={Boolean(deletion.item)}
+        setIsOpen={deletion.cancel}
+        onDelete={() =>
+          deletion.item &&
+          deletion.confirm(deletion.item.id)
+        }
+        title={"Weegbon verwijderen"}
+        description={`Weet u zeker dat u weegbon met nummer ${deletion.item?.id} wilt verwijderen?`}
+      />
     </>
   );
 };

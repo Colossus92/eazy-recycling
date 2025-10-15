@@ -990,6 +990,21 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
+  /weight-tickets/{weightTicketId}:
+    delete:
+      tags:
+      - weight-ticket-controller
+      operationId: delete_1
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
 components:
   schemas:
     CompanyConsignor:

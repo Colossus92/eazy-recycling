@@ -7,4 +7,5 @@ const weightTicketApi = new WeightTicketControllerApi(apiInstance.config)
 export const weightTicketService = {
     getAll: () => weightTicketApi.getWeightTickets().then((r) => r.data),
     create: (weightTicketRequest: CreateWeightTicketRequest) => weightTicketApi.create(weightTicketRequest).then((r) => r.data),
+    delete: (weightTicketId: number) => weightTicketApi.delete1(weightTicketId),
 };
