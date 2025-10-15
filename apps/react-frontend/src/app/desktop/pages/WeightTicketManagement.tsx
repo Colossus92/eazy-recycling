@@ -1,44 +1,38 @@
-import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view';
-import Scale from '@/assets/icons/Scale.svg?react';
+import { WeightTicketListView } from '@/api/client/models';
 import Plus from '@/assets/icons/Plus.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
 import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Button } from '@/components/ui/button/Button';
-import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
 import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
-import { useWasteStreamCrud } from '@/features/wastestreams/hooks/useWasteStreamCrud';
-import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
+import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
+import { useWeightTicketCrud } from '@/features/weighttickets/hooks/useWeightTicketCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
-import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
-import { Drawer } from '@/components/ui/drawer/Drawer';
-import { WasteStreamFilterForm } from '@/features/wastestreams/components/filter/WasteStreamFilterForm';
 
-type Column<T> = {
-  key: keyof T;
+type Column = {
+  key: keyof WeightTicketListView;
   label: string;
-  accessor: (value: T) => React.ReactNode;
-  title: (value: T) => string | undefined;
+  accessor: (value: WeightTicketListView) => React.ReactNode;
+  title: (value: WeightTicketListView) => string | undefined;
   width: string;
 };
 
 export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { read, form, deletion } = useWasteStreamCrud();
+  const { read, form } = useWeightTicketCrud();
 
-  const columns: Column<WasteStreamListView>[] = [
-    { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, title: (item) => item.wasteStreamNumber, width: '14%' },
-    { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, title: (item) => item.wasteName, width: '14%' },
+  const columns: Column[] = [
+    { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, title: (item) => item.pickupLocation, width: '25%' },
-    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, title: (item) => item.deliveryLocation, width: '25%' },
-    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status as WasteStreamStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
+    { key: 'note', label: 'Opmerking', accessor: (item) => item.note, title: (item) => item.note, width: '64%' },
+    { key: 'status', label: 'Status', accessor: (item) => <WeightTicketStatusTag status={item.status as WeightTicketStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
   ];
 
   return (
@@ -102,10 +96,10 @@ export const WeightTicketManagement = () => {
                             </td>
                           ))}
                           <td className="p-4 text-center">
-                            {item.status !== 'INACTIVE' && item.status !== 'EXPIRED' &&
-                              <ActionMenu<WasteStreamListView>
+                            {item.status !== 'CANCELLED' &&
+                              <ActionMenu<WeightTicketListView>
                                 onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
-                                onDelete={(wasteStream) => deletion.initiate(wasteStream)}
+                                onDelete={(weightTicket) => deletion.initiate(weightTicket)}
                                 item={item}
                               />
                             }
@@ -132,35 +126,6 @@ export const WeightTicketManagement = () => {
           </ErrorBoundary>
         </div>
       </ContentContainer>
-      {/*
-        Dialog to confirm deletion of waste stream number
-      */}
-      <DeleteDialog
-        isOpen={Boolean(deletion.item)}
-        setIsOpen={deletion.cancel}
-        onDelete={() =>
-          deletion.item &&
-          deletion.confirm(deletion.item.wasteStreamNumber)
-        }
-        title={"Weegbon verwijderen"}
-        description={`Weet u zeker dat u weegbon met code ${deletion.item?.wasteStreamNumber} wilt verwijderen?`}
-      />
-      <WasteStreamForm
-        isOpen={form.isOpen}
-        setIsOpen={form.close}
-        wasteStreamNumber={form.item?.wasteStreamNumber}
-      />
-      <Drawer
-        title={'Weegbon filter'}
-        isOpen={read.filter.isFilterOpen}
-        setIsOpen={read.filter.setIsFilterOpen}
-      >
-        <WasteStreamFilterForm
-          onSubmit={read.filter.applyFilterFormValues}
-          closeDialog={() => read.filter.setIsFilterOpen(false)}
-          currentValues={read.filter.currentFormValues}
-        />
-      </Drawer>
     </>
   );
 };

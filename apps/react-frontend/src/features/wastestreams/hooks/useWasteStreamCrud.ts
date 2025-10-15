@@ -34,8 +34,6 @@ export function useWasteStreamCrud() {
   });
   const displayedWasteStreams = useMemo(
     () => {
-      console.log(JSON.stringify(filters))
-      console.log(JSON.stringify(wasteStreams))
       return wasteStreams.filter((wasteStream) => {
         // Apply search query filter (OR logic for different fields)
         const matchesQuery = query === '' || (
