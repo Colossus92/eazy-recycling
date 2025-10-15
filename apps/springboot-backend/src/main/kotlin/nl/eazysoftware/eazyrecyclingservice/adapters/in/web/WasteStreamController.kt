@@ -224,7 +224,7 @@ sealed class PickupLocationRequest {
   data class PickupCompanyRequest(
     val companyId: UUID
   ) : PickupLocationRequest() {
-    override fun toDomain() = PickupLocation.PickupCompany(
+    override fun toDomain() = PickupCompany(
       companyId = CompanyId(companyId)
     )
   }

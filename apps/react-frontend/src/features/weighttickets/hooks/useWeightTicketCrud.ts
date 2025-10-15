@@ -1,4 +1,4 @@
-import { WeightTicketRequest, WeightTicketListView } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -20,7 +20,7 @@ export function useWeightTicketCrud() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [query, setQuery] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<WeightTicketListView | undefined>(undefined);
+  const [itemToEdit, setItemToEdit] = useState<WeightTicketDetailView | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [itemToDelete, setItemToDelete] = useState<WeightTicketListView | undefined>(undefined);
 
@@ -43,7 +43,6 @@ export function useWeightTicketCrud() {
     [weightTickets, query, filters]
   );
 
-
   const createMutation = useMutation({
     mutationFn: (item: WeightTicketRequest) =>
       weightTicketService.create(item),
@@ -53,9 +52,27 @@ export function useWeightTicketCrud() {
     },
   });
 
-  const create = async (item: CreateWeightTicketRequest): Promise<void> => {
+  const updateMutation = useMutation({
+    mutationFn: ({weightTicketNumber, item}: {weightTicketNumber: number; item: WeightTicketRequest}) =>
+      weightTicketService.update(weightTicketNumber, item),
+    onSuccess: () => {
+      queryClient
+        .invalidateQueries({ queryKey: ['weightTickets'] })
+    },
+  });
+
+  const create = async (item: WeightTicketRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       createMutation.mutate(item, {
+        onSuccess: () => resolve(),
+        onError: (error) => reject(error),
+      });
+    });
+  };
+
+  const update = async (weightTicketNumber: number, item: WeightTicketRequest): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      updateMutation.mutate({ weightTicketNumber, item }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -105,13 +122,18 @@ export function useWeightTicketCrud() {
         setItemToEdit(undefined);
         setIsFormOpen(true);
       },
+      openForEdit: async (item: WeightTicketListView) => {
+        const weightTicketDetails = await weightTicketService.getByNumber(item.id);
+        setItemToEdit(weightTicketDetails);
+        setIsFormOpen(true);
+      },
       close: () => {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
-      submit: async (item: CreateWeightTicketRequest) => {
+      submit: async (item: WeightTicketRequest) => {
         if (itemToEdit) {
-          // return update(itemToEdit.wasteStreamNumber, item);
+          return update(itemToEdit.id, item);
         } else {
           return create(item);
         }

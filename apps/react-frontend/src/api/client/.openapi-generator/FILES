@@ -77,11 +77,11 @@ models/waste-container.ts
 models/waste-stream-detail-view-pickup-location.ts
 models/waste-stream-detail-view.ts
 models/waste-stream-list-view.ts
-models/waste-stream-request-consignor-party.ts
 models/waste-stream-request-pickup-location.ts
 models/waste-stream-request.ts
 models/waste-type-view.ts
 models/weight-ticket-detail-view-consignor-party.ts
 models/weight-ticket-detail-view.ts
 models/weight-ticket-list-view.ts
+models/weight-ticket-request-consignor-party.ts
 models/weight-ticket-request.ts

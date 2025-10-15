@@ -8,6 +8,6 @@ export const weightTicketService = {
     getAll: () => weightTicketApi.getWeightTickets().then((r) => r.data),
     getByNumber: (weightTicketNumber: number) => weightTicketApi.getWeightTicketByNumber(weightTicketNumber).then((r) => r.data),
     create: (weightTicketRequest: WeightTicketRequest) => weightTicketApi.create(weightTicketRequest).then((r) => r.data),
-    update: (weightTicketNumber: number, weightTicketRequest: WeightTicketRequest) => weightTicketApi.create(weightTicketRequest).then((r) => r.data),
-    delete: (weightTicketId: number) => weightTicketApi.delete1(weightTicketId),
+    update: (weightTicketNumber: number, weightTicketRequest: WeightTicketRequest) => weightTicketApi.update(weightTicketNumber, weightTicketRequest).then((r) => r.data),
+    delete: (weightTicketId: number) => weightTicketApi._delete(weightTicketId),
 };

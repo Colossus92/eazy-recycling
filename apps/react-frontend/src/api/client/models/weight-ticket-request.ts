@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WasteStreamRequestConsignorParty } from './waste-stream-request-consignor-party';
+import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
 
 /**
  * 
@@ -31,10 +31,10 @@ export interface WeightTicketRequest {
     'carrierParty'?: string;
     /**
      * 
-     * @type {WasteStreamRequestConsignorParty}
+     * @type {WeightTicketRequestConsignorParty}
      * @memberof WeightTicketRequest
      */
-    'consignorParty': WasteStreamRequestConsignorParty;
+    'consignorParty': WeightTicketRequestConsignorParty;
     /**
      * 
      * @type {string}

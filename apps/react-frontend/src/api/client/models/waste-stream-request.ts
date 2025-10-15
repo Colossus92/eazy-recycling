@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WasteStreamRequestConsignorParty } from './waste-stream-request-consignor-party';
+import type { WasteStreamRequestPickupLocation } from './waste-stream-request-pickup-location';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WasteStreamRequestPickupLocation } from './waste-stream-request-pickup-location';
+import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
 
 /**
  * 
@@ -64,10 +64,10 @@ export interface WasteStreamRequest {
     'processorPartyId': string;
     /**
      * 
-     * @type {WasteStreamRequestConsignorParty}
+     * @type {WeightTicketRequestConsignorParty}
      * @memberof WasteStreamRequest
      */
-    'consignorParty': WasteStreamRequestConsignorParty;
+    'consignorParty': WeightTicketRequestConsignorParty;
     /**
      * 
      * @type {string}

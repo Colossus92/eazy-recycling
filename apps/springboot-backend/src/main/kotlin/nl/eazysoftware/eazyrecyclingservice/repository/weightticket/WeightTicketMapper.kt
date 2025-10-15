@@ -10,7 +10,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
