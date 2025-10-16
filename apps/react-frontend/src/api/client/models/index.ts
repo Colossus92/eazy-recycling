@@ -67,6 +67,7 @@ export * from './weight-request';
 export * from './weight-ticket-detail-view';
 export * from './weight-ticket-detail-view-consignor-party';
 export * from './weight-ticket-line-request';
+export * from './weight-ticket-line-view';
 export * from './weight-ticket-list-view';
 export * from './weight-ticket-request';
 export * from './weight-ticket-request-consignor-party';

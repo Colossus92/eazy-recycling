@@ -85,6 +85,7 @@ models/weight-request.ts
 models/weight-ticket-detail-view-consignor-party.ts
 models/weight-ticket-detail-view.ts
 models/weight-ticket-line-request.ts
+models/weight-ticket-line-view.ts
 models/weight-ticket-list-view.ts
 models/weight-ticket-request-consignor-party.ts
 models/weight-ticket-request.ts

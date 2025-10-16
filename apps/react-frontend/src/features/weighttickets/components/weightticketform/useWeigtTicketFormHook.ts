@@ -129,7 +129,11 @@ const weightTicketDetailsToFormValues = (weightTicketDetails: WeightTicketDetail
         truckLicensePlate: weightTicketDetails.truckLicensePlate || '',
         reclamation: weightTicketDetails.reclamation || '',
         note: weightTicketDetails.note || '',
-        lines: [],
+        lines: (weightTicketDetails.lines || []).map(line => ({
+            wasteStreamNumber: line.wasteStreamNumber || '',
+            weightValue: line.weightValue?.toString() || '',
+            weightUnit: line.weightUnit || 'KG',
+        })),
     };
 }
 

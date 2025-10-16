@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.ConsignorView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWeightTickets
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketByNumber
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketLineView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
@@ -53,13 +54,20 @@ class WeightTicketQueryRepository(
       id = weightTicket.id,
       consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(weightTicket.consignorParty)),
       status = weightTicket.status.name,
+      lines = weightTicket.lines.map { line ->
+        WeightTicketLineView(
+          wasteStreamNumber = line.wasteStreamNumber,
+          weightValue = line.weightValue,
+          weightUnit = line.weightUnit.name,
+        )
+      },
+      carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },
+      truckLicensePlate = weightTicket.truckLicensePlate,
+      reclamation = weightTicket.reclamation,
       note = weightTicket.note,
       createdAt = weightTicket.createdAt.toKotlinInstant().toDisplayTime(),
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),
       weightedAt = weightTicket.weightedAt?.toKotlinInstant()?.toDisplayTime(),
-      carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },
-      truckLicensePlate = weightTicket.truckLicensePlate,
-      reclamation = weightTicket.reclamation,
     )
   }
 }

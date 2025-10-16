@@ -3,7 +3,7 @@ import { TextFormField } from '@/components/ui/form/TextFormField';
 import { useQuery } from '@tanstack/react-query';
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
@@ -28,15 +28,29 @@ export const WeightTicketLinesSection = () => {
     name: 'consignorPartyId',
   });
 
-  // When the consignorPartyId changes, reset the lines
+  // Track previous consignorPartyId to detect actual changes (not initial load)
+  const previousConsignorPartyIdRef = useRef<string | undefined>(undefined);
+  const isInitialMount = useRef(true);
+
+  // When the consignorPartyId changes (but not on initial load), reset the lines
   useEffect(() => {
-    remove();
-    append({
-      wasteStreamNumber: '',
-      weightValue: '',
-      weightUnit: 'KG',
-    });
-  }, [consignorPartyId]);
+    // Skip on initial mount to preserve loaded data
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      previousConsignorPartyIdRef.current = consignorPartyId;
+      return;
+    }
+
+    // Only reset if consignor actually changed from a previous value
+    if (
+      previousConsignorPartyIdRef.current !== undefined &&
+      previousConsignorPartyIdRef.current !== consignorPartyId
+    ) {
+      remove();
+    }
+
+    previousConsignorPartyIdRef.current = consignorPartyId;
+  }, [consignorPartyId, append, remove]);
 
   // Fetch waste streams
   const { data: wasteStreams = [] } = useQuery<WasteStreamListView[]>({

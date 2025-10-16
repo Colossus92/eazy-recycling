@@ -2256,6 +2256,10 @@ components:
           - $ref: "#/components/schemas/PersonConsignorView"
         status:
           type: string
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTicketLineView"
         carrierParty:
           $ref: "#/components/schemas/CompanyView"
         truckLicensePlate:
@@ -2274,7 +2278,21 @@ components:
       - consignorParty
       - createdAt
       - id
+      - lines
       - status
+    WeightTicketLineView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        weightValue:
+          type: number
+        weightUnit:
+          type: string
+      required:
+      - wasteStreamNumber
+      - weightUnit
+      - weightValue
     WasteStreamListView:
       type: object
       properties:

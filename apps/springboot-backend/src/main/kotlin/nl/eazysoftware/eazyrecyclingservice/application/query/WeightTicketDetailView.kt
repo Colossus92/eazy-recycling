@@ -1,11 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import kotlinx.datetime.LocalDateTime
+import java.math.BigDecimal
 
 data class WeightTicketDetailView(
   val id: Long,
   val consignorParty: ConsignorView,
   val status: String,
+  val lines: List<WeightTicketLineView>,
   val carrierParty: CompanyView?,
   val truckLicensePlate: String?,
   val reclamation: String?,
@@ -13,5 +15,10 @@ data class WeightTicketDetailView(
   val createdAt: LocalDateTime,
   val updatedAt: LocalDateTime?,
   val weightedAt: LocalDateTime?,
-) {
-}
+)
+
+data class WeightTicketLineView(
+  val wasteStreamNumber: String,
+  val weightValue: BigDecimal,
+  val weightUnit: String,
+)

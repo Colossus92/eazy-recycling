@@ -22,6 +22,9 @@ import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketLineView } from './weight-ticket-line-view';
 
 /**
  * 
@@ -47,6 +50,12 @@ export interface WeightTicketDetailView {
      * @memberof WeightTicketDetailView
      */
     'status': string;
+    /**
+     * 
+     * @type {Array<WeightTicketLineView>}
+     * @memberof WeightTicketDetailView
+     */
+    'lines': Array<WeightTicketLineView>;
     /**
      * 
      * @type {CompanyView}
