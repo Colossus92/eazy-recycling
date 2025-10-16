@@ -42,7 +42,6 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
       <div className="flex items-center self-stretch justify-between">
         <span className="text-subtitle-2">{title}</span>
-        {error && <span className="text-body-2 text-color-error">{error}</span>}
       </div>
       <textarea
         className={clsx(
@@ -59,6 +58,9 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
         data-testid={testId}
         {...register(name, rules)}
       />
+      {error && <span className="text-caption-1 text-color-status-error-dark">
+        {error}
+      </span>}
     </div>
   );
 };

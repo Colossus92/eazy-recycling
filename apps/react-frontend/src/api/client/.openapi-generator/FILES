@@ -18,6 +18,7 @@ index.ts
 models/address-dto.ts
 models/address-request.ts
 models/address-view.ts
+models/cancel-weight-ticket-request.ts
 models/company-branch-dto.ts
 models/company-branch-response.ts
 models/company-consignor-view.ts

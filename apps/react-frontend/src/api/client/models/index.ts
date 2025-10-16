@@ -1,6 +1,7 @@
 export * from './address-dto';
 export * from './address-request';
 export * from './address-view';
+export * from './cancel-weight-ticket-request';
 export * from './company-branch-dto';
 export * from './company-branch-response';
 export * from './company-consignor';

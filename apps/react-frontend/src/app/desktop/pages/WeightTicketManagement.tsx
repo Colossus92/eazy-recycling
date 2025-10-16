@@ -4,12 +4,12 @@ import Scale from '@/assets/icons/Scale.svg?react';
 import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Button } from '@/components/ui/button/Button';
-import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
+import { WeightTicketCancellationForm } from '@/features/weighttickets/components/WeightTicketCancellationForm';
 import { WeightTicketFilterForm } from '@/features/weighttickets/components/WeightTicketFilterForm';
 import { WeightTicketForm } from '@/features/weighttickets/components/weightticketform/WeightTicketForm';
 import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
@@ -130,12 +130,11 @@ export const WeightTicketManagement = () => {
           </ErrorBoundary>
         </div>
       </ContentContainer>
-      <DeleteDialog
+      <WeightTicketCancellationForm
         isOpen={Boolean(deletion.item)}
         setIsOpen={deletion.cancel}
-        onDelete={() => deletion.item && deletion.confirm(deletion.item.id)}
-        title={"Weegbon verwijderen"}
-        description={`Weet u zeker dat u weegbon met nummer ${deletion.item?.id} wilt verwijderen?`}
+        weightTicketId={deletion.item?.id}
+        onCancel={deletion.confirm}
       />
       <WeightTicketForm
         isOpen={form.isOpen}

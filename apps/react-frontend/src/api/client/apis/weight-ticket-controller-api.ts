@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { CancelWeightTicketRequest } from '../models';
+// @ts-ignore
 import type { CreateWeightTicketResponse } from '../models';
 // @ts-ignore
 import type { WeightTicketDetailView } from '../models';
@@ -38,13 +40,16 @@ export const WeightTicketControllerApiAxiosParamCreator = function (configuratio
         /**
          * 
          * @param {number} weightTicketId 
+         * @param {CancelWeightTicketRequest} cancelWeightTicketRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _delete: async (weightTicketId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        cancel: async (weightTicketId: number, cancelWeightTicketRequest: CancelWeightTicketRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'weightTicketId' is not null or undefined
-            assertParamExists('_delete', 'weightTicketId', weightTicketId)
-            const localVarPath = `/weight-tickets/{weightTicketId}`
+            assertParamExists('cancel', 'weightTicketId', weightTicketId)
+            // verify required parameter 'cancelWeightTicketRequest' is not null or undefined
+            assertParamExists('cancel', 'cancelWeightTicketRequest', cancelWeightTicketRequest)
+            const localVarPath = `/weight-tickets/{weightTicketId}/cancel`
                 .replace(`{${"weightTicketId"}}`, encodeURIComponent(String(weightTicketId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -53,7 +58,7 @@ export const WeightTicketControllerApiAxiosParamCreator = function (configuratio
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -63,9 +68,12 @@ export const WeightTicketControllerApiAxiosParamCreator = function (configuratio
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(cancelWeightTicketRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -237,13 +245,14 @@ export const WeightTicketControllerApiFp = function(configuration?: Configuratio
         /**
          * 
          * @param {number} weightTicketId 
+         * @param {CancelWeightTicketRequest} cancelWeightTicketRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async _delete(weightTicketId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator._delete(weightTicketId, options);
+        async cancel(weightTicketId: number, cancelWeightTicketRequest: CancelWeightTicketRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.cancel(weightTicketId, cancelWeightTicketRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['WeightTicketControllerApi._delete']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['WeightTicketControllerApi.cancel']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -307,11 +316,12 @@ export const WeightTicketControllerApiFactory = function (configuration?: Config
         /**
          * 
          * @param {number} weightTicketId 
+         * @param {CancelWeightTicketRequest} cancelWeightTicketRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _delete(weightTicketId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp._delete(weightTicketId, options).then((request) => request(axios, basePath));
+        cancel(weightTicketId: number, cancelWeightTicketRequest: CancelWeightTicketRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.cancel(weightTicketId, cancelWeightTicketRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -362,12 +372,13 @@ export class WeightTicketControllerApi extends BaseAPI {
     /**
      * 
      * @param {number} weightTicketId 
+     * @param {CancelWeightTicketRequest} cancelWeightTicketRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof WeightTicketControllerApi
      */
-    public _delete(weightTicketId: number, options?: RawAxiosRequestConfig) {
-        return WeightTicketControllerApiFp(this.configuration)._delete(weightTicketId, options).then((request) => request(this.axios, this.basePath));
+    public cancel(weightTicketId: number, cancelWeightTicketRequest: CancelWeightTicketRequest, options?: RawAxiosRequestConfig) {
+        return WeightTicketControllerApiFp(this.configuration).cancel(weightTicketId, cancelWeightTicketRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

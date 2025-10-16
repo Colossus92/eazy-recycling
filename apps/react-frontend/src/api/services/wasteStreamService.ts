@@ -10,5 +10,5 @@ export const wasteStreamService = {
     getByNumber: (number: string) => wasteStreamApi.getWasteStreamByNumber(number).then((r) => r.data),
     create: (wasteStreamRequest: WasteStreamRequest) => wasteStreamApi.create1(wasteStreamRequest).then((r) => r.data),
     update: (wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest) => wasteStreamApi.update1(wasteStreamNumber, wasteStreamRequest).then((r) => r.data),
-    delete: (id: string) => wasteStreamApi.delete1(id),
+    delete: (id: string) => wasteStreamApi._delete(id),
 };

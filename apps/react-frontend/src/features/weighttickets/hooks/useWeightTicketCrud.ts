@@ -100,8 +100,8 @@ export function useWeightTicketCrud() {
     });
   };
 
-  const removeMutation = useMutation({
-    mutationFn: (number: number) => weightTicketService.delete(number),
+  const cancelMutation = useMutation({
+    mutationFn: ({number, cancellationReason}: {number: number, cancellationReason: string}) => weightTicketService.cancel(number, { cancellationReason }),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['weightTickets'] })
@@ -110,9 +110,9 @@ export function useWeightTicketCrud() {
   });
 
 
-  const remove = async (number: number): Promise<void> => {
+  const cancel = async (number: number, cancellationReason: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      removeMutation.mutate(number, {
+      cancelMutation.mutate({ number, cancellationReason }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -165,7 +165,7 @@ export function useWeightTicketCrud() {
     deletion: {
       item: itemToDelete,
       initiate: setItemToDelete,
-      confirm: remove,
+      confirm: cancel,
       cancel: () => setItemToDelete(undefined),
     },
   };
