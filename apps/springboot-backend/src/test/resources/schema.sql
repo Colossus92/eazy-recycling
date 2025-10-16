@@ -215,3 +215,19 @@ create table if not exists pickup_locations (
                                  postal_code text,
                                  company_id uuid
 );
+
+create sequence if not exists weight_tickets_id_seq start with 1 increment by 1;
+
+create table if not exists weight_tickets (
+                                 id bigint not null,
+                                 consignor_party_id uuid not null,
+                                 carrier_party_id uuid,
+                                 truck_license_plate varchar(255),
+                                 reclamation varchar(255),
+                                 note varchar(255),
+                                 status varchar(50) not null,
+                                 created_at timestamp(6) not null,
+                                 updated_at timestamp(6),
+                                 weighted_at timestamp(6),
+                                 primary key (id)
+);
