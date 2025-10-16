@@ -1,14 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumberGenerator
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,8 +19,8 @@ interface CreateWasteStream {
 data class WasteStreamCommand(
   val wasteType: WasteType,
   val collectionType: WasteCollectionType,
-  val pickupLocation: PickupLocation,
-  val deliveryLocation: DeliveryLocation,
+  val pickupLocation: Location,
+  val deliveryLocation: WasteDeliveryLocation,
   val consignorParty: Consignor,
   val pickupParty: CompanyId,
   val dealerParty: CompanyId?,

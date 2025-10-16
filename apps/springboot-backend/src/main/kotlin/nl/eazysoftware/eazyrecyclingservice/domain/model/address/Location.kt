@@ -1,6 +1,5 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
+package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
 /**
@@ -8,7 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
  *
  * According to the Dutch regulations, also a foreign address is allowed, but this is currently not supported.
  */
-sealed interface PickupLocation {
+sealed interface Location {
 
   /**
    * Variant 1: Dutch address with full postal code
@@ -21,7 +20,7 @@ sealed interface PickupLocation {
     val buildingNumberAddition: String? = null,
     val city: String,
     val country: String = "Nederland"
-  ) : PickupLocation {
+  ) : Location {
     init {
       require(buildingNumber.isNotBlank()) { "Het huisnummer is verplicht" }
       require(country == "Nederland") { "Het land dient Nederland te zijn, maar was: $country" }
@@ -37,7 +36,7 @@ sealed interface PickupLocation {
     val city: String,
     val description: String,
     val country: String = "Nederland"
-  ) : PickupLocation {
+  ) : Location {
     init {
       require(postalCodeDigits.matches(Regex("\\d{4}"))) {
         "Voor een nabijheidsbeschrijving moet de postcode alleen vier cijfers bevatten, maar was: $postalCodeDigits"
@@ -50,11 +49,11 @@ sealed interface PickupLocation {
   /**
    * Variant 3: No origin location for route collection, collectors scheme, or private disposers
    */
-  data object NoPickupLocation : PickupLocation
+  data object NoLocation : Location
 
   /**
    * Variant 4: Company location reference
    * References a company's address as the pickup location
    */
-  data class PickupCompany(val companyId: CompanyId) : PickupLocation
+  data class Company(val companyId: CompanyId) : Location
 }

@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 
@@ -17,18 +17,18 @@ data class TransportsView(
 )
 
 data class TransportView(
-    val pickupDate: String,
-    val deliveryDate: String?,
-    val id: String,
-    val truck: Truck?,
-    val originCity: String?,
-    val destinationCity: String?,
-    val driver: ProfileDto?,
-    val status: TransportDto.Status,
-    val displayNumber: String?,
-    val containerId: String?,
-    val transportType: TransportType,
-    val sequenceNumber: Int,
+  val pickupDate: String,
+  val deliveryDate: String?,
+  val id: String,
+  val truck: Truck?,
+  val originCity: String?,
+  val destinationCity: String?,
+  val driver: ProfileDto?,
+  val status: TransportDto.Status,
+  val displayNumber: String?,
+  val containerId: String?,
+  val transportType: TransportType,
+  val sequenceNumber: Int,
 ) {
 
     constructor(transportDto: TransportDto): this(

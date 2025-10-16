@@ -5,7 +5,7 @@ import jakarta.persistence.PersistenceContext
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
@@ -13,11 +13,11 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMe
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
@@ -65,14 +65,14 @@ class WasteStreamMapper(
                 country = actualPickupLocation.country
             )
 
-            is PickupLocationDto.PickupCompanyDto -> PickupCompany(
+            is PickupLocationDto.PickupCompanyDto -> Company(
                 companyId = CompanyId(actualPickupLocation.companyId)
             )
 
-            is PickupLocationDto.NoPickupLocationDto -> NoPickupLocation
+            is PickupLocationDto.NoPickupLocationDto -> NoLocation
             else -> throw IllegalArgumentException("Ongeldige herkomstlocatie: ${actualPickupLocation::class.simpleName}")
         },
-        deliveryLocation = DeliveryLocation(
+        deliveryLocation = WasteDeliveryLocation(
             processorPartyId = processorPartyId
         ),
         consignorParty = Consignor.Company(
@@ -100,8 +100,8 @@ class WasteStreamMapper(
       pickupLocation = when (val location = domain.pickupLocation) {
         is DutchAddress -> findOrCreateLocation(location)
         is ProximityDescription -> createProximity(location)
-        is PickupCompany -> createPickupCompany(location)
-        is NoPickupLocation -> PickupLocationDto.NoPickupLocationDto()
+        is Company -> createPickupCompany(location)
+        is NoLocation -> PickupLocationDto.NoPickupLocationDto()
       },
       processorParty = companyRepository.findByProcessorId(domain.deliveryLocation.processorPartyId.number)
         ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.deliveryLocation.processorPartyId.number}"),
@@ -147,7 +147,7 @@ class WasteStreamMapper(
   }
 
   private fun createPickupCompany(
-    domain: PickupCompany
+    domain: Company
   ): PickupLocationDto.PickupCompanyDto {
     val company = companyRepository.findByIdOrNull(domain.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")

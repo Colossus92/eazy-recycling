@@ -1,5 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
+
 /**
  * Domain service responsible for generating sequential waste stream numbers.
  *

@@ -3,10 +3,10 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -133,7 +133,7 @@ class PlanningControllerIntegrationTest {
         // Given
         val startDate = LocalDate.now()
         val endDate = startDate.plusDays(7)
-        
+
         createTestTransportsForDriver(startDate)
 
         // When & Then
@@ -155,7 +155,7 @@ class PlanningControllerIntegrationTest {
         // Given
         val startDate = LocalDate.now()
         val endDate = startDate.plusDays(7)
-        
+
         createTestTransportsForDriver(startDate)
 
         // When & Then - Driver accessing their own planning
@@ -177,7 +177,7 @@ class PlanningControllerIntegrationTest {
         // Given
         val startDate = LocalDate.now()
         val endDate = startDate.plusDays(7)
-        
+
         createTestTransportsForDriver(startDate)
 
         // When & Then
@@ -196,7 +196,7 @@ class PlanningControllerIntegrationTest {
         // Given
         val startDate = LocalDate.now()
         val endDate = startDate.plusDays(7)
-        
+
         // No transports created for this driver
 
         // When & Then

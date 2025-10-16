@@ -3,6 +3,8 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
@@ -12,9 +14,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto

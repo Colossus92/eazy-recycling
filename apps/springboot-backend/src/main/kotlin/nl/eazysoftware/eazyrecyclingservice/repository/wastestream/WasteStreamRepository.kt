@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import org.springframework.data.jpa.repository.JpaRepository

@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.model.transport
+package nl.eazysoftware.eazyrecyclingservice.domain.model.company
 
 /**
  * Dutch VIHB number (Vergunning Inzamelen Huishoudelijke en Bedrijfsafvalstoffen)

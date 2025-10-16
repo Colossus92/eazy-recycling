@@ -3,13 +3,15 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 import kotlinx.datetime.Clock
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 
 class WasteStream(
   val wasteStreamNumber: WasteStreamNumber,
   var wasteType: WasteType,
   var collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
-  var pickupLocation: PickupLocation,
-  var deliveryLocation: DeliveryLocation,
+  var pickupLocation: Location,
+  var deliveryLocation: WasteDeliveryLocation,
   /**
    * Dutch: Afzender
    */
@@ -48,8 +50,8 @@ class WasteStream(
 
   private fun validateBusinessRules(
     collectionType: WasteCollectionType,
-    pickupLocation: PickupLocation,
-    deliveryLocation: DeliveryLocation,
+    pickupLocation: Location,
+    deliveryLocation: WasteDeliveryLocation,
     consignorParty: Consignor,
     collectorParty: CompanyId?,
     brokerParty: CompanyId?
@@ -60,7 +62,7 @@ class WasteStream(
 
     // Origin location validation: either has location with default collection + company,
     // or no location with non-default collection or person
-    val hasPickupLocation = pickupLocation !is PickupLocation.NoPickupLocation
+    val hasPickupLocation = pickupLocation !is Location.NoLocation
     val isDefaultCollection = collectionType == WasteCollectionType.DEFAULT
     val isCompanyConsignor = consignorParty is Consignor.Company
 
@@ -102,8 +104,8 @@ class WasteStream(
   fun update(
     wasteType: WasteType = this.wasteType,
     collectionType: WasteCollectionType = this.collectionType,
-    pickupLocation: PickupLocation = this.pickupLocation,
-    deliveryLocation: DeliveryLocation = this.deliveryLocation,
+    pickupLocation: Location = this.pickupLocation,
+    deliveryLocation: WasteDeliveryLocation = this.deliveryLocation,
     consignorParty: Consignor = this.consignorParty,
     pickupParty: CompanyId = this.pickupParty,
     dealerParty: CompanyId? = this.dealerParty,
@@ -168,21 +170,6 @@ sealed interface Consignor {
   data class Company(val id: CompanyId) : Consignor
   data object Person : Consignor
 }
-
-data class DeliveryLocation(
-  val processorPartyId: ProcessorPartyId,
-)
-
-data class ProcessorPartyId(
-  val number: String
-) {
-  init {
-    require(number.length == 5) {
-      "Het verwerkersnummer moet exact 5 tekens lang zijn, maar is: $number"
-    }
-  }
-}
-
 
 enum class WasteCollectionType {
   DEFAULT,

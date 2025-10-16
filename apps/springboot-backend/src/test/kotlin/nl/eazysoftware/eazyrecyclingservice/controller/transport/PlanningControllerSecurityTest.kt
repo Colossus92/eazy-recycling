@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PlanningService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import org.junit.jupiter.api.BeforeEach
@@ -47,7 +47,7 @@ class PlanningControllerSecurityTest {
                 Arguments.of("unauthorized_role", 403)
             )
         }
-        
+
         @JvmStatic
         fun driverPlanningAccessScenarios(): Stream<Arguments> {
             return Stream.of(
@@ -105,7 +105,7 @@ class PlanningControllerSecurityTest {
                 )
             )
         )
-        
+
         // Mock the service call for driver planning
         whenever(planningService.getPlanningByDriver(any(), any(), any())).thenReturn(
             mapOf(
@@ -177,7 +177,7 @@ class PlanningControllerSecurityTest {
                 .with(
                     jwt()
                         .authorities(SimpleGrantedAuthority(role))
-                        .jwt { jwt -> 
+                        .jwt { jwt ->
                             if (userSubjectId != null) {
                                 jwt.claim("sub", userSubjectId.toString())
                             }
@@ -185,7 +185,7 @@ class PlanningControllerSecurityTest {
                 )
         ).andExpect(status().`is`(expectedStatus))
     }
-    
+
     private fun testDeliveryLocation() = nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto(
         id = UUID.randomUUID().toString(),
         address = nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto(

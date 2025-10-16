@@ -5,12 +5,12 @@ import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
@@ -35,7 +35,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.ProximityDescription(
+        pickupLocation = Location.ProximityDescription(
           "1234",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -61,7 +61,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.ROUTE,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
@@ -77,7 +77,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.DutchAddress(
+        pickupLocation = Location.DutchAddress(
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "2",
@@ -101,7 +101,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
@@ -209,7 +209,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
@@ -226,7 +226,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
@@ -243,7 +243,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
@@ -259,7 +259,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        pickupLocation = PickupLocation.DutchAddress(
+        pickupLocation = Location.DutchAddress(
           streetName = "Stadstraat",
           postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
@@ -281,7 +281,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.DutchAddress(
+        pickupLocation = Location.DutchAddress(
           streetName = "Stadstraat",
           postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
@@ -303,7 +303,7 @@ class WasteStreamTest {
         wasteStreamNumber = WasteStreamNumber("123466789012"),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.DutchAddress(
+        pickupLocation = Location.DutchAddress(
           streetName = "Stadstraat",
           postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
@@ -326,7 +326,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = collectionType,
-        pickupLocation = PickupLocation.NoPickupLocation,
+        pickupLocation = Location.NoLocation,
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
@@ -342,7 +342,7 @@ class WasteStreamTest {
     @Test
     fun `a dutch address can't have a blank house number`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.DutchAddress(
+        Location.DutchAddress(
           streetName = "Stadstraat",
           postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "",
@@ -355,7 +355,7 @@ class WasteStreamTest {
     @Test
     fun `a dutch address must have Nederland as country`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.DutchAddress(
+        Location.DutchAddress(
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
@@ -369,7 +369,7 @@ class WasteStreamTest {
     @Test
     fun `a dutch address can have a house number addition`() {
       assertDoesNotThrow {
-        PickupLocation.DutchAddress(
+        Location.DutchAddress(
           streetName = "Stadstraat",
           DutchPostalCode("1234 AB"),
           "123",
@@ -385,7 +385,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a dutch postal code`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "1234 AB",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -397,7 +397,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with 3 digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "123",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -409,7 +409,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with 5 digits`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "12345",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -421,7 +421,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a postal code with a letter`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "1234a",
           "Stad",
           "Nabijheidsbeschrijving"
@@ -433,7 +433,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a blank city`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "1234",
           "",
           "Nabijheidsbeschrijving"
@@ -445,7 +445,7 @@ class WasteStreamTest {
     @Test
     fun `a proximity description can't have a blank proximity description`() {
       val exception = assertFailsWith<IllegalArgumentException> {
-        PickupLocation.ProximityDescription(
+        Location.ProximityDescription(
           "1234",
           "Stad",
           ""
@@ -490,7 +490,7 @@ class WasteStreamTest {
     wasteStreamNumber = wasteStreamNumber(),
     wasteType = wasteType(),
     collectionType = WasteCollectionType.DEFAULT,
-    pickupLocation = PickupLocation.DutchAddress(
+    pickupLocation = Location.DutchAddress(
       streetName = "Stadstraat",
       DutchPostalCode("1234 AB"),
       "2",
@@ -513,7 +513,7 @@ class WasteStreamTest {
 
   private fun companyId(): CompanyId = CompanyId(UUID.randomUUID())
 
-  private fun destinationLocation(): DeliveryLocation = DeliveryLocation(
+  private fun destinationLocation(): WasteDeliveryLocation = WasteDeliveryLocation(
     ProcessorPartyId("12345"),
   )
 }

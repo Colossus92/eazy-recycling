@@ -7,30 +7,21 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.DeleteWasteStream
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.DeleteWasteStreamCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.UpdateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamService
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation.*
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/waste-streams")
@@ -126,7 +117,7 @@ data class WasteStreamRequest(
       ),
       collectionType = WasteCollectionType.valueOf(collectionType.uppercase()),
       pickupLocation = pickupLocation.toDomain(),
-      deliveryLocation = DeliveryLocation(
+      deliveryLocation = WasteDeliveryLocation(
         processorPartyId = ProcessorPartyId(processorPartyId)
       ),
       consignorParty = consignorParty.toDomain(),
@@ -175,7 +166,7 @@ sealed class ConsignorRequest {
   JsonSubTypes.Type(value = PickupLocationRequest.NoPickupLocationRequest::class, name = "none")
 )
 sealed class PickupLocationRequest {
-  abstract fun toDomain(): PickupLocation
+  abstract fun toDomain(): Location
 
   data class DutchAddressRequest(
 
@@ -232,12 +223,12 @@ sealed class PickupLocationRequest {
   data class PickupCompanyRequest(
     val companyId: UUID
   ) : PickupLocationRequest() {
-    override fun toDomain() = PickupCompany(
+    override fun toDomain() = Company(
       companyId = CompanyId(companyId)
     )
   }
 
   class NoPickupLocationRequest : PickupLocationRequest() {
-    override fun toDomain() = NoPickupLocation
+    override fun toDomain() = NoLocation
   }
 }

@@ -2,9 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.ZoneId

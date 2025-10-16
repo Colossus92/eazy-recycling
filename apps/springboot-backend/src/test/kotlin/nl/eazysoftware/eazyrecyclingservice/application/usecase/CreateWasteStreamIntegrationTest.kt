@@ -6,11 +6,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
@@ -149,13 +149,13 @@ class CreateWasteStreamIntegrationTest {
             processingMethod = ProcessingMethod("R01")
         ),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocation.DutchAddress(
+        pickupLocation = Location.DutchAddress(
             streetName = "Test Street",
             postalCode = DutchPostalCode("1234AB"),
             buildingNumber = "1",
             city = "Test City"
         ),
-        deliveryLocation = DeliveryLocation(processorPartyId = processorId),
+        deliveryLocation = WasteDeliveryLocation(processorPartyId = processorId),
         consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
         pickupParty = CompanyId(UUID.randomUUID()),
         dealerParty = null,

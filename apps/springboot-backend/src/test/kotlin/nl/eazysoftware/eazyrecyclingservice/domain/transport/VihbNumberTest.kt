@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.transport
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.VihbNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest

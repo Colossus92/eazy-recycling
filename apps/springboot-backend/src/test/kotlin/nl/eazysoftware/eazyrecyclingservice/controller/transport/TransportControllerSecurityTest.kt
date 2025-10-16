@@ -2,11 +2,11 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
