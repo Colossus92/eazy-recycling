@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.transport
 
 import kotlinx.datetime.Instant
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
+import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -11,12 +11,12 @@ import java.util.*
 import kotlin.time.Duration
 
 class ContainerTransport(
-  val transportId: TransportId,
+  val transportId: TransportId? = null, // TODO remove UUID generation in DTO
 
   /**
    * Used for human-readable display in the UI
    */
-  val displayNumber: TransportDisplayNumber,
+  val displayNumber: TransportDisplayNumber? = null, // TODO get value from database in domain service
 
   /**
    * The party client ordering the transport.
@@ -38,9 +38,9 @@ class ContainerTransport(
 
   val transportType: TransportType,
 
-  val wasteContainer: WasteContainer,
+  val wasteContainer: WasteContainerId?,
 
-  val truck: Truck?,
+  val truck: LicensePlate?,
 
   val driver: UserId?,
 

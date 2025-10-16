@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.container
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
+import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.springframework.stereotype.Component
 
@@ -10,7 +11,7 @@ class WasteContainerMapper {
 
     fun toDomain(dto: WasteContainerDto): WasteContainer {
         return WasteContainer(
-            uuid = dto.uuid!!,
+            wasteContainerId = WasteContainerId(dto.uuid!!),
             id = dto.id,
             location = WasteContainer.ContainerLocation(
                 companyId = dto.company?.id,

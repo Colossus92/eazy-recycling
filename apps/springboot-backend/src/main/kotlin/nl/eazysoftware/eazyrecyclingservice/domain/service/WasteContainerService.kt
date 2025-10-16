@@ -55,7 +55,7 @@ class WasteContainerService(
 
     private fun toDto(container: WasteContainer): WasteContainerDto {
         val dto = WasteContainerDto(
-            uuid = container.uuid,
+            uuid = container.wasteContainerId.uuid,
             id = container.id,
             notes = container.notes,
         )

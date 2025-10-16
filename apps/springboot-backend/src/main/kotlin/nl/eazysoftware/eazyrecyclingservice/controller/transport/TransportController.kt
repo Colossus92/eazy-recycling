@@ -37,12 +37,6 @@ class TransportController(
         return transport
     }
 
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    @PostMapping("/container")
-    fun createContainerTransport(@Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
-        return transportService.createContainerTransport(request)
-    }
-
     @PreAuthorize(HAS_ANY_ROLE)
     @PutMapping(path = ["/container/{id}"])
     fun updateContainerTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
