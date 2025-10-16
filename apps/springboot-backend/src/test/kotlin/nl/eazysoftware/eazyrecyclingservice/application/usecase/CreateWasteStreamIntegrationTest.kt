@@ -2,11 +2,18 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
-import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.junit.jupiter.api.*

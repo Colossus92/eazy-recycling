@@ -3,10 +3,9 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import kotlinx.datetime.toKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.PickupLocation.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
@@ -14,6 +13,16 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMe
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationRepository
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -32,46 +41,49 @@ class WasteStreamMapper(
     val actualPickupLocation = Hibernate.unproxy(dto.pickupLocation, PickupLocationDto::class.java)
 
     return WasteStream(
-      wasteStreamNumber = WasteStreamNumber(dto.number),
-      wasteType = WasteType(
-        name = dto.name,
-        euralCode = EuralCode(dto.euralCode.code),
-        processingMethod = ProcessingMethod(dto.processingMethodCode.code)
-      ),
-      collectionType = WasteCollectionType.valueOf(dto.wasteCollectionType),
-      pickupLocation = when (actualPickupLocation) {
-        is PickupLocationDto.DutchAddressDto -> DutchAddress(
-          streetName = actualPickupLocation.streetName,
-          postalCode = DutchPostalCode(actualPickupLocation.postalCode),
-          buildingNumber = actualPickupLocation.buildingNumber,
-          buildingNumberAddition = actualPickupLocation.buildingNumberAddition,
-          city = actualPickupLocation.city,
-          country = actualPickupLocation.country,
-        )
-        is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
-          description = actualPickupLocation.description,
-          postalCodeDigits = actualPickupLocation.postalCode,
-          city = actualPickupLocation.city,
-          country = actualPickupLocation.country
-        )
-        is PickupLocationDto.PickupCompanyDto -> PickupCompany(
-          companyId = CompanyId(actualPickupLocation.companyId)
-        )
-        is PickupLocationDto.NoPickupLocationDto -> NoPickupLocation
-        else -> throw IllegalArgumentException("Ongeldige herkomstlocatie: ${actualPickupLocation::class.simpleName}")
-      },
-      deliveryLocation = DeliveryLocation(
-        processorPartyId = processorPartyId
-      ),
-      consignorParty = Consignor.Company(
-        CompanyId(dto.consignorParty.id!!)
-      ),
-      pickupParty = CompanyId(dto.pickupParty.id!!),
-      dealerParty = dto.dealerParty?.let { CompanyId(it.id!!) },
-      collectorParty = dto.collectorParty?.let { CompanyId(it.id!!) },
-      brokerParty = dto.brokerParty?.let { CompanyId(it.id!!) },
-      lastActivityAt = dto.lastActivityAt.toKotlinInstant(),
-      status = WasteStreamStatus.valueOf(dto.status)
+        wasteStreamNumber = WasteStreamNumber(dto.number),
+        wasteType = WasteType(
+            name = dto.name,
+            euralCode = EuralCode(dto.euralCode.code),
+            processingMethod = ProcessingMethod(dto.processingMethodCode.code)
+        ),
+        collectionType = WasteCollectionType.valueOf(dto.wasteCollectionType),
+        pickupLocation = when (actualPickupLocation) {
+            is PickupLocationDto.DutchAddressDto -> DutchAddress(
+                streetName = actualPickupLocation.streetName,
+                postalCode = DutchPostalCode(actualPickupLocation.postalCode),
+                buildingNumber = actualPickupLocation.buildingNumber,
+                buildingNumberAddition = actualPickupLocation.buildingNumberAddition,
+                city = actualPickupLocation.city,
+                country = actualPickupLocation.country,
+            )
+
+            is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
+                description = actualPickupLocation.description,
+                postalCodeDigits = actualPickupLocation.postalCode,
+                city = actualPickupLocation.city,
+                country = actualPickupLocation.country
+            )
+
+            is PickupLocationDto.PickupCompanyDto -> PickupCompany(
+                companyId = CompanyId(actualPickupLocation.companyId)
+            )
+
+            is PickupLocationDto.NoPickupLocationDto -> NoPickupLocation
+            else -> throw IllegalArgumentException("Ongeldige herkomstlocatie: ${actualPickupLocation::class.simpleName}")
+        },
+        deliveryLocation = DeliveryLocation(
+            processorPartyId = processorPartyId
+        ),
+        consignorParty = Consignor.Company(
+            CompanyId(dto.consignorParty.id!!)
+        ),
+        pickupParty = CompanyId(dto.pickupParty.id!!),
+        dealerParty = dto.dealerParty?.let { CompanyId(it.id!!) },
+        collectorParty = dto.collectorParty?.let { CompanyId(it.id!!) },
+        brokerParty = dto.brokerParty?.let { CompanyId(it.id!!) },
+        lastActivityAt = dto.lastActivityAt.toKotlinInstant(),
+        status = WasteStreamStatus.valueOf(dto.status)
     )
   }
 

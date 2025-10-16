@@ -9,8 +9,8 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetail
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketLineView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository

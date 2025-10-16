@@ -1,11 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
 import java.math.BigDecimal
-import java.util.UUID
 
 @Embeddable
 data class WeightTicketLineDto(

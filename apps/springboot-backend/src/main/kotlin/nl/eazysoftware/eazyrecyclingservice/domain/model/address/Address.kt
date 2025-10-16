@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.address
+package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
 data class Address(
   val streetName: String,

@@ -1,5 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumberGenerator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

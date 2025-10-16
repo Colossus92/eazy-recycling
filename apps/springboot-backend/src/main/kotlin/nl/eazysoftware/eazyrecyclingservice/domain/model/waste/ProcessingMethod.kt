@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.waste
+package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
 data class ProcessingMethod(
   val code: String,

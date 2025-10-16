@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWasteStreams
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetWasteStreamByNumber
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import org.springframework.stereotype.Service
 
 @Service

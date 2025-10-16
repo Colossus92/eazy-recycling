@@ -2,8 +2,20 @@ package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -249,7 +261,7 @@ class WasteStreamTest {
         collectionType = collectionType,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          postalCode =  DutchPostalCode("1234 AB"),
+          postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
           city = "Test city",
         ),
@@ -271,7 +283,7 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          postalCode =  DutchPostalCode("1234 AB"),
+          postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
           city = "Test city",
         ),
@@ -293,7 +305,7 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = PickupLocation.DutchAddress(
           streetName = "Stadstraat",
-          postalCode =  DutchPostalCode("1234 AB"),
+          postalCode = DutchPostalCode("1234 AB"),
           buildingNumber = "123",
           city = "Test city",
         ),

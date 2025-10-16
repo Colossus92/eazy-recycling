@@ -1,8 +1,15 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.DeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.PickupLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumberGenerator
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

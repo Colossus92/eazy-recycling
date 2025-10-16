@@ -1,6 +1,6 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.waste
+package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
-import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
 /**

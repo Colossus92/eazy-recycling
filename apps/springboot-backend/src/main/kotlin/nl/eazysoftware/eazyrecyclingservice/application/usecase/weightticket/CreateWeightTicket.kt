@@ -3,12 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
-import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLines
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

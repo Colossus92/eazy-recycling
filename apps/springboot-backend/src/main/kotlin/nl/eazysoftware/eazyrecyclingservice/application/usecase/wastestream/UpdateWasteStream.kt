@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

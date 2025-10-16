@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository

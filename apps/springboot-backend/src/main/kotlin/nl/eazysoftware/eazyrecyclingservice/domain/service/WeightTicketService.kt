@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketByNumber
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import org.springframework.stereotype.Service
 
 @Service

@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.transport
+package nl.eazysoftware.eazyrecyclingservice.domain.model.transport
 
 import java.time.ZonedDateTime
 

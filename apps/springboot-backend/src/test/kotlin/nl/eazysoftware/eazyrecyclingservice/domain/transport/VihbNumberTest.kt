@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.transport
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.VihbNumber
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +21,7 @@ class VihbNumberTest {
   @CsvSource(value = ["12345VXXX", "1234567VXXX", "123456VXX", "123456VXXXX", ])
   fun `VIHB number should have exactly 6 digits and 4 letters`(value: String) {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber(value)
+        VihbNumber(value)
     }
     assert(exception.message!!.contains("exact 6 cijfers"))
   }
@@ -28,7 +29,7 @@ class VihbNumberTest {
   @Test
   fun `VIHB number with invalid letter should be rejected`() {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber("123456VAAA")
+        VihbNumber("123456VAAA")
     }
     assert(exception.message!!.contains("X, V, I, H of B"))
   }
@@ -36,7 +37,7 @@ class VihbNumberTest {
   @Test
   fun `VIHB number with lowercase letters should be rejected`() {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber("123456vxxx")
+        VihbNumber("123456vxxx")
     }
     assert(exception.message!!.contains("X, V, I, H of B"))
   }
@@ -44,7 +45,7 @@ class VihbNumberTest {
   @Test
   fun `VIHB number with only X letters should be rejected`() {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber("123456XXXX")
+        VihbNumber("123456XXXX")
     }
     assert(exception.message!!.contains("maximaal 3"))
   }
@@ -52,7 +53,7 @@ class VihbNumberTest {
   @Test
   fun `VIHB number with letters before digits should be rejected`() {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber("VXXX123456")
+        VihbNumber("VXXX123456")
     }
     assert(exception.message!!.contains("exact 6 cijfers"))
   }
@@ -60,7 +61,7 @@ class VihbNumberTest {
   @Test
   fun `VIHB number with mixed digits and letters should be rejected`() {
     val exception = assertThrows<IllegalArgumentException> {
-      VihbNumber("12V34X56HB")
+        VihbNumber("12V34X56HB")
     }
     assert(exception.message!!.contains("exact 6 cijfers"))
   }

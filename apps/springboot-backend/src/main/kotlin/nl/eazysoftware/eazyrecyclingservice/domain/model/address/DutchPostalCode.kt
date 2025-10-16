@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.address
+package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
 /**
  * Dutch postal code value object (4 digits + 2 letters, e.g., "1234AB")

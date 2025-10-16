@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
-import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 
 data class WeightTicketListView(
     val id: Long,

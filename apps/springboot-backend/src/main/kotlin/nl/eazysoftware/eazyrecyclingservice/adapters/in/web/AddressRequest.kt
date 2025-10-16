@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
-import nl.eazysoftware.eazyrecyclingservice.domain.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 
 data class AddressRequest(
   @field:NotBlank val street: String,

@@ -1,7 +1,7 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
+package nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket
 
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 
 class WeightTicketLines(
   private val lines: List<WeightTicketLine>,

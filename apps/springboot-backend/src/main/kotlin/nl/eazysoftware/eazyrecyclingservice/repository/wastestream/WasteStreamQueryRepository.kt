@@ -5,9 +5,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.EffectiveStatusPolicy
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatusPolicy
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto

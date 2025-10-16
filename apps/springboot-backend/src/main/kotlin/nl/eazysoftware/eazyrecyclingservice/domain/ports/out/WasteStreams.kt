@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStream
-import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 
 /**
  * Domain port for WasteStream repository following hexagonal architecture

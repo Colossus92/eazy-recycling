@@ -1,4 +1,4 @@
-package nl.eazysoftware.eazyrecyclingservice.domain.waste
+package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
 import kotlinx.datetime.Clock
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
