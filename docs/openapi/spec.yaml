@@ -2288,6 +2288,9 @@ components:
           type: string
         consignorPartyName:
           type: string
+        consignorPartyId:
+          type: string
+          format: uuid
         pickupLocation:
           type: string
         deliveryLocation:
@@ -2297,6 +2300,7 @@ components:
         lastActivityAt:
           $ref: "#/components/schemas/LocalDateTime"
       required:
+      - consignorPartyId
       - consignorPartyName
       - deliveryLocation
       - euralCode

@@ -9,12 +9,19 @@ import {
 } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 
+export interface WeightTicketLineFormValues {
+    wasteStreamNumber: string;
+    weightValue: string;
+    weightUnit: string;
+}
+
 export interface WeightTicketFormValues {
     consignorPartyId: string;
     carrierPartyId: string;
     truckLicensePlate: string;
     reclamation: string;
     note: string;
+    lines: WeightTicketLineFormValues[];
 }
 
 export function useWeightTicketForm(
@@ -40,6 +47,7 @@ export function useWeightTicketForm(
             truckLicensePlate: '',
             reclamation: '',
             note: '',
+            lines: [],
         }
     });
     const mutation = useMutation({
@@ -78,6 +86,7 @@ export function useWeightTicketForm(
             truckLicensePlate: '',
             reclamation: '',
             note: '',
+            lines: [],
         });
     };
 
@@ -120,6 +129,7 @@ const weightTicketDetailsToFormValues = (weightTicketDetails: WeightTicketDetail
         truckLicensePlate: weightTicketDetails.truckLicensePlate || '',
         reclamation: weightTicketDetails.reclamation || '',
         note: weightTicketDetails.note || '',
+        lines: [],
     };
 }
 
@@ -138,6 +148,12 @@ const formValuesToWeightTicketRequest = (
         truckLicensePlate: formValues.truckLicensePlate,
         reclamation: formValues.reclamation,
         note: formValues.note,
-        lines: [],
+        lines: formValues.lines.map(line => ({
+            wasteStreamNumber: line.wasteStreamNumber,
+            weight: {
+                value: line.weightValue,
+                unit: line.weightUnit as any,
+            },
+        })),
     };
 }

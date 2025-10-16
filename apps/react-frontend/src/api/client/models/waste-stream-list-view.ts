@@ -58,6 +58,12 @@ export interface WasteStreamListView {
      * @type {string}
      * @memberof WasteStreamListView
      */
+    'consignorPartyId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteStreamListView
+     */
     'pickupLocation': string;
     /**
      * 

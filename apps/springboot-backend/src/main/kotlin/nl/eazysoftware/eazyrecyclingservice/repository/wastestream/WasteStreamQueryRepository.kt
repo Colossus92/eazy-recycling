@@ -38,6 +38,7 @@ class WasteStreamQueryRepository(
                 e.code,
                 pm.code,
                 c.name,
+                c.id,
                 pl.location_type,
                 pl.street_name,
                 pl.building_number,
@@ -62,8 +63,8 @@ class WasteStreamQueryRepository(
 
     return results.map { row ->
       val columns = row as Array<*>
-      val status = columns[14] as String
-      val lastActivityAtRaw = columns[15]
+      val status = columns[15] as String
+      val lastActivityAtRaw = columns[16]
       val lastActivityAt = when (lastActivityAtRaw) {
         is OffsetDateTime -> lastActivityAtRaw.toInstant() // Support for H2 Database
         is Instant -> lastActivityAtRaw
@@ -75,8 +76,9 @@ class WasteStreamQueryRepository(
         euralCode = columns[2] as String,
         processingMethodCode = columns[3] as String,
         consignorPartyName = columns[4] as String,
+        consignorPartyId = columns[5] as UUID,
         pickupLocation = formatPickupLocation(columns),
-        deliveryLocation = "${columns[11]} ${columns[12]}, ${columns[13]}",
+        deliveryLocation = "${columns[12]} ${columns[13]}, ${columns[14]}",
         lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
         status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(status), lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
       )
@@ -84,11 +86,11 @@ class WasteStreamQueryRepository(
   }
 
   private fun formatPickupLocation(columns: Array<*>): String {
-    return when (val locationType: String = columns[5] as String) {
-      DUTCH_ADDRESS -> "${columns[6]} ${columns[7]}, ${columns[9]}"
-      PROXIMITY_DESC -> "${columns[8]}, ${columns[9]}"
+    return when (val locationType: String = columns[6] as String) {
+      DUTCH_ADDRESS -> "${columns[7]} ${columns[8]}, ${columns[10]}"
+      PROXIMITY_DESC -> "${columns[9]}, ${columns[10]}"
       COMPANY -> {
-        val companyId = columns[10] as UUID
+        val companyId = columns[11] as UUID
         val company = companyRepository.findByIdOrNull(companyId) ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
         "${company.name}, ${company.address.city}"
       }

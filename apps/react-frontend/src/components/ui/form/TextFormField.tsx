@@ -34,7 +34,7 @@ export const TextFormField = <TFieldValues extends FieldValues>({
   const fieldError = formHook?.errors?.[formHook?.name]?.message?.toString();
   return (
     <div className="flex flex-1 flex-col items-start self-stretch gap-1">
-      <span className="text-subtitle-2">{title}</span>
+      <span className="text-caption-2">{title}</span>
       <TextInput
         placeholder={placeholder}
         formHook={{

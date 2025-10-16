@@ -12,6 +12,7 @@ import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
+import { WeightTicketLinesSection } from './WeightTicketLinesSection';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
@@ -53,7 +54,7 @@ export const WeightTicketForm = ({
 
     return (
         <ErrorBoundary fallbackRender={fallbackRender}>
-            <FormDialog isOpen={isOpen} setIsOpen={onCancel}>
+            <FormDialog isOpen={isOpen} setIsOpen={onCancel} width="w-[720px]">
                 <div className={'w-full'}>
                     <FormProvider {...formContext}>
                         <form
@@ -67,7 +68,7 @@ export const WeightTicketForm = ({
                                 onClick={onCancel}
                             />
                             <div
-                                className={'flex flex-col items-start self-stretch gap-5 p-4 w'}
+                                className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
                             >
                                 {isLoading ? (
                                     <div className="flex justify-center items-center w-full p-8">
@@ -75,39 +76,46 @@ export const WeightTicketForm = ({
                                     </div>
                                 ) : (
                                     <div className={'flex flex-col items-start self-stretch gap-4'}>
-                                        <SelectFormField
-                                            title={'Opdrachtgever'}
-                                            placeholder={'Selecteer een opdrachtgever'}
-                                            options={companyOptions}
-                                            testId="consignor-party-select"
-                                            formHook={{
-                                                register: formContext.register,
-                                                name: 'consignorPartyId',
-                                                rules: { required: 'Opdrachtgever is verplicht' },
-                                                errors: formContext.formState.errors,
-                                                control: formContext.control,
-                                            }}
-                                        />
-                                        <SelectFormField
-                                            title={'Vervoerder'}
-                                            placeholder={'Selecteer een vervoerder'}
-                                            options={companyOptions}
-                                            testId="carrier-party-select"
-                                            formHook={{
-                                                register: formContext.register,
-                                                name: 'carrierPartyId',
-                                                errors: formContext.formState.errors,
-                                                control: formContext.control,
-                                            }}
-                                        />
-                                        <TruckSelectFormField
+                                        <div className="w-1/2">
+                                            <SelectFormField
+                                                title={'Opdrachtgever'}
+                                                placeholder={'Selecteer een opdrachtgever'}
+                                                options={companyOptions}
+                                                testId="consignor-party-select"
                                                 formHook={{
-                                                  register: formContext.register,
-                                                  name: 'truckLicensePlate',
-                                                  errors: formContext.formState.errors,
-                                                  control: formContext.control,
+                                                    register: formContext.register,
+                                                    name: 'consignorPartyId',
+                                                    rules: { required: 'Opdrachtgever is verplicht' },
+                                                    errors: formContext.formState.errors,
+                                                    control: formContext.control,
                                                 }}
-                                              />
+                                            />
+                                        </div>
+                                        <div className="w-1/2">
+                                            <SelectFormField
+                                                title={'Vervoerder'}
+                                                placeholder={'Selecteer een vervoerder'}
+                                                options={companyOptions}
+                                                testId="carrier-party-select"
+                                                formHook={{
+                                                    register: formContext.register,
+                                                    name: 'carrierPartyId',
+                                                    errors: formContext.formState.errors,
+                                                    control: formContext.control,
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="w-1/2">
+                                            <TruckSelectFormField
+                                                formHook={{
+                                                    register: formContext.register,
+                                                    name: 'truckLicensePlate',
+                                                    errors: formContext.formState.errors,
+                                                    control: formContext.control,
+                                                }}
+                                            />
+                                        </div>
+                                        <WeightTicketLinesSection />
                                         <TextFormField
                                             title={'Reclamatie'}
                                             placeholder={'Vul reclamatie in'}
