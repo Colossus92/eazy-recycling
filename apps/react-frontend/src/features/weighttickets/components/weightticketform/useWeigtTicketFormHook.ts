@@ -42,6 +42,11 @@ export function useWeightTicketForm(
     });
     const formContext = useForm<WeightTicketFormValues>({
         defaultValues: {
+            consignorPartyId: '',
+            carrierPartyId: undefined,
+            truckLicensePlate: undefined,
+            reclamation: undefined,
+            note: undefined,
             lines: [],
         }
     });
@@ -76,7 +81,7 @@ export function useWeightTicketForm(
 
     const resetForm = () => {
         formContext.reset({
-            consignorPartyId: undefined,
+            consignorPartyId: '',
             carrierPartyId: undefined,
             truckLicensePlate: undefined,
             reclamation: undefined,
@@ -119,7 +124,7 @@ const weightTicketDetailsToFormValues = (weightTicketDetails: WeightTicketDetail
     const consignorCompany = resolveConsignorCompany(weightTicketDetails.consignorParty);
 
     return {
-        consignorPartyId: consignorCompany.id,
+        consignorPartyId: consignorCompany.id || '',
         carrierPartyId: weightTicketDetails.carrierParty?.id,
         truckLicensePlate: weightTicketDetails.truckLicensePlate,
         reclamation: weightTicketDetails.reclamation,

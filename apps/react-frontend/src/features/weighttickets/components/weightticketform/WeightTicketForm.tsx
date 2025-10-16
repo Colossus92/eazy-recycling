@@ -8,6 +8,7 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
@@ -32,10 +33,24 @@ export const WeightTicketForm = ({
         resetForm
     } = useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
 
-    const onCancel = () => {
+    const handleClose = (value: boolean) => {
+        if (!value) {
+            resetForm();
+        }
+        setIsOpen(value);
+    };
+
+    const handleCancel = () => {
         resetForm();
         setIsOpen(false);
     };
+
+    // Reset form when dialog closes or when switching between create/edit
+    useEffect(() => {
+        if (!isOpen) {
+            resetForm();
+        }
+    }, [isOpen, resetForm]);
 
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies'],
@@ -60,7 +75,7 @@ export const WeightTicketForm = ({
 
     return (
         <ErrorBoundary fallbackRender={fallbackRender}>
-            <FormDialog isOpen={isOpen} setIsOpen={onCancel} width="w-[720px]">
+            <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
                 <div className={'w-full'}>
                     <FormProvider {...formContext}>
                         <form
@@ -71,7 +86,7 @@ export const WeightTicketForm = ({
                                 title={
                                     data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'
                                 }
-                                onClick={onCancel}
+                                onClick={handleCancel}
                             />
                             <div
                                 className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
@@ -146,7 +161,7 @@ export const WeightTicketForm = ({
                                     </div>
                                 )}
                             </div>
-                            <FormActionButtons onClick={onCancel} item={undefined} />
+                            <FormActionButtons onClick={handleCancel} item={undefined} />
                         </form>
                     </FormProvider>
                 </div>
