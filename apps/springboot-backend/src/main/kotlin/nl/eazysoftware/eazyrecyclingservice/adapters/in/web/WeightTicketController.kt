@@ -13,10 +13,15 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.CancellationReason
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLines
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.math.BigDecimal
 import java.util.*
 
 @RestController
@@ -79,16 +84,18 @@ data class CancelWeightTicketRequest(
 )
 
 data class WeightTicketRequest(
-  val carrierParty: UUID?,
   val consignorParty: ConsignorRequest,
+  val lines: List<WeightTicketLineRequest>,
+  val carrierParty: UUID?,
   val truckLicensePlate: String?,
   val reclamation: String?,
   val note: String?,
 ) {
   fun toCommand(): WeightTicketCommand {
     return WeightTicketCommand(
-      carrierParty = carrierParty?.let { CompanyId(it) },
+      lines = lines.toDomain(),
       consignorParty = consignorParty.toDomain(),
+      carrierParty = carrierParty?.let { CompanyId(it) },
       truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },
       reclamation = reclamation,
       note = note?.let { Note(it) },
@@ -97,3 +104,33 @@ data class WeightTicketRequest(
 }
 
 data class CreateWeightTicketResponse(val id: Long)
+
+data class WeightTicketLineRequest(
+  val wasteStreamNumber: String,
+  val weight: WeightRequest,
+)
+
+data class WeightRequest(
+  val value: String,
+  val unit: WeightUnitRequest,
+)
+
+enum class WeightUnitRequest {
+  KG,
+}
+
+fun List<WeightTicketLineRequest>.toDomain(): WeightTicketLines {
+  return WeightTicketLines(
+    this.map { line ->
+      WeightTicketLine(
+        waste = WasteStreamNumber(line.wasteStreamNumber),
+        weight = Weight(
+          value = BigDecimal(line.weight.value),
+          unit = when (line.weight.unit) {
+            WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
+          }
+        )
+      )
+    }
+  )
+}

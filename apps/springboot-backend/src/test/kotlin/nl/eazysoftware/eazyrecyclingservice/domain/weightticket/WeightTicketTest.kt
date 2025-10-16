@@ -5,6 +5,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
+import java.math.BigDecimal
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -14,6 +17,15 @@ import java.util.*
 import kotlin.test.assertFailsWith
 
 private val REASON = CancellationReason("reason")
+private val EMPTY_LINES = WeightTicketLines(emptyList())
+private val SAMPLE_LINES = WeightTicketLines(
+  listOf(
+    WeightTicketLine(
+      waste = WasteStreamNumber("123456789012"),
+      weight = Weight(BigDecimal("100.50"), Weight.WeightUnit.KILOGRAM)
+    )
+  )
+)
 
 class WeightTicketTest {
 
@@ -28,6 +40,7 @@ class WeightTicketTest {
     id = WeightTicketId(1),
     consignorParty = Consignor.Company(companyId()),
     status = status,
+    lines = EMPTY_LINES,
     carrierParty = companyId(),
     truckLicensePlate = LicensePlate("AB-123-CD"),
     reclamation = "Reclamation",
@@ -44,6 +57,40 @@ class WeightTicketTest {
     )
 
     assertThat(weightTicket.reclamation).isEqualTo("New reclamation")
+  }
+
+  @Test
+  fun `weight ticket can be updated with lines`() {
+    val weightTicket = weightTicket()
+
+    weightTicket.update(
+      lines = SAMPLE_LINES,
+      reclamation = "New reclamation",
+    )
+
+    assertThat(weightTicket.lines).isEqualTo(SAMPLE_LINES)
+    assertThat(weightTicket.lines.isEmpty()).isFalse()
+    assertThat(weightTicket.reclamation).isEqualTo("New reclamation")
+  }
+
+  @Test
+  fun `weight ticket can be created with lines`() {
+    val weightTicket = WeightTicket(
+      id = WeightTicketId(1),
+      consignorParty = Consignor.Company(companyId()),
+      status = WeightTicketStatus.DRAFT,
+      lines = SAMPLE_LINES,
+      carrierParty = companyId(),
+      truckLicensePlate = LicensePlate("AB-123-CD"),
+      reclamation = "Reclamation",
+      note = Note("note"),
+      createdAt = Clock.System.now(),
+    )
+
+    assertThat(weightTicket.lines).isEqualTo(SAMPLE_LINES)
+    assertThat(weightTicket.lines.getLines()).hasSize(1)
+    assertThat(weightTicket.lines.getLines().first().waste.number).isEqualTo("123456789012")
+    assertThat(weightTicket.lines.getLines().first().weight.value).isEqualByComparingTo(BigDecimal("100.50"))
   }
 
   @ParameterizedTest

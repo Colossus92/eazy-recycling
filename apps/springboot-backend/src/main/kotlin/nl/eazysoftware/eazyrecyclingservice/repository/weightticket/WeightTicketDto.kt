@@ -14,6 +14,13 @@ data class WeightTicketDto(
   @JoinColumn(name = "consignor_party_id", nullable = false)
   val consignorParty: CompanyDto,
 
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(
+    name = "weight_ticket_lines",
+    joinColumns = [JoinColumn(name = "weight_ticket_id")]
+  )
+  val lines: List<WeightTicketLineDto> = emptyList(),
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id")
   val carrierParty: CompanyDto?,

@@ -70,6 +70,12 @@ class WeightTicketControllerIntegrationTest {
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = testCarrierCompany.id,
             consignorCompanyId = testConsignorCompany.id!!,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "150.75"
+                )
+            ),
             truckLicensePlate = "AA-123-BB",
             reclamation = "Test reclamation",
             note = "Test note"
@@ -96,6 +102,9 @@ class WeightTicketControllerIntegrationTest {
         assertThat(savedWeightTicket.get().truckLicensePlate).isEqualTo("AA-123-BB")
         assertThat(savedWeightTicket.get().reclamation).isEqualTo("Test reclamation")
         assertThat(savedWeightTicket.get().note).isEqualTo("Test note")
+        assertThat(savedWeightTicket.get().lines).hasSize(1)
+        assertThat(savedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(savedWeightTicket.get().lines[0].weightValue).isEqualByComparingTo("150.75")
     }
 
     @Test
@@ -171,6 +180,50 @@ class WeightTicketControllerIntegrationTest {
     }
 
     @Test
+    fun `should create weight ticket with multiple lines`() {
+        // Given
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id!!,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789011",
+                    weightValue = "100.00"
+                ),
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "250.50"
+                ),
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789013",
+                    weightValue = "75.25"
+                )
+            ),
+            note = "Multiple lines test"
+        )
+
+        // When & Then
+        val result = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val generatedId = objectMapper.readTree(result.response.contentAsString).get("id").asLong()
+
+        // Verify all lines were saved
+        val savedWeightTicket = weightTicketRepository.findById(generatedId)
+        assertThat(savedWeightTicket).isPresent
+        assertThat(savedWeightTicket.get().lines).hasSize(3)
+        assertThat(savedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789011")
+        assertThat(savedWeightTicket.get().lines[0].weightValue).isEqualByComparingTo("100.00")
+        assertThat(savedWeightTicket.get().lines[1].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(savedWeightTicket.get().lines[1].weightValue).isEqualByComparingTo("250.50")
+        assertThat(savedWeightTicket.get().lines[2].wasteStreamNumber).isEqualTo("123456789013")
+        assertThat(savedWeightTicket.get().lines[2].weightValue).isEqualByComparingTo("75.25")
+    }
+
+    @Test
     fun `can get weight ticket by id with full details`() {
         // Given - create weight ticket and extract generated ID
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
@@ -240,6 +293,12 @@ class WeightTicketControllerIntegrationTest {
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = testCarrierCompany.id,
             consignorCompanyId = testConsignorCompany.id!!,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00"
+                )
+            ),
             truckLicensePlate = "EE-111-FF",
             note = "Original note"
         )
@@ -253,8 +312,18 @@ class WeightTicketControllerIntegrationTest {
         val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
             .get("id").asLong()
 
-        // When - update the weight ticket
+        // When - update the weight ticket with new lines
         val updatedRequest = weightTicketRequest.copy(
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "200.00"
+                ),
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789013",
+                    weightValue = "300.00"
+                )
+            ),
             truckLicensePlate = "GG-222-HH",
             note = "Updated note"
         )
@@ -265,11 +334,16 @@ class WeightTicketControllerIntegrationTest {
         )
             .andExpect(status().isNoContent)
 
-        // Then - verify the update was applied
+        // Then - verify the update was applied including lines
         val updatedWeightTicket = weightTicketRepository.findById(weightTicketId)
         assertThat(updatedWeightTicket).isPresent
         assertThat(updatedWeightTicket.get().truckLicensePlate).isEqualTo("GG-222-HH")
         assertThat(updatedWeightTicket.get().note).isEqualTo("Updated note")
+        assertThat(updatedWeightTicket.get().lines).hasSize(2)
+        assertThat(updatedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(updatedWeightTicket.get().lines[0].weightValue).isEqualTo("200.00")
+        assertThat(updatedWeightTicket.get().lines[1].wasteStreamNumber).isEqualTo("123456789013")
+      assertThat(updatedWeightTicket.get().lines[1].weightValue).isEqualTo("300.00")
     }
 
     @Test

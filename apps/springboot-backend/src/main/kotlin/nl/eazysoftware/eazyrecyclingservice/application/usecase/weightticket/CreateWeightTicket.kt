@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLines
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,6 +21,7 @@ interface CreateWeightTicket {
  * Contains GoodsCommand with only waste stream reference - full WasteStream will be fetched in the service.
  */
 data class WeightTicketCommand(
+  val lines: WeightTicketLines,
   val consignorParty: Consignor,
   val carrierParty: CompanyId?,
   val truckLicensePlate: LicensePlate?,
@@ -40,8 +42,9 @@ class CreateWeightTicketService(
 
     val ticket = WeightTicket(
       id = id,
-      carrierParty = cmd.carrierParty,
       consignorParty = cmd.consignorParty,
+      lines = cmd.lines,
+      carrierParty = cmd.carrierParty,
       truckLicensePlate = cmd.truckLicensePlate,
       reclamation = cmd.reclamation,
       note = cmd.note,

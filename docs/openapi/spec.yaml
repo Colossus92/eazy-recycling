@@ -1073,16 +1073,42 @@ components:
     PersonConsignor:
       allOf:
       - $ref: "#/components/schemas/ConsignorRequest"
+    WeightRequest:
+      type: object
+      properties:
+        value:
+          type: string
+        unit:
+          type: string
+          enum:
+          - KG
+      required:
+      - unit
+      - value
+    WeightTicketLineRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        weight:
+          $ref: "#/components/schemas/WeightRequest"
+      required:
+      - wasteStreamNumber
+      - weight
     WeightTicketRequest:
       type: object
       properties:
-        carrierParty:
-          type: string
-          format: uuid
         consignorParty:
           oneOf:
           - $ref: "#/components/schemas/CompanyConsignor"
           - $ref: "#/components/schemas/PersonConsignor"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTicketLineRequest"
+        carrierParty:
+          type: string
+          format: uuid
         truckLicensePlate:
           type: string
         reclamation:
@@ -1091,6 +1117,7 @@ components:
           type: string
       required:
       - consignorParty
+      - lines
     DutchAddressRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
@@ -2097,12 +2124,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2165,15 +2192,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2203,11 +2230,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute

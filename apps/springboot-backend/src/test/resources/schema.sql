@@ -198,7 +198,8 @@ create table if not exists waste_streams (
                                   broker_party_id uuid,
                                   processor_party_id text,
                                   status text,
-                                  last_activity_at timestamp with time zone not null default now()
+                                  last_activity_at timestamp with time zone not null default now(),
+                                  primary key (number)
 );
 
 
@@ -231,4 +232,13 @@ create table if not exists weight_tickets (
                                  weighted_at timestamp(6),
                                  cancellation_reason text,
                                  primary key (id)
+);
+
+create table if not exists weight_ticket_lines (
+                                 weight_ticket_id bigint not null,
+                                 waste_stream_number text not null,
+                                 weight_value numeric(10,2) not null,
+                                 weight_unit text not null,
+                                 constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id),
+                                 constraint fk_weight_ticket_lines_waste_stream foreign key (waste_stream_number) references waste_streams(number)
 );

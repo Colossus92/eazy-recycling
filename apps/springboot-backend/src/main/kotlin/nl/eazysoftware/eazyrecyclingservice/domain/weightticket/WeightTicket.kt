@@ -11,6 +11,7 @@ class WeightTicket(
   val id: WeightTicketId,
   var consignorParty: Consignor,
   var status: WeightTicketStatus = WeightTicketStatus.DRAFT,
+  var lines: WeightTicketLines,
   var carrierParty: CompanyId?,
   var truckLicensePlate: LicensePlate?,
   var reclamation: String?,
@@ -18,7 +19,7 @@ class WeightTicket(
   var cancellationReason: CancellationReason? = null,
   val createdAt: Instant = Clock.System.now(),
   var updatedAt: Instant? = null,
-  val weightedAt: Instant? = null,
+  var weightedAt: Instant? = null,
 ) {
   fun cancel(cancellationReason: CancellationReason) {
     check(status != WeightTicketStatus.CANCELLED) {
@@ -36,6 +37,7 @@ class WeightTicket(
   }
 
   fun update(
+    lines: WeightTicketLines = this.lines,
     carrierParty: CompanyId? = this.carrierParty,
     consignorParty: Consignor = this.consignorParty,
     truckLicensePlate: LicensePlate? = this.truckLicensePlate,
@@ -45,6 +47,7 @@ class WeightTicket(
     check(status == WeightTicketStatus.DRAFT) {
       "Weegbon kan alleen worden gewijzigd als de status concept is."
     }
+    this.lines = lines
     this.carrierParty = carrierParty
     this.consignorParty = consignorParty
     this.truckLicensePlate = truckLicensePlate

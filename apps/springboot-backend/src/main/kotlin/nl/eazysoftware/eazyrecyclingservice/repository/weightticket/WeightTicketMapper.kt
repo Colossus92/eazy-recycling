@@ -6,9 +6,12 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.CancellationReason
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketLines
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -32,6 +35,10 @@ class WeightTicketMapper(
       updatedAt = dto.updatedAt?.toKotlinInstant(),
       weightedAt = dto.weightedAt?.toKotlinInstant(),
       cancellationReason = dto.cancellationReason?.let { CancellationReason(it) },
+      lines = dto.lines
+        .map { it.toDomain() }
+        .toMutableList()
+        .let { WeightTicketLines(it) },
     )
   }
 
@@ -49,6 +56,7 @@ class WeightTicketMapper(
     val weightTicketDto = WeightTicketDto(
       id = domain.id.number,
       consignorParty = consignorParty,
+      lines = toDto(domain.lines),
       carrierParty = carrierParty,
       truckLicensePlate = domain.truckLicensePlate?.value,
       reclamation = domain.reclamation,
@@ -61,6 +69,19 @@ class WeightTicketMapper(
     )
 
     return weightTicketDto
+  }
+
+  private fun toDto(domain: WeightTicketLines): List<WeightTicketLineDto> {
+    return domain.getLines()
+      .map {
+        WeightTicketLineDto(
+          wasteStreamNumber = it.waste.number,
+          weightValue = it.weight.value,
+          weightUnit = when (it.weight.unit) {
+            Weight.WeightUnit.KILOGRAM -> WeightUnitDto.KILOGRAM
+          },
+        )
+      }
   }
 
   private fun toDomainStatus(dto: WeightTicketStatusDto): WeightTicketStatus {
