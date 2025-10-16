@@ -20,6 +20,7 @@ import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.time.OffsetDateTime
 import java.util.*
 
 @Repository
@@ -62,7 +63,12 @@ class WasteStreamQueryRepository(
     return results.map { row ->
       val columns = row as Array<*>
       val status = columns[14] as String
-      val lastActivityAt = columns[15] as Instant
+      val lastActivityAtRaw = columns[15]
+      val lastActivityAt = when (lastActivityAtRaw) {
+        is OffsetDateTime -> lastActivityAtRaw.toInstant() // Support for H2 Database
+        is Instant -> lastActivityAtRaw
+        else -> throw IllegalStateException("Unexpected type for last_activity_at: ${lastActivityAtRaw?.javaClass}")
+      }
       WasteStreamListView(
         wasteStreamNumber = columns[0] as String,
         wasteName = columns[1] as String,

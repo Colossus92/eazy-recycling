@@ -117,6 +117,38 @@ class WasteStreamControllerIntegrationTest {
   }
 
   @Test
+  fun `can get all waste streams`() {
+    // Given - create multiple waste streams
+    val firstRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id!!,
+      name = "Glass"
+    )
+    val secondRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id!!,
+      name = "Plastic"
+    )
+
+    securedMockMvc.post(
+      "/waste-streams",
+      objectMapper.writeValueAsString(firstRequest)
+    ).andExpect(status().isCreated)
+
+    securedMockMvc.post(
+      "/waste-streams",
+      objectMapper.writeValueAsString(secondRequest)
+    ).andExpect(status().isCreated)
+
+    // When & Then
+    securedMockMvc.get("/waste-streams")
+      .andExpect(status().isOk)
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$[0].wasteStreamNumber").exists())
+      .andExpect(jsonPath("$[1].wasteStreamNumber").exists())
+  }
+
+  @Test
   fun `can get waste stream by number with full details`() {
     // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
