@@ -17,10 +17,10 @@ export interface WeightTicketLineFormValues {
 
 export interface WeightTicketFormValues {
     consignorPartyId: string;
-    carrierPartyId: string;
-    truckLicensePlate: string;
-    reclamation: string;
-    note: string;
+    carrierPartyId?: string;
+    truckLicensePlate?: string;
+    reclamation?: string;
+    note?: string;
     lines: WeightTicketLineFormValues[];
 }
 
@@ -42,11 +42,6 @@ export function useWeightTicketForm(
     });
     const formContext = useForm<WeightTicketFormValues>({
         defaultValues: {
-            consignorPartyId: '',
-            carrierPartyId: '',
-            truckLicensePlate: '',
-            reclamation: '',
-            note: '',
             lines: [],
         }
     });
@@ -81,11 +76,11 @@ export function useWeightTicketForm(
 
     const resetForm = () => {
         formContext.reset({
-            consignorPartyId: '',
-            carrierPartyId: '',
-            truckLicensePlate: '',
-            reclamation: '',
-            note: '',
+            consignorPartyId: undefined,
+            carrierPartyId: undefined,
+            truckLicensePlate: undefined,
+            reclamation: undefined,
+            note: undefined,
             lines: [],
         });
     };
@@ -113,22 +108,22 @@ const isCompanyConsignor = (
  */
 const resolveConsignorCompany = (
     consignorParty: WeightTicketDetailViewConsignorParty
-): CompanyView | null => {
+): CompanyView => {
     if (isCompanyConsignor(consignorParty)) {
         return (consignorParty as any).company;
     }
-    return null;
+    throw new Error('Alleen zakelijke opdrachtgevers worden op dit moment ondersteund');
 };
 
 const weightTicketDetailsToFormValues = (weightTicketDetails: WeightTicketDetailView): WeightTicketFormValues => {
     const consignorCompany = resolveConsignorCompany(weightTicketDetails.consignorParty);
 
     return {
-        consignorPartyId: consignorCompany?.id || '',
-        carrierPartyId: weightTicketDetails.carrierParty?.id || '',
-        truckLicensePlate: weightTicketDetails.truckLicensePlate || '',
-        reclamation: weightTicketDetails.reclamation || '',
-        note: weightTicketDetails.note || '',
+        consignorPartyId: consignorCompany.id,
+        carrierPartyId: weightTicketDetails.carrierParty?.id,
+        truckLicensePlate: weightTicketDetails.truckLicensePlate,
+        reclamation: weightTicketDetails.reclamation,
+        note: weightTicketDetails.note,
         lines: (weightTicketDetails.lines || []).map(line => ({
             wasteStreamNumber: line.wasteStreamNumber || '',
             weightValue: line.weightValue?.toString() || '',
@@ -156,7 +151,7 @@ const formValuesToWeightTicketRequest = (
             wasteStreamNumber: line.wasteStreamNumber,
             weight: {
                 value: line.weightValue,
-                unit: line.weightUnit as any,
+                unit: 'KG',
             },
         })),
     };

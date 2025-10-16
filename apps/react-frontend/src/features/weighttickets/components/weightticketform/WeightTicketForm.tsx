@@ -8,7 +8,6 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useQuery } from '@tanstack/react-query';
-import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
@@ -47,10 +46,17 @@ export const WeightTicketForm = ({
         label: company.name,
     }));
 
-    const submitForm = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        mutation.mutateAsync(formContext.getValues());
-    };
+    const onSubmit = formContext.handleSubmit(async (formValues) => {
+        // Filter out empty lines (lines where wasteStreamNumber is empty)
+        const filteredFormValues = {
+            ...formValues,
+            lines: formValues.lines.filter(
+                (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
+            ),
+        };
+        
+        await mutation.mutateAsync(filteredFormValues);
+    });
 
     return (
         <ErrorBoundary fallbackRender={fallbackRender}>
@@ -59,7 +65,7 @@ export const WeightTicketForm = ({
                     <FormProvider {...formContext}>
                         <form
                             className="flex flex-col items-center self-stretch"
-                            onSubmit={(e) => submitForm(e)}
+                            onSubmit={onSubmit}
                         >
                             <FormTopBar
                                 title={

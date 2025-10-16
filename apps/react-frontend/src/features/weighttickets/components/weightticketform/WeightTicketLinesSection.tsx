@@ -137,7 +137,21 @@ export const WeightTicketLinesSection = () => {
                     formHook={{
                       register,
                       name: `lines.${index}.wasteStreamNumber` as const,
-                      rules: { required: 'Afvalstroom is verplicht' },
+                      rules: {
+                        validate: (value) => {
+                          const lines = formContext.getValues('lines');
+                          const weightValue = lines[index]?.weightValue;
+                          // If both are empty, it's valid (will be filtered out)
+                          if (!value && !weightValue) {
+                            return true;
+                          }
+                          // If weight is filled but waste stream is not, show error
+                          if (!value && weightValue) {
+                            return 'Afvalstroom is verplicht';
+                          }
+                          return true;
+                        },
+                      },
                       errors,
                       control,
                     }}
@@ -152,10 +166,23 @@ export const WeightTicketLinesSection = () => {
                       register,
                       name: `lines.${index}.weightValue` as const,
                       rules: {
-                        required: 'Hoeveelheid is verplicht',
-                        pattern: {
-                          value: /^\d+(\.\d+)?$/,
-                          message: 'Voer een geldig getal in',
+                        validate: (value) => {
+                          const lines = formContext.getValues('lines');
+                          const wasteStreamNumber = lines[index]?.wasteStreamNumber;
+                          const stringValue = typeof value === 'string' ? value : '';
+                          // If both are empty, it's valid (will be filtered out)
+                          if (!stringValue && !wasteStreamNumber) {
+                            return true;
+                          }
+                          // If waste stream is filled but weight is not, show error
+                          if (!stringValue && wasteStreamNumber) {
+                            return 'Hoeveelheid is verplicht';
+                          }
+                          // Validate number format if value exists
+                          if (stringValue && !/^\d+(\.\d+)?$/.test(stringValue)) {
+                            return 'Voer een geldig getal in';
+                          }
+                          return true;
                         },
                       },
                       errors,
