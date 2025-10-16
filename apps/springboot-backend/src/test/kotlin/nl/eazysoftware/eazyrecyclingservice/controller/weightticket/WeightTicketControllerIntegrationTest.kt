@@ -168,4 +168,133 @@ class WeightTicketControllerIntegrationTest {
         assertThat(id1).isNotEqualTo(id2)
         assertThat(id2).isGreaterThan(id1)
     }
+
+    @Test
+    fun `can get weight ticket by id with full details`() {
+        // Given - create weight ticket and extract generated ID
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            carrierParty = testCarrierCompany.id,
+            consignorCompanyId = testConsignorCompany.id!!,
+            truckLicensePlate = "CC-789-DD",
+            reclamation = "Detail test reclamation",
+            note = "Detail test note"
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // When & Then
+        securedMockMvc.get("/weight-tickets/${weightTicketId}")
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.id").value(weightTicketId))
+            .andExpect(jsonPath("$.truckLicensePlate").value("CC-789-DD"))
+            .andExpect(jsonPath("$.reclamation").value("Detail test reclamation"))
+            .andExpect(jsonPath("$.note").value("Detail test note"))
+            .andExpect(jsonPath("$.status").exists())
+            .andExpect(jsonPath("$.consignorParty").exists())
+            .andExpect(jsonPath("$.carrierParty").exists())
+    }
+
+    @Test
+    fun `can get all weight tickets`() {
+        // Given - create multiple weight tickets
+        val firstRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id!!,
+            note = "First ticket for list"
+        )
+        val secondRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id!!,
+            note = "Second ticket for list"
+        )
+
+        securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(firstRequest)
+        ).andExpect(status().isCreated)
+
+        securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(secondRequest)
+        ).andExpect(status().isCreated)
+
+        // When & Then
+        securedMockMvc.get("/weight-tickets")
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$").isArray)
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").exists())
+            .andExpect(jsonPath("$[1].id").exists())
+    }
+
+    @Test
+    fun `can update created weight ticket`() {
+        // Given - create weight ticket and extract generated ID
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            carrierParty = testCarrierCompany.id,
+            consignorCompanyId = testConsignorCompany.id!!,
+            truckLicensePlate = "EE-111-FF",
+            note = "Original note"
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // When - update the weight ticket
+        val updatedRequest = weightTicketRequest.copy(
+            truckLicensePlate = "GG-222-HH",
+            note = "Updated note"
+        )
+
+        securedMockMvc.put(
+            "/weight-tickets/${weightTicketId}",
+            objectMapper.writeValueAsString(updatedRequest)
+        )
+            .andExpect(status().isNoContent)
+
+        // Then - verify the update was applied
+        val updatedWeightTicket = weightTicketRepository.findById(weightTicketId)
+        assertThat(updatedWeightTicket).isPresent
+        assertThat(updatedWeightTicket.get().truckLicensePlate).isEqualTo("GG-222-HH")
+        assertThat(updatedWeightTicket.get().note).isEqualTo("Updated note")
+    }
+
+    @Test
+    fun `can delete created weight ticket`() {
+        // Given - create weight ticket and extract generated ID
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id!!,
+            note = "To be deleted"
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // When - delete the weight ticket (soft delete)
+        securedMockMvc.delete("/weight-tickets/${weightTicketId}")
+            .andExpect(status().isNoContent)
+
+        // Then - verify the weight ticket status is set to CANCELLED
+        val deletedWeightTicket = weightTicketRepository.findById(weightTicketId)
+        assertThat(deletedWeightTicket).isPresent
+        assertThat(deletedWeightTicket.get().status.name).isEqualTo("CANCELLED")
+    }
 }
