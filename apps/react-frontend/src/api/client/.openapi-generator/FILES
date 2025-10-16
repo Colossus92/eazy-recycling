@@ -81,8 +81,10 @@ models/waste-stream-list-view.ts
 models/waste-stream-request-pickup-location.ts
 models/waste-stream-request.ts
 models/waste-type-view.ts
+models/weight-request.ts
 models/weight-ticket-detail-view-consignor-party.ts
 models/weight-ticket-detail-view.ts
+models/weight-ticket-line-request.ts
 models/weight-ticket-list-view.ts
 models/weight-ticket-request-consignor-party.ts
 models/weight-ticket-request.ts

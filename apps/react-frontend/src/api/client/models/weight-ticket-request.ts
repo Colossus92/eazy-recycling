@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { WeightTicketLineRequest } from './weight-ticket-line-request';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
 
 /**
@@ -25,16 +28,22 @@ import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-
 export interface WeightTicketRequest {
     /**
      * 
-     * @type {string}
-     * @memberof WeightTicketRequest
-     */
-    'carrierParty'?: string;
-    /**
-     * 
      * @type {WeightTicketRequestConsignorParty}
      * @memberof WeightTicketRequest
      */
     'consignorParty': WeightTicketRequestConsignorParty;
+    /**
+     * 
+     * @type {Array<WeightTicketLineRequest>}
+     * @memberof WeightTicketRequest
+     */
+    'lines': Array<WeightTicketLineRequest>;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
+    'carrierParty'?: string;
     /**
      * 
      * @type {string}

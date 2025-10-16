@@ -138,5 +138,6 @@ const formValuesToWeightTicketRequest = (
         truckLicensePlate: formValues.truckLicensePlate,
         reclamation: formValues.reclamation,
         note: formValues.note,
+        lines: [],
     };
 }
