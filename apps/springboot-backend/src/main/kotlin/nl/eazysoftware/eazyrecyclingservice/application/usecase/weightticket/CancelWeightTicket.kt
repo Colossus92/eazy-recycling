@@ -2,29 +2,31 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.CancellationReason
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-interface DeleteWeightTicket {
-  fun handle(cmd: DeleteWeightTicketCommand)
+interface CancelWeightTicket {
+  fun handle(cmd: CancelWeightTicketCommand)
 }
 
-data class DeleteWeightTicketCommand(
-  val weightTicketId: WeightTicketId
+data class CancelWeightTicketCommand(
+  val weightTicketId: WeightTicketId,
+  val cancellationReason: CancellationReason,
 )
 
 @Service
-class DeleteWeightTicketService(
+class CancelWeightTicketService(
   private val weightTickets: WeightTickets
-) : DeleteWeightTicket {
+) : CancelWeightTicket {
 
   @Transactional
-  override fun handle(cmd: DeleteWeightTicketCommand) {
+  override fun handle(cmd: CancelWeightTicketCommand) {
     val weightTicket = weightTickets.findById(cmd.weightTicketId)
       ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketId.number} bestaat niet")
 
-    weightTicket.delete()
+    weightTicket.cancel(cmd.cancellationReason)
     weightTickets.save(weightTicket)
   }
 }

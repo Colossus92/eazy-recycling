@@ -1,17 +1,19 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.WeightTicketCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.DeleteWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.DeleteWeightTicketCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CancelWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CancelWeightTicketCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.UpdateWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.CancellationReason
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -23,7 +25,7 @@ class WeightTicketController(
   private val create: CreateWeightTicket,
   private val weightTicketService: WeightTicketService,
   private val updateWeightTicket: UpdateWeightTicket,
-  private val deleteWeightTicket: DeleteWeightTicket,
+  private val cancelWeightTicket: CancelWeightTicket,
 ) {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -55,15 +57,26 @@ class WeightTicketController(
     updateWeightTicket.handle(WeightTicketId(weightTicketId), request.toCommand())
   }
 
-  @DeleteMapping("/{weightTicketId}")
+  @PostMapping("/{weightTicketId}/cancel")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  fun delete(
+  fun cancel(
     @PathVariable
-    weightTicketId: Long
+    weightTicketId: Long,
+    @Valid @RequestBody request: CancelWeightTicketRequest
   ) {
-    deleteWeightTicket.handle(DeleteWeightTicketCommand(WeightTicketId(weightTicketId)))
+    cancelWeightTicket.handle(
+      CancelWeightTicketCommand(
+        WeightTicketId(weightTicketId),
+        CancellationReason(request.cancellationReason),
+      )
+    )
   }
 }
+
+data class CancelWeightTicketRequest(
+  @field:NotBlank(message = "Een reden van annulering is verplicht")
+  val cancellationReason: String,
+)
 
 data class WeightTicketRequest(
   val carrierParty: UUID?,

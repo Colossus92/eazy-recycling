@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.CancellationReason
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.weightticket.WeightTicketStatus
@@ -29,7 +30,8 @@ class WeightTicketMapper(
       status = toDomainStatus(dto.status),
       createdAt = dto.createdAt.toKotlinInstant(),
       updatedAt = dto.updatedAt?.toKotlinInstant(),
-      weightedAt = dto.weightedAt?.toKotlinInstant()
+      weightedAt = dto.weightedAt?.toKotlinInstant(),
+      cancellationReason = dto.cancellationReason?.let { CancellationReason(it) },
     )
   }
 
@@ -54,7 +56,8 @@ class WeightTicketMapper(
       status = toDtoStatus(domain.status),
       createdAt = domain.createdAt.toJavaInstant(),
       updatedAt = domain.updatedAt?.toJavaInstant(),
-      weightedAt = domain.weightedAt?.toJavaInstant()
+      weightedAt = domain.weightedAt?.toJavaInstant(),
+      cancellationReason = domain.cancellationReason?.value,
     )
 
     return weightTicketDto

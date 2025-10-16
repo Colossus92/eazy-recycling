@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.weightticket
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.CancelWeightTicketRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
@@ -288,13 +289,21 @@ class WeightTicketControllerIntegrationTest {
         val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
             .get("id").asLong()
 
+        val cancelWeightTicketRequest = CancelWeightTicketRequest(
+          cancellationReason = "Good Reason"
+        )
+
         // When - delete the weight ticket (soft delete)
-        securedMockMvc.delete("/weight-tickets/${weightTicketId}")
+        securedMockMvc.post(
+          "/weight-tickets/${weightTicketId}/cancel",
+          objectMapper.writeValueAsString(cancelWeightTicketRequest)
+        )
             .andExpect(status().isNoContent)
 
         // Then - verify the weight ticket status is set to CANCELLED
         val deletedWeightTicket = weightTicketRepository.findById(weightTicketId)
         assertThat(deletedWeightTicket).isPresent
         assertThat(deletedWeightTicket.get().status.name).isEqualTo("CANCELLED")
+        assertThat(deletedWeightTicket.get().cancellationReason).isEqualTo("Good Reason")
     }
 }

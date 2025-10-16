@@ -222,12 +222,13 @@ create table if not exists weight_tickets (
                                  id bigint not null,
                                  consignor_party_id uuid not null,
                                  carrier_party_id uuid,
-                                 truck_license_plate varchar(255),
-                                 reclamation varchar(255),
-                                 note varchar(255),
-                                 status varchar(50) not null,
+                                 truck_license_plate text,
+                                 reclamation text,
+                                 note text,
+                                 status text not null,
                                  created_at timestamp(6) not null,
                                  updated_at timestamp(6),
                                  weighted_at timestamp(6),
+                                 cancellation_reason text,
                                  primary key (id)
 );

@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.EnumSource
 import java.util.*
 import kotlin.test.assertFailsWith
 
+private val REASON = CancellationReason("reason")
+
 class WeightTicketTest {
 
   @Test
@@ -63,10 +65,12 @@ class WeightTicketTest {
     val weightTicket = weightTicket()
 
     assertDoesNotThrow {
-      weightTicket.delete()
+      weightTicket.cancel(REASON)
     }
 
     assertThat(weightTicket.status).isEqualTo(WeightTicketStatus.CANCELLED)
+    assertThat(weightTicket.cancellationReason).isEqualTo(REASON)
+    assertThat(weightTicket.updatedAt).isNotNull
   }
 
   @Test
@@ -76,7 +80,7 @@ class WeightTicketTest {
     }
 
     val exception = assertFailsWith<IllegalStateException> {
-      weightTicket.delete()
+      weightTicket.cancel(REASON)
     }
 
     assertThat(exception).hasMessageContaining("Weegbon is al geannuleerd en kan niet opnieuw worden geannuleerd")
@@ -89,7 +93,7 @@ class WeightTicketTest {
     }
 
     val exception = assertFailsWith<IllegalStateException> {
-      weightTicket.delete()
+      weightTicket.cancel(REASON)
     }
 
     assertThat(exception).hasMessageContaining("Weegbon is al gefactureerd en kan niet worden geannuleerd")
@@ -102,7 +106,7 @@ class WeightTicketTest {
     }
 
     val exception = assertFailsWith<IllegalStateException> {
-      weightTicket.delete()
+      weightTicket.cancel(REASON)
     }
 
     assertThat(exception).hasMessageContaining("Weegbon is al verwerkt en kan niet worden geannuleerd")
@@ -116,7 +120,7 @@ class WeightTicketTest {
     }
 
     assertFailsWith<IllegalStateException> {
-      weightTicket.delete()
+      weightTicket.cancel(REASON)
     }
   }
 

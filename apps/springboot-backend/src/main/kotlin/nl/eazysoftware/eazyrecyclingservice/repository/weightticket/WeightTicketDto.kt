@@ -38,7 +38,10 @@ data class WeightTicketDto(
   val updatedAt: Instant?,
 
   @Column(name = "weighted_at")
-  val weightedAt: Instant?
+  val weightedAt: Instant?,
+
+  @Column(name = "cancellation_reason", nullable = true)
+  val cancellationReason: String?,
 )
 
 enum class WeightTicketStatusDto {

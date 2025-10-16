@@ -47,20 +47,6 @@ paths:
       responses:
         "204":
           description: No Content
-    delete:
-      tags:
-      - weight-ticket-controller
-      operationId: delete
-      parameters:
-      - name: weightTicketId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "204":
-          description: No Content
   /waste-streams/{wasteStreamNumber}:
     get:
       tags:
@@ -103,7 +89,7 @@ paths:
     delete:
       tags:
       - waste-stream-controller
-      operationId: delete_1
+      operationId: delete
       parameters:
       - name: wasteStreamNumber
         in: path
@@ -569,6 +555,27 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateWeightTicketResponse"
+  /weight-tickets/{weightTicketId}/cancel:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: cancel
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelWeightTicketRequest"
+        required: true
+      responses:
+        "204":
+          description: No Content
   /waste-streams:
     get:
       tags:
@@ -1858,6 +1865,14 @@ components:
           format: int64
       required:
       - id
+    CancelWeightTicketRequest:
+      type: object
+      properties:
+        cancellationReason:
+          type: string
+          minLength: 1
+      required:
+      - cancellationReason
     CreateWasteStreamResponse:
       type: object
       properties:
@@ -2082,12 +2097,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2150,15 +2165,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2188,11 +2203,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute

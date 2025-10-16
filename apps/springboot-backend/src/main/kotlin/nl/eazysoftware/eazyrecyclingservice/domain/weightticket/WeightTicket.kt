@@ -15,21 +15,24 @@ class WeightTicket(
   var truckLicensePlate: LicensePlate?,
   var reclamation: String?,
   var note: Note?,
+  var cancellationReason: CancellationReason? = null,
   val createdAt: Instant = Clock.System.now(),
   var updatedAt: Instant? = null,
   val weightedAt: Instant? = null,
 ) {
-  fun delete() {
+  fun cancel(cancellationReason: CancellationReason) {
     check(status != WeightTicketStatus.CANCELLED) {
-      "Weegbon is al geannuleerd en kan niet opnieuw worden geannuleerd"
+      "Weegbon is al geannuleerd en kan niet opnieuw worden geannuleerd."
     }
     check(status != WeightTicketStatus.INVOICED) {
-      "Weegbon is al gefactureerd en kan niet worden geannuleerd"
+      "Weegbon is al gefactureerd en kan niet worden geannuleerd."
     }
     check(status != WeightTicketStatus.COMPLETED) {
-      "Weegbon is al verwerkt en kan niet worden geannuleerd"
+      "Weegbon is al verwerkt en kan niet worden geannuleerd."
     }
     this.status = WeightTicketStatus.CANCELLED
+    this.cancellationReason = cancellationReason
+    this.updatedAt = Clock.System.now()
   }
 
   fun update(
@@ -61,3 +64,11 @@ enum class WeightTicketStatus {
 data class WeightTicketId(
   val number: Long
 )
+
+data class CancellationReason(
+  val value: String
+) {
+  init {
+      require(value.isNotBlank()) { "Een reden van annulering is verplicht." }
+  }
+}
