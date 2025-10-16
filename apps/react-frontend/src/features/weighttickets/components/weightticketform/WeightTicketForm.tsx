@@ -8,7 +8,6 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
@@ -44,13 +43,6 @@ export const WeightTicketForm = ({
         resetForm();
         setIsOpen(false);
     };
-
-    // Reset form when dialog closes or when switching between create/edit
-    useEffect(() => {
-        if (!isOpen) {
-            resetForm();
-        }
-    }, [isOpen, resetForm]);
 
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies'],
