@@ -19,6 +19,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocati
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.nio.ByteBuffer
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.*
@@ -76,7 +77,7 @@ class WasteStreamQueryRepository(
         euralCode = columns[2] as String,
         processingMethodCode = columns[3] as String,
         consignorPartyName = columns[4] as String,
-        consignorPartyId = columns[5] as UUID,
+        consignorPartyId = toUuid(columns[5]),
         pickupLocation = formatPickupLocation(columns),
         deliveryLocation = "${columns[12]} ${columns[13]}, ${columns[14]}",
         lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
@@ -90,12 +91,27 @@ class WasteStreamQueryRepository(
       DUTCH_ADDRESS -> "${columns[7]} ${columns[8]}, ${columns[10]}"
       PROXIMITY_DESC -> "${columns[9]}, ${columns[10]}"
       COMPANY -> {
-        val companyId = columns[11] as UUID
+        val companyId = toUuid(columns[11])
         val company = companyRepository.findByIdOrNull(companyId) ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
         "${company.name}, ${company.address.city}"
       }
       NO_PICKUP -> "Geen herkomstlocatie"
       else -> throw IllegalStateException("Unexpected pickup location type: $locationType")
+    }
+  }
+
+  /**
+   * Converts a UUID column value to java.util.UUID.
+   * Handles both PostgreSQL (returns UUID directly) and H2 (returns byte array).
+   */
+  private fun toUuid(value: Any?): UUID {
+    return when (value) {
+      is UUID -> value
+      is ByteArray -> {
+        val buffer = ByteBuffer.wrap(value)
+        UUID(buffer.long, buffer.long)
+      }
+      else -> throw IllegalStateException("Unexpected type for UUID column: ${value?.javaClass}")
     }
   }
 
