@@ -12,6 +12,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+import java.util.UUID
 
 @Component
 class PickupLocationMapper(
@@ -44,6 +45,7 @@ class PickupLocationMapper(
       )
 
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
+        id = UUID.fromString(dto.id),
         address = Address(
           streetName = dto.streetName,
           postalCode = DutchPostalCode(dto.postalCode),
@@ -71,27 +73,18 @@ class PickupLocationMapper(
     }
   }
 
-  private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    companyRepository.findByIdOrNull(location.companyId.uuid)
-      ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${location.companyId}")
+  private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto =
+    PickupLocationDto.PickupProjectLocationDto(
+      id = location.id.toString(),
+      companyId = location.companyId.uuid,
+      streetName = location.streetName(),
+      buildingNumber = location.buildingNumber(),
+      buildingNumberAddition = location.buildingNumberAddition(),
+      postalCode = location.postalCode().value,
+      city = location.city(),
+      country = location.country()
+    )
 
-    return pickupLocationRepository.findPickupProjectLocationByPostalCodeAndBuildingNumberAndCompanyId(
-      location.postalCode().value,
-      location.buildingNumber(),
-      location.companyId.uuid,
-    ) ?: run {
-      val newLocation = PickupLocationDto.PickupProjectLocationDto(
-        companyId = location.companyId.uuid,
-        streetName = location.streetName(),
-        buildingNumber = location.buildingNumber(),
-        buildingNumberAddition = location.buildingNumberAddition(),
-        postalCode = location.postalCode().value,
-        city = location.city(),
-        country = location.country()
-      )
-      pickupLocationRepository.save(newLocation)
-    }
-  }
 
   private fun createProximity(
     domain: ProximityDescription

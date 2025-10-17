@@ -62,22 +62,9 @@ class ProjectLocationRepository(
     jpaRepository.deleteById(id.toString())
   }
 
-  override fun update(id: UUID, location: Location.ProjectLocation) {
-    val existingDto = jpaRepository.findByIdOrNull(id.toString())
-      // TODO: remove this fetch when Projectlocation contains ID
-      .let { it as? PickupProjectLocationDto }
-      ?: throw IllegalArgumentException("Project location with id $id not found")
 
-    // Update the existing DTO fields
-    existingDto.companyId = location.companyId.uuid
-    existingDto.streetName = location.streetName()
-    existingDto.buildingNumber = location.buildingNumber()
-    existingDto.buildingNumberAddition = location.buildingNumberAddition()
-    existingDto.postalCode = location.postalCode().value
-    existingDto.city = location.city()
-    existingDto.country = location.country()
-
-    jpaRepository.save(existingDto)
+  override fun update(location: Location.ProjectLocation) {
+    locationMapper.toDto(location)
+      .let { jpaRepository.save(it) }
   }
-
 }

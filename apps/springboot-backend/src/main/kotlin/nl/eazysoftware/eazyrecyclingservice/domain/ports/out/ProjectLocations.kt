@@ -21,6 +21,6 @@ interface ProjectLocations {
 
   fun deleteById(id: UUID)
 
-  fun update(id: UUID, location: Location.ProjectLocation)
+  fun update(location: Location.ProjectLocation)
 
 }

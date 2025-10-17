@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreatePr
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocationCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.ProjectLocationResult
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
@@ -66,7 +67,7 @@ class CompanyController(
 
   @PostMapping("/{id}/branches")
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  fun createBranch(@PathVariable("id") id: UUID, @RequestBody projectLocation: AddressRequest): ProjectLocationResponse {
+  fun createBranch(@PathVariable("id") id: UUID, @RequestBody projectLocation: AddressRequest): ProjectLocationResult =
     createProjectLocation.handle(
       CreateProjectLocationCommand(
         CompanyId(id),
@@ -78,9 +79,6 @@ class CompanyController(
           country = projectLocation.country
         )))
 
-    return ProjectLocationResponse(id)
-  }
-
   @DeleteMapping("/{companyId}/branches/{branchId}")
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -88,7 +86,7 @@ class CompanyController(
     deleteProjectLocation.handle(
       DeleteProjectLocationCommand(
         companyId = CompanyId(companyId),
-        branchId = branchId
+        projectLocationId = branchId
       )
     )
   }
@@ -104,7 +102,7 @@ class CompanyController(
     updateProjectLocation.handle(
       UpdateProjectLocationCommand(
         companyId = CompanyId(companyId),
-        branchId = branchId,
+        projectLocationId = branchId,
         address = Address(
           streetName = branch.streetName,
           buildingNumber = branch.buildingNumber,
@@ -129,9 +127,5 @@ class CompanyController(
     val name: String,
     @field:Valid
     val address: AddressRequest,
-  )
-
-  data class ProjectLocationResponse(
-    val companyId: UUID,
   )
 }

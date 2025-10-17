@@ -226,6 +226,9 @@ sealed class PickupLocationRequest {
 
   data class ProjectLocationRequest(
 
+    @field:NotBlank(message = "Projectlocatie ID is verplicht")
+    val id: UUID,
+
     val companyId: UUID,
 
     @field:NotBlank(message = "Straatnaam is verplicht")
@@ -247,6 +250,7 @@ sealed class PickupLocationRequest {
     val country: String
   ) : PickupLocationRequest() {
     override fun toDomain() = ProjectLocation(
+      id = id,
       companyId = CompanyId(companyId),
       address = Address(
         streetName = streetName,

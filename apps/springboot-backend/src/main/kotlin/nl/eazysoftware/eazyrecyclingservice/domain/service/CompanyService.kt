@@ -88,8 +88,6 @@ class CompanyService(
       || cause.constraintName?.contains("companies_vihb_number_key") == true)
   }
 
-
-
   data class CompanyResponse(
     val id: UUID,
     val chamberOfCommerceId: String?,
@@ -128,8 +126,10 @@ class CompanyService(
   ) {
     companion object {
       fun from(branch: Location.ProjectLocation): CompanyBranchResponse {
+        requireNotNull(branch.id) { "Branch must have an ID" }
+
         return CompanyBranchResponse(
-          id = UUID.randomUUID(), // TODO: refer to branch id
+          id = branch.id,
           address = AddressDto (
             streetName = branch.address.streetName,
             buildingNumber = branch.address.buildingNumber,

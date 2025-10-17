@@ -66,6 +66,8 @@ class PickupLocationDto(
   @Entity
   @DiscriminatorValue(PROJECT_LOCATION)
   class PickupProjectLocationDto(
+    id: String,
+
     @Column(name = "company_id")
     var companyId: UUID,
 
@@ -86,7 +88,7 @@ class PickupLocationDto(
 
     @Column
     var country: String,
-  ) : PickupLocationDto()
+  ) : PickupLocationDto(id)
 }
 
 object PickupLocationType {

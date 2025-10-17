@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import java.util.UUID
 
 /**
  * Origin location of waste with three possible variants based on Dutch regulations
@@ -64,6 +65,7 @@ sealed interface Location {
    * Combines a full Dutch address with company ownership
    */
   data class ProjectLocation(
+    val id: UUID,
     val companyId: CompanyId,
     val address: Address,
   ) : Location {
@@ -77,5 +79,16 @@ sealed interface Location {
     fun postalCode(): DutchPostalCode = address.postalCode
     fun city(): String = address.city
     fun country(): String = address.country
+
+    /**
+     * Entity equality based on identity (ID), not attributes
+     * Two ProjectLocations are the same entity if they have the same ID
+     */
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is ProjectLocation) return false
+
+        return id == other.id
+    }
   }
 }

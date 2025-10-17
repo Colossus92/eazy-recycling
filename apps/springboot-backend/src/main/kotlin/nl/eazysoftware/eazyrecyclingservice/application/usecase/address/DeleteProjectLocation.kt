@@ -13,7 +13,7 @@ interface DeleteProjectLocation {
 
 data class DeleteProjectLocationCommand(
   val companyId: CompanyId,
-  val branchId: UUID
+  val projectLocationId: UUID
 )
 
 @Service
@@ -23,13 +23,13 @@ class DeleteProjectLocationService(
 
   @Transactional
   override fun handle(cmd: DeleteProjectLocationCommand) {
-    val branch = projectLocations.findById(cmd.branchId)
-      ?: throw EntityNotFoundException("Vestiging met id ${cmd.branchId} niet gevonden")
+    val branch = projectLocations.findById(cmd.projectLocationId)
+      ?: throw EntityNotFoundException("Vestiging met id ${cmd.projectLocationId} niet gevonden")
 
     if (branch.companyId != cmd.companyId) {
-      throw IllegalArgumentException("Vestiging met id ${cmd.branchId} is niet van bedrijf met id ${cmd.companyId.uuid}")
+      throw IllegalArgumentException("Vestiging met id ${cmd.projectLocationId} is niet van bedrijf met id ${cmd.companyId.uuid}")
     }
 
-    projectLocations.deleteById(cmd.branchId)
+    projectLocations.deleteById(cmd.projectLocationId)
   }
 }
