@@ -6,7 +6,6 @@ import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
@@ -274,7 +273,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       vihbId = req.vihbId,
       name = req.name,
       address = AddressDto(
-        streetName = req.address!!.streetName,
+        streetName = req.address.streetName,
         buildingName = req.address.buildingName,
         buildingNumber = req.address.buildingNumber,
         postalCode = req.address.postalCode,
@@ -344,7 +343,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     val response = objectMapper.readValue(branchResult.response.contentAsString, ProjectLocationResult::class.java)
 
     // Delete the branch
-    securedMockMvc.delete("/companies/${company.id}/branches/${response.companyId}")
+    securedMockMvc.delete("/companies/${company.id}/branches/${response.projectLocationId}")
       .andExpect(status().isNoContent)
   }
 
@@ -606,12 +605,12 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       country = "Nederland"
     )
 
-    val branchResult = securedMockMvc.post(
+    val response = securedMockMvc.post(
       "/companies/${company2.id}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
-    val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+    val result = objectMapper.readValue(response.response.contentAsString, ProjectLocationResult::class.java)
 
     // Try to update the branch using company1's ID (should fail)
     val updateRequest = AddressRequest(
@@ -624,7 +623,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.put(
-      "/companies/${company1.id}/branches/${branch.id}",
+      "/companies/${company1.id}/branches/${result.projectLocationId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isBadRequest)
@@ -654,12 +653,12 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       country = "Nederland"
     )
 
-    val branchResult = securedMockMvc.post(
+    val response = securedMockMvc.post(
       "/companies/${company.id}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
-    val branch = objectMapper.readValue(branchResult.response.contentAsString, CompanyBranchDto::class.java)
+    val result = objectMapper.readValue(response.response.contentAsString, ProjectLocationResult::class.java)
 
     // Update the branch with null building name
     val updateRequest = AddressRequest(
@@ -671,7 +670,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       country = "Nederland"
     )
 
-    securedMockMvc.put("/companies/${company.id}/branches/${branch.id}", objectMapper.writeValueAsString(updateRequest))
+    securedMockMvc.put("/companies/${company.id}/branches/${result.projectLocationId}", objectMapper.writeValueAsString(updateRequest))
       .andExpect(status().isNoContent)
 
     // Verify the branch was updated correctly
@@ -680,7 +679,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
       .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value(null))
       .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("600"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000 FF"))
+      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000FF"))
       .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
   }
 }
