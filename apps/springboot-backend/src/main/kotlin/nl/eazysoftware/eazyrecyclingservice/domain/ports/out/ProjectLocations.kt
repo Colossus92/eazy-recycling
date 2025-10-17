@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import java.util.*
 
 interface ProjectLocations {
 
@@ -15,5 +16,9 @@ interface ProjectLocations {
   fun create(location: Location.ProjectLocation)
 
   fun findAll(): List<Location.ProjectLocation>
+
+  fun findById(id: UUID): Location.ProjectLocation?
+
+  fun deleteById(id: UUID)
 
 }

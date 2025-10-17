@@ -46,5 +46,13 @@ class ProjectLocationRepository(
     jpaRepository.findAll()
       .map { dto -> locationMapper.toDomain(dto) as Location.ProjectLocation }
 
+  override fun findById(id: UUID): Location.ProjectLocation? =
+    jpaRepository.findById(id)
+      .map { dto -> locationMapper.toDomain(dto) as Location.ProjectLocation }
+      .orElse(null)
+
+  override fun deleteById(id: UUID) {
+    jpaRepository.deleteById(id)
+  }
 
 }

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocationCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocation
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
@@ -23,6 +25,7 @@ import java.util.*
 class CompanyController(
   val companyService: CompanyService,
   val createProjectLocation: CreateProjectLocation,
+  val deleteProjectLocation: DeleteProjectLocation,
 ) {
 
   @PostMapping
@@ -79,7 +82,12 @@ class CompanyController(
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteBranch(@PathVariable("companyId") companyId: UUID, @PathVariable("branchId") branchId: UUID) {
-    companyService.deleteBranch(companyId, branchId)
+    deleteProjectLocation.handle(
+      DeleteProjectLocationCommand(
+        companyId = CompanyId(companyId),
+        branchId = branchId
+      )
+    )
   }
 
   @PutMapping("/{companyId}/branches/{branchId}")

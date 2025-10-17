@@ -93,16 +93,6 @@ class CompanyService(
       || cause.constraintName?.contains("companies_vihb_number_key") == true)
   }
 
-  fun deleteBranch(companyId: UUID, branchId: UUID) {
-    val branch = companyBranchRepository.findById(branchId)
-      .orElseThrow { EntityNotFoundException("Vestiging met id $branchId niet gevonden") }
-
-    if (branch.company.id != companyId) {
-      throw IllegalArgumentException("Vestiging met id $branchId is niet van bedrijf met id $companyId")
-    }
-
-    companyBranchRepository.deleteById(branchId)
-  }
 
   fun updateBranch(companyId: UUID, branchId: UUID, branchAddress: AddressRequest) {
     val branch = companyBranchRepository.findById(branchId)
