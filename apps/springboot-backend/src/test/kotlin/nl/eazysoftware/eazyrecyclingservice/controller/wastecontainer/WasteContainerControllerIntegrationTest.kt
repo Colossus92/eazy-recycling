@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
+import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -248,7 +249,7 @@ class WasteContainerControllerIntegrationTest {
         val containerId = wasteContainerRepository.save(originalContainer).uuid!!
 
         val updatedContainer = WasteContainer(
-            uuid = containerId,
+            wasteContainerId = WasteContainerId(containerId),
             id = "UPDATE-ME",
             location = WasteContainer.ContainerLocation(
                 companyId = null,
@@ -287,7 +288,7 @@ class WasteContainerControllerIntegrationTest {
         // Given
         val nonExistentId = UUID.randomUUID()
         val container = WasteContainer(
-            uuid = nonExistentId,
+            wasteContainerId = WasteContainerId(nonExistentId),
             id = "NON-EXISTENT",
             location = WasteContainer.ContainerLocation(
                 companyId = null,

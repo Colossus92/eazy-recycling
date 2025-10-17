@@ -11,11 +11,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.COMPANY
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.DUTCH_ADDRESS
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.NO_PICKUP
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.PROXIMITY_DESC
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
@@ -81,7 +81,11 @@ class WasteStreamQueryRepository(
         pickupLocation = formatPickupLocation(columns),
         deliveryLocation = "${columns[12]} ${columns[13]}, ${columns[14]}",
         lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
-        status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(status), lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
+        status = EffectiveStatusPolicy.compute(
+          WasteStreamStatus.valueOf(status),
+          lastActivityAt.toKotlinInstant(),
+          Clock.System.now()
+        ).toString(),
       )
     }
   }
@@ -92,9 +96,11 @@ class WasteStreamQueryRepository(
       PROXIMITY_DESC -> "${columns[9]}, ${columns[10]}"
       COMPANY -> {
         val companyId = toUuid(columns[11])
-        val company = companyRepository.findByIdOrNull(companyId) ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
+        val company = companyRepository.findByIdOrNull(companyId)
+          ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
         "${company.name}, ${company.address.city}"
       }
+
       NO_PICKUP -> "Geen herkomstlocatie"
       else -> throw IllegalStateException("Unexpected pickup location type: $locationType")
     }
@@ -111,6 +117,7 @@ class WasteStreamQueryRepository(
         val buffer = ByteBuffer.wrap(value)
         UUID(buffer.long, buffer.long)
       }
+
       else -> throw IllegalStateException("Unexpected type for UUID column: ${value?.javaClass}")
     }
   }
@@ -142,7 +149,11 @@ class WasteStreamQueryRepository(
       dealerParty = wasteStream.dealerParty?.let { CompanyViewMapper.map(it) },
       collectorParty = wasteStream.collectorParty?.let { CompanyViewMapper.map(it) },
       brokerParty = wasteStream.brokerParty?.let { CompanyViewMapper.map(it) },
-      status = EffectiveStatusPolicy.compute(WasteStreamStatus.valueOf(wasteStream.status), wasteStream.lastActivityAt.toKotlinInstant(), Clock.System.now()).toString(),
+      status = EffectiveStatusPolicy.compute(
+        WasteStreamStatus.valueOf(wasteStream.status),
+        wasteStream.lastActivityAt.toKotlinInstant(),
+        Clock.System.now()
+      ).toString(),
       lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant().toDisplayTime()
     )
   }
@@ -167,13 +178,27 @@ class WasteStreamQueryRepository(
           country = dto.country
         )
 
-      is PickupLocationDto.PickupCompanyDto -> {
+      is PickupLocationDto.PickupCompanyDto ->
+        entityManager.find(CompanyDto::class.java, dto.companyId)
+          .let {
+            PickupLocationView.PickupCompanyView(
+              company = CompanyViewMapper.map(it)
+            )
+          }
+
+
+      is PickupLocationDto.PickupProjectLocationDto -> {
         val company = entityManager.find(CompanyDto::class.java, dto.companyId)
-        company?.let {
-          PickupLocationView.PickupCompanyView(
-            company = CompanyViewMapper.map(it)
-          )
-        }
+
+        PickupLocationView.ProjectLocationView(
+          company = company.let { CompanyViewMapper.map(it) },
+          streetName = dto.streetName,
+          postalCode = dto.postalCode,
+          buildingNumber = dto.buildingNumber,
+          buildingNumberAddition = dto.buildingNumberAddition,
+          city = dto.city,
+          country = dto.country
+        )
       }
 
       else -> null

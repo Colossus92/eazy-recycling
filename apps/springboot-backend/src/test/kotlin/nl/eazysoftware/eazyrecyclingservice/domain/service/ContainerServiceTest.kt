@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
+import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
@@ -70,7 +71,7 @@ class ContainerServiceTest {
             )
         )
         val containerToUpdate = WasteContainer(
-            uuid = containerId,
+            wasteContainerId = WasteContainerId(containerId),
             id = "container-123",
             location = WasteContainer.ContainerLocation(
                 companyId = companyId,
@@ -89,7 +90,7 @@ class ContainerServiceTest {
         // Then
         verify(wasteContainerRepository).save(wasteContainerDtoCaptor.capture())
         val savedDto = wasteContainerDtoCaptor.value
-        
+
         assertThat(savedDto.company).isEqualTo(company)
         assertThat(savedDto.address).isNull()
     }
@@ -112,7 +113,7 @@ class ContainerServiceTest {
             notes = "Some notes"
         )
         val containerToUpdate = WasteContainer(
-            uuid = containerId,
+            wasteContainerId = WasteContainerId(containerId),
             id = "container-123",
             location = WasteContainer.ContainerLocation(
                 companyId = null,
@@ -130,7 +131,7 @@ class ContainerServiceTest {
         // Then
         verify(wasteContainerRepository).save(wasteContainerDtoCaptor.capture())
         val savedDto = wasteContainerDtoCaptor.value
-        
+
         assertThat(savedDto.company).isNull()
         assertThat(savedDto.address).isEqualTo(address)
     }
@@ -146,7 +147,7 @@ class ContainerServiceTest {
             notes = "Some notes"
         )
         val containerToUpdate = WasteContainer(
-            uuid = containerId,
+          wasteContainerId = WasteContainerId(containerId),
             id = "container-123",
             location = WasteContainer.ContainerLocation(
                 companyId = nonExistentCompanyId,

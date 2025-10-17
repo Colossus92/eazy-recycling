@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
@@ -78,10 +79,12 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
-          streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "2",
-          city = "Test City",
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "2",
+            city = "Test City",
+          )
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -260,10 +263,12 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = collectionType,
         pickupLocation = Location.DutchAddress(
-          streetName = "Stadstraat",
-          postalCode = DutchPostalCode("1234 AB"),
-          buildingNumber = "123",
-          city = "Test city",
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "123",
+            city = "Test city",
+          ),
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -282,10 +287,12 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
-          streetName = "Stadstraat",
-          postalCode = DutchPostalCode("1234 AB"),
-          buildingNumber = "123",
-          city = "Test city",
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "123",
+            city = "Test city",
+          ),
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
@@ -304,10 +311,12 @@ class WasteStreamTest {
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
-          streetName = "Stadstraat",
-          postalCode = DutchPostalCode("1234 AB"),
-          buildingNumber = "123",
-          city = "Test city",
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "123",
+            city = "Test city",
+          ),
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
@@ -343,10 +352,12 @@ class WasteStreamTest {
     fun `a dutch address can't have a blank house number`() {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.DutchAddress(
-          streetName = "Stadstraat",
-          postalCode = DutchPostalCode("1234 AB"),
-          buildingNumber = "",
-          city = "Test city",
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "",
+            city = "Test city",
+          ),
         )
       }
       assertThat(exception.message).isEqualTo("Het huisnummer is verplicht")
@@ -356,11 +367,13 @@ class WasteStreamTest {
     fun `a dutch address must have Nederland as country`() {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.DutchAddress(
-          streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "123",
-          country = "Belgium",
-          city = "Test city"
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "123",
+            country = "Belgium",
+            city = "Test city"
+          ),
         )
       }
       assertThat(exception.message).isEqualTo("Het land dient Nederland te zijn, maar was: Belgium")
@@ -370,11 +383,13 @@ class WasteStreamTest {
     fun `a dutch address can have a house number addition`() {
       assertDoesNotThrow {
         Location.DutchAddress(
-          streetName = "Stadstraat",
-          DutchPostalCode("1234 AB"),
-          "123",
-          buildingNumberAddition = "A",
-          city = "Test city"
+          address = Address(
+            streetName = "Stadstraat",
+            postalCode = DutchPostalCode("1234 AB"),
+            buildingNumber = "123",
+            buildingNumberAddition = "A",
+            city = "Test city"
+          ),
         )
       }
     }
@@ -491,10 +506,12 @@ class WasteStreamTest {
     wasteType = wasteType(),
     collectionType = WasteCollectionType.DEFAULT,
     pickupLocation = Location.DutchAddress(
-      streetName = "Stadstraat",
-      DutchPostalCode("1234 AB"),
-      "2",
-      city = "Test City",
+      address = Address(
+        streetName = "Stadstraat",
+        postalCode = DutchPostalCode("1234 AB"),
+        buildingNumber = "2",
+        city = "Test City",
+      ),
     ),
     deliveryLocation = destinationLocation(),
     consignorParty = Consignor.Company(companyId()),

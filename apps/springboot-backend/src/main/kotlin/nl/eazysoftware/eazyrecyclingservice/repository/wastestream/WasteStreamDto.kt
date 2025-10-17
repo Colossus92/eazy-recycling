@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import java.time.Instant
 
 @Entity

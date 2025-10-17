@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailV
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
@@ -161,6 +162,7 @@ sealed class ConsignorRequest {
 )
 @JsonSubTypes(
   JsonSubTypes.Type(value = PickupLocationRequest.DutchAddressRequest::class, name = "dutch_address"),
+  JsonSubTypes.Type(value = PickupLocationRequest.ProjectLocationRequest::class, name = "project_location"),
   JsonSubTypes.Type(value = PickupLocationRequest.ProximityDescriptionRequest::class, name = "proximity"),
   JsonSubTypes.Type(value = PickupLocationRequest.PickupCompanyRequest::class, name = "company"),
   JsonSubTypes.Type(value = PickupLocationRequest.NoPickupLocationRequest::class, name = "none")
@@ -189,12 +191,14 @@ sealed class PickupLocationRequest {
     val country: String
   ) : PickupLocationRequest() {
     override fun toDomain() = DutchAddress(
-      streetName = streetName,
-      postalCode = DutchPostalCode(postalCode),
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      city = city,
-      country = country
+      address = Address(
+        streetName = streetName,
+        postalCode = DutchPostalCode(postalCode),
+        buildingNumber = buildingNumber,
+        buildingNumberAddition = buildingNumberAddition,
+        city = city,
+        country = country
+      )
     )
   }
 
@@ -217,6 +221,41 @@ sealed class PickupLocationRequest {
       postalCodeDigits = postalCodeDigits,
       city = city,
       country = country
+    )
+  }
+
+  data class ProjectLocationRequest(
+
+    val companyId: UUID,
+
+    @field:NotBlank(message = "Straatnaam is verplicht")
+    val streetName: String,
+
+    @field:NotBlank(message = "Huisnummer is verplicht")
+    val buildingNumber: String,
+
+    val buildingNumberAddition: String? = null,
+
+    @field:NotBlank(message = "Postcode is verplicht")
+    @field:Pattern(regexp = "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$", message = "Postcode moet het formaat 1234AB of 1234 AB hebben")
+    val postalCode: String,
+
+    @field:NotBlank(message = "Woonplaats is verplicht")
+    val city: String,
+
+    @field:NotBlank(message = "Land is verplicht")
+    val country: String
+  ) : PickupLocationRequest() {
+    override fun toDomain() = ProjectLocation(
+      companyId = CompanyId(companyId),
+      address = Address(
+        streetName = streetName,
+        postalCode = DutchPostalCode(postalCode),
+        buildingNumber = buildingNumber,
+        buildingNumberAddition = buildingNumberAddition,
+        city = city,
+        country = country
+      )
     )
   }
 

@@ -4,6 +4,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.Crea
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
@@ -150,10 +151,12 @@ class CreateWasteStreamIntegrationTest {
         ),
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
-            streetName = "Test Street",
-            postalCode = DutchPostalCode("1234AB"),
-            buildingNumber = "1",
-            city = "Test City"
+            address = Address(
+              streetName = "Test Street",
+              postalCode = DutchPostalCode("1234AB"),
+              buildingNumber = "1",
+              city = "Test City"
+            ),
         ),
         deliveryLocation = WasteDeliveryLocation(processorPartyId = processorId),
         consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),

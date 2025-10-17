@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.Create
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -22,16 +23,16 @@ import java.util.*
 @RestController
 @RequestMapping("/transport")
 class ContainerTransportController(
-    private val createContainerTransport: CreateContainerTransport
+  private val createContainerTransport: CreateContainerTransport
 ) {
 
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    @PostMapping("/container")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun createContainerTransport(@Valid @RequestBody request: CreateContainerTransportRequest): CreateContainerTransportResponse {
-        val result = createContainerTransport.handle(request.toCommand())
-        return CreateContainerTransportResponse(transportId = result.transportId.uuid)
-    }
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/container")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createContainerTransport(@Valid @RequestBody request: CreateContainerTransportRequest): CreateContainerTransportResponse {
+    val result = createContainerTransport.handle(request.toCommand())
+    return CreateContainerTransportResponse(transportId = result.transportId.uuid)
+  }
 
 }
 
@@ -47,17 +48,21 @@ fun CreateContainerTransportRequest.toCommand(): CreateContainerTransportCommand
     consignorParty = CompanyId(this.consignorPartyId),
     carrierParty = CompanyId(this.carrierPartyId),
     pickupLocation = Location.DutchAddress(
-      streetName = this.pickupStreet,
-      postalCode = DutchPostalCode(this.pickupPostalCode),
-      buildingNumber = this.pickupBuildingNumber,
-      city = this.pickupCity
+      address = Address(
+        streetName = this.pickupStreet,
+        postalCode = DutchPostalCode(this.pickupPostalCode),
+        buildingNumber = this.pickupBuildingNumber,
+        city = this.pickupCity
+      )
     ),
     pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
     deliveryLocation = Location.DutchAddress(
-      streetName = this.deliveryStreet,
-      postalCode = DutchPostalCode(this.deliveryPostalCode),
-      buildingNumber = this.deliveryBuildingNumber,
-      city = this.deliveryCity
+      address = Address(
+        streetName = this.deliveryStreet,
+        postalCode = DutchPostalCode(this.deliveryPostalCode),
+        buildingNumber = this.deliveryBuildingNumber,
+        city = this.deliveryCity
+      )
     ),
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
       ?: kotlinx.datetime.Clock.System.now(),

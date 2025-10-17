@@ -14,17 +14,18 @@ sealed interface Location {
    * Requires: NL + postal code (4 digits + 2 letters) + house number
    */
   data class DutchAddress(
-    val streetName: String,
-    val postalCode: DutchPostalCode,
-    val buildingNumber: String,
-    val buildingNumberAddition: String? = null,
-    val city: String,
-    val country: String = "Nederland"
+    val address: Address
   ) : Location {
     init {
-      require(buildingNumber.isNotBlank()) { "Het huisnummer is verplicht" }
-      require(country == "Nederland") { "Het land dient Nederland te zijn, maar was: $country" }
+      require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: $address.country" }
     }
+
+    fun streetName(): String = address.streetName
+    fun buildingNumber(): String = address.buildingNumber
+    fun buildingNumberAddition(): String? = address.buildingNumberAddition
+    fun postalCode(): DutchPostalCode = address.postalCode
+    fun city(): String = address.city
+    fun country(): String = address.country
   }
 
   /**
@@ -56,4 +57,25 @@ sealed interface Location {
    * References a company's address as the pickup location
    */
   data class Company(val companyId: CompanyId) : Location
+
+  /**
+   * Variant 5: Project/Branch location
+   * A specific physical address that belongs to a company (e.g., construction site, branch office, project location)
+   * Combines a full Dutch address with company ownership
+   */
+  data class ProjectLocation(
+    val companyId: CompanyId,
+    val address: Address,
+  ) : Location {
+    init {
+      require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: ${address.country}" }
+    }
+
+    fun streetName(): String = address.streetName
+    fun buildingNumber(): String = address.buildingNumber
+    fun buildingNumberAddition(): String? = address.buildingNumberAddition
+    fun postalCode(): DutchPostalCode = address.postalCode
+    fun city(): String = address.city
+    fun country(): String = address.country
+  }
 }

@@ -1,10 +1,11 @@
-package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
+package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.*
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.COMPANY
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.DUTCH_ADDRESS
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.NO_PICKUP
-import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.PickupLocationType.PROXIMITY_DESC
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROJECT_LOCATION
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
 import java.util.*
 
 @Entity
@@ -60,6 +61,32 @@ class PickupLocationDto(
     @Column(name = "company_id")
     var companyId: UUID
   ) : PickupLocationDto()
+
+
+  @Entity
+  @DiscriminatorValue(PROJECT_LOCATION)
+  class PickupProjectLocationDto(
+    @Column(name = "company_id")
+    var companyId: UUID,
+
+    @Column(name = "street_name")
+    var streetName: String,
+
+    @Column(name = "building_number")
+    var buildingNumber: String,
+
+    @Column(name = "building_number_addition")
+    var buildingNumberAddition: String?,
+
+    @Column(name = "postal_code")
+    var postalCode: String,
+
+    @Column
+    var city: String,
+
+    @Column
+    var country: String,
+  ) : PickupLocationDto()
 }
 
 object PickupLocationType {
@@ -67,4 +94,5 @@ object PickupLocationType {
     const val PROXIMITY_DESC: String = "PROXIMITY_DESC"
     const val NO_PICKUP: String = "NO_PICKUP"
     const val COMPANY: String = "COMPANY"
+    const val PROJECT_LOCATION: String = "PROJECT_LOCATION"
 }
