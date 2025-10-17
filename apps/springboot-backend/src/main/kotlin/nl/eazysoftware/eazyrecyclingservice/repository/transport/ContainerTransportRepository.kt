@@ -13,9 +13,10 @@ class ContainerTransportRepository(
   private val mapper: ContainerTransportMapper
 ) : ContainerTransports {
 
-  override fun save(containerTransport: ContainerTransport) {
-    mapper.toDto(containerTransport)
-      .apply { jpaRepository.save(this) }
+  override fun save(containerTransport: ContainerTransport): ContainerTransport {
+    val savedDto = mapper.toDto(containerTransport)
+      .let { jpaRepository.save(it) }
+    return mapper.toDomain(savedDto)
   }
 
   override fun findById(transportId: TransportId): ContainerTransport? {

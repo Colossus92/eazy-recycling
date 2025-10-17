@@ -62,10 +62,10 @@ class CreateContainerTransportService(
       sequenceNumber = 9999 // Create as last in line
     )
 
-    containerTransports.save(containerTransport)
+    val savedTransport = containerTransports.save(containerTransport)
 
     return CreateContainerTransportResult(
-      transportId = containerTransport.transportId ?: TransportId(UUID.randomUUID()) // TODO remove fallback after UUID is removed from DTO
+      transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save")
     )
   }
 }

@@ -248,8 +248,8 @@ class WasteContainerControllerIntegrationTest {
         )
         val containerId = wasteContainerRepository.save(originalContainer).uuid!!
 
-        val updatedContainer = WasteContainer(
-            wasteContainerId = WasteContainerId(containerId),
+        val updatedContainer = WasteContainerController.WasteContainerRequest(
+            uuid = containerId,
             id = "UPDATE-ME",
             location = WasteContainer.ContainerLocation(
                 companyId = null,
@@ -287,8 +287,8 @@ class WasteContainerControllerIntegrationTest {
     fun `should return not found when updating non-existent container`() {
         // Given
         val nonExistentId = UUID.randomUUID()
-        val container = WasteContainer(
-            wasteContainerId = WasteContainerId(nonExistentId),
+        val container = WasteContainerController.WasteContainerRequest(
+            uuid = nonExistentId,
             id = "NON-EXISTENT",
             location = WasteContainer.ContainerLocation(
                 companyId = null,

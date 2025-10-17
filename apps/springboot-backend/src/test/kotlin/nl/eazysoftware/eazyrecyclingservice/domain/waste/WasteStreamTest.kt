@@ -360,7 +360,7 @@ class WasteStreamTest {
           ),
         )
       }
-      assertThat(exception.message).isEqualTo("Het huisnummer is verplicht")
+      assertThat(exception.message).isEqualTo("Huisnummer moet een waarde hebben.")
     }
 
     @Test

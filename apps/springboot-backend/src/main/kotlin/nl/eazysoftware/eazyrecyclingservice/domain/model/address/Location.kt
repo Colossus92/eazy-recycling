@@ -18,7 +18,7 @@ sealed interface Location {
     val address: Address
   ) : Location {
     init {
-      require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: $address.country" }
+      require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: ${address.country}" }
     }
 
     fun streetName(): String = address.streetName
