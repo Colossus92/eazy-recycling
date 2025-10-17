@@ -5,7 +5,7 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
@@ -28,7 +28,7 @@ import java.util.*
 class TransportService(
   private val transportRepository: TransportRepository,
   private val locationRepository: LocationRepository,
-  private val companyBranchRepository: ProjectLocationJpaRepository,
+  private val companyBranchRepository: CompanyBranchRepository,
   private val entityManager: EntityManager,
   private val pdfGenerationClient: PdfGenerationClient,
 ) {

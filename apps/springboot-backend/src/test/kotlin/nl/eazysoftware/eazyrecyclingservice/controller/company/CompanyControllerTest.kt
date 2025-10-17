@@ -2,8 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -32,7 +33,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 ) {
     private lateinit var securedMockMvc: SecuredMockMvc
     private lateinit var testCompany: CompanyDto
-    private lateinit var testBranches: List<CompanyBranchDto>
+    private lateinit var testBranches: List<PickupLocationDto.PickupProjectLocationDto>
 
     @BeforeEach
     fun setup() {
@@ -56,28 +57,24 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         )
 
         // Create test branches
-        val branch1 = CompanyBranchDto(
-            company = testCompany,
-            address = AddressDto(
+        val branch1 = PickupLocationDto.PickupProjectLocationDto(
+                companyId = testCompany.id!!,
                 streetName = "Branch Street",
-                buildingName = "Branch Building 1",
                 buildingNumber = "42",
+                buildingNumberAddition = null,
                 postalCode = "5678CD",
                 city = "Rotterdam",
                 country = "Nederland"
             )
-        )
 
-        val branch2 = CompanyBranchDto(
-            company = testCompany,
-            address = AddressDto(
+        val branch2 = PickupLocationDto.PickupProjectLocationDto(
+                companyId = testCompany.id!!,
                 streetName = "Another Street",
-                buildingName = "Branch Building 2",
                 buildingNumber = "99",
+                buildingNumberAddition = null,
                 postalCode = "9876ZY",
                 city = "Utrecht",
-                country = "Nederland"
-            )
+                country = "Nederland",
         )
 
         testBranches = listOf(
@@ -164,9 +161,9 @@ class CompanyControllerIntegrationTest @Autowired constructor(
             .andExpect(jsonPath("$[0].name").value(testCompany.name))
             .andExpect(jsonPath("$[0].branches.length()").value(2))
             .andExpect(jsonPath("$[0].branches[0].id").exists())
-            .andExpect(jsonPath("$[0].branches[0].address.postalCode").value(testBranches[0].address.postalCode))
+            .andExpect(jsonPath("$[0].branches[0].address.postalCode").value(testBranches[0].postalCode))
             .andExpect(jsonPath("$[0].branches[1].id").exists())
-            .andExpect(jsonPath("$[0].branches[1].address.postalCode").value(testBranches[1].address.postalCode))
+            .andExpect(jsonPath("$[0].branches[1].address.postalCode").value(testBranches[1].postalCode))
     }
 
     @Test
@@ -191,16 +188,14 @@ class CompanyControllerIntegrationTest @Autowired constructor(
         )
 
         val secondCompanyBranch = companyBranchRepository.save(
-            CompanyBranchDto(
-                company = secondCompany,
-                address = AddressDto(
+            PickupLocationDto.PickupProjectLocationDto(
+                companyId = secondCompany.id!!,
                     streetName = "Second Branch St",
-                    buildingName = "Branch Building",
                     buildingNumber = "22",
+                    buildingNumberAddition = null,
                     postalCode = "8765DC",
                     city = "Groningen",
                     country = "Nederland"
-                )
             )
         )
 
@@ -213,7 +208,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
             // Second company should have 1 branch
             .andExpect(jsonPath("$[?(@.id == '${secondCompany.id}')].branches.length()").value(1))
-            .andExpect(jsonPath("$[?(@.id == '${secondCompany.id}')].branches[0].address.postalCode").value(secondCompanyBranch.address.postalCode))
+            .andExpect(jsonPath("$[?(@.id == '${secondCompany.id}')].branches[0].address.postalCode").value(secondCompanyBranch.postalCode))
     }
 
     @Test

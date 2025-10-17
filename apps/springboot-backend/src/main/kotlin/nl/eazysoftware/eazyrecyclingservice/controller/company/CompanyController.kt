@@ -7,6 +7,8 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreatePr
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocationCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocation
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
@@ -26,6 +28,7 @@ class CompanyController(
   val companyService: CompanyService,
   val createProjectLocation: CreateProjectLocation,
   val deleteProjectLocation: DeleteProjectLocation,
+  val updateProjectLocation: UpdateProjectLocation,
 ) {
 
   @PostMapping
@@ -98,7 +101,19 @@ class CompanyController(
     @PathVariable("branchId") branchId: UUID,
     @RequestBody branch: AddressRequest
   ) {
-    companyService.updateBranch(companyId, branchId, branch)
+    updateProjectLocation.handle(
+      UpdateProjectLocationCommand(
+        companyId = CompanyId(companyId),
+        branchId = branchId,
+        address = Address(
+          streetName = branch.streetName,
+          buildingNumber = branch.buildingNumber,
+          postalCode = DutchPostalCode(branch.postalCode),
+          city = branch.city,
+          country = branch.country
+        )
+      )
+    )
   }
 
   data class CompanyRequest(

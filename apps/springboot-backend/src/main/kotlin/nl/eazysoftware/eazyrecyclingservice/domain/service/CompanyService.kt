@@ -2,14 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
-import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.hibernate.exception.ConstraintViolationException
@@ -94,29 +89,6 @@ class CompanyService(
   }
 
 
-  fun updateBranch(companyId: UUID, branchId: UUID, branchAddress: AddressRequest) {
-    val branch = companyBranchRepository.findById(branchId)
-      .orElseThrow { EntityNotFoundException("Vestiging met id $branchId niet gevonden") }
-
-    if (branch.company.id != companyId) {
-      throw IllegalArgumentException("Vestiging met id $branchId is niet van bedrijf met id $companyId")
-    }
-
-    val updatedBranch = CompanyBranchDto(
-      id = branchId,
-      company = branch.company,
-      address = AddressDto(
-        streetName = branchAddress.streetName,
-        buildingName = branchAddress.buildingName,
-        buildingNumber = branchAddress.buildingNumber,
-        postalCode = branchAddress.postalCode,
-        city = branchAddress.city,
-        country = branchAddress.country
-      )
-    )
-
-    companyBranchRepository.save(updatedBranch)
-  }
 
   data class CompanyResponse(
     val id: UUID,

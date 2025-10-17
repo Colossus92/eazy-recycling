@@ -5,7 +5,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
-import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
@@ -63,7 +63,7 @@ class TransportControllerIntegrationTest {
     private lateinit var entityManager: EntityManager
 
     @Autowired
-    private lateinit var companyBranchRepository: ProjectLocationJpaRepository
+    private lateinit var companyBranchRepository: CompanyBranchRepository
 
     private lateinit var testCompany: CompanyDto
     private lateinit var testLocation: LocationDto
