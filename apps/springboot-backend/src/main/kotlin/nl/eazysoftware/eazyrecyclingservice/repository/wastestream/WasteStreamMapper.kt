@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component
 @Component
 class WasteStreamMapper(
   @PersistenceContext private var entityManager: EntityManager,
-  private var pickupLocationRepository: PickupLocationRepository,
   private var pickupLocationMapper: PickupLocationMapper,
   private var companyRepository: CompanyRepository,
 ) {

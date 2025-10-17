@@ -72,7 +72,7 @@ class PickupLocationMapper(
   }
 
   private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    val company = companyRepository.findByIdOrNull(location.companyId.uuid)
+    companyRepository.findByIdOrNull(location.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${location.companyId}")
 
     return pickupLocationRepository.findPickupProjectLocationByPostalCodeAndBuildingNumberAndCompanyId(
