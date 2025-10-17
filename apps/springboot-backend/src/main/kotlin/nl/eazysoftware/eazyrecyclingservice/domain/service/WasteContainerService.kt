@@ -28,7 +28,7 @@ class WasteContainerService(
 
     fun getAllContainers(): List<WasteContainer> {
         return wasteContainerRepository.findAll()
-            .map { it -> wasteContainerMapper.toDomain(it) }
+            .map { wasteContainerMapper.toDomain(it) }
     }
 
     fun getContainerById(id: UUID): WasteContainer {
