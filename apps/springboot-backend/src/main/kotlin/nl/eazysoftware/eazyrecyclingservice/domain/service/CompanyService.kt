@@ -3,8 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyBranchDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -18,7 +22,7 @@ import java.util.*
 @Service
 class CompanyService(
   private val companyRepository: CompanyRepository,
-  private val companyBranchRepository: CompanyBranchRepository,
+  private val companyBranchRepository: ProjectLocations,
 ) {
   fun create(company: CompanyController.CompanyRequest): CompanyDto {
     val companyDto = CompanyDto(
@@ -87,36 +91,6 @@ class CompanyService(
     return cause is ConstraintViolationException
       && (cause.constraintName?.contains("companies_chamber_of_commerce_id_key") == true
       || cause.constraintName?.contains("companies_vihb_number_key") == true)
-  }
-
-  fun createBranch(companyId: UUID, branch: AddressRequest): CompanyBranchDto {
-    // Check if a branch with the same postal code and building number already exists for this company
-    if (companyBranchRepository.existsByCompanyIdAndPostalCodeAndBuildingNumber(
-        companyId,
-        branch.postalCode,
-        branch.buildingNumber
-      )
-    ) {
-      throw DuplicateKeyException("Er bestaat al een vestiging op dit adres (postcode en huisnummer) voor dit bedrijf.")
-    }
-
-    // Use findById instead of getReference to avoid proxy serialization issues
-    val company = companyRepository.findById(companyId)
-      .orElseThrow { EntityNotFoundException("Bedrijf met id $companyId niet gevonden") }
-
-    val branchDto = CompanyBranchDto(
-      company = company,
-      address = AddressDto(
-        streetName = branch.streetName,
-        buildingName = branch.buildingName,
-        buildingNumber = branch.buildingNumber,
-        postalCode = branch.postalCode,
-        city = branch.city,
-        country = branch.country
-      )
-    )
-
-    return companyBranchRepository.save(branchDto)
   }
 
   fun deleteBranch(companyId: UUID, branchId: UUID) {
@@ -191,19 +165,17 @@ class CompanyService(
     val companyId: UUID,
   ) {
     companion object {
-      fun from(branch: CompanyBranchDto): CompanyBranchResponse {
-        if (branch.id == null) {
-          throw IllegalArgumentException("Vestiging heeft geen id")
-        }
-
-        if (branch.company.id == null) {
-          throw IllegalArgumentException("Vestiging is niet gekoppeld aan een bedrijf met een id")
-        }
-
+      fun from(branch: Location.ProjectLocation): CompanyBranchResponse {
         return CompanyBranchResponse(
-          id = branch.id!!,
-          address = branch.address,
-          companyId = branch.company.id!!,
+          id = UUID.randomUUID(), // TODO: refer to branch id
+          address = AddressDto (
+            streetName = branch.address.streetName,
+            buildingNumber = branch.address.buildingNumber,
+            postalCode = branch.address.postalCode.value,
+            city = branch.address.city,
+            country = branch.address.country
+          ),
+          companyId = branch.companyId.uuid,
         )
       }
     }

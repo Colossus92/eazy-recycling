@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyBranchRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -28,7 +28,7 @@ class CompanyServiceTest {
     private lateinit var companyRepository: CompanyRepository
 
     @Mock
-    private lateinit var companyBranchRepository: CompanyBranchRepository
+    private lateinit var companyBranchRepository: ProjectLocationJpaRepository
 
     private lateinit var companyService: CompanyService
 
