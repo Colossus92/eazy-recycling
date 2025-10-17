@@ -90,5 +90,12 @@ sealed interface Location {
 
         return id == other.id
     }
+
+    override fun hashCode(): Int {
+      var result = id.hashCode()
+      result = 31 * result + companyId.hashCode()
+      result = 31 * result + address.hashCode()
+      return result
+    }
   }
 }
