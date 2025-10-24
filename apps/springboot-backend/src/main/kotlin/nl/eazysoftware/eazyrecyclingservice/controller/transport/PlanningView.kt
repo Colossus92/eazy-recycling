@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -36,8 +37,8 @@ data class TransportView(
         deliveryDate = transportDto.deliveryDateTime?.toLocalDate()?.toString().takeIf { transportDto.deliveryDateTime != null },
         id = transportDto.id.toString(),
         truck =  transportDto.truck,
-        originCity = transportDto.pickupLocation.address.city,
-        destinationCity = transportDto.deliveryLocation.address.city,
+        originCity = getCityFrom(transportDto.pickupLocation),
+        destinationCity = getCityFrom(transportDto.deliveryLocation),
         driver = transportDto.driver,
         status = transportDto.getStatus(),
         displayNumber = transportDto.displayNumber,
@@ -45,4 +46,15 @@ data class TransportView(
         transportType = transportDto.transportType,
         sequenceNumber = transportDto.sequenceNumber,
     )
+}
+
+fun getCityFrom(location: PickupLocationDto): String {
+  when (location) {
+    is PickupLocationDto.DutchAddressDto -> location.city
+    is PickupLocationDto.PickupCompanyDto -> location.company.address.city
+    is PickupLocationDto.PickupProjectLocationDto -> location.city
+    is PickupLocationDto.NoPickupLocationDto -> return "n.v.t."
+    is PickupLocationDto.ProximityDescriptionDto -> location.city
+    else -> throw IllegalStateException("Ongeldige ophaallocatie type: ${location::class.simpleName}")
+  }
 }

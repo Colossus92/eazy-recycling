@@ -2,13 +2,14 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
@@ -16,8 +17,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -27,20 +26,16 @@ import java.util.*
 @Service
 class TransportService(
   private val transportRepository: TransportRepository,
-  private val locationRepository: LocationRepository,
   private val companyBranchRepository: ProjectLocations,
   private val entityManager: EntityManager,
   private val pdfGenerationClient: PdfGenerationClient,
+  private val pickupLocationMapper: PickupLocationMapper,
 ) {
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
     fun getAllTransports(): List<TransportDto> {
         return transportRepository.findAll()
-    }
-
-    fun createContainerTransport(request: CreateContainerTransportRequest): TransportDto {
-        return createContainerTransport(request = request, goods = null)
     }
 
     fun createWasteTransport(request: CreateWasteTransportRequest): TransportDto {
@@ -78,35 +73,12 @@ class TransportService(
             deliveryBranchId = request.deliveryCompanyBranchId,
             deliveryCompanyId = request.deliveryCompanyId
         )
-        val pickupLocation = findOrCreateLocation(AddressRequest(
-            streetName = request.pickupStreet,
-            buildingNumber = request.pickupBuildingNumber,
-            postalCode = request.pickupPostalCode,
-            city = request.pickupCity
-        ))
-
-        // Check if delivery location is the same as pickup
-        val deliveryLocation = if (isDeliveryAndPickupSameLocation(request)) {
-            pickupLocation
-        } else {
-            findOrCreateLocation(AddressRequest(
-                streetName = request.deliveryStreet,
-                buildingNumber = request.deliveryBuildingNumber,
-                postalCode = request.deliveryPostalCode,
-                city = request.deliveryCity
-            ))
-        }
-
-        // Create and return the transport
+      // Create and return the transport
         val transport = TransportDto(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
-            pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
-            pickupCompanyBranch = request.pickupCompanyBranchId?.let { entityManager.getReference(PickupLocationDto.PickupProjectLocationDto::class.java, it.toString()) },
-            pickupLocation = pickupLocation,
+            pickupLocation = pickupLocationMapper.toDto(getPickupLocation(request)),
             pickupDateTime = request.pickupDateTime,
-            deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, it) },
-            deliveryCompanyBranch = request.deliveryCompanyBranchId?.let { entityManager.getReference(PickupLocationDto.PickupProjectLocationDto::class.java, it.toString()) },
-            deliveryLocation = deliveryLocation,
+            deliveryLocation = pickupLocationMapper.toDto(getDeliveryLocation(request)),
             deliveryDateTime = request.deliveryDateTime,
             truck = request.truckId?.let { entityManager.getReference(Truck::class.java, it) },
             driver = request.driverId?.let { entityManager.getReference(ProfileDto::class.java, it) },
@@ -211,20 +183,6 @@ class TransportService(
             ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 
-    private fun findOrCreateLocation(address: AddressRequest): LocationDto {
-        return locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(address.postalCode, address.buildingNumber)
-            ?: LocationDto(
-                address = AddressDto(
-                    streetName = address.streetName,
-                    buildingNumber = address.buildingNumber,
-                    postalCode = address.postalCode,
-                    city = address.city,
-                    country = address.country
-                ),
-                id = UUID.randomUUID().toString()
-            ).let { locationRepository.save(it) }
-    }
-
     private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
         validateBranchCompanyRelationships(request.pickupCompanyBranchId, request.pickupCompanyId, request.deliveryCompanyBranchId, request.deliveryCompanyId)
         val transport = transportRepository.findById(id)
@@ -234,40 +192,13 @@ class TransportService(
             throw IllegalStateException("Transport is gereed gemeld en kan niet meer worden aangepast.")
         }
 
-        val pickupLocation = findOrCreateLocation(
-            AddressRequest(
-                streetName = request.pickupStreet,
-                buildingNumber = request.pickupBuildingNumber,
-                postalCode = request.pickupPostalCode,
-                city = request.pickupCity
-            )
-        )
-
-        val deliveryLocation = if (isDeliveryAndPickupSameLocation(request)
-        ) {
-            pickupLocation
-        } else {
-            findOrCreateLocation(
-                AddressRequest(
-                    streetName = request.deliveryStreet,
-                    buildingNumber = request.deliveryBuildingNumber,
-                    postalCode = request.deliveryPostalCode,
-                    city = request.deliveryCity
-                )
-            )
-        }
-
-        val updatedTransport = transport.copy(
+      val updatedTransport = transport.copy(
             consignorParty = entityManager.getReference(CompanyDto::class.java, request.consignorPartyId),
             carrierParty = entityManager.getReference(CompanyDto::class.java, request.carrierPartyId),
-            pickupCompany = request.pickupCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.pickupCompanyId)},
-            pickupCompanyBranch = request.pickupCompanyBranchId?.let { entityManager.getReference(PickupLocationDto.PickupProjectLocationDto::class.java, request.pickupCompanyBranchId.toString())},
-            pickupLocation = pickupLocation,
+            pickupLocation = pickupLocationMapper.toDto(getPickupLocation(request)),
             pickupDateTime = request.pickupDateTime,
-            deliveryLocation = deliveryLocation,
+            deliveryLocation = pickupLocationMapper.toDto(getDeliveryLocation(request)),
             deliveryDateTime = request.deliveryDateTime,
-            deliveryCompany = request.deliveryCompanyId?.let { entityManager.getReference(CompanyDto::class.java, request.deliveryCompanyId) },
-            deliveryCompanyBranch = request.deliveryCompanyBranchId?.let { entityManager.getReference(PickupLocationDto.PickupProjectLocationDto::class.java, request.deliveryCompanyBranchId.toString()) },
             wasteContainer = request.containerId?.let { entityManager.getReference(WasteContainerDto::class.java, it) },
             transportType = request.transportType,
             truck = if (request.truckId?.isNotEmpty() ?: false) entityManager.getReference(Truck::class.java, request.truckId) else null,
@@ -279,7 +210,30 @@ class TransportService(
         return updatedTransport
     }
 
-    private fun isDeliveryAndPickupSameLocation(request: CreateContainerTransportRequest): Boolean =
+  private fun getPickupLocation(request: CreateContainerTransportRequest): Location = LocationFactory.create(
+    companyId = request.pickupCompanyId?.let { CompanyId(it) },
+    streetName = request.pickupStreet,
+    buildingNumber = request.pickupBuildingNumber,
+    buildingNumberAddition = request.pickupBuildingNumberAddition,
+    postalCode = request.pickupPostalCode,
+    description = request.pickupDescription,
+    city = request.pickupCity
+  )
+
+  private fun getDeliveryLocation(request: CreateContainerTransportRequest): Location {
+    val deliveryLocation = LocationFactory.create(
+      companyId = request.deliveryCompanyId?.let { CompanyId(it) },
+      streetName = request.deliveryStreet,
+      buildingNumber = request.deliveryBuildingNumber,
+      buildingNumberAddition = request.deliveryBuildingNumberAddition,
+      postalCode = request.deliveryPostalCode,
+      description = request.deliveryDescription,
+      city = request.deliveryCity
+    )
+    return deliveryLocation
+  }
+
+  private fun isDeliveryAndPickupSameLocation(request: CreateContainerTransportRequest): Boolean =
         request.pickupPostalCode == request.deliveryPostalCode && request.pickupBuildingNumber == request.deliveryBuildingNumber
 
     fun markTransportAsFinished(id: UUID, transportHours: Double): TransportDto {

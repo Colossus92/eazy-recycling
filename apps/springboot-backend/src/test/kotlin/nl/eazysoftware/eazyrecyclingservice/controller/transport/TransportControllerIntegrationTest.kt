@@ -7,7 +7,6 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransp
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
@@ -56,9 +55,6 @@ class TransportControllerIntegrationTest {
 
   @Autowired
   private lateinit var companyRepository: CompanyRepository
-
-  @Autowired
-  private lateinit var locationRepository: LocationRepository
 
   @Autowired
   private lateinit var entityManager: EntityManager
@@ -114,7 +110,6 @@ class TransportControllerIntegrationTest {
         country = "Location Country"
       )
     )
-    locationRepository.save(testLocation)
 
     // Create test truck
     testTruck = Truck(

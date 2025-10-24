@@ -41,7 +41,7 @@ class PickupLocationMapper(
       )
 
       is PickupLocationDto.PickupCompanyDto -> Company(
-        companyId = CompanyId(dto.companyId)
+        companyId = CompanyId(dto.company.id!!)
       )
 
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
@@ -54,7 +54,7 @@ class PickupLocationMapper(
           city = dto.city,
           country = dto.country,
         ),
-        companyId = CompanyId(dto.companyId)
+        companyId = CompanyId(dto.company.id!!)
       )
 
       is PickupLocationDto.NoPickupLocationDto -> NoLocation
@@ -73,10 +73,13 @@ class PickupLocationMapper(
     }
   }
 
-  private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto =
-    PickupLocationDto.PickupProjectLocationDto(
+  private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
+    val company = companyRepository.findByIdOrNull(location.companyId.uuid)
+      ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
+
+    return PickupLocationDto.PickupProjectLocationDto(
       id = location.id.toString(),
-      companyId = location.companyId.uuid,
+      company = company,
       streetName = location.streetName(),
       buildingNumber = location.buildingNumber(),
       buildingNumberAddition = location.buildingNumberAddition(),
@@ -84,6 +87,7 @@ class PickupLocationMapper(
       city = location.city(),
       country = location.country()
     )
+  }
 
 
   private fun createProximity(
@@ -121,7 +125,8 @@ class PickupLocationMapper(
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")
 
     return pickupLocationRepository.findCompanyByCompanyId(company.id) ?: run {
-      pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(companyId = domain.companyId.uuid))
+      pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(company = company))
     }
   }
+
 }

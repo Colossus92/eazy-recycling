@@ -1,11 +1,15 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROJECT_LOCATION
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.util.*
 
 @Entity
@@ -58,8 +62,9 @@ class PickupLocationDto(
   @Entity
   @DiscriminatorValue(COMPANY)
   class PickupCompanyDto(
-    @Column(name = "company_id")
-    var companyId: UUID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    var company: CompanyDto
   ) : PickupLocationDto()
 
 
@@ -68,8 +73,9 @@ class PickupLocationDto(
   class PickupProjectLocationDto(
     id: String,
 
-    @Column(name = "company_id")
-    var companyId: UUID,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    var company: CompanyDto,
 
     @Column(name = "street_name")
     var streetName: String,
@@ -92,9 +98,48 @@ class PickupLocationDto(
 }
 
 object PickupLocationType {
-    const val DUTCH_ADDRESS: String = "DUTCH_ADDRESS"
-    const val PROXIMITY_DESC: String = "PROXIMITY_DESC"
-    const val NO_PICKUP: String = "NO_PICKUP"
-    const val COMPANY: String = "COMPANY"
-    const val PROJECT_LOCATION: String = "PROJECT_LOCATION"
+  const val DUTCH_ADDRESS: String = "DUTCH_ADDRESS"
+  const val PROXIMITY_DESC: String = "PROXIMITY_DESC"
+  const val NO_PICKUP: String = "NO_PICKUP"
+  const val COMPANY: String = "COMPANY"
+  const val PROJECT_LOCATION: String = "PROJECT_LOCATION"
+}
+
+
+fun PickupLocationDto.toPickupLocationView(): PickupLocationView {
+  return when (this) {
+    is PickupLocationDto.DutchAddressDto -> PickupLocationView.DutchAddressView(
+      streetName = streetName,
+      buildingNumber = buildingNumber,
+      buildingNumberAddition = buildingNumberAddition,
+      postalCode = postalCode,
+      city = city,
+      country = country,
+    )
+
+    is PickupLocationDto.ProximityDescriptionDto -> PickupLocationView.ProximityDescriptionView(
+      postalCodeDigits = postalCode,
+      city = city,
+      description = description,
+      country = country,
+    )
+
+    is PickupLocationDto.NoPickupLocationDto -> PickupLocationView.NoPickupView()
+
+    is PickupLocationDto.PickupCompanyDto -> PickupLocationView.PickupCompanyView(
+      company = CompanyViewMapper.map(company)
+    )
+
+    is PickupLocationDto.PickupProjectLocationDto -> PickupLocationView.ProjectLocationView(
+      company = CompanyViewMapper.map(company),
+      streetName = streetName,
+      buildingNumber = buildingNumber,
+      buildingNumberAddition = buildingNumberAddition,
+      postalCode = postalCode,
+      city = city,
+      country = country
+    )
+
+    else -> throw IllegalStateException("Ongeldig ophaallocatie type; ${this::class.simpleName}")
+  }
 }
