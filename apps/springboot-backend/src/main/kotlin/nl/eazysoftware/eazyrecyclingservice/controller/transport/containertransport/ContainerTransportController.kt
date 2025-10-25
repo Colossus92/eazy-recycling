@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -47,22 +48,24 @@ fun CreateContainerTransportRequest.toCommand(): CreateContainerTransportCommand
   return CreateContainerTransportCommand(
     consignorParty = CompanyId(this.consignorPartyId),
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupLocation = Location.DutchAddress(
-      address = Address(
-        streetName = this.pickupStreet,
-        postalCode = DutchPostalCode(this.pickupPostalCode),
-        buildingNumber = this.pickupBuildingNumber,
-        city = this.pickupCity
-      )
+    pickupLocation = LocationFactory.create(
+      companyId = this.pickupCompanyId?.let { CompanyId(it) },
+      streetName = this.pickupStreet,
+      buildingNumber = this.pickupBuildingNumber,
+      buildingNumberAddition = this.pickupBuildingNumberAddition,
+      postalCode = this.pickupPostalCode,
+      description = this.pickupCity,
+      city = this.pickupDescription,
     ),
     pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-    deliveryLocation = Location.DutchAddress(
-      address = Address(
-        streetName = this.deliveryStreet,
-        postalCode = DutchPostalCode(this.deliveryPostalCode),
-        buildingNumber = this.deliveryBuildingNumber,
-        city = this.deliveryCity
-      )
+    deliveryLocation = LocationFactory.create(
+      companyId = this.deliveryCompanyId?.let { CompanyId(it) },
+      streetName = this.deliveryStreet,
+      buildingNumber = this.deliveryBuildingNumber,
+      buildingNumberAddition = this.deliveryBuildingNumberAddition,
+      postalCode = this.deliveryPostalCode,
+      description = this.deliveryDescription,
+      city = this.deliveryCity,
     ),
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
       ?: kotlinx.datetime.Clock.System.now(),
