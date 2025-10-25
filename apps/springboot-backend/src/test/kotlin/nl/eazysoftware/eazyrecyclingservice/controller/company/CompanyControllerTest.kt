@@ -29,7 +29,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val companyRepository: CompanyRepository,
-  val companyBranchRepository: ProjectLocationJpaRepository,
+  val projectLocationRepository: ProjectLocationJpaRepository,
 ) {
   private lateinit var securedMockMvc: SecuredMockMvc
   private lateinit var testCompany: CompanyDto
@@ -59,7 +59,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create test branches
     val branch1 = PickupLocationDto.PickupProjectLocationDto(
       id = UUID.randomUUID().toString(),
-      companyId = testCompany.id!!,
+      company = testCompany,
       streetName = "Branch Street",
       buildingNumber = "42",
       buildingNumberAddition = null,
@@ -70,7 +70,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     val branch2 = PickupLocationDto.PickupProjectLocationDto(
       id = UUID.randomUUID().toString(),
-      companyId = testCompany.id!!,
+      company = testCompany,
       streetName = "Another Street",
       buildingNumber = "99",
       buildingNumberAddition = null,
@@ -80,8 +80,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     testBranches = listOf(
-      companyBranchRepository.save(branch1),
-      companyBranchRepository.save(branch2)
+      projectLocationRepository.save(branch1),
+      projectLocationRepository.save(branch2)
     )
   }
 
@@ -189,10 +189,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       )
     )
 
-    val secondCompanyBranch = companyBranchRepository.save(
+    val secondCompanyBranch = projectLocationRepository.save(
       PickupLocationDto.PickupProjectLocationDto(
         id = UUID.randomUUID().toString(),
-        companyId = secondCompany.id!!,
+        company = secondCompany,
         streetName = "Second Branch St",
         buildingNumber = "22",
         buildingNumberAddition = null,

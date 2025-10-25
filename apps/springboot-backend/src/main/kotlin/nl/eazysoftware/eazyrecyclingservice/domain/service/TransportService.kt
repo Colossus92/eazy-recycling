@@ -68,9 +68,9 @@ class TransportService(
 
     private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
         validateBranchCompanyRelationships(
-            pickupBranchId = request.pickupCompanyBranchId,
+            pickupBranchId = request.pickupProjectLocationId,
             pickupCompanyId = request.pickupCompanyId,
-            deliveryBranchId = request.deliveryCompanyBranchId,
+            deliveryBranchId = request.deliveryProjectLocationId,
             deliveryCompanyId = request.deliveryCompanyId
         )
       // Create and return the transport
@@ -184,7 +184,7 @@ class TransportService(
     }
 
     private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
-        validateBranchCompanyRelationships(request.pickupCompanyBranchId, request.pickupCompanyId, request.deliveryCompanyBranchId, request.deliveryCompanyId)
+        validateBranchCompanyRelationships(request.pickupProjectLocationId, request.pickupCompanyId, request.deliveryProjectLocationId, request.deliveryCompanyId)
         val transport = transportRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Transport met id $id is niet gevonden") }
 

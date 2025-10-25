@@ -1,13 +1,16 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
+import jakarta.persistence.EntityNotFoundException
 import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -23,9 +26,23 @@ interface CreateContainerTransport {
 data class CreateContainerTransportCommand(
   val consignorParty: CompanyId,
   val carrierParty: CompanyId,
-  val pickupLocation: Location,
+  val pickupCompanyId: CompanyId? = null,
+  val pickupProjectLocationId: UUID? = null,
+  val pickupStreetName: String?,
+  val pickupBuildingNumber: String?,
+  val pickupBuildingNumberAddition: String? = null,
+  val pickupPostalCode: String?,
+  val pickupCity: String?,
+  val pickupDescription: String? = null,
   val pickupDateTime: Instant,
-  val deliveryLocation: Location,
+  val deliveryCompanyId: CompanyId?,
+  val deliveryProjectLocationId: UUID? = null,
+  val deliveryStreetName: String,
+  val deliveryBuildingNumber: String,
+  val deliveryBuildingNumberAddition: String? = null,
+  val deliveryPostalCode: String,
+  val deliveryCity: String,
+  val deliveryDescription: String? = null,
   val deliveryDateTime: Instant,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
@@ -40,7 +57,8 @@ data class CreateContainerTransportResult(
 
 @Service
 class CreateContainerTransportService(
-  private val containerTransports: ContainerTransports
+  private val containerTransports: ContainerTransports,
+  private val locations: ProjectLocations
 ) : CreateContainerTransport {
 
   @Transactional
@@ -48,9 +66,9 @@ class CreateContainerTransportService(
     val containerTransport = ContainerTransport(
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
-      pickupLocation = cmd.pickupLocation,
+      pickupLocation = createPickupLocation(cmd),
       pickupDateTime = cmd.pickupDateTime,
-      deliveryLocation = cmd.deliveryLocation,
+      deliveryLocation = createDeliveryLocation(cmd),
       deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
@@ -66,6 +84,60 @@ class CreateContainerTransportService(
 
     return CreateContainerTransportResult(
       transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save")
+    )
+  }
+
+  private fun createDeliveryLocation(cmd: CreateContainerTransportCommand): Location = createLocation(
+    cmd.deliveryProjectLocationId,
+    cmd.deliveryCompanyId,
+    cmd.deliveryStreetName,
+    cmd.deliveryBuildingNumber,
+    cmd.deliveryBuildingNumberAddition,
+    cmd.deliveryPostalCode,
+    cmd.deliveryCity,
+    cmd.deliveryDescription
+  )
+
+  private fun createPickupLocation(cmd: CreateContainerTransportCommand): Location = createLocation(
+    cmd.pickupProjectLocationId,
+    cmd.pickupCompanyId,
+    cmd.pickupStreetName,
+    cmd.pickupBuildingNumber,
+    cmd.pickupBuildingNumberAddition,
+    cmd.pickupPostalCode,
+    cmd.pickupCity,
+    cmd.pickupDescription
+  )
+
+  private fun createLocation(
+    projectLocationId: UUID? = null,
+    companyId: CompanyId?,
+    streetName: String?,
+    buildingNumber: String?,
+    buildingNumberAddition: String? = null,
+    postalCode: String?,
+    city: String?,
+    description: String? = null,
+  ): Location {
+    if (projectLocationId != null) {
+      val existingLocation = locations.findById(projectLocationId)
+        ?: throw EntityNotFoundException("Geen projectlocatie gevonden voor id ${projectLocationId}")
+
+      require(existingLocation.companyId == companyId) {
+        "Projectlocatie met id ${projectLocationId} is niet van bedrijf met id ${companyId?.uuid}"
+      }
+
+      return existingLocation
+    }
+
+    return LocationFactory.create(
+      companyId = companyId,
+      streetName = streetName,
+      buildingNumber = buildingNumber,
+      buildingNumberAddition = buildingNumberAddition,
+      postalCode = postalCode,
+      description = description,
+      city = city
     )
   }
 }

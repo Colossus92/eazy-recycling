@@ -1,12 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.test.helpers
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDateTime
 import java.util.*
 
@@ -21,10 +21,8 @@ object TransportDtoHelper {
             displayNumber = "T-001",
             consignorParty = company,
             carrierParty = company,
-            pickupCompany = company,
             pickupLocation = pickupLocation,
             pickupDateTime = pickupDateTime,
-            deliveryCompany = company,
             deliveryLocation = deliveryLocation,
             deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
             transportType = TransportType.WASTE,
@@ -46,35 +44,37 @@ object TransportDtoHelper {
         lastName = "Smith",
     )
 
-    val address1 = AddressDto(
+    val company = CompanyDto(
+        id = UUID.randomUUID(),
+        name = "Test Company",
+      address = AddressDto(
         streetName = "Main Street",
         buildingNumber = "10",
         postalCode = "1234 AB",
         city = "Amsterdam",
         country = "Netherlands"
+      )
     )
 
-    val address2 = AddressDto(
+    val pickupLocation = PickupLocationDto.PickupProjectLocationDto(
+        id = UUID.randomUUID().toString(),
+        company = company,
+        streetName = "Main Street",
+        buildingNumber = "10",
+        buildingNumberAddition = null,
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Netherlands"
+    )
+
+    val deliveryLocation = PickupLocationDto.PickupProjectLocationDto(
+        id = UUID.randomUUID().toString(),
+        company = company,
         streetName = "Second Street",
+        buildingNumberAddition = null,
         buildingNumber = "20",
         postalCode = "5678 CD",
         city = "Rotterdam",
         country = "Netherlands"
-    )
-
-    val company = CompanyDto(
-        id = UUID.randomUUID(),
-        name = "Test Company",
-        address = address1
-    )
-
-    val pickupLocation = LocationDto(
-        id = UUID.randomUUID().toString(),
-        address = address1
-    )
-
-    val deliveryLocation = LocationDto(
-        id = UUID.randomUUID().toString(),
-        address = address2
     )
 }

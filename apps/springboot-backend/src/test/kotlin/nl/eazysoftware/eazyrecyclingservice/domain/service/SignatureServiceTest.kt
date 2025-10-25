@@ -126,8 +126,6 @@ class SignatureServiceTest {
             deliveryLocation = mock(),
             deliveryDateTime = LocalDateTime.now(),
             note = "",
-            pickupCompany = mock(),
-            deliveryCompany = mock(),
             driver = mock(),
             sequenceNumber = 1
         )
