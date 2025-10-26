@@ -134,9 +134,6 @@ class TransportControllerSecurityTest {
     @MockitoBean
     private lateinit var containerTransports: ContainerTransports
 
-    @MockitoBean
-    private lateinit var companyRepository: CompanyRepository
-
     // Use the companion object constants instead of local variables
     private val testTransportId = TEST_TRANSPORT_ID
     private val testDriverId = TEST_DRIVER_ID
