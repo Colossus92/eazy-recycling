@@ -74,6 +74,7 @@ class CompanyController(
         Address(
           streetName = projectLocation.streetName,
           buildingNumber = projectLocation.buildingNumber,
+          buildingNumberAddition = projectLocation.buildingNumberAddition,
           postalCode = DutchPostalCode(projectLocation.postalCode),
           city = projectLocation.city,
           country = projectLocation.country
@@ -106,6 +107,7 @@ class CompanyController(
         address = Address(
           streetName = branch.streetName,
           buildingNumber = branch.buildingNumber,
+          buildingNumberAddition = branch.buildingNumberAddition,
           postalCode = DutchPostalCode(branch.postalCode),
           city = branch.city,
           country = branch.country

@@ -74,12 +74,6 @@ class PickupLocationMapper(
   }
 
   private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    // Try to find existing project location by ID
-    val existingLocation = pickupLocationRepository.findByIdOrNull(location.id.toString())
-    if (existingLocation is PickupLocationDto.PickupProjectLocationDto) {
-      return existingLocation
-    }
-
     // If not found, create and save new project location
     val company = companyRepository.findByIdOrNull(location.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
@@ -94,7 +88,7 @@ class PickupLocationMapper(
       city = location.city(),
       country = location.country()
     )
-    
+
     return pickupLocationRepository.save(newLocation)
   }
 

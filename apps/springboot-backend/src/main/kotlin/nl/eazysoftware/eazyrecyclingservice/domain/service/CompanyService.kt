@@ -26,7 +26,7 @@ class CompanyService(
       vihbId = company.vihbId,
       address = AddressDto(
         streetName = company.address.streetName,
-        buildingName = company.address.buildingName,
+        buildingName = company.address.buildingNumberAddition,
         buildingNumber = company.address.buildingNumber,
         postalCode = company.address.postalCode,
         city = company.address.city,
