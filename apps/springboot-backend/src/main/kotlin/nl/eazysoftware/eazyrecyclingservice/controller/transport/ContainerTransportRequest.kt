@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import java.time.LocalDateTime
 import java.util.*
 
-open class CreateContainerTransportRequest(
+open class ContainerTransportRequest(
   open val consignorPartyId: UUID,
   open val pickupDateTime: LocalDateTime,
   open val deliveryDateTime: LocalDateTime?,

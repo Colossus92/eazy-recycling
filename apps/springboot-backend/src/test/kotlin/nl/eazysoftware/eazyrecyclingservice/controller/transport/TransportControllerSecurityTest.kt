@@ -1,9 +1,17 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateContainerTransport
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateContainerTransportResult
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransport
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransportResult
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
@@ -54,7 +62,7 @@ class TransportControllerSecurityTest {
                 Arguments.of("/transport", "GET", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport", "GET", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
-                // POST container transport - admin and planner can access
+                // POST container transport - admin and planner can access (returns 201 CREATED)
                 Arguments.of("/transport/container", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/container", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/container", "POST", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
@@ -118,6 +126,15 @@ class TransportControllerSecurityTest {
     private lateinit var transportService: TransportService
 
     @MockitoBean
+    private lateinit var createContainerTransport: CreateContainerTransport
+
+    @MockitoBean
+    private lateinit var updateContainerTransport: UpdateContainerTransport
+
+    @MockitoBean
+    private lateinit var containerTransports: ContainerTransports
+
+    @MockitoBean
     private lateinit var companyRepository: CompanyRepository
 
     // Use the companion object constants instead of local variables
@@ -169,9 +186,6 @@ class TransportControllerSecurityTest {
 
         // Mock the service calls
         whenever(transportService.getTransportById(testTransportId)).thenReturn(transportWithTestDriver)
-        whenever(transportService.updateContainerTransport(eq(testTransportId), any())).thenReturn(
-            transportWithTestDriver
-        )
         whenever(transportService.updateWasteTransport(eq(testTransportId), any())).thenReturn(transportWithTestDriver)
         whenever(transportService.getTransportById(transportWithOtherDriver.id!!)).thenReturn(transportWithOtherDriver)
         whenever(transportService.getAllTransports()).thenReturn(
@@ -180,10 +194,56 @@ class TransportControllerSecurityTest {
                 transportWithOtherDriver
             )
         )
-        whenever(companyRepository.findById(consignor.id!!)).thenReturn(Optional.of(consignor))
-        whenever(companyRepository.findById(carrier.id!!)).thenReturn(Optional.of(carrier))
-        whenever(companyRepository.findById(pickupCompany.id!!)).thenReturn(Optional.of(pickupCompany))
-        whenever(companyRepository.findById(deliveryCompany.id!!)).thenReturn(Optional.of(deliveryCompany))
+
+        // Mock container transport create use case
+        whenever(createContainerTransport.handle(any())).thenReturn(
+            CreateContainerTransportResult(
+                transportId = TransportId(testTransportId)
+            )
+        )
+
+        // Mock container transport update use case
+        whenever(updateContainerTransport.handle(any())).thenReturn(
+            UpdateContainerTransportResult(
+                transportId = TransportId(testTransportId),
+                status = "PLANNED"
+            )
+        )
+
+        // Mock container transports repository for authorization check
+        val mockContainerTransport = ContainerTransport(
+            transportId = TransportId(testTransportId),
+            displayNumber = null,
+            consignorParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(consignor.id!!),
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            pickupLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
+                address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
+                    streetName = "Test Street",
+                    postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
+                    buildingNumber = "1",
+                    city = "Test City"
+                )
+            ),
+            pickupDateTime = kotlinx.datetime.Clock.System.now(),
+            deliveryLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
+                address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
+                    streetName = "Test Street",
+                    postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
+                    buildingNumber = "1",
+                    city = "Test City"
+                )
+            ),
+            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            transportType = TransportType.CONTAINER,
+            wasteContainer = null,
+            truck = null,
+            driver = UserId(testDriverId),
+            note = nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note("Test note"),
+            transportHours = null,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            sequenceNumber = 1
+        )
+        whenever(containerTransports.findById(TransportId(testTransportId))).thenReturn(mockContainerTransport)
     }
 
     // Helper method to create mock objects
@@ -211,7 +271,7 @@ class TransportControllerSecurityTest {
     )
 
     private fun createContainerTransportRequestJson(): String {
-        val request = CreateContainerTransportRequest(
+        val request = ContainerTransportRequest(
             consignorPartyId = consignor.id!!,
             pickupDateTime = LocalDateTime.now(),
             deliveryDateTime = LocalDateTime.now().plusDays(1),

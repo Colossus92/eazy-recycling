@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.CreateWasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
@@ -66,7 +66,7 @@ class TransportService(
         return wasteTransport
     }
 
-    private fun createContainerTransport(request: CreateContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
+    private fun createContainerTransport(request: ContainerTransportRequest, goods: GoodsDto? = null): TransportDto {
         validateBranchCompanyRelationships(
             pickupBranchId = request.pickupProjectLocationId,
             pickupCompanyId = request.pickupCompanyId,
@@ -126,9 +126,6 @@ class TransportService(
         }
     }
 
-    fun updateContainerTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
-        return transportRepository.save(getUpdatedTransport(id, request))
-    }
 
     @Transactional
     fun updateWasteTransport(id: UUID, request: CreateWasteTransportRequest): TransportDto {
@@ -183,7 +180,7 @@ class TransportService(
             ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 
-    private fun getUpdatedTransport(id: UUID, request: CreateContainerTransportRequest): TransportDto {
+    private fun getUpdatedTransport(id: UUID, request: ContainerTransportRequest): TransportDto {
         validateBranchCompanyRelationships(request.pickupProjectLocationId, request.pickupCompanyId, request.deliveryProjectLocationId, request.deliveryCompanyId)
         val transport = transportRepository.findById(id)
         .orElseThrow { EntityNotFoundException("Transport met id $id is niet gevonden") }
@@ -210,7 +207,7 @@ class TransportService(
         return updatedTransport
     }
 
-  private fun getPickupLocation(request: CreateContainerTransportRequest): Location = LocationFactory.create(
+  private fun getPickupLocation(request: ContainerTransportRequest): Location = LocationFactory.create(
     companyId = request.pickupCompanyId?.let { CompanyId(it) },
     streetName = request.pickupStreet,
     buildingNumber = request.pickupBuildingNumber,
@@ -220,7 +217,7 @@ class TransportService(
     city = request.pickupCity
   )
 
-  private fun getDeliveryLocation(request: CreateContainerTransportRequest): Location {
+  private fun getDeliveryLocation(request: ContainerTransportRequest): Location {
     val deliveryLocation = LocationFactory.create(
       companyId = request.deliveryCompanyId?.let { CompanyId(it) },
       streetName = request.deliveryStreet,
@@ -233,7 +230,7 @@ class TransportService(
     return deliveryLocation
   }
 
-  private fun isDeliveryAndPickupSameLocation(request: CreateContainerTransportRequest): Boolean =
+  private fun isDeliveryAndPickupSameLocation(request: ContainerTransportRequest): Boolean =
         request.pickupPostalCode == request.deliveryPostalCode && request.pickupBuildingNumber == request.deliveryBuildingNumber
 
     fun markTransportAsFinished(id: UUID, transportHours: Double): TransportDto {

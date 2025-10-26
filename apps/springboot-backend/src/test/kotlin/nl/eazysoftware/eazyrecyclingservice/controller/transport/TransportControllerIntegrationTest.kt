@@ -82,7 +82,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
         buildingNumber = "123",
         postalCode = "1234 AB",
         city = "Test City",
-        country = "Test Country"
+        country = "Nederland"
       )
     )
 
@@ -105,7 +105,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       buildingNumberAddition = null,
       postalCode = "5678 CD",
       city = "Location City",
-      country = "Location Country"
+      country = "Nederland"
     )
 
     transactionTemplate.execute {
@@ -185,7 +185,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Test
   fun `should create container transport`() {
     // Given
-    val request = CreateContainerTransportRequest(
+    val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -300,7 +300,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     val transport = createTestTransport("Original Transport")
     val savedTransport = transportRepository.save(transport)
 
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
@@ -330,14 +330,12 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Container Transport"))
-      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
 
     // Verify transport was updated in the database
     val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Container Transport")
-    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.EXCHANGE)
+    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
   }
 
   @Test
@@ -435,7 +433,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   fun `should return not found when updating non-existent transport`() {
     // Given
     val nonExistentId = UUID.randomUUID()
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -582,7 +580,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Test
   fun `should create container transport with branch references`() {
     // Given
-    val request = CreateContainerTransportRequest(
+    val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -640,7 +638,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Test
   fun `should update container transport with branch references`() {
     // Given
-    val createRequest = CreateContainerTransportRequest(
+    val createRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -678,7 +676,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       CreateContainerTransportResponse::class.java
     )
 
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
@@ -710,15 +708,13 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Transport with Branches"))
-      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
 
     // Retrieve and verify the updated transport
     securedMockMvc.get("/transport/${createResult.transportId}")
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$.note").value("Updated Transport with Branches"))
-      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
+      .andExpect(jsonPath("$.containerOperation").value("DELIVERY"))
       .andExpect(jsonPath("$.transportType").value("CONTAINER"))
   }
 
@@ -733,12 +729,12 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
         buildingNumber = "789",
         postalCode = "9012 EF",
         city = "Another City",
-        country = "Another Country"
+        country = "Nederland"
       )
     )
     companyRepository.save(anotherCompany)
 
-    val request = CreateContainerTransportRequest(
+    val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),

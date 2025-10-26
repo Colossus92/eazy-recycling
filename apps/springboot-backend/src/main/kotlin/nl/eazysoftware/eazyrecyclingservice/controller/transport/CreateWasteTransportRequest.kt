@@ -59,7 +59,7 @@ data class CreateWasteTransportRequest(
   val euralCode: String,
   @NotBlank
   val processingMethodCode: String,
-) : CreateContainerTransportRequest(
+) : ContainerTransportRequest(
   // Waste transport is also a container transport
   consignorPartyId = consignorPartyId,
   pickupDateTime = pickupDateTime,
