@@ -79,7 +79,7 @@ class WasteContainerService(
 
     private fun toAddressDto(address: AddressRequest): AddressDto = AddressDto(
         streetName = address.streetName,
-        buildingName = address.buildingName,
+        buildingName = address.buildingNumberAddition,
         buildingNumber = address.buildingNumber,
         postalCode = address.postalCode,
         city = address.city,

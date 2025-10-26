@@ -5,12 +5,13 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -54,8 +55,8 @@ class TransportControllerSecurityTest {
                 Arguments.of("/transport", "GET", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
                 // POST container transport - admin and planner can access
-                Arguments.of("/transport/container", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 200),
-                Arguments.of("/transport/container", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 200),
+                Arguments.of("/transport/container", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 201),
+                Arguments.of("/transport/container", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/container", "POST", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport/container", "POST", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
@@ -116,6 +117,9 @@ class TransportControllerSecurityTest {
     @MockitoBean
     private lateinit var transportService: TransportService
 
+    @MockitoBean
+    private lateinit var companyRepository: CompanyRepository
+
     // Use the companion object constants instead of local variables
     private val testTransportId = TEST_TRANSPORT_ID
     private val testDriverId = TEST_DRIVER_ID
@@ -123,6 +127,11 @@ class TransportControllerSecurityTest {
 
     private lateinit var transportWithTestDriver: TransportDto
     private lateinit var transportWithOtherDriver: TransportDto
+
+    private var consignor: CompanyDto = mockCompanyDto()
+    private var carrier: CompanyDto = mockCompanyDto()
+    private var deliveryCompany: CompanyDto = mockCompanyDto()
+    private var pickupCompany: CompanyDto = mockCompanyDto()
 
     @BeforeEach
     fun setup() {
@@ -135,16 +144,14 @@ class TransportControllerSecurityTest {
                 lastName = "Driver",
                 roles = listOf(UserRoleDto(id = 1, userId = testDriverId, role = Roles.CHAUFFEUR))
             ),
-            consignorParty = mockCompanyDto(),
-            carrierParty = mockCompanyDto(),
+            consignorParty = consignor,
+            carrierParty = carrier,
             pickupLocation = mockLocationDto(),
             deliveryLocation = mockLocationDto(),
             pickupDateTime = LocalDateTime.now(),
             deliveryDateTime = LocalDateTime.now().plusDays(1),
             transportType = TransportType.CONTAINER,
             note = "Test transport",
-            pickupCompany = mockCompanyDto(),
-            deliveryCompany = mockCompanyDto(),
             containerOperation = ContainerOperation.DELIVERY,
             sequenceNumber = 1,
         )
@@ -173,6 +180,10 @@ class TransportControllerSecurityTest {
                 transportWithOtherDriver
             )
         )
+        whenever(companyRepository.findById(consignor.id!!)).thenReturn(Optional.of(consignor))
+        whenever(companyRepository.findById(carrier.id!!)).thenReturn(Optional.of(carrier))
+        whenever(companyRepository.findById(pickupCompany.id!!)).thenReturn(Optional.of(pickupCompany))
+        whenever(companyRepository.findById(deliveryCompany.id!!)).thenReturn(Optional.of(deliveryCompany))
     }
 
     // Helper method to create mock objects
@@ -188,32 +199,32 @@ class TransportControllerSecurityTest {
         )
     )
 
-    private fun mockLocationDto() = LocationDto(
-        id = UUID.randomUUID().toString(),
-        address = AddressDto(
+    private fun mockLocationDto() = PickupLocationDto.PickupProjectLocationDto(
+            id = UUID.randomUUID().toString(),
+            company = mockCompanyDto(),
             streetName = "Test Street",
             buildingNumber = "1",
+            buildingNumberAddition = null,
             postalCode = "1234 AB",
             city = "Test City",
             country = "Test Country"
-        )
     )
 
     private fun createContainerTransportRequestJson(): String {
         val request = CreateContainerTransportRequest(
-            consignorPartyId = UUID.randomUUID(),
+            consignorPartyId = consignor.id!!,
             pickupDateTime = LocalDateTime.now(),
             deliveryDateTime = LocalDateTime.now().plusDays(1),
             transportType = TransportType.CONTAINER,
             containerOperation = ContainerOperation.DELIVERY,
             driverId = testDriverId,
-            carrierPartyId = UUID.randomUUID(),
-            pickupCompanyId = UUID.randomUUID(),
+            carrierPartyId = carrier.id!!,
+            pickupCompanyId = pickupCompany.id!!,
             pickupStreet = "Pickup Street",
             pickupBuildingNumber = "1",
             pickupPostalCode = "1234 AB",
             pickupCity = "Pickup City",
-            deliveryCompanyId = UUID.randomUUID(),
+            deliveryCompanyId = deliveryCompany.id!!,
             deliveryStreet = "Delivery Street",
             deliveryBuildingNumber = "2",
             deliveryPostalCode = "5678 CD",

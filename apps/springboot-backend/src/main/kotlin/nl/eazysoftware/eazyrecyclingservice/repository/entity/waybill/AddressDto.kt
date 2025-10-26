@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable
 @Embeddable
 data class AddressDto(
     var streetName: String?,
+    // TODO rename to buildingnumberaddition
     var buildingName: String? = null,
     var buildingNumber: String,
     var city: String?,

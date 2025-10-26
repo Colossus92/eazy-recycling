@@ -29,7 +29,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
   val companyRepository: CompanyRepository,
-  val companyBranchRepository: ProjectLocationJpaRepository,
+  val projectLocationRepository: ProjectLocationJpaRepository,
 ) {
   private lateinit var securedMockMvc: SecuredMockMvc
   private lateinit var testCompany: CompanyDto
@@ -59,7 +59,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create test branches
     val branch1 = PickupLocationDto.PickupProjectLocationDto(
       id = UUID.randomUUID().toString(),
-      companyId = testCompany.id!!,
+      company = testCompany,
       streetName = "Branch Street",
       buildingNumber = "42",
       buildingNumberAddition = null,
@@ -70,7 +70,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     val branch2 = PickupLocationDto.PickupProjectLocationDto(
       id = UUID.randomUUID().toString(),
-      companyId = testCompany.id!!,
+      company = testCompany,
       streetName = "Another Street",
       buildingNumber = "99",
       buildingNumberAddition = null,
@@ -80,8 +80,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     testBranches = listOf(
-      companyBranchRepository.save(branch1),
-      companyBranchRepository.save(branch2)
+      projectLocationRepository.save(branch1),
+      projectLocationRepository.save(branch2)
     )
   }
 
@@ -95,7 +95,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     name = name,
     address = AddressRequest(
       streetName = "Main St",
-      buildingName = "HQ",
+      buildingNumberAddition = "HQ",
       buildingNumber = "1",
       postalCode = "1234 AB",
       city = "Amsterdam",
@@ -189,10 +189,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       )
     )
 
-    val secondCompanyBranch = companyBranchRepository.save(
+    val secondCompanyBranch = projectLocationRepository.save(
       PickupLocationDto.PickupProjectLocationDto(
         id = UUID.randomUUID().toString(),
-        companyId = secondCompany.id!!,
+        company = secondCompany,
         streetName = "Second Branch St",
         buildingNumber = "22",
         buildingNumberAddition = null,
@@ -274,7 +274,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       name = req.name,
       address = AddressDto(
         streetName = req.address.streetName,
-        buildingName = req.address.buildingName,
+        buildingName = req.address.buildingNumberAddition,
         buildingNumber = req.address.buildingNumber,
         postalCode = req.address.postalCode,
         city = req.address.city,
@@ -328,7 +328,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for the company
     val branchRequest = AddressRequest(
       streetName = "Branch Street",
-      buildingName = "Branch Building",
+      buildingNumberAddition = "Branch Building",
       buildingNumber = "123",
       postalCode = "1111 AA",
       city = "Test City",
@@ -405,7 +405,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for company2
     val branchRequest = AddressRequest(
       streetName = "Branch Street",
-      buildingName = "Branch Building",
+      buildingNumberAddition = "Branch Building",
       buildingNumber = "456",
       postalCode = "2222 BB",
       city = "Test City",
@@ -441,7 +441,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for the company
     val branchRequest = AddressRequest(
       streetName = "Branch Street",
-      buildingName = "Branch Building",
+      buildingNumberAddition = "Branch Building",
       buildingNumber = "789",
       postalCode = "3333 CC",
       city = "Test City",
@@ -476,7 +476,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for the company
     val branchRequest = AddressRequest(
       streetName = "Original Street",
-      buildingName = "Original Building",
+      buildingNumberAddition = "Original Building",
       buildingNumber = "100",
       postalCode = "1000 AA",
       city = "Original City",
@@ -494,7 +494,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Update the branch
     val updateRequest = AddressRequest(
       streetName = "Updated Street",
-      buildingName = "Updated Building",
+      buildingNumberAddition = "Updated Building",
       buildingNumber = "200",
       postalCode = "2000 BB",
       city = "Updated City",
@@ -523,7 +523,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     val updateRequest = AddressRequest(
       streetName = "Test Street",
-      buildingName = "Test Building",
+      buildingNumberAddition = "Test Building",
       buildingNumber = "123",
       postalCode = "1234 AB",
       city = "Test City",
@@ -555,7 +555,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     val updateRequest = AddressRequest(
       streetName = "Test Street",
-      buildingName = "Test Building",
+      buildingNumberAddition = "Test Building",
       buildingNumber = "123",
       postalCode = "1234 AB",
       city = "Test City",
@@ -598,7 +598,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for company2
     val branchRequest = AddressRequest(
       streetName = "Branch Street",
-      buildingName = "Branch Building",
+      buildingNumberAddition = "Branch Building",
       buildingNumber = "300",
       postalCode = "3000 CC",
       city = "Test City",
@@ -615,7 +615,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Try to update the branch using company1's ID (should fail)
     val updateRequest = AddressRequest(
       streetName = "Updated Street",
-      buildingName = "Updated Building",
+      buildingNumberAddition = "Updated Building",
       buildingNumber = "400",
       postalCode = "4000 DD",
       city = "Updated City",
@@ -646,7 +646,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a branch for the company
     val branchRequest = AddressRequest(
       streetName = "Original Street",
-      buildingName = "Original Building",
+      buildingNumberAddition = "Original Building",
       buildingNumber = "500",
       postalCode = "5000 EE",
       city = "Original City",
@@ -660,10 +660,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       .andReturn()
     val result = objectMapper.readValue(response.response.contentAsString, ProjectLocationResult::class.java)
 
-    // Update the branch with null building name
+    // Update the branch with null building number addition
     val updateRequest = AddressRequest(
       streetName = "Updated Street",
-      buildingName = null,
+      buildingNumberAddition = null,
       buildingNumber = "600",
       postalCode = "6000 FF",
       city = "Updated City",

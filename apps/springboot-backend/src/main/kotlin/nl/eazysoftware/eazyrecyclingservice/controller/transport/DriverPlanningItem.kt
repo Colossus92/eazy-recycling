@@ -1,18 +1,19 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
+import nl.eazysoftware.eazyrecyclingservice.repository.address.toPickupLocationView
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class DriverPlanningItem(
     val id: UUID?,
     val displayNumber: String?,
     val pickupDateTime: LocalDateTime,
     val deliveryDateTime: LocalDateTime?,
-    val pickupLocation: LocationDto,
-    val deliveryLocation: LocationDto,
+    val pickupLocation: PickupLocationView,
+    val deliveryLocation: PickupLocationView,
     val containerId: String?,
     val status: TransportDto.Status,
 ) {
@@ -21,8 +22,8 @@ data class DriverPlanningItem(
         transport.displayNumber,
         transport.pickupDateTime,
         transport.deliveryDateTime,
-        transport.pickupLocation,
-        transport.deliveryLocation,
+        transport.pickupLocation.toPickupLocationView(),
+        transport.deliveryLocation.toPickupLocationView(),
         transport.wasteContainer?.id ?: "-",
         transport.getStatus(),
     )

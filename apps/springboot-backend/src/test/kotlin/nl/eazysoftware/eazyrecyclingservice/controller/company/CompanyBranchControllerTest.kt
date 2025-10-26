@@ -61,7 +61,7 @@ class CompanyBranchControllerTest @Autowired constructor(
         country: String = "Nederland"
     ) = AddressRequest(
         streetName = streetName,
-        buildingName = buildingName,
+        buildingNumberAddition = buildingName,
         buildingNumber = buildingNumber,
         postalCode = postalCode,
         city = city,

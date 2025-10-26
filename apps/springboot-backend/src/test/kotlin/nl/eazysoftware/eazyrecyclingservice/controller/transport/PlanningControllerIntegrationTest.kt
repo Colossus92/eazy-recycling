@@ -5,12 +5,12 @@ import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -49,8 +49,8 @@ class PlanningControllerIntegrationTest {
     private lateinit var entityManager: EntityManager
 
     private lateinit var testCompany: CompanyDto
-    private lateinit var testPickupLocation: LocationDto
-    private lateinit var testDeliveryLocation: LocationDto
+    private lateinit var testPickupLocation: PickupLocationDto
+    private lateinit var testDeliveryLocation: PickupLocationDto
     private lateinit var testTruck: Truck
     private lateinit var testDriver: ProfileDto
     private lateinit var otherDriver: ProfileDto
@@ -73,27 +73,27 @@ class PlanningControllerIntegrationTest {
         entityManager.persist(testCompany)
 
         // Create test locations
-        testPickupLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
+        testPickupLocation = PickupLocationDto.PickupProjectLocationDto(
+                id = UUID.randomUUID().toString(),
+                company = testCompany,
                 streetName = "Pickup Street",
                 buildingNumber = "456",
+                buildingNumberAddition = null,
                 postalCode = "5678CD",
                 city = "Pickup City",
-                country = "Pickup Country"
-            )
+                country = "Pickup Country",
         )
         entityManager.persist(testPickupLocation)
 
-        testDeliveryLocation = LocationDto(
-            id = UUID.randomUUID().toString(),
-            address = AddressDto(
+        testDeliveryLocation = PickupLocationDto.PickupProjectLocationDto(
+                id = UUID.randomUUID().toString(),
+                company = testCompany,
                 streetName = "Delivery Street",
                 buildingNumber = "789",
+                buildingNumberAddition = null,
                 postalCode = "9012EF",
                 city = "Delivery City",
                 country = "Delivery Country"
-            )
         )
         entityManager.persist(testDeliveryLocation)
 
@@ -257,7 +257,6 @@ class PlanningControllerIntegrationTest {
             displayNumber = "T-001",
             consignorParty = testCompany,
             carrierParty = testCompany,
-            pickupCompany = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
             pickupDateTime = pickupDateTime1,
@@ -265,7 +264,6 @@ class PlanningControllerIntegrationTest {
             note = "Test Transport 1",
             truck = testTruck,
             driver = testDriver,
-            deliveryCompany = testCompany,
             sequenceNumber = 1, transportType = TransportType.CONTAINER,
         )
 
@@ -273,7 +271,6 @@ class PlanningControllerIntegrationTest {
             displayNumber = "T-002",
             consignorParty = testCompany,
             carrierParty = testCompany,
-            pickupCompany = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
             pickupDateTime = pickupDateTime2,
@@ -281,7 +278,6 @@ class PlanningControllerIntegrationTest {
             note = "Test Transport 2",
             truck = testTruck,
             driver = testDriver,
-            deliveryCompany = testCompany,
             sequenceNumber = 2,
             transportType = TransportType.CONTAINER,
         )

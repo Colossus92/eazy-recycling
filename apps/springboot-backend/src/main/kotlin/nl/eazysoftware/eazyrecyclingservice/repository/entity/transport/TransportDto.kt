@@ -9,7 +9,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import java.time.LocalDateTime
 import java.util.*
 
@@ -40,41 +39,15 @@ data class TransportDto(
   @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
   val carrierParty: CompanyDto,
 
-  /**
-   * This is the company that is located at the pickup location.
-   *
-   * This is not necessarily the Pickup Party! The pickup party is the company disposing the waste.
-   */
-  @ManyToOne
-  @JoinColumn(name = "pickup_company_id", referencedColumnName = "id")
-  val pickupCompany: CompanyDto?,
-
-  @ManyToOne
-  @JoinColumn(name = "pickup_company_branch_id", referencedColumnName = "id")
-  val pickupCompanyBranch: PickupLocationDto.PickupProjectLocationDto? = null,
-
-  @OneToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
-  val pickupLocation: LocationDto,
+  val pickupLocation: PickupLocationDto,
 
   val pickupDateTime: LocalDateTime, // TODO change to instant
 
-  /**
-   * This is the company that is located at the delivery location.
-   *
-   * This is not necessarily the Consignee Party! The consignee party is the company taking ownership of the waste.
-   */
-  @ManyToOne
-  @JoinColumn(name = "delivery_company_id", referencedColumnName = "id")
-  val deliveryCompany: CompanyDto?,
-
-  @ManyToOne
-  @JoinColumn(name = "delivery_company_branch_id", referencedColumnName = "id")
-  val deliveryCompanyBranch: PickupLocationDto.PickupProjectLocationDto? = null,
-
   @OneToOne
   @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
-  val deliveryLocation: LocationDto,
+  val deliveryLocation: PickupLocationDto,
 
   val deliveryDateTime: LocalDateTime?, // TODO change to instant
 

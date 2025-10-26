@@ -179,19 +179,14 @@ class WasteStreamQueryRepository(
         )
 
       is PickupLocationDto.PickupCompanyDto ->
-        entityManager.find(CompanyDto::class.java, dto.companyId)
-          .let {
-            PickupLocationView.PickupCompanyView(
-              company = CompanyViewMapper.map(it)
-            )
-          }
+        PickupLocationView.PickupCompanyView(
+          company = CompanyViewMapper.map(dto.company)
+        )
 
 
       is PickupLocationDto.PickupProjectLocationDto -> {
-        val company = entityManager.find(CompanyDto::class.java, dto.companyId)
-
         PickupLocationView.ProjectLocationView(
-          company = company.let { CompanyViewMapper.map(it) },
+          company = CompanyViewMapper.map(dto.company),
           streetName = dto.streetName,
           postalCode = dto.postalCode,
           buildingNumber = dto.buildingNumber,

@@ -4,29 +4,23 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.LocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.LocationDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class ContainerTransportMapper(
   private val companyRepository: CompanyRepository,
-  private val locationRepository: LocationRepository,
+  private val pickupLocationMapper: PickupLocationMapper,
   private val truckRepository: TruckRepository,
   private val containerRepository: WasteContainerRepository,
   private val entityManager: EntityManager,
@@ -38,9 +32,9 @@ class ContainerTransportMapper(
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       consignorParty = CompanyId(dto.consignorParty.id!!),
       carrierParty = CompanyId(dto.carrierParty.id!!),
-      pickupLocation = mapLocationToDomain(dto.pickupLocation),
+      pickupLocation = pickupLocationMapper.toDomain(dto.pickupLocation),
       pickupDateTime = dto.pickupDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-      deliveryLocation = mapLocationToDomain(dto.deliveryLocation),
+      deliveryLocation = pickupLocationMapper.toDomain(dto.deliveryLocation),
       deliveryDateTime = dto.deliveryDateTime?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
         ?: kotlinx.datetime.Clock.System.now(),
       transportType = dto.transportType,
@@ -60,27 +54,14 @@ class ContainerTransportMapper(
     val carrierCompany = companyRepository.findByIdOrNull(domain.carrierParty.uuid)
       ?: throw IllegalArgumentException("Carrier company not found: ${domain.carrierParty.uuid}")
 
-    val pickupLocationDto = mapLocationToDto(domain.pickupLocation)
-    val deliveryLocationDto = mapLocationToDto(domain.deliveryLocation)
-
     return TransportDto(
       id = domain.transportId?.uuid,
       displayNumber = domain.displayNumber?.value,
       consignorParty = consignorCompany,
       carrierParty = carrierCompany,
-      pickupCompany = when (domain.pickupLocation) {
-        is Location.Company -> entityManager.getReference(CompanyDto::class.java, domain.pickupLocation.companyId)
-        else -> null
-      },
-      pickupCompanyBranch = null,
-      pickupLocation = pickupLocationDto,
+      pickupLocation = pickupLocationMapper.toDto(domain.pickupLocation),
       pickupDateTime = domain.pickupDateTime.toJavaInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime(),
-      deliveryCompany = when (domain.deliveryLocation) {
-        is Location.Company -> entityManager.getReference(CompanyDto::class.java, domain.deliveryLocation.companyId)
-        else -> null
-      },
-      deliveryCompanyBranch = null,
-      deliveryLocation = deliveryLocationDto,
+      deliveryLocation = pickupLocationMapper.toDto(domain.deliveryLocation),
       deliveryDateTime = domain.deliveryDateTime.toJavaInstant().atZone(java.time.ZoneId.systemDefault())
         .toLocalDateTime(),
       transportType = domain.transportType,
@@ -94,111 +75,5 @@ class ContainerTransportMapper(
       updatedAt = domain.updatedAt.toJavaInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber
     )
-  }
-
-  private fun mapLocationToDomain(locationDto: LocationDto): Location {
-    // Simple mapping - in real implementation you'd need to determine the type
-    return Location.DutchAddress(
-      address = Address(
-
-        streetName = locationDto.address.streetName ?: "",
-        postalCode = DutchPostalCode(locationDto.address.postalCode),
-        buildingNumber = locationDto.address.buildingNumber,
-        buildingNumberAddition = null,
-        city = locationDto.address.city ?: "",
-        country = locationDto.address.country ?: "",
-      )
-    )
-  }
-
-  //TODO allow for different types in database
-  private fun mapLocationToDto(location: Location): LocationDto {
-    return when (location) {
-      is Location.DutchAddress -> {
-        val existingLocation = locationRepository.findByAddress_PostalCodeAndAddress_BuildingNumber(
-          location.postalCode().value,
-          location.buildingNumber(),
-        )
-
-        existingLocation ?: locationRepository.save(
-          LocationDto(
-            id = java.util.UUID.randomUUID().toString(),
-            address = AddressDto(
-              streetName = location.streetName(),
-              buildingNumber = location.buildingNumber(),
-              postalCode = location.postalCode().value,
-              city = location.city(),
-              country = location.country()
-            )
-          )
-        )
-      }
-
-      is Location.ProximityDescription -> {
-        locationRepository.save(
-          LocationDto(
-            id = java.util.UUID.randomUUID().toString(),
-            address = AddressDto(
-              streetName = location.description,
-              buildingNumber = "",
-              postalCode = location.postalCodeDigits,
-              city = location.city,
-              country = location.country
-            )
-          )
-        )
-      }
-
-      is Location.Company -> {
-        val company = companyRepository.findByIdOrNull(location.companyId.uuid)
-          ?: throw IllegalArgumentException("Company not found: ${location.companyId.uuid}")
-        // Map company address to location
-        locationRepository.save(
-          LocationDto(
-            id = java.util.UUID.randomUUID().toString(),
-            address = AddressDto(
-              streetName = company.address.streetName ?: "",
-              buildingNumber = company.address.buildingNumber,
-              postalCode = company.address.postalCode,
-              city = company.address.city ?: "",
-              country = company.address.country ?: "Nederland"
-            )
-          )
-        )
-      }
-
-      is Location.ProjectLocation -> {
-        val company = companyRepository.findByIdOrNull(location.companyId.uuid)
-          ?: throw IllegalArgumentException("Company not found: ${location.companyId.uuid}")
-        // Map company address to location
-        locationRepository.save(
-          LocationDto(
-            id = java.util.UUID.randomUUID().toString(),
-            address = AddressDto(
-              streetName = company.address.streetName ?: "",
-              buildingNumber = company.address.buildingNumber,
-              postalCode = company.address.postalCode,
-              city = company.address.city ?: "",
-              country = company.address.country ?: "Nederland"
-            )
-          )
-        )
-      }
-
-      is Location.NoLocation -> {
-        locationRepository.save(
-          LocationDto(
-            id = java.util.UUID.randomUUID().toString(),
-            address = AddressDto(
-              streetName = "Geen locatie",
-              buildingNumber = "",
-              postalCode = "0000",
-              city = "",
-              country = "Nederland"
-            )
-          )
-        )
-      }
-    }
   }
 }

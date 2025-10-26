@@ -13,7 +13,7 @@ import java.util.*
 
 interface ProjectLocationJpaRepository : JpaRepository<PickupLocationDto, String> {
 
-  @Query("SELECT COUNT(p) > 0 FROM PickupLocationDto p WHERE TYPE(p) = 'PROJECT_LOCATION' AND p.companyId = :companyId AND p.postalCode = :postalCode AND p.buildingNumber = :buildingNumber")
+  @Query("SELECT COUNT(p) > 0 FROM PickupLocationDto p WHERE TYPE(p) = 'PROJECT_LOCATION' AND p.company.id = :companyId AND p.postalCode = :postalCode AND p.buildingNumber = :buildingNumber")
   fun existsByCompanyIdAndPostalCodeAndBuildingNumber(
     @Param("companyId") companyId: UUID,
     @Param("postalCode") postalCode: String,

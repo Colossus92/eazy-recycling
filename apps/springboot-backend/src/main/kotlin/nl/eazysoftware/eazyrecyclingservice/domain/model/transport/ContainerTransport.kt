@@ -28,7 +28,7 @@ class ContainerTransport(
    */
   val carrierParty: CompanyId,
 
-  val pickupLocation: Location, //TODO: implement the branch(project location) possibilty
+  val pickupLocation: Location,
 
   val pickupDateTime: Instant,
 

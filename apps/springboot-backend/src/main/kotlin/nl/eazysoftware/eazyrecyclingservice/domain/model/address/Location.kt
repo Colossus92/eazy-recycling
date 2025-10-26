@@ -1,6 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.Company
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProjectLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProximityDescription
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import java.lang.IllegalArgumentException
 import java.util.UUID
 
 /**
@@ -80,6 +86,7 @@ sealed interface Location {
     fun city(): String = address.city
     fun country(): String = address.country
 
+
     /**
      * Entity equality based on identity (ID), not attributes
      * Two ProjectLocations are the same entity if they have the same ID
@@ -88,7 +95,7 @@ sealed interface Location {
       if (this === other) return true
       if (other !is ProjectLocation) return false
 
-        return id == other.id
+      return id == other.id
     }
 
     override fun hashCode(): Int {
@@ -97,5 +104,60 @@ sealed interface Location {
       result = 31 * result + address.hashCode()
       return result
     }
+  }
+}
+
+object LocationFactory {
+
+  fun create(
+    companyId: CompanyId? = null,
+    streetName: String? = null,
+    buildingNumber: String? = null,
+    buildingNumberAddition: String? = null,
+    postalCode: String? = null,
+    description: String? = null,
+    city: String? = null,
+  ): Location {
+
+    if (description?.isNotBlank() == true) return ProximityDescription(
+      postalCodeDigits = postalCode
+        ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
+      city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+      description = description,
+      country = "Nederland"
+    )
+    if (companyId != null && streetName?.isNotBlank() == true) return ProjectLocation(
+      id = UUID.randomUUID(),
+      companyId = companyId,
+      address = Address(
+        streetName = streetName,
+        postalCode = postalCode
+          ?.let { DutchPostalCode(it) }
+          ?: throw IllegalArgumentException("De postcode is verplicht "),
+        buildingNumber = buildingNumber
+          ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
+        buildingNumberAddition = buildingNumberAddition,
+        city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+        country = "Nederland"
+      )
+    )
+
+    if (companyId != null) return Company(companyId)
+
+    if (streetName?.isNotBlank() == true) return DutchAddress(
+      address = Address(
+        streetName = streetName,
+        postalCode = postalCode
+          ?.let { DutchPostalCode(it) }
+          ?: throw IllegalArgumentException("De postcode is verplicht "),
+        buildingNumber = buildingNumber
+          ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
+        buildingNumberAddition = buildingNumberAddition,
+        city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+        country = "Nederland"
+      )
+    )
+
+    return NoLocation
   }
 }
