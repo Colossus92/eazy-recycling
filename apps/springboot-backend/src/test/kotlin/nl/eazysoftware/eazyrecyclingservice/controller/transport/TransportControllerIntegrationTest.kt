@@ -383,67 +383,70 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
 
   @Test
   fun `should update waste transport`() {
-    // Given
-    val goodsItem = GoodsItemDto(
-      wasteStreamNumber = testWasteStream.number,
-      netNetWeight = 500,
-      unit = "KG",
-      quantity = 1,
-    )
-
-    val transport = createTestTransport("Original Waste Transport", goodsItem)
-    val savedTransport = transportRepository.save(transport)
-
-    val updateRequest = CreateWasteTransportRequest(
-      consigneePartyId = testCompany.id.toString(),
-      pickupPartyId = testCompany.id.toString(),
-      consignorPartyId = testCompany.id!!,
-      pickupDateTime = LocalDateTime.now().plusDays(3),
-      deliveryDateTime = LocalDateTime.now().plusDays(4),
+    // Given - create initial waste transport
+    val createRequest = WasteTransportRequest(
+      pickupDateTime = LocalDateTime.now().plusDays(1),
+      deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Updated Pickup Street",
-      pickupBuildingNumber = "999",
-      pickupPostalCode = "3344 IJ",
-      pickupCity = "Updated Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Updated Delivery Street",
-      deliveryBuildingNumber = "888",
-      deliveryPostalCode = "5566 KL",
-      deliveryCity = "Updated Delivery City",
+      truckId = testTruck.licensePlate,
+      containerId = testContainer.uuid,
+      note = "Original Waste Transport",
+      wasteStreamNumber = testWasteStream.number,
+      weight = 1000,
+      unit = "KG",
+      quantity = 1,
+    )
+
+    val createResponse = securedMockMvc.post(
+      "/transport/waste",
+      objectMapper.writeValueAsString(createRequest)
+    )
+      .andExpect(status().isCreated)
+      .andReturn()
+
+    val createResult = objectMapper.readValue(
+      createResponse.response.contentAsString,
+      CreateWasteTransportResponse::class.java
+    )
+
+    // Update the transport
+    val updateRequest = WasteTransportRequest(
+      pickupDateTime = LocalDateTime.now().plusDays(3),
+      deliveryDateTime = LocalDateTime.now().plusDays(4),
+      transportType = TransportType.WASTE,
+      containerOperation = ContainerOperation.DELIVERY,
+      driverId = testDriver.id,
+      carrierPartyId = testCompany.id!!,
       truckId = testTruck.licensePlate,
       containerId = testContainer.uuid,
       note = "Updated Waste Transport",
-      wasteStreamNumber = "Updated-WSN",
+      wasteStreamNumber = testWasteStream.number,
       weight = 2000,
       unit = "KG",
       quantity = 2,
-      goodsName = "Updated Waste",
-      euralCode = "200301",
-      processingMethodCode = "A.02",
-      consignorClassification = 1
     )
 
     // When & Then
     securedMockMvc.put(
-      "/transport/waste/${savedTransport.id}",
+      "/transport/waste/${createResult.transportId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Waste Transport"))
-      .andExpect(jsonPath("$.goods.goodsItem.wasteStreamNumber").value("Updated-WSN"))
-      .andExpect(jsonPath("$.goods.goodsItem.netNetWeight").value(2000))
+      .andExpect(jsonPath("$.transportId").value(createResult.transportId.toString()))
+      .andExpect(jsonPath("$.status").exists())
 
     // Verify transport was updated in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(createResult.transportId)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Waste Transport")
-    assertThat(updatedTransport?.goodsItem?.wasteStreamNumber).isEqualTo("Updated-WSN")
+    assertThat(updatedTransport?.goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
     assertThat(updatedTransport?.goodsItem?.netNetWeight).isEqualTo(2000)
+    assertThat(updatedTransport?.goodsItem?.quantity).isEqualTo(2)
+    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
   }
 
   @Test

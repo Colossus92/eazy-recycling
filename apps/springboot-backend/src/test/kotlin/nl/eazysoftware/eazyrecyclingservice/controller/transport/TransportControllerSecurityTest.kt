@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -141,6 +142,12 @@ class TransportControllerSecurityTest {
     private lateinit var createWasteTransport: CreateWasteTransport
 
     @MockitoBean
+    private lateinit var updateWasteTransport: UpdateWasteTransport
+
+    @MockitoBean
+    private lateinit var wasteTransports: WasteTransports
+
+    @MockitoBean
     private lateinit var wasteStreamJpaRepository: WasteStreamJpaRepository
 
     // Use the companion object constants instead of local variables
@@ -193,7 +200,6 @@ class TransportControllerSecurityTest {
 
         // Mock the service calls
         whenever(transportService.getTransportById(testTransportId)).thenReturn(transportWithTestDriver)
-//        whenever(transportService.updateWasteTransport(eq(testTransportId), any())).thenReturn(transportWithTestDriver) TODO enable
         whenever(transportService.getTransportById(transportWithOtherDriver.id!!)).thenReturn(transportWithOtherDriver)
         whenever(transportService.getAllTransports()).thenReturn(
             listOf(
@@ -247,6 +253,14 @@ class TransportControllerSecurityTest {
             )
         )
 
+        // Mock waste transport update use case
+        whenever(updateWasteTransport.handle(any())).thenReturn(
+            UpdateWasteTransportResult(
+                transportId = TransportId(testTransportId),
+                status = "PLANNED"
+            )
+        )
+
         // Mock container transports repository for authorization check
         val mockContainerTransport = ContainerTransport(
             transportId = TransportId(testTransportId),
@@ -281,6 +295,31 @@ class TransportControllerSecurityTest {
             sequenceNumber = 1
         )
         whenever(containerTransports.findById(TransportId(testTransportId))).thenReturn(mockContainerTransport)
+
+        // Mock waste transports repository for authorization check
+        val mockWasteTransport = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.WasteTransport(
+            transportId = TransportId(testTransportId),
+            displayNumber = null,
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            pickupDateTime = kotlinx.datetime.Clock.System.now(),
+            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            transportType = TransportType.WASTE,
+            goodsItem = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.GoodsItem(
+                wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
+                netNetWeight = 1000,
+                unit = "KG",
+                quantity = 1
+            ),
+            wasteContainer = null,
+            containerOperation = ContainerOperation.PICKUP,
+            truck = null,
+            driver = UserId(testDriverId),
+            note = nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note("Test note"),
+            transportHours = null,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            sequenceNumber = 1
+        )
+        whenever(wasteTransports.findById(TransportId(testTransportId))).thenReturn(mockWasteTransport)
     }
 
     // Helper method to create mock objects
