@@ -69,7 +69,7 @@ class WasteTransportMapper(
   fun toDomain(dto: TransportDto): WasteTransport {
 
     return WasteTransport(
-      transportId = TransportId(dto.id!!),
+      transportId = TransportId(dto.id),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       carrierParty = CompanyId(dto.carrierParty.id!!),
       pickupDateTime = dto.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),

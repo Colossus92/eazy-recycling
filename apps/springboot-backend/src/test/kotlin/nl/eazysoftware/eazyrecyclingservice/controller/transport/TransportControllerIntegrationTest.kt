@@ -166,7 +166,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
 
     // Reload testCompany to ensure it's managed
     val managedCompany = companyRepository.findById(testCompany.id!!).get()
-    val managedLocation = projectLocationJpaRepository.findById(testLocation.id!!).get()
+    val managedLocation = projectLocationJpaRepository.findById(testLocation.id).get()
 
     // Create test waste stream
     testWasteStream = TestWasteStreamFactory.createTestWasteStreamDto(
@@ -362,7 +362,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
 
     // Verify transport was updated in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Container Transport")
     assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
@@ -447,7 +447,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isNoContent)
 
     // Verify transport was deleted
-    assertThat(transportRepository.findByIdOrNull(savedTransport.id!!)).isNull()
+    assertThat(transportRepository.findByIdOrNull(savedTransport.id)).isNull()
   }
 
   @Test
@@ -500,7 +500,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(2.5)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
@@ -540,7 +540,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isForbidden)
 
     // Verify transport was NOT marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isNull()
     assertThat(updatedTransport?.getStatus()).isNotEqualTo(TransportDto.Status.FINISHED)
@@ -566,7 +566,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(4.0)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
@@ -592,7 +592,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(2.75)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
