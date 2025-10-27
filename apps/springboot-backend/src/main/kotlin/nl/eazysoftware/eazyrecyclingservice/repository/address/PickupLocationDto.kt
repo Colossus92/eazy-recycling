@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationTyp
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import org.hibernate.Hibernate
 import java.util.*
 
 @Entity
@@ -107,37 +108,37 @@ object PickupLocationType {
 
 
 fun PickupLocationDto.toPickupLocationView(): PickupLocationView {
-  return when (this) {
+  return when (val unproxied = Hibernate.unproxy(this)) {
     is PickupLocationDto.DutchAddressDto -> PickupLocationView.DutchAddressView(
-      streetName = streetName,
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      postalCode = postalCode,
-      city = city,
-      country = country,
+      streetName = unproxied.streetName,
+      buildingNumber = unproxied.buildingNumber,
+      buildingNumberAddition = unproxied.buildingNumberAddition,
+      postalCode = unproxied.postalCode,
+      city = unproxied.city,
+      country = unproxied.country,
     )
 
     is PickupLocationDto.ProximityDescriptionDto -> PickupLocationView.ProximityDescriptionView(
-      postalCodeDigits = postalCode,
-      city = city,
-      description = description,
-      country = country,
+      postalCodeDigits = unproxied.postalCode,
+      city = unproxied.city,
+      description = unproxied.description,
+      country = unproxied.country,
     )
 
     is PickupLocationDto.NoPickupLocationDto -> PickupLocationView.NoPickupView()
 
     is PickupLocationDto.PickupCompanyDto -> PickupLocationView.PickupCompanyView(
-      company = CompanyViewMapper.map(company)
+      company = CompanyViewMapper.map(unproxied.company)
     )
 
     is PickupLocationDto.PickupProjectLocationDto -> PickupLocationView.ProjectLocationView(
-      company = CompanyViewMapper.map(company),
-      streetName = streetName,
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      postalCode = postalCode,
-      city = city,
-      country = country
+      company = CompanyViewMapper.map(unproxied.company),
+      streetName = unproxied.streetName,
+      buildingNumber = unproxied.buildingNumber,
+      buildingNumberAddition = unproxied.buildingNumberAddition,
+      postalCode = unproxied.postalCode,
+      city = unproxied.city,
+      country = unproxied.country
     )
 
     else -> throw IllegalStateException("Ongeldig ophaallocatie type; ${this::class.simpleName}")

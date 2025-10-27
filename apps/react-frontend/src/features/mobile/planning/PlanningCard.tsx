@@ -4,6 +4,7 @@ import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
+import { resolveLocationAddress } from '@/api/services/transportService';
 
 interface PlanningCardProps {
   transport: DriverPlanningItem;
@@ -38,13 +39,14 @@ export const PlanningCard = ({
     ],
     [DriverPlanningItemStatusEnum.Invoiced, 'border-color-text-disabled bg-color-surface-background'],
   ]);
+  const deliveryAddress = resolveLocationAddress(transport.deliveryLocation);
 
-  const deliveryAddress =
-    transport.deliveryLocation.address.streetName +
+  const deliveryAddressText =
+    deliveryAddress?.street +
     ' ' +
-    transport.deliveryLocation.address.buildingNumber +
+    deliveryAddress?.houseNumber +
     ', ' +
-    transport.deliveryLocation.address.city;
+    deliveryAddress?.city;
 
   return (
     <div
@@ -63,13 +65,13 @@ export const PlanningCard = ({
           </span>
           <div className={'flex items-center self-stretch gap-1'}>
             <span className={'text-subtitle-1 text-color'}>
-              {transport.pickupLocation.address.city}
+              {deliveryAddress?.city}
             </span>
             <div className="flex-shrink-0">
               <CaretRight className={'text-color-text-secondary'} />
             </div>
             <span className={'text-subtitle-1'}>
-              {transport.deliveryLocation.address.city}
+              {deliveryAddress?.city}
             </span>
           </div>
         </div>
@@ -77,7 +79,7 @@ export const PlanningCard = ({
           <div className={'flex items-center self-stretch gap-2'}>
             <MapPin className={'size-5 text-color-text-secondary'} />
             <span className={'text-body-2 text-color-text-primary'}>
-              {deliveryAddress}
+              {deliveryAddressText}
             </span>
           </div>
           <div className={'flex items-center self-stretch gap-2'}>
