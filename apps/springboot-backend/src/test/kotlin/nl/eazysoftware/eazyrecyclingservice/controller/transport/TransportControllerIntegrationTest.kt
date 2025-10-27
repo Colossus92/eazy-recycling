@@ -155,24 +155,11 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
     entityManager.persist(testContainer)
 
-    // Create test eural code and processing method if they don't exist
-    val testEural = euralRepository.findById("16 01 17").orElseGet {
-      euralRepository.save(
-        nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural(
-          code = "16 01 17",
-          description = "Paper and cardboard"
-        )
-      )
-    }
+    val testEural = euralRepository.findById("16 01 17")
+      .orElseThrow { IllegalStateException("Eural 16 01 17 should exist in data.sql") }
 
-    val testProcessingMethod = processingMethodRepository.findById("A.01").orElseGet {
-      processingMethodRepository.save(
-        nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto(
-          code = "A.01",
-          description = "Recycling"
-        )
-      )
-    }
+    val testProcessingMethod = processingMethodRepository.findById("A.01")
+      .orElseThrow { IllegalStateException("Processing method A.01 should exist in data.sql") }
 
     entityManager.flush()
     entityManager.clear()
