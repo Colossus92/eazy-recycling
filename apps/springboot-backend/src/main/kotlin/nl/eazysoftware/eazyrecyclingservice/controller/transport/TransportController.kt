@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
-import jakarta.validation.Valid
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -31,22 +30,6 @@ class TransportController(
     @GetMapping(path = ["/{id}"])
     fun getTransportById(@PathVariable id: UUID): TransportDto {
         val transport = transportService.getTransportById(id)
-
-        checkAuthorization(transport)
-
-        return transport
-    }
-
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    @PostMapping("/waste")
-    fun createWasteTransport(@Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
-        return transportService.createWasteTransport(request)
-    }
-
-    @PreAuthorize(HAS_ANY_ROLE)
-    @PutMapping(path = ["/waste/{id}"])
-    fun updateWasteTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
-        val transport = transportService.updateWasteTransport(id, request)
 
         checkAuthorization(transport)
 

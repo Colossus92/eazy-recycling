@@ -8,7 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.Update
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransportCommand
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
-import nl.eazysoftware.eazyrecyclingservice.controller.transport.ContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId

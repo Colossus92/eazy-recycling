@@ -46,7 +46,7 @@ class ContainerTransport(
 
   override val transportHours: Duration?,
 
-  val updatedAt: Instant,
+  val updatedAt: Instant?,
 
   /**
    * Used for ordering transports within the planning

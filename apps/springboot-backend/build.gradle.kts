@@ -55,7 +55,7 @@ dependencies {
     // Web
     implementation("wsdl4j:wsdl4j:1.6.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta:2.19.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.19.0")
     implementation("io.ktor:ktor-client-cio:3.1.2")
     implementation(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0")

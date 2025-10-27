@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.transport
 
 import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
@@ -16,7 +15,7 @@ class WasteTransport(
    * Used for human-readable display in the UI
    */
   val displayNumber: TransportDisplayNumber? = null, // TODO get value from database in domain service
-  
+
   /**
    * The party executing the transport.
    */
@@ -24,13 +23,15 @@ class WasteTransport(
 
   val pickupDateTime: Instant,
 
-  val deliveryDateTime: Instant?,
+  val deliveryDateTime: Instant,
 
-  val transportType: TransportType,
+  val transportType: TransportType = TransportType.WASTE,
 
-  val wasteStreamNumber: WasteStreamNumber,
+  val goodsItem: GoodsItem,
 
   val wasteContainer: WasteContainerId?,
+
+  val containerOperation: ContainerOperation?,
 
   override val truck: LicensePlate?,
 
@@ -40,14 +41,14 @@ class WasteTransport(
 
   override val transportHours: Duration?,
 
-  val updatedAt: Instant,
+  val updatedAt: Instant?,
 
   /**
    * Used for ordering transports within the planning
    */
   val sequenceNumber: Int,
 
-) : Transport {
+  ) : Transport {
 
   /**
    * Get the current status of this transport.
@@ -57,3 +58,10 @@ class WasteTransport(
     return TransportStatusCalculator.calculateStatus(this)
   }
 }
+
+data class GoodsItem(
+  val wasteStreamNumber: WasteStreamNumber,
+  val netNetWeight: Int,
+  val unit: String,
+  val quantity: Int,
+)

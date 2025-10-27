@@ -22,7 +22,7 @@ class ContainerTransportRepository(
   override fun findById(transportId: TransportId): ContainerTransport? {
     val dto = jpaRepository.findByIdOrNull(transportId.uuid) ?: return null
     // Only return if it's a container transport (no goods)
-    return if (dto.goods == null) {
+    return if (dto.goodsItem == null) {
       mapper.toDomain(dto)
     } else {
       null
@@ -31,7 +31,7 @@ class ContainerTransportRepository(
 
   override fun findAll(): List<ContainerTransport> {
     return jpaRepository.findAll()
-      .filter { it.goods == null } // Only container transports
+      .filter { it.goodsItem == null } // Only container transports
       .map { mapper.toDomain(it) }
   }
 

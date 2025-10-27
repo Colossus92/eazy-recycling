@@ -43,7 +43,7 @@ class ContainerTransportMapper(
       driver = dto.driver?.let { UserId(it.id) },
       note = Note(dto.note),
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
-      updatedAt = dto.updatedAt!!.atZone(java.time.ZoneId.systemDefault()).toInstant().toKotlinInstant(),
+      updatedAt = dto.updatedAt?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toKotlinInstant(),
       sequenceNumber = dto.sequenceNumber
     )
   }
@@ -70,9 +70,8 @@ class ContainerTransportMapper(
       truck = domain.truck?.let { truckRepository.findByIdOrNull(it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
-      goods = null, // Container transport has no goods
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
-      updatedAt = domain.updatedAt.toJavaInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime(),
+      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(java.time.ZoneId.systemDefault())?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber
     )
   }
