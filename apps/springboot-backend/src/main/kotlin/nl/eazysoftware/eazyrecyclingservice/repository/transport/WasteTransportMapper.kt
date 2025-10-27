@@ -72,8 +72,8 @@ class WasteTransportMapper(
       transportId = dto.id?.let { TransportId(it)},
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       carrierParty = CompanyId(dto.carrierParty.id!!),
-      pickupDateTime = dto.pickupDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-      deliveryDateTime = dto.deliveryDateTime?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
+      pickupDateTime = dto.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
+      deliveryDateTime = dto.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
         ?: kotlinx.datetime.Clock.System.now(),
       transportType = dto.transportType,
       goodsItem = dto.goodsItem

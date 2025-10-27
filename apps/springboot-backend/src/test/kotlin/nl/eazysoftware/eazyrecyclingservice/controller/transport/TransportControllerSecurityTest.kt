@@ -237,7 +237,7 @@ class TransportControllerSecurityTest {
 
         // Mock waste stream repository
         whenever(wasteStreamJpaRepository.findById(testWasteStream.number)).thenReturn(
-            java.util.Optional.of(testWasteStream)
+            Optional.of(testWasteStream)
         )
 
         // Mock waste transport create use case

@@ -16,16 +16,6 @@ import java.util.*
 
 object TestWasteStreamFactory {
 
-  fun randomWasteStreamNumber(): String {
-    val chars = ('0'..'9')
-    val sb = StringBuilder()
-    repeat(7) {
-        val randomChar = chars.random()
-        sb.append(randomChar)
-    }
-    return "12345$sb"
-  }
-
   fun createTestWasteStreamRequest(
     companyId: UUID,
     name: String = "Test Waste Stream",
@@ -56,7 +46,7 @@ object TestWasteStreamFactory {
   }
 
   fun createTestWasteStreamDto(
-    number: String = "WS" + UUID.randomUUID().toString().substring(0, 8),
+    number: String,
     name: String = "Test Waste Stream",
     euralCode: Eural = Eural(code = "16 01 17", description = "Paper and cardboard"),
     processingMethod: ProcessingMethodDto = ProcessingMethodDto(code = "A.01", description = "Recycling"),
