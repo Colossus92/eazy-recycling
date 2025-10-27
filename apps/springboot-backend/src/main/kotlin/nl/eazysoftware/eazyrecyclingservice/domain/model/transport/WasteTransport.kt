@@ -12,9 +12,10 @@ class WasteTransport(
   val transportId: TransportId,
 
   /**
-   * Used for human-readable display in the UI
+   * Used for human-readable display in the UI.
+   * Generated automatically by TransportDisplayNumberGenerator for new transports.
    */
-  val displayNumber: TransportDisplayNumber? = null, // TODO get value from database in domain service
+  val displayNumber: TransportDisplayNumber? = null,
 
   /**
    * The party executing the transport.
@@ -63,6 +64,7 @@ class WasteTransport(
      * Factory method to create a new WasteTransport with a generated UUID.
      */
     fun create(
+      displayNumber: TransportDisplayNumber,
       carrierParty: CompanyId,
       pickupDateTime: Instant,
       deliveryDateTime: Instant,
@@ -79,7 +81,7 @@ class WasteTransport(
     ): WasteTransport {
       return WasteTransport(
         transportId = TransportId.generate(),
-        displayNumber = null,
+        displayNumber = displayNumber,
         carrierParty = carrierParty,
         pickupDateTime = pickupDateTime,
         deliveryDateTime = deliveryDateTime,

@@ -12,9 +12,10 @@ class ContainerTransport(
   val transportId: TransportId,
 
   /**
-   * Used for human-readable display in the UI
+   * Used for human-readable display in the UI.
+   * Generated automatically by TransportDisplayNumberGenerator for new transports.
    */
-  val displayNumber: TransportDisplayNumber? = null, // TODO get value from database in domain service
+  val displayNumber: TransportDisplayNumber? = null,
 
   /**
    * The party client ordering the transport.
@@ -68,6 +69,7 @@ class ContainerTransport(
      * Factory method to create a new ContainerTransport with a generated UUID.
      */
     fun create(
+      displayNumber: TransportDisplayNumber,
       consignorParty: CompanyId,
       carrierParty: CompanyId,
       pickupLocation: Location,
@@ -85,7 +87,7 @@ class ContainerTransport(
     ): ContainerTransport {
       return ContainerTransport(
         transportId = TransportId.generate(),
-        displayNumber = null,
+        displayNumber = displayNumber,
         consignorParty = consignorParty,
         carrierParty = carrierParty,
         pickupLocation = pickupLocation,

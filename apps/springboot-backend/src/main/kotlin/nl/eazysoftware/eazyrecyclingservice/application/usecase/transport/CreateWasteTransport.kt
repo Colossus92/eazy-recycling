@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -38,11 +39,15 @@ data class CreateWasteTransportResult(
 @Service
 class CreateWasteTransportService(
   private val wasteTransports: WasteTransports,
+  private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
 ) : CreateWasteTransport {
 
   @Transactional
   override fun handle(cmd: CreateWasteTransportCommand): CreateWasteTransportResult {
+    val displayNumber = transportDisplayNumberGenerator.generateDisplayNumber()
+
     val wasteTransport = WasteTransport.create(
+      displayNumber = displayNumber,
       carrierParty = cmd.carrierParty,
       pickupDateTime = cmd.pickupDateTime,
       deliveryDateTime = cmd.deliveryDateTime,

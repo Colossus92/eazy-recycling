@@ -7,13 +7,17 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 interface CreateContainerTransport {
   fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult
@@ -58,12 +62,16 @@ data class CreateContainerTransportResult(
 @Service
 class CreateContainerTransportService(
   private val containerTransports: ContainerTransports,
-  private val locations: ProjectLocations
+  private val locations: ProjectLocations,
+  private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
 ) : CreateContainerTransport {
 
   @Transactional
   override fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult {
+    val displayNumber = transportDisplayNumberGenerator.generateDisplayNumber()
+
     val containerTransport = ContainerTransport.create(
+      displayNumber = displayNumber,
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
       pickupLocation = createPickupLocation(cmd),

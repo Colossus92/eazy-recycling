@@ -25,6 +25,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -49,7 +50,7 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class TransportControllerSecurityTest {
+class TransportControllerSecurityTest : BaseIntegrationTest() {
 
     companion object {
         // Class-level constants for IDs that need to be accessed in companion object methods
@@ -200,7 +201,7 @@ class TransportControllerSecurityTest {
 
         // Mock the service calls
         whenever(transportService.getTransportById(testTransportId)).thenReturn(transportWithTestDriver)
-        whenever(transportService.getTransportById(transportWithOtherDriver.id!!)).thenReturn(transportWithOtherDriver)
+        whenever(transportService.getTransportById(transportWithOtherDriver.id)).thenReturn(transportWithOtherDriver)
         whenever(transportService.getAllTransports()).thenReturn(
             listOf(
                 transportWithTestDriver,

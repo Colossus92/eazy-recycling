@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +36,7 @@ import java.util.*
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-class PlanningControllerIntegrationTest {
+class PlanningControllerIntegrationTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc

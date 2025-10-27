@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
@@ -28,7 +29,7 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class CompanyControllerSecurityTest {
+class CompanyControllerSecurityTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
