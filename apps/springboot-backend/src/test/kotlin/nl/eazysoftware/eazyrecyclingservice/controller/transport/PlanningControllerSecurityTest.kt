@@ -79,11 +79,11 @@ class PlanningControllerSecurityTest : BaseIntegrationTest() {
       PlanningView(
         dates = listOf(testDate.toString()),
         transports = listOf(
-          TransportsView(
+          PlanningTransportsView(
             truck = testTruckId,
             transports = mapOf(
               testDate.toString() to listOf(
-                TransportView(
+                PlanningTransportView(
                   pickupDate = testDate.toString(),
                   deliveryDate = testDate.plusDays(1).toString(),
                   id = UUID.randomUUID().toString(),
