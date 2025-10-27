@@ -11,10 +11,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto.Status
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 interface UpdateContainerTransport {
   fun handle(cmd: UpdateContainerTransportCommand): UpdateContainerTransportResult
@@ -71,7 +70,7 @@ class UpdateContainerTransportService(
       ?: throw EntityNotFoundException("Transport met id ${cmd.transportId.uuid} niet gevonden")
 
     // Check if transport is already finished
-    if (existingTransport.getStatus() == Status.FINISHED) {
+    if (existingTransport.getStatus() == TransportStatus.FINISHED) {
       throw IllegalStateException("Transport is gereed gemeld en kan niet meer worden aangepast.")
     }
 
