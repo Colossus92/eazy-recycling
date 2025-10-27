@@ -15,37 +15,31 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ContainerLocationView } from './container-location-view';
+import type { AddressView } from './address-view';
 
 /**
  * 
  * @export
- * @interface WasteContainerView
+ * @interface ContainerLocationView
  */
-export interface WasteContainerView {
+export interface ContainerLocationView {
     /**
      * 
      * @type {string}
-     * @memberof WasteContainerView
+     * @memberof ContainerLocationView
      */
-    'uuid': string;
+    'companyId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof WasteContainerView
+     * @memberof ContainerLocationView
      */
-    'id': string;
+    'companyName'?: string;
     /**
      * 
-     * @type {ContainerLocationView}
-     * @memberof WasteContainerView
+     * @type {AddressView}
+     * @memberof ContainerLocationView
      */
-    'location': ContainerLocationView;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteContainerView
-     */
-    'notes'?: string;
+    'addressView'?: AddressView;
 }
 

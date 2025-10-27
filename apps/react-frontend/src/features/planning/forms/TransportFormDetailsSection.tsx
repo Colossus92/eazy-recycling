@@ -4,7 +4,7 @@ import {
   Option,
   SelectFormField,
 } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { WasteContainer } from '@/api/client';
+import { WasteContainerView } from '@/api/client';
 import { containerService } from '@/api/services/containerService';
 import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
@@ -18,7 +18,7 @@ export const TransportFormDetailsSection = () => {
     control,
     formState: { errors },
   } = useFormContext<ContainerTransportFormValues | WasteTransportFormValues>();
-  const { data: wastecontainers = [] } = useQuery<WasteContainer[]>({
+  const { data: wastecontainers = [] } = useQuery<WasteContainerView[]>({
     queryKey: ['containers'],
     queryFn: () => containerService.getAll(),
   });

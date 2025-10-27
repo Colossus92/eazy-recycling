@@ -24,9 +24,9 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 // @ts-ignore
 import type { CreateContainerRequest } from '../models';
 // @ts-ignore
-import type { WasteContainer } from '../models';
-// @ts-ignore
 import type { WasteContainerRequest } from '../models';
+// @ts-ignore
+import type { WasteContainerView } from '../models';
 /**
  * WasteContainerControllerApi - axios parameter creator
  * @export
@@ -148,9 +148,9 @@ export const WasteContainerControllerApiAxiosParamCreator = function (configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContainerByLicensePlate: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getContainerById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('getContainerByLicensePlate', 'id', id)
+            assertParamExists('getContainerById', 'id', id)
             const localVarPath = `/containers/{id}`
                 .replace(`{${"id"}}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -261,7 +261,7 @@ export const WasteContainerControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllContainers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WasteContainer>>> {
+        async getAllContainers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WasteContainerView>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getAllContainers(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['WasteContainerControllerApi.getAllContainers']?.[localVarOperationServerIndex]?.url;
@@ -273,10 +273,10 @@ export const WasteContainerControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getContainerByLicensePlate(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteContainer>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getContainerByLicensePlate(id, options);
+        async getContainerById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteContainerView>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getContainerById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['WasteContainerControllerApi.getContainerByLicensePlate']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['WasteContainerControllerApi.getContainerById']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -286,7 +286,7 @@ export const WasteContainerControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateContainer(id: string, wasteContainerRequest: WasteContainerRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteContainer>> {
+        async updateContainer(id: string, wasteContainerRequest: WasteContainerRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteContainerView>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateContainer(id, wasteContainerRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['WasteContainerControllerApi.updateContainer']?.[localVarOperationServerIndex]?.url;
@@ -325,7 +325,7 @@ export const WasteContainerControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllContainers(options?: RawAxiosRequestConfig): AxiosPromise<Array<WasteContainer>> {
+        getAllContainers(options?: RawAxiosRequestConfig): AxiosPromise<Array<WasteContainerView>> {
             return localVarFp.getAllContainers(options).then((request) => request(axios, basePath));
         },
         /**
@@ -334,8 +334,8 @@ export const WasteContainerControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getContainerByLicensePlate(id: string, options?: RawAxiosRequestConfig): AxiosPromise<WasteContainer> {
-            return localVarFp.getContainerByLicensePlate(id, options).then((request) => request(axios, basePath));
+        getContainerById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<WasteContainerView> {
+            return localVarFp.getContainerById(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -344,7 +344,7 @@ export const WasteContainerControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateContainer(id: string, wasteContainerRequest: WasteContainerRequest, options?: RawAxiosRequestConfig): AxiosPromise<WasteContainer> {
+        updateContainer(id: string, wasteContainerRequest: WasteContainerRequest, options?: RawAxiosRequestConfig): AxiosPromise<WasteContainerView> {
             return localVarFp.updateContainer(id, wasteContainerRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -396,8 +396,8 @@ export class WasteContainerControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof WasteContainerControllerApi
      */
-    public getContainerByLicensePlate(id: string, options?: RawAxiosRequestConfig) {
-        return WasteContainerControllerApiFp(this.configuration).getContainerByLicensePlate(id, options).then((request) => request(this.axios, this.basePath));
+    public getContainerById(id: string, options?: RawAxiosRequestConfig) {
+        return WasteContainerControllerApiFp(this.configuration).getContainerById(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

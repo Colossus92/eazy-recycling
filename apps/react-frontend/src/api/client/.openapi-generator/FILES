@@ -30,6 +30,7 @@ models/company-response.ts
 models/company-view.ts
 models/consignor-request.ts
 models/consignor-view.ts
+models/container-location-view.ts
 models/container-location.ts
 models/container-transport-request.ts
 models/create-container-request.ts
@@ -85,10 +86,8 @@ models/update-waste-transport-response.ts
 models/user-response.ts
 models/user-role-dto.ts
 models/waste-container-dto.ts
-models/waste-container-id.ts
 models/waste-container-request.ts
 models/waste-container-view.ts
-models/waste-container.ts
 models/waste-stream-detail-view-pickup-location.ts
 models/waste-stream-detail-view.ts
 models/waste-stream-list-view.ts

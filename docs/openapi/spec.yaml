@@ -370,7 +370,7 @@ paths:
     get:
       tags:
       - waste-container-controller
-      operationId: getContainerByLicensePlate
+      operationId: getContainerById
       parameters:
       - name: id
         in: path
@@ -384,7 +384,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/WasteContainer"
+                $ref: "#/components/schemas/WasteContainerView"
     put:
       tags:
       - waste-container-controller
@@ -408,7 +408,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/WasteContainer"
+                $ref: "#/components/schemas/WasteContainerView"
     delete:
       tags:
       - waste-container-controller
@@ -822,7 +822,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/WasteContainer"
+                  $ref: "#/components/schemas/WasteContainerView"
     post:
       tags:
       - waste-container-controller
@@ -1656,27 +1656,52 @@ components:
       required:
       - id
       - uuid
-    WasteContainer:
+    AddressView:
       type: object
       properties:
-        wasteContainerId:
-          $ref: "#/components/schemas/WasteContainerId"
-        id:
+        street:
           type: string
-        location:
-          $ref: "#/components/schemas/ContainerLocation"
-        notes:
+        houseNumber:
+          type: string
+        houseNumberAddition:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        country:
           type: string
       required:
-      - id
-      - wasteContainerId
-    WasteContainerId:
+      - city
+      - country
+      - houseNumber
+      - postalCode
+      - street
+    ContainerLocationView:
+      type: object
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        companyName:
+          type: string
+        addressView:
+          $ref: "#/components/schemas/AddressView"
+    WasteContainerView:
       type: object
       properties:
         uuid:
           type: string
           format: uuid
+        id:
+          type: string
+        location:
+          $ref: "#/components/schemas/ContainerLocationView"
+        notes:
+          type: string
       required:
+      - id
+      - location
       - uuid
     CompanyDto:
       type: object
@@ -2011,27 +2036,6 @@ components:
       - consignorPartyName
       - id
       - status
-    AddressView:
-      type: object
-      properties:
-        street:
-          type: string
-        houseNumber:
-          type: string
-        houseNumberAddition:
-          type: string
-        postalCode:
-          type: string
-        city:
-          type: string
-        country:
-          type: string
-      required:
-      - city
-      - country
-      - houseNumber
-      - postalCode
-      - street
     CompanyConsignorView:
       allOf:
       - $ref: "#/components/schemas/ConsignorView"
@@ -2525,12 +2529,12 @@ components:
         value$kotlinx_datetime:
           type: string
           format: date-time
-        epochSeconds:
-          type: integer
-          format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
+        epochSeconds:
+          type: integer
+          format: int64
       required:
       - epochSeconds
       - nanosecondsOfSecond
@@ -2614,17 +2618,6 @@ components:
       - brand
       - licensePlate
       - model
-    WasteContainerView:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        containerNumber:
-          type: string
-      required:
-      - containerNumber
-      - uuid
     DriverPlanningItem:
       type: object
       properties:

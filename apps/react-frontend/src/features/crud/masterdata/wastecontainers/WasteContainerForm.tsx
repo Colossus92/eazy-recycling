@@ -7,7 +7,7 @@ import { fallbackRender } from "@/utils/fallbackRender";
 import { FormTopBar } from "@/components/ui/form/FormTopBar";
 import { TextFormField } from "@/components/ui/form/TextFormField";
 import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
-import { WasteContainer } from "@/api/client/models";
+import { WasteContainerRequest, WasteContainerView } from "@/api/client/models";
 import { Company, companyService } from "@/api/services/companyService";
 import { SelectFormField } from "@/components/ui/form/selectfield/SelectFormField";
 import { useQuery } from "@tanstack/react-query";
@@ -18,8 +18,8 @@ interface WasteContainerFormProps {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     onCancel: () => void;
-    onSubmit: (eural: WasteContainer) => void;
-    initialData?: WasteContainer;
+    onSubmit: (eural: WasteContainerRequest) => void;
+    initialData?: WasteContainerView;
 }
 
 export interface WasteContainerFormValues {
@@ -37,8 +37,8 @@ export interface WasteContainerFormValues {
 function toWasteContainer(
     data: WasteContainerFormValues,
     companies: Company[]
-): WasteContainer {
-    const container: WasteContainer = {
+): WasteContainerRequest {
+    const container: WasteContainerRequest = {
         uuid: data.uuid || crypto.randomUUID(),
         id: data.id,
         location: {
@@ -47,6 +47,7 @@ function toWasteContainer(
                 buildingNumber: data.houseNumber,
                 postalCode: data.postalCode || '',
                 city: data.city,
+                country: 'Nederland',
             }
         },
         notes: data.notes,
@@ -63,6 +64,7 @@ function toWasteContainer(
                     buildingNumber: data.houseNumber,
                     postalCode: data.postalCode || '',
                     city: data.city,
+                    country: 'Nederland',
                 }
             };
         }
@@ -107,10 +109,10 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                 uuid: initialData.uuid,
                 id: initialData.id,
                 companyId: initialData?.location?.companyId,
-                street: initialData?.location?.address?.streetName,
-                houseNumber: initialData?.location?.address?.buildingNumber,
-                postalCode: initialData?.location?.address?.postalCode,
-                city: initialData?.location?.address?.city,
+                street: initialData?.location?.addressView?.street,
+                houseNumber: initialData?.location?.addressView?.houseNumber,
+                postalCode: initialData?.location?.addressView?.postalCode,
+                city: initialData?.location?.addressView?.city,
                 notes: initialData.notes,
             });
         } else {
@@ -222,7 +224,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                                         name: 'street',
                                         errors,
                                     }}
-                                    value={initialData?.location?.address?.streetName}
+                                    value={initialData?.location?.addressView?.street}
                                     disabled={hasCompanySelected}
                                 />
 
@@ -234,7 +236,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                                         name: 'houseNumber',
                                         errors,
                                     }}
-                                    value={initialData?.location?.address?.buildingNumber}
+                                    value={initialData?.location?.addressView?.houseNumber}
                                     disabled={hasCompanySelected}
                                 />
                             </div>
@@ -245,7 +247,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                                     setValue={setValue}
                                     errors={errors}
                                     name="postalCode"
-                                    value={initialData?.location?.address?.postalCode}
+                                    value={initialData?.location?.addressView?.postalCode}
                                     required={false}
                                     disabled={hasCompanySelected}
                                 />
@@ -258,7 +260,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                                         name: 'city',
                                         errors,
                                     }}
-                                    value={initialData?.location?.address?.city}
+                                    value={initialData?.location?.addressView?.city}
                                     disabled={hasCompanySelected}
                                 />
                             </div>
