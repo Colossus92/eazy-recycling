@@ -11,7 +11,7 @@ import { TransportStatusTag } from '@/features/planning/components/tag/Transport
 import { MobileTabBar } from '@/components/ui/mobile/MobileTabBar';
 import { Button } from '@/components/ui/button/Button';
 import { ReportFinishedComponent } from '@/features/mobile/planning/ReportFinishedComponent';
-import { transportService } from '@/api/services/transportService';
+import { resolveLocationAddress, transportService } from '@/api/services/transportService';
 
 const MobileTransportDetailsTab = lazy(
   () => import('@/features/mobile/planning/MobileTransportDetails')
@@ -43,6 +43,9 @@ export const MobileTransportDetailsPage = () => {
     refetchOnMount: false,
     refetchOnWindowFocus: false,
   });
+
+  const pickupAddress = transport && resolveLocationAddress(transport.pickupLocation);
+  const deliveryAddress = transport && resolveLocationAddress(transport.deliveryLocation);
 
   return (
     <div className="flex flex-col w-full">
@@ -82,9 +85,9 @@ export const MobileTransportDetailsPage = () => {
           <div className="flex flex-col items-start self-stretch gap-4">
             <div className="flex flex-col items-start self-stretch gap-2">
               <div className="flex items-center self-stretch gap-4">
-                <h4>{transport.pickupLocation.address.city}</h4>
+                <h4>{pickupAddress?.city}</h4>
                 <CaretRight className="text-color-text-secondary" />
-                <h4>{transport.deliveryLocation.address.city}</h4>
+                <h4>{deliveryAddress?.city}</h4>
               </div>
               <span className="text-subtitle-2 text-color-text-secondary">
                 {transport.truck?.brand} {transport.truck?.model} (
