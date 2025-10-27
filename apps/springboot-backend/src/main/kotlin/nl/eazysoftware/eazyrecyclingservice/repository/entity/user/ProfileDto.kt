@@ -1,13 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.user
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
-import java.util.UUID
+import jakarta.persistence.*
+import java.util.*
 
 @Entity
 @Table(name = "profiles")
@@ -23,5 +17,5 @@ data class ProfileDto(
     val lastName: String?,
 
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    val roles: List<UserRoleDto> = emptyList(),
+    val roles: MutableList<UserRoleDto> = mutableListOf(),
 )

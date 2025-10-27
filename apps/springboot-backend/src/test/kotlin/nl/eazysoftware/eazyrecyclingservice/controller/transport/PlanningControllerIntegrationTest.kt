@@ -254,6 +254,7 @@ class PlanningControllerIntegrationTest {
         val deliveryDateTime2 = date.atTime(16, 0)
 
         val transport1 = TransportDto(
+            id = UUID.randomUUID(),
             displayNumber = "T-001",
             consignorParty = testCompany,
             carrierParty = testCompany,
@@ -264,10 +265,12 @@ class PlanningControllerIntegrationTest {
             note = "Test Transport 1",
             truck = testTruck,
             driver = testDriver,
-            sequenceNumber = 1, transportType = TransportType.CONTAINER,
+            sequenceNumber = 1,
+            transportType = TransportType.CONTAINER,
         )
 
         val transport2 = TransportDto(
+            id = UUID.randomUUID(),
             displayNumber = "T-002",
             consignorParty = testCompany,
             carrierParty = testCompany,

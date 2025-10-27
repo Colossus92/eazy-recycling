@@ -76,7 +76,7 @@ class UpdateWasteTransportService(
     val savedTransport = wasteTransports.save(updatedTransport)
 
     return UpdateWasteTransportResult(
-      transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save"),
+      transportId = savedTransport.transportId,
       status = savedTransport.getStatus().name
     )
   }

@@ -41,7 +41,7 @@ class WasteTransportMapper(
       ?: throw IllegalArgumentException("Verwerker niet gevonden: ${wasteStream.deliveryLocation.processorPartyId.number}")
 
     return TransportDto(
-      id = domain.transportId?.uuid,
+      id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
       pickupDateTime = domain.pickupDateTime.toJavaInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
       deliveryDateTime = domain.deliveryDateTime.toJavaInstant().atZone(ZoneId.systemDefault())
@@ -69,7 +69,7 @@ class WasteTransportMapper(
   fun toDomain(dto: TransportDto): WasteTransport {
 
     return WasteTransport(
-      transportId = dto.id?.let { TransportId(it)},
+      transportId = TransportId(dto.id!!),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       carrierParty = CompanyId(dto.carrierParty.id!!),
       pickupDateTime = dto.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),

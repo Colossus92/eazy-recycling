@@ -9,7 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import kotlin.time.Duration
 
 class WasteTransport(
-  val transportId: TransportId? = null, // TODO remove UUID generation in DTO
+  val transportId: TransportId,
 
   /**
    * Used for human-readable display in the UI
@@ -56,6 +56,45 @@ class WasteTransport(
    */
   fun getStatus(): TransportStatus {
     return TransportStatusCalculator.calculateStatus(this)
+  }
+
+  companion object {
+    /**
+     * Factory method to create a new WasteTransport with a generated UUID.
+     */
+    fun create(
+      carrierParty: CompanyId,
+      pickupDateTime: Instant,
+      deliveryDateTime: Instant,
+      transportType: TransportType = TransportType.WASTE,
+      goodsItem: GoodsItem,
+      wasteContainer: WasteContainerId?,
+      containerOperation: ContainerOperation?,
+      truck: LicensePlate?,
+      driver: UserId?,
+      note: Note,
+      transportHours: Duration?,
+      updatedAt: Instant?,
+      sequenceNumber: Int,
+    ): WasteTransport {
+      return WasteTransport(
+        transportId = TransportId.generate(),
+        displayNumber = null,
+        carrierParty = carrierParty,
+        pickupDateTime = pickupDateTime,
+        deliveryDateTime = deliveryDateTime,
+        transportType = transportType,
+        goodsItem = goodsItem,
+        wasteContainer = wasteContainer,
+        containerOperation = containerOperation,
+        truck = truck,
+        driver = driver,
+        note = note,
+        transportHours = transportHours,
+        updatedAt = updatedAt,
+        sequenceNumber = sequenceNumber
+      )
+    }
   }
 }
 

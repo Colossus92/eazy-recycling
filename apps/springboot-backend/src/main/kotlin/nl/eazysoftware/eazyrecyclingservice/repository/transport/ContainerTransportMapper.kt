@@ -28,7 +28,7 @@ class ContainerTransportMapper(
 
   fun toDomain(dto: TransportDto): ContainerTransport {
     return ContainerTransport(
-      transportId = TransportId(dto.id!!),
+      transportId = TransportId(dto.id),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       consignorParty = CompanyId(dto.consignorParty.id!!),
       carrierParty = CompanyId(dto.carrierParty.id!!),
@@ -55,7 +55,7 @@ class ContainerTransportMapper(
       ?: throw IllegalArgumentException("Carrier company not found: ${domain.carrierParty.uuid}")
 
     return TransportDto(
-      id = domain.transportId?.uuid,
+      id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
       consignorParty = consignorCompany,
       carrierParty = carrierCompany,

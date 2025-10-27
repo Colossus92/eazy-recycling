@@ -97,7 +97,7 @@ class UpdateContainerTransportService(
     val savedTransport = containerTransports.save(updatedTransport)
 
     return UpdateContainerTransportResult(
-      transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save"),
+      transportId = savedTransport.transportId,
       status = savedTransport.getStatus().name
     )
   }

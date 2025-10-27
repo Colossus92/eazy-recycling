@@ -63,7 +63,7 @@ class CreateContainerTransportService(
 
   @Transactional
   override fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult {
-    val containerTransport = ContainerTransport(
+    val containerTransport = ContainerTransport.create(
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
       pickupLocation = createPickupLocation(cmd),
@@ -83,7 +83,7 @@ class CreateContainerTransportService(
     val savedTransport = containerTransports.save(containerTransport)
 
     return CreateContainerTransportResult(
-      transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save")
+      transportId = savedTransport.transportId
     )
   }
 

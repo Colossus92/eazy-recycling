@@ -737,6 +737,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
 
   private fun createTestTransport(note: String, goodsItem: GoodsItemDto? = null): TransportDto {
     return TransportDto(
+      id = UUID.randomUUID(),
       consignorParty = testCompany,
       carrierParty = testCompany,
       pickupLocation = testLocation,

@@ -42,7 +42,7 @@ class CreateWasteTransportService(
 
   @Transactional
   override fun handle(cmd: CreateWasteTransportCommand): CreateWasteTransportResult {
-    val wasteTransport = WasteTransport(
+    val wasteTransport = WasteTransport.create(
       carrierParty = cmd.carrierParty,
       pickupDateTime = cmd.pickupDateTime,
       deliveryDateTime = cmd.deliveryDateTime,
@@ -61,7 +61,7 @@ class CreateWasteTransportService(
     val savedTransport = wasteTransports.save(wasteTransport)
 
     return CreateWasteTransportResult(
-      transportId = savedTransport.transportId!! //TODO remove non-null assertion
+      transportId = savedTransport.transportId
     )
   }
 }
