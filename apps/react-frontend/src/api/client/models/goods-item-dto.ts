@@ -31,7 +31,7 @@ export interface GoodsItemDto {
      * @type {string}
      * @memberof GoodsItemDto
      */
-    'wasteStreamNumber'?: string;
+    'wasteStreamNumber': string;
     /**
      * 
      * @type {number}
@@ -50,23 +50,5 @@ export interface GoodsItemDto {
      * @memberof GoodsItemDto
      */
     'quantity': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsItemDto
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsItemDto
-     */
-    'euralCode': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsItemDto
-     */
-    'processingMethodCode': string;
 }
 

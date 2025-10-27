@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { LocationDto } from './location-dto';
+import type { WasteStreamDetailViewPickupLocation } from './waste-stream-detail-view-pickup-location';
 
 /**
  * 
@@ -49,16 +49,16 @@ export interface DriverPlanningItem {
     'deliveryDateTime'?: string;
     /**
      * 
-     * @type {LocationDto}
+     * @type {WasteStreamDetailViewPickupLocation}
      * @memberof DriverPlanningItem
      */
-    'pickupLocation': LocationDto;
+    'pickupLocation': WasteStreamDetailViewPickupLocation;
     /**
      * 
-     * @type {LocationDto}
+     * @type {WasteStreamDetailViewPickupLocation}
      * @memberof DriverPlanningItem
      */
-    'deliveryLocation': LocationDto;
+    'deliveryLocation': WasteStreamDetailViewPickupLocation;
     /**
      * 
      * @type {string}

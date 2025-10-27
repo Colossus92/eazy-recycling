@@ -31,7 +31,7 @@ export interface AddressRequest {
      * @type {string}
      * @memberof AddressRequest
      */
-    'buildingName'?: string;
+    'buildingNumberAddition'?: string;
     /**
      * 
      * @type {string}

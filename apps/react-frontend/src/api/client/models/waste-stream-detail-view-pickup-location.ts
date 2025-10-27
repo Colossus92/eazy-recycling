@@ -21,7 +21,13 @@ import type { CompanyView } from './company-view';
 import type { DutchAddressView } from './dutch-address-view';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { NoPickupView } from './no-pickup-view';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { PickupCompanyView } from './pickup-company-view';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ProjectLocationView } from './project-location-view';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ProximityDescriptionView } from './proximity-description-view';
@@ -30,6 +36,6 @@ import type { ProximityDescriptionView } from './proximity-description-view';
  * @type WasteStreamDetailViewPickupLocation
  * @export
  */
-export type WasteStreamDetailViewPickupLocation = DutchAddressView | PickupCompanyView | ProximityDescriptionView;
+export type WasteStreamDetailViewPickupLocation = DutchAddressView | NoPickupView | PickupCompanyView | ProjectLocationView | ProximityDescriptionView;
 
 
