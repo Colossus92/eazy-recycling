@@ -10,15 +10,15 @@ import org.hibernate.Hibernate
 
 data class PlanningView(
   val dates: List<String>,
-  val transports: List<TransportsView>,
+  val transports: List<PlanningTransportsView>,
 )
 
-data class TransportsView(
+data class PlanningTransportsView(
   val truck: String,
-  val transports: Map<String, List<TransportView>>
+  val transports: Map<String, List<PlanningTransportView>>
 )
 
-data class TransportView(
+data class PlanningTransportView(
   val pickupDate: String,
   val deliveryDate: String?,
   val id: String,

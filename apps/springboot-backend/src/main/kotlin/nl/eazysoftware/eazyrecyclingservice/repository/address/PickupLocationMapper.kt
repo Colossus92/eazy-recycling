@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.util.*
@@ -17,40 +18,42 @@ class PickupLocationMapper(
 ) {
 
   fun toDomain(dto: PickupLocationDto): Location {
-    return when (dto) {
+
+
+    return when (val unproxied = Hibernate.unproxy(dto)) {
       is PickupLocationDto.DutchAddressDto -> DutchAddress(
         address = Address(
-          streetName = dto.streetName,
-          postalCode = DutchPostalCode(dto.postalCode),
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country,
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
         )
       )
 
       is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
-        description = dto.description,
-        postalCodeDigits = dto.postalCode,
-        city = dto.city,
-        country = dto.country
+        description = unproxied.description,
+        postalCodeDigits = unproxied.postalCode,
+        city = unproxied.city,
+        country = unproxied.country
       )
 
       is PickupLocationDto.PickupCompanyDto -> Company(
-        companyId = CompanyId(dto.company.id!!)
+        companyId = CompanyId(unproxied.company.id!!)
       )
 
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
-        id = UUID.fromString(dto.id),
+        id = UUID.fromString(unproxied.id),
         address = Address(
-          streetName = dto.streetName,
-          postalCode = DutchPostalCode(dto.postalCode),
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country,
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
         ),
-        companyId = CompanyId(dto.company.id!!)
+        companyId = CompanyId(unproxied.company.id!!)
       )
 
       is PickupLocationDto.NoPickupLocationDto -> NoLocation
