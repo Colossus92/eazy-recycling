@@ -2110,12 +2110,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2178,15 +2178,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2216,11 +2216,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2522,15 +2522,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond
@@ -2569,6 +2569,10 @@ components:
           type: string
         status:
           type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
         truck:
           $ref: "#/components/schemas/TruckView"
         driver:
@@ -2602,8 +2606,14 @@ components:
       properties:
         licensePlate:
           type: string
+        brand:
+          type: string
+        model:
+          type: string
       required:
+      - brand
       - licensePlate
+      - model
     WasteContainerView:
       type: object
       properties:

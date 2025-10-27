@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportStatus
 import java.util.*
 
 /**
@@ -17,7 +18,7 @@ data class TransportDetailView(
   val deliveryLocation: PickupLocationView,
   val deliveryDateTime: Instant,
   val transportType: String,
-  val status: String,
+  val status: TransportStatus,
   val truck: TruckView?,
   val driver: DriverView?,
   val note: String,
@@ -33,7 +34,9 @@ data class WasteContainerView(
 )
 
 data class TruckView(
-  val licensePlate: String
+  val licensePlate: String,
+  val brand: String,
+  val model: String,
 )
 
 data class DriverView(

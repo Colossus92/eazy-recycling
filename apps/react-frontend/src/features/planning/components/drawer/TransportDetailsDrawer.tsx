@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { useEffect } from 'react';
+import { formatInstantInCET } from '@/utils/dateUtils';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
-import { transportService } from '@/api/services/transportService';
+import { resolveLocationAddress, transportService } from '@/api/services/transportService';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
@@ -77,8 +77,8 @@ export const TransportDetailsDrawer = ({
       goodsItem?.quantity +
       ')'
     : 'Geen afval';
-  const containerText = data?.wasteContainer?.id
-    ? data.wasteContainer.id
+  const containerText = data?.wasteContainer?.containerNumber
+    ? data.wasteContainer.containerNumber
     : 'Geen container toegewezen';
   return (
     <Drawer
@@ -101,9 +101,9 @@ export const TransportDetailsDrawer = ({
               }
             >
               <div className="flex items-center self-stretch gap-4">
-                <h4>{data.pickupLocation.address.city}</h4>
+                <h4>{resolveLocationAddress(data.pickupLocation)?.city}</h4>
                 <CaretRight />
-                <h4>{data?.deliveryLocation.address.city}</h4>
+                <h4>{resolveLocationAddress(data.deliveryLocation)?.city}</h4>
               </div>
               <span className="text-subtitle-2 text-color-text-secondary">
                 {data?.truck?.brand} {data?.truck?.model}{' '}
@@ -144,10 +144,9 @@ export const TransportDetailsDrawer = ({
                   </span>
                 </div>
                 <span className={'text-body-2 truncate'}>
-                  {format(new Date(data.pickupDateTime), 'dd-MM-yyyy')}{' '}
+                  {formatInstantInCET(data.pickupDateTime, 'dd-MM-yyyy')}{' '}
                   {data.deliveryDateTime
-                    ? ' - ' +
-                      format(new Date(data.deliveryDateTime), 'dd-MM-yyyy')
+                    ? ' - ' + formatInstantInCET(data.deliveryDateTime, 'dd-MM-yyyy')
                     : ''}
                 </span>
               </div>
@@ -176,9 +175,8 @@ export const TransportDetailsDrawer = ({
                   <Ellipse />
                 </div>
                 <CompanyCard
-                  companyName={data?.pickupCompany?.name}
                   dateTime={data.pickupDateTime}
-                  address={data.pickupLocation.address}
+                  details={resolveLocationAddress(data.pickupLocation)}
                 />
               </div>
               <DottedStroke
@@ -195,9 +193,8 @@ export const TransportDetailsDrawer = ({
                   <MapPin />
                 </div>
                 <CompanyCard
-                  companyName={data?.deliveryCompany?.name}
                   dateTime={data.deliveryDateTime}
-                  address={data.deliveryLocation.address}
+                  details={resolveLocationAddress(data.deliveryLocation)}
                 />
               </div>
             </div>

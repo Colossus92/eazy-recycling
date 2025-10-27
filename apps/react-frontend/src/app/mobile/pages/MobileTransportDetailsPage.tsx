@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { formatInstantInCET } from '@/utils/dateUtils';
 import { useState, lazy, Suspense } from 'react';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
@@ -121,7 +121,7 @@ export const MobileTransportDetailsPage = () => {
                 </span>
               </div>
               <span className="text-subtitle-2">
-                {format(new Date(transport.pickupDateTime), 'dd-MM-yyyy')}
+                {formatInstantInCET(transport.pickupDateTime, 'dd-MM-yyyy')}
               </span>
             </div>
           </div>

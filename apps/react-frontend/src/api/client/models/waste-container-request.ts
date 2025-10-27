@@ -13,48 +13,39 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ContainerLocation } from './container-location';
 
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface WasteContainerRequest
  */
-export interface LocalTime {
+export interface WasteContainerRequest {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof WasteContainerRequest
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'uuid': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof WasteContainerRequest
      */
-    'value$kotlinx_datetime': string;
+    'id': string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {ContainerLocation}
+     * @memberof WasteContainerRequest
      */
-    'nanosecond': number;
+    'location'?: ContainerLocation;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerRequest
+     */
+    'notes'?: string;
 }
 

@@ -1,17 +1,16 @@
-import { format } from 'date-fns';
 import { JdenticonAvatar } from '../icon/JdenticonAvatar';
-import { AddressDto } from '@/api/client';
+import { Instant } from '@/api/client';
+import { formatInstantInCET } from '@/utils/dateUtils';
+import { NormalizedAddress } from '@/api/services/transportService';
 
 interface CompanyCardProps {
-  companyName?: string;
-  dateTime?: string;
-  address: AddressDto;
+  dateTime?: Instant;
+  details: NormalizedAddress | null;
 }
 
 export const CompanyCard = ({
-  companyName,
   dateTime,
-  address,
+  details,
 }: CompanyCardProps) => {
   return (
     <div
@@ -19,17 +18,17 @@ export const CompanyCard = ({
         'flex flex-1 items-center gap-2 h-16 p-3 border border-solid border-color-border-primary rounded-radius-md'
       }
     >
-      {companyName && <JdenticonAvatar value={companyName} size={44} />}
+      {details?.companyName && <JdenticonAvatar value={details.companyName} size={44} />}
       <div className={'flex flex-col justify-center items-start gap-1 flex-1'}>
         <div className={'flex justify-between items-center self-stretch'}>
-          <span className="subtitle-2">{companyName}</span>
+          <span className="subtitle-2">{details?.companyName}</span>
           <span className="text-body-2 text-color-text-secondary">
-            {dateTime ? format(new Date(dateTime), 'dd-MM-yyyy') : ''}
+            {dateTime ? formatInstantInCET(dateTime, 'dd-MM-yyyy HH:mm') : ''}
           </span>
         </div>
         <span
           className={'text-caption-1 text-color-text-secondary'}
-        >{`${address.streetName} ${address.buildingNumber}, ${address.city}`}</span>
+        >{`${details?.street} ${details?.houseNumber}, ${details?.city}`}</span>
       </div>
     </div>
   );

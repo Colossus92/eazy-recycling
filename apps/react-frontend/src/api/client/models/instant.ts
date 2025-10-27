@@ -17,44 +17,32 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface Instant
  */
-export interface LocalTime {
+export interface Instant {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof Instant
      */
     'value'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
-    /**
-     * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof Instant
      */
     'value$kotlinx_datetime': string;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof Instant
      */
-    'nanosecond': number;
+    'epochSeconds': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Instant
+     */
+    'nanosecondsOfSecond': number;
 }
 

@@ -17,44 +17,26 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface TruckView
  */
-export interface LocalTime {
+export interface TruckView {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckView
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'licensePlate': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckView
      */
-    'value$kotlinx_datetime': string;
+    'brand': string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof TruckView
      */
-    'nanosecond': number;
+    'model': string;
 }
 

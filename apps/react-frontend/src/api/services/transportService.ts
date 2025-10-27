@@ -3,18 +3,20 @@ import {
   TransportControllerApi,
   TransportDto,
   TransportFinishedRequest,
-  WasteTransportControllerApi
-} from '../client';
+  WasteTransportControllerApi,
+  WasteStreamDetailViewPickupLocation,
+  PickupLocationView
+} from '@/api/client';
 import { apiInstance } from './apiInstance';
-import { ContainerTransportRequest } from '../client/models/container-transport-request';
+import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
 import {
   CreateContainerTransportRequest,
   CreateContainerTransportRequestContainerOperationEnum
-} from '../client/models/create-container-transport-request';
+} from '@/api/client/models/create-container-transport-request';
 import {
   CreateWasteTransportRequest,
   CreateWasteTransportRequestContainerOperationEnum
-} from '../client/models/create-waste-transport-request';
+} from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
 import { format } from 'date-fns';
@@ -23,6 +25,87 @@ import { format } from 'date-fns';
 const transportApi = new TransportControllerApi(apiInstance.config)
 const containerTransportApi = new ContainerTransportControllerApi(apiInstance.config)
 const wasteTransportApi = new WasteTransportControllerApi(apiInstance.config)
+
+/**
+ * Represents a normalized address structure
+ */
+export interface NormalizedAddress {
+  companyName?: string;
+  street: string;
+  houseNumber: string;
+  postalCode: string;
+  city: string;
+  country?: string;
+}
+
+/**
+ * Resolves address details from a WasteStreamDetailViewPickupLocation union type.
+ * Supports PickupCompanyView (type === 'company') and DutchAddressView (type === 'dutch_address').
+ * 
+ * @param location - The pickup or delivery location from TransportDetailView
+ * @returns A normalized address object or null if location is invalid
+ */
+export const  resolveLocationAddress = (location: PickupLocationView): NormalizedAddress | null => {
+  if (!location) {
+    return null;
+  }
+
+  const locationAny = location as any;
+  
+  // Handle PickupCompanyView (type === 'company')
+  if (locationAny.type === 'company' && locationAny.company?.address) {
+    const address = locationAny.company.address;
+    return {
+      companyName: locationAny.company.name,
+      street: address.street || '',
+      houseNumber: address.houseNumber || '',
+      postalCode: address.postalCode || '',
+      city: address.city || '',
+      country: address.country
+    };
+  }
+  
+  // Handle DutchAddressView (type === 'dutch_address')
+  if (locationAny.type === 'dutch_address') {
+    return {
+      street: locationAny.streetName || locationAny.street || '',
+      houseNumber: locationAny.buildingNumber || locationAny.houseNumber || '',
+      postalCode: locationAny.postalCode || '',
+      city: locationAny.city || '',
+      country: locationAny.country || 'Nederland'
+    };
+  }
+  
+  // Fallback: try to extract address directly if it exists
+  if (locationAny.address) {
+    return {
+      street: locationAny.address.street || locationAny.address.streetName || '',
+      houseNumber: locationAny.address.houseNumber || locationAny.address.buildingNumber || '',
+      postalCode: locationAny.address.postalCode || '',
+      city: locationAny.address.city || '',
+      country: locationAny.address.country
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Resolves company ID from a WasteStreamDetailViewPickupLocation union type.
+ * Returns the company ID if the location is of type 'company'.
+ * 
+ * @param location - The pickup or delivery location from TransportDetailView
+ * @returns The company ID or undefined if not a company location
+ */
+export const resolveLocationCompanyId = (location: WasteStreamDetailViewPickupLocation): string | undefined => {
+  const locationAny = location as any;
+  
+  if (locationAny.type === 'company' && locationAny.company?.id) {
+    return locationAny.company.id;
+  }
+  
+  return undefined;
+}
 
 export const transportService = {
     deleteTransport: (id: string) => transportApi.deleteTransport(id),
@@ -199,3 +282,30 @@ export const transportDtoToWasteTransportFormValues = (dto: TransportDto) => {
     }
     return formValues
 }
+
+/**
+ * Example usage of resolveLocationAddress with TransportDetailView
+ * 
+ * @example
+ * ```typescript
+ * const transport: TransportDetailView = await transportService.getTransportById(id);
+ * 
+ * // Resolve pickup location address
+ * const pickupAddress = resolveLocationAddress(transport.pickupLocation);
+ * if (pickupAddress) {
+ *   console.log(`Pickup: ${pickupAddress.street} ${pickupAddress.houseNumber}, ${pickupAddress.city}`);
+ * }
+ * 
+ * // Resolve delivery location address
+ * const deliveryAddress = resolveLocationAddress(transport.deliveryLocation);
+ * if (deliveryAddress) {
+ *   console.log(`Delivery: ${deliveryAddress.street} ${deliveryAddress.houseNumber}, ${deliveryAddress.city}`);
+ * }
+ * 
+ * // Get company ID if location is a company
+ * const pickupCompanyId = resolveLocationCompanyId(transport.pickupLocation);
+ * if (pickupCompanyId) {
+ *   console.log(`Pickup company ID: ${pickupCompanyId}`);
+ * }
+ * ```
+ */
