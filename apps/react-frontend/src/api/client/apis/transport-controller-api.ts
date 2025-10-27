@@ -34,7 +34,8 @@ import {
 import { BASE_PATH, BaseAPI, COLLECTION_FORMATS, operationServerMap, type RequestArgs, RequiredError } from '../base';
 // @ts-ignore
 // @ts-ignore
-import type { TransportDto, TransportFinishedRequest } from '../models';
+// @ts-ignore
+import type { TransportDetailView, TransportDto, TransportFinishedRequest } from '../models';
 
 /**
  * TransportControllerApi - axios parameter creator
@@ -231,7 +232,7 @@ export const TransportControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTransportById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
+        async getTransportById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDetailView>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTransportById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.getTransportById']?.[localVarOperationServerIndex]?.url;
@@ -283,7 +284,7 @@ export const TransportControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransportById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
+        getTransportById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<TransportDetailView> {
             return localVarFp.getTransportById(id, options).then((request) => request(axios, basePath));
         },
         /**

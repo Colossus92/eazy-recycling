@@ -944,7 +944,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TransportDto"
+                $ref: "#/components/schemas/TransportDetailView"
     delete:
       tags:
       - transport-controller
@@ -1503,38 +1503,7 @@ components:
       - date
       - licensePlate
       - transportIds
-    PlanningView:
-      type: object
-      properties:
-        dates:
-          type: array
-          items:
-            type: string
-        transports:
-          type: array
-          items:
-            $ref: "#/components/schemas/TransportsView"
-      required:
-      - dates
-      - transports
-    ProfileDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        firstName:
-          type: string
-        lastName:
-          type: string
-        roles:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserRoleDto"
-      required:
-      - id
-      - roles
-    TransportView:
+    PlanningTransportView:
       type: object
       properties:
         pickupDate:
@@ -1576,7 +1545,7 @@ components:
       - sequenceNumber
       - status
       - transportType
-    TransportsView:
+    PlanningTransportsView:
       type: object
       properties:
         truck:
@@ -1586,10 +1555,41 @@ components:
           additionalProperties:
             type: array
             items:
-              $ref: "#/components/schemas/TransportView"
+              $ref: "#/components/schemas/PlanningTransportView"
       required:
       - transports
       - truck
+    PlanningView:
+      type: object
+      properties:
+        dates:
+          type: array
+          items:
+            type: string
+        transports:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlanningTransportsView"
+      required:
+      - dates
+      - transports
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoleDto"
+      required:
+      - id
+      - roles
     UserRoleDto:
       type: object
       properties:
@@ -2110,12 +2110,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2178,15 +2178,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2216,11 +2216,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -2504,6 +2504,117 @@ components:
       required:
       - id
       - roles
+    DriverView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    Instant:
+      type: object
+      properties:
+        value:
+          type: string
+          format: date-time
+          writeOnly: true
+        epochSeconds:
+          type: integer
+          format: int64
+        nanosecondsOfSecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
+      required:
+      - epochSeconds
+      - nanosecondsOfSecond
+      - value$kotlinx_datetime
+    TransportDetailView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyView"
+        carrierParty:
+          $ref: "#/components/schemas/CompanyView"
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
+          - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
+        pickupDateTime:
+          $ref: "#/components/schemas/Instant"
+        deliveryLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
+          - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
+        deliveryDateTime:
+          $ref: "#/components/schemas/Instant"
+        transportType:
+          type: string
+        status:
+          type: string
+        truck:
+          $ref: "#/components/schemas/TruckView"
+        driver:
+          $ref: "#/components/schemas/DriverView"
+        note:
+          type: string
+        transportHours:
+          type: number
+          format: double
+        sequenceNumber:
+          type: integer
+          format: int32
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+        wasteContainer:
+          $ref: "#/components/schemas/WasteContainerView"
+      required:
+      - carrierParty
+      - consignorParty
+      - deliveryDateTime
+      - deliveryLocation
+      - id
+      - note
+      - pickupDateTime
+      - pickupLocation
+      - sequenceNumber
+      - status
+      - transportType
+    TruckView:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+      required:
+      - licensePlate
+    WasteContainerView:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        containerNumber:
+          type: string
+      required:
+      - containerNumber
+      - uuid
     DriverPlanningItem:
       type: object
       properties:

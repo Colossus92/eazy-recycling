@@ -41,12 +41,14 @@ models/create-waste-transport-response.ts
 models/create-weight-ticket-response.ts
 models/delivery-location-view.ts
 models/driver-planning-item.ts
+models/driver-view.ts
 models/dutch-address-request.ts
 models/dutch-address-view.ts
 models/eural-code-view.ts
 models/eural.ts
 models/goods-item-dto.ts
 models/index.ts
+models/instant.ts
 models/local-date-time.ts
 models/local-date.ts
 models/local-time.ts
@@ -59,6 +61,8 @@ models/pickup-company-view.ts
 models/pickup-location-dto.ts
 models/pickup-location-request.ts
 models/pickup-location-view.ts
+models/planning-transport-view.ts
+models/planning-transports-view.ts
 models/planning-view.ts
 models/processing-method-dto.ts
 models/processing-method-view.ts
@@ -69,11 +73,11 @@ models/project-location-view.ts
 models/proximity-description-request.ts
 models/proximity-description-view.ts
 models/signature-status-view.ts
+models/transport-detail-view.ts
 models/transport-dto.ts
 models/transport-finished-request.ts
 models/transport-reorder-request.ts
-models/transport-view.ts
-models/transports-view.ts
+models/truck-view.ts
 models/truck.ts
 models/update-container-transport-response.ts
 models/update-user-request.ts
@@ -83,6 +87,7 @@ models/user-role-dto.ts
 models/waste-container-dto.ts
 models/waste-container-id.ts
 models/waste-container-request.ts
+models/waste-container-view.ts
 models/waste-container.ts
 models/waste-stream-detail-view-pickup-location.ts
 models/waste-stream-detail-view.ts
