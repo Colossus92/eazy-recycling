@@ -3,16 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.repository.address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.Company
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProximityDescription
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 class PickupLocationMapper(
@@ -67,14 +63,13 @@ class PickupLocationMapper(
     return when (location) {
       is DutchAddress -> findOrCreateDutchAddress(location)
       is ProximityDescription -> createProximity(location)
-      is Company -> createPickupCompany(location)
+      is Company -> findOrCreateCompany(location)
       is ProjectLocation -> findOrCreateProjectLocation(location)
       is NoLocation -> PickupLocationDto.NoPickupLocationDto()
     }
   }
 
   private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    // If not found, create and save new project location
     val company = companyRepository.findByIdOrNull(location.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
 
@@ -121,7 +116,7 @@ class PickupLocationMapper(
     }
   }
 
-  private fun createPickupCompany(
+  private fun findOrCreateCompany(
     domain: Company
   ): PickupLocationDto.PickupCompanyDto {
     val company = companyRepository.findByIdOrNull(domain.companyId.uuid)

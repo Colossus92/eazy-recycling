@@ -1,48 +1,82 @@
-import { TransportControllerApi, TransportDto, TransportFinishedRequest } from "../client"
-import { apiInstance } from "./apiInstance"
-import { CreateContainerTransportRequest, CreateContainerTransportRequestContainerOperationEnum } from "../client/models/create-container-transport-request"
-import { CreateWasteTransportRequest, CreateWasteTransportRequestContainerOperationEnum } from "../client/models/create-waste-transport-request"
-import { ContainerTransportFormValues } from "@/features/planning/hooks/useContainerTransportForm"
-import { WasteTransportFormValues } from "@/features/planning/hooks/useWasteTransportForm"
+import {
+  ContainerTransportControllerApi,
+  TransportControllerApi,
+  TransportDto,
+  TransportFinishedRequest,
+  WasteTransportControllerApi
+} from '../client';
+import { apiInstance } from './apiInstance';
+import { ContainerTransportRequest } from '../client/models/container-transport-request';
+import {
+  CreateContainerTransportRequest,
+  CreateContainerTransportRequestContainerOperationEnum
+} from '../client/models/create-container-transport-request';
+import {
+  CreateWasteTransportRequest,
+  CreateWasteTransportRequestContainerOperationEnum
+} from '../client/models/create-waste-transport-request';
+import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
+import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
 import { format } from 'date-fns';
 
 
 const transportApi = new TransportControllerApi(apiInstance.config)
+const containerTransportApi = new ContainerTransportControllerApi(apiInstance.config)
+const wasteTransportApi = new WasteTransportControllerApi(apiInstance.config)
 
 export const transportService = {
     deleteTransport: (id: string) => transportApi.deleteTransport(id),
     getTransportById: (id: string) => transportApi.getTransportById(id).then((response) => response.data),
-    updateContainerTransport: (id: string, data: CreateContainerTransportRequest) => transportApi.updateContainerTransport(id, data),
-    createContainerTransport: (data: CreateContainerTransportRequest) => transportApi.createContainerTransport(data),
-    createWasteTransport: (data: CreateWasteTransportRequest) => transportApi.createWasteTransport(data),
-    updateWasteTransport: (id: string, data: CreateWasteTransportRequest) => transportApi.updateWasteTransport(id, data),
+    updateContainerTransport: (id: string, data: CreateContainerTransportRequest) => containerTransportApi.updateContainerTransport(id, data),
+    createContainerTransport: (data: CreateContainerTransportRequest) => containerTransportApi.createContainerTransport(data),
+    createWasteTransport: (data: CreateWasteTransportRequest) => wasteTransportApi.createWasteTransport(data),
+    updateWasteTransport: (id: string, data: CreateWasteTransportRequest) => wasteTransportApi.updateWasteTransport(id, data),
     reportFinished: (id: string, data: TransportFinishedRequest) => transportApi.markTransportAsFinished(id, data),
 }
 
 export const formValuesToCreateContainerTransportRequest = (formValues: ContainerTransportFormValues) => {
-    const request: CreateContainerTransportRequest = {
+
+
+
+    const request: ContainerTransportRequest = {
         consignorPartyId: formValues.consignorPartyId,
         carrierPartyId: formValues.carrierPartyId,
         containerOperation: formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
-        pickupCompanyId: formValues.pickupCompanyId,
-        pickupCompanyBranchId: formValues.pickupCompanyBranchId,
-        pickupStreet: formValues.pickupStreet,
-        pickupBuildingNumber: formValues.pickupBuildingNumber,
-        pickupPostalCode: formValues.pickupPostalCode,
-        pickupCity: formValues.pickupCity,
         pickupDateTime: formValues.pickupDateTime,
-        deliveryCompanyId: formValues.deliveryCompanyId,
-        deliveryCompanyBranchId: formValues.deliveryCompanyBranchId,
-        deliveryStreet: formValues.deliveryStreet,
-        deliveryBuildingNumber: formValues.deliveryBuildingNumber,
-        deliveryPostalCode: formValues.deliveryPostalCode,
-        deliveryCity: formValues.deliveryCity,
         deliveryDateTime: formValues.deliveryDateTime,
         truckId: formValues.truckId,
         driverId: formValues.driverId,
         containerId: formValues.containerId,
         note: formValues.note || '',
-        transportType: "CONTAINER"
+        transportType: "CONTAINER",
+        deliveryStreet: "",
+        deliveryBuildingNumber: "",
+        deliveryPostalCode: "",
+        deliveryCity: ""
+    }
+
+    //TODO should be possible to just send all available fields
+
+    if (formValues.pickupCompanyBranchId) {
+        request.pickupProjectLocationId = formValues.pickupCompanyBranchId
+    } else if (formValues.pickupCompanyId) {
+        request.pickupCompanyId = formValues.pickupCompanyId
+    } else if (formValues.pickupStreet) {
+        request.pickupStreet = formValues.pickupStreet
+        request.pickupBuildingNumber = formValues.pickupBuildingNumber
+        request.pickupPostalCode = formValues.pickupPostalCode
+        request.pickupCity = formValues.pickupCity
+    }
+
+    if (formValues.deliveryCompanyBranchId) {
+        request.deliveryProjectLocationId = formValues.deliveryCompanyBranchId
+    } else if (formValues.deliveryCompanyId) {
+        request.deliveryCompanyId = formValues.deliveryCompanyId
+    } else if (formValues.deliveryStreet) {
+        request.deliveryStreet = formValues.deliveryStreet
+        request.deliveryBuildingNumber = formValues.deliveryBuildingNumber
+        request.deliveryPostalCode = formValues.deliveryPostalCode
+        request.deliveryCity = formValues.deliveryCity
     }
     return request
 }

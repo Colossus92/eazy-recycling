@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import org.hibernate.Hibernate
 
 
 data class PlanningView(
@@ -50,11 +51,11 @@ data class TransportView(
 }
 
 fun getCityFrom(location: PickupLocationDto) =
-  when (location) {
-    is PickupLocationDto.DutchAddressDto -> location.city
-    is PickupLocationDto.PickupCompanyDto -> location.company.address.city ?: "niet bekend"
-    is PickupLocationDto.PickupProjectLocationDto -> location.city
+  when (val unproxied = Hibernate.unproxy(location)) {
+    is PickupLocationDto.DutchAddressDto -> unproxied.city
+    is PickupLocationDto.PickupCompanyDto -> unproxied.company.address.city ?: "niet bekend"
+    is PickupLocationDto.PickupProjectLocationDto -> unproxied.city
     is PickupLocationDto.NoPickupLocationDto -> "n.v.t."
-    is PickupLocationDto.ProximityDescriptionDto -> location.city
-    else -> throw IllegalStateException("Ongeldige ophaallocatie type: ${location::class.simpleName}")
+    is PickupLocationDto.ProximityDescriptionDto -> unproxied.city
+    else -> throw IllegalStateException("Ongeldige ophaallocatie type: ${unproxied::class.simpleName}")
   }
