@@ -227,7 +227,7 @@ paths:
   /transport/waste/{id}:
     put:
       tags:
-      - transport-controller
+      - waste-transport-controller
       operationId: updateWasteTransport
       parameters:
       - name: id
@@ -240,7 +240,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateWasteTransportRequest"
+              $ref: "#/components/schemas/WasteTransportRequest"
         required: true
       responses:
         "200":
@@ -248,11 +248,11 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TransportDto"
+                $ref: "#/components/schemas/UpdateWasteTransportResponse"
   /transport/container/{id}:
     put:
       tags:
-      - transport-controller
+      - container-transport-controller
       operationId: updateContainerTransport
       parameters:
       - name: id
@@ -265,7 +265,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateContainerTransportRequest"
+              $ref: "#/components/schemas/ContainerTransportRequest"
         required: true
       responses:
         "200":
@@ -273,7 +273,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TransportDto"
+                $ref: "#/components/schemas/UpdateContainerTransportResponse"
   /processing-methods/{code}:
     put:
       tags:
@@ -400,7 +400,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WasteContainer"
+              $ref: "#/components/schemas/WasteContainerRequest"
         required: true
       responses:
         "200":
@@ -714,39 +714,39 @@ paths:
   /transport/waste:
     post:
       tags:
-      - transport-controller
+      - waste-transport-controller
       operationId: createWasteTransport
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateWasteTransportRequest"
+              $ref: "#/components/schemas/WasteTransportRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TransportDto"
+                $ref: "#/components/schemas/CreateWasteTransportResponse"
   /transport/container:
     post:
       tags:
-      - transport-controller
+      - container-transport-controller
       operationId: createContainerTransport
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateContainerTransportRequest"
+              $ref: "#/components/schemas/ContainerTransportRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/TransportDto"
+                $ref: "#/components/schemas/CreateContainerTransportResponse"
   /processing-methods:
     get:
       tags:
@@ -897,7 +897,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CompanyBranchDto"
+                $ref: "#/components/schemas/ProjectLocationResult"
   /users/drivers:
     get:
       tags:
@@ -1168,6 +1168,44 @@ components:
           type: string
       required:
       - type
+    ProjectLocationRequest:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationRequest"
+      - type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+            minLength: 1
+          companyId:
+            type: string
+            format: uuid
+          streetName:
+            type: string
+            minLength: 1
+          buildingNumber:
+            type: string
+            minLength: 1
+          buildingNumberAddition:
+            type: string
+          postalCode:
+            type: string
+            minLength: 1
+            pattern: "^[1-9][0-9]{3}\\s?[A-Za-z]{2}$"
+          city:
+            type: string
+            minLength: 1
+          country:
+            type: string
+            minLength: 1
+      required:
+      - buildingNumber
+      - city
+      - companyId
+      - country
+      - id
+      - postalCode
+      - streetName
     ProximityDescriptionRequest:
       allOf:
       - $ref: "#/components/schemas/PickupLocationRequest"
@@ -1210,6 +1248,7 @@ components:
           - $ref: "#/components/schemas/DutchAddressRequest"
           - $ref: "#/components/schemas/NoPickupLocationRequest"
           - $ref: "#/components/schemas/PickupCompanyRequest"
+          - $ref: "#/components/schemas/ProjectLocationRequest"
           - $ref: "#/components/schemas/ProximityDescriptionRequest"
         processorPartyId:
           type: string
@@ -1275,16 +1314,9 @@ components:
       - displayName
       - licensePlate
       - updatedAt
-    CreateWasteTransportRequest:
+    WasteTransportRequest:
       type: object
       properties:
-        consigneePartyId:
-          type: string
-        pickupPartyId:
-          type: string
-        consignorPartyId:
-          type: string
-          format: uuid
         pickupDateTime:
           type: string
           format: date-time
@@ -1309,36 +1341,6 @@ components:
         carrierPartyId:
           type: string
           format: uuid
-        pickupCompanyId:
-          type: string
-          format: uuid
-        pickupCompanyBranchId:
-          type: string
-          format: uuid
-        pickupStreet:
-          type: string
-        pickupBuildingNumber:
-          type: string
-        pickupPostalCode:
-          type: string
-          pattern: "^\\d{4}\\s[A-Z]{2}$"
-        pickupCity:
-          type: string
-        deliveryCompanyId:
-          type: string
-          format: uuid
-        deliveryCompanyBranchId:
-          type: string
-          format: uuid
-        deliveryStreet:
-          type: string
-        deliveryBuildingNumber:
-          type: string
-        deliveryPostalCode:
-          type: string
-          pattern: "^\\d{4}\\s[A-Z]{2}$"
-        deliveryCity:
-          type: string
         truckId:
           type: string
         containerId:
@@ -1346,9 +1348,6 @@ components:
           format: uuid
         note:
           type: string
-        consignorClassification:
-          type: integer
-          format: int32
         wasteStreamNumber:
           type: string
         weight:
@@ -1362,291 +1361,27 @@ components:
           type: integer
           format: int32
           minimum: 0
-        goodsName:
-          type: string
-          minLength: 1
-        euralCode:
-          type: string
-          minLength: 1
-        processingMethodCode:
-          type: string
-          minLength: 1
       required:
       - carrierPartyId
-      - consigneePartyId
-      - consignorClassification
-      - consignorPartyId
       - containerOperation
-      - deliveryBuildingNumber
-      - deliveryCity
-      - deliveryPostalCode
-      - deliveryStreet
-      - euralCode
-      - goodsName
       - note
-      - pickupBuildingNumber
-      - pickupCity
       - pickupDateTime
-      - pickupPartyId
-      - pickupPostalCode
-      - pickupStreet
-      - processingMethodCode
       - quantity
       - transportType
       - unit
       - weight
-    AddressDto:
+    UpdateWasteTransportResponse:
       type: object
       properties:
-        streetName:
-          type: string
-        buildingName:
-          type: string
-        buildingNumber:
-          type: string
-        city:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
-      required:
-      - buildingNumber
-      - postalCode
-    CompanyBranchDto:
-      type: object
-      properties:
-        id:
+        transportId:
           type: string
           format: uuid
-        company:
-          $ref: "#/components/schemas/CompanyDto"
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-      - address
-      - company
-      - updatedAt
-    CompanyDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        chamberOfCommerceId:
-          type: string
-        vihbId:
-          type: string
-        processorId:
-          type: string
-        name:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-      - address
-      - name
-      - updatedAt
-    GoodsDto:
-      type: object
-      properties:
-        id:
-          type: string
-        uuid:
-          type: string
-          format: uuid
-        goodsItem:
-          $ref: "#/components/schemas/GoodsItemDto"
-        consignorClassification:
-          type: integer
-          format: int32
-        consigneeParty:
-          $ref: "#/components/schemas/CompanyDto"
-        pickupParty:
-          $ref: "#/components/schemas/CompanyDto"
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-      - consigneeParty
-      - consignorClassification
-      - goodsItem
-      - id
-      - pickupParty
-    GoodsItemDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        wasteStreamNumber:
-          type: string
-        netNetWeight:
-          type: integer
-          format: int32
-        unit:
-          type: string
-        quantity:
-          type: integer
-          format: int32
-        name:
-          type: string
-        euralCode:
-          type: string
-        processingMethodCode:
-          type: string
-      required:
-      - euralCode
-      - name
-      - netNetWeight
-      - processingMethodCode
-      - quantity
-      - unit
-    LocationDto:
-      type: object
-      properties:
-        id:
-          type: string
-        description:
-          type: string
-        locationTypeCode:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
-      required:
-      - address
-      - id
-    ProfileDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        firstName:
-          type: string
-        lastName:
-          type: string
-        roles:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserRoleDto"
-      required:
-      - id
-      - roles
-    TransportDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        displayNumber:
-          type: string
-        consignorParty:
-          $ref: "#/components/schemas/CompanyDto"
-        carrierParty:
-          $ref: "#/components/schemas/CompanyDto"
-        pickupCompany:
-          $ref: "#/components/schemas/CompanyDto"
-        pickupCompanyBranch:
-          $ref: "#/components/schemas/CompanyBranchDto"
-        pickupLocation:
-          $ref: "#/components/schemas/LocationDto"
-        pickupDateTime:
-          type: string
-          format: date-time
-        deliveryCompany:
-          $ref: "#/components/schemas/CompanyDto"
-        deliveryCompanyBranch:
-          $ref: "#/components/schemas/CompanyBranchDto"
-        deliveryLocation:
-          $ref: "#/components/schemas/LocationDto"
-        deliveryDateTime:
-          type: string
-          format: date-time
-        transportType:
-          type: string
-          enum:
-          - CONTAINER
-          - WASTE
-        containerOperation:
-          type: string
-          enum:
-          - EXCHANGE
-          - PICKUP
-          - EMPTY
-          - DELIVERY
-        wasteContainer:
-          $ref: "#/components/schemas/WasteContainerDto"
-        truck:
-          $ref: "#/components/schemas/Truck"
-        driver:
-          $ref: "#/components/schemas/ProfileDto"
-        note:
-          type: string
-        goods:
-          $ref: "#/components/schemas/GoodsDto"
-        transportHours:
-          type: number
-          format: double
-        updatedAt:
-          type: string
-          format: date-time
-        sequenceNumber:
-          type: integer
-          format: int32
         status:
           type: string
-          enum:
-          - UNPLANNED
-          - PLANNED
-          - FINISHED
-          - INVOICED
       required:
-      - carrierParty
-      - consignorParty
-      - deliveryLocation
-      - note
-      - pickupDateTime
-      - pickupLocation
-      - sequenceNumber
       - status
-      - transportType
-    UserRoleDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: string
-          format: uuid
-        role:
-          type: string
-      required:
-      - role
-    WasteContainerDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        id:
-          type: string
-        company:
-          $ref: "#/components/schemas/CompanyDto"
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        notes:
-          type: string
-      required:
-      - id
-    CreateContainerTransportRequest:
+      - transportId
+    ContainerTransportRequest:
       type: object
       properties:
         consignorPartyId:
@@ -1679,30 +1414,38 @@ components:
         pickupCompanyId:
           type: string
           format: uuid
-        pickupCompanyBranchId:
+        pickupProjectLocationId:
           type: string
           format: uuid
         pickupStreet:
           type: string
         pickupBuildingNumber:
           type: string
+        pickupBuildingNumberAddition:
+          type: string
         pickupPostalCode:
           type: string
         pickupCity:
           type: string
+        pickupDescription:
+          type: string
         deliveryCompanyId:
           type: string
           format: uuid
-        deliveryCompanyBranchId:
+        deliveryProjectLocationId:
           type: string
           format: uuid
         deliveryStreet:
           type: string
         deliveryBuildingNumber:
           type: string
+        deliveryBuildingNumberAddition:
+          type: string
         deliveryPostalCode:
           type: string
         deliveryCity:
+          type: string
+        deliveryDescription:
           type: string
         truckId:
           type: string
@@ -1720,12 +1463,19 @@ components:
       - deliveryPostalCode
       - deliveryStreet
       - note
-      - pickupBuildingNumber
-      - pickupCity
       - pickupDateTime
-      - pickupPostalCode
-      - pickupStreet
       - transportType
+    UpdateContainerTransportResponse:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+        status:
+          type: string
+      required:
+      - status
+      - transportId
     ProcessingMethodDto:
       type: object
       properties:
@@ -1767,6 +1517,23 @@ components:
       required:
       - dates
       - transports
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoleDto"
+      required:
+      - id
+      - roles
     TransportView:
       type: object
       properties:
@@ -1823,6 +1590,19 @@ components:
       required:
       - transports
       - truck
+    UserRoleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        userId:
+          type: string
+          format: uuid
+        role:
+          type: string
+      required:
+      - role
     Eural:
       type: object
       properties:
@@ -1833,6 +1613,24 @@ components:
       required:
       - code
       - description
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingName:
+          type: string
+        buildingNumber:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - postalCode
     ContainerLocation:
       type: object
       properties:
@@ -1843,7 +1641,7 @@ components:
           type: string
         address:
           $ref: "#/components/schemas/AddressDto"
-    WasteContainer:
+    WasteContainerRequest:
       type: object
       properties:
         uuid:
@@ -1858,13 +1656,58 @@ components:
       required:
       - id
       - uuid
+    WasteContainer:
+      type: object
+      properties:
+        wasteContainerId:
+          $ref: "#/components/schemas/WasteContainerId"
+        id:
+          type: string
+        location:
+          $ref: "#/components/schemas/ContainerLocation"
+        notes:
+          type: string
+      required:
+      - id
+      - wasteContainerId
+    WasteContainerId:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+      required:
+      - uuid
+    CompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - address
+      - name
+      - updatedAt
     AddressRequest:
       type: object
       properties:
         streetName:
           type: string
           minLength: 1
-        buildingName:
+        buildingNumberAddition:
           type: string
         buildingNumber:
           type: string
@@ -1976,6 +1819,137 @@ components:
           format: double
       required:
       - hours
+    GoodsItemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        wasteStreamNumber:
+          type: string
+        netNetWeight:
+          type: integer
+          format: int32
+        unit:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+      required:
+      - netNetWeight
+      - quantity
+      - unit
+      - wasteStreamNumber
+    PickupLocationDto:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+      - id
+    TransportDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDto"
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        pickupLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        deliveryDateTime:
+          type: string
+          format: date-time
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
+        wasteContainer:
+          $ref: "#/components/schemas/WasteContainerDto"
+        truck:
+          $ref: "#/components/schemas/Truck"
+        driver:
+          $ref: "#/components/schemas/ProfileDto"
+        note:
+          type: string
+        goodsItem:
+          $ref: "#/components/schemas/GoodsItemDto"
+        transportHours:
+          type: number
+          format: double
+        updatedAt:
+          type: string
+          format: date-time
+        sequenceNumber:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
+          - INVOICED
+      required:
+      - carrierParty
+      - consignorParty
+      - deliveryLocation
+      - id
+      - note
+      - pickupDateTime
+      - pickupLocation
+      - sequenceNumber
+      - status
+      - transportType
+    WasteContainerDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        id:
+          type: string
+        company:
+          $ref: "#/components/schemas/CompanyDto"
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        notes:
+          type: string
+      required:
+      - id
+    CreateWasteTransportResponse:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+      required:
+      - transportId
+    CreateContainerTransportResponse:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+      required:
+      - transportId
     CreateContainerRequest:
       type: object
       properties:
@@ -2004,6 +1978,18 @@ components:
       required:
       - address
       - name
+    ProjectLocationResult:
+      type: object
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        projectLocationId:
+          type: string
+          format: uuid
+      required:
+      - companyId
+      - projectLocationId
     WeightTicketListView:
       type: object
       properties:
@@ -2124,12 +2110,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2192,15 +2178,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2230,11 +2216,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2369,6 +2355,9 @@ components:
           type: string
       required:
       - code
+    NoPickupView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
     PickupCompanyView:
       allOf:
       - $ref: "#/components/schemas/PickupLocationView"
@@ -2395,6 +2384,32 @@ components:
           type: string
       required:
       - code
+    ProjectLocationView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          company:
+            $ref: "#/components/schemas/CompanyView"
+          streetName:
+            type: string
+          postalCode:
+            type: string
+          buildingNumber:
+            type: string
+          buildingNumberAddition:
+            type: string
+          city:
+            type: string
+          country:
+            type: string
+      required:
+      - buildingNumber
+      - city
+      - company
+      - country
+      - postalCode
+      - streetName
     ProximityDescriptionView:
       allOf:
       - $ref: "#/components/schemas/PickupLocationView"
@@ -2425,7 +2440,9 @@ components:
         pickupLocation:
           oneOf:
           - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
           - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
         deliveryLocation:
           $ref: "#/components/schemas/DeliveryLocationView"
@@ -2502,9 +2519,19 @@ components:
           type: string
           format: date-time
         pickupLocation:
-          $ref: "#/components/schemas/LocationDto"
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
+          - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
         deliveryLocation:
-          $ref: "#/components/schemas/LocationDto"
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
+          - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
         containerId:
           type: string
         status:
