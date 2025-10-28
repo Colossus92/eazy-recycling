@@ -131,7 +131,11 @@ class PickupLocationMapper(
       return existing
     }
 
-    return pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(company = company))
+    val newCompanyLocation = PickupLocationDto.PickupCompanyDto(company = company)
+    val saved = pickupLocationRepository.save(newCompanyLocation)
+    pickupLocationRepository.flush()
+
+    return saved
   }
 
 }

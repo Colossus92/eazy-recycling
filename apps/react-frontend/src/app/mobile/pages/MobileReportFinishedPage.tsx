@@ -1,15 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { transportService } from '@/api/services/transportService';
+import { resolveLocationAddress, transportService } from '@/api/services/transportService';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { TransportDto } from '@/api/client/models/transport-dto';
+import { TransportDetailView } from '@/api/client';
 
 type LocationState = {
-  transport: TransportDto;
+  transport: TransportDetailView;
 };
 
 export const MobileReportFinishedPage = () => {
@@ -19,18 +19,17 @@ export const MobileReportFinishedPage = () => {
   const { ErrorDialogComponent } = useErrorHandling();
   const navigateBack = () =>
     navigate(`/mobile/transport/${state.transport.id}`, {
-      state: { activeTab: 'Handtekeningen' },
+      state: { activeTab: 'Algemeen' },
     });
 
   const queryClient = useQueryClient();
 
   const reportFinishedMutation = useMutation({
     mutationFn: (hours: number) => transportService.reportFinished(state.transport.id!, { hours }),
-    onSuccess: (updatedTransport) => {
-      queryClient.setQueryData(
-        ['transport', state.transport.id],
-        updatedTransport
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['transport', state.transport.id],
+      });
       navigateBack();
     },
     onError: (error) => {
@@ -64,8 +63,8 @@ export const MobileReportFinishedPage = () => {
             <div className="flex flex-col items-start self-stretch gap-4">
               <h4>
                 {' '}
-                {state.transport.pickupLocation.address.city} &gt;{' '}
-                {state.transport.deliveryLocation.address.city}
+                {resolveLocationAddress(state.transport.pickupLocation)?.city} &gt;{' '}
+                {resolveLocationAddress(state.transport.deliveryLocation)?.city}
               </h4>
             </div>
             <div className="flex flex-col items-start self-stretch gap-1">
