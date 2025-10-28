@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   CompanyAddressInput,
@@ -8,14 +9,17 @@ import { ContainerTransportFormValues } from '@/features/planning/hooks/useConta
 
 export const ContainerTransportFormDeliverySection = () => {
   const formContext = useFormContext<ContainerTransportFormValues>();
-  const deliveryFieldnames: FieldNames<ContainerTransportFormValues> = {
-    companyId: 'deliveryCompanyId',
-    branchId: 'deliveryCompanyBranchId',
-    street: 'deliveryStreet',
-    buildingNumber: 'deliveryBuildingNumber',
-    postalCode: 'deliveryPostalCode',
-    city: 'deliveryCity',
-  };
+  const deliveryFieldnames: FieldNames<ContainerTransportFormValues> = useMemo(
+    () => ({
+      companyId: 'deliveryCompanyId',
+      branchId: 'deliveryCompanyBranchId',
+      street: 'deliveryStreet',
+      buildingNumber: 'deliveryBuildingNumber',
+      postalCode: 'deliveryPostalCode',
+      city: 'deliveryCity',
+    }),
+    []
+  );
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>

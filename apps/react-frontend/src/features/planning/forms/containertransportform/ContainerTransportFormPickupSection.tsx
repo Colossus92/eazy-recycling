@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   CompanyAddressInput,
@@ -9,14 +10,17 @@ import { ContainerTransportFormValues } from '@/features/planning/hooks/useConta
 export const ContainerTransportFormPickupSection = () => {
   const formContext = useFormContext<ContainerTransportFormValues>();
 
-  const pickupFieldNames: FieldNames<ContainerTransportFormValues> = {
-    companyId: 'pickupCompanyId',
-    branchId: 'pickupCompanyBranchId',
-    street: 'pickupStreet',
-    buildingNumber: 'pickupBuildingNumber',
-    postalCode: 'pickupPostalCode',
-    city: 'pickupCity',
-  };
+  const pickupFieldNames: FieldNames<ContainerTransportFormValues> = useMemo(
+    () => ({
+      companyId: 'pickupCompanyId',
+      branchId: 'pickupCompanyBranchId',
+      street: 'pickupStreet',
+      buildingNumber: 'pickupBuildingNumber',
+      postalCode: 'pickupPostalCode',
+      city: 'pickupCity',
+    }),
+    []
+  );
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>
