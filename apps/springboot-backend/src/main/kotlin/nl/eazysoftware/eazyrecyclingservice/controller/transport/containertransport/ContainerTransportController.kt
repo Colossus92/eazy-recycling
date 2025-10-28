@@ -1,11 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport
 
 import jakarta.validation.Valid
+import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateContainerTransport
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateContainerTransportCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransport
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransportCommand
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -22,6 +24,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 
@@ -113,7 +116,7 @@ fun ContainerTransportRequest.toCommand(): CreateContainerTransportCommand {
     pickupPostalCode = this.pickupPostalCode,
     pickupCity = this.pickupCity,
     pickupDescription = this.pickupDescription,
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
+    pickupDateTime = this.pickupDateTime.toCetInstant(),
     deliveryCompanyId = this.deliveryCompanyId?.let { CompanyId(it) },
     deliveryProjectLocationId = deliveryProjectLocationId,
     deliveryStreetName = this.deliveryStreet,
@@ -122,8 +125,7 @@ fun ContainerTransportRequest.toCommand(): CreateContainerTransportCommand {
     deliveryPostalCode = this.deliveryPostalCode,
     deliveryDescription = this.deliveryDescription,
     deliveryCity = this.deliveryCity,
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
-      ?: kotlinx.datetime.Clock.System.now(),
+    deliveryDateTime = this.deliveryDateTime?.toCetInstant(),
     transportType = this.transportType,
     wasteContainer = this.containerId?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
@@ -149,7 +151,7 @@ fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContaine
     pickupPostalCode = this.pickupPostalCode,
     pickupCity = this.pickupCity,
     pickupDescription = this.pickupDescription,
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
+    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
     deliveryCompanyId = this.deliveryCompanyId?.let { CompanyId(it) },
     deliveryProjectLocationId = this.deliveryProjectLocationId,
     deliveryStreetName = this.deliveryStreet,
@@ -158,8 +160,7 @@ fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContaine
     deliveryPostalCode = this.deliveryPostalCode,
     deliveryDescription = this.deliveryDescription,
     deliveryCity = this.deliveryCity,
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
-      ?: kotlinx.datetime.Clock.System.now(),
+    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant(),
     transportType = this.transportType,
     wasteContainer = this.containerId?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
@@ -167,4 +168,8 @@ fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContaine
     driver = this.driverId?.let { UserId(it) },
     note = Note(this.note),
   )
+
+}
+fun LocalDateTime.toCetInstant(): Instant {
+  return this.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant()
 }

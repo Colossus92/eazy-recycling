@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import org.hibernate.Hibernate
+import java.time.ZoneId
 
 
 data class PlanningView(
@@ -34,8 +35,8 @@ data class PlanningTransportView(
 ) {
 
   constructor(transportDto: TransportDto) : this(
-    pickupDate = transportDto.pickupDateTime.toLocalDate().toString(),
-    deliveryDate = transportDto.deliveryDateTime?.toLocalDate()?.toString()
+    pickupDate = transportDto.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate().toString(),
+    deliveryDate = transportDto.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDate()?.toString()
       .takeIf { transportDto.deliveryDateTime != null },
     id = transportDto.id.toString(),
     truck = transportDto.truck,

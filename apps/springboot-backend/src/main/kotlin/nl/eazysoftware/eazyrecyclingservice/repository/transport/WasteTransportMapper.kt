@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.transport
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -43,9 +44,8 @@ class WasteTransportMapper(
     return TransportDto(
       id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
-      pickupDateTime = domain.pickupDateTime.toJavaInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
-      deliveryDateTime = domain.deliveryDateTime.toJavaInstant().atZone(ZoneId.systemDefault())
-        .toLocalDateTime(),
+      pickupDateTime = domain.pickupDateTime.toJavaInstant(),
+      deliveryDateTime = domain.deliveryDateTime?.toJavaInstant(),
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let { entityManager.getReference(WasteContainerDto::class.java, it.uuid) },
@@ -54,7 +54,7 @@ class WasteTransportMapper(
       note = domain.note.description,
       goodsItem = toDto(domain.goodsItem),
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
-      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.systemDefault())?.toLocalDateTime(),
+      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber,
       carrierParty = domain.carrierParty.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       consignorParty = when (val consignor = wasteStream.consignorParty) {
@@ -72,9 +72,8 @@ class WasteTransportMapper(
       transportId = TransportId(dto.id),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       carrierParty = CompanyId(dto.carrierParty.id!!),
-      pickupDateTime = dto.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-      deliveryDateTime = dto.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
-        ?: kotlinx.datetime.Clock.System.now(),
+      pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
+      deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
       transportType = dto.transportType,
       goodsItem = dto.goodsItem
         ?.let { toDomain(it) }
@@ -85,7 +84,7 @@ class WasteTransportMapper(
       driver = dto.driver?.let { UserId(it.id) },
       note = Note(dto.note),
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
-      updatedAt = dto.updatedAt?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant(),
+      updatedAt = dto.updatedAt?.toCetKotlinInstant(),
       sequenceNumber = dto.sequenceNumber,
     )
   }

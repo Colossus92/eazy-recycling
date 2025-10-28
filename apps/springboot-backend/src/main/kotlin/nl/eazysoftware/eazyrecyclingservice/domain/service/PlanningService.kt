@@ -7,6 +7,8 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -28,8 +30,8 @@ class PlanningService(
 
         // Get all transports for the week
         val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay(),
-            daysInWeek.last().atTime(23, 59, 59)
+            daysInWeek.first().atStartOfDay().toInstant(ZoneOffset.of("Z")),
+            daysInWeek.last().atTime(23, 59, 59).toInstant(ZoneOffset.of("Z"))
         )
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
@@ -111,8 +113,8 @@ class PlanningService(
 
             transport.copy(
                 truck = truck,
-                pickupDateTime = date.atTime(transport.pickupDateTime.hour, transport.pickupDateTime.minute),
-                deliveryDateTime = transport.deliveryDateTime?.let { date.atTime(it.hour, it.minute) },
+                pickupDateTime = transport.pickupDateTime,
+                deliveryDateTime = transport.deliveryDateTime,
                 sequenceNumber = index,
             )
         }
@@ -121,13 +123,14 @@ class PlanningService(
         return getPlanningByDate(date)
     }
 
+
     fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
         return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
             driverId,
-            startDate.atStartOfDay(),
-            endDate.atTime(23, 59, 59)
+            startDate.atStartOfDay().toInstant(ZoneOffset.of("Z")),
+            endDate.atTime(23, 59, 59).toInstant(ZoneOffset.of("Z"))
         )
-            .groupBy { it.pickupDateTime.toLocalDate() }
+            .groupBy { it.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate() }
             .mapValues { (_, transportsByDate) ->
                 transportsByDate
                     .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }

@@ -33,7 +33,7 @@ class ContainerTransport(
 
   val deliveryLocation: Location,
 
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
 
   val transportType: TransportType,
 
@@ -77,7 +77,7 @@ class ContainerTransport(
       pickupLocation: Location,
       pickupDateTime: Instant,
       deliveryLocation: Location,
-      deliveryDateTime: Instant,
+      deliveryDateTime: Instant?,
       transportType: TransportType,
       wasteContainer: WasteContainerId?,
       containerOperation: ContainerOperation?,

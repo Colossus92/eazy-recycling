@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.transport
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -19,6 +20,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
+import java.time.ZoneId
 
 @Component
 class ContainerTransportMapper(
@@ -36,10 +38,9 @@ class ContainerTransportMapper(
       consignorParty = CompanyId(dto.consignorParty.id!!),
       carrierParty = CompanyId(dto.carrierParty.id!!),
       pickupLocation = pickupLocationMapper.toDomain(dto.pickupLocation),
-      pickupDateTime = dto.pickupDateTime.atZone(java.time.ZoneId.systemDefault()).toInstant().toKotlinInstant(),
+      pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
       deliveryLocation = pickupLocationMapper.toDomain(dto.deliveryLocation),
-      deliveryDateTime = dto.deliveryDateTime?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
-        ?: kotlinx.datetime.Clock.System.now(),
+      deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
       transportType = dto.transportType,
       wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.uuid!!) },
       containerOperation = dto.containerOperation,
@@ -47,7 +48,7 @@ class ContainerTransportMapper(
       driver = dto.driver?.let { UserId(it.id) },
       note = Note(dto.note),
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
-      updatedAt = dto.updatedAt?.atZone(java.time.ZoneId.systemDefault())?.toInstant()?.toKotlinInstant(),
+      updatedAt = dto.updatedAt?.toCetKotlinInstant(),
       sequenceNumber = dto.sequenceNumber
     )
   }
@@ -64,10 +65,9 @@ class ContainerTransportMapper(
       consignorParty = consignorCompany,
       carrierParty = carrierCompany,
       pickupLocation = pickupLocationMapper.toDto(domain.pickupLocation),
-      pickupDateTime = domain.pickupDateTime.toJavaInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime(),
+      pickupDateTime = domain.pickupDateTime.toJavaInstant(),
       deliveryLocation = pickupLocationMapper.toDto(domain.deliveryLocation),
-      deliveryDateTime = domain.deliveryDateTime.toJavaInstant().atZone(java.time.ZoneId.systemDefault())
-        .toLocalDateTime(),
+      deliveryDateTime = domain.deliveryDateTime?.toJavaInstant(),
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let { containerRepository.findByIdOrNull(it.uuid) },
@@ -75,7 +75,7 @@ class ContainerTransportMapper(
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
-      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(java.time.ZoneId.systemDefault())?.toLocalDateTime(),
+      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber
     )
   }

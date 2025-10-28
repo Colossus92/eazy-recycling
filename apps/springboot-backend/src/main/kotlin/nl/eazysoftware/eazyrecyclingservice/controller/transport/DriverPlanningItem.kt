@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.toPickupLocationV
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 data class DriverPlanningItem(
@@ -20,8 +21,8 @@ data class DriverPlanningItem(
     constructor(transport: TransportDto) : this(
         transport.id,
         transport.displayNumber,
-        transport.pickupDateTime,
-        transport.deliveryDateTime,
+        transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDateTime(),
+        transport.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
         transport.pickupLocation.toPickupLocationView(),
         transport.deliveryLocation.toPickupLocationView(),
         transport.wasteContainer?.id ?: "-",

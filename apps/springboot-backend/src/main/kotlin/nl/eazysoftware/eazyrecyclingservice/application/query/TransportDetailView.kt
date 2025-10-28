@@ -17,7 +17,7 @@ data class TransportDetailView(
   val pickupLocation: PickupLocationView,
   val pickupDateTime: String,
   val deliveryLocation: PickupLocationView,
-  val deliveryDateTime: String,
+  val deliveryDateTime: String?,
   val transportType: String,
   val status: TransportStatus,
   val truck: TruckView?,

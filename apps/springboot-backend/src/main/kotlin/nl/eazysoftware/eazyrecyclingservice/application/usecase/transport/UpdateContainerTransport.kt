@@ -44,7 +44,7 @@ data class UpdateContainerTransportCommand(
   val deliveryPostalCode: String,
   val deliveryCity: String,
   val deliveryDescription: String? = null,
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
   val containerOperation: ContainerOperation?,

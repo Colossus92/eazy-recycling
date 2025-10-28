@@ -1,8 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import jakarta.persistence.EntityNotFoundException
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toJavaInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayString
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
@@ -14,8 +13,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 interface GetTransportById {
@@ -44,9 +41,9 @@ class GetTransportByIdService(
       consignorParty = mapCompany(containerTransport.consignorParty.uuid),
       carrierParty = mapCompany(containerTransport.carrierParty.uuid),
       pickupLocation = mapLocation(containerTransport.pickupLocation),
-      pickupDateTime = formatInstantToCET(containerTransport.pickupDateTime),
+      pickupDateTime = containerTransport.pickupDateTime.toDisplayString(),
       deliveryLocation = mapLocation(containerTransport.deliveryLocation),
-      deliveryDateTime = formatInstantToCET(containerTransport.deliveryDateTime),
+      deliveryDateTime =containerTransport.deliveryDateTime?.toDisplayString(),
       transportType = containerTransport.transportType.name,
       status = containerTransport.getStatus(),
       truck = containerTransport.truck?.let { mapTruck(it) },
@@ -94,17 +91,6 @@ class GetTransportByIdService(
 
       is Location.NoLocation -> PickupLocationView.NoPickupView()
     }
-  }
-
-
-  /**
-   * Formats a kotlinx.datetime.Instant to a datetime-local string (yyyy-MM-dd'T'HH:mm) in CET timezone
-   * for direct use in HTML5 datetime-local inputs.
-   */
-  private fun formatInstantToCET(instant: Instant): String {
-    return instant.toJavaInstant()
-      .atZone(ZoneId.of("Europe/Amsterdam"))
-      .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
   }
 
   private fun mapCompany(companyId: UUID): CompanyView {

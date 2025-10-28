@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
@@ -43,13 +44,13 @@ data class TransportDto(
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
   val pickupLocation: PickupLocationDto,
 
-  val pickupDateTime: LocalDateTime, // TODO change to instant
+  val pickupDateTime: Instant,
 
   @OneToOne
   @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
   val deliveryLocation: PickupLocationDto,
 
-  val deliveryDateTime: LocalDateTime?, // TODO change to instant
+  val deliveryDateTime: Instant?,
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)

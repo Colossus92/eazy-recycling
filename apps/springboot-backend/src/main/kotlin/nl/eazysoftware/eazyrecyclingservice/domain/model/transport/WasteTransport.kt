@@ -24,7 +24,7 @@ class WasteTransport(
 
   val pickupDateTime: Instant,
 
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
 
   val transportType: TransportType = TransportType.WASTE,
 

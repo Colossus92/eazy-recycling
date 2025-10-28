@@ -110,8 +110,8 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
 
   return CreateWasteTransportCommand(
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
+    pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
+    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
       ?: kotlinx.datetime.Clock.System.now(),
     transportType = this.transportType,
     goodsItem = GoodsItem(
@@ -139,8 +139,8 @@ fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTranspo
   return UpdateWasteTransportCommand(
     transportId = TransportId(transportId),
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.systemDefault())?.toInstant()?.toKotlinInstant()
+    pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
+    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
       ?: kotlinx.datetime.Clock.System.now(),
     transportType = this.transportType,
     goodsItem = GoodsItem(

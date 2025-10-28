@@ -24,3 +24,7 @@ fun KotlinxInstant.toJavaInstant(): JavaInstant =
 fun KotlinxInstant.toDisplayTime(): LocalDateTime {
   return this.toLocalDateTime(TimeConfiguration.DISPLAY_TIMEZONE_KX)
 }
+
+fun KotlinxInstant.toDisplayString(): String {
+  return this.toDisplayTime().toString()
+}
