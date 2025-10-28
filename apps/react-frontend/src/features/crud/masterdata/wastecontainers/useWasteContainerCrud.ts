@@ -80,7 +80,7 @@ export const useWasteContainerCrud = () => {
     };
 
     const updateMutation = useMutation({
-        mutationFn: (item: WasteContainerRequest) => containerService.update(item),
+        mutationFn: (item: WasteContainerRequest) => containerService.update(item.uuid, item),
         onSuccess: () => {
             queryClient
                 .invalidateQueries({ queryKey: [queryKey] })

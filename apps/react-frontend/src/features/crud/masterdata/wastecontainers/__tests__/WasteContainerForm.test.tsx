@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WasteContainerForm } from '../WasteContainerForm';
-import { WasteContainer } from '@/api/client';
+import { WasteContainerView } from '@/api/client';
 import { Company } from '@/api/services/companyService';
 
 // Mock the company service
@@ -155,15 +155,16 @@ describe('WasteContainerForm Tests', () => {
     });
 
     it('calls onSubmit with correct data when updating an existing waste container', async () => {
-      const existingContainer: WasteContainer = {
+      const existingContainer: WasteContainerView = {
         uuid: 'existing-uuid',
         id: 'CONT-002',
         location: {
-          address: {
-            streetName: 'Old Street',
-            buildingNumber: '10',
+          addressView: {
+            street: 'Old Street',
+            houseNumber: '10',
             postalCode: '9876 ZY',
             city: 'Old City',
+            country: 'Nederland',
           },
         },
         notes: 'Original notes',
@@ -269,15 +270,16 @@ describe('WasteContainerForm Tests', () => {
     });
 
     it('renders correctly in edit mode', async () => {
-      const existingContainer: WasteContainer = {
+      const existingContainer: WasteContainerView = {
         uuid: 'test-uuid',
         id: 'CONT-004',
         location: {
-          address: {
-            streetName: 'Edit Street',
-            buildingNumber: '99',
+          addressView: {
+            street: 'Edit Street',
+            houseNumber: '99',
             postalCode: '1111 AA',
             city: 'Edit City',
+            country: 'Nederland'
           },
         },
       };

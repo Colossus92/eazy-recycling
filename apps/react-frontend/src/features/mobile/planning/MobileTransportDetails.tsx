@@ -25,8 +25,8 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
       goodsItem?.quantity +
       ')'
     : 'Geen afval';
-  const containerText = transport?.wasteContainer?.containerNumber
-    ? transport.wasteContainer.containerNumber
+  const containerText = transport?.wasteContainer?.id
+    ? transport.wasteContainer.id
     : 'Geen container toegewezen';
 
   return (

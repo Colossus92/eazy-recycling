@@ -77,8 +77,8 @@ export const TransportDetailsDrawer = ({
       goodsItem?.quantity +
       ')'
     : 'Geen afval';
-  const containerText = data?.wasteContainer?.containerNumber
-    ? data.wasteContainer.containerNumber
+  const containerText = data?.wasteContainer?.id
+    ? data.wasteContainer.id
     : 'Geen container toegewezen';
   return (
     <Drawer
