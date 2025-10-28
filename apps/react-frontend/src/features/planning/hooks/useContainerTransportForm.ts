@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import {
   formValuesToCreateContainerTransportRequest,
   transportDetailViewToContainerTransportFormValues,
-  transportService
+  transportService,
 } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 
@@ -71,7 +71,8 @@ export function useContainerTransportForm(
     queryKey: ['transport', transportId],
     queryFn: async () => {
       const response = await transportService.getTransportById(transportId!);
-      const formValues = transportDetailViewToContainerTransportFormValues(response);
+      const formValues =
+        transportDetailViewToContainerTransportFormValues(response);
       formContext.reset(formValues);
 
       return formValues;
@@ -83,11 +84,15 @@ export function useContainerTransportForm(
   });
   const mutation = useMutation({
     mutationFn: async (data: ContainerTransportFormValues) => {
-
       if (!!data && transportId) {
-        return transportService.updateContainerTransport(transportId, formValuesToCreateContainerTransportRequest(data));
+        return transportService.updateContainerTransport(
+          transportId,
+          formValuesToCreateContainerTransportRequest(data)
+        );
       } else {
-        return transportService.createContainerTransport(formValuesToCreateContainerTransportRequest(data));
+        return transportService.createContainerTransport(
+          formValuesToCreateContainerTransportRequest(data)
+        );
       }
     },
     onSuccess: () => {
