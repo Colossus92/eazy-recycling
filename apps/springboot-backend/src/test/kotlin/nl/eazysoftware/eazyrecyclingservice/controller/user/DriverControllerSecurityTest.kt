@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.user
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.service.UserService
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -24,8 +26,12 @@ class DriverControllerSecurityTest : BaseIntegrationTest() {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
+  @MockitoBean
+  @Suppress("unused")
+  private lateinit var userService: UserService
+
     companion object {
-        @JvmStatic
+      @JvmStatic
         fun roleAccessScenarios(): Stream<Arguments> {
             return Stream.of(
                 // GET all drivers - any role can access

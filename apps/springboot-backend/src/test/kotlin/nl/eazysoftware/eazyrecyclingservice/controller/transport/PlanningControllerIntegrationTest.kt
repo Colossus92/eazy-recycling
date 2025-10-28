@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 
 @SpringBootTest
@@ -261,8 +262,8 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime1,
-            deliveryDateTime = deliveryDateTime1,
+            pickupDateTime = pickupDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            deliveryDateTime = deliveryDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
             note = "Test Transport 1",
             truck = testTruck,
             driver = testDriver,
@@ -277,8 +278,8 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime2,
-            deliveryDateTime = deliveryDateTime2,
+            pickupDateTime = pickupDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            deliveryDateTime = deliveryDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
             note = "Test Transport 2",
             truck = testTruck,
             driver = testDriver,

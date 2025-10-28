@@ -1,14 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
@@ -43,7 +42,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.stream.Stream
 
@@ -131,6 +132,9 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
     private lateinit var transportService: TransportService
 
     @MockitoBean
+    private lateinit var getTransportById: GetTransportById
+
+    @MockitoBean
     private lateinit var createContainerTransport: CreateContainerTransport
 
     @MockitoBean
@@ -180,8 +184,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             carrierParty = carrier,
             pickupLocation = mockLocationDto(),
             deliveryLocation = mockLocationDto(),
-            pickupDateTime = LocalDateTime.now(),
-            deliveryDateTime = LocalDateTime.now().plusDays(1),
+            pickupDateTime = Instant.now(),
+            deliveryDateTime = Instant.now().plus(1, ChronoUnit.DAYS),
             transportType = TransportType.CONTAINER,
             note = "Test transport",
             containerOperation = ContainerOperation.DELIVERY,
@@ -208,6 +212,13 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
                 transportWithOtherDriver
             )
         )
+
+        // Mock GetTransportById query for container transports
+        val transportDetailViewWithTestDriver = createTransportDetailView(testTransportId, testDriverId)
+        val transportDetailViewWithOtherDriver = createTransportDetailView(transportWithOtherDriver.id, otherDriverId)
+
+        whenever(getTransportById.execute(testTransportId)).thenReturn(transportDetailViewWithTestDriver)
+        whenever(getTransportById.execute(transportWithOtherDriver.id)).thenReturn(transportDetailViewWithOtherDriver)
 
         // Mock container transport create use case
         whenever(createContainerTransport.handle(any())).thenReturn(
@@ -238,7 +249,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             dealerParty = null,
             collectorParty = null,
             brokerParty = null,
-            lastActivityAt = java.time.Instant.now(),
+            lastActivityAt = Instant.now(),
             status = WasteStreamStatus.ACTIVE.name
         )
 
@@ -288,9 +299,10 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             deliveryDateTime = kotlinx.datetime.Clock.System.now(),
             transportType = TransportType.CONTAINER,
             wasteContainer = null,
+            containerOperation = ContainerOperation.DELIVERY,
             truck = null,
             driver = UserId(testDriverId),
-            note = nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note("Test note"),
+            note = Note("Test note"),
             transportHours = null,
             updatedAt = kotlinx.datetime.Clock.System.now(),
             sequenceNumber = 1
@@ -298,14 +310,14 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         whenever(containerTransports.findById(TransportId(testTransportId))).thenReturn(mockContainerTransport)
 
         // Mock waste transports repository for authorization check
-        val mockWasteTransport = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.WasteTransport(
+        val mockWasteTransport = WasteTransport(
             transportId = TransportId(testTransportId),
             displayNumber = null,
             carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
             pickupDateTime = kotlinx.datetime.Clock.System.now(),
             deliveryDateTime = kotlinx.datetime.Clock.System.now(),
             transportType = TransportType.WASTE,
-            goodsItem = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.GoodsItem(
+            goodsItem = GoodsItem(
                 wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
                 netNetWeight = 1000,
                 unit = "KG",
@@ -315,7 +327,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             containerOperation = ContainerOperation.PICKUP,
             truck = null,
             driver = UserId(testDriverId),
-            note = nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note("Test note"),
+            note = Note("Test note"),
             transportHours = null,
             updatedAt = kotlinx.datetime.Clock.System.now(),
             sequenceNumber = 1
@@ -346,6 +358,54 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             city = "Test City",
             country = "Test Country"
     )
+
+    private fun createTransportDetailView(transportId: UUID, driverId: UUID): TransportDetailView {
+        val mockCompany = CompanyView(
+            id = UUID.randomUUID(),
+            name = "Test Company",
+            chamberOfCommerceId = null,
+            vihbId = null,
+            processorId = null,
+            address = AddressView(
+                street = "Test Street",
+                houseNumber = "1",
+                houseNumberAddition = null,
+                postalCode = "1234 AB",
+                city = "Test City",
+                country = "Netherlands"
+            )
+        )
+
+        val mockLocation = PickupLocationView.DutchAddressView(
+            streetName = "Test Street",
+            postalCode = "1234 AB",
+            buildingNumber = "1",
+            buildingNumberAddition = null,
+            city = "Test City",
+            country = "Netherlands"
+        )
+
+        return TransportDetailView(
+            id = transportId,
+            displayNumber = "T-001",
+            consignorParty = mockCompany,
+            carrierParty = mockCompany,
+            pickupLocation = mockLocation,
+            pickupDateTime = "2025-10-28T10:00:00",
+            deliveryLocation = mockLocation,
+            deliveryDateTime = "2025-10-28T14:00:00",
+            transportType = TransportType.CONTAINER.name,
+            status = TransportStatus.PLANNED,
+            truck = null,
+            driver = DriverView(id = driverId, name = "Test Driver"),
+            note = "Test transport",
+            transportHours = null,
+            sequenceNumber = 1,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            wasteContainer = null,
+            containerOperation = ContainerOperation.DELIVERY
+        )
+    }
 
     private fun createContainerTransportRequestJson(): String {
         val request = ContainerTransportRequest(

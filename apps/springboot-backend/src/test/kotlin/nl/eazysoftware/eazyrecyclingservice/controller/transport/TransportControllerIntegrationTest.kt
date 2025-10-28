@@ -38,6 +38,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 class TransportControllerIntegrationTest(
@@ -360,7 +361,7 @@ class TransportControllerIntegrationTest(
     val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Container Transport")
-    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
+    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.EXCHANGE)
   }
 
   @Test
@@ -672,7 +673,7 @@ class TransportControllerIntegrationTest(
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$.note").value("Updated Transport with Branches"))
-      .andExpect(jsonPath("$.containerOperation").value("DELIVERY"))
+      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
       .andExpect(jsonPath("$.transportType").value("CONTAINER"))
   }
 
@@ -736,9 +737,9 @@ class TransportControllerIntegrationTest(
       consignorParty = testCompany,
       carrierParty = testCompany,
       pickupLocation = testLocation,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
+      pickupDateTime = LocalDateTime.now().plusDays(1).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
       deliveryLocation = testLocation,
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      deliveryDateTime = LocalDateTime.now().plusDays(2).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       truck = testTruck,

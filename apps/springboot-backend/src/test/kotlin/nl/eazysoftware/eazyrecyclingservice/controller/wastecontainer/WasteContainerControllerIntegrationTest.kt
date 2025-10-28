@@ -197,7 +197,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value("GET-ONE"))
             .andExpect(jsonPath("$.notes").value("Test container to retrieve"))
-            .andExpect(jsonPath("$.location.address.streetName").value("Retrieve Street"))
+            .andExpect(jsonPath("$.location.addressView.street").value("Retrieve Street"))
     }
 
     @Test
@@ -273,7 +273,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value("UPDATE-ME"))
             .andExpect(jsonPath("$.notes").value("Updated notes"))
-            .andExpect(jsonPath("$.location.address.streetName").value("Updated Street"))
+            .andExpect(jsonPath("$.location.addressView.street").value("Updated Street"))
 
         // Verify container was updated in the database
         val savedContainer = wasteContainerRepository.findByIdOrNull(containerId)

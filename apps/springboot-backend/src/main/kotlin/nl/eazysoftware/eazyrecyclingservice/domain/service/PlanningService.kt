@@ -8,7 +8,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -30,8 +29,8 @@ class PlanningService(
 
         // Get all transports for the week
         val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay().toInstant(ZoneOffset.of("Z")),
-            daysInWeek.last().atTime(23, 59, 59).toInstant(ZoneOffset.of("Z"))
+            daysInWeek.first().atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            daysInWeek.last().atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
         )
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
@@ -111,9 +110,15 @@ class PlanningService(
                 truck = entityManager.getReference(Truck::class.java, licensePlate)
             }
 
+            // Update the date while preserving the time of day
+            val currentDateTime = transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam"))
+            val newPickupDateTime = date.atTime(currentDateTime.toLocalTime())
+                .atZone(ZoneId.of("Europe/Amsterdam"))
+                .toInstant()
+
             transport.copy(
                 truck = truck,
-                pickupDateTime = transport.pickupDateTime,
+                pickupDateTime = newPickupDateTime,
                 deliveryDateTime = transport.deliveryDateTime,
                 sequenceNumber = index,
             )
@@ -127,8 +132,8 @@ class PlanningService(
     fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
         return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
             driverId,
-            startDate.atStartOfDay().toInstant(ZoneOffset.of("Z")),
-            endDate.atTime(23, 59, 59).toInstant(ZoneOffset.of("Z"))
+            startDate.atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            endDate.atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
         )
             .groupBy { it.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate() }
             .mapValues { (_, transportsByDate) ->

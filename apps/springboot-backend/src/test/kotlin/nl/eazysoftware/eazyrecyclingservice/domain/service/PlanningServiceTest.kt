@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
@@ -17,6 +18,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
@@ -59,8 +61,9 @@ class PlanningServiceTest {
         // When
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+
             )
         ).thenReturn(transports)
 
@@ -107,8 +110,8 @@ class PlanningServiceTest {
         // When
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
             )
         ).thenReturn(transports)
 
@@ -140,8 +143,8 @@ class PlanningServiceTest {
         // When
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
             )
         ).thenReturn(transports)
 
@@ -190,8 +193,8 @@ class PlanningServiceTest {
         // When
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
             )
         ).thenReturn(transports)
 
@@ -284,7 +287,7 @@ class PlanningServiceTest {
         val transports = listOf(transport1, transport2, transport3)
 
         // We'll move all transports to a new truck and date with a new order
-        val transportIds = listOf(transport1.id!!, transport2.id!!, transport3.id!!)
+        val transportIds = listOf(transport1.id, transport2.id, transport3.id)
 
         whenever(transportRepository.findAllById(transportIds)).thenReturn(transports)
         whenever(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
@@ -295,8 +298,8 @@ class PlanningServiceTest {
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
             )
         ).thenReturn(transports)
 
@@ -312,11 +315,11 @@ class PlanningServiceTest {
 
         val updatedTransports = transportCaptor.firstValue
         assertThat(updatedTransports).hasSize(3)
-        assertThat(updatedTransports[0].pickupDateTime.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[0].pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
-        assertThat(updatedTransports[1].pickupDateTime.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[1].pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
-        assertThat(updatedTransports[2].pickupDateTime.toLocalDate()).isEqualTo(newDate)
+        assertThat(updatedTransports[2].pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate()).isEqualTo(newDate)
         assertThat(updatedTransports[2].sequenceNumber).isEqualTo(2)
         verify(transportRepository).saveAll(any<List<TransportDto>>())
 
@@ -337,8 +340,8 @@ class PlanningServiceTest {
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
             )
         ).thenReturn(emptyList())
 
@@ -361,18 +364,18 @@ class PlanningServiceTest {
         // Transports with original truck
         val transport1 = TransportDtoHelper.transport(truck1)
         val transport2 = TransportDtoHelper.transport(truck1)
-        val transportIds = listOf(transport1.id!!, transport2.id!!)
-        
+        val transportIds = listOf(transport1.id, transport2.id)
+
         whenever(transportRepository.findAllById(transportIds)).thenReturn(listOf(transport1, transport2))
-        
+
         // For the getPlanningByDate call at the end
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
             )
         ).thenReturn(listOf(transport1, transport2))
 
@@ -388,17 +391,17 @@ class PlanningServiceTest {
 
         val updatedTransports = transportCaptor.firstValue
         assertThat(updatedTransports).hasSize(2)
-        
+
         // Verify truck is set to null for all transports
         updatedTransports.forEach { transport ->
             assertThat(transport.truck).isNull()
-            assertThat(transport.pickupDateTime.toLocalDate()).isEqualTo(date)
+            assertThat(transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate()).isEqualTo(date)
         }
-        
+
         // Verify sequence numbers are updated correctly
         assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
         assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
-        
+
         // Verify the result contains the updated planning
         assertThat(result).isNotNull
     }
@@ -407,23 +410,23 @@ class PlanningServiceTest {
     fun `reorderTransports should set truck reference when license plate is not Niet toegewezen`() {
         // Given
         val date = LocalDate.of(2025, 5, 21)
-        
+
         // Transports with no truck (unassigned)
         val transport1 = TransportDtoHelper.transport(truck = null)
         val transport2 = TransportDtoHelper.transport(truck = null)
-        val transportIds = listOf(transport1.id!!, transport2.id!!)
-        
+        val transportIds = listOf(transport1.id, transport2.id)
+
         whenever(transportRepository.findAllById(transportIds)).thenReturn(listOf(transport1, transport2))
         whenever(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
-        
+
         // For the getPlanningByDate call at the end
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
             )
         ).thenReturn(listOf(transport1, transport2))
 
@@ -439,17 +442,17 @@ class PlanningServiceTest {
 
         val updatedTransports = transportCaptor.firstValue
         assertThat(updatedTransports).hasSize(2)
-        
+
         // Verify truck is set to the referenced truck for all transports
         updatedTransports.forEach { transport ->
             assertThat(transport.truck).isEqualTo(truck2)
-            assertThat(transport.pickupDateTime.toLocalDate()).isEqualTo(date)
+            assertThat(transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate()).isEqualTo(date)
         }
-        
+
         // Verify sequence numbers are updated correctly
         assertThat(updatedTransports[0].sequenceNumber).isEqualTo(0)
         assertThat(updatedTransports[1].sequenceNumber).isEqualTo(1)
-        
+
         // Verify the result contains the updated planning
         assertThat(result).isNotNull
     }
@@ -463,8 +466,8 @@ class PlanningServiceTest {
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
             )
         ).thenReturn(emptyList())
         whenever(truckService.getTruckByLicensePlate(truck1.licensePlate)).thenReturn(truck1)
@@ -489,8 +492,8 @@ class PlanningServiceTest {
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
             )
         ).thenReturn(listOf(transport))
 
@@ -520,8 +523,8 @@ class PlanningServiceTest {
 
         whenever(
             transportRepository.findByPickupDateTimeIsBetween(
-                mondayOfWeek.atStartOfDay(),
-                sundayOfWeek.atTime(23, 59, 59)
+                mondayOfWeek.atStartOfDay().toCetInstant(),
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
             )
         ).thenReturn(listOf(transport))
 
