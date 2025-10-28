@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import jakarta.persistence.EntityNotFoundException
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
@@ -12,7 +14,9 @@ import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 interface GetTransportById {
   fun execute(transportId: UUID): TransportDetailView
@@ -40,9 +44,9 @@ class GetTransportByIdService(
       consignorParty = mapCompany(containerTransport.consignorParty.uuid),
       carrierParty = mapCompany(containerTransport.carrierParty.uuid),
       pickupLocation = mapLocation(containerTransport.pickupLocation),
-      pickupDateTime = containerTransport.pickupDateTime,
+      pickupDateTime = formatInstantToCET(containerTransport.pickupDateTime),
       deliveryLocation = mapLocation(containerTransport.deliveryLocation),
-      deliveryDateTime = containerTransport.deliveryDateTime,
+      deliveryDateTime = formatInstantToCET(containerTransport.deliveryDateTime),
       transportType = containerTransport.transportType.name,
       status = containerTransport.getStatus(),
       truck = containerTransport.truck?.let { mapTruck(it) },
@@ -51,7 +55,8 @@ class GetTransportByIdService(
       transportHours = containerTransport.transportHours?.inWholeSeconds?.toDouble()?.div(3600),
       sequenceNumber = containerTransport.sequenceNumber,
       updatedAt = containerTransport.updatedAt,
-      wasteContainer = containerTransport.wasteContainer?.let { mapWasteContainer(it.uuid) }
+      wasteContainer = containerTransport.wasteContainer?.let { mapWasteContainer(it.uuid) },
+      containerOperation = containerTransport.containerOperation,
     )
   }
 
@@ -89,6 +94,17 @@ class GetTransportByIdService(
 
       is Location.NoLocation -> PickupLocationView.NoPickupView()
     }
+  }
+
+
+  /**
+   * Formats a kotlinx.datetime.Instant to a datetime-local string (yyyy-MM-dd'T'HH:mm) in CET timezone
+   * for direct use in HTML5 datetime-local inputs.
+   */
+  private fun formatInstantToCET(instant: Instant): String {
+    return instant.toJavaInstant()
+      .atZone(ZoneId.of("Europe/Amsterdam"))
+      .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"))
   }
 
   private fun mapCompany(companyId: UUID): CompanyView {

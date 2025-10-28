@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportStatus
 import java.util.*
 
@@ -14,9 +15,9 @@ data class TransportDetailView(
   val consignorParty: CompanyView,
   val carrierParty: CompanyView,
   val pickupLocation: PickupLocationView,
-  val pickupDateTime: Instant,
+  val pickupDateTime: String,
   val deliveryLocation: PickupLocationView,
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: String,
   val transportType: String,
   val status: TransportStatus,
   val truck: TruckView?,
@@ -25,7 +26,8 @@ data class TransportDetailView(
   val transportHours: Double?,
   val sequenceNumber: Int,
   val updatedAt: Instant?,
-  val wasteContainer: WasteContainerView?
+  val wasteContainer: WasteContainerView?,
+  val containerOperation: ContainerOperation?,
 )
 
 data class WasteContainerView(

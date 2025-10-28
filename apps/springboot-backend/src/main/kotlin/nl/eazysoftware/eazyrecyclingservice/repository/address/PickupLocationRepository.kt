@@ -15,6 +15,6 @@ interface PickupLocationRepository : JpaRepository<PickupLocationDto, String> {
   ): DutchAddressDto?
 
   @Query("SELECT p FROM PickupLocationDto p WHERE TYPE(p) = 'COMPANY' AND p.company.id = :companyId")
-  fun findCompanyByCompanyId(companyId: UUID?): PickupLocationDto.PickupCompanyDto?
+  fun findCompanyByCompanyId(companyId: UUID?): PickupLocationDto
 
 }

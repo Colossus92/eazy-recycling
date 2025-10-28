@@ -2559,7 +2559,7 @@ components:
           - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
         pickupDateTime:
-          $ref: "#/components/schemas/Instant"
+          type: string
         deliveryLocation:
           oneOf:
           - $ref: "#/components/schemas/DutchAddressView"
@@ -2568,7 +2568,7 @@ components:
           - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
         deliveryDateTime:
-          $ref: "#/components/schemas/Instant"
+          type: string
         transportType:
           type: string
         status:
@@ -2593,6 +2593,13 @@ components:
           $ref: "#/components/schemas/Instant"
         wasteContainer:
           $ref: "#/components/schemas/WasteContainerView"
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
       required:
       - carrierParty
       - consignorParty

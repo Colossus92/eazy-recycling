@@ -70,10 +70,10 @@ export interface TransportDetailView {
     'pickupLocation': WasteStreamDetailViewPickupLocation;
     /**
      * 
-     * @type {Instant}
+     * @type {string}
      * @memberof TransportDetailView
      */
-    'pickupDateTime': Instant;
+    'pickupDateTime': string;
     /**
      * 
      * @type {WasteStreamDetailViewPickupLocation}
@@ -82,10 +82,10 @@ export interface TransportDetailView {
     'deliveryLocation': WasteStreamDetailViewPickupLocation;
     /**
      * 
-     * @type {Instant}
+     * @type {string}
      * @memberof TransportDetailView
      */
-    'deliveryDateTime': Instant;
+    'deliveryDateTime': string;
     /**
      * 
      * @type {string}
@@ -140,6 +140,12 @@ export interface TransportDetailView {
      * @memberof TransportDetailView
      */
     'wasteContainer'?: WasteContainerView;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
+    'containerOperation'?: TransportDetailViewContainerOperationEnum;
 }
 
 export const TransportDetailViewStatusEnum = {
@@ -149,5 +155,13 @@ export const TransportDetailViewStatusEnum = {
 } as const;
 
 export type TransportDetailViewStatusEnum = typeof TransportDetailViewStatusEnum[keyof typeof TransportDetailViewStatusEnum];
+export const TransportDetailViewContainerOperationEnum = {
+    Exchange: 'EXCHANGE',
+    Pickup: 'PICKUP',
+    Empty: 'EMPTY',
+    Delivery: 'DELIVERY'
+} as const;
+
+export type TransportDetailViewContainerOperationEnum = typeof TransportDetailViewContainerOperationEnum[keyof typeof TransportDetailViewContainerOperationEnum];
 
 

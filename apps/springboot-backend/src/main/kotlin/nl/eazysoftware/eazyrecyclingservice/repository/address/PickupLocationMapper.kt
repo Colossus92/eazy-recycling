@@ -125,9 +125,13 @@ class PickupLocationMapper(
     val company = companyRepository.findByIdOrNull(domain.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")
 
-    return pickupLocationRepository.findCompanyByCompanyId(company.id) ?: run {
-      pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(company = company))
+
+    val existing = pickupLocationRepository.findCompanyByCompanyId(company.id)
+    if (existing is PickupLocationDto.PickupCompanyDto) {
+      return existing
     }
+
+    return pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(company = company))
   }
 
 }

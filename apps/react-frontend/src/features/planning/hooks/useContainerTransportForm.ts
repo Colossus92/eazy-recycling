@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { formValuesToCreateContainerTransportRequest, transportDtoToContainerTransportFormValues, transportService } from '@/api/services/transportService.ts';
+import {
+  formValuesToCreateContainerTransportRequest,
+  transportDetailViewToContainerTransportFormValues,
+  transportService
+} from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 
 export interface ContainerTransportFormValues {
@@ -67,10 +71,10 @@ export function useContainerTransportForm(
     queryKey: ['transport', transportId],
     queryFn: async () => {
       const response = await transportService.getTransportById(transportId!);
-      const formValues = transportDtoToContainerTransportFormValues(response);
+      const formValues = transportDetailViewToContainerTransportFormValues(response);
       formContext.reset(formValues);
 
-      return response;
+      return formValues;
     },
     enabled: !!transportId,
   });

@@ -39,6 +39,8 @@ class ContainerTransport(
 
   val wasteContainer: WasteContainerId?,
 
+  val containerOperation: ContainerOperation?,
+
   override val truck: LicensePlate?,
 
   override val driver: UserId?,
@@ -54,7 +56,7 @@ class ContainerTransport(
    */
   val sequenceNumber: Int,
 
-) : Transport {
+  ) : Transport {
 
   /**
    * Get the current status of this transport.
@@ -78,6 +80,7 @@ class ContainerTransport(
       deliveryDateTime: Instant,
       transportType: TransportType,
       wasteContainer: WasteContainerId?,
+      containerOperation: ContainerOperation?,
       truck: LicensePlate?,
       driver: UserId?,
       note: Note,
@@ -96,6 +99,7 @@ class ContainerTransport(
         deliveryDateTime = deliveryDateTime,
         transportType = transportType,
         wasteContainer = wasteContainer,
+        containerOperation = containerOperation,
         truck = truck,
         driver = driver,
         note = note,

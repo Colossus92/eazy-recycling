@@ -7,10 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
@@ -50,6 +47,7 @@ data class CreateContainerTransportCommand(
   val deliveryDateTime: Instant,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
+  val containerOperation: ContainerOperation,
   val truck: LicensePlate?,
   val driver: UserId?,
   val note: Note,
@@ -80,6 +78,7 @@ class CreateContainerTransportService(
       deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
+      containerOperation = cmd.containerOperation,
       truck = cmd.truck,
       driver = cmd.driver,
       note = cmd.note,

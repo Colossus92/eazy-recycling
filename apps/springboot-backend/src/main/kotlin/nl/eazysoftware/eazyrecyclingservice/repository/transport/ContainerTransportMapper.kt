@@ -6,7 +6,10 @@ import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportDisplayNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
@@ -39,6 +42,7 @@ class ContainerTransportMapper(
         ?: kotlinx.datetime.Clock.System.now(),
       transportType = dto.transportType,
       wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.uuid!!) },
+      containerOperation = dto.containerOperation,
       truck = dto.truck?.let { LicensePlate(it.licensePlate) },
       driver = dto.driver?.let { UserId(it.id) },
       note = Note(dto.note),
@@ -65,7 +69,7 @@ class ContainerTransportMapper(
       deliveryDateTime = domain.deliveryDateTime.toJavaInstant().atZone(java.time.ZoneId.systemDefault())
         .toLocalDateTime(),
       transportType = domain.transportType,
-      containerOperation = ContainerOperation.DELIVERY,
+      containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let { containerRepository.findByIdOrNull(it.uuid) },
       truck = domain.truck?.let { truckRepository.findByIdOrNull(it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },

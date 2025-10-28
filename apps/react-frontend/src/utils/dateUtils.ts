@@ -102,3 +102,44 @@ export const formatInstantInCET = (
     return '';
   }
 };
+
+/**
+ * Formats an Instant as a datetime-local input string (yyyy-MM-ddTHH:mm) in CET timezone
+ * This is specifically for HTML5 datetime-local inputs which require this format
+ * @param instant - Instant object with epochSeconds property
+ * @returns Formatted datetime string in yyyy-MM-ddTHH:mm format in CET timezone
+ */
+export const formatInstantForDateTimeInput = (
+  instant: { epochSeconds: number } | null | undefined
+): string => {
+  const date = instantToDate(instant);
+  if (!date) return '';
+
+  try {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Europe/Amsterdam', // CET/CEST timezone
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    };
+
+    const formatter = new Intl.DateTimeFormat('nl-NL', options);
+    const parts = formatter.formatToParts(date);
+    
+    // Extract parts
+    const day = parts.find(p => p.type === 'day')?.value || '';
+    const month = parts.find(p => p.type === 'month')?.value || '';
+    const year = parts.find(p => p.type === 'year')?.value || '';
+    const hour = parts.find(p => p.type === 'hour')?.value || '';
+    const minute = parts.find(p => p.type === 'minute')?.value || '';
+
+    // Format as yyyy-MM-ddTHH:mm for datetime-local input
+    return `${year}-${month}-${day}T${hour}:${minute}`;
+  } catch (error) {
+    console.error('Error formatting instant for datetime input:', error);
+    return '';
+  }
+};
