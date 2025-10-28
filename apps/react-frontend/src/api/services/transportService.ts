@@ -82,6 +82,8 @@ export const resolveLocationAddress = (
   // Handle DutchAddressView (type === 'project_location')
   if (locationAny.type === 'project_location') {
     return {
+      companyId: locationAny.company.id,
+      companyName: locationAny.company.name,
       street: locationAny.streetName,
       houseNumber: locationAny.buildingNumber,
       postalCode: locationAny.postalCode ,
