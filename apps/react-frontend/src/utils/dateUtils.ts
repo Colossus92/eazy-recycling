@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 /**
  * Formats a date string from ISO format to a custom format
  * @param dateString - ISO date string (e.g., "2025-05-01T11:55:12.045350Z")
@@ -38,108 +40,36 @@ export const formatWeekday = (date: Date) =>
   new Intl.DateTimeFormat('nl-NL', { weekday: 'long' }).format(date);
 
 /**
- * Converts an Instant object to a JavaScript Date object
- * @param instant - Instant object with epochSeconds property
+ * Converts a datetime string to a JavaScript Date object
+ * @param dateString - Datetime string (YYYY-MM-DDThh:mm)
  * @returns Date object or null if invalid
  */
-export const instantToDate = (instant: { epochSeconds: number } | null | undefined): Date | null => {
-  if (!instant || typeof instant.epochSeconds !== 'number') {
+export const instantToDate = (dateString: string | null | undefined): Date | null => {
+  if (!dateString) {
     return null;
   }
   
-  // Convert epoch seconds to milliseconds
-  return new Date(instant.epochSeconds * 1000);
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? null : date;
 };
 
 /**
- * Formats an Instant as a date string in CET timezone
- * @param instant - Instant object with epochSeconds property
+ * Formats a datetime string as a date string in CET timezone
+ * @param dateString - Datetime string (YYYY-MM-DDThh:mm)
  * @param formatPattern - Format pattern (e.g., 'dd-MM-yyyy', 'dd-MM-yyyy HH:mm')
  * @returns Formatted date string in CET timezone
  */
 export const formatInstantInCET = (
-  instant: { epochSeconds: number } | null | undefined,
+  dateString: string | null | undefined,
   formatPattern: 'dd-MM-yyyy' | 'dd-MM-yyyy HH:mm' | 'HH:mm' = 'dd-MM-yyyy HH:mm'
 ): string => {
-  const date = instantToDate(instant);
+  const date = instantToDate(dateString);
   if (!date) return '';
 
   try {
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: 'Europe/Amsterdam', // CET/CEST timezone
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    };
-
-    // Add time parts if format includes time
-    if (formatPattern.includes('HH:mm')) {
-      options.hour = '2-digit';
-      options.minute = '2-digit';
-      options.hour12 = false;
-    }
-
-    const formatter = new Intl.DateTimeFormat('nl-NL', options);
-    const parts = formatter.formatToParts(date);
-    
-    // Extract parts
-    const day = parts.find(p => p.type === 'day')?.value || '';
-    const month = parts.find(p => p.type === 'month')?.value || '';
-    const year = parts.find(p => p.type === 'year')?.value || '';
-    const hour = parts.find(p => p.type === 'hour')?.value || '';
-    const minute = parts.find(p => p.type === 'minute')?.value || '';
-
-    // Format according to pattern
-    if (formatPattern === 'dd-MM-yyyy') {
-      return `${day}-${month}-${year}`;
-    } else if (formatPattern === 'HH:mm') {
-      return `${hour}:${minute}`;
-    } else {
-      return `${day}-${month}-${year} ${hour}:${minute}`;
-    }
+    return format(date, formatPattern);
   } catch (error) {
     console.error('Error formatting instant in CET:', error);
-    return '';
-  }
-};
-
-/**
- * Formats an Instant as a datetime-local input string (yyyy-MM-ddTHH:mm) in CET timezone
- * This is specifically for HTML5 datetime-local inputs which require this format
- * @param instant - Instant object with epochSeconds property
- * @returns Formatted datetime string in yyyy-MM-ddTHH:mm format in CET timezone
- */
-export const formatInstantForDateTimeInput = (
-  instant: { epochSeconds: number } | null | undefined
-): string => {
-  const date = instantToDate(instant);
-  if (!date) return '';
-
-  try {
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: 'Europe/Amsterdam', // CET/CEST timezone
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    };
-
-    const formatter = new Intl.DateTimeFormat('nl-NL', options);
-    const parts = formatter.formatToParts(date);
-    
-    // Extract parts
-    const day = parts.find(p => p.type === 'day')?.value || '';
-    const month = parts.find(p => p.type === 'month')?.value || '';
-    const year = parts.find(p => p.type === 'year')?.value || '';
-    const hour = parts.find(p => p.type === 'hour')?.value || '';
-    const minute = parts.find(p => p.type === 'minute')?.value || '';
-
-    // Format as yyyy-MM-ddTHH:mm for datetime-local input
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-  } catch (error) {
-    console.error('Error formatting instant for datetime input:', error);
     return '';
   }
 };

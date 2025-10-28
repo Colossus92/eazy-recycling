@@ -1,10 +1,9 @@
 import { JdenticonAvatar } from '../icon/JdenticonAvatar';
-import { Instant } from '@/api/client';
 import { formatInstantInCET } from '@/utils/dateUtils';
 import { NormalizedAddress } from '@/api/services/transportService';
 
 interface CompanyCardProps {
-  dateTime?: Instant;
+  dateTime?: string;
   details: NormalizedAddress | null;
 }
 

@@ -79,6 +79,17 @@ export const resolveLocationAddress = (
     };
   }
 
+  // Handle DutchAddressView (type === 'project_location')
+  if (locationAny.type === 'project_location') {
+    return {
+      street: locationAny.streetName,
+      houseNumber: locationAny.buildingNumber,
+      postalCode: locationAny.postalCode ,
+      city: locationAny.city,
+      country: locationAny.country,
+    };
+  }
+
   // Fallback: try to extract address directly if it exists
   if (locationAny.address) {
     return {
