@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayString
+import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.toView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
@@ -11,10 +12,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProfileRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -33,8 +34,8 @@ class GetTransportByIdService(
   private val wasteStreams: WasteStreams,
   private val companyRepository: CompanyRepository,
   private val profileRepository: ProfileRepository,
-  private val wasteContainerRepository: WasteContainerRepository,
   private val truckRepository: TruckRepository,
+  private val wasteContainerService: WasteContainerService,
 ) : GetTransportById {
 
   override fun execute(transportId: UUID): TransportDetailView {
@@ -136,15 +137,8 @@ class GetTransportByIdService(
     )
   }
 
-  private fun mapWasteContainer(containerId: UUID): WasteContainerView {
-    val container = wasteContainerRepository.findByIdOrNull(containerId)
-      ?: throw EntityNotFoundException("Container met id $containerId niet gevonden")
-
-    return WasteContainerView(
-      uuid = container.uuid!!,
-      containerNumber = container.id,
-    )
-  }
+  private fun mapWasteContainer(containerId: UUID) =
+    wasteContainerService.getContainerById(containerId).toView()
 
   private fun mapGoodsItem(goodsItem: GoodsItem, wasteStream: WasteStream): GoodsItemView {
     return GoodsItemView(

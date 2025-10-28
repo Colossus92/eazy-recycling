@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.WasteContainerView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportStatus
 import java.util.*
@@ -33,11 +34,6 @@ data class TransportDetailView(
   val goodsItem: GoodsItemView? = null,
   val consigneeParty: CompanyView? = null,
   val pickupParty: CompanyView? = null,
-)
-
-data class WasteContainerView(
-  val uuid: UUID,
-  val containerNumber: String,
 )
 
 data class TruckView(
