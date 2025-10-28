@@ -161,6 +161,7 @@ export const formValuesToCreateContainerTransportRequest = (
 
   if (formValues.pickupCompanyBranchId) {
     request.pickupProjectLocationId = formValues.pickupCompanyBranchId;
+    request.pickupCompanyId = formValues.pickupCompanyId;
   } else if (formValues.pickupCompanyId) {
     request.pickupCompanyId = formValues.pickupCompanyId;
   } else if (formValues.pickupStreet) {
@@ -172,6 +173,7 @@ export const formValuesToCreateContainerTransportRequest = (
 
   if (formValues.deliveryCompanyBranchId) {
     request.deliveryProjectLocationId = formValues.deliveryCompanyBranchId;
+    request.deliveryCompanyId = formValues.deliveryCompanyId;
   } else if (formValues.deliveryCompanyId) {
     request.deliveryCompanyId = formValues.deliveryCompanyId;
   } else if (formValues.deliveryStreet) {
