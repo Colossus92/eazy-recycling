@@ -28,6 +28,11 @@ data class TransportDetailView(
   val updatedAt: Instant?,
   val wasteContainer: WasteContainerView?,
   val containerOperation: ContainerOperation?,
+
+  // Waste transport specific details
+  val goodsItem: GoodsItemView? = null,
+  val consigneeParty: CompanyView? = null,
+  val pickupParty: CompanyView? = null,
 )
 
 data class WasteContainerView(
@@ -45,3 +50,15 @@ data class DriverView(
   val id: UUID,
   val name: String,
 )
+
+data class GoodsItemView(
+  val wasteStreamNumber: String,
+  val name: String,
+  val netNetWeight: Double,
+  val unit: String,
+  val quantity: Int,
+  val euralCode: String,
+  val processingMethodCode: String,
+  val consignorClassification: Int = 1,
+)
+

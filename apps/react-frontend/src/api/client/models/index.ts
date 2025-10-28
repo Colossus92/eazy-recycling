@@ -29,6 +29,7 @@ export * from './dutch-address-view';
 export * from './eural';
 export * from './eural-code-view';
 export * from './goods-item-dto';
+export * from './goods-item-view';
 export * from './instant';
 export * from './local-date';
 export * from './local-date-time';

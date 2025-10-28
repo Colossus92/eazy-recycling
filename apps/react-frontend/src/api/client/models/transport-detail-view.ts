@@ -21,6 +21,9 @@ import type { CompanyView } from './company-view';
 import type { DriverView } from './driver-view';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { GoodsItemView } from './goods-item-view';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Instant } from './instant';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -85,7 +88,7 @@ export interface TransportDetailView {
      * @type {string}
      * @memberof TransportDetailView
      */
-    'deliveryDateTime': string;
+    'deliveryDateTime'?: string;
     /**
      * 
      * @type {string}
@@ -146,6 +149,24 @@ export interface TransportDetailView {
      * @memberof TransportDetailView
      */
     'containerOperation'?: TransportDetailViewContainerOperationEnum;
+    /**
+     * 
+     * @type {GoodsItemView}
+     * @memberof TransportDetailView
+     */
+    'goodsItem'?: GoodsItemView;
+    /**
+     * 
+     * @type {CompanyView}
+     * @memberof TransportDetailView
+     */
+    'consigneeParty'?: CompanyView;
+    /**
+     * 
+     * @type {CompanyView}
+     * @memberof TransportDetailView
+     */
+    'pickupParty'?: CompanyView;
 }
 
 export const TransportDetailViewStatusEnum = {

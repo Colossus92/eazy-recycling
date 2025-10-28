@@ -1351,8 +1351,8 @@ components:
         wasteStreamNumber:
           type: string
         weight:
-          type: integer
-          format: int32
+          type: number
+          format: double
           minimum: 0
         unit:
           type: string
@@ -1853,8 +1853,8 @@ components:
         wasteStreamNumber:
           type: string
         netNetWeight:
-          type: integer
-          format: int32
+          type: number
+          format: double
         unit:
           type: string
         quantity:
@@ -2114,12 +2114,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2182,15 +2182,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2220,11 +2220,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -2519,6 +2519,37 @@ components:
       required:
       - id
       - name
+    GoodsItemView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        name:
+          type: string
+        netNetWeight:
+          type: number
+          format: double
+        unit:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        euralCode:
+          type: string
+        processingMethodCode:
+          type: string
+        consignorClassification:
+          type: integer
+          format: int32
+      required:
+      - consignorClassification
+      - euralCode
+      - name
+      - netNetWeight
+      - processingMethodCode
+      - quantity
+      - unit
+      - wasteStreamNumber
     Instant:
       type: object
       properties:
@@ -2526,15 +2557,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         nanosecondsOfSecond:
           type: integer
           format: int32
         epochSeconds:
           type: integer
           format: int64
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond
@@ -2600,10 +2631,15 @@ components:
           - PICKUP
           - EMPTY
           - DELIVERY
+        goodsItem:
+          $ref: "#/components/schemas/GoodsItemView"
+        consigneeParty:
+          $ref: "#/components/schemas/CompanyView"
+        pickupParty:
+          $ref: "#/components/schemas/CompanyView"
       required:
       - carrierParty
       - consignorParty
-      - deliveryDateTime
       - deliveryLocation
       - id
       - note

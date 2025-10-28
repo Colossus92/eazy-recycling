@@ -9,7 +9,7 @@ data class GoodsItemDto(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     val wasteStreamNumber: String,
-    val netNetWeight: Int,
+    val netNetWeight: Double,
     val unit: String,
     val quantity: Int,
 )

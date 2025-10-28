@@ -3,13 +3,14 @@ import {
   PickupLocationView,
   TransportControllerApi,
   TransportDetailView,
-  TransportDto,
   TransportFinishedRequest,
   WasteStreamDetailViewPickupLocation,
   WasteTransportControllerApi,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
-import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
+import {
+  CreateContainerTransportRequestContainerOperationEnum
+} from '@/api/client/models/create-container-transport-request';
 import {
   CreateWasteTransportRequest,
   CreateWasteTransportRequestContainerOperationEnum,
@@ -228,6 +229,7 @@ export const transportDetailViewToContainerTransportFormValues = (
     note: data.note,
     transportType: data.transportType,
   };
+
   return formValues;
 };
 
@@ -272,46 +274,47 @@ export const formValuesToCreateWasteTransportRequest = (
   return request;
 };
 
-export const transportDtoToWasteTransportFormValues = (dto: TransportDto) => {
-  const goods = dto.goods;
+export const transportDtoToWasteTransportFormValues = (transport: TransportDetailView) => {
+  const goods = transport.goodsItem;
+  const pickupLocationAddress = resolveLocationAddress(transport.pickupLocation);
+  const deliveryLocationAddress = resolveLocationAddress(transport.deliveryLocation);
 
   const formValues: WasteTransportFormValues = {
-    consignorPartyId: dto.consignorParty?.id || '',
-    carrierPartyId: dto.carrierParty?.id || '',
-    containerOperation: dto.containerOperation || '',
-    pickupCompanyId: dto.pickupCompany?.id || '',
-    pickupCompanyBranchId: dto.pickupCompanyBranch?.id || '',
-    pickupStreet: dto.pickupLocation.address.streetName || '',
-    pickupBuildingNumber: dto.pickupLocation.address.buildingNumber || '',
-    pickupPostalCode: dto.pickupLocation.address.postalCode || '',
-    pickupCity: dto.pickupLocation.address.city || '',
-    pickupDateTime: format(new Date(dto.pickupDateTime), "yyyy-MM-dd'T'HH:mm"),
-    deliveryCompanyId: dto.deliveryCompany?.id || '',
-    deliveryCompanyBranchId: dto.deliveryCompanyBranch?.id || '',
-    deliveryStreet: dto.deliveryLocation.address.streetName || '',
-    deliveryBuildingNumber: dto.deliveryLocation.address.buildingNumber || '',
-    deliveryPostalCode: dto.deliveryLocation.address.postalCode || '',
-    deliveryCity: dto.deliveryLocation.address.city || '',
-    deliveryDateTime: dto.deliveryDateTime
-      ? format(new Date(dto.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
+    consignorPartyId: transport.consignorParty?.id || '',
+    carrierPartyId: transport.carrierParty?.id || '',
+    containerOperation: transport.containerOperation || '',
+    // pickupCompanyBranchId: data.pickupCompanyBranch?.id || '', //TODO
+    pickupStreet: pickupLocationAddress?.street || '',
+    pickupBuildingNumber: pickupLocationAddress?.houseNumber || '',
+    pickupPostalCode: pickupLocationAddress?.postalCode || '',
+    pickupCity: pickupLocationAddress?.city || '',
+    pickupDateTime: format(new Date(transport.pickupDateTime), "yyyy-MM-dd'T'HH:mm"),
+    deliveryCompanyId: deliveryLocationAddress?.companyId || '',
+    // deliveryCompanyBranchId: data.deliveryCompanyBranch?.id || '',
+    deliveryStreet: deliveryLocationAddress?.street || '',
+    deliveryBuildingNumber: deliveryLocationAddress?.houseNumber || '',
+    deliveryPostalCode: deliveryLocationAddress?.postalCode || '',
+    deliveryCity: deliveryLocationAddress?.city || '',
+    deliveryDateTime: transport.deliveryDateTime
+      ? format(new Date(transport.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
       : undefined,
-    truckId: dto.truck?.licensePlate || '',
-    driverId: dto.driver?.id || '',
-    containerId: dto.wasteContainer?.uuid || '',
-    note: dto.note,
-    transportType: dto.transportType,
+    truckId: transport.truck?.licensePlate || '',
+    driverId: transport.driver?.id || '',
+    containerId: transport.wasteContainer?.uuid || '',
+    note: transport.note,
+    transportType: transport.transportType,
 
     // Goods data
     consignorClassification: goods?.consignorClassification || 0,
-    consigneePartyId: goods?.consigneeParty.id || '',
-    pickupPartyId: goods?.pickupParty.id || '',
-    wasteStreamNumber: goods?.goodsItem.wasteStreamNumber || '',
-    weight: goods?.goodsItem.netNetWeight || 0,
-    unit: goods?.goodsItem.unit || '',
-    quantity: goods?.goodsItem.quantity || 0,
-    goodsName: goods?.goodsItem.name || '',
-    euralCode: goods?.goodsItem.euralCode || '',
-    processingMethodCode: goods?.goodsItem.processingMethodCode || '',
+    consigneePartyId: transport.consigneeParty?.id || '',
+    pickupPartyId: transport.pickupParty?.id || '',
+    wasteStreamNumber: goods?.wasteStreamNumber || '',
+    weight: goods?.netNetWeight || 0,
+    unit: goods?.unit || '',
+    quantity: goods?.quantity || 0,
+    goodsName: goods?.name || '',
+    euralCode: goods?.euralCode || '',
+    processingMethodCode: goods?.processingMethodCode || '',
   };
   return formValues;
 };

@@ -48,6 +48,7 @@ models/dutch-address-view.ts
 models/eural-code-view.ts
 models/eural.ts
 models/goods-item-dto.ts
+models/goods-item-view.ts
 models/index.ts
 models/instant.ts
 models/local-date-time.ts

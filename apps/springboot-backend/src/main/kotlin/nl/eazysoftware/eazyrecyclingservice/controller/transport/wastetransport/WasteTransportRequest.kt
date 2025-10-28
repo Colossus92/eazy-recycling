@@ -19,7 +19,7 @@ data class WasteTransportRequest(
   val note: String,
   val wasteStreamNumber: String?,
   @field:Min(0)
-  val weight: Int,
+  val weight: Double,
   @field:NotBlank
   val unit: String,
   @field:Min(0)
