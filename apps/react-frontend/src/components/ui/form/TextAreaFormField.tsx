@@ -34,9 +34,17 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
 }: TextAreaFormFieldProps<TFieldValues>) => {
   const { register, name, rules, errors } = formHook;
   const error = errors[name]?.message as string;
-  const borderColorClasses = error
-    ? formInputClasses.border.error
-    : formInputClasses.border.default;
+  const textColorClasses = disabled
+    ? formInputClasses.text.disabled
+    : formInputClasses.text.default;
+  const borderColorClasses = disabled
+    ? formInputClasses.border.disabled
+    : error
+      ? formInputClasses.border.error
+      : formInputClasses.border.default;
+  const backgroundClasses = disabled
+    ? formInputClasses.background.disabled
+    : formInputClasses.background.hover;
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
@@ -47,8 +55,8 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
         className={clsx(
           formInputClasses.base,
           formInputClasses.padding.default,
-          formInputClasses.text.default,
-          formInputClasses.background.hover,
+          textColorClasses,
+          backgroundClasses,
           borderColorClasses
         )}
         placeholder={placeholder}

@@ -22,7 +22,7 @@ export function useWeightTicketCrud() {
   const [query, setQuery] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<WeightTicketDetailView | undefined>(undefined);
-  const [itemToDelete, setItemToDelete] = useState<WeightTicketListView | undefined>(undefined);
+  const [itemToDelete, setItemToDelete] = useState<number | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
     isDraft: false,

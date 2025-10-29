@@ -14,12 +14,14 @@ import { FormProvider } from 'react-hook-form';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
 import { WeightTicketLinesSection } from './WeightTicketLinesSection';
+import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     weightTicketNumber?: number;
     status?: string;
+    onDelete: (id: number) => void;
 }
 
 export const WeightTicketForm = ({
@@ -27,6 +29,7 @@ export const WeightTicketForm = ({
     setIsOpen,
     weightTicketNumber,
     status,
+    onDelete,
 }: WeightTicketFormProps) => {
     const {
         data,
@@ -48,7 +51,7 @@ export const WeightTicketForm = ({
         setIsOpen(false);
     };
 
-    const isDisabled = Boolean(status && status !== 'DRAFT');
+    const isDisabled = Boolean((data?.status || status) && (data?.status || status) !== 'DRAFT');
 
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies'],
@@ -85,6 +88,14 @@ export const WeightTicketForm = ({
                             <FormTopBar
                                 title={
                                     data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'
+                                }
+                                actions={
+                                    data && (
+                                        <WeightTicketFormActionMenu 
+                                            weightTicket={data}
+                                            onDelete={onDelete}
+                                        />
+                                    )
                                 }
                                 onClick={handleCancel}
                             />

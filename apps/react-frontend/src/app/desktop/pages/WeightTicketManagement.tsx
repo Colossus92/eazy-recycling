@@ -107,7 +107,7 @@ export const WeightTicketManagement = () => {
                             {item.status !== 'CANCELLED' &&
                               <ActionMenu<WeightTicketListView>
                                 onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
-                                onDelete={(weightTicket) => deletion.initiate(weightTicket)}
+                                onDelete={(weightTicket) => deletion.initiate(weightTicket.id)}
                                 deleteText="Annuleren"
                                 item={item}
                               />
@@ -138,7 +138,7 @@ export const WeightTicketManagement = () => {
       <WeightTicketCancellationForm
         isOpen={Boolean(deletion.item)}
         setIsOpen={deletion.cancel}
-        weightTicketId={deletion.item?.id}
+        weightTicketId={deletion.item}
         onCancel={deletion.confirm}
       />
       <WeightTicketForm
@@ -146,6 +146,7 @@ export const WeightTicketManagement = () => {
         setIsOpen={form.close}
         weightTicketNumber={form.item?.id}
         status={form.item?.status}
+        onDelete={deletion.initiate}
       />
       <Drawer
         title={'Weegbon filter'}
