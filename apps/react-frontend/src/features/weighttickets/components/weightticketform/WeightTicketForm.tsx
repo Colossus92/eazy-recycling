@@ -153,7 +153,7 @@ export const WeightTicketForm = ({
                                     </div>
                                 )}
                             </div>
-                            <FormActionButtons onClick={handleCancel} item={undefined} />
+                            <FormActionButtons onClick={handleCancel} item={data} />
                         </form>
                     </FormProvider>
                 </div>
