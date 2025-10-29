@@ -75,6 +75,8 @@ models/project-location-view.ts
 models/proximity-description-request.ts
 models/proximity-description-view.ts
 models/signature-status-view.ts
+models/split-weight-ticket-request.ts
+models/split-weight-ticket-response.ts
 models/transport-detail-view.ts
 models/transport-dto.ts
 models/transport-finished-request.ts

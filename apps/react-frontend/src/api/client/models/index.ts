@@ -55,6 +55,8 @@ export * from './project-location-view';
 export * from './proximity-description-request';
 export * from './proximity-description-view';
 export * from './signature-status-view';
+export * from './split-weight-ticket-request';
+export * from './split-weight-ticket-response';
 export * from './transport-detail-view';
 export * from './transport-dto';
 export * from './transport-finished-request';
