@@ -2,14 +2,16 @@ import { Company, companyService } from '@/api/services/companyService';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
-import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
-import { TextFormField } from '@/components/ui/form/TextFormField';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
+import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
+import { TextFormField } from '@/components/ui/form/TextFormField';
+import { Note } from '@/features/planning/components/note/Note';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
+import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
 import { WeightTicketLinesSection } from './WeightTicketLinesSection';
 
@@ -88,13 +90,15 @@ export const WeightTicketForm = ({
                             />
                             <div
                                 className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
-                            >
+                                >
+                                {data?.cancellationReason && <Note note={data?.cancellationReason} />}
                                 {isLoading ? (
                                     <div className="flex justify-center items-center w-full p-8">
                                         <p>Weegbon laden...</p>
                                     </div>
                                 ) : (
                                     <div className={'flex flex-col items-start self-stretch gap-4'}>
+                                        {data?.status && <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />}
                                         <div className="w-1/2">
                                             <SelectFormField
                                                 title={'Opdrachtgever'}

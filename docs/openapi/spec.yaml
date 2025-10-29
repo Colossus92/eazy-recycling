@@ -2264,6 +2264,8 @@ components:
           type: string
         note:
           type: string
+        cancellationReason:
+          type: string
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
         updatedAt:

@@ -12,6 +12,7 @@ data class WeightTicketDetailView(
   val truckLicensePlate: String?,
   val reclamation: String?,
   val note: String?,
+  val cancellationReason: String?,
   val createdAt: LocalDateTime,
   val updatedAt: LocalDateTime?,
   val weightedAt: LocalDateTime?,

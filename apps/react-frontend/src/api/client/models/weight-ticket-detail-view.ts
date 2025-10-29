@@ -82,6 +82,12 @@ export interface WeightTicketDetailView {
     'note'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'cancellationReason'?: string;
+    /**
+     * 
      * @type {LocalDateTime}
      * @memberof WeightTicketDetailView
      */

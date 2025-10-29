@@ -13,11 +13,11 @@ import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
-import Warning from '@/assets/icons/Warning.svg?react';
 import PhRecycleLight from '@/assets/icons/PhRecycleLight.svg?react';
 import BxTimeFive from '@/assets/icons/BxTimeFive.svg?react';
 import { CompanyCard } from '@/components/ui/company/CompanyCard';
 import { toastService } from '@/components/ui/toast/toastService';
+import { Note } from '@/features/planning/components/note/Note';
 
 interface TransportDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -241,14 +241,7 @@ export const TransportDetailsDrawer = ({
           <WaybillDownloadSection transportId={data.id} />
 
           {data.note && (
-            <div
-              className={
-                'flex items-center self-stretch gap-2 py-2 pl-2 pr-3 border border-solid border-color-status-warning-primary bg-color-status-warning-light rounded-radius-sm'
-              }
-            >
-              <Warning />
-              <span className={'text-body-2'}>{data.note}</span>
-            </div>
+            <Note note={data.note} />
           )}
         </div>
       )}

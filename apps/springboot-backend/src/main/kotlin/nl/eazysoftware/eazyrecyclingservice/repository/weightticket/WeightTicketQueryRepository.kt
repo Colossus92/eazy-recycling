@@ -65,6 +65,7 @@ class WeightTicketQueryRepository(
       truckLicensePlate = weightTicket.truckLicensePlate,
       reclamation = weightTicket.reclamation,
       note = weightTicket.note,
+      cancellationReason = weightTicket.cancellationReason,
       createdAt = weightTicket.createdAt.toKotlinInstant().toDisplayTime(),
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),
       weightedAt = weightTicket.weightedAt?.toKotlinInstant()?.toDisplayTime(),
