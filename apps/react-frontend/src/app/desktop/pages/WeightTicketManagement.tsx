@@ -93,7 +93,11 @@ export const WeightTicketManagement = () => {
                     {read.items
                       .slice((page - 1) * rowsPerPage, page * rowsPerPage)
                       .map((item, index) => (
-                        <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
+                        <tr
+                          key={index}
+                          className="text-body-2 border-b border-solid border-color-border-primary cursor-pointer hover:bg-color-surface-secondary"
+                          onDoubleClick={() => form.openForEdit(item)}
+                        >
                           {columns.map((col) => (
                             <td className="p-4 truncate" key={String(col.key)} title={col.title(item)}>
                               {col.accessor(item)}
@@ -141,6 +145,7 @@ export const WeightTicketManagement = () => {
         isOpen={form.isOpen}
         setIsOpen={form.close}
         weightTicketNumber={form.item?.id}
+        status={form.item?.status}
       />
       <Drawer
         title={'Weegbon filter'}

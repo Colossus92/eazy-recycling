@@ -9,7 +9,11 @@ import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamListView } from '@/api/client';
 
-export const WeightTicketLinesSection = () => {
+interface WeightTicketLinesSectionProps {
+  disabled?: boolean;
+}
+
+export const WeightTicketLinesSection = ({ disabled = false }: WeightTicketLinesSectionProps) => {
   const formContext = useFormContext<WeightTicketFormValues>();
   const {
     control,
@@ -90,9 +94,9 @@ export const WeightTicketLinesSection = () => {
         <button
           type="button"
           onClick={handleAddLine}
-          disabled={!hasConsignorSelected}
+          disabled={!hasConsignorSelected || disabled}
           className="flex items-center justify-center w-8 h-8 rounded-radius-sm bg-color-primary text-color-on-primary hover:bg-color-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title={!hasConsignorSelected ? 'Selecteer eerst een opdrachtgever' : 'Voeg weging toe'}
+          title={disabled ? 'Kan niet bewerken in deze status' : !hasConsignorSelected ? 'Selecteer eerst een opdrachtgever' : 'Voeg weging toe'}
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -120,8 +124,9 @@ export const WeightTicketLinesSection = () => {
                 <button
                   type="button"
                   onClick={() => remove(index)}
-                  className="flex items-center justify-center w-6 h-6 rounded-radius-sm text-color-error hover:bg-color-error hover:text-color-on-error transition-colors"
-                  title="Verwijder weging"
+                  disabled={disabled}
+                  className="flex items-center justify-center w-6 h-6 rounded-radius-sm text-color-error hover:bg-color-error hover:text-color-on-error disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  title={disabled ? 'Kan niet bewerken in deze status' : 'Verwijder weging'}
                 >
                   <TrashSimple className="w-4 h-4" />
                 </button>
@@ -134,6 +139,7 @@ export const WeightTicketLinesSection = () => {
                     placeholder={'Selecteer een afvalstroom'}
                     options={wasteStreamOptions}
                     testId={`waste-stream-select-${index}`}
+                    disabled={disabled}
                     formHook={{
                       register,
                       name: `lines.${index}.wasteStreamNumber` as const,
@@ -162,6 +168,7 @@ export const WeightTicketLinesSection = () => {
                   <TextFormField
                     title={'Hoeveelheid'}
                     placeholder={'0'}
+                    disabled={disabled}
                     formHook={{
                       register,
                       name: `lines.${index}.weightValue` as const,

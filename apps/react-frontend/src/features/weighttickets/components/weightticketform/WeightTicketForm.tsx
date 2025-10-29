@@ -17,12 +17,14 @@ interface WeightTicketFormProps {
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     weightTicketNumber?: number;
+    status?: string;
 }
 
 export const WeightTicketForm = ({
     isOpen,
     setIsOpen,
     weightTicketNumber,
+    status,
 }: WeightTicketFormProps) => {
     const {
         data,
@@ -43,6 +45,8 @@ export const WeightTicketForm = ({
         resetForm();
         setIsOpen(false);
     };
+
+    const isDisabled = Boolean(status && status !== 'DRAFT');
 
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies'],
@@ -65,6 +69,8 @@ export const WeightTicketForm = ({
         await mutation.mutateAsync(filteredFormValues);
     });
 
+    const handleSubmit = isDisabled ? (e: React.FormEvent) => e.preventDefault() : onSubmit;
+
     return (
         <ErrorBoundary fallbackRender={fallbackRender}>
             <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
@@ -72,7 +78,7 @@ export const WeightTicketForm = ({
                     <FormProvider {...formContext}>
                         <form
                             className="flex flex-col items-center self-stretch"
-                            onSubmit={onSubmit}
+                            onSubmit={handleSubmit}
                         >
                             <FormTopBar
                                 title={
@@ -95,6 +101,7 @@ export const WeightTicketForm = ({
                                                 placeholder={'Selecteer een opdrachtgever'}
                                                 options={companyOptions}
                                                 testId="consignor-party-select"
+                                                disabled={isDisabled}
                                                 formHook={{
                                                     register: formContext.register,
                                                     name: 'consignorPartyId',
@@ -110,6 +117,7 @@ export const WeightTicketForm = ({
                                                 placeholder={'Selecteer een vervoerder'}
                                                 options={companyOptions}
                                                 testId="carrier-party-select"
+                                                disabled={isDisabled}
                                                 formHook={{
                                                     register: formContext.register,
                                                     name: 'carrierPartyId',
@@ -120,6 +128,7 @@ export const WeightTicketForm = ({
                                         </div>
                                         <div className="w-1/2">
                                             <TruckSelectFormField
+                                                disabled={isDisabled}
                                                 formHook={{
                                                     register: formContext.register,
                                                     name: 'truckLicensePlate',
@@ -128,10 +137,11 @@ export const WeightTicketForm = ({
                                                 }}
                                             />
                                         </div>
-                                        <WeightTicketLinesSection />
+                                        <WeightTicketLinesSection disabled={isDisabled} />
                                         <TextFormField
                                             title={'Reclamatie'}
                                             placeholder={'Vul reclamatie in'}
+                                            disabled={isDisabled}
                                             formHook={{
                                                 register: formContext.register,
                                                 name: 'reclamation',
@@ -142,6 +152,7 @@ export const WeightTicketForm = ({
                                         <TextAreaFormField
                                             title={'Opmerkingen'}
                                             placeholder={'Plaats opmerkingen'}
+                                            disabled={isDisabled}
                                             formHook={{
                                                 register: formContext.register,
                                                 name: 'note',
@@ -153,7 +164,7 @@ export const WeightTicketForm = ({
                                     </div>
                                 )}
                             </div>
-                            <FormActionButtons onClick={handleCancel} item={data} />
+                            <FormActionButtons onClick={handleCancel} item={data} disabled={isDisabled} />
                         </form>
                     </FormProvider>
                 </div>

@@ -3,8 +3,8 @@ spring:
     url: jdbc:postgresql://127.0.0.1:54322/postgres?user=postgres&password=postgres
 supabase:
   api:
-    url: ${SUPABASE_API_URL:}
-    secret: ${SUPABASE_API_SECRET:}
+    url: ${SUPABASE_API_URL:http://127.0.0.1:54321}
+    secret: ${SUPABASE_API_SECRET:sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz}
     publishable: ${SUPABASE_API_PUBLISHABLE:}
     jwt-secret: ${SUPABASE_API_JWT_SECRET:}
     jwt-issuer: ${SUPABASE_API_JWT_ISSUER:}

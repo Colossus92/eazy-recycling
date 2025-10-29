@@ -3,6 +3,7 @@ import { Button } from '../button/Button.tsx';
 export const FormActionButtons = <T,>(props: {
   onClick: () => void;
   item: T | undefined;
+  disabled?: boolean;
 }) => {
   return (
     <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
@@ -21,6 +22,7 @@ export const FormActionButtons = <T,>(props: {
           variant={'primary'}
           label={props.item ? 'Aanpassen' : 'Toevoegen'}
           fullWidth={true}
+          disabled={props.disabled}
           data-testid={'submit-button'}
         />
       </div>

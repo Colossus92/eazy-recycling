@@ -20,10 +20,12 @@ interface TruckSelectFormFieldProps<TFieldValues extends FieldValues> {
     errors: FieldErrors;
     control: Control<TFieldValues>;
   };
+  disabled?: boolean;
 }
 
 export const TruckSelectFormField = <T extends FieldValues>({
   formHook,
+  disabled = false,
 }: TruckSelectFormFieldProps<T>) => {
   const { data: trucks = [] } = useQuery<Truck[]>({
     queryKey: ['trucks'],
@@ -41,6 +43,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
       placeholder={'Selecteer een vrachtwagen'}
       options={truckOptions}
       testId='truck-select'
+      disabled={disabled}
       formHook={{
         register: formHook.register,
         name: formHook.name,
