@@ -5,19 +5,21 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import org.hibernate.Hibernate
+import java.time.ZoneId
 
 
 data class PlanningView(
   val dates: List<String>,
-  val transports: List<TransportsView>,
+  val transports: List<PlanningTransportsView>,
 )
 
-data class TransportsView(
+data class PlanningTransportsView(
   val truck: String,
-  val transports: Map<String, List<TransportView>>
+  val transports: Map<String, List<PlanningTransportView>>
 )
 
-data class TransportView(
+data class PlanningTransportView(
   val pickupDate: String,
   val deliveryDate: String?,
   val id: String,
@@ -33,8 +35,8 @@ data class TransportView(
 ) {
 
   constructor(transportDto: TransportDto) : this(
-    pickupDate = transportDto.pickupDateTime.toLocalDate().toString(),
-    deliveryDate = transportDto.deliveryDateTime?.toLocalDate()?.toString()
+    pickupDate = transportDto.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate().toString(),
+    deliveryDate = transportDto.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDate()?.toString()
       .takeIf { transportDto.deliveryDateTime != null },
     id = transportDto.id.toString(),
     truck = transportDto.truck,
@@ -50,11 +52,11 @@ data class TransportView(
 }
 
 fun getCityFrom(location: PickupLocationDto) =
-  when (location) {
-    is PickupLocationDto.DutchAddressDto -> location.city
-    is PickupLocationDto.PickupCompanyDto -> location.company.address.city ?: "niet bekend"
-    is PickupLocationDto.PickupProjectLocationDto -> location.city
+  when (val unproxied = Hibernate.unproxy(location)) {
+    is PickupLocationDto.DutchAddressDto -> unproxied.city
+    is PickupLocationDto.PickupCompanyDto -> unproxied.company.address.city ?: "niet bekend"
+    is PickupLocationDto.PickupProjectLocationDto -> unproxied.city
     is PickupLocationDto.NoPickupLocationDto -> "n.v.t."
-    is PickupLocationDto.ProximityDescriptionDto -> location.city
-    else -> throw IllegalStateException("Ongeldige ophaallocatie type: ${location::class.simpleName}")
+    is PickupLocationDto.ProximityDescriptionDto -> unproxied.city
+    else -> throw IllegalStateException("Ongeldige ophaallocatie type: ${unproxied::class.simpleName}")
   }

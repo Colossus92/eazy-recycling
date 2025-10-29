@@ -1,12 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.test.helpers
 
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,9 +23,9 @@ object TransportDtoHelper {
             consignorParty = company,
             carrierParty = company,
             pickupLocation = pickupLocation,
-            pickupDateTime = pickupDateTime,
+            pickupDateTime = pickupDateTime.toCetInstant(),
             deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0),
+            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0).toCetInstant(),
             transportType = TransportType.WASTE,
             truck = truck,
             driver = driver,

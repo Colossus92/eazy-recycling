@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
-import jakarta.validation.Valid
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetTransportById
+import nl.eazysoftware.eazyrecyclingservice.application.query.TransportDetailView
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -18,7 +19,8 @@ import java.util.*
 @RestController
 @RequestMapping("/transport")
 class TransportController(
-    val transportService: TransportService
+    val transportService: TransportService,
+    val getTransportById: GetTransportById
 ) {
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -29,34 +31,8 @@ class TransportController(
 
     @PreAuthorize(HAS_ANY_ROLE)
     @GetMapping(path = ["/{id}"])
-    fun getTransportById(@PathVariable id: UUID): TransportDto {
-        val transport = transportService.getTransportById(id)
-
-        checkAuthorization(transport)
-
-        return transport
-    }
-
-    @PreAuthorize(HAS_ANY_ROLE)
-    @PutMapping(path = ["/container/{id}"])
-    fun updateContainerTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateContainerTransportRequest): TransportDto {
-        val transport = transportService.updateContainerTransport(id, request)
-
-        checkAuthorization(transport)
-
-        return transport
-    }
-
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-    @PostMapping("/waste")
-    fun createWasteTransport(@Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
-        return transportService.createWasteTransport(request)
-    }
-
-    @PreAuthorize(HAS_ANY_ROLE)
-    @PutMapping(path = ["/waste/{id}"])
-    fun updateWasteTransport(@PathVariable id: UUID, @Valid @RequestBody request: CreateWasteTransportRequest): TransportDto {
-        val transport = transportService.updateWasteTransport(id, request)
+    fun getTransportById(@PathVariable id: UUID): TransportDetailView {
+        val transport = getTransportById.execute(id)
 
         checkAuthorization(transport)
 
@@ -83,6 +59,31 @@ class TransportController(
     }
 
     data class TransportFinishedRequest(val hours: Double)
+
+    private fun checkAuthorization(transport: TransportDetailView) {
+        val authentication = SecurityContextHolder.getContext().authentication
+
+        when (authentication) {
+            is JwtAuthenticationToken -> {
+                val userIdFromToken = authentication.token.subject
+                val isAdminOrPlanner = authentication.authorities.any {
+                    it.authority == Roles.ADMIN || it.authority == Roles.PLANNER
+                }
+
+                // If user is not admin/planner and not the driver of this transport
+                if (!isAdminOrPlanner && transport.driver?.id?.toString() != userIdFromToken) {
+                    throw ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Geen toegang: je hebt geen toegang tot dit transport"
+                    )
+                }
+            }
+            else -> throw ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Geen toegang: Je moet ingelogd zijn om dit transport te zien"
+            )
+        }
+    }
 
     private fun checkAuthorization(transport: TransportDto) {
         val authentication = SecurityContextHolder.getContext().authentication

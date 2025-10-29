@@ -15,16 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { CompanyBranchDto } from './company-branch-dto';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { CompanyDto } from './company-dto';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { GoodsDto } from './goods-dto';
+import type { GoodsItemDto } from './goods-item-dto';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { LocationDto } from './location-dto';
+import type { PickupLocationDto } from './pickup-location-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ProfileDto } from './profile-dto';
@@ -46,7 +43,7 @@ export interface TransportDto {
      * @type {string}
      * @memberof TransportDto
      */
-    'id'?: string;
+    'id': string;
     /**
      * 
      * @type {string}
@@ -67,22 +64,10 @@ export interface TransportDto {
     'carrierParty': CompanyDto;
     /**
      * 
-     * @type {CompanyDto}
+     * @type {PickupLocationDto}
      * @memberof TransportDto
      */
-    'pickupCompany'?: CompanyDto;
-    /**
-     * 
-     * @type {CompanyBranchDto}
-     * @memberof TransportDto
-     */
-    'pickupCompanyBranch'?: CompanyBranchDto;
-    /**
-     * 
-     * @type {LocationDto}
-     * @memberof TransportDto
-     */
-    'pickupLocation': LocationDto;
+    'pickupLocation': PickupLocationDto;
     /**
      * 
      * @type {string}
@@ -91,22 +76,10 @@ export interface TransportDto {
     'pickupDateTime': string;
     /**
      * 
-     * @type {CompanyDto}
+     * @type {PickupLocationDto}
      * @memberof TransportDto
      */
-    'deliveryCompany'?: CompanyDto;
-    /**
-     * 
-     * @type {CompanyBranchDto}
-     * @memberof TransportDto
-     */
-    'deliveryCompanyBranch'?: CompanyBranchDto;
-    /**
-     * 
-     * @type {LocationDto}
-     * @memberof TransportDto
-     */
-    'deliveryLocation': LocationDto;
+    'deliveryLocation': PickupLocationDto;
     /**
      * 
      * @type {string}
@@ -151,10 +124,10 @@ export interface TransportDto {
     'note': string;
     /**
      * 
-     * @type {GoodsDto}
+     * @type {GoodsItemDto}
      * @memberof TransportDto
      */
-    'goods'?: GoodsDto;
+    'goodsItem'?: GoodsItemDto;
     /**
      * 
      * @type {number}

@@ -6,17 +6,16 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto.Status
-import java.util.*
 import kotlin.time.Duration
 
 class ContainerTransport(
-  val transportId: TransportId? = null, // TODO remove UUID generation in DTO
+  val transportId: TransportId,
 
   /**
-   * Used for human-readable display in the UI
+   * Used for human-readable display in the UI.
+   * Generated automatically by TransportDisplayNumberGenerator for new transports.
    */
-  val displayNumber: TransportDisplayNumber? = null, // TODO get value from database in domain service
+  val displayNumber: TransportDisplayNumber? = null,
 
   /**
    * The party client ordering the transport.
@@ -34,61 +33,80 @@ class ContainerTransport(
 
   val deliveryLocation: Location,
 
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
 
   val transportType: TransportType,
 
   val wasteContainer: WasteContainerId?,
 
-  val truck: LicensePlate?,
+  val containerOperation: ContainerOperation?,
 
-  val driver: UserId?,
+  override val truck: LicensePlate?,
+
+  override val driver: UserId?,
 
   val note: Note,
 
-  val transportHours: Duration?,
+  override val transportHours: Duration?,
 
-  val updatedAt: Instant,
+  val updatedAt: Instant?,
 
   /**
    * Used for ordering transports within the planning
    */
   val sequenceNumber: Int,
 
-  ) {
+  ) : Transport {
 
-  fun getStatus(): Status {
-    if (driver == null || truck == null) {
-      return Status.UNPLANNED
+  /**
+   * Get the current status of this transport.
+   * Delegates to the domain service for status calculation.
+   */
+  fun getStatus(): TransportStatus {
+    return TransportStatusCalculator.calculateStatus(this)
+  }
+
+  companion object {
+    /**
+     * Factory method to create a new ContainerTransport with a generated UUID.
+     */
+    fun create(
+      displayNumber: TransportDisplayNumber,
+      consignorParty: CompanyId,
+      carrierParty: CompanyId,
+      pickupLocation: Location,
+      pickupDateTime: Instant,
+      deliveryLocation: Location,
+      deliveryDateTime: Instant?,
+      transportType: TransportType,
+      wasteContainer: WasteContainerId?,
+      containerOperation: ContainerOperation?,
+      truck: LicensePlate?,
+      driver: UserId?,
+      note: Note,
+      transportHours: Duration?,
+      updatedAt: Instant?,
+      sequenceNumber: Int,
+    ): ContainerTransport {
+      return ContainerTransport(
+        transportId = TransportId.generate(),
+        displayNumber = displayNumber,
+        consignorParty = consignorParty,
+        carrierParty = carrierParty,
+        pickupLocation = pickupLocation,
+        pickupDateTime = pickupDateTime,
+        deliveryLocation = deliveryLocation,
+        deliveryDateTime = deliveryDateTime,
+        transportType = transportType,
+        wasteContainer = wasteContainer,
+        containerOperation = containerOperation,
+        truck = truck,
+        driver = driver,
+        note = note,
+        transportHours = transportHours,
+        updatedAt = updatedAt,
+        sequenceNumber = sequenceNumber
+      )
     }
-
-    if (transportHours != null) {
-      return Status.FINISHED
-    }
-
-    return Status.PLANNED
-
   }
 }
-
-data class TransportDisplayNumber(
-  val value: String,
-)
-
-data class TransportId(
-  val uuid: UUID,
-)
-
-enum class TransportType {
-  CONTAINER,
-  WASTE,
-}
-
-
-enum class ContainerOperation {
-  EXCHANGE,
-  PICKUP,
-  EMPTY,
-  DELIVERY,
-}
-

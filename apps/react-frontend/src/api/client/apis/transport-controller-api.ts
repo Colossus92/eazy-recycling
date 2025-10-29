@@ -22,9 +22,7 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { CreateContainerTransportRequest } from '../models';
-// @ts-ignore
-import type { CreateWasteTransportRequest } from '../models';
+import type { TransportDetailView } from '../models';
 // @ts-ignore
 import type { TransportDto } from '../models';
 // @ts-ignore
@@ -35,84 +33,6 @@ import type { TransportFinishedRequest } from '../models';
  */
 export const TransportControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createContainerTransport: async (createContainerTransportRequest: CreateContainerTransportRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createContainerTransportRequest' is not null or undefined
-            assertParamExists('createContainerTransport', 'createContainerTransportRequest', createContainerTransportRequest)
-            const localVarPath = `/transport/container`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createContainerTransportRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createWasteTransport: async (createWasteTransportRequest: CreateWasteTransportRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createWasteTransportRequest' is not null or undefined
-            assertParamExists('createWasteTransport', 'createWasteTransportRequest', createWasteTransportRequest)
-            const localVarPath = `/transport/waste`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createWasteTransportRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @param {string} id 
@@ -263,92 +183,6 @@ export const TransportControllerApiAxiosParamCreator = function (configuration?:
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateContainerTransport: async (id: string, createContainerTransportRequest: CreateContainerTransportRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('updateContainerTransport', 'id', id)
-            // verify required parameter 'createContainerTransportRequest' is not null or undefined
-            assertParamExists('updateContainerTransport', 'createContainerTransportRequest', createContainerTransportRequest)
-            const localVarPath = `/transport/container/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createContainerTransportRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateWasteTransport: async (id: string, createWasteTransportRequest: CreateWasteTransportRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('updateWasteTransport', 'id', id)
-            // verify required parameter 'createWasteTransportRequest' is not null or undefined
-            assertParamExists('updateWasteTransport', 'createWasteTransportRequest', createWasteTransportRequest)
-            const localVarPath = `/transport/waste/{id}`
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createWasteTransportRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -359,30 +193,6 @@ export const TransportControllerApiAxiosParamCreator = function (configuration?:
 export const TransportControllerApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TransportControllerApiAxiosParamCreator(configuration)
     return {
-        /**
-         * 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createContainerTransport(createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createContainerTransport(createContainerTransportRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.createContainerTransport']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createWasteTransport(createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createWasteTransport(createWasteTransportRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.createWasteTransport']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
         /**
          * 
          * @param {string} id 
@@ -412,7 +222,7 @@ export const TransportControllerApiFp = function(configuration?: Configuration) 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTransportById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
+        async getTransportById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDetailView>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTransportById(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.getTransportById']?.[localVarOperationServerIndex]?.url;
@@ -431,32 +241,6 @@ export const TransportControllerApiFp = function(configuration?: Configuration) 
             const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.markTransportAsFinished']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateContainerTransport(id: string, createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateContainerTransport(id, createContainerTransportRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.updateContainerTransport']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateWasteTransport(id: string, createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransportDto>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWasteTransport(id, createWasteTransportRequest, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['TransportControllerApi.updateWasteTransport']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
     }
 };
 
@@ -467,24 +251,6 @@ export const TransportControllerApiFp = function(configuration?: Configuration) 
 export const TransportControllerApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TransportControllerApiFp(configuration)
     return {
-        /**
-         * 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createContainerTransport(createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
-            return localVarFp.createContainerTransport(createContainerTransportRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createWasteTransport(createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
-            return localVarFp.createWasteTransport(createWasteTransportRequest, options).then((request) => request(axios, basePath));
-        },
         /**
          * 
          * @param {string} id 
@@ -508,7 +274,7 @@ export const TransportControllerApiFactory = function (configuration?: Configura
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTransportById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
+        getTransportById(id: string, options?: RawAxiosRequestConfig): AxiosPromise<TransportDetailView> {
             return localVarFp.getTransportById(id, options).then((request) => request(axios, basePath));
         },
         /**
@@ -521,26 +287,6 @@ export const TransportControllerApiFactory = function (configuration?: Configura
         markTransportAsFinished(id: string, transportFinishedRequest: TransportFinishedRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
             return localVarFp.markTransportAsFinished(id, transportFinishedRequest, options).then((request) => request(axios, basePath));
         },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateContainerTransport(id: string, createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
-            return localVarFp.updateContainerTransport(id, createContainerTransportRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} id 
-         * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateWasteTransport(id: string, createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig): AxiosPromise<TransportDto> {
-            return localVarFp.updateWasteTransport(id, createWasteTransportRequest, options).then((request) => request(axios, basePath));
-        },
     };
 };
 
@@ -551,28 +297,6 @@ export const TransportControllerApiFactory = function (configuration?: Configura
  * @extends {BaseAPI}
  */
 export class TransportControllerApi extends BaseAPI {
-    /**
-     * 
-     * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TransportControllerApi
-     */
-    public createContainerTransport(createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig) {
-        return TransportControllerApiFp(this.configuration).createContainerTransport(createContainerTransportRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TransportControllerApi
-     */
-    public createWasteTransport(createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig) {
-        return TransportControllerApiFp(this.configuration).createWasteTransport(createWasteTransportRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @param {string} id 
@@ -615,30 +339,6 @@ export class TransportControllerApi extends BaseAPI {
      */
     public markTransportAsFinished(id: string, transportFinishedRequest: TransportFinishedRequest, options?: RawAxiosRequestConfig) {
         return TransportControllerApiFp(this.configuration).markTransportAsFinished(id, transportFinishedRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {CreateContainerTransportRequest} createContainerTransportRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TransportControllerApi
-     */
-    public updateContainerTransport(id: string, createContainerTransportRequest: CreateContainerTransportRequest, options?: RawAxiosRequestConfig) {
-        return TransportControllerApiFp(this.configuration).updateContainerTransport(id, createContainerTransportRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} id 
-     * @param {CreateWasteTransportRequest} createWasteTransportRequest 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof TransportControllerApi
-     */
-    public updateWasteTransport(id: string, createWasteTransportRequest: CreateWasteTransportRequest, options?: RawAxiosRequestConfig) {
-        return TransportControllerApiFp(this.configuration).updateWasteTransport(id, createWasteTransportRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

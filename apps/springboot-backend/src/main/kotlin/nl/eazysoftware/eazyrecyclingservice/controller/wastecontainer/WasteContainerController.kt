@@ -25,14 +25,16 @@ class WasteContainerController(
 
   @GetMapping
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getAllContainers(): List<WasteContainer> {
+  fun getAllContainers(): List<WasteContainerView> {
     return wasteContainerService.getAllContainers()
+      .map { it.toView() }
   }
 
   @GetMapping("/{id}")
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getContainerByLicensePlate(@PathVariable id: UUID): WasteContainer {
-    return wasteContainerService.getContainerById(id)
+  fun getContainerById(@PathVariable id: UUID): WasteContainerView {
+    return wasteContainerService.getContainerById(id).toView()
+
   }
 
   @DeleteMapping("/{id}")
@@ -45,8 +47,8 @@ class WasteContainerController(
   @PutMapping("/{id}")
   @PreAuthorize(HAS_ANY_ROLE)
   @ResponseStatus(HttpStatus.OK)
-  fun updateContainer(@PathVariable id: UUID, @RequestBody request: WasteContainerRequest): WasteContainer {
-    return wasteContainerService.updateContainer(id, request.toDomain())
+  fun updateContainer(@PathVariable id: UUID, @RequestBody request: WasteContainerRequest): WasteContainerView {
+    return wasteContainerService.updateContainer(id, request.toDomain()).toView()
   }
 
   data class WasteContainerRequest(

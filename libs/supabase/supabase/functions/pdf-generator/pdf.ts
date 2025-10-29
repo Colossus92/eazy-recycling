@@ -1,21 +1,25 @@
-import { PDFDocument, rgb } from 'npm:pdf-lib'
-import type { PDFPage } from 'npm:pdf-lib'
-import { TransportData } from './db.ts'
+import type { PDFPage } from 'npm:pdf-lib';
+import { PDFDocument, rgb } from 'npm:pdf-lib';
+import { TransportData } from './db.ts';
 
+export async function drawBackgroundWaybill(
+  page: PDFPage,
+  pdfDoc: PDFDocument
+) {
+  const waybillImage = await pdfDoc.embedPng(
+    Uint8Array.from(atob(base64Image), (c) => c.charCodeAt(0))
+  );
 
-export async function drawBackgroundWaybill(page: PDFPage, pdfDoc: PDFDocument) {
-    const waybillImage = await pdfDoc.embedPng(Uint8Array.from(atob(base64Image), c => c.charCodeAt(0)))
-
-    page.drawImage(waybillImage, {
-        x: 0,
-        y: 0,
-        width: page.getWidth(),
-        height: page.getHeight(),
-    })
+  page.drawImage(waybillImage, {
+    x: 0,
+    y: 0,
+    width: page.getWidth(),
+    height: page.getHeight(),
+  });
 }
 
 export function drawData(page: PDFPage, transportData: TransportData) {
-    drawConsignorClassification(page, transportData.goods.consignor_classification);
+    drawConsignorClassification(page, transportData.goodsItem.consignor_classification);
     drawConsignee(page, transportData);
     drawParty(110, 755, page, transportData.consignor);
     drawParty(110, 640, page, transportData.pickup_party);
@@ -25,7 +29,7 @@ export function drawData(page: PDFPage, transportData: TransportData) {
     transportData.transport.delivery_date_time && drawDate(page, transportData.transport.delivery_date_time, 400, 537);
     drawLicensePlate(page, transportData.transport.truck_id);
     drawDetails(page);
-    drawWaste(page, transportData.goods);
+    drawWaste(page, transportData.goodsItem);
 }
 
 function drawConsignorClassification(page: PDFPage, consignorClassification: number) {

@@ -1,20 +1,20 @@
 import { MasterDataTab } from "../MasterDataTab"
 import { DataTableProps } from "../MasterDataTab";
-import { WasteContainer } from "@/api/client";
 import { Column } from "../MasterDataTab";
 import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
 import { EmptyState } from "../../EmptyState";
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import { useWasteContainerCrud } from "./useWasteContainerCrud";
 import { WasteContainerForm } from "./WasteContainerForm";
+import { WasteContainerView } from "@/api/client";
 
-function getWasteContainerLocation(container: WasteContainer): string {
+function getWasteContainerLocation(container: WasteContainerView): string {
   if (container.location?.companyName) {
-    return `${container.location.companyName}, ${container.location.address?.city}`;
+    return `${container.location.companyName}, ${container.location.addressView?.city}`;
   }
-  if (container.location?.address) {
-    const address = container.location.address;
-    return `${address.streetName} ${address.buildingNumber}, ${address.city}`;
+  if (container.location?.addressView) {
+    const address = container.location.addressView;
+    return `${address.street} ${address.houseNumber}, ${address.city}`;
   }
   return '';
 }
@@ -26,13 +26,13 @@ export const WasteContainersTab = () => {
         deletion,
     } = useWasteContainerCrud();
 
-    const columns: Column<WasteContainer>[] = [
+    const columns: Column<WasteContainerView>[] = [
         { key: "id", label: "Kenmerk", width: "20", accessor: (item) => item.id },
         { key: "location", label: "Huidige locatie", width: "30", accessor: (item) => getWasteContainerLocation(item) },
         { key: "notes", label: "Opmerkingen", width: "50", accessor: (item) => item.notes },
     ];
 
-    const data: DataTableProps<WasteContainer> = {
+    const data: DataTableProps<WasteContainerView> = {
         columns,
         items: read.items,
     };

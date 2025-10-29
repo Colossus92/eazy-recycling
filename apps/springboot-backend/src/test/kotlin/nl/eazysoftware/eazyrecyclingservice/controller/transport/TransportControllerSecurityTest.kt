@@ -1,23 +1,35 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.application.query.*
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportService
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -30,14 +42,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.stream.Stream
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class TransportControllerSecurityTest {
+class TransportControllerSecurityTest : BaseIntegrationTest() {
 
     companion object {
         // Class-level constants for IDs that need to be accessed in companion object methods
@@ -54,15 +68,15 @@ class TransportControllerSecurityTest {
                 Arguments.of("/transport", "GET", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport", "GET", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
-                // POST container transport - admin and planner can access
+                // POST container transport - admin and planner can access (returns 201 CREATED)
                 Arguments.of("/transport/container", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/container", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/container", "POST", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport/container", "POST", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
-                // POST waste transport - admin and planner can access
-                Arguments.of("/transport/waste", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 200),
-                Arguments.of("/transport/waste", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 200),
+                // POST waste transport - admin and planner can access (returns 201 CREATED)
+                Arguments.of("/transport/waste", "POST", Roles.ADMIN, OTHER_DRIVER_ID.toString(), 201),
+                Arguments.of("/transport/waste", "POST", Roles.PLANNER, OTHER_DRIVER_ID.toString(), 201),
                 Arguments.of("/transport/waste", "POST", Roles.CHAUFFEUR, TEST_DRIVER_ID.toString(), 403),
                 Arguments.of("/transport/waste", "POST", "unauthorized_role", UUID.randomUUID().toString(), 403),
 
@@ -118,7 +132,28 @@ class TransportControllerSecurityTest {
     private lateinit var transportService: TransportService
 
     @MockitoBean
-    private lateinit var companyRepository: CompanyRepository
+    private lateinit var getTransportById: GetTransportById
+
+    @MockitoBean
+    private lateinit var createContainerTransport: CreateContainerTransport
+
+    @MockitoBean
+    private lateinit var updateContainerTransport: UpdateContainerTransport
+
+    @MockitoBean
+    private lateinit var containerTransports: ContainerTransports
+
+    @MockitoBean
+    private lateinit var createWasteTransport: CreateWasteTransport
+
+    @MockitoBean
+    private lateinit var updateWasteTransport: UpdateWasteTransport
+
+    @MockitoBean
+    private lateinit var wasteTransports: WasteTransports
+
+    @MockitoBean
+    private lateinit var wasteStreamJpaRepository: WasteStreamJpaRepository
 
     // Use the companion object constants instead of local variables
     private val testTransportId = TEST_TRANSPORT_ID
@@ -132,6 +167,7 @@ class TransportControllerSecurityTest {
     private var carrier: CompanyDto = mockCompanyDto()
     private var deliveryCompany: CompanyDto = mockCompanyDto()
     private var pickupCompany: CompanyDto = mockCompanyDto()
+    private lateinit var testWasteStream: WasteStreamDto
 
     @BeforeEach
     fun setup() {
@@ -142,14 +178,14 @@ class TransportControllerSecurityTest {
                 id = testDriverId,
                 firstName = "Test",
                 lastName = "Driver",
-                roles = listOf(UserRoleDto(id = 1, userId = testDriverId, role = Roles.CHAUFFEUR))
+                roles = mutableListOf(UserRoleDto(id = 1, userId = testDriverId, role = Roles.CHAUFFEUR))
             ),
             consignorParty = consignor,
             carrierParty = carrier,
             pickupLocation = mockLocationDto(),
             deliveryLocation = mockLocationDto(),
-            pickupDateTime = LocalDateTime.now(),
-            deliveryDateTime = LocalDateTime.now().plusDays(1),
+            pickupDateTime = Instant.now(),
+            deliveryDateTime = Instant.now().plus(1, ChronoUnit.DAYS),
             transportType = TransportType.CONTAINER,
             note = "Test transport",
             containerOperation = ContainerOperation.DELIVERY,
@@ -163,27 +199,140 @@ class TransportControllerSecurityTest {
                 id = otherDriverId,
                 firstName = "Second",
                 lastName = "Driver",
-                roles = listOf(UserRoleDto(id = 2, userId = otherDriverId, role = Roles.CHAUFFEUR))
+                roles = mutableListOf(UserRoleDto(id = 2, userId = otherDriverId, role = Roles.CHAUFFEUR))
             ),
         )
 
         // Mock the service calls
         whenever(transportService.getTransportById(testTransportId)).thenReturn(transportWithTestDriver)
-        whenever(transportService.updateContainerTransport(eq(testTransportId), any())).thenReturn(
-            transportWithTestDriver
-        )
-        whenever(transportService.updateWasteTransport(eq(testTransportId), any())).thenReturn(transportWithTestDriver)
-        whenever(transportService.getTransportById(transportWithOtherDriver.id!!)).thenReturn(transportWithOtherDriver)
+        whenever(transportService.getTransportById(transportWithOtherDriver.id)).thenReturn(transportWithOtherDriver)
         whenever(transportService.getAllTransports()).thenReturn(
             listOf(
                 transportWithTestDriver,
                 transportWithOtherDriver
             )
         )
-        whenever(companyRepository.findById(consignor.id!!)).thenReturn(Optional.of(consignor))
-        whenever(companyRepository.findById(carrier.id!!)).thenReturn(Optional.of(carrier))
-        whenever(companyRepository.findById(pickupCompany.id!!)).thenReturn(Optional.of(pickupCompany))
-        whenever(companyRepository.findById(deliveryCompany.id!!)).thenReturn(Optional.of(deliveryCompany))
+
+        // Mock GetTransportById query for container transports
+        val transportDetailViewWithTestDriver = createTransportDetailView(testTransportId, testDriverId)
+        val transportDetailViewWithOtherDriver = createTransportDetailView(transportWithOtherDriver.id, otherDriverId)
+
+        whenever(getTransportById.execute(testTransportId)).thenReturn(transportDetailViewWithTestDriver)
+        whenever(getTransportById.execute(transportWithOtherDriver.id)).thenReturn(transportDetailViewWithOtherDriver)
+
+        // Mock container transport create use case
+        whenever(createContainerTransport.handle(any())).thenReturn(
+            CreateContainerTransportResult(
+                transportId = TransportId(testTransportId)
+            )
+        )
+
+        // Mock container transport update use case
+        whenever(updateContainerTransport.handle(any())).thenReturn(
+            UpdateContainerTransportResult(
+                transportId = TransportId(testTransportId),
+                status = "PLANNED"
+            )
+        )
+
+        // Create test waste stream
+        testWasteStream = WasteStreamDto(
+            number = "123451234567",
+            name = "Test Waste Stream",
+            euralCode = Eural(code = "16 01 17", description = "Paper and cardboard"),
+            processingMethodCode = ProcessingMethodDto(code = "A.01", description = "Recycling"),
+            wasteCollectionType = WasteCollectionType.DEFAULT.name,
+            pickupLocation = mockLocationDto(),
+            processorParty = consignor,
+            consignorParty = consignor,
+            pickupParty = consignor,
+            dealerParty = null,
+            collectorParty = null,
+            brokerParty = null,
+            lastActivityAt = Instant.now(),
+            status = WasteStreamStatus.ACTIVE.name
+        )
+
+        // Mock waste stream repository
+        whenever(wasteStreamJpaRepository.findById(testWasteStream.number)).thenReturn(
+            Optional.of(testWasteStream)
+        )
+
+        // Mock waste transport create use case
+        whenever(createWasteTransport.handle(any())).thenReturn(
+            CreateWasteTransportResult(
+                transportId = TransportId(testTransportId)
+            )
+        )
+
+        // Mock waste transport update use case
+        whenever(updateWasteTransport.handle(any())).thenReturn(
+            UpdateWasteTransportResult(
+                transportId = TransportId(testTransportId),
+                status = "PLANNED"
+            )
+        )
+
+        // Mock container transports repository for authorization check
+        val mockContainerTransport = ContainerTransport(
+            transportId = TransportId(testTransportId),
+            displayNumber = null,
+            consignorParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(consignor.id!!),
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            pickupLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
+                address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
+                    streetName = "Test Street",
+                    postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
+                    buildingNumber = "1",
+                    city = "Test City"
+                )
+            ),
+            pickupDateTime = kotlinx.datetime.Clock.System.now(),
+            deliveryLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
+                address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
+                    streetName = "Test Street",
+                    postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
+                    buildingNumber = "1",
+                    city = "Test City"
+                )
+            ),
+            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            transportType = TransportType.CONTAINER,
+            wasteContainer = null,
+            containerOperation = ContainerOperation.DELIVERY,
+            truck = null,
+            driver = UserId(testDriverId),
+            note = Note("Test note"),
+            transportHours = null,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            sequenceNumber = 1
+        )
+        whenever(containerTransports.findById(TransportId(testTransportId))).thenReturn(mockContainerTransport)
+
+        // Mock waste transports repository for authorization check
+        val mockWasteTransport = WasteTransport(
+            transportId = TransportId(testTransportId),
+            displayNumber = null,
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            pickupDateTime = kotlinx.datetime.Clock.System.now(),
+            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            transportType = TransportType.WASTE,
+            goodsItem = GoodsItem(
+                wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
+                netNetWeight = 1000.0,
+                unit = "KG",
+                quantity = 1
+            ),
+            wasteContainer = null,
+            containerOperation = ContainerOperation.PICKUP,
+            truck = null,
+            driver = UserId(testDriverId),
+            note = Note("Test note"),
+            transportHours = null,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            sequenceNumber = 1
+        )
+        whenever(wasteTransports.findById(TransportId(testTransportId))).thenReturn(mockWasteTransport)
     }
 
     // Helper method to create mock objects
@@ -210,65 +359,96 @@ class TransportControllerSecurityTest {
             country = "Test Country"
     )
 
+    private fun createTransportDetailView(transportId: UUID, driverId: UUID): TransportDetailView {
+        val mockCompany = CompanyView(
+            id = UUID.randomUUID(),
+            name = "Test Company",
+            chamberOfCommerceId = null,
+            vihbId = null,
+            processorId = null,
+            address = AddressView(
+                street = "Test Street",
+                houseNumber = "1",
+                houseNumberAddition = null,
+                postalCode = "1234 AB",
+                city = "Test City",
+                country = "Netherlands"
+            )
+        )
+
+        val mockLocation = PickupLocationView.DutchAddressView(
+            streetName = "Test Street",
+            postalCode = "1234 AB",
+            buildingNumber = "1",
+            buildingNumberAddition = null,
+            city = "Test City",
+            country = "Netherlands"
+        )
+
+        return TransportDetailView(
+            id = transportId,
+            displayNumber = "T-001",
+            consignorParty = mockCompany,
+            carrierParty = mockCompany,
+            pickupLocation = mockLocation,
+            pickupDateTime = "2025-10-28T10:00:00",
+            deliveryLocation = mockLocation,
+            deliveryDateTime = "2025-10-28T14:00:00",
+            transportType = TransportType.CONTAINER.name,
+            status = TransportStatus.PLANNED,
+            truck = null,
+            driver = DriverView(id = driverId, name = "Test Driver"),
+            note = "Test transport",
+            transportHours = null,
+            sequenceNumber = 1,
+            updatedAt = kotlinx.datetime.Clock.System.now(),
+            wasteContainer = null,
+            containerOperation = ContainerOperation.DELIVERY
+        )
+    }
+
     private fun createContainerTransportRequestJson(): String {
-        val request = CreateContainerTransportRequest(
-            consignorPartyId = consignor.id!!,
-            pickupDateTime = LocalDateTime.now(),
-            deliveryDateTime = LocalDateTime.now().plusDays(1),
-            transportType = TransportType.CONTAINER,
-            containerOperation = ContainerOperation.DELIVERY,
-            driverId = testDriverId,
-            carrierPartyId = carrier.id!!,
-            pickupCompanyId = pickupCompany.id!!,
-            pickupStreet = "Pickup Street",
-            pickupBuildingNumber = "1",
-            pickupPostalCode = "1234 AB",
-            pickupCity = "Pickup City",
-            deliveryCompanyId = deliveryCompany.id!!,
-            deliveryStreet = "Delivery Street",
-            deliveryBuildingNumber = "2",
-            deliveryPostalCode = "5678 CD",
-            deliveryCity = "Delivery City",
-            truckId = "TRUCK-123",
-            containerId = UUID.randomUUID(),
-            note = "Test container transport"
+        val request = ContainerTransportRequest(
+          consignorPartyId = consignor.id!!,
+          pickupDateTime = LocalDateTime.now(),
+          deliveryDateTime = LocalDateTime.now().plusDays(1),
+          transportType = TransportType.CONTAINER,
+          containerOperation = ContainerOperation.DELIVERY,
+          driverId = testDriverId,
+          carrierPartyId = carrier.id!!,
+          pickupCompanyId = pickupCompany.id!!,
+          pickupStreet = "Pickup Street",
+          pickupBuildingNumber = "1",
+          pickupPostalCode = "1234 AB",
+          pickupCity = "Pickup City",
+          deliveryCompanyId = deliveryCompany.id!!,
+          deliveryStreet = "Delivery Street",
+          deliveryBuildingNumber = "2",
+          deliveryPostalCode = "5678 CD",
+          deliveryCity = "Delivery City",
+          truckId = "TRUCK-123",
+          containerId = UUID.randomUUID(),
+          note = "Test container transport"
         )
 
         return objectMapper.writeValueAsString(request)
     }
 
     private fun createWasteTransportRequestJson(): String {
-        val request = CreateWasteTransportRequest(
-            consigneePartyId = UUID.randomUUID().toString(),
-            pickupPartyId = UUID.randomUUID().toString(),
-            consignorPartyId = UUID.randomUUID(),
+        val request = WasteTransportRequest(
             pickupDateTime = LocalDateTime.now(),
             deliveryDateTime = LocalDateTime.now().plusDays(1),
             containerOperation = ContainerOperation.PICKUP,
             transportType = TransportType.WASTE,
             driverId = testDriverId,
-            carrierPartyId = UUID.randomUUID(),
-            pickupCompanyId = UUID.randomUUID(),
-            pickupStreet = "Pickup Street",
-            pickupBuildingNumber = "1",
-            pickupPostalCode = "1234 AB",
-            pickupCity = "Pickup City",
-            deliveryCompanyId = UUID.randomUUID(),
-            deliveryStreet = "Delivery Street",
-            deliveryBuildingNumber = "2",
-            deliveryPostalCode = "5678 CD",
-            deliveryCity = "Delivery City",
+            carrierPartyId = carrier.id!!,
             truckId = "TRUCK-123",
             containerId = UUID.randomUUID(),
             note = "Test waste transport",
-            wasteStreamNumber = "WASTE-123",
-            weight = 10,
+            wasteStreamNumber = testWasteStream.number,
+            weight = 10.0,
             unit = "KG",
-            quantity = 1,
-            euralCode = "EURAL-123",
-            goodsName = "Test Goods",
-            processingMethodCode = "A.02",
-            consignorClassification = 4
+            quantity = 1
         )
 
         return objectMapper.writeValueAsString(request)

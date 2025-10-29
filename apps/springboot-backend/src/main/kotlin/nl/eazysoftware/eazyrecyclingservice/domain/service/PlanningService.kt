@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -28,8 +29,8 @@ class PlanningService(
 
         // Get all transports for the week
         val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay(),
-            daysInWeek.last().atTime(23, 59, 59)
+            daysInWeek.first().atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            daysInWeek.last().atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
         )
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
@@ -38,9 +39,9 @@ class PlanningService(
         val transportsView = createTransportsView(transports)
 
         getMissingTrucks(transports, truckId)
-            .forEach { transportsView.add(TransportsView(it.getDisplayName(), emptyMap())) }
+            .forEach { transportsView.add(PlanningTransportsView(it.getDisplayName(), emptyMap())) }
 
-        transportsView.sortWith(compareBy<TransportsView> {
+        transportsView.sortWith(compareBy<PlanningTransportsView> {
             when {
                 it.truck == "Niet toegewezen" -> 0
                 it.transports.isNotEmpty() -> 1
@@ -52,7 +53,7 @@ class PlanningService(
     }
 
     fun createTransportsView(transports: List<TransportDto>) =
-        transports.map { transportDto -> TransportView(transportDto) }
+        transports.map { transportDto -> PlanningTransportView(transportDto) }
             .groupBy { transportView -> transportView.truck }
             .map { (truck, transportViews) ->
                 // Group by pickup date
@@ -64,7 +65,7 @@ class PlanningService(
                 }
                 val displayName = truck?.getDisplayName() ?: "Niet toegewezen"
 
-                TransportsView(displayName, sortedTransportsByDate)
+                PlanningTransportsView(displayName, sortedTransportsByDate)
             }.toMutableList()
 
 
@@ -109,10 +110,16 @@ class PlanningService(
                 truck = entityManager.getReference(Truck::class.java, licensePlate)
             }
 
+            // Update the date while preserving the time of day
+            val currentDateTime = transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam"))
+            val newPickupDateTime = date.atTime(currentDateTime.toLocalTime())
+                .atZone(ZoneId.of("Europe/Amsterdam"))
+                .toInstant()
+
             transport.copy(
                 truck = truck,
-                pickupDateTime = date.atTime(transport.pickupDateTime.hour, transport.pickupDateTime.minute),
-                deliveryDateTime = transport.deliveryDateTime?.let { date.atTime(it.hour, it.minute) },
+                pickupDateTime = newPickupDateTime,
+                deliveryDateTime = transport.deliveryDateTime,
                 sequenceNumber = index,
             )
         }
@@ -121,13 +128,14 @@ class PlanningService(
         return getPlanningByDate(date)
     }
 
+
     fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
         return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
             driverId,
-            startDate.atStartOfDay(),
-            endDate.atTime(23, 59, 59)
+            startDate.atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            endDate.atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
         )
-            .groupBy { it.pickupDateTime.toLocalDate() }
+            .groupBy { it.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate() }
             .mapValues { (_, transportsByDate) ->
                 transportsByDate
                     .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }

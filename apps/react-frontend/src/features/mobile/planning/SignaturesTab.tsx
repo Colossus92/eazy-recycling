@@ -3,10 +3,10 @@ import { SignatureStatusTag } from './SignatureStatusTag';
 import Pen from '@/assets/icons/Pen.svg?react';
 import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar';
 import { useSignatureStatus } from '@/features/mobile/hooks/useSignatureStatus';
-import { TransportDto } from '@/api/client/models/transport-dto';
+import { TransportDetailView } from '@/api/client';
 
 interface SignaturesTabProps {
-  transport: TransportDto;
+  transport: TransportDetailView;
 }
 
 const SignaturesTab = ({ transport }: SignaturesTabProps) => {

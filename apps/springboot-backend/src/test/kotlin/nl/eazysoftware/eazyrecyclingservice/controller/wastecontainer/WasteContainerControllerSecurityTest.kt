@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,7 +25,7 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class WasteContainerControllerSecurityTest {
+class WasteContainerControllerSecurityTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc

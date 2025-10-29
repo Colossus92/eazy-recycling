@@ -24,13 +24,13 @@ import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError
 // @ts-ignore
 import type { AddressRequest } from '../models';
 // @ts-ignore
-import type { CompanyBranchDto } from '../models';
-// @ts-ignore
 import type { CompanyDto } from '../models';
 // @ts-ignore
 import type { CompanyRequest } from '../models';
 // @ts-ignore
 import type { CompanyResponse } from '../models';
+// @ts-ignore
+import type { ProjectLocationResult } from '../models';
 /**
  * CompanyControllerApi - axios parameter creator
  * @export
@@ -379,7 +379,7 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createBranch(id: string, addressRequest: AddressRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompanyBranchDto>> {
+        async createBranch(id: string, addressRequest: AddressRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectLocationResult>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createBranch(id, addressRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CompanyControllerApi.createBranch']?.[localVarOperationServerIndex]?.url;
@@ -490,7 +490,7 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createBranch(id: string, addressRequest: AddressRequest, options?: RawAxiosRequestConfig): AxiosPromise<CompanyBranchDto> {
+        createBranch(id: string, addressRequest: AddressRequest, options?: RawAxiosRequestConfig): AxiosPromise<ProjectLocationResult> {
             return localVarFp.createBranch(id, addressRequest, options).then((request) => request(axios, basePath));
         },
         /**

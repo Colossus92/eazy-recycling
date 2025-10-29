@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
@@ -122,9 +123,9 @@ class SignatureServiceTest {
             consignorParty = mock(),
             carrierParty = mock(),
             pickupLocation = mock(),
-            pickupDateTime = LocalDateTime.now(),
+            pickupDateTime = LocalDateTime.now().toCetInstant(),
             deliveryLocation = mock(),
-            deliveryDateTime = LocalDateTime.now(),
+            deliveryDateTime = LocalDateTime.now().toCetInstant(),
             note = "",
             driver = mock(),
             sequenceNumber = 1

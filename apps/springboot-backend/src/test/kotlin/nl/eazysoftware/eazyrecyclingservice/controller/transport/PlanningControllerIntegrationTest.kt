@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,13 +30,14 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-class PlanningControllerIntegrationTest {
+class PlanningControllerIntegrationTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -254,27 +256,30 @@ class PlanningControllerIntegrationTest {
         val deliveryDateTime2 = date.atTime(16, 0)
 
         val transport1 = TransportDto(
+            id = UUID.randomUUID(),
             displayNumber = "T-001",
             consignorParty = testCompany,
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime1,
-            deliveryDateTime = deliveryDateTime1,
+            pickupDateTime = pickupDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            deliveryDateTime = deliveryDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
             note = "Test Transport 1",
             truck = testTruck,
             driver = testDriver,
-            sequenceNumber = 1, transportType = TransportType.CONTAINER,
+            sequenceNumber = 1,
+            transportType = TransportType.CONTAINER,
         )
 
         val transport2 = TransportDto(
+            id = UUID.randomUUID(),
             displayNumber = "T-002",
             consignorParty = testCompany,
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime2,
-            deliveryDateTime = deliveryDateTime2,
+            pickupDateTime = pickupDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            deliveryDateTime = deliveryDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
             note = "Test Transport 2",
             truck = testTruck,
             driver = testDriver,

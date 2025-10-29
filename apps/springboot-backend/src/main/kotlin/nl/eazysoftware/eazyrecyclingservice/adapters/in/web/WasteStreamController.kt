@@ -9,10 +9,6 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailV
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
@@ -117,7 +113,7 @@ data class WasteStreamRequest(
         processingMethod = ProcessingMethod(processingMethodCode)
       ),
       collectionType = WasteCollectionType.valueOf(collectionType.uppercase()),
-      pickupLocation = pickupLocation.toDomain(),
+      pickupLocation = pickupLocation.toCommand(),
       deliveryLocation = WasteDeliveryLocation(
         processorPartyId = ProcessorPartyId(processorPartyId)
       ),
@@ -168,7 +164,7 @@ sealed class ConsignorRequest {
   JsonSubTypes.Type(value = PickupLocationRequest.NoPickupLocationRequest::class, name = "none")
 )
 sealed class PickupLocationRequest {
-  abstract fun toDomain(): Location
+  abstract fun toCommand(): PickupLocationCommand
 
   data class DutchAddressRequest(
 
@@ -190,15 +186,13 @@ sealed class PickupLocationRequest {
     @field:NotBlank(message = "Land is verplicht")
     val country: String
   ) : PickupLocationRequest() {
-    override fun toDomain() = DutchAddress(
-      address = Address(
-        streetName = streetName,
-        postalCode = DutchPostalCode(postalCode),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        city = city,
-        country = country
-      )
+    override fun toCommand() = PickupLocationCommand.DutchAddressCommand(
+      streetName = streetName,
+      buildingNumber = buildingNumber,
+      buildingNumberAddition = buildingNumberAddition,
+      postalCode = postalCode,
+      city = city,
+      country = country
     )
   }
 
@@ -216,7 +210,7 @@ sealed class PickupLocationRequest {
     @field:NotBlank(message = "Land is verplicht")
     val country: String
   ) : PickupLocationRequest() {
-    override fun toDomain() = ProximityDescription(
+    override fun toCommand() = PickupLocationCommand.ProximityDescriptionCommand(
       description = description,
       postalCodeDigits = postalCodeDigits,
       city = city,
@@ -249,29 +243,27 @@ sealed class PickupLocationRequest {
     @field:NotBlank(message = "Land is verplicht")
     val country: String
   ) : PickupLocationRequest() {
-    override fun toDomain() = ProjectLocation(
+    override fun toCommand() = PickupLocationCommand.ProjectLocationCommand(
       id = id,
       companyId = CompanyId(companyId),
-      address = Address(
-        streetName = streetName,
-        postalCode = DutchPostalCode(postalCode),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        city = city,
-        country = country
-      )
+      streetName = streetName,
+      buildingNumber = buildingNumber,
+      buildingNumberAddition = buildingNumberAddition,
+      postalCode = postalCode,
+      city = city,
+      country = country
     )
   }
 
   data class PickupCompanyRequest(
     val companyId: UUID
   ) : PickupLocationRequest() {
-    override fun toDomain() = Company(
+    override fun toCommand() = PickupLocationCommand.PickupCompanyCommand(
       companyId = CompanyId(companyId)
     )
   }
 
   class NoPickupLocationRequest : PickupLocationRequest() {
-    override fun toDomain() = NoLocation
+    override fun toCommand() = PickupLocationCommand.NoPickupLocationCommand
   }
 }

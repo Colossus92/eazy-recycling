@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -29,7 +29,7 @@ import java.util.*
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
-class WasteContainerControllerIntegrationTest {
+class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -197,7 +197,7 @@ class WasteContainerControllerIntegrationTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value("GET-ONE"))
             .andExpect(jsonPath("$.notes").value("Test container to retrieve"))
-            .andExpect(jsonPath("$.location.address.streetName").value("Retrieve Street"))
+            .andExpect(jsonPath("$.location.addressView.street").value("Retrieve Street"))
     }
 
     @Test
@@ -273,7 +273,7 @@ class WasteContainerControllerIntegrationTest {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value("UPDATE-ME"))
             .andExpect(jsonPath("$.notes").value("Updated notes"))
-            .andExpect(jsonPath("$.location.address.streetName").value("Updated Street"))
+            .andExpect(jsonPath("$.location.addressView.street").value("Updated Street"))
 
         // Verify container was updated in the database
         val savedContainer = wasteContainerRepository.findByIdOrNull(containerId)

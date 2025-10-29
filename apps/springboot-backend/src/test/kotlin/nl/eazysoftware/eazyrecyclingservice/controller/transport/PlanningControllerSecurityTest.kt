@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.service.PlanningService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -30,7 +31,7 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class PlanningControllerSecurityTest {
+class PlanningControllerSecurityTest : BaseIntegrationTest() {
 
   companion object {
     // Class-level constants for IDs that need to be accessed in companion object methods
@@ -78,11 +79,11 @@ class PlanningControllerSecurityTest {
       PlanningView(
         dates = listOf(testDate.toString()),
         transports = listOf(
-          TransportsView(
+          PlanningTransportsView(
             truck = testTruckId,
             transports = mapOf(
               testDate.toString() to listOf(
-                TransportView(
+                PlanningTransportView(
                   pickupDate = testDate.toString(),
                   deliveryDate = testDate.plusDays(1).toString(),
                   id = UUID.randomUUID().toString(),

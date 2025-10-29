@@ -1,13 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.Company
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProximityDescription
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import java.lang.IllegalArgumentException
-import java.util.UUID
+import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
+import java.util.*
 
 /**
  * Origin location of waste with three possible variants based on Dutch regulations
@@ -63,7 +61,11 @@ sealed interface Location {
    * Variant 4: Company location reference
    * References a company's address as the pickup location
    */
-  data class Company(val companyId: CompanyId) : Location
+  data class Company(
+    val companyId: CompanyId,
+    val name: String,
+    val address: Address,
+  ) : Location
 
   /**
    * Variant 5: Project/Branch location
@@ -107,7 +109,10 @@ sealed interface Location {
   }
 }
 
-object LocationFactory {
+@Component
+class LocationFactory(
+  private val companyRepository: CompanyRepository,
+) {
 
   fun create(
     companyId: CompanyId? = null,
@@ -142,7 +147,24 @@ object LocationFactory {
       )
     )
 
-    if (companyId != null) return Company(companyId)
+    if (companyId != null) {
+      val company = companyRepository.findByIdOrNull(companyId.uuid)
+        ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
+      return Company(
+        companyId = companyId,
+        name = company.name,
+        address = Address(
+          streetName = company.address.streetName
+            ?: throw IllegalArgumentException("Bedrijf heeft geen straatnaam, maar dit is verplicht"),
+          postalCode = DutchPostalCode(company.address.postalCode),
+          buildingNumber = company.address.buildingNumber,
+          buildingNumberAddition = company.address.buildingName,
+          city = company.address.city
+            ?: throw IllegalArgumentException("Bedrijf heeft geen stad, maar dit is verplicht"),
+          country = "Nederland"
+        )
+      )
+    }
 
     if (streetName?.isNotBlank() == true) return DutchAddress(
       address = Address(

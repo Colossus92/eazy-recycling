@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.CreateContainerRequest
+import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.WasteContainerController.WasteContainerRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository

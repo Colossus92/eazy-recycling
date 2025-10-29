@@ -1,19 +1,20 @@
-import { TransportDto } from '@/api/client/models/transport-dto';
-import Ellipse from '@/assets/icons/Ellipse.svg?react';
-import { CompanyCard } from '@/components/ui/company/CompanyCard';
+import { TransportDetailView } from '@/api/client';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
+import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
-import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import PhRecycleLight from '@/assets/icons/PhRecycleLight.svg?react';
+import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import Warning from '@/assets/icons/Warning.svg?react';
+import { CompanyCard } from '@/components/ui/company/CompanyCard';
 import { WaybillDownloadSection } from '@/features/planning/components/drawer/WaybillDownloadSection';
+import { resolveLocationAddress } from '@/api/services/transportService';
 
 interface MobileTransportDetailsProps {
-  transport: TransportDto;
+  transport: TransportDetailView;
 }
 
 const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
-  const goodsItem = transport?.goods?.goodsItem;
+  const goodsItem = transport?.goodsItem;
   const goodsItemText = goodsItem
     ? goodsItem?.name +
       ' - ' +
@@ -38,9 +39,8 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
               <Ellipse />
             </div>
             <CompanyCard
-              companyName={transport.pickupCompany?.name}
               dateTime={transport.pickupDateTime}
-              address={transport.pickupLocation.address}
+              details={resolveLocationAddress(transport.pickupLocation)}
             />
             <DottedStroke
               className="absolute left-[13px]"
@@ -55,9 +55,8 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
               <MapPin />
             </div>
             <CompanyCard
-              companyName={transport.deliveryCompany?.name}
               dateTime={transport.deliveryDateTime}
-              address={transport.deliveryLocation.address}
+              details={resolveLocationAddress(transport.deliveryLocation)}
             />
           </div>
         </div>

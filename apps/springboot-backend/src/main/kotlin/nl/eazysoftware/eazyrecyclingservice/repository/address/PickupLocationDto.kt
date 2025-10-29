@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
@@ -10,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationTyp
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import org.hibernate.Hibernate
 import java.util.*
 
 @Entity
@@ -64,7 +64,28 @@ class PickupLocationDto(
   class PickupCompanyDto(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
-    var company: CompanyDto
+    var company: CompanyDto,
+
+    @Column(name = "name")
+    var name: String,
+
+    @Column(name = "street_name")
+    var streetName: String,
+
+    @Column(name = "building_number")
+    var buildingNumber: String,
+
+    @Column(name = "building_number_addition")
+    var buildingNumberAddition: String?,
+
+    @Column(name = "postal_code")
+    var postalCode: String,
+
+    @Column
+    var city: String,
+
+    @Column
+    var country: String,
   ) : PickupLocationDto()
 
 
@@ -107,37 +128,37 @@ object PickupLocationType {
 
 
 fun PickupLocationDto.toPickupLocationView(): PickupLocationView {
-  return when (this) {
+  return when (val unproxied = Hibernate.unproxy(this)) {
     is PickupLocationDto.DutchAddressDto -> PickupLocationView.DutchAddressView(
-      streetName = streetName,
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      postalCode = postalCode,
-      city = city,
-      country = country,
+      streetName = unproxied.streetName,
+      buildingNumber = unproxied.buildingNumber,
+      buildingNumberAddition = unproxied.buildingNumberAddition,
+      postalCode = unproxied.postalCode,
+      city = unproxied.city,
+      country = unproxied.country,
     )
 
     is PickupLocationDto.ProximityDescriptionDto -> PickupLocationView.ProximityDescriptionView(
-      postalCodeDigits = postalCode,
-      city = city,
-      description = description,
-      country = country,
+      postalCodeDigits = unproxied.postalCode,
+      city = unproxied.city,
+      description = unproxied.description,
+      country = unproxied.country,
     )
 
     is PickupLocationDto.NoPickupLocationDto -> PickupLocationView.NoPickupView()
 
     is PickupLocationDto.PickupCompanyDto -> PickupLocationView.PickupCompanyView(
-      company = CompanyViewMapper.map(company)
+      company = CompanyViewMapper.map(unproxied.company)
     )
 
     is PickupLocationDto.PickupProjectLocationDto -> PickupLocationView.ProjectLocationView(
-      company = CompanyViewMapper.map(company),
-      streetName = streetName,
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      postalCode = postalCode,
-      city = city,
-      country = country
+      company = CompanyViewMapper.map(unproxied.company),
+      streetName = unproxied.streetName,
+      buildingNumber = unproxied.buildingNumber,
+      buildingNumberAddition = unproxied.buildingNumberAddition,
+      postalCode = unproxied.postalCode,
+      city = unproxied.city,
+      country = unproxied.country
     )
 
     else -> throw IllegalStateException("Ongeldig ophaallocatie type; ${this::class.simpleName}")

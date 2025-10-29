@@ -1,4 +1,4 @@
-import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
+import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts';
 
 // Initialize database connection pool
 const databaseUrl = Deno.env.get('SUPABASE_DB_URL')!
@@ -28,7 +28,7 @@ export interface TransportData {
     chamber_of_commerce_id: string;
     vihb_id?: string;
   };
-  goods: {
+  goodsItem: {
     name: string;
     quantity: number;
     unit: string;
@@ -125,12 +125,12 @@ export function isValidUUID(id: string): boolean {
  */
 export function formatDate(dateString: string): string {
   if (!dateString) return '';
-  
+
   const date = new Date(dateString);
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
   const year = date.getFullYear();
-  
+
   return `${day}-${month}-${year}`;
 }
 
@@ -149,28 +149,28 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       })
     };
   }
-  
+
   let connection;
   try {
     connection = await pool.connect();
-    
+
     // Get transport details
     const transportResult = await connection.queryObject`
-      SELECT 
-        t.id, 
-        t.display_number, 
-        t.transport_type, 
-        t.pickup_date_time, 
-        t.delivery_date_time, 
+      SELECT
+        t.id,
+        t.display_number,
+        t.transport_type,
+        t.pickup_date_time,
+        t.delivery_date_time,
         t.note,
-        t.goods_id,
+        t.goods_item_id,
         t.truck_id
-      FROM 
-        transports t 
-      WHERE 
+      FROM
+        transports t
+      WHERE
         t.id = ${transportId}
     `;
-    
+
     if (transportResult.rows.length === 0) {
       return {
         response: new Response(JSON.stringify({ error: 'Transport not found' }), {
@@ -179,7 +179,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         })
       };
     }
-    
+
     // Define type for transport result
     interface TransportRow {
       id: string;
@@ -188,16 +188,16 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       pickup_date_time: string;
       delivery_date_time?: string;
       note?: string;
-      goods_id: string;
+      goods_item_id: string;
       truck_id: string;
     }
-    
+
     const transport = transportResult.rows[0] as TransportRow;
-    const goodsId = transport.goods_id;
-    
+    const goodsItemId = transport.goods_item_id;
+
     // Get consignor details
     const consignorResult = await connection.queryObject`
-      SELECT 
+      SELECT
         c.id,
         c.name,
         c.street_name,
@@ -207,54 +207,55 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         c.country,
         c.chamber_of_commerce_id,
         c.vihb_id
-      FROM 
+      FROM
         transports t
-      JOIN 
+      JOIN
         companies c ON t.consignor_party_id = c.id
-      WHERE 
+      WHERE
         t.id = ${transportId}
     `;
-    
-    const goodsResult = await connection.queryObject`
-      SELECT 
-        g.id,
-        g.consignor_classification,
-        gi.eural_code,
-        gi.name,
+
+    const goodsItemResult = await connection.queryObject`
+      SELECT
+        gi.id,
+        ws.eural_code,
+        ws.name,
         gi.quantity,
         gi.unit,
         gi.net_net_weight,
         gi.waste_stream_number,
-        gi.processing_method_code
-      FROM 
-        goods g
+        ws.processing_method_code
+      FROM
+        goods_items gi
       JOIN
-        goods_items gi ON g.goods_item_id = gi.id
-      WHERE 
-        g.uuid = ${goodsId}
+        waste_streams ws ON gi.waste_stream_number = ws.number
+      WHERE
+        gi.id = ${goodsItemId}
     `;
-    
+
     const deliveryCompanyResult = await connection.queryObject`
-      SELECT 
-        c.id,
-        c.name,
-        c.street_name,
-        c.building_number,
-        c.postal_code,
-        c.city,
-        c.country,
+      SELECT
+        pl.id,
+        pl.name,
+        pl.street_name,
+        pl.building_number,
+        pl.postal_code,
+        pl.city,
+        pl.country,
         c.chamber_of_commerce_id,
         c.vihb_id
-      FROM 
+      FROM
         transports t
-      JOIN 
-        companies c ON t.delivery_company_id = c.id
-      WHERE 
+      JOIN
+        pickup_locations pl ON t.delivery_location_id = pl.id
+      JOIN
+        companies c ON pl.company_id = c.id
+      WHERE
         t.id = ${transportId}
     `;
-    
+
     const carrierPartyResult = await connection.queryObject`
-      SELECT 
+      SELECT
         c.id,
         c.name,
         c.street_name,
@@ -264,16 +265,16 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         c.country,
         c.chamber_of_commerce_id,
         c.vihb_id
-      FROM 
+      FROM
         transports t
-      JOIN 
+      JOIN
         companies c ON t.carrier_party_id = c.id
-      WHERE 
+      WHERE
         t.id = ${transportId}
     `;
-    
+
     const signaturesResult = await connection.queryObject`
-      SELECT 
+      SELECT
         consignor_email,
         consignor_signed_at,
         carrier_email,
@@ -282,14 +283,14 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         consignee_signed_at,
         pickup_email,
         pickup_signed_at
-      FROM 
+      FROM
         signatures
-      WHERE 
+      WHERE
         transport_id = ${transportId}
     `;
 
     const pickupPartyResult = await connection.queryObject`
-      SELECT 
+      SELECT
         c.id,
         c.name,
         c.street_name,
@@ -299,17 +300,19 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         c.country,
         c.chamber_of_commerce_id,
         c.vihb_id
-      FROM 
+      FROM
         transports t
-      JOIN 
-        goods g ON t.goods_id = g.uuid
       JOIN
-        companies c ON g.pickup_party_id = c.id
-      WHERE 
+        goods_items g ON t.goods_item_id = g.id
+      JOIN
+        waste_streams w ON g.waste_stream_number = w.number
+      JOIN
+        companies c ON w.pickup_party_id = c.id
+      WHERE
         t.id = ${transportId}
     `;
     const consigneeResult = await connection.queryObject`
-      SELECT 
+      SELECT
         c.id,
         c.name,
         c.street_name,
@@ -319,31 +322,33 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         c.country,
         c.chamber_of_commerce_id,
         c.vihb_id
-      FROM 
+      FROM
         transports t
-      JOIN 
-        goods g ON t.goods_id = g.uuid
-      JOIN
-        companies c ON g.consignee_party_id = c.id
-      WHERE 
+          JOIN
+        goods_items g ON t.goods_item_id = g.id
+          JOIN
+        waste_streams w ON g.waste_stream_number = w.number
+          JOIN
+        companies c ON w.processor_party_id = c.processor_id
+      WHERE
         t.id = ${transportId}
     `;
     const pickupLocationResult = await connection.queryObject`
-      SELECT 
+      SELECT
         c.name,
         l.street_name,
         l.building_number,
         l.postal_code,
         l.city
-      FROM 
+      FROM
         transports t
-      JOIN 
-        locations l ON t.pickup_location_id = l.id
+      JOIN
+        pickup_locations l ON t.pickup_location_id = l.id
       LEFT JOIN
-        companies c ON t.pickup_company_id = c.id
-      WHERE 
+        companies c ON l.company_id = c.id
+      WHERE
         t.id = ${transportId}
-    `; 
+    `;
     const deliveryLocationResult = await connection.queryObject`
       SELECT
         c.name,
@@ -351,15 +356,15 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         l.building_number,
         l.postal_code,
         l.city
-      FROM 
+      FROM
         transports t
-      JOIN 
-        locations l ON t.delivery_location_id = l.id
+      JOIN
+        pickup_locations l ON t.delivery_location_id = l.id
       LEFT JOIN
-        companies c ON t.delivery_company_id = c.id
-      WHERE 
+        companies c ON l.company_id = c.id
+      WHERE
         t.id = ${transportId}
-    `;    
+    `;
     const transportData: TransportData = {
       transport: {
         id: String(transport.id),
@@ -371,7 +376,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         truck_id: transport.truck_id ? String(transport.truck_id) : undefined,
       },
       consignor: consignorResult.rows[0] as TransportData['consignor'],
-      goods: goodsResult.rows[0] as TransportData['goods'],
+      goodsItem: goodsItemResult.rows[0] as TransportData['goodsItem'],
       signatures: signaturesResult.rows[0] as TransportData['signatures'],
       delivery_company: deliveryCompanyResult.rows[0] as TransportData['delivery_company'],
       pickup_party: pickupPartyResult.rows[0] as TransportData['pickup_party'],
@@ -380,7 +385,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       pickup_location: pickupLocationResult.rows[0] as TransportData['pickup_location'],
       delivery_location: deliveryLocationResult.rows[0] as TransportData['delivery_location']
     };
-    
+
     return { data: transportData };
   } catch (err) {
     console.error('Database error:', err);

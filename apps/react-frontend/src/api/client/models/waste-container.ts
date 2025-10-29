@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import type { ContainerLocation } from './container-location';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WasteContainerId } from './waste-container-id';
 
 /**
  * 
@@ -25,10 +28,10 @@ import type { ContainerLocation } from './container-location';
 export interface WasteContainer {
     /**
      * 
-     * @type {string}
+     * @type {WasteContainerId}
      * @memberof WasteContainer
      */
-    'uuid': string;
+    'wasteContainerId': WasteContainerId;
     /**
      * 
      * @type {string}

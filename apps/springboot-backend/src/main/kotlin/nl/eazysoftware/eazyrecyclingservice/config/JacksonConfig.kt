@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.config
 
-import com.fasterxml.jackson.datatype.hibernate5.jakarta.Hibernate5JakartaModule
+import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -8,19 +8,19 @@ import org.springframework.context.annotation.Configuration
 class JacksonConfig {
 
     /**
-     * Register the Hibernate5JakartaModule to handle lazy-loaded objects.
+     * Register the Hibernate6Module to handle lazy-loaded objects.
      * This approach preserves Spring Boot's default Jackson configuration
      * while adding support for Hibernate proxies.
      */
     @Bean
-    fun hibernate5Module(): Hibernate5JakartaModule {
-        val hibernate5Module = Hibernate5JakartaModule()
+    fun hibernate6Module(): Hibernate6Module {
+        val hibernate6Module = Hibernate6Module()
 
         // Configure the module to handle lazy-loading
         // Force lazy-loaded properties to be serialized as null instead of failing
-        hibernate5Module.configure(Hibernate5JakartaModule.Feature.FORCE_LAZY_LOADING, false)
-        hibernate5Module.configure(Hibernate5JakartaModule.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, true)
+        hibernate6Module.configure(Hibernate6Module.Feature.FORCE_LAZY_LOADING, false)
+        hibernate6Module.configure(Hibernate6Module.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, true)
 
-        return hibernate5Module
+        return hibernate6Module
     }
 }

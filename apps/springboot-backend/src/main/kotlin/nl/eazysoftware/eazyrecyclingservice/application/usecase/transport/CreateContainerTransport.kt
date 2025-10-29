@@ -11,9 +11,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 interface CreateContainerTransport {
   fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult
@@ -43,9 +44,10 @@ data class CreateContainerTransportCommand(
   val deliveryPostalCode: String,
   val deliveryCity: String,
   val deliveryDescription: String? = null,
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
+  val containerOperation: ContainerOperation,
   val truck: LicensePlate?,
   val driver: UserId?,
   val note: Note,
@@ -58,12 +60,17 @@ data class CreateContainerTransportResult(
 @Service
 class CreateContainerTransportService(
   private val containerTransports: ContainerTransports,
-  private val locations: ProjectLocations
+  private val locations: ProjectLocations,
+  private val locationFactory: LocationFactory,
+  private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
 ) : CreateContainerTransport {
 
   @Transactional
   override fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult {
-    val containerTransport = ContainerTransport(
+    val displayNumber = transportDisplayNumberGenerator.generateDisplayNumber()
+
+    val containerTransport = ContainerTransport.create(
+      displayNumber = displayNumber,
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
       pickupLocation = createPickupLocation(cmd),
@@ -72,6 +79,7 @@ class CreateContainerTransportService(
       deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
+      containerOperation = cmd.containerOperation,
       truck = cmd.truck,
       driver = cmd.driver,
       note = cmd.note,
@@ -83,7 +91,7 @@ class CreateContainerTransportService(
     val savedTransport = containerTransports.save(containerTransport)
 
     return CreateContainerTransportResult(
-      transportId = savedTransport.transportId ?: throw IllegalStateException("Transport ID should be set after save")
+      transportId = savedTransport.transportId
     )
   }
 
@@ -130,7 +138,7 @@ class CreateContainerTransportService(
       return existingLocation
     }
 
-    return LocationFactory.create(
+    return locationFactory.create(
       companyId = companyId,
       streetName = streetName,
       buildingNumber = buildingNumber,

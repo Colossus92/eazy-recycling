@@ -1,20 +1,20 @@
-import { CreateContainerRequest, WasteContainer } from '@/api/client/models';
+import { CreateContainerRequest,  WasteContainerRequest, WasteContainerView } from '@/api/client/models';
 import { containerService } from '@/api/services/containerService';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
 const queryKey = 'containers';
 
-function filter(container: WasteContainer, query: string) {
+function filter(container: WasteContainerView, query: string) {
   return (
     container.id.toLowerCase().includes(query.toLowerCase()) ||
     container.location?.companyName
       ?.toLowerCase()
       .includes(query.toLowerCase()) ||
-    container.location?.address?.streetName
+    container.location?.addressView?.street
       ?.toLowerCase()
       .includes(query.toLowerCase()) ||
-    container.location?.address?.city
+    container.location?.addressView?.city
       ?.toLowerCase()
       .includes(query.toLowerCase()) ||
     container.notes?.toLowerCase().includes(query.toLowerCase())
@@ -29,8 +29,8 @@ export const useWasteContainerCrud = () => {
         queryFn: () => containerService.getAll(),
     });
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [itemToEdit, setItemToEdit] = useState<WasteContainer | undefined>(undefined);
-    const [itemToDelete, setItemToDelete] = useState<WasteContainer | undefined>(undefined)
+    const [itemToEdit, setItemToEdit] = useState<WasteContainerView | undefined>(undefined);
+    const [itemToDelete, setItemToDelete] = useState<WasteContainerView | undefined>(undefined)
 
   const displayedContainers = useMemo(
     () =>
@@ -53,7 +53,7 @@ export const useWasteContainerCrud = () => {
     });
 
     const removeMutation = useMutation({
-        mutationFn: (item: WasteContainer) => containerService.delete(item.uuid),
+        mutationFn: (item: WasteContainerView) => containerService.delete(item.uuid),
         onSuccess: () => {
             queryClient
                 .invalidateQueries({ queryKey: [queryKey] })
@@ -61,7 +61,7 @@ export const useWasteContainerCrud = () => {
         },
     });
 
-    const create = async (item: WasteContainer): Promise<void> => {
+    const create = async (item: CreateContainerRequest): Promise<void> => {
         return new Promise((resolve, reject) => {
             createMutation.mutate(item, {
                 onSuccess: () => resolve(),
@@ -70,7 +70,7 @@ export const useWasteContainerCrud = () => {
         });
     };
 
-    const remove = async (item: WasteContainer): Promise<void> => {
+    const remove = async (item: WasteContainerView): Promise<void> => {
         return new Promise((resolve, reject) => {
             removeMutation.mutate(item, {
                 onSuccess: () => resolve(),
@@ -80,7 +80,7 @@ export const useWasteContainerCrud = () => {
     };
 
     const updateMutation = useMutation({
-        mutationFn: (item: WasteContainer) => containerService.update(item),
+        mutationFn: (item: WasteContainerRequest) => containerService.update(item.uuid, item),
         onSuccess: () => {
             queryClient
                 .invalidateQueries({ queryKey: [queryKey] })
@@ -91,7 +91,7 @@ export const useWasteContainerCrud = () => {
         },
     });
 
-    const update = async (item: WasteContainer): Promise<void> => {
+    const update = async (item: WasteContainerRequest): Promise<void> => {
         return new Promise((resolve, reject) => {
             updateMutation.mutate(item, {
                 onSuccess: () => resolve(),
@@ -119,7 +119,7 @@ export const useWasteContainerCrud = () => {
                 setItemToEdit(undefined);
                 setIsFormOpen(true);
             },
-            openForEdit: (item: WasteContainer) => {
+            openForEdit: (item: WasteContainerView) => {
                 setItemToEdit(item);
                 setIsFormOpen(true);
             },
@@ -127,7 +127,7 @@ export const useWasteContainerCrud = () => {
                 setItemToEdit(undefined);
                 setIsFormOpen(false);
             },
-            submit: async (item: WasteContainer) => {
+            submit: async (item: WasteContainerRequest) => {
                 if (itemToEdit) {
                     return update(item);
                 } else {

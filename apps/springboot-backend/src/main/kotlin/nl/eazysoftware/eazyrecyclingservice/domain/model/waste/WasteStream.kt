@@ -1,16 +1,19 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
 import kotlinx.datetime.Clock
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
 class WasteStream(
   val wasteStreamNumber: WasteStreamNumber,
   var wasteType: WasteType,
   var collectionType: WasteCollectionType = WasteCollectionType.DEFAULT,
   var pickupLocation: Location,
+  /**
+   * Also the consignee
+   */
   var deliveryLocation: WasteDeliveryLocation,
   /**
    * Dutch: Afzender

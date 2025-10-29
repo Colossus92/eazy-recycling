@@ -2,12 +2,12 @@ package nl.eazysoftware.eazyrecyclingservice.config
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.storage.Storage
-import kotlinx.coroutines.runBlocking
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -16,11 +16,15 @@ class SupabaseConfiguration(
     private val supabaseProperties: SupabaseProperties,
 ) {
 
+    private val logger: Logger = LoggerFactory.getLogger(SupabaseConfiguration::class.java)
+
     @Bean
     fun supabaseClient(): SupabaseClient {
-        val supabase = createSupabaseClient(
+        logger.info("Supabase URL: ${supabaseProperties.url}")
+      logger.info("Supabase Secret: ${supabaseProperties.secret}")
+        return createSupabaseClient(
             supabaseUrl = supabaseProperties.url,
-            supabaseKey = supabaseProperties.publishable
+            supabaseKey = supabaseProperties.secret
         ) {
             install(Auth) {
                 minimalSettings() //disables session saving and auto-refreshing
@@ -28,11 +32,5 @@ class SupabaseConfiguration(
             install(Functions)
             install(Storage)
         }
-
-        runBlocking {
-            supabase.auth.importAuthToken(supabaseProperties.secret)
-        }
-        
-        return supabase
     }
 }

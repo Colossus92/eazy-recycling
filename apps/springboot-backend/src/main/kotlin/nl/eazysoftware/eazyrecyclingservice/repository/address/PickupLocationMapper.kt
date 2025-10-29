@@ -1,60 +1,71 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.address
 
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.Company
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProximityDescription
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 class PickupLocationMapper(
   private var pickupLocationRepository: PickupLocationRepository,
   private var companyRepository: CompanyRepository,
+  private var entityManager: EntityManager,
 ) {
 
   fun toDomain(dto: PickupLocationDto): Location {
-    return when (dto) {
+
+
+    return when (val unproxied = Hibernate.unproxy(dto)) {
       is PickupLocationDto.DutchAddressDto -> DutchAddress(
         address = Address(
-          streetName = dto.streetName,
-          postalCode = DutchPostalCode(dto.postalCode),
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country,
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
         )
       )
 
       is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
-        description = dto.description,
-        postalCodeDigits = dto.postalCode,
-        city = dto.city,
-        country = dto.country
+        description = unproxied.description,
+        postalCodeDigits = unproxied.postalCode,
+        city = unproxied.city,
+        country = unproxied.country
       )
 
       is PickupLocationDto.PickupCompanyDto -> Company(
-        companyId = CompanyId(dto.company.id!!)
+        companyId = CompanyId(unproxied.company.id!!),
+        name = unproxied.company.name,
+        address = Address(
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
+        )
       )
 
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
-        id = UUID.fromString(dto.id),
+        id = UUID.fromString(unproxied.id),
         address = Address(
-          streetName = dto.streetName,
-          postalCode = DutchPostalCode(dto.postalCode),
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country,
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
         ),
-        companyId = CompanyId(dto.company.id!!)
+        companyId = CompanyId(unproxied.company.id!!)
       )
 
       is PickupLocationDto.NoPickupLocationDto -> NoLocation
@@ -67,14 +78,13 @@ class PickupLocationMapper(
     return when (location) {
       is DutchAddress -> findOrCreateDutchAddress(location)
       is ProximityDescription -> createProximity(location)
-      is Company -> createPickupCompany(location)
+      is Company -> createCompany(location)
       is ProjectLocation -> findOrCreateProjectLocation(location)
       is NoLocation -> PickupLocationDto.NoPickupLocationDto()
     }
   }
 
   private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    // If not found, create and save new project location
     val company = companyRepository.findByIdOrNull(location.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
 
@@ -121,15 +131,24 @@ class PickupLocationMapper(
     }
   }
 
-  private fun createPickupCompany(
+  private fun createCompany (
     domain: Company
   ): PickupLocationDto.PickupCompanyDto {
-    val company = companyRepository.findByIdOrNull(domain.companyId.uuid)
-      ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")
+    val saved = pickupLocationRepository.save(
+      PickupLocationDto.PickupCompanyDto(
+        company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
+        name = domain.name,
+        streetName = domain.address.streetName,
+        buildingNumber = domain.address.buildingNumber,
+        buildingNumberAddition = domain.address.buildingNumberAddition,
+        postalCode = domain.address.postalCode.value,
+        city = domain.address.city,
+        country = domain.address.country,
+      )
+    )
+    pickupLocationRepository.flush()
 
-    return pickupLocationRepository.findCompanyByCompanyId(company.id) ?: run {
-      pickupLocationRepository.save(PickupLocationDto.PickupCompanyDto(company = company))
-    }
+    return saved
   }
 
 }

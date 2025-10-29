@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { TransportsView } from './transports-view';
+import type { PlanningTransportsView } from './planning-transports-view';
 
 /**
  * 
@@ -31,9 +31,9 @@ export interface PlanningView {
     'dates': Array<string>;
     /**
      * 
-     * @type {Array<TransportsView>}
+     * @type {Array<PlanningTransportsView>}
      * @memberof PlanningView
      */
-    'transports': Array<TransportsView>;
+    'transports': Array<PlanningTransportsView>;
 }
 

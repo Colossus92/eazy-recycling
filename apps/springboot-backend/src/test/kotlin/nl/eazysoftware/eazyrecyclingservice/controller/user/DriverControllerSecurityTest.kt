@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.user
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.service.UserService
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -20,16 +21,17 @@ import java.util.stream.Stream
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class DriverControllerSecurityTest {
+class DriverControllerSecurityTest : BaseIntegrationTest() {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockitoBean
-    private lateinit var userService: UserService
+  @MockitoBean
+  @Suppress("unused")
+  private lateinit var userService: UserService
 
     companion object {
-        @JvmStatic
+      @JvmStatic
         fun roleAccessScenarios(): Stream<Arguments> {
             return Stream.of(
                 // GET all drivers - any role can access

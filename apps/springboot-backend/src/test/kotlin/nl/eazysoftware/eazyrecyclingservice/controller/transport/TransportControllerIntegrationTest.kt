@@ -2,46 +2,48 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
-import jakarta.transaction.Transactional
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.CreateContainerTransportResponse
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportResponse
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.CoreMatchers.containsString
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
-class TransportControllerIntegrationTest(@param:Autowired private val transactionTemplate: TransactionTemplate) {
+class TransportControllerIntegrationTest(
+    @param:Autowired private val transactionTemplate: TransactionTemplate
+) : BaseIntegrationTest() {
 
   @Autowired
   private lateinit var mockMvc: MockMvc
@@ -63,12 +65,22 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Autowired
   private lateinit var projectLocationJpaRepository: ProjectLocationJpaRepository
 
+  @Autowired
+  private lateinit var wasteStreamJpaRepository: WasteStreamJpaRepository
+
+  @Autowired
+  private lateinit var euralRepository: EuralRepository
+
+  @Autowired
+  private lateinit var processingMethodRepository: ProcessingMethodRepository
+
   private lateinit var testCompany: CompanyDto
   private lateinit var testLocation: PickupLocationDto.DutchAddressDto
   private lateinit var testTruck: Truck
   private lateinit var testDriver: ProfileDto
   private lateinit var testContainer: WasteContainerDto
   private lateinit var testBranch: PickupLocationDto.PickupProjectLocationDto
+  private lateinit var testWasteStream: WasteStreamDto
 
   @BeforeEach
   fun setup() {
@@ -77,12 +89,13 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     // Create test company
     testCompany = CompanyDto(
       name = "Test Company",
+      processorId = "12345",
       address = AddressDto(
         streetName = "Company Street",
         buildingNumber = "123",
         postalCode = "1234 AB",
         city = "Test City",
-        country = "Test Country"
+        country = "Nederland"
       )
     )
 
@@ -105,7 +118,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       buildingNumberAddition = null,
       postalCode = "5678 CD",
       city = "Location City",
-      country = "Location Country"
+      country = "Nederland"
     )
 
     transactionTemplate.execute {
@@ -138,12 +151,39 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
     entityManager.persist(testContainer)
 
+    val testEural = euralRepository.findById("16 01 17")
+      .orElseThrow { IllegalStateException("Eural 16 01 17 should exist in data.sql") }
+
+    val testProcessingMethod = processingMethodRepository.findById("A.01")
+      .orElseThrow { IllegalStateException("Processing method A.01 should exist in data.sql") }
+
+    entityManager.flush()
+    entityManager.clear()
+
+    // Reload testCompany to ensure it's managed
+    val managedCompany = companyRepository.findById(testCompany.id!!).get()
+    val managedLocation = projectLocationJpaRepository.findById(testLocation.id).get()
+
+    // Create test waste stream
+    testWasteStream = TestWasteStreamFactory.createTestWasteStreamDto(
+      number = "123451321321",
+      name = "Test Waste Stream",
+      euralCode = testEural,
+      processingMethod = testProcessingMethod,
+      pickupLocation = managedLocation,
+      processorPartyId = managedCompany,
+      consignorParty = managedCompany,
+      pickupParty = managedCompany
+    )
+    wasteStreamJpaRepository.save(testWasteStream)
+
     entityManager.flush()
   }
 
   @AfterEach
   fun cleanup() {
     transportRepository.deleteAll()
+    wasteStreamJpaRepository.deleteAll()
   }
 
   @Test
@@ -185,7 +225,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Test
   fun `should create container transport`() {
     // Given
-    val request = CreateContainerTransportRequest(
+    val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -239,59 +279,45 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
   @Test
   fun `should create waste transport`() {
     // Given
-    val request = CreateWasteTransportRequest(
-      consigneePartyId = testCompany.id.toString(),
-      pickupPartyId = testCompany.id.toString(),
-      consignorPartyId = testCompany.id!!,
+    val request = WasteTransportRequest(
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Pickup Street",
-      pickupBuildingNumber = "789",
-      pickupPostalCode = "9012 EF",
-      pickupCity = "Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Delivery Street",
-      deliveryBuildingNumber = "101",
-      deliveryPostalCode = "1122 GH",
-      deliveryCity = "Delivery City",
       truckId = testTruck.licensePlate,
       containerId = testContainer.uuid,
       note = "New Waste Transport",
-      wasteStreamNumber = "WSN123",
-      weight = 1000,
+      wasteStreamNumber = testWasteStream.number,
+      weight = 1000.0,
       unit = "KG",
       quantity = 1,
-      goodsName = "Test Waste",
-      euralCode = "200301",
-      processingMethodCode = "A.02",
-      consignorClassification = 1,
     )
 
     // When & Then
-    securedMockMvc.post(
+    val createResponse = securedMockMvc.post(
       "/transport/waste",
       objectMapper.writeValueAsString(request)
     )
-      .andExpect(status().isOk)
+      .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("New Waste Transport"))
-      .andExpect(jsonPath("$.transportType").value("WASTE"))
-      .andExpect(jsonPath("$.containerOperation").value("PICKUP"))
-      .andExpect(jsonPath("$.goods").exists())
-      .andExpect(jsonPath("$.goods.goodsItem.wasteStreamNumber").value("WSN123"))
+      .andExpect(jsonPath("$.transportId").exists())
+      .andReturn()
+
+    val createResult = objectMapper.readValue(
+      createResponse.response.contentAsString,
+      CreateWasteTransportResponse::class.java
+    )
 
     // Verify transport was saved in the database
     val savedTransports = transportRepository.findAll()
     assertThat(savedTransports).hasSize(1)
+    assertThat(savedTransports[0].id).isEqualTo(createResult.transportId)
     assertThat(savedTransports[0].note).isEqualTo("New Waste Transport")
     assertThat(savedTransports[0].transportType).isEqualTo(TransportType.WASTE)
-    assertThat(savedTransports[0].goods).isNotNull
-    assertThat(savedTransports[0].goods?.goodsItem?.wasteStreamNumber).isEqualTo("WSN123")
+    assertThat(savedTransports[0].goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
+    assertThat(savedTransports[0].containerOperation).isEqualTo(ContainerOperation.PICKUP)
   }
 
   @Test
@@ -300,7 +326,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     val transport = createTestTransport("Original Transport")
     val savedTransport = transportRepository.save(transport)
 
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
@@ -330,11 +356,9 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Container Transport"))
-      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
 
     // Verify transport was updated in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Container Transport")
     assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.EXCHANGE)
@@ -342,79 +366,70 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
 
   @Test
   fun `should update waste transport`() {
-    // Given
-    val goodsItem = GoodsItemDto(
-      wasteStreamNumber = "Original-WSN",
-      netNetWeight = 500,
-      unit = "KG",
-      quantity = 1,
-      euralCode = "200101",
-      name = "Original Waste",
-      processingMethodCode = "A.02",
-    )
-
-    val goods = GoodsDto(
-      id = UUID.randomUUID().toString(),
-      goodsItem = goodsItem,
-      consigneeParty = testCompany,
-      pickupParty = testCompany,
-      consignorClassification = 2
-    )
-
-    val transport = createTestTransport("Original Waste Transport", goods)
-    val savedTransport = transportRepository.save(transport)
-
-    val updateRequest = CreateWasteTransportRequest(
-      consigneePartyId = testCompany.id.toString(),
-      pickupPartyId = testCompany.id.toString(),
-      consignorPartyId = testCompany.id!!,
-      pickupDateTime = LocalDateTime.now().plusDays(3),
-      deliveryDateTime = LocalDateTime.now().plusDays(4),
+    // Given - create initial waste transport
+    val createRequest = WasteTransportRequest(
+      pickupDateTime = LocalDateTime.now().plusDays(1),
+      deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Updated Pickup Street",
-      pickupBuildingNumber = "999",
-      pickupPostalCode = "3344 IJ",
-      pickupCity = "Updated Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Updated Delivery Street",
-      deliveryBuildingNumber = "888",
-      deliveryPostalCode = "5566 KL",
-      deliveryCity = "Updated Delivery City",
+      truckId = testTruck.licensePlate,
+      containerId = testContainer.uuid,
+      note = "Original Waste Transport",
+      wasteStreamNumber = testWasteStream.number,
+      weight = 1000.0,
+      unit = "KG",
+      quantity = 1,
+    )
+
+    val createResponse = securedMockMvc.post(
+      "/transport/waste",
+      objectMapper.writeValueAsString(createRequest)
+    )
+      .andExpect(status().isCreated)
+      .andReturn()
+
+    val createResult = objectMapper.readValue(
+      createResponse.response.contentAsString,
+      CreateWasteTransportResponse::class.java
+    )
+
+    // Update the transport
+    val updateRequest = WasteTransportRequest(
+      pickupDateTime = LocalDateTime.now().plusDays(3),
+      deliveryDateTime = LocalDateTime.now().plusDays(4),
+      transportType = TransportType.WASTE,
+      containerOperation = ContainerOperation.DELIVERY,
+      driverId = testDriver.id,
+      carrierPartyId = testCompany.id!!,
       truckId = testTruck.licensePlate,
       containerId = testContainer.uuid,
       note = "Updated Waste Transport",
-      wasteStreamNumber = "Updated-WSN",
-      weight = 2000,
+      wasteStreamNumber = testWasteStream.number,
+      weight = 2000.0,
       unit = "KG",
       quantity = 2,
-      goodsName = "Updated Waste",
-      euralCode = "200301",
-      processingMethodCode = "A.02",
-      consignorClassification = 1
     )
 
     // When & Then
     securedMockMvc.put(
-      "/transport/waste/${savedTransport.id}",
+      "/transport/waste/${createResult.transportId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Waste Transport"))
-      .andExpect(jsonPath("$.goods.goodsItem.wasteStreamNumber").value("Updated-WSN"))
-      .andExpect(jsonPath("$.goods.goodsItem.netNetWeight").value(2000))
+      .andExpect(jsonPath("$.transportId").value(createResult.transportId.toString()))
+      .andExpect(jsonPath("$.status").exists())
 
     // Verify transport was updated in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(createResult.transportId)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Waste Transport")
-    assertThat(updatedTransport?.goods?.goodsItem?.wasteStreamNumber).isEqualTo("Updated-WSN")
-    assertThat(updatedTransport?.goods?.goodsItem?.netNetWeight).isEqualTo(2000)
-    assertThat(updatedTransport?.goods?.consignorClassification).isOne
+    assertThat(updatedTransport?.goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
+    assertThat(updatedTransport?.goodsItem?.netNetWeight).isEqualTo(2000.0)
+    assertThat(updatedTransport?.goodsItem?.quantity).isEqualTo(2)
+    assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
   }
 
   @Test
@@ -428,14 +443,14 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isNoContent)
 
     // Verify transport was deleted
-    assertThat(transportRepository.findByIdOrNull(savedTransport.id!!)).isNull()
+    assertThat(transportRepository.findByIdOrNull(savedTransport.id)).isNull()
   }
 
   @Test
   fun `should return not found when updating non-existent transport`() {
     // Given
     val nonExistentId = UUID.randomUUID()
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -481,7 +496,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished in the database
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(2.5)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
@@ -521,7 +536,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isForbidden)
 
     // Verify transport was NOT marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isNull()
     assertThat(updatedTransport?.getStatus()).isNotEqualTo(TransportDto.Status.FINISHED)
@@ -547,7 +562,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(4.0)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
@@ -573,74 +588,16 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       .andExpect(status().isOk)
 
     // Verify transport was marked as finished
-    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id!!)
+    val updatedTransport = transportRepository.findByIdOrNull(savedTransport.id)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.transportHours).isEqualTo(2.75)
     assertThat(updatedTransport?.getStatus()).isEqualTo(TransportDto.Status.FINISHED)
   }
 
   @Test
-  fun `should create container transport with branch references`() {
-    // Given
-    val request = CreateContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
-      transportType = TransportType.CONTAINER,
-      containerOperation = ContainerOperation.DELIVERY,
-      driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = UUID.fromString(testBranch.id),
-      pickupStreet = "Branch Street",
-      pickupBuildingNumber = "456",
-      pickupPostalCode = "5678 CD",
-      pickupCity = "Branch City",
-      deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = UUID.fromString(testBranch.id),
-      deliveryStreet = "Branch Street",
-      deliveryBuildingNumber = "456",
-      deliveryPostalCode = "5678 CD",
-      deliveryCity = "Branch City",
-      truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
-      note = "Transport with Branch References"
-    )
-
-    // When & Then
-    // Create the transport
-    val createResponse = securedMockMvc.post(
-      "/transport/container",
-      objectMapper.writeValueAsString(request)
-    )
-      .andExpect(status().isCreated)
-      .andReturn()
-
-    val createResult = objectMapper.readValue(
-      createResponse.response.contentAsString,
-      CreateContainerTransportResponse::class.java
-    )
-
-    // Retrieve and verify the updated transport
-    securedMockMvc.get("/transport/${createResult.transportId}")
-      .andExpect(status().isOk)
-      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Transport with Branch References"))
-      .andExpect(jsonPath("$.containerOperation").value("DELIVERY"))
-      .andExpect(jsonPath("$.transportType").value("CONTAINER"))
-
-    // Verify transport was saved in the database with branch references
-    val savedTransports = transportRepository.findAll()
-    assertThat(savedTransports).hasSize(1)
-    assertThat(savedTransports[0].note).isEqualTo("Transport with Branch References")
-    assertThat(savedTransports[0].pickupLocation.id).isEqualTo(testBranch.id)
-    assertThat(savedTransports[0].deliveryLocation.id).isEqualTo(testBranch.id)
-  }
-
-  @Test
   fun `should update container transport with branch references`() {
     // Given
-    val createRequest = CreateContainerTransportRequest(
+    val createRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -678,7 +635,7 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
       CreateContainerTransportResponse::class.java
     )
 
-    val updateRequest = CreateContainerTransportRequest(
+    val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
@@ -710,8 +667,6 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Updated Transport with Branches"))
-      .andExpect(jsonPath("$.containerOperation").value("EXCHANGE"))
 
     // Retrieve and verify the updated transport
     securedMockMvc.get("/transport/${createResult.transportId}")
@@ -733,12 +688,12 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
         buildingNumber = "789",
         postalCode = "9012 EF",
         city = "Another City",
-        country = "Another Country"
+        country = "Nederland"
       )
     )
     companyRepository.save(anotherCompany)
 
-    val request = CreateContainerTransportRequest(
+    val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id!!,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
@@ -776,80 +731,21 @@ class TransportControllerIntegrationTest(@param:Autowired private val transactio
     assertThat(savedTransports).isEmpty()
   }
 
-  @Disabled //TODO enable after waste transport is refactored to domain model
-  @Test
-  fun `should create waste transport with branch references`() {
-    // Given
-    val request = CreateWasteTransportRequest(
-      consigneePartyId = testCompany.id.toString(),
-      pickupPartyId = testCompany.id.toString(),
-      consignorPartyId = testCompany.id!!,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
-      transportType = TransportType.WASTE,
-      containerOperation = ContainerOperation.PICKUP,
-      driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = UUID.fromString(testBranch.id),
-      pickupStreet = "Branch Street",
-      pickupBuildingNumber = "456",
-      pickupPostalCode = "5678 CD",
-      pickupCity = "Branch City",
-      deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = UUID.fromString(testBranch.id),
-      deliveryStreet = "Branch Street",
-      deliveryBuildingNumber = "456",
-      deliveryPostalCode = "5678 CD",
-      deliveryCity = "Branch City",
-      truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
-      note = "Waste Transport with Branches",
-      wasteStreamNumber = "WSN123",
-      weight = 1000,
-      unit = "KG",
-      quantity = 1,
-      goodsName = "Test Waste",
-      euralCode = "200301",
-      processingMethodCode = "A.02",
-      consignorClassification = 1,
-    )
-
-    // When & Then
-    securedMockMvc.post(
-      "/transport/waste",
-      objectMapper.writeValueAsString(request)
-    )
-      .andExpect(status().isOk)
-      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.note").value("Waste Transport with Branches"))
-      .andExpect(jsonPath("$.transportType").value("WASTE"))
-      .andExpect(jsonPath("$.containerOperation").value("PICKUP"))
-      .andExpect(jsonPath("$.goods").exists())
-      .andExpect(jsonPath("$.goods.goodsItem.wasteStreamNumber").value("WSN123"))
-
-    // Verify transport was saved in the database with branch references
-    val savedTransports = transportRepository.findAll()
-    assertThat(savedTransports).hasSize(1)
-    assertThat(savedTransports[0].note).isEqualTo("Waste Transport with Branches")
-    assertThat(savedTransports[0].pickupLocation.id).isEqualTo(testBranch.id)
-    assertThat(savedTransports[0].deliveryLocation.id).isEqualTo(testBranch.id)
-  }
-
-  private fun createTestTransport(note: String, goods: GoodsDto? = null): TransportDto {
+  private fun createTestTransport(note: String, goodsItem: GoodsItemDto? = null): TransportDto {
     return TransportDto(
+      id = UUID.randomUUID(),
       consignorParty = testCompany,
       carrierParty = testCompany,
       pickupLocation = testLocation,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
+      pickupDateTime = LocalDateTime.now().plusDays(1).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
       deliveryLocation = testLocation,
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      deliveryDateTime = LocalDateTime.now().plusDays(2).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       truck = testTruck,
       driver = testDriver,
       note = note,
-      goods = goods,
+      goodsItem = goodsItem,
       sequenceNumber = 1,
     )
   }

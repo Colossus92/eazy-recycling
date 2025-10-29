@@ -8,6 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,7 +31,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
   val objectMapper: ObjectMapper,
   val companyRepository: CompanyRepository,
   val projectLocationRepository: ProjectLocationJpaRepository,
-) {
+) : BaseIntegrationTest() {
   private lateinit var securedMockMvc: SecuredMockMvc
   private lateinit var testCompany: CompanyDto
   private lateinit var testBranches: List<PickupLocationDto.PickupProjectLocationDto>
