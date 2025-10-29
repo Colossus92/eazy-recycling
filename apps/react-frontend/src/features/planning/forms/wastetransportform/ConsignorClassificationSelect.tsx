@@ -8,7 +8,7 @@ import {
   Control,
 } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
+import { WasteStreamFormValues } from '@/features/wastestreams/components/wastetransportform/hooks/useWasteStreamFormHook.ts';
 
 interface ConsignorClassificationSelectProps<TFieldValues extends FieldValues> {
   testId?: string;
@@ -31,7 +31,7 @@ const consignorTypes = [
 export const ConsignorClassificationSelect = ({
   formHook,
   testId = 'consignor-classification-select',
-}: ConsignorClassificationSelectProps<WasteTransportFormValues>) => {
+}: ConsignorClassificationSelectProps<WasteStreamFormValues>) => {
   const { name, rules, errors, control } = formHook;
 
   return (

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Company } from '@/api/services/companyService';
 import { companyService } from '@/api/services/companyService.ts';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
+import { ConsignorClassificationSelect } from '@/features/planning/forms/wastetransportform/ConsignorClassificationSelect';
 
 export const WasteStreamFormRouteSection = () => {
   const formContext = useFormContext<WasteStreamFormValues>();
@@ -45,6 +46,15 @@ export const WasteStreamFormRouteSection = () => {
           register: formContext.register,
           name: 'consignorPartyId',
           rules: { required: 'Afzender is verplicht' },
+          errors: formContext.formState.errors,
+          control: formContext.control,
+        }}
+      />
+      <ConsignorClassificationSelect
+        formHook={{
+          register: formContext.register,
+          name: 'consignorClassification',
+          rules: { required: 'Afzender type is verplicht' },
           errors: formContext.formState.errors,
           control: formContext.control,
         }}

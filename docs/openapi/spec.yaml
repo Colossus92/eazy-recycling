@@ -1257,6 +1257,11 @@ components:
           oneOf:
           - $ref: "#/components/schemas/CompanyConsignor"
           - $ref: "#/components/schemas/PersonConsignor"
+        consignorClassification:
+          type: integer
+          format: int32
+          maximum: 4
+          minimum: 1
         pickupParty:
           type: string
           format: uuid
@@ -1271,6 +1276,7 @@ components:
           format: uuid
       required:
       - collectionType
+      - consignorClassification
       - consignorParty
       - euralCode
       - name
@@ -2454,6 +2460,9 @@ components:
           oneOf:
           - $ref: "#/components/schemas/CompanyConsignorView"
           - $ref: "#/components/schemas/PersonConsignorView"
+        consignorClassification:
+          type: integer
+          format: int32
         pickupParty:
           $ref: "#/components/schemas/CompanyView"
         dealerParty:
@@ -2468,6 +2477,7 @@ components:
           $ref: "#/components/schemas/LocalDateTime"
       required:
       - collectionType
+      - consignorClassification
       - consignorParty
       - deliveryLocation
       - lastActivityAt
@@ -2557,12 +2567,12 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        nanosecondsOfSecond:
-          type: integer
-          format: int32
         epochSeconds:
           type: integer
           format: int64
+        nanosecondsOfSecond:
+          type: integer
+          format: int32
         value$kotlinx_datetime:
           type: string
           format: date-time

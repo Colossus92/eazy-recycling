@@ -5,7 +5,6 @@ import { toastService } from '@/components/ui/toast/toastService.ts';
 
 export interface WasteTransportFormValues {
   consignorPartyId: string;
-  consignorClassification: number;
   consigneePartyId: string;
   carrierPartyId: string;
   transportType: string;
@@ -48,7 +47,6 @@ export const fieldsToValidate: Array<Array<keyof WasteTransportFormValues>> = [
   // Step 0: Main section fields
   [
     'consignorPartyId',
-    'consignorClassification',
     'carrierPartyId',
     'containerOperation',
   ],

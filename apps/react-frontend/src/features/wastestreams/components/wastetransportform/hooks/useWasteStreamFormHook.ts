@@ -14,6 +14,7 @@ export interface WasteStreamFormValues {
      * Afzender
      */
     consignorPartyId: string;
+    consignorClassification: number;
     /**
      * Ontdoener
      */
@@ -37,6 +38,7 @@ export const fieldsToValidate: Array<Array<keyof WasteStreamFormValues>> = [
     // Step 0: Waste stream parties
     [
         'consignorPartyId',
+        'consignorClassification',
         'pickupCompanyId',
         'pickupCompanyBranchId',
         'pickupStreet',
@@ -77,6 +79,7 @@ export function useWasteStreamForm(
     const formContext = useForm<WasteStreamFormValues>({
         defaultValues: {
             consignorPartyId: '',
+            consignorClassification: 1,
             pickupPartyId: '',
             pickupCompanyId: '',
             pickupCompanyBranchId: '',
@@ -122,6 +125,7 @@ export function useWasteStreamForm(
     const resetForm = () => {
             formContext.reset({
                 consignorPartyId: '',
+                consignorClassification: 1,
                 pickupPartyId: '',
                 pickupCompanyId: '',
                 pickupCompanyBranchId: '',
@@ -177,6 +181,7 @@ const wasteStreamDetailsToFormValues = (wasteStreamDetails: WasteStreamDetailVie
 
     return {
         consignorPartyId: consignorCompany?.id || '',
+        consignorClassification: wasteStreamDetails.consignorClassification,
         pickupPartyId: wasteStreamDetails.pickupParty.id,
         pickupCompanyId: isCompanyPickup ? pickupLocation?.company?.id : undefined,
         pickupCompanyBranchId: (wasteStreamDetails as any).pickupCompanyBranchId,
@@ -223,6 +228,7 @@ const formValuesToCreateWasteStreamRequest = (
             type: 'company',
             companyId: formValues.consignorPartyId
         } as any,
+        consignorClassification: formValues.consignorClassification,
         pickupParty: formValues.pickupPartyId,
     };
 }

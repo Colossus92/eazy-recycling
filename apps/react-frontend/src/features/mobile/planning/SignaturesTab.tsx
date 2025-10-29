@@ -89,11 +89,11 @@ const SignaturesTab = ({ transport }: SignaturesTabProps) => {
           <div className="flex items-center gap-2 flex-1">
             <JdenticonAvatar
               size={40}
-              value={transport.goods?.pickupParty.name || 'Ontdoener'}
+              value={transport.pickupParty?.name || 'Ontdoener'}
             />
             <div className="flex flex-col items-start justify-center flex-1">
               <span className="text-subtitle-2">
-                {transport.goods?.pickupParty.name || 'Ontdoener'}
+                {transport.pickupParty?.name || 'Ontdoener'}
               </span>
               <span className="text-caption-1 text-color-text-secondary">
                 Ontdoener
@@ -148,11 +148,11 @@ const SignaturesTab = ({ transport }: SignaturesTabProps) => {
           <div className="flex items-center gap-2 flex-1">
             <JdenticonAvatar
               size={40}
-              value={transport.goods?.consigneeParty.name || 'Ontvanger'}
+              value={transport.consigneeParty?.name || 'Ontvanger'}
             />
             <div className="flex flex-col items-start justify-center flex-1">
               <span className="text-subtitle-2">
-                {transport.goods?.consigneeParty.name || 'Ontvanger'}
+                {transport.consigneeParty?.name || 'Ontvanger'}
               </span>
               <span className="text-caption-1 text-color-text-secondary">
                 Ontvanger

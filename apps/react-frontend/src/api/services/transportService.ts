@@ -6,13 +6,13 @@ import {
   TransportFinishedRequest,
   WasteStreamDetailViewPickupLocation,
   WasteTransportControllerApi,
+  WasteTransportRequest,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
 import {
   CreateContainerTransportRequestContainerOperationEnum
 } from '@/api/client/models/create-container-transport-request';
 import {
-  CreateWasteTransportRequest,
   CreateWasteTransportRequestContainerOperationEnum,
 } from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
@@ -138,9 +138,9 @@ export const transportService = {
     containerTransportApi.updateContainerTransport(id, data),
   createContainerTransport: (data: ContainerTransportRequest) =>
     containerTransportApi.createContainerTransport(data),
-  createWasteTransport: (data: CreateWasteTransportRequest) =>
+  createWasteTransport: (data: WasteTransportRequest) =>
     wasteTransportApi.createWasteTransport(data),
-  updateWasteTransport: (id: string, data: CreateWasteTransportRequest) =>
+  updateWasteTransport: (id: string, data: WasteTransportRequest) =>
     wasteTransportApi.updateWasteTransport(id, data),
   reportFinished: (id: string, data: TransportFinishedRequest) =>
     transportApi.markTransportAsFinished(id, data),
@@ -236,40 +236,21 @@ export const transportDetailViewToContainerTransportFormValues = (
 export const formValuesToCreateWasteTransportRequest = (
   formValues: WasteTransportFormValues
 ) => {
-  const request: CreateWasteTransportRequest = {
-    consignorPartyId: formValues.consignorPartyId,
+  const request: WasteTransportRequest = {
     carrierPartyId: formValues.carrierPartyId,
     containerOperation:
       formValues.containerOperation as CreateWasteTransportRequestContainerOperationEnum,
-    pickupCompanyId: formValues.pickupCompanyId,
-    pickupCompanyBranchId: formValues.pickupCompanyBranchId,
-    pickupStreet: formValues.pickupStreet,
-    pickupBuildingNumber: formValues.pickupBuildingNumber,
-    pickupPostalCode: formValues.pickupPostalCode,
-    pickupCity: formValues.pickupCity,
     pickupDateTime: formValues.pickupDateTime,
-    deliveryCompanyId: formValues.deliveryCompanyId,
-    deliveryCompanyBranchId: formValues.deliveryCompanyBranchId,
-    deliveryStreet: formValues.deliveryStreet,
-    deliveryBuildingNumber: formValues.deliveryBuildingNumber,
-    deliveryPostalCode: formValues.deliveryPostalCode,
-    deliveryCity: formValues.deliveryCity,
     deliveryDateTime: formValues.deliveryDateTime,
     truckId: formValues.truckId,
     driverId: formValues.driverId,
     containerId: formValues.containerId,
     note: formValues.note || '',
     transportType: 'WASTE',
-    consigneePartyId: formValues.consigneePartyId,
-    pickupPartyId: formValues.pickupPartyId,
-    consignorClassification: formValues.consignorClassification,
     wasteStreamNumber: formValues.wasteStreamNumber,
     weight: formValues.weight,
     unit: 'kg',
     quantity: formValues.quantity,
-    goodsName: formValues.goodsName,
-    euralCode: formValues.euralCode,
-    processingMethodCode: formValues.processingMethodCode,
   };
   return request;
 };
@@ -305,7 +286,6 @@ export const transportDtoToWasteTransportFormValues = (transport: TransportDetai
     transportType: transport.transportType,
 
     // Goods data
-    consignorClassification: goods?.consignorClassification || 0,
     consigneePartyId: transport.consigneeParty?.id || '',
     pickupPartyId: transport.pickupParty?.id || '',
     wasteStreamNumber: goods?.wasteStreamNumber || '',

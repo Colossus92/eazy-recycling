@@ -12,6 +12,7 @@ data class WasteStreamDetailView(
   val pickupLocation: PickupLocationView?,
   val deliveryLocation: DeliveryLocationView,
   val consignorParty: ConsignorView,
+  val consignorClassification: Int,
   val pickupParty: CompanyView,
   val dealerParty: CompanyView?,
   val collectorParty: CompanyView?,

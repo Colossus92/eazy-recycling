@@ -145,6 +145,7 @@ class WasteStreamQueryRepository(
         processor = CompanyViewMapper.map(wasteStream.processorParty)
       ),
       consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(wasteStream.consignorParty)),
+      consignorClassification = wasteStream.consignorClassification,
       pickupParty = CompanyViewMapper.map(wasteStream.pickupParty),
       dealerParty = wasteStream.dealerParty?.let { CompanyViewMapper.map(it) },
       collectorParty = wasteStream.collectorParty?.let { CompanyViewMapper.map(it) },

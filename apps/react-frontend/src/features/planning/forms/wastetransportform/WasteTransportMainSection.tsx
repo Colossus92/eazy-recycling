@@ -1,6 +1,5 @@
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
-import { ConsignorClassificationSelect } from './ConsignorClassificationSelect';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { companyService, Company } from '@/api/services/companyService.ts';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
@@ -47,15 +46,6 @@ export const WasteTransportMainSection = () => {
           register: register,
           name: 'consignorPartyId',
           rules: { required: 'Afzender is verplicht' },
-          errors: errors,
-          control: control,
-        }}
-      />
-      <ConsignorClassificationSelect
-        formHook={{
-          register: register,
-          name: 'consignorClassification',
-          rules: { required: 'Afzender type is verplicht' },
           errors: errors,
           control: control,
         }}

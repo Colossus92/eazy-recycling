@@ -76,6 +76,12 @@ export interface WasteStreamDetailView {
     'consignorParty': WeightTicketDetailViewConsignorParty;
     /**
      * 
+     * @type {number}
+     * @memberof WasteStreamDetailView
+     */
+    'consignorClassification': number;
+    /**
+     * 
      * @type {CompanyView}
      * @memberof WasteStreamDetailView
      */

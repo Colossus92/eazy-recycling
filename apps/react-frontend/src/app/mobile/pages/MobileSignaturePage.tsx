@@ -10,10 +10,10 @@ import { SignatureStatusTag } from '@/features/mobile/planning/SignatureStatusTa
 import { useSignatureForm } from '@/features/mobile/hooks/useSignatureForm';
 import { useSignatureStatus } from '@/features/mobile/hooks/useSignatureStatus';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { TransportDto } from '@/api/client/models/transport-dto';
+import { TransportDetailView } from '@/api/client';
 
 type LocationState = {
-  transport: TransportDto;
+  transport: TransportDetailView;
 };
 
 export const MobileSignaturePage = () => {
@@ -34,11 +34,11 @@ export const MobileSignaturePage = () => {
     type === 'consignor'
       ? state.transport.consignorParty
       : type === 'pickup'
-        ? state.transport.goods?.pickupParty
+        ? state.transport.pickupParty
         : type === 'carrier'
           ? state.transport.carrierParty
           : type === 'consignee'
-            ? state.transport.goods?.consigneeParty
+            ? state.transport.consigneeParty
             : undefined;
   const { signatureStatus, isLoading: isLoadingStatus } = useSignatureStatus({
     transportId: id || '',

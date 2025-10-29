@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamDetailView, WasteStreamListView } from '@/api/client';
 import { WasteStreamRequest } from '@/api/client/models/waste-stream-request';
-import { CreateWasteStreamRequest } from '@/api/client/models/create-waste-stream-request';
 import { WasteStreamFilterFormValues } from '../components/WasteStreamFilterForm';
 
 interface WasteStreamFilterParams {
@@ -158,7 +157,7 @@ export function useWasteStreamCrud() {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
-      submit: async (item: CreateWasteStreamRequest) => {
+      submit: async (item: WasteStreamRequest) => {
         if (itemToEdit) {
           return update(itemToEdit.wasteStreamNumber, item);
         } else {

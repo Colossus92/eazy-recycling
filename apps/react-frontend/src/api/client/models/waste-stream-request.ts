@@ -70,6 +70,12 @@ export interface WasteStreamRequest {
     'consignorParty': WeightTicketRequestConsignorParty;
     /**
      * 
+     * @type {number}
+     * @memberof WasteStreamRequest
+     */
+    'consignorClassification': number;
+    /**
+     * 
      * @type {string}
      * @memberof WasteStreamRequest
      */
