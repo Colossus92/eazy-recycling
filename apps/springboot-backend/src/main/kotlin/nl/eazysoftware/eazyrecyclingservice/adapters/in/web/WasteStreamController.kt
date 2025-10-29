@@ -3,6 +3,8 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
@@ -97,6 +99,10 @@ data class WasteStreamRequest(
 
   val consignorParty: ConsignorRequest,
 
+  @field:Min(value = 1, message = "Afzender classificatie moet een waarde tussen 1 en 4 hebben")
+  @field:Max(value = 4, message = "Afzender classificatie moet een waarde tussen 1 en 4 hebben")
+  val consignorClassification: Int,
+
   val pickupParty: UUID,
 
   val dealerParty: UUID? = null,
@@ -118,10 +124,11 @@ data class WasteStreamRequest(
         processorPartyId = ProcessorPartyId(processorPartyId)
       ),
       consignorParty = consignorParty.toDomain(),
+      consignorClassification = consignorClassification,
       pickupParty = CompanyId(pickupParty),
       dealerParty = dealerParty?.let { CompanyId(it) },
       collectorParty = collectorParty?.let { CompanyId(it) },
-      brokerParty = brokerParty?.let { CompanyId(it) }
+      brokerParty = brokerParty?.let { CompanyId(it) },
     )
   }
 }

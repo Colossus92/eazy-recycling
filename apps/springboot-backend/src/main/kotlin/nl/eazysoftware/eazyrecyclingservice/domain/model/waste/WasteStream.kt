@@ -19,6 +19,8 @@ class WasteStream(
    * Dutch: Afzender
    */
   var consignorParty: Consignor,
+
+  var consignorClassification: ConsignorClassification,
   /**
    * Dutch: Ontdoener
    */
@@ -187,5 +189,21 @@ data class WasteStreamNumber(
     require(number.length == 12) {
       "Een afvalstroomnummer dient 12 tekens lang te zijn"
     }
+  }
+}
+
+
+enum class ConsignorClassification(
+  var code: Int,
+) {
+  PICKUP_PARTY(1), // Ontdoener
+  DELIVERY_PARTY(2), // Ontvanger
+  DEALER(3), // Handelaar
+  BROKER(4); // Bemiddelaar
+
+  companion object {
+    fun fromCode(code: Int): ConsignorClassification =
+      entries.find { it.code == code }
+        ?: throw IllegalArgumentException("Unknown classification code: $code")
   }
 }

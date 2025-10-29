@@ -11,7 +11,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
@@ -46,6 +45,7 @@ class WasteStreamMapper(
       consignorParty = Consignor.Company(
         CompanyId(dto.consignorParty.id!!)
       ),
+      consignorClassification = ConsignorClassification.fromCode(dto.consignorClassification),
       pickupParty = CompanyId(dto.pickupParty.id!!),
       dealerParty = dto.dealerParty?.let { CompanyId(it.id!!) },
       collectorParty = dto.collectorParty?.let { CompanyId(it.id!!) },
@@ -72,6 +72,7 @@ class WasteStreamMapper(
         is Consignor.Company -> entityManager.getReference(CompanyDto::class.java, consignor.id.uuid)
         is Consignor.Person -> throw IllegalArgumentException("Person consignor is not yet supported in persistence layer")
       },
+      consignorClassification = domain.consignorClassification.code,
       pickupParty = entityManager.getReference(CompanyDto::class.java, domain.pickupParty.uuid),
       dealerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       collectorParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },

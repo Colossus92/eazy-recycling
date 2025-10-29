@@ -26,10 +26,11 @@ data class WasteStreamCommand(
   val pickupLocation: PickupLocationCommand,
   val deliveryLocation: WasteDeliveryLocation,
   val consignorParty: Consignor,
+  val consignorClassification: Int,
   val pickupParty: CompanyId,
   val dealerParty: CompanyId?,
   val collectorParty: CompanyId?,
-  val brokerParty: CompanyId?
+  val brokerParty: CompanyId?,
 )
 
 /**
@@ -99,6 +100,7 @@ class CreateWasteStreamService(
       pickupLocation = pickupLocation,
       deliveryLocation = cmd.deliveryLocation,
       consignorParty = cmd.consignorParty,
+      consignorClassification = ConsignorClassification.fromCode(cmd.consignorClassification),
       pickupParty = cmd.pickupParty,
       dealerParty = cmd.dealerParty,
       collectorParty = cmd.collectorParty,

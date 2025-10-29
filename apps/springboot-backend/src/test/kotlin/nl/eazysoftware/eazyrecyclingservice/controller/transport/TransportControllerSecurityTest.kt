@@ -245,12 +245,13 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             pickupLocation = mockLocationDto(),
             processorParty = consignor,
             consignorParty = consignor,
+            consignorClassification = 1,
             pickupParty = consignor,
             dealerParty = null,
             collectorParty = null,
             brokerParty = null,
             lastActivityAt = Instant.now(),
-            status = WasteStreamStatus.ACTIVE.name
+            status = WasteStreamStatus.ACTIVE.name,
         )
 
         // Mock waste stream repository

@@ -170,6 +170,7 @@ create table if not exists waste_streams (
                                   waste_collection_type text not null,
                                   pickup_location_id text,
                                   consignor_party_id uuid not null,
+                                  consignor_classification smallint,
                                   pickup_party_id uuid not null,
                                   dealer_party_id uuid,
                                   collector_party_id uuid,

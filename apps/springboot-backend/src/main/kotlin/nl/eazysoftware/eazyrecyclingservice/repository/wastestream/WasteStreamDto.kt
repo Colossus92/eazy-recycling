@@ -1,10 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import java.time.Instant
 
 @Entity
@@ -42,6 +42,16 @@ data class WasteStreamDto(
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "consignor_party_id", referencedColumnName = "id", nullable = false)
   val consignorParty: CompanyDto,
+
+  /**
+   * The classification of the consignor, this can be:
+   *      1 = Ontdoener
+   *      2 = Ontvanger
+   *      3 = Handelaar
+   *      4 = Bemiddelaar
+   */
+  @Column(name = "consignor_classification", nullable = false)
+  val consignorClassification: Int,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "pickup_party_id", referencedColumnName = "id", nullable = false)

@@ -4,19 +4,11 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatus
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EuralCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ProcessingMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -43,6 +35,7 @@ class WasteStreamTest {
         ),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
         pickupParty = companyId(),
       )
     }
@@ -67,6 +60,7 @@ class WasteStreamTest {
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
         collectorParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
   }
@@ -91,6 +85,7 @@ class WasteStreamTest {
         pickupParty = companyId(),
         brokerParty = companyId(),
         collectorParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -108,6 +103,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -217,6 +213,7 @@ class WasteStreamTest {
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
         collectorParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
   }
@@ -233,6 +230,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -250,6 +248,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
   }
@@ -273,6 +272,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -297,6 +297,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -321,6 +322,7 @@ class WasteStreamTest {
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         pickupParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -340,6 +342,7 @@ class WasteStreamTest {
         consignorParty = Consignor.Person,
         pickupParty = companyId(),
         collectorParty = companyId(),
+        consignorClassification = ConsignorClassification.PICKUP_PARTY,
       )
     }
 
@@ -518,6 +521,7 @@ class WasteStreamTest {
     pickupParty = companyId(),
     status = status,
     lastActivityAt = lastActivityAt,
+    consignorClassification = ConsignorClassification.PICKUP_PARTY,
   )
 
   private fun wasteStreamNumber(): WasteStreamNumber = WasteStreamNumber("123456789012")

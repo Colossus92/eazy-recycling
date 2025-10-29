@@ -139,24 +139,25 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
 
   private fun createTestCommand(processorId: ProcessorPartyId): WasteStreamCommand {
     return WasteStreamCommand(
-        wasteType = WasteType(
-            name = "Test Waste",
-            euralCode = EuralCode("010101"),
-            processingMethod = ProcessingMethod("R01")
-        ),
-        collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = PickupLocationCommand.DutchAddressCommand(
-              streetName = "Test Street",
-              postalCode = "1234AB",
-              buildingNumber = "1",
-              city = "Test City",
-        ),
-        deliveryLocation = WasteDeliveryLocation(processorPartyId = processorId),
-        consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
-        pickupParty = CompanyId(UUID.randomUUID()),
-        dealerParty = null,
-        collectorParty = null,
-        brokerParty = null
+      wasteType = WasteType(
+          name = "Test Waste",
+          euralCode = EuralCode("010101"),
+          processingMethod = ProcessingMethod("R01")
+      ),
+      collectionType = WasteCollectionType.DEFAULT,
+      pickupLocation = PickupLocationCommand.DutchAddressCommand(
+            streetName = "Test Street",
+            postalCode = "1234AB",
+            buildingNumber = "1",
+            city = "Test City",
+      ),
+      deliveryLocation = WasteDeliveryLocation(processorPartyId = processorId),
+      consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
+      pickupParty = CompanyId(UUID.randomUUID()),
+      dealerParty = null,
+      collectorParty = null,
+      brokerParty = null,
+      consignorClassification = 1,
     )
   }
 }

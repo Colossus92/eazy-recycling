@@ -33,9 +33,6 @@ data class TransportDto(
   @JoinColumn(name = "consignor_party_id", referencedColumnName = "id")
   val consignorParty: CompanyDto,
 
-  @Column("consignor_classification", nullable = true)
-  val consignorClassification: Int? = null,
-
   /**
    * The party executing the transport.
    */
