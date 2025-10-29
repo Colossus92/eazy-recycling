@@ -66,9 +66,29 @@ class GetTransportByIdService(
         country = location.country
       )
 
-      is Location.Company -> PickupLocationView.PickupCompanyView(
-        company = mapCompany(location.companyId.uuid)
-      )
+      is Location.Company -> {
+        val id = location.companyId.uuid
+        val company = companyRepository.findByIdOrNull(id)
+          ?: throw EntityNotFoundException("Bedrijf met id $id niet gevonden")
+
+        return PickupLocationView.PickupCompanyView(
+          company = CompanyView(
+            id = id,
+            name = location.name,
+            chamberOfCommerceId = company.chamberOfCommerceId,
+            vihbId = company.vihbId,
+            processorId = company.processorId,
+            address = AddressView(
+              street = location.address.streetName,
+              houseNumber = location.address.buildingNumber,
+              houseNumberAddition = location.address.buildingNumberAddition,
+              postalCode = location.address.postalCode.value,
+              city = location.address.city,
+              country = location.address.country
+            )
+          )
+        )
+      }
 
       is Location.ProjectLocation -> PickupLocationView.ProjectLocationView(
         company = mapCompany(location.companyId.uuid),

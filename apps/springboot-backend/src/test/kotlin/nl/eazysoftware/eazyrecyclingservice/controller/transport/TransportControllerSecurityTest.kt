@@ -319,7 +319,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             transportType = TransportType.WASTE,
             goodsItem = GoodsItem(
                 wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
-                netNetWeight = 1000,
+                netNetWeight = 1000.0,
                 unit = "KG",
                 quantity = 1
             ),
@@ -446,7 +446,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             containerId = UUID.randomUUID(),
             note = "Test waste transport",
             wasteStreamNumber = testWasteStream.number,
-            weight = 10,
+            weight = 10.0,
             unit = "KG",
             quantity = 1
         )

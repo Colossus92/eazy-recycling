@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
@@ -65,7 +64,28 @@ class PickupLocationDto(
   class PickupCompanyDto(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
-    var company: CompanyDto
+    var company: CompanyDto,
+
+    @Column(name = "name")
+    var name: String,
+
+    @Column(name = "street_name")
+    var streetName: String,
+
+    @Column(name = "building_number")
+    var buildingNumber: String,
+
+    @Column(name = "building_number_addition")
+    var buildingNumberAddition: String?,
+
+    @Column(name = "postal_code")
+    var postalCode: String,
+
+    @Column
+    var city: String,
+
+    @Column
+    var country: String,
   ) : PickupLocationDto()
 
 

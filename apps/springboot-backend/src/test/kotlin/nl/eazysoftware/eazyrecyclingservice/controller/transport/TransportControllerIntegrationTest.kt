@@ -290,7 +290,7 @@ class TransportControllerIntegrationTest(
       containerId = testContainer.uuid,
       note = "New Waste Transport",
       wasteStreamNumber = testWasteStream.number,
-      weight = 1000,
+      weight = 1000.0,
       unit = "KG",
       quantity = 1,
     )
@@ -378,7 +378,7 @@ class TransportControllerIntegrationTest(
       containerId = testContainer.uuid,
       note = "Original Waste Transport",
       wasteStreamNumber = testWasteStream.number,
-      weight = 1000,
+      weight = 1000.0,
       unit = "KG",
       quantity = 1,
     )
@@ -407,7 +407,7 @@ class TransportControllerIntegrationTest(
       containerId = testContainer.uuid,
       note = "Updated Waste Transport",
       wasteStreamNumber = testWasteStream.number,
-      weight = 2000,
+      weight = 2000.0,
       unit = "KG",
       quantity = 2,
     )
@@ -427,7 +427,7 @@ class TransportControllerIntegrationTest(
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Waste Transport")
     assertThat(updatedTransport?.goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
-    assertThat(updatedTransport?.goodsItem?.netNetWeight).isEqualTo(2000)
+    assertThat(updatedTransport?.goodsItem?.netNetWeight).isEqualTo(2000.0)
     assertThat(updatedTransport?.goodsItem?.quantity).isEqualTo(2)
     assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
   }

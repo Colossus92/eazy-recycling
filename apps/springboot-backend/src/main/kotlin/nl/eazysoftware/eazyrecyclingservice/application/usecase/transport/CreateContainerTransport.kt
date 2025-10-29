@@ -61,6 +61,7 @@ data class CreateContainerTransportResult(
 class CreateContainerTransportService(
   private val containerTransports: ContainerTransports,
   private val locations: ProjectLocations,
+  private val locationFactory: LocationFactory,
   private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
 ) : CreateContainerTransport {
 
@@ -137,7 +138,7 @@ class CreateContainerTransportService(
       return existingLocation
     }
 
-    return LocationFactory.create(
+    return locationFactory.create(
       companyId = companyId,
       streetName = streetName,
       buildingNumber = buildingNumber,

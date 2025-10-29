@@ -192,6 +192,7 @@ create table if not exists goods_items (
 
 create table if not exists pickup_locations (
                                  id text not null,
+                                 name text,
                                  created_at timestamp with time zone not null default now(),
                                  location_type text not null,
                                  street_name text,

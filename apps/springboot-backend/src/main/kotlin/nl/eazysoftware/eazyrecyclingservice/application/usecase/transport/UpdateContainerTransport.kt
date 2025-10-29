@@ -61,7 +61,8 @@ data class UpdateContainerTransportResult(
 @Service
 class UpdateContainerTransportService(
   private val containerTransports: ContainerTransports,
-  private val locations: ProjectLocations
+  private val locations: ProjectLocations,
+  private val locationFactory: LocationFactory
 ) : UpdateContainerTransport {
 
   @Transactional
@@ -147,7 +148,7 @@ class UpdateContainerTransportService(
       return existingLocation
     }
 
-    return LocationFactory.create(
+    return locationFactory.create(
       companyId = companyId,
       streetName = streetName,
       buildingNumber = buildingNumber,

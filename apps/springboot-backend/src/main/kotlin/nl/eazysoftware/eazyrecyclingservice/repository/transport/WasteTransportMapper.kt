@@ -5,6 +5,8 @@ import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -37,7 +39,20 @@ class WasteTransportMapper(
       ?: throw IllegalArgumentException("Afvalstroomnummer niet gevonden: ${domain.goodsItem.wasteStreamNumber.number}")
     val deliveryLocation = companyRepository.findByProcessorId(wasteStream.deliveryLocation.processorPartyId.number)
       ?.let {
-        it.id?.let { id -> Location.Company(CompanyId(id)) }
+        it.id?.let { id ->
+          Location.Company(
+            CompanyId(id),
+            name = it.name,
+            address = Address(
+              streetName = it.address.streetName ?: throw IllegalStateException("Bedrijf heeft geen straatnaam, maar dit is verplicht"),
+              buildingNumber = it.address.buildingNumber,
+              buildingNumberAddition = it.address.buildingName,
+              city = it.address.city ?: throw IllegalStateException("Bedrijf heeft geen stad, maar dit is verplicht"),
+              country = it.address.country ?: "Nederland",
+              postalCode = DutchPostalCode(it.address.postalCode)
+            )
+          )
+        }
       }
       ?: throw IllegalArgumentException("Verwerker niet gevonden: ${wasteStream.deliveryLocation.processorPartyId.number}")
 
@@ -48,7 +63,12 @@ class WasteTransportMapper(
       deliveryDateTime = domain.deliveryDateTime?.toJavaInstant(),
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
-      wasteContainer = domain.wasteContainer?.let { entityManager.getReference(WasteContainerDto::class.java, it.uuid) },
+      wasteContainer = domain.wasteContainer?.let {
+        entityManager.getReference(
+          WasteContainerDto::class.java,
+          it.uuid
+        )
+      },
       truck = domain.truck?.let { entityManager.getReference(Truck::class.java, it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
@@ -89,14 +109,14 @@ class WasteTransportMapper(
     )
   }
 
-  private fun toDto(goodsItem: GoodsItem) = GoodsItemDto (
+  private fun toDto(goodsItem: GoodsItem) = GoodsItemDto(
     wasteStreamNumber = goodsItem.wasteStreamNumber.number,
     netNetWeight = goodsItem.netNetWeight,
     unit = goodsItem.unit,
     quantity = goodsItem.quantity
   )
 
-  private fun toDomain(goodsItemDto: GoodsItemDto) = GoodsItem (
+  private fun toDomain(goodsItemDto: GoodsItemDto) = GoodsItem(
     wasteStreamNumber = WasteStreamNumber(goodsItemDto.wasteStreamNumber),
     netNetWeight = goodsItemDto.netNetWeight,
     unit = goodsItemDto.unit,

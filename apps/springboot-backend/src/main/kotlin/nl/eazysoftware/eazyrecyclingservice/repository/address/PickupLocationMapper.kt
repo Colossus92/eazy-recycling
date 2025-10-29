@@ -1,11 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.address
 
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -15,6 +17,7 @@ import java.util.*
 class PickupLocationMapper(
   private var pickupLocationRepository: PickupLocationRepository,
   private var companyRepository: CompanyRepository,
+  private var entityManager: EntityManager,
 ) {
 
   fun toDomain(dto: PickupLocationDto): Location {
@@ -40,7 +43,16 @@ class PickupLocationMapper(
       )
 
       is PickupLocationDto.PickupCompanyDto -> Company(
-        companyId = CompanyId(unproxied.company.id!!)
+        companyId = CompanyId(unproxied.company.id!!),
+        name = unproxied.company.name,
+        address = Address(
+          streetName = unproxied.streetName,
+          postalCode = DutchPostalCode(unproxied.postalCode),
+          buildingNumber = unproxied.buildingNumber,
+          buildingNumberAddition = unproxied.buildingNumberAddition,
+          city = unproxied.city,
+          country = unproxied.country,
+        )
       )
 
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
@@ -66,7 +78,7 @@ class PickupLocationMapper(
     return when (location) {
       is DutchAddress -> findOrCreateDutchAddress(location)
       is ProximityDescription -> createProximity(location)
-      is Company -> findOrCreateCompany(location)
+      is Company -> createCompany(location)
       is ProjectLocation -> findOrCreateProjectLocation(location)
       is NoLocation -> PickupLocationDto.NoPickupLocationDto()
     }
@@ -119,20 +131,21 @@ class PickupLocationMapper(
     }
   }
 
-  private fun findOrCreateCompany(
+  private fun createCompany (
     domain: Company
   ): PickupLocationDto.PickupCompanyDto {
-    val company = companyRepository.findByIdOrNull(domain.companyId.uuid)
-      ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.companyId}")
-
-
-    val existing = pickupLocationRepository.findCompanyByCompanyId(company.id)
-    if (existing is PickupLocationDto.PickupCompanyDto) {
-      return existing
-    }
-
-    val newCompanyLocation = PickupLocationDto.PickupCompanyDto(company = company)
-    val saved = pickupLocationRepository.save(newCompanyLocation)
+    val saved = pickupLocationRepository.save(
+      PickupLocationDto.PickupCompanyDto(
+        company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
+        name = domain.name,
+        streetName = domain.address.streetName,
+        buildingNumber = domain.address.buildingNumber,
+        buildingNumberAddition = domain.address.buildingNumberAddition,
+        postalCode = domain.address.postalCode.value,
+        city = domain.address.city,
+        country = domain.address.country,
+      )
+    )
     pickupLocationRepository.flush()
 
     return saved

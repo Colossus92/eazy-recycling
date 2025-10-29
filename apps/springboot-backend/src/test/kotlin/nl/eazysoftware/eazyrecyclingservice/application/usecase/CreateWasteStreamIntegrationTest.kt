@@ -1,11 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
@@ -147,13 +145,11 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
             processingMethod = ProcessingMethod("R01")
         ),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = Location.DutchAddress(
-            address = Address(
+        pickupLocation = PickupLocationCommand.DutchAddressCommand(
               streetName = "Test Street",
-              postalCode = DutchPostalCode("1234AB"),
+              postalCode = "1234AB",
               buildingNumber = "1",
-              city = "Test City"
-            ),
+              city = "Test City",
         ),
         deliveryLocation = WasteDeliveryLocation(processorPartyId = processorId),
         consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
