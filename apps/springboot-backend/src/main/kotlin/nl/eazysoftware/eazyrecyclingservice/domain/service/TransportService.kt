@@ -10,7 +10,6 @@ import java.util.*
 @Service
 class TransportService(
   private val transportRepository: TransportRepository,
-  private val pdfGenerationClient: PdfGenerationClient, //TODO generate pdf on transport creation
 ) {
 
     fun getAllTransports(): List<TransportDto> {

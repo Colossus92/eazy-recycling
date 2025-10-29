@@ -2,5 +2,6 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "vitest.enable": true,
     "vitest.commandLine": "npm test --",
-    "vitest.workspaceConfig": "apps/react-frontend/vite.config.ts"
+    "vitest.workspaceConfig": "apps/react-frontend/vite.config.ts",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

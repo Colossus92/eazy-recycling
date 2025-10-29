@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
+import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,6 +41,7 @@ data class CreateWasteTransportResult(
 class CreateWasteTransportService(
   private val wasteTransports: WasteTransports,
   private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
+  private val pdfGenerationClient: PdfGenerationClient,
 ) : CreateWasteTransport {
 
   @Transactional
@@ -64,6 +66,7 @@ class CreateWasteTransportService(
     )
 
     val savedTransport = wasteTransports.save(wasteTransport)
+    pdfGenerationClient.triggerPdfGeneration(savedTransport.transportId.uuid, "empty")
 
     return CreateWasteTransportResult(
       transportId = savedTransport.transportId

@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -62,7 +63,8 @@ data class UpdateContainerTransportResult(
 class UpdateContainerTransportService(
   private val containerTransports: ContainerTransports,
   private val locations: ProjectLocations,
-  private val locationFactory: LocationFactory
+  private val locationFactory: LocationFactory,
+  private val pdfGenerationClient: PdfGenerationClient,
 ) : UpdateContainerTransport {
 
   @Transactional
@@ -98,6 +100,7 @@ class UpdateContainerTransportService(
     )
 
     val savedTransport = containerTransports.save(updatedTransport)
+    pdfGenerationClient.triggerPdfGeneration(savedTransport.transportId.uuid, "empty")
 
     return UpdateContainerTransportResult(
       transportId = savedTransport.transportId,
