@@ -104,6 +104,7 @@ export const WeightTicketManagement = () => {
                               <ActionMenu<WeightTicketListView>
                                 onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
                                 onDelete={(weightTicket) => deletion.initiate(weightTicket)}
+                                deleteText="Annuleren"
                                 item={item}
                               />
                             }

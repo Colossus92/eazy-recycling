@@ -15,6 +15,7 @@ export interface AdditionalAction<T> {
 interface ActionMenuProps<T> {
   onEdit?: (item: T) => void;
   onDelete: (item: T) => void;
+  deleteText: string;
   item: T;
   additionalActions?: AdditionalAction<T>[];
 }
@@ -22,6 +23,7 @@ interface ActionMenuProps<T> {
 export const ActionMenu = <T,>({
   onEdit,
   onDelete,
+  deleteText = "Verwijderen",
   item,
   additionalActions,
 }: ActionMenuProps<T>) => {
@@ -71,7 +73,7 @@ export const ActionMenu = <T,>({
         <MenuItem>
           <div className={'flex flex-col items-start self-stretch p-2'}>
             <MenuItemButton
-              label={'Verwijderen'}
+              label={deleteText}
               icon={TrashSimple}
               onClick={() => onDelete(item)}
               textColor={'text-color-status-error-primary'}
