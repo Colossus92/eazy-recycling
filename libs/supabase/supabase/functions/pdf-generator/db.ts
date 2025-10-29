@@ -224,7 +224,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         gi.unit,
         gi.net_net_weight,
         gi.waste_stream_number,
-        ws.processing_method_code
+        ws.processing_method_code,
+        ws.consignor_classification
       FROM
         goods_items gi
       JOIN
