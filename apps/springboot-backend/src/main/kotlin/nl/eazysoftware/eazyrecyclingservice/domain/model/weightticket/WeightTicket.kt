@@ -55,6 +55,54 @@ class WeightTicket(
     this.note = note
     this.updatedAt = Clock.System.now()
   }
+
+  fun split(newId: WeightTicketId, originalPercentage: Int, newPercentage: Int) : WeightTicket {
+    // 1. Validate business rules
+    require(originalPercentage + newPercentage == 100) {
+      "Percentages moeten optellen tot 100"
+    }
+    require(originalPercentage > 0 && newPercentage > 0) {
+      "Percentages moeten positief zijn"
+    }
+    check(status == WeightTicketStatus.DRAFT) {
+      "Weegbon kan alleen worden gesplitst als de status openstaand is"
+    }
+    check(!lines.isEmpty()) {
+      "Kan geen lege weegbon splitsen"
+    }
+
+    // 2. Split lines by percentage
+    val originalLines = lines.getLines().map { line ->
+      WeightTicketLine(
+        waste = line.waste,
+        weight = line.weight.multiplyByPercentage(originalPercentage)
+      )
+    }
+
+    val newLines = lines.getLines().map { line ->
+      WeightTicketLine(
+        waste = line.waste,
+        weight = line.weight.multiplyByPercentage(newPercentage)
+      )
+    }
+
+    // 3. Update this aggregate's lines
+    this.lines = WeightTicketLines(originalLines)
+    this.updatedAt = Clock.System.now()
+
+    // 4. Return new aggregate (ID will be assigned by repository)
+    return WeightTicket(
+      id = newId,
+      consignorParty = this.consignorParty,
+      status = WeightTicketStatus.DRAFT,
+      lines = WeightTicketLines(newLines),
+      carrierParty = this.carrierParty,
+      truckLicensePlate = this.truckLicensePlate,
+      reclamation = this.reclamation,
+      note = this.note?.copy(),
+      createdAt = Clock.System.now()
+    )
+  }
 }
 
 enum class WeightTicketStatus {

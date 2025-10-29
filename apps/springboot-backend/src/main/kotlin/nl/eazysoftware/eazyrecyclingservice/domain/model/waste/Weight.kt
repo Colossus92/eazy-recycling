@@ -1,16 +1,23 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 data class Weight(
-    val value: BigDecimal,
-    val unit: WeightUnit
+  val value: BigDecimal,
+  val unit: WeightUnit
 ) {
-    init {
-        require(value >= BigDecimal.ZERO) { "Gewicht dient een positief getal te zijn" }
-    }
+  fun multiplyByPercentage(percentage: Int): Weight {
+    require(percentage in 1..100) { "Percentage moet tussen 1 en 100 zijn" }
+    val newValue = (value * BigDecimal(percentage)) / BigDecimal(100)
+    return Weight(newValue.setScale(2, RoundingMode.HALF_UP), unit)
+  }
 
-    enum class WeightUnit(val code: String) {
-        KILOGRAM("Kg"),
-    }
+  init {
+    require(value >= BigDecimal.ZERO) { "Gewicht dient een positief getal te zijn" }
+  }
+
+  enum class WeightUnit(val code: String) {
+    KILOGRAM("Kg"),
+  }
 }

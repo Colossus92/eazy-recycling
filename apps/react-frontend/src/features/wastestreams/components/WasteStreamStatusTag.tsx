@@ -13,7 +13,7 @@ export const WasteStreamStatusTag = ({ status }: WasteStreamStatusTagProps) => {
   }[status];
 
   const text = {
-    DRAFT: 'Concept',
+    DRAFT: 'Openstaand',
     ACTIVE: 'Actief',
     INACTIVE: 'Inactief',
     EXPIRED: 'Verlopen',

@@ -1,17 +1,14 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.WeightTicketCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CancelWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CancelWeightTicketCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.UpdateWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
-import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
@@ -19,6 +16,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.Cancellati
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
+import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
@@ -31,6 +29,7 @@ class WeightTicketController(
   private val weightTicketService: WeightTicketService,
   private val updateWeightTicket: UpdateWeightTicket,
   private val cancelWeightTicket: CancelWeightTicket,
+  private val splitWeightTicket: SplitWeightTicket,
 ) {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -76,7 +75,43 @@ class WeightTicketController(
       )
     )
   }
+
+  @PostMapping("/{weightTicketId}/split")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun split(
+    @PathVariable
+    weightTicketId: Long,
+    @Valid @RequestBody request: SplitWeightTicketRequest
+  ): SplitWeightTicketResponse {
+    val newTicketId = splitWeightTicket.handle(
+      SplitWeightTicketCommand(
+        WeightTicketId(weightTicketId),
+        request.originalWeightTicketPercentage,
+        request.newWeightTicketPercentage,
+      )
+    )
+
+    return SplitWeightTicketResponse(
+      originalWeightTicketId = weightTicketId,
+      newWeightTicketId = newTicketId.number,
+    )
+  }
 }
+
+data class SplitWeightTicketRequest(
+  @field:Min(value = 1, message = "De minimale waarde bij splitsen is 1%")
+  @field:Max(value = 100, message = "De maximale waarde bij splitsen is 99%")
+  val originalWeightTicketPercentage: Int,
+
+  @field:Min(value = 1, message = "De minimale waarde bij splitsen is 1%")
+  @field:Max(value = 100, message = "De maximale waarde bij splitsen is 99%")
+  val newWeightTicketPercentage: Int,
+)
+
+data class SplitWeightTicketResponse(
+  val originalWeightTicketId: Long,
+  val newWeightTicketId: Long,
+)
 
 data class CancelWeightTicketRequest(
   @field:NotBlank(message = "Een reden van annulering is verplicht")
