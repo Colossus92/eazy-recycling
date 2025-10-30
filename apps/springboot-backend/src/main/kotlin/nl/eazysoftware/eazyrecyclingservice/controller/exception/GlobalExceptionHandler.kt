@@ -48,7 +48,7 @@ class GlobalExceptionHandler {
 
 
   @ExceptionHandler(IllegalStateException::class)
-  fun handleDuplicateKeyException(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
+  fun handleIllegalStateException(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
     val errorResponse = ErrorResponse(
       message = ex.message ?: "Deze actie brengt de data in een ongeldige staat en is niet toegestaan",
     )

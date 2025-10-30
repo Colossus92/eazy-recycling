@@ -87,7 +87,7 @@ export const MasterDataTab = <T,>({ data, searchQuery, openAddForm, editAction, 
                                 {data.items
                                     .slice((page - 1) * rowsPerPage, page * rowsPerPage)
                                     .map((item, index) => (
-                                        <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary">
+                                        <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary" onDoubleClick={() => editAction(item)}>
                                             {data.columns.map((col) => (
                                                 <td className="p-4" key={String(col.key)}>
                                                     {col.accessor(item)}

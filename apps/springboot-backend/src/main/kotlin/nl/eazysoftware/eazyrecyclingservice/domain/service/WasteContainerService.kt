@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.CreateContainerRequest
-import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.WasteContainerController.WasteContainerRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
@@ -12,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -24,6 +24,9 @@ class WasteContainerService(
 
     @Transactional
     fun createContainer(container: CreateContainerRequest) {
+        if (wasteContainerRepository.existsById(container.id)) {
+            throw DuplicateKeyException("Container met kenmerk ${container.id} bestaat al")
+        }
         wasteContainerRepository.save(requestToDto(container))
     }
 

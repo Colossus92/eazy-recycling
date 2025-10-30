@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.springframework.stereotype.Service

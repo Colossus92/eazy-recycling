@@ -15,7 +15,7 @@ export interface AdditionalAction<T> {
 interface ActionMenuProps<T> {
   onEdit?: (item: T) => void;
   onDelete: (item: T) => void;
-  deleteText: string;
+  deleteText?: string;
   item: T;
   additionalActions?: AdditionalAction<T>[];
 }

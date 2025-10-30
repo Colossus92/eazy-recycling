@@ -9,10 +9,9 @@ import { TextFormField } from "@/components/ui/form/TextFormField";
 import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 import { WasteContainerRequest, WasteContainerView } from "@/api/client/models";
 import { Company, companyService } from "@/api/services/companyService";
-import { SelectFormField } from "@/components/ui/form/selectfield/SelectFormField";
 import { useQuery } from "@tanstack/react-query";
-import { PostalCodeFormField } from "@/components/ui/form/PostalCodeFormField";
 import { TextAreaFormField } from "@/components/ui/form/TextAreaFormField";
+import { CompanyAddressInput } from "@/components/ui/form/CompanyAddressInput";
 
 interface WasteContainerFormProps {
     isOpen: boolean;
@@ -28,7 +27,7 @@ export interface WasteContainerFormValues {
     containerType: string;
     companyId?: string;
     street: string;
-    houseNumber: string;
+    buildingNumber: string;
     postalCode?: string;
     city: string;
     notes?: string;
@@ -44,7 +43,7 @@ function toWasteContainer(
         location: {
             address: {
                 streetName: data.street,
-                buildingNumber: data.houseNumber,
+                buildingNumber: data.buildingNumber,
                 postalCode: data.postalCode || '',
                 city: data.city,
                 country: 'Nederland',
@@ -61,7 +60,7 @@ function toWasteContainer(
                 companyName: company.name,
                 address: {
                     streetName: data.street,
-                    buildingNumber: data.houseNumber,
+                    buildingNumber: data.buildingNumber,
                     postalCode: data.postalCode || '',
                     city: data.city,
                     country: 'Nederland',
@@ -90,18 +89,6 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
         queryFn: () => companyService.getAll(),
     });
 
-    const companyOptions = companies.map((company) => ({
-        value: company.id || '',
-        label: company.name,
-    }));
-
-
-    const watchCompanyId = watch('companyId');
-    const hasCompanySelected =
-        watchCompanyId !== undefined &&
-        watchCompanyId !== null &&
-        watchCompanyId.length > 0;
-
     // Reset form when initialData changes (for edit mode)
     useEffect(() => {
         if (initialData) {
@@ -110,7 +97,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                 id: initialData.id,
                 companyId: initialData?.location?.companyId,
                 street: initialData?.location?.addressView?.street,
-                houseNumber: initialData?.location?.addressView?.houseNumber,
+                buildingNumber: initialData?.location?.addressView?.houseNumber,
                 postalCode: initialData?.location?.addressView?.postalCode,
                 city: initialData?.location?.addressView?.city,
                 notes: initialData.notes,
@@ -121,7 +108,7 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                 id: '',
                 companyId: '',
                 street: '',
-                houseNumber: '',
+                buildingNumber: '',
                 postalCode: '',
                 city: '',
                 notes: '',
@@ -129,23 +116,10 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
         }
     }, [initialData, reset]);
 
-    // Auto-fill address fields when company is selected
-    useEffect(() => {
-        if (hasCompanySelected) {
-            const company = companies.find((c) => c.id === watchCompanyId);
-            if (company) {
-                setValue('street', company.address.streetName || '');
-                setValue('houseNumber', company.address.buildingNumber || '');
-                setValue('postalCode', company.address.postalCode || '');
-                setValue('city', company.address.city || '');
-            }
-        }
-    }, [watchCompanyId, companies, setValue, hasCompanySelected]);
-
 
 
     const cancel = () => {
-        reset({ id: '', companyId: '', street: '', houseNumber: '', postalCode: '', city: '', notes: '', });
+        reset({ id: '', companyId: '', street: '', buildingNumber: '', postalCode: '', city: '', notes: '', });
         onCancel();
     }
 
@@ -188,83 +162,17 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
                             }}
                         />
 
-                        <div className="flex flex-col items-start self-stretch gap-4 p-4 bg-color-surface-secondary rounded-radius-md">
-                            <span className="text-subtitle-1">Huidige locatie</span>
-
-                            <div className="flex-grow-0 flex flex-col items-start self-stretch gap-4">
-                                <SelectFormField
-                                    title={'Kies bedrijf (optioneel)'}
-                                    placeholder={'Selecteer een bedrijf of vul zelf een adres in'}
-                                    options={companyOptions}
-                                    formHook={{
-                                        register,
-                                        name: 'companyId',
-                                        rules: {},
-                                        errors,
-                                        control,
-                                    }}
-                                />
-
-                                {hasCompanySelected && (
-                                    <div className="flex items-center max-w-96">
-                                        <span className="text-body-2 whitespace-normal break-words">
-                                            Adresgegevens worden automatisch ingevuld op basis van het
-                                            geselecteerde bedrijf
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="flex items-start self-stretch gap-4 flex-grow">
-                                <TextFormField
-                                    title={'Straat'}
-                                    placeholder={'Vul straatnaam in'}
-                                    formHook={{
-                                        register,
-                                        name: 'street',
-                                        errors,
-                                    }}
-                                    value={initialData?.location?.addressView?.street}
-                                    disabled={hasCompanySelected}
-                                />
-
-                                <TextFormField
-                                    title={'Nummer'}
-                                    placeholder={'Vul huisnummer in'}
-                                    formHook={{
-                                        register,
-                                        name: 'houseNumber',
-                                        errors,
-                                    }}
-                                    value={initialData?.location?.addressView?.houseNumber}
-                                    disabled={hasCompanySelected}
-                                />
-                            </div>
-
-                            <div className="flex items-start self-stretch gap-4">
-                                <PostalCodeFormField
-                                    register={register}
-                                    setValue={setValue}
-                                    errors={errors}
-                                    name="postalCode"
-                                    value={initialData?.location?.addressView?.postalCode}
-                                    required={false}
-                                    disabled={hasCompanySelected}
-                                />
-
-                                <TextFormField
-                                    title={'Plaats'}
-                                    placeholder={'Vul Plaats in'}
-                                    formHook={{
-                                        register,
-                                        name: 'city',
-                                        errors,
-                                    }}
-                                    value={initialData?.location?.addressView?.city}
-                                    disabled={hasCompanySelected}
-                                />
-                            </div>
-                        </div>
+                        <CompanyAddressInput
+                            formContext={{ register, formState: { errors }, control, watch, setValue } as any}
+                            fieldNames={{
+                                companyId: 'companyId',
+                                street: 'street',
+                                buildingNumber: 'buildingNumber',
+                                postalCode: 'postalCode',
+                                city: 'city',
+                            }}
+                            required={false}
+                        />
 
                         <TextAreaFormField
                             title={'Opmerkingen'}

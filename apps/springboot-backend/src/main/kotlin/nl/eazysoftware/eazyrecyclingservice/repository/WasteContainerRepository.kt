@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
 interface WasteContainerRepository: JpaRepository<WasteContainerDto, UUID> {
-
+    fun existsById(id: String): Boolean
 }

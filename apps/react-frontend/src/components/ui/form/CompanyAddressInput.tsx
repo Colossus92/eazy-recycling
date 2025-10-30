@@ -22,6 +22,7 @@ interface CompanyAddressInputProps<T extends FieldValues> {
   title?: string;
   includeBranches?: boolean;
   testId?: string;
+  required?: boolean;
 }
 
 export const CompanyAddressInput = <T extends FieldValues>({
@@ -30,6 +31,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
   title = 'Huidige locatie',
   includeBranches = false,
   testId,
+  required = true,
 }: CompanyAddressInputProps<T>) => {
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies', includeBranches],
@@ -258,7 +260,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
           formHook={{
             register,
             name: fieldNames.street,
-            rules: !hasCompanySelected
+            rules: !hasCompanySelected && required
               ? { required: 'Straat is verplicht' }
               : {},
             errors,
@@ -272,7 +274,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
           formHook={{
             register,
             name: fieldNames.buildingNumber,
-            rules: !hasCompanySelected
+            rules: !hasCompanySelected && required
               ? { required: 'Huisnummer is verplicht' }
               : {},
             errors,
@@ -288,7 +290,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
           errors={errors}
           name={fieldNames.postalCode}
           value={watch(fieldNames.postalCode)}
-          required={!hasCompanySelected}
+          required={!hasCompanySelected && required}
           disabled={hasCompanySelected}
         />
 
@@ -298,7 +300,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
           formHook={{
             register,
             name: fieldNames.city,
-            rules: !hasCompanySelected
+            rules: !hasCompanySelected && required
               ? { required: 'Plaats is verplicht' }
               : {},
             errors,
