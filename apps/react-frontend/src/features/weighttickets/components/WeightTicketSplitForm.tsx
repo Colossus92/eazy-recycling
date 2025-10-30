@@ -45,10 +45,10 @@ export const WeightTicketSplitForm = ({
         const values = formContext.getValues();
         
         // Validate that percentages add up to 100
-        const total = values.originalWeightTicketPercentage + values.newWeightTicketPercentage;
+        const total = Number(values.originalWeightTicketPercentage) + Number(values.newWeightTicketPercentage);
         if (total !== 100) {
             formContext.setError('originalWeightTicketPercentage', {
-                message: 'Percentages moeten optellen tot 100%'
+                message: `Totaal: ${total}% Percentages moeten optellen tot 100%`
             });
             return;
         }
@@ -64,7 +64,7 @@ export const WeightTicketSplitForm = ({
 
     const watchOriginal = formContext.watch('originalWeightTicketPercentage');
     const watchNew = formContext.watch('newWeightTicketPercentage');
-    const total = (watchOriginal || 0) + (watchNew || 0);
+    const total = Number(watchOriginal || 0) + Number(watchNew || 0);
     const isInvalid = total !== 100;
 
     return (

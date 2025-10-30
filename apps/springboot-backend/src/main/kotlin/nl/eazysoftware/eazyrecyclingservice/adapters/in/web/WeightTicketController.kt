@@ -77,7 +77,7 @@ class WeightTicketController(
   }
 
   @PostMapping("/{weightTicketId}/split")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   fun split(
     @PathVariable
     weightTicketId: Long,

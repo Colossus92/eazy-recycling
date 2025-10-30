@@ -23,6 +23,7 @@ interface WeightTicketFormProps {
     status?: string;
     onDelete: (id: number) => void;
     onSplit?: (id: number) => void;
+    noDialog?: boolean;
 }
 
 export const WeightTicketForm = ({
@@ -32,6 +33,7 @@ export const WeightTicketForm = ({
     status,
     onDelete,
     onSplit,
+    noDialog = false,
 }: WeightTicketFormProps) => {
     const {
         data,
@@ -78,30 +80,28 @@ export const WeightTicketForm = ({
 
     const handleSubmit = isDisabled ? (e: React.FormEvent) => e.preventDefault() : onSubmit;
 
-    return (
-        <ErrorBoundary fallbackRender={fallbackRender}>
-            <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
-                <div className={'w-full'}>
-                    <FormProvider {...formContext}>
-                        <form
-                            className="flex flex-col items-center self-stretch"
-                            onSubmit={handleSubmit}
-                        >
-                            <FormTopBar
-                                title={
-                                    data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'
-                                }
-                                actions={
-                                    data && (
-                                        <WeightTicketFormActionMenu 
-                                            weightTicket={data}
-                                            onDelete={onDelete}
-                                            onSplit={onSplit}
-                                        />
-                                    )
-                                }
-                                onClick={handleCancel}
-                            />
+    const formContent = (
+        <div className={'w-full h-full'}>
+            <FormProvider {...formContext}>
+                <form
+                    className="flex flex-col items-center self-stretch h-full"
+                    onSubmit={handleSubmit}
+                >
+                    <FormTopBar
+                        title={
+                            data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'
+                        }
+                        actions={
+                            data && (
+                                <WeightTicketFormActionMenu 
+                                    weightTicket={data}
+                                    onDelete={onDelete}
+                                    onSplit={onSplit}
+                                />
+                            )
+                        }
+                        onClick={handleCancel}
+                    />
                             <div
                                 className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
                                 >
@@ -186,6 +186,20 @@ export const WeightTicketForm = ({
                         </form>
                     </FormProvider>
                 </div>
+    );
+
+    if (noDialog) {
+        return (
+            <ErrorBoundary fallbackRender={fallbackRender}>
+                {formContent}
+            </ErrorBoundary>
+        );
+    }
+
+    return (
+        <ErrorBoundary fallbackRender={fallbackRender}>
+            <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
+                {formContent}
             </FormDialog>
         </ErrorBoundary>
     );
