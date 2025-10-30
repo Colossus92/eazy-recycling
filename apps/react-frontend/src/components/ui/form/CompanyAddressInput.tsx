@@ -126,7 +126,6 @@ export const CompanyAddressInput = <T extends FieldValues>({
   }, [
     watchCompanyId,
     fieldNames.branchId,
-    setValue,
     hasCompanySelected,
   ]);
 
@@ -149,7 +148,6 @@ export const CompanyAddressInput = <T extends FieldValues>({
     selectedCompany,
     hasBranchSelected,
     fieldNames.branchId,
-    setValue,
     includeBranches,
   ]);
 
@@ -204,8 +202,10 @@ export const CompanyAddressInput = <T extends FieldValues>({
     hasCompanySelected,
     hasBranchSelected,
     selectedCompany,
-    setValue,
-    fieldNames,
+    fieldNames.street,
+    fieldNames.buildingNumber,
+    fieldNames.postalCode,
+    fieldNames.city,
   ]);
 
   return (
