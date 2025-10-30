@@ -10,14 +10,16 @@ import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { WeightTicketCancellationForm } from '@/features/weighttickets/components/WeightTicketCancellationForm';
+import { WeightTicketSplitForm } from '@/features/weighttickets/components/WeightTicketSplitForm';
 import { WeightTicketFilterForm } from '@/features/weighttickets/components/WeightTicketFilterForm';
 import { WeightTicketForm } from '@/features/weighttickets/components/weightticketform/WeightTicketForm';
 import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
 import { useWeightTicketCrud } from '@/features/weighttickets/hooks/useWeightTicketCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
+import { weightTicketService } from '@/api/services/weightTicketService';
 
 type Column = {
   key: keyof WeightTicketListView;
@@ -30,7 +32,24 @@ type Column = {
 export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { read, form, deletion } = useWeightTicketCrud();
+  const [isNewWeightTicketFormOpen, setIsNewWeightTicketFormOpen] = useState(false);
+  const { read, form, deletion, split } = useWeightTicketCrud();
+
+  // Handle opening the new weight ticket form after split
+  useEffect(() => {
+    if (split.response) {
+      // First, update the currently open form with the original weight ticket
+      weightTicketService.getByNumber(split.response.originalWeightTicketId).then((data) => {
+        form.openForEdit({ id: data.id, status: data.status } as WeightTicketListView);
+      });
+      
+      // Then open the second form with the new weight ticket
+      weightTicketService.getByNumber(split.response.newWeightTicketId).then(() => {
+        setIsNewWeightTicketFormOpen(true);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [split.response]);
 
   const columns: Column[] = [
     { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
@@ -141,13 +160,34 @@ export const WeightTicketManagement = () => {
         weightTicketId={deletion.item}
         onCancel={deletion.confirm}
       />
+      <WeightTicketSplitForm
+        isOpen={Boolean(split.item)}
+        setIsOpen={split.cancel}
+        weightTicketId={split.item}
+        onSplit={split.confirm}
+      />
       <WeightTicketForm
         isOpen={form.isOpen}
         setIsOpen={form.close}
         weightTicketNumber={form.item?.id}
         status={form.item?.status}
         onDelete={deletion.initiate}
+        onSplit={split.initiate}
       />
+      {split.response && (
+        <WeightTicketForm
+          isOpen={isNewWeightTicketFormOpen}
+          setIsOpen={(value) => {
+            setIsNewWeightTicketFormOpen(value);
+            if (!value) {
+              split.clearResponse();
+            }
+          }}
+          weightTicketNumber={split.response.newWeightTicketId}
+          onDelete={deletion.initiate}
+          onSplit={split.initiate}
+        />
+      )}
       <Drawer
         title={'Weegbon filter'}
         isOpen={read.filter.isFilterOpen}

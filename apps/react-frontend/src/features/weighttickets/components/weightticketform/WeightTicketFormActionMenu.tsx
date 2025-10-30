@@ -5,20 +5,24 @@ import { WeightTicketDetailView } from '@/api/client/models';
 interface WeightTicketFormActionMenuProps {
     weightTicket: WeightTicketDetailView;
     onDelete: (id: number) => void;
+    onSplit?: (id: number) => void;
 }
 
 export const WeightTicketFormActionMenu = ({
     weightTicket,
     onDelete,
+    onSplit,
 }: WeightTicketFormActionMenuProps) => {
+    const canSplit = weightTicket.status === 'DRAFT' && onSplit;
+    
     return (<FormActionMenu
         onDelete={() => onDelete(weightTicket.id)}
-        additionalActions={[
+        additionalActions={canSplit ? [
             {
                 label: 'Splitsen',
                 icon: Plus,
-                onClick: () => {},
+                onClick: () => onSplit(weightTicket.id),
             },
-        ]}
+        ] : []}
     />);
 }

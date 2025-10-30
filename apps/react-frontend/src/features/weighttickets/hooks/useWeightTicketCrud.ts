@@ -1,4 +1,4 @@
-import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -23,6 +23,8 @@ export function useWeightTicketCrud() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<WeightTicketDetailView | undefined>(undefined);
   const [itemToDelete, setItemToDelete] = useState<number | undefined>(undefined);
+  const [itemToSplit, setItemToSplit] = useState<number | undefined>(undefined);
+  const [splitResponse, setSplitResponse] = useState<SplitWeightTicketResponse | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
     isDraft: false,
@@ -101,7 +103,7 @@ export function useWeightTicketCrud() {
   };
 
   const cancelMutation = useMutation({
-    mutationFn: ({number, cancellationReason}: {number: number, cancellationReason: string}) => weightTicketService.cancel(number, { cancellationReason }),
+    mutationFn: ({ number, cancellationReason }: { number: number, cancellationReason: string }) => weightTicketService.cancel(number, { cancellationReason }),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['weightTickets'] })
@@ -113,6 +115,34 @@ export function useWeightTicketCrud() {
   const cancel = async (number: number, cancellationReason: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       cancelMutation.mutate({ number, cancellationReason }, {
+        onSuccess: () => resolve(),
+        onError: (error) => reject(error),
+      });
+    });
+  };
+
+  const splitMutation = useMutation({
+    mutationFn: ({ weightTicketId, originalPercentage, newPercentage }: {
+      weightTicketId: number;
+      originalPercentage: number;
+      newPercentage: number;
+    }) => weightTicketService.split(weightTicketId, {
+      originalWeightTicketPercentage: originalPercentage,
+      newWeightTicketPercentage: newPercentage,
+    }),
+    onSuccess: (data) => {
+      queryClient
+        .invalidateQueries({ queryKey: ['weightTickets'] })
+        .then(() => {
+          setSplitResponse(data);
+          setItemToSplit(undefined);
+        });
+    },
+  });
+
+  const split = async (weightTicketId: number, originalPercentage: number, newPercentage: number): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      splitMutation.mutate({ weightTicketId, originalPercentage, newPercentage }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });
@@ -167,6 +197,14 @@ export function useWeightTicketCrud() {
       initiate: setItemToDelete,
       confirm: cancel,
       cancel: () => setItemToDelete(undefined),
+    },
+    split: {
+      item: itemToSplit,
+      response: splitResponse,
+      initiate: setItemToSplit,
+      confirm: split,
+      cancel: () => setItemToSplit(undefined),
+      clearResponse: () => setSplitResponse(undefined),
     },
   };
 }

@@ -22,6 +22,7 @@ interface WeightTicketFormProps {
     weightTicketNumber?: number;
     status?: string;
     onDelete: (id: number) => void;
+    onSplit?: (id: number) => void;
 }
 
 export const WeightTicketForm = ({
@@ -30,6 +31,7 @@ export const WeightTicketForm = ({
     weightTicketNumber,
     status,
     onDelete,
+    onSplit,
 }: WeightTicketFormProps) => {
     const {
         data,
@@ -94,6 +96,7 @@ export const WeightTicketForm = ({
                                         <WeightTicketFormActionMenu 
                                             weightTicket={data}
                                             onDelete={onDelete}
+                                            onSplit={onSplit}
                                         />
                                     )
                                 }
