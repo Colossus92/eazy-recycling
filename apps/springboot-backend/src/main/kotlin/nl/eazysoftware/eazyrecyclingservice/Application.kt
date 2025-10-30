@@ -1,17 +1,34 @@
 package nl.eazysoftware.eazyrecyclingservice
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.security.SecurityScheme
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import java.util.TimeZone
-import jakarta.annotation.PostConstruct
+import java.util.*
 
+@SecurityScheme(
+  name = "bearerAuth",
+  type = SecuritySchemeType.HTTP,
+  bearerFormat = "JWT",
+  `in` = SecuritySchemeIn.HEADER,
+  paramName = "Authorization",
+  scheme = "bearer"
+)
+@OpenAPIDefinition(
+  info = Info(title = "Eazy Recycling Backend Service", version = "0.0.1"),
+  security = [SecurityRequirement(name = "bearerAuth")]
+)
 @SpringBootApplication
 class Application {
-    
     @PostConstruct
     fun init() {
         // Set JVM default timezone to UTC for consistency

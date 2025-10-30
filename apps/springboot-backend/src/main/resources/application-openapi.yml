@@ -1,12 +1,13 @@
 spring:
-  # Datasource will be provided by Testcontainers @ServiceConnection
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: create-drop
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
   sql:
     init:
@@ -17,3 +18,8 @@ supabase:
     url: https://supabase.com
     jwt-secret: super-secret-jwt-token-with-at-least-32-characters-long
     jwt-issuer: http://localhost:54321/auth/v1
+
+
+springdoc:
+  api-docs:
+    enabled: true

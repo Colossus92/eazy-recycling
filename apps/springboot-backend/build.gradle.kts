@@ -122,7 +122,7 @@ openApi {
   outputDir.set(file("../../docs/openapi"))
   outputFileName.set("spec.yaml")
   customBootRun {
-    args.set(listOf("--spring.profiles.active=test"))
+    args.set(listOf("--spring.profiles.active=openapi"))
   }
 }
 tasks.withType<Test> {
