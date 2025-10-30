@@ -114,11 +114,11 @@ export const WeightTicketManagement = () => {
                       .map((item, index) => (
                         <tr
                           key={index}
-                          className="text-body-2 border-b border-solid border-color-border-primary cursor-pointer hover:bg-color-surface-secondary"
+                          className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
                           onDoubleClick={() => form.openForEdit(item)}
                         >
                           {columns.map((col) => (
-                            <td className="p-4 truncate" key={String(col.key)} title={col.title(item)}>
+                            <td className={`p-4 ${col.key !== 'status' ? 'truncate' : ''}`} key={String(col.key)} title={col.title(item)}>
                               {col.accessor(item)}
                             </td>
                           ))}
