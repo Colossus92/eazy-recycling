@@ -574,12 +574,27 @@ paths:
               $ref: "#/components/schemas/SplitWeightTicketRequest"
         required: true
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SplitWeightTicketResponse"
+  /weight-tickets/{weightTicketId}/complete:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: complete
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
   /weight-tickets/{weightTicketId}/cancel:
     post:
       tags:
@@ -2173,12 +2188,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2241,15 +2256,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2279,11 +2294,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2622,15 +2637,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond

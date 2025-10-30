@@ -5,6 +5,7 @@ import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Button } from '@/components/ui/button/Button';
 import { Drawer } from '@/components/ui/drawer/Drawer';
+import { ErrorDialog } from '@/components/ui/dialog/ErrorDialog';
 import { ActionMenu } from '@/features/crud/ActionMenu';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
@@ -33,7 +34,7 @@ export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDualFormOpen, setIsDualFormOpen] = useState(false);
-  const { read, form, deletion, split } = useWeightTicketCrud();
+  const { read, form, deletion, split, error } = useWeightTicketCrud();
 
   // Handle opening the dual form after split
   useEffect(() => {
@@ -166,6 +167,7 @@ export const WeightTicketManagement = () => {
           weightTicketNumber={form.item?.id}
           status={form.item?.status}
           onDelete={deletion.initiate}
+          onComplete={form.complete}
           onSplit={split.initiate}
         />
       ) : (
@@ -176,10 +178,11 @@ export const WeightTicketManagement = () => {
           newWeightTicketId={split.response.newWeightTicketId}
           onDelete={deletion.initiate}
           onSplit={split.initiate}
-          onComplete={() => {
+          onClose={() => {
             split.clearResponse();
             setIsDualFormOpen(false);
           }}
+          onComplete={form.complete}
         />
       )}
       <Drawer
@@ -193,6 +196,15 @@ export const WeightTicketManagement = () => {
           currentValues={read.filter.currentFormValues}
         />
       </Drawer>
+      <ErrorDialog
+        isOpen={!!error.message}
+        setIsOpen={(value) => {
+          if (!value) {
+            error.clear();
+          }
+        }}
+        errorMessage={error.message || ''}
+      />
     </>
   );
 };

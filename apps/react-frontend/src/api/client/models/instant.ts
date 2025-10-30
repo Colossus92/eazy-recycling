@@ -28,6 +28,12 @@ export interface Instant {
     'value'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof Instant
+     */
+    'value$kotlinx_datetime': string;
+    /**
+     * 
      * @type {number}
      * @memberof Instant
      */
@@ -38,11 +44,5 @@ export interface Instant {
      * @memberof Instant
      */
     'nanosecondsOfSecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Instant
-     */
-    'value$kotlinx_datetime': string;
 }
 

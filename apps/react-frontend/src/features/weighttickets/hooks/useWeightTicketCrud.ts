@@ -32,6 +32,7 @@ export function useWeightTicketCrud() {
     isInvoice: false,
     isCancelled: false,
   });
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
 
   const displayedWeightTickets = useMemo(
     () => {
@@ -138,6 +139,10 @@ export function useWeightTicketCrud() {
           setItemToSplit(undefined);
         });
     },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het splitsen';
+      setErrorMessage(message);
+    },
   });
 
   const split = async (weightTicketId: number, originalPercentage: number, newPercentage: number): Promise<void> => {
@@ -149,6 +154,27 @@ export function useWeightTicketCrud() {
     });
   };
 
+  const completeMutation = useMutation({
+    mutationFn: ({ weightTicketNumber }: { weightTicketNumber: number }) => weightTicketService.complete(weightTicketNumber),
+    onSuccess: async (_, { weightTicketNumber }) => {
+      await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
+      const refetchedWeightTicket = await weightTicketService.getByNumber(weightTicketNumber);
+      setItemToEdit(refetchedWeightTicket);
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het voltooien';
+      setErrorMessage(message);
+    },
+  });
+
+  const complete = async (weightTicketNumber: number): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      completeMutation.mutate({ weightTicketNumber }, {
+        onSuccess: () => resolve(),
+        onError: (error) => reject(error),
+      });
+    });
+  };
 
   return {
     read: {
@@ -184,6 +210,12 @@ export function useWeightTicketCrud() {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
+      complete: () => {
+        if (itemToEdit) {
+          complete(itemToEdit.id);
+        }
+        close();
+      },
       submit: async (item: WeightTicketRequest) => {
         if (itemToEdit) {
           return update(itemToEdit.id, item);
@@ -205,6 +237,10 @@ export function useWeightTicketCrud() {
       confirm: split,
       cancel: () => setItemToSplit(undefined),
       clearResponse: () => setSplitResponse(undefined),
+    },
+    error: {
+      message: errorMessage,
+      clear: () => setErrorMessage(undefined),
     },
   };
 }

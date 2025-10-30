@@ -103,6 +103,17 @@ class WeightTicket(
       createdAt = Clock.System.now()
     )
   }
+
+  fun complete() {
+    check(status == WeightTicketStatus.DRAFT) {
+      "Weegbon kan alleen worden voltooid als de status openstaand is"
+    }
+    check (!lines.isEmpty()) {
+      "Weegbon kan alleen worden voltooid als er minimaal één sorteerweging is"
+    }
+    this.status = WeightTicketStatus.COMPLETED
+    this.updatedAt = Clock.System.now()
+  }
 }
 
 enum class WeightTicketStatus {

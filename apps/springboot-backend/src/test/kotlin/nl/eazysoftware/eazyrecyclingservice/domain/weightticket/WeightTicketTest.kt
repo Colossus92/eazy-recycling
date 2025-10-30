@@ -177,5 +177,46 @@ class WeightTicketTest {
     }
   }
 
+  @Test
+  fun `can complete weight ticket with draft status and lines`() {
+    val weightTicket = weightTicket().apply {
+      lines = SAMPLE_LINES
+    }
+
+    assertDoesNotThrow {
+      weightTicket.complete()
+    }
+
+    assertThat(weightTicket.status).isEqualTo(WeightTicketStatus.COMPLETED)
+    assertThat(weightTicket.updatedAt).isNotNull
+  }
+
+  @Test
+  fun `cannot complete weight ticket without lines`() {
+    val weightTicket = weightTicket().apply {
+      lines = EMPTY_LINES
+    }
+
+    val exception = assertFailsWith<IllegalStateException> {
+      weightTicket.complete()
+    }
+
+    assertThat(exception).hasMessageContaining("Weegbon kan alleen worden voltooid als er minimaal één sorteerweging is")
+  }
+
+  @ParameterizedTest
+  @EnumSource(value = WeightTicketStatus::class, mode = EnumSource.Mode.EXCLUDE, names = ["DRAFT"])
+  fun `cannot complete weight ticket with non-draft status`(status: WeightTicketStatus) {
+    val weightTicket = weightTicket(status).apply {
+      lines = SAMPLE_LINES
+    }
+
+    val exception = assertFailsWith<IllegalStateException> {
+      weightTicket.complete()
+    }
+
+    assertThat(exception).hasMessageContaining("Weegbon kan alleen worden voltooid als de status openstaand is")
+  }
+
   private fun companyId(): CompanyId = CompanyId(UUID.randomUUID())
 }

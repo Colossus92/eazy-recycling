@@ -58,16 +58,16 @@ export interface LocalDate {
     'dayOfYear': number;
     /**
      * 
-     * @type {number}
-     * @memberof LocalDate
-     */
-    'monthNumber': number;
-    /**
-     * 
      * @type {string}
      * @memberof LocalDate
      */
     'value$kotlinx_datetime': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LocalDate
+     */
+    'monthNumber': number;
 }
 
 export const LocalDateMonthEnum = {

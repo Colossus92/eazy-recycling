@@ -9,6 +9,7 @@ interface WeightTicketDualFormProps {
     newWeightTicketId: number;
     onDelete: (id: number) => void;
     onSplit: (id: number) => void;
+    onClose: () => void;
     onComplete: () => void;
 }
 
@@ -19,6 +20,7 @@ export const WeightTicketDualForm = ({
     newWeightTicketId,
     onDelete,
     onSplit,
+    onClose,
     onComplete,
 }: WeightTicketDualFormProps) => {
     const [showSecond, setShowSecond] = useState(false);
@@ -49,9 +51,9 @@ export const WeightTicketDualForm = ({
         if (hasBeenOpened && !originalFormOpen && !newFormOpen && isOpen) {
             setIsOpen(false);
             setHasBeenOpened(false);
-            onComplete();
+            onClose();
         }
-    }, [originalFormOpen, newFormOpen, isOpen, hasBeenOpened, setIsOpen, onComplete]);
+    }, [originalFormOpen, newFormOpen, isOpen, hasBeenOpened, setIsOpen, onClose]);
 
     return (
         <Dialog
@@ -74,6 +76,7 @@ export const WeightTicketDualForm = ({
                                     onDelete={onDelete}
                                     onSplit={onSplit}
                                     noDialog={true}
+                                    onComplete={onComplete}
                                 />
                             </div>
                         )}
@@ -96,6 +99,7 @@ export const WeightTicketDualForm = ({
                                     onDelete={onDelete}
                                     onSplit={onSplit}
                                     noDialog={true}
+                                    onComplete={onComplete}
                                 />
                             </div>
                         )}

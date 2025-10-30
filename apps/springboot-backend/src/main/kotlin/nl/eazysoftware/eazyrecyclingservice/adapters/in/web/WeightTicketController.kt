@@ -4,24 +4,31 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.application.query.ConsignorView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketLineView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
+import kotlin.collections.map
 
+@PreAuthorize(HAS_ANY_ROLE)
 @RestController
 @RequestMapping("/weight-tickets")
 class WeightTicketController(
@@ -30,6 +37,7 @@ class WeightTicketController(
   private val updateWeightTicket: UpdateWeightTicket,
   private val cancelWeightTicket: CancelWeightTicket,
   private val splitWeightTicket: SplitWeightTicket,
+  private val completeWeightTicket: CompleteWeightTicket,
 ) {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -61,6 +69,7 @@ class WeightTicketController(
     updateWeightTicket.handle(WeightTicketId(weightTicketId), request.toCommand())
   }
 
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @PostMapping("/{weightTicketId}/cancel")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun cancel(
@@ -76,6 +85,7 @@ class WeightTicketController(
     )
   }
 
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @PostMapping("/{weightTicketId}/split")
   @ResponseStatus(HttpStatus.OK)
   fun split(
@@ -94,6 +104,20 @@ class WeightTicketController(
     return SplitWeightTicketResponse(
       originalWeightTicketId = weightTicketId,
       newWeightTicketId = newTicketId.number,
+    )
+  }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/{weightTicketId}/complete")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun complete(
+    @PathVariable
+    weightTicketId: Long,
+  ) {
+    completeWeightTicket.handle(
+      CompleteWeightTicketCommand(
+        WeightTicketId(weightTicketId)
+      )
     )
   }
 }

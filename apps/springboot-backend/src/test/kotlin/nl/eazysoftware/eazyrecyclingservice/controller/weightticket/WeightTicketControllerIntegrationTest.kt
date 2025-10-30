@@ -380,4 +380,43 @@ class WeightTicketControllerIntegrationTest {
         assertThat(deletedWeightTicket.get().status.name).isEqualTo("CANCELLED")
         assertThat(deletedWeightTicket.get().cancellationReason).isEqualTo("Good Reason")
     }
+
+    @Test
+    fun `can complete weight ticket with draft status and lines`() {
+        // Given - create weight ticket with lines
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id!!,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "150.75"
+                )
+            ),
+            note = "To be completed"
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // Verify initial status is DRAFT
+        val draftWeightTicket = weightTicketRepository.findById(weightTicketId)
+        assertThat(draftWeightTicket).isPresent
+        assertThat(draftWeightTicket.get().status.name).isEqualTo("DRAFT")
+
+        // When - complete the weight ticket
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+            .andExpect(status().isNoContent)
+
+        // Then - verify the weight ticket status is set to COMPLETED
+        val completedWeightTicket = weightTicketRepository.findById(weightTicketId)
+        assertThat(completedWeightTicket).isPresent
+        assertThat(completedWeightTicket.get().status.name).isEqualTo("COMPLETED")
+        assertThat(completedWeightTicket.get().updatedAt).isNotNull
+    }
 }

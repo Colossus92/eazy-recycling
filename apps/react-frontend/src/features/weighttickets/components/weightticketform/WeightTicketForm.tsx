@@ -15,6 +15,7 @@ import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
 import { useWeightTicketForm } from './useWeigtTicketFormHook';
 import { WeightTicketLinesSection } from './WeightTicketLinesSection';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
+import { useEffect, useState } from 'react';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
@@ -23,6 +24,7 @@ interface WeightTicketFormProps {
     status?: string;
     onDelete: (id: number) => void;
     onSplit?: (id: number) => void;
+    onComplete?: (id: number) => void;
     noDialog?: boolean;
 }
 
@@ -33,6 +35,7 @@ export const WeightTicketForm = ({
     status,
     onDelete,
     onSplit,
+    onComplete,
     noDialog = false,
 }: WeightTicketFormProps) => {
     const {
@@ -42,6 +45,7 @@ export const WeightTicketForm = ({
         mutation,
         resetForm
     } = useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const handleClose = (value: boolean) => {
         if (!value) {
@@ -55,7 +59,9 @@ export const WeightTicketForm = ({
         setIsOpen(false);
     };
 
-    const isDisabled = Boolean((data?.status || status) && (data?.status || status) !== 'DRAFT');
+    useEffect(() => {
+        setIsDisabled(Boolean((data?.status || status) && (data?.status || status) !== 'DRAFT'));
+    }, [data?.status, status]);
 
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies'],
@@ -97,6 +103,7 @@ export const WeightTicketForm = ({
                                     weightTicket={data}
                                     onDelete={onDelete}
                                     onSplit={onSplit}
+                                    onComplete={onComplete}
                                 />
                             )
                         }
