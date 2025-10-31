@@ -21,11 +21,11 @@ data class WeightTicketLineDto(
   fun toDomain() = WeightTicketLine(
     waste = WasteStreamNumber(this.wasteStreamNumber),
     weight = Weight(this.weightValue, when(this.weightUnit) {
-      WeightUnitDto.KILOGRAM -> Weight.WeightUnit.KILOGRAM
+      WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
     })
   )
 }
 
 enum class WeightUnitDto {
-  KILOGRAM,
+  kg,
 }

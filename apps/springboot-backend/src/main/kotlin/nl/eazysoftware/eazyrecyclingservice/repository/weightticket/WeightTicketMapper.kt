@@ -43,7 +43,7 @@ class WeightTicketMapper(
         Weight(
           it,
           when (dto.tarraWeightUnit) {
-            WeightUnitDto.KILOGRAM -> Weight.WeightUnit.KILOGRAM
+            WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
             null -> throw IllegalStateException("Tarra gewicht eenheid is niet gevonden voor weegbon met nummer ${dto.id}")
           },
         )
@@ -68,7 +68,7 @@ class WeightTicketMapper(
       lines = toDto(domain.lines),
       tarraWeightValue = domain.tarraWeight?.value,
       tarraWeightUnit = when(domain.tarraWeight?.unit) {
-        Weight.WeightUnit.KILOGRAM -> WeightUnitDto.KILOGRAM
+        Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
         null -> null
       },
       carrierParty = carrierParty,
@@ -95,7 +95,7 @@ class WeightTicketMapper(
           wasteStreamNumber = it.waste.number,
           weightValue = it.weight.value,
           weightUnit = when (it.weight.unit) {
-            Weight.WeightUnit.KILOGRAM -> WeightUnitDto.KILOGRAM
+            Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
           },
         )
       }

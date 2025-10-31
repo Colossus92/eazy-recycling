@@ -315,3 +315,10 @@ entrypoint = "./functions/pdf-generator/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/pdf-generator/*.html" ]
+
+[functions.weight-ticket-pdf-generator]
+enabled = true
+verify_jwt = true
+import_map = "./functions/weight-ticket-pdf-generator/deno.json"
+entrypoint = "./functions/weight-ticket-pdf-generator/index.ts"
+static_files = [ "./functions/weight-ticket-pdf-generator/logo.png" ]
