@@ -4,9 +4,9 @@ import {
   TransportControllerApi,
   TransportDetailView,
   TransportFinishedRequest,
-  WasteStreamDetailViewPickupLocation,
   WasteTransportControllerApi,
   WasteTransportRequest,
+  WeightTicketDetailViewPickupLocation,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
 import {
@@ -119,7 +119,7 @@ export const resolveLocationAddress = (
  * @returns The company ID or undefined if not a company location
  */
 export const resolveLocationCompanyId = (
-  location: WasteStreamDetailViewPickupLocation
+  location: WeightTicketDetailViewPickupLocation
 ): string | undefined => {
   const locationAny = location as any;
 
