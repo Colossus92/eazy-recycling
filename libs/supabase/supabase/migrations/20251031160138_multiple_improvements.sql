@@ -75,7 +75,3 @@ alter table "public"."weight_tickets" validate constraint "weight_tickets_pickup
 alter table "public"."transports" add constraint "transports_container_id_fkey" FOREIGN KEY (container_id) REFERENCES public.waste_containers(id) not valid;
 
 alter table "public"."transports" validate constraint "transports_container_id_fkey";
-
-CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
-
-

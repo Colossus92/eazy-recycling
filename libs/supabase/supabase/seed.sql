@@ -1,3 +1,5 @@
+SET search_path TO public, extensions;
+
 INSERT INTO auth.users (instance_id,
                         id,
                         aud,
@@ -16,7 +18,7 @@ INSERT INTO auth.users (instance_id,
                         email_change_token_new,
                         recovery_token)
 VALUES ('00000000-0000-0000-0000-000000000000',
-        uuid_generate_v4(),
+        gen_random_uuid(),
         'authenticated',
         'authenticated',
         'admin@eazyrecycling.nl',
@@ -33,7 +35,7 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '',
         ''),
         ('00000000-0000-0000-0000-000000000000',
-        uuid_generate_v4(),
+        gen_random_uuid(),
         'authenticated',
         'authenticated',
         'planner@eazyrecycling.nl',
@@ -50,7 +52,7 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '',
         ''),
         ('00000000-0000-0000-0000-000000000000',
-        uuid_generate_v4(),
+        gen_random_uuid(),
         'authenticated',
         'authenticated',
         'chauffeur@eazyrecycling.nl',
@@ -139,8 +141,5 @@ VALUES ('A.01', 'Bewaren'),
        ('G.01', 'Direct storten'),
        ('G.02', 'Immobiliseren');
 
-INSERT INTO "public"."waste_stream" ("number", "name") VALUES
-	('087970000135', 'ijzer en staal');
-
-INSERT INTO "public"."waste_containers" ("uuid", "id", "type", "created_at", "updated_at", "location_company_id", "street_name", "postal_code", "city", "building_number", "building_name", "country", "notes") VALUES
-	('3eb0e01e-155c-4e0a-9162-3f4d14d0f13f', '40M001', NULL, '2025-09-22 08:04:13.247323+00', '2025-09-22 08:04:13.247323+00', NULL, '', '', '', '', NULL, 'Nederland', '');
+INSERT INTO "public"."waste_containers" ("id", "type", "created_at", "updated_at", "location_company_id", "street_name", "postal_code", "city", "building_number", "building_name", "country", "notes") VALUES
+	('40M001', NULL, '2025-09-22 08:04:13.247323+00', '2025-09-22 08:04:13.247323+00', NULL, '', '', '', '', NULL, 'Nederland', '');
