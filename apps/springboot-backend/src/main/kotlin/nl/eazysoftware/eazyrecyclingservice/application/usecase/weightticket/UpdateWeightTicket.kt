@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,6 +22,7 @@ class UpdateWeightTicketService(
 
     weightTicket.update(
       lines = cmd.lines,
+      tarraWeight = cmd.tarraWeight,
       carrierParty = cmd.carrierParty,
       consignorParty = cmd.consignorParty,
       truckLicensePlate = cmd.truckLicensePlate,

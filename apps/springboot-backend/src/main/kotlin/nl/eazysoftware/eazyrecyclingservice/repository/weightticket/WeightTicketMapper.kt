@@ -7,11 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -38,6 +34,15 @@ class WeightTicketMapper(
         .map { it.toDomain() }
         .toMutableList()
         .let { WeightTicketLines(it) },
+      tarraWeight = dto.tarraWeightValue?.let {
+        Weight(
+          it,
+          when (dto.tarraWeightUnit) {
+            WeightUnitDto.KILOGRAM -> Weight.WeightUnit.KILOGRAM
+            null -> throw IllegalStateException("Tarra gewicht eenheid is niet gevonden voor weegbon met nummer ${dto.id}")
+          },
+        )
+      },
     )
   }
 
@@ -56,6 +61,11 @@ class WeightTicketMapper(
       id = domain.id.number,
       consignorParty = consignorParty,
       lines = toDto(domain.lines),
+      tarraWeightValue = domain.tarraWeight?.value,
+      tarraWeightUnit = when(domain.tarraWeight?.unit) {
+        Weight.WeightUnit.KILOGRAM -> WeightUnitDto.KILOGRAM
+        null -> null
+      },
       carrierParty = carrierParty,
       truckLicensePlate = domain.truckLicensePlate?.value,
       reclamation = domain.reclamation,

@@ -1146,6 +1146,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WeightTicketLineRequest"
+        tarraWeight:
+          $ref: "#/components/schemas/WeightRequest"
         carrierParty:
           type: string
           format: uuid
@@ -2188,12 +2190,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2256,15 +2258,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2294,11 +2296,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -2637,15 +2639,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
-        epochSeconds:
-          type: integer
-          format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
+        epochSeconds:
+          type: integer
+          format: int64
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond

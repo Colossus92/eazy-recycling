@@ -6,11 +6,16 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 
 class WeightTicket(
   val id: WeightTicketId,
   var consignorParty: Consignor,
   var status: WeightTicketStatus = WeightTicketStatus.DRAFT,
+  /**
+   * The weight of any kind of container (waste container, truck) without waste
+   */
+  var tarraWeight: Weight?,
   var lines: WeightTicketLines,
   var carrierParty: CompanyId?,
   var truckLicensePlate: LicensePlate?,
@@ -40,6 +45,7 @@ class WeightTicket(
     lines: WeightTicketLines = this.lines,
     carrierParty: CompanyId? = this.carrierParty,
     consignorParty: Consignor = this.consignorParty,
+    tarraWeight: Weight? = this.tarraWeight,
     truckLicensePlate: LicensePlate? = this.truckLicensePlate,
     reclamation: String? = this.reclamation,
     note: Note? = this.note,
@@ -48,6 +54,7 @@ class WeightTicket(
       "Weegbon kan alleen worden gewijzigd als de status concept is."
     }
     this.lines = lines
+    this.tarraWeight = tarraWeight
     this.carrierParty = carrierParty
     this.consignorParty = consignorParty
     this.truckLicensePlate = truckLicensePlate
@@ -96,6 +103,7 @@ class WeightTicket(
       consignorParty = this.consignorParty,
       status = WeightTicketStatus.DRAFT,
       lines = WeightTicketLines(newLines),
+      tarraWeight = this.tarraWeight,
       carrierParty = this.carrierParty,
       truckLicensePlate = this.truckLicensePlate,
       reclamation = this.reclamation,

@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import java.math.BigDecimal
 import java.time.Instant
 @Entity
 @Table(name = "weight_tickets")
@@ -20,6 +21,11 @@ data class WeightTicketDto(
     joinColumns = [JoinColumn(name = "weight_ticket_id")]
   )
   val lines: List<WeightTicketLineDto> = emptyList(),
+
+  @Column(name = "tarra_weight", nullable = true)
+  val tarraWeightValue: BigDecimal?,
+  @Enumerated(EnumType.STRING)
+  val tarraWeightUnit: WeightUnitDto?,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id")

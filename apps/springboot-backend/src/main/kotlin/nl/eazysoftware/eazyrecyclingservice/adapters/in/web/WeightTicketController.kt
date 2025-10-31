@@ -4,13 +4,9 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
-import kotlinx.datetime.toKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.application.query.ConsignorView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
-import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketLineView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -18,15 +14,16 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
-import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
 import java.util.*
-import kotlin.collections.map
 
 @PreAuthorize(HAS_ANY_ROLE)
 @RestController
@@ -145,6 +142,7 @@ data class CancelWeightTicketRequest(
 data class WeightTicketRequest(
   val consignorParty: ConsignorRequest,
   val lines: List<WeightTicketLineRequest>,
+  val tarraWeight: WeightRequest?,
   val carrierParty: UUID?,
   val truckLicensePlate: String?,
   val reclamation: String?,
@@ -153,6 +151,7 @@ data class WeightTicketRequest(
   fun toCommand(): WeightTicketCommand {
     return WeightTicketCommand(
       lines = lines.toDomain(),
+      tarraWeight = tarraWeight?.toDomain(),
       consignorParty = consignorParty.toDomain(),
       carrierParty = carrierParty?.let { CompanyId(it) },
       truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },
@@ -172,7 +171,14 @@ data class WeightTicketLineRequest(
 data class WeightRequest(
   val value: String,
   val unit: WeightUnitRequest,
-)
+) {
+  fun toDomain() = Weight(
+    value = BigDecimal(value),
+    unit = when (unit) {
+      WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
+    }
+  )
+}
 
 enum class WeightUnitRequest {
   KG,
@@ -183,12 +189,7 @@ fun List<WeightTicketLineRequest>.toDomain(): WeightTicketLines {
     this.map { line ->
       WeightTicketLine(
         waste = WasteStreamNumber(line.wasteStreamNumber),
-        weight = Weight(
-          value = BigDecimal(line.weight.value),
-          unit = when (line.weight.unit) {
-            WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
-          }
-        )
+        weight = line.weight.toDomain()
       )
     }
   )
