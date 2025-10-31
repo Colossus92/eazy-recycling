@@ -16,6 +16,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
   disabled = false,
   placeholder,
   formHook,
+  step = 'any',
   ...props
 }: InputProps<TFieldValues>) => {
   const textColorClasses = disabled
@@ -34,7 +35,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
     <div className={clsx(formInputClasses.container, textColorClasses)}>
       <input
         type={'number'}
-        step={'any'}
+        step={step}
         placeholder={placeholder}
         className={clsx(
           'h-10',
@@ -46,7 +47,14 @@ export const NumberInput = <TFieldValues extends FieldValues>({
         )}
         disabled={disabled}
         {...(formHook?.register && formHook?.name
-          ? formHook?.register(formHook?.name, formHook?.rules)
+          ? formHook?.register(formHook?.name, { 
+              ...(formHook?.rules || {}), 
+              setValueAs: (v: string) => {
+                if (v === '' || v === null || v === undefined) return undefined;
+                const parsed = parseFloat(v);
+                return isNaN(parsed) ? undefined : parsed;
+              }
+            } as any)
           : {})}
         {...props}
       />

@@ -6,6 +6,7 @@ import {
     WeightTicketDetailViewConsignorParty,
     CompanyView,
     WeightTicketRequest,
+    WeightTicketRequestTarraWeightUnitEnum,
 } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 
@@ -17,11 +18,13 @@ export interface WeightTicketLineFormValues {
 
 export interface WeightTicketFormValues {
     consignorPartyId: string;
-    carrierPartyId?: string;
-    truckLicensePlate?: string;
-    reclamation?: string;
-    note?: string;
+    carrierPartyId: string;
+    truckLicensePlate: string;
+    reclamation: string;
+    note: string;
     lines: WeightTicketLineFormValues[];
+    tarraWeightValue?: number;
+    tarraWeightUnit?: string;
 }
 
 export function useWeightTicketForm(
@@ -29,6 +32,19 @@ export function useWeightTicketForm(
     onSuccess?: () => void
 ) {
     const queryClient = useQueryClient();
+    const formContext = useForm<WeightTicketFormValues>({
+        defaultValues: {
+            consignorPartyId: '',
+            carrierPartyId: '',
+            truckLicensePlate: '',
+            reclamation: '',
+            note: '',
+            lines: [],
+            tarraWeightValue: undefined,
+            tarraWeightUnit: undefined,
+        }
+    });
+    
     const { data, isLoading } = useQuery({
         queryKey: ['weightTickets', weightTicketNumber],
         queryFn: async () => {
@@ -39,16 +55,6 @@ export function useWeightTicketForm(
             return response;
         },
         enabled: !!weightTicketNumber,
-    });
-    const formContext = useForm<WeightTicketFormValues>({
-        defaultValues: {
-            consignorPartyId: '',
-            carrierPartyId: undefined,
-            truckLicensePlate: undefined,
-            reclamation: undefined,
-            note: undefined,
-            lines: [],
-        }
     });
     const mutation = useMutation({
         mutationFn: async (data: WeightTicketFormValues) => {
@@ -82,11 +88,13 @@ export function useWeightTicketForm(
     const resetForm = () => {
         formContext.reset({
             consignorPartyId: '',
-            carrierPartyId: undefined,
-            truckLicensePlate: undefined,
-            reclamation: undefined,
-            note: undefined,
+            carrierPartyId: '',
+            truckLicensePlate: '',
+            reclamation: '',
+            note: '',
             lines: [],
+            tarraWeightValue: NaN,
+            tarraWeightUnit: undefined,
         });
     };
 
@@ -125,15 +133,17 @@ const weightTicketDetailsToFormValues = (weightTicketDetails: WeightTicketDetail
 
     return {
         consignorPartyId: consignorCompany.id || '',
-        carrierPartyId: weightTicketDetails.carrierParty?.id,
-        truckLicensePlate: weightTicketDetails.truckLicensePlate,
-        reclamation: weightTicketDetails.reclamation,
-        note: weightTicketDetails.note,
+        carrierPartyId: weightTicketDetails.carrierParty?.id || '',
+        truckLicensePlate: weightTicketDetails.truckLicensePlate || '',
+        reclamation: weightTicketDetails.reclamation || '',
+        note: weightTicketDetails.note || '',
         lines: (weightTicketDetails.lines || []).map(line => ({
             wasteStreamNumber: line.wasteStreamNumber || '',
             weightValue: line.weightValue?.toString() || '',
             weightUnit: line.weightUnit || 'KG',
         })),
+        tarraWeightValue: weightTicketDetails.tarraWeightValue,
+        tarraWeightUnit: weightTicketDetails.tarraWeightUnit,
     };
 }
 
@@ -148,10 +158,10 @@ const formValuesToWeightTicketRequest = (
             type: 'company',
             companyId: formValues.consignorPartyId
         } as any,
-        carrierParty: formValues.carrierPartyId,
-        truckLicensePlate: formValues.truckLicensePlate,
-        reclamation: formValues.reclamation,
-        note: formValues.note,
+        carrierParty: formValues.carrierPartyId || undefined,
+        truckLicensePlate: formValues.truckLicensePlate || undefined,
+        reclamation: formValues.reclamation || undefined,
+        note: formValues.note || undefined,
         lines: formValues.lines.map(line => ({
             wasteStreamNumber: line.wasteStreamNumber,
             weight: {
@@ -159,5 +169,7 @@ const formValuesToWeightTicketRequest = (
                 unit: 'KG',
             },
         })),
+        tarraWeightValue: formValues.tarraWeightValue?.toString(),
+        tarraWeightUnit: WeightTicketRequestTarraWeightUnitEnum.Kg,
     };
 }

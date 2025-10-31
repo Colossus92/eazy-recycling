@@ -98,7 +98,6 @@ export const WeightTicketSplitForm = ({
                                             },
                                             errors: formContext.formState.errors,
                                         }}
-                                        value={formContext.watch('originalWeightTicketPercentage')?.toString()}
                                     />
                                     <NumberFormField
                                         title={'Nieuw weegbon percentage (%)'}
@@ -114,7 +113,6 @@ export const WeightTicketSplitForm = ({
                                             },
                                             errors: formContext.formState.errors,
                                         }}
-                                        value={formContext.watch('newWeightTicketPercentage')?.toString()}
                                     />
                                     {isInvalid && (
                                         <div className="text-caption-1 text-color-status-error-dark">

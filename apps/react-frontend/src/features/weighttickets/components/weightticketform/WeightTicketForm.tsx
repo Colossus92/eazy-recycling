@@ -16,6 +16,7 @@ import { useWeightTicketForm } from './useWeigtTicketFormHook';
 import { WeightTicketLinesSection } from './WeightTicketLinesSection';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { useEffect, useState } from 'react';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
@@ -80,7 +81,7 @@ export const WeightTicketForm = ({
                 (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
             ),
         };
-        
+
         await mutation.mutateAsync(filteredFormValues);
     });
 
@@ -99,7 +100,7 @@ export const WeightTicketForm = ({
                         }
                         actions={
                             data && (
-                                <WeightTicketFormActionMenu 
+                                <WeightTicketFormActionMenu
                                     weightTicket={data}
                                     onDelete={onDelete}
                                     onSplit={onSplit}
@@ -109,90 +110,109 @@ export const WeightTicketForm = ({
                         }
                         onClick={handleCancel}
                     />
-                            <div
-                                className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
-                                >
-                                {data?.cancellationReason && <Note note={data?.cancellationReason} />}
-                                {isLoading ? (
-                                    <div className="flex justify-center items-center w-full p-8">
-                                        <p>Weegbon laden...</p>
-                                    </div>
-                                ) : (
-                                    <div className={'flex flex-col items-start self-stretch gap-4'}>
-                                        {data?.status && <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />}
-                                        <div className="w-1/2">
-                                            <SelectFormField
-                                                title={'Opdrachtgever'}
-                                                placeholder={'Selecteer een opdrachtgever'}
-                                                options={companyOptions}
-                                                testId="consignor-party-select"
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    register: formContext.register,
-                                                    name: 'consignorPartyId',
-                                                    rules: { required: 'Opdrachtgever is verplicht' },
-                                                    errors: formContext.formState.errors,
-                                                    control: formContext.control,
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="w-1/2">
-                                            <SelectFormField
-                                                title={'Vervoerder'}
-                                                placeholder={'Selecteer een vervoerder'}
-                                                options={companyOptions}
-                                                testId="carrier-party-select"
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    register: formContext.register,
-                                                    name: 'carrierPartyId',
-                                                    errors: formContext.formState.errors,
-                                                    control: formContext.control,
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="w-1/2">
-                                            <TruckSelectFormField
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    register: formContext.register,
-                                                    name: 'truckLicensePlate',
-                                                    errors: formContext.formState.errors,
-                                                    control: formContext.control,
-                                                }}
-                                            />
-                                        </div>
-                                        <WeightTicketLinesSection disabled={isDisabled} />
-                                        <TextFormField
-                                            title={'Reclamatie'}
-                                            placeholder={'Vul reclamatie in'}
-                                            disabled={isDisabled}
-                                            formHook={{
-                                                register: formContext.register,
-                                                name: 'reclamation',
-                                                errors: formContext.formState.errors,
-                                            }}
-                                            value={formContext.getValues('reclamation')}
-                                        />
-                                        <TextAreaFormField
-                                            title={'Opmerkingen'}
-                                            placeholder={'Plaats opmerkingen'}
-                                            disabled={isDisabled}
-                                            formHook={{
-                                                register: formContext.register,
-                                                name: 'note',
-                                                rules: {},
-                                                errors: formContext.formState.errors,
-                                            }}
-                                            value={formContext.getValues('note')}
-                                        />
-                                    </div>
-                                )}
+                    <div
+                        className={'flex flex-col items-start self-stretch gap-5 p-4 max-h-[calc(100vh-200px)] overflow-y-auto'}
+                    >
+                        {data?.cancellationReason && <Note note={data?.cancellationReason} />}
+                        {isLoading ? (
+                            <div className="flex justify-center items-center w-full p-8">
+                                <p>Weegbon laden...</p>
                             </div>
-                            <FormActionButtons onClick={handleCancel} item={data} disabled={isDisabled} />
-                        </form>
-                    </FormProvider>
-                </div>
+                        ) : (
+                            <div className={'flex flex-col items-start self-stretch gap-4'}>
+                                {data?.status && <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />}
+                                <div className="w-1/2">
+                                    <SelectFormField
+                                        title={'Opdrachtgever'}
+                                        placeholder={'Selecteer een opdrachtgever'}
+                                        options={companyOptions}
+                                        testId="consignor-party-select"
+                                        disabled={isDisabled}
+                                        formHook={{
+                                            register: formContext.register,
+                                            name: 'consignorPartyId',
+                                            rules: { required: 'Opdrachtgever is verplicht' },
+                                            errors: formContext.formState.errors,
+                                            control: formContext.control,
+                                        }}
+                                    />
+                                </div>
+                                <div className="w-1/2">
+                                    <SelectFormField
+                                        title={'Vervoerder'}
+                                        placeholder={'Selecteer een vervoerder'}
+                                        options={companyOptions}
+                                        testId="carrier-party-select"
+                                        disabled={isDisabled}
+                                        formHook={{
+                                            register: formContext.register,
+                                            name: 'carrierPartyId',
+                                            errors: formContext.formState.errors,
+                                            control: formContext.control,
+                                        }}
+                                    />
+                                </div>
+                                <div className="w-1/2">
+                                    <TruckSelectFormField
+                                        disabled={isDisabled}
+                                        formHook={{
+                                            register: formContext.register,
+                                            name: 'truckLicensePlate',
+                                            errors: formContext.formState.errors,
+                                            control: formContext.control,
+                                        }}
+                                    />
+                                </div>
+                                <WeightTicketLinesSection disabled={isDisabled} />
+                                <div className="flex items-start self-stretch gap-4">
+                                    <NumberFormField
+                                        title={'Tarra'}
+                                        placeholder={'Vul tarra in'}
+                                        step={0.01}
+                                        disabled={isDisabled}
+                                        formHook={{
+                                            register: formContext.register,
+                                            name: 'tarraWeightValue',
+                                            errors: formContext.formState.errors,
+                                        }}
+                                    />
+                                    <div className="flex flex-col items-start gap-2">
+                                        <label className="text-caption-2">
+                                            Eenheid
+                                        </label>
+                                        <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
+                                            kg
+                                        </div>
+                                    </div>
+                                </div>
+                                <TextFormField
+                                    title={'Reclamatie'}
+                                    placeholder={'Vul reclamatie in'}
+                                    disabled={isDisabled}
+                                    formHook={{
+                                        register: formContext.register,
+                                        name: 'reclamation',
+                                        errors: formContext.formState.errors,
+                                    }}
+                                />
+                                <TextAreaFormField
+                                    title={'Opmerkingen'}
+                                    placeholder={'Plaats opmerkingen'}
+                                    disabled={isDisabled}
+                                    formHook={{
+                                        register: formContext.register,
+                                        name: 'note',
+                                        rules: {},
+                                        errors: formContext.formState.errors,
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <FormActionButtons onClick={handleCancel} item={data} disabled={isDisabled} />
+                </form>
+            </FormProvider>
+        </div>
     );
 
     if (noDialog) {

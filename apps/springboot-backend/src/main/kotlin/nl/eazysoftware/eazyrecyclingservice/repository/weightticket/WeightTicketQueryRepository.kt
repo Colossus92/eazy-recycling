@@ -42,7 +42,7 @@ class WeightTicketQueryRepository(
         id = columns[0] as Long,
         consignorPartyName = columns[1] as String,
         status = WeightTicketStatus.valueOf(columns[2] as String),
-        note = columns[3] as String,
+        note = columns[3] as String?,
       )
     }
   }
@@ -61,6 +61,8 @@ class WeightTicketQueryRepository(
           weightUnit = line.weightUnit.name,
         )
       },
+      tarraWeightValue = weightTicket.tarraWeightValue,
+      tarraWeightUnit = weightTicket.tarraWeightUnit.toString(),
       carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },
       truckLicensePlate = weightTicket.truckLicensePlate,
       reclamation = weightTicket.reclamation,

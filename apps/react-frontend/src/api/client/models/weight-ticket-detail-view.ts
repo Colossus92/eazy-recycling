@@ -58,6 +58,18 @@ export interface WeightTicketDetailView {
     'lines': Array<WeightTicketLineView>;
     /**
      * 
+     * @type {number}
+     * @memberof WeightTicketDetailView
+     */
+    'tarraWeightValue'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'tarraWeightUnit'?: string;
+    /**
+     * 
      * @type {CompanyView}
      * @memberof WeightTicketDetailView
      */

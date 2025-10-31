@@ -1146,8 +1146,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WeightTicketLineRequest"
-        tarraWeight:
-          $ref: "#/components/schemas/WeightRequest"
+        tarraWeightValue:
+          type: string
+        tarraWeightUnit:
+          type: string
+          enum:
+          - KG
         carrierParty:
           type: string
           format: uuid
@@ -2190,12 +2194,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2258,15 +2262,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2296,11 +2300,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2326,6 +2330,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WeightTicketLineView"
+        tarraWeightValue:
+          type: number
+        tarraWeightUnit:
+          type: string
         carrierParty:
           $ref: "#/components/schemas/CompanyView"
         truckLicensePlate:
@@ -2639,15 +2647,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         nanosecondsOfSecond:
           type: integer
           format: int32
         epochSeconds:
           type: integer
           format: int64
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond

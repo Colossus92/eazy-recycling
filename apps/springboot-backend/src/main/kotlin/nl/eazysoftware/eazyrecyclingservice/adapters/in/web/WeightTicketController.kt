@@ -142,7 +142,8 @@ data class CancelWeightTicketRequest(
 data class WeightTicketRequest(
   val consignorParty: ConsignorRequest,
   val lines: List<WeightTicketLineRequest>,
-  val tarraWeight: WeightRequest?,
+  val tarraWeightValue: String?,
+  val tarraWeightUnit: WeightUnitRequest?,
   val carrierParty: UUID?,
   val truckLicensePlate: String?,
   val reclamation: String?,
@@ -151,7 +152,15 @@ data class WeightTicketRequest(
   fun toCommand(): WeightTicketCommand {
     return WeightTicketCommand(
       lines = lines.toDomain(),
-      tarraWeight = tarraWeight?.toDomain(),
+      tarraWeight = tarraWeightValue?.let {
+        Weight (
+          BigDecimal(tarraWeightValue),
+          when (tarraWeightUnit) {
+            WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
+            null -> throw IllegalArgumentException("Tarra gewicht eenheid is verplicht bij het opgeven van een gewicht")
+          }
+        )
+                                          },
       consignorParty = consignorParty.toDomain(),
       carrierParty = carrierParty?.let { CompanyId(it) },
       truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },

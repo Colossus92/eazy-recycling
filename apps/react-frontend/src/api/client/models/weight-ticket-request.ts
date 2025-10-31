@@ -15,9 +15,6 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WeightRequest } from './weight-request';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { WeightTicketLineRequest } from './weight-ticket-line-request';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -43,10 +40,16 @@ export interface WeightTicketRequest {
     'lines': Array<WeightTicketLineRequest>;
     /**
      * 
-     * @type {WeightRequest}
+     * @type {string}
      * @memberof WeightTicketRequest
      */
-    'tarraWeight'?: WeightRequest;
+    'tarraWeightValue'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
+    'tarraWeightUnit'?: WeightTicketRequestTarraWeightUnitEnum;
     /**
      * 
      * @type {string}
@@ -72,4 +75,11 @@ export interface WeightTicketRequest {
      */
     'note'?: string;
 }
+
+export const WeightTicketRequestTarraWeightUnitEnum = {
+    Kg: 'KG'
+} as const;
+
+export type WeightTicketRequestTarraWeightUnitEnum = typeof WeightTicketRequestTarraWeightUnitEnum[keyof typeof WeightTicketRequestTarraWeightUnitEnum];
+
 
