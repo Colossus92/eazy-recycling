@@ -22,7 +22,6 @@ interface WasteContainerFormProps {
 }
 
 export interface WasteContainerFormValues {
-    uuid?: string;
     id: string;
     containerType: string;
     companyId?: string;
@@ -38,7 +37,6 @@ function toWasteContainer(
     companies: Company[]
 ): WasteContainerRequest {
     const container: WasteContainerRequest = {
-        uuid: data.uuid || crypto.randomUUID(),
         id: data.id,
         location: {
             address: {
@@ -93,7 +91,6 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
     useEffect(() => {
         if (initialData) {
             reset({
-                uuid: initialData.uuid,
                 id: initialData.id,
                 companyId: initialData?.location?.companyId,
                 street: initialData?.location?.addressView?.street,

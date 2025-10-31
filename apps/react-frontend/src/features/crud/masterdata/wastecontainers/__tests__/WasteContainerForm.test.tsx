@@ -120,7 +120,7 @@ describe('WasteContainerForm Tests', () => {
             },
           },
         });
-        expect(submittedData.uuid).toBeDefined();
+        expect(submittedData.id).toBeDefined();
       });
 
       // Verify onCancel was called after successful submission
@@ -156,7 +156,6 @@ describe('WasteContainerForm Tests', () => {
 
     it('calls onSubmit with correct data when updating an existing waste container', async () => {
       const existingContainer: WasteContainerView = {
-        uuid: 'existing-uuid',
         id: 'CONT-002',
         location: {
           addressView: {
@@ -202,7 +201,6 @@ describe('WasteContainerForm Tests', () => {
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith(
           expect.objectContaining({
-            uuid: 'existing-uuid',
             id: 'CONT-002',
             location: expect.objectContaining({
               address: expect.objectContaining({
@@ -271,7 +269,6 @@ describe('WasteContainerForm Tests', () => {
 
     it('renders correctly in edit mode', async () => {
       const existingContainer: WasteContainerView = {
-        uuid: 'test-uuid',
         id: 'CONT-004',
         location: {
           addressView: {

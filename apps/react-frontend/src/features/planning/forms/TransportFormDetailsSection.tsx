@@ -24,7 +24,7 @@ export const TransportFormDetailsSection = () => {
   });
 
   const containerOptions: Option[] = wastecontainers.map((container) => ({
-    value: container.uuid,
+    value: container.id,
     label: container.id,
   }));
   return (

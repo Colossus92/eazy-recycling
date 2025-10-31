@@ -377,7 +377,6 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: OK
@@ -395,7 +394,6 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -419,7 +417,6 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
       responses:
         "204":
           description: No Content
@@ -1417,7 +1414,6 @@ components:
           type: string
         containerId:
           type: string
-          format: uuid
         note:
           type: string
         wasteStreamNumber:
@@ -1523,7 +1519,6 @@ components:
           type: string
         containerId:
           type: string
-          format: uuid
         note:
           type: string
       required:
@@ -1716,9 +1711,6 @@ components:
     WasteContainerRequest:
       type: object
       properties:
-        uuid:
-          type: string
-          format: uuid
         id:
           type: string
         location:
@@ -1727,7 +1719,6 @@ components:
           type: string
       required:
       - id
-      - uuid
     AddressView:
       type: object
       properties:
@@ -1762,9 +1753,6 @@ components:
     WasteContainerView:
       type: object
       properties:
-        uuid:
-          type: string
-          format: uuid
         id:
           type: string
         location:
@@ -1774,7 +1762,6 @@ components:
       required:
       - id
       - location
-      - uuid
     CompanyDto:
       type: object
       properties:
@@ -2046,9 +2033,6 @@ components:
     WasteContainerDto:
       type: object
       properties:
-        uuid:
-          type: string
-          format: uuid
         id:
           type: string
         company:
@@ -2684,12 +2668,12 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        nanosecondsOfSecond:
-          type: integer
-          format: int32
         epochSeconds:
           type: integer
           format: int64
+        nanosecondsOfSecond:
+          type: integer
+          format: int32
         value$kotlinx_datetime:
           type: string
           format: date-time

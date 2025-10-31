@@ -31,13 +31,13 @@ export interface Instant {
      * @type {number}
      * @memberof Instant
      */
-    'nanosecondsOfSecond': number;
+    'epochSeconds': number;
     /**
      * 
      * @type {number}
      * @memberof Instant
      */
-    'epochSeconds': number;
+    'nanosecondsOfSecond': number;
     /**
      * 
      * @type {string}

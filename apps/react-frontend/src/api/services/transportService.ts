@@ -225,7 +225,7 @@ export const transportDetailViewToContainerTransportFormValues = (
     deliveryDateTime: data.deliveryDateTime,
     truckId: data.truck?.licensePlate || '',
     driverId: data.driver?.id || '',
-    containerId: data.wasteContainer?.uuid || '',
+    containerId: data.wasteContainer?.id || '',
     note: data.note,
     transportType: data.transportType,
   };
@@ -281,7 +281,7 @@ export const transportDtoToWasteTransportFormValues = (transport: TransportDetai
       : undefined,
     truckId: transport.truck?.licensePlate || '',
     driverId: transport.driver?.id || '',
-    containerId: transport.wasteContainer?.uuid || '',
+    containerId: transport.wasteContainer?.id || '',
     note: transport.note,
     transportType: transport.transportType,
 

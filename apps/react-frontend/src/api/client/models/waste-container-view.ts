@@ -28,12 +28,6 @@ export interface WasteContainerView {
      * @type {string}
      * @memberof WasteContainerView
      */
-    'uuid': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteContainerView
-     */
     'id': string;
     /**
      * 

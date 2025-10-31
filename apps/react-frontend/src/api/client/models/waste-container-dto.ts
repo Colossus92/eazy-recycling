@@ -31,12 +31,6 @@ export interface WasteContainerDto {
      * @type {string}
      * @memberof WasteContainerDto
      */
-    'uuid'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteContainerDto
-     */
     'id': string;
     /**
      * 
