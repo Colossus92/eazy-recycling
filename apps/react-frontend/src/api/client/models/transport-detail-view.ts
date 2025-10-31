@@ -33,7 +33,7 @@ import type { TruckView } from './truck-view';
 import type { WasteContainerView } from './waste-container-view';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WasteStreamDetailViewPickupLocation } from './waste-stream-detail-view-pickup-location';
+import type { WeightTicketDetailViewPickupLocation } from './weight-ticket-detail-view-pickup-location';
 
 /**
  * 
@@ -67,10 +67,10 @@ export interface TransportDetailView {
     'carrierParty': CompanyView;
     /**
      * 
-     * @type {WasteStreamDetailViewPickupLocation}
+     * @type {WeightTicketDetailViewPickupLocation}
      * @memberof TransportDetailView
      */
-    'pickupLocation': WasteStreamDetailViewPickupLocation;
+    'pickupLocation': WeightTicketDetailViewPickupLocation;
     /**
      * 
      * @type {string}
@@ -79,10 +79,10 @@ export interface TransportDetailView {
     'pickupDateTime': string;
     /**
      * 
-     * @type {WasteStreamDetailViewPickupLocation}
+     * @type {WeightTicketDetailViewPickupLocation}
      * @memberof TransportDetailView
      */
-    'deliveryLocation': WasteStreamDetailViewPickupLocation;
+    'deliveryLocation': WeightTicketDetailViewPickupLocation;
     /**
      * 
      * @type {string}

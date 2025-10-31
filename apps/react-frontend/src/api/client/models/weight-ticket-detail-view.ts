@@ -24,6 +24,9 @@ import type { LocalDateTime } from './local-date-time';
 import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { WeightTicketDetailViewPickupLocation } from './weight-ticket-detail-view-pickup-location';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WeightTicketLineView } from './weight-ticket-line-view';
 
 /**
@@ -74,6 +77,24 @@ export interface WeightTicketDetailView {
      * @memberof WeightTicketDetailView
      */
     'carrierParty'?: CompanyView;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'direction': string;
+    /**
+     * 
+     * @type {WeightTicketDetailViewPickupLocation}
+     * @memberof WeightTicketDetailView
+     */
+    'pickupLocation'?: WeightTicketDetailViewPickupLocation;
+    /**
+     * 
+     * @type {WeightTicketDetailViewPickupLocation}
+     * @memberof WeightTicketDetailView
+     */
+    'deliveryLocation'?: WeightTicketDetailViewPickupLocation;
     /**
      * 
      * @type {string}

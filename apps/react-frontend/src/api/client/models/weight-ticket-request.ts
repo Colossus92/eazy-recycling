@@ -19,6 +19,9 @@ import type { WeightTicketLineRequest } from './weight-ticket-line-request';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -61,6 +64,24 @@ export interface WeightTicketRequest {
      * @type {string}
      * @memberof WeightTicketRequest
      */
+    'direction': WeightTicketRequestDirectionEnum;
+    /**
+     * 
+     * @type {WeightTicketRequestPickupLocation}
+     * @memberof WeightTicketRequest
+     */
+    'pickupLocation'?: WeightTicketRequestPickupLocation;
+    /**
+     * 
+     * @type {WeightTicketRequestPickupLocation}
+     * @memberof WeightTicketRequest
+     */
+    'deliveryLocation'?: WeightTicketRequestPickupLocation;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
     'truckLicensePlate'?: string;
     /**
      * 
@@ -81,5 +102,11 @@ export const WeightTicketRequestTarraWeightUnitEnum = {
 } as const;
 
 export type WeightTicketRequestTarraWeightUnitEnum = typeof WeightTicketRequestTarraWeightUnitEnum[keyof typeof WeightTicketRequestTarraWeightUnitEnum];
+export const WeightTicketRequestDirectionEnum = {
+    Inbound: 'INBOUND',
+    Outbound: 'OUTBOUND'
+} as const;
+
+export type WeightTicketRequestDirectionEnum = typeof WeightTicketRequestDirectionEnum[keyof typeof WeightTicketRequestDirectionEnum];
 
 
