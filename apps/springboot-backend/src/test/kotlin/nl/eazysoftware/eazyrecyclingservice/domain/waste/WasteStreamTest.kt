@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
@@ -28,11 +29,7 @@ class WasteStreamTest {
         wasteStreamNumber = wasteStreamNumber(),
         wasteType = wasteType(),
         collectionType = WasteCollectionType.DEFAULT,
-        pickupLocation = Location.ProximityDescription(
-          "1234",
-          "Stad",
-          "Nabijheidsbeschrijving"
-        ),
+        pickupLocation = TestLocationFactory.createProximityDescription(),
         deliveryLocation = destinationLocation(),
         consignorParty = Consignor.Company(companyId()),
         consignorClassification = ConsignorClassification.PICKUP_PARTY,
@@ -508,14 +505,7 @@ class WasteStreamTest {
     wasteStreamNumber = wasteStreamNumber(),
     wasteType = wasteType(),
     collectionType = WasteCollectionType.DEFAULT,
-    pickupLocation = Location.DutchAddress(
-      address = Address(
-        streetName = "Stadstraat",
-        postalCode = DutchPostalCode("1234 AB"),
-        buildingNumber = "2",
-        city = "Test City",
-      ),
-    ),
+    pickupLocation = TestLocationFactory.createDutchAddress(),
     deliveryLocation = destinationLocation(),
     consignorParty = Consignor.Company(companyId()),
     pickupParty = companyId(),

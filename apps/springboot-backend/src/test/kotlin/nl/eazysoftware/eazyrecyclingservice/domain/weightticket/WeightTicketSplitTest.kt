@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
 import kotlinx.datetime.Clock
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -148,10 +149,15 @@ class WeightTicketSplitTest {
         val reclamation = "Test reclamation"
         val note = Note("Test note")
 
-        val originalTicket = WeightTicket(
+      val pickupLocation = TestLocationFactory.createDutchAddress()
+      val deliveryLocation = TestLocationFactory.createCompanyAddress()
+      val originalTicket = WeightTicket(
             id = WeightTicketId(1),
             consignorParty = consignor,
             status = WeightTicketStatus.DRAFT,
+            direction = WeightTicketDirection.INBOUND,
+            pickupLocation = pickupLocation,
+            deliveryLocation = deliveryLocation,
             lines = WeightTicketLines(
                 listOf(
                     WeightTicketLine(
@@ -179,6 +185,8 @@ class WeightTicketSplitTest {
         assertThat(newTicket.consignorParty).isEqualTo(consignor)
         assertThat(newTicket.tarraWeight).isNull()
         assertThat(newTicket.carrierParty).isEqualTo(carrier)
+        assertThat(newTicket.pickupLocation).isEqualTo(pickupLocation)
+        assertThat(newTicket.deliveryLocation).isEqualTo(deliveryLocation)
         assertThat(newTicket.truckLicensePlate).isEqualTo(licensePlate)
         assertThat(newTicket.reclamation).isEqualTo(reclamation)
         assertThat(newTicket.note?.description).isEqualTo(note.description)
@@ -278,6 +286,9 @@ class WeightTicketSplitTest {
             id = WeightTicketId(1),
             consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
             status = WeightTicketStatus.DRAFT,
+            direction = WeightTicketDirection.INBOUND,
+            pickupLocation = null,
+            deliveryLocation = null,
             lines = WeightTicketLines(emptyList()),
             carrierParty = null,
             truckLicensePlate = null,
@@ -354,6 +365,9 @@ class WeightTicketSplitTest {
             id = WeightTicketId(1),
             consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
             status = status,
+            direction = WeightTicketDirection.INBOUND,
+            pickupLocation = TestLocationFactory.createDutchAddress(),
+            deliveryLocation = TestLocationFactory.createCompanyAddress(),
             lines = WeightTicketLines(lines),
             tarraWeight = null,
             carrierParty = CompanyId(UUID.randomUUID()),

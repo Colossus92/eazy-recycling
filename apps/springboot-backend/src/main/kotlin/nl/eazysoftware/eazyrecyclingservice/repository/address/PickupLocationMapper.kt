@@ -1,12 +1,14 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.hibernate.Hibernate
 import org.springframework.data.repository.findByIdOrNull
@@ -21,8 +23,6 @@ class PickupLocationMapper(
 ) {
 
   fun toDomain(dto: PickupLocationDto): Location {
-
-
     return when (val unproxied = Hibernate.unproxy(dto)) {
       is PickupLocationDto.DutchAddressDto -> DutchAddress(
         address = Address(
@@ -84,6 +84,49 @@ class PickupLocationMapper(
     }
   }
 
+  fun toView(location: PickupLocationDto): PickupLocationView? {
+    return when (val dto = Hibernate.unproxy(location)) {
+      is PickupLocationDto.DutchAddressDto ->
+        PickupLocationView.DutchAddressView(
+          streetName = dto.streetName,
+          postalCode = dto.postalCode,
+          buildingNumber = dto.buildingNumber,
+          buildingNumberAddition = dto.buildingNumberAddition,
+          city = dto.city,
+          country = dto.country
+        )
+
+      is PickupLocationDto.ProximityDescriptionDto ->
+        PickupLocationView.ProximityDescriptionView(
+          postalCodeDigits = dto.postalCode,
+          city = dto.city,
+          description = dto.description,
+          country = dto.country
+        )
+
+      is PickupLocationDto.PickupCompanyDto ->
+        PickupLocationView.PickupCompanyView(
+          company = CompanyViewMapper.map(dto.company)
+        )
+
+
+      is PickupLocationDto.PickupProjectLocationDto -> {
+        PickupLocationView.ProjectLocationView(
+          company = CompanyViewMapper.map(dto.company),
+          streetName = dto.streetName,
+          postalCode = dto.postalCode,
+          buildingNumber = dto.buildingNumber,
+          buildingNumberAddition = dto.buildingNumberAddition,
+          city = dto.city,
+          country = dto.country
+        )
+      }
+
+      else -> null
+    }
+  }
+
+
   private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
     val company = companyRepository.findByIdOrNull(location.companyId.uuid)
       ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
@@ -131,7 +174,7 @@ class PickupLocationMapper(
     }
   }
 
-  private fun createCompany (
+  private fun createCompany(
     domain: Company
   ): PickupLocationDto.PickupCompanyDto {
     val saved = pickupLocationRepository.save(

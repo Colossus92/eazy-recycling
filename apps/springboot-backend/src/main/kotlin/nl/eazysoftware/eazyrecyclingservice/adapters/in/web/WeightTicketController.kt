@@ -14,10 +14,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -145,6 +142,9 @@ data class WeightTicketRequest(
   val tarraWeightValue: String?,
   val tarraWeightUnit: WeightUnitRequest?,
   val carrierParty: UUID?,
+  val direction: WeightTicketDirection,
+  val pickupLocation: PickupLocationRequest?,
+  val deliveryLocation: PickupLocationRequest?,
   val truckLicensePlate: String?,
   val reclamation: String?,
   val note: String?,
@@ -153,16 +153,19 @@ data class WeightTicketRequest(
     return WeightTicketCommand(
       lines = lines.toDomain(),
       tarraWeight = tarraWeightValue?.let {
-        Weight (
+        Weight(
           BigDecimal(tarraWeightValue),
           when (tarraWeightUnit) {
             WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
             null -> throw IllegalArgumentException("Tarra gewicht eenheid is verplicht bij het opgeven van een gewicht")
           }
         )
-                                          },
+      },
       consignorParty = consignorParty.toDomain(),
       carrierParty = carrierParty?.let { CompanyId(it) },
+      direction = direction,
+      pickupLocation = pickupLocation?.toCommand(),
+      deliveryLocation = deliveryLocation?.toCommand(),
       truckLicensePlate = truckLicensePlate?.let { LicensePlate(it) },
       reclamation = reclamation,
       note = note?.let { Note(it) },

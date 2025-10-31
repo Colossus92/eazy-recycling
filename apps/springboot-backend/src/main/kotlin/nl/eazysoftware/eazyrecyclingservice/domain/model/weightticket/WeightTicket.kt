@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -18,6 +19,9 @@ class WeightTicket(
   var tarraWeight: Weight?,
   var lines: WeightTicketLines,
   var carrierParty: CompanyId?,
+  var direction: WeightTicketDirection,
+  var pickupLocation: Location?,
+  var deliveryLocation: Location?,
   var truckLicensePlate: LicensePlate?,
   var reclamation: String?,
   var note: Note?,
@@ -45,6 +49,9 @@ class WeightTicket(
     lines: WeightTicketLines = this.lines,
     carrierParty: CompanyId? = this.carrierParty,
     consignorParty: Consignor = this.consignorParty,
+    direction: WeightTicketDirection = this.direction,
+    pickupLocation: Location? = this.pickupLocation,
+    deliveryLocation: Location? = this.deliveryLocation,
     tarraWeight: Weight? = this.tarraWeight,
     truckLicensePlate: LicensePlate? = this.truckLicensePlate,
     reclamation: String? = this.reclamation,
@@ -55,6 +62,9 @@ class WeightTicket(
     }
     this.lines = lines
     this.tarraWeight = tarraWeight
+    this.direction = direction
+    this.pickupLocation = pickupLocation
+    this.deliveryLocation = deliveryLocation
     this.carrierParty = carrierParty
     this.consignorParty = consignorParty
     this.truckLicensePlate = truckLicensePlate
@@ -105,6 +115,9 @@ class WeightTicket(
       lines = WeightTicketLines(newLines),
       tarraWeight = this.tarraWeight,
       carrierParty = this.carrierParty,
+      direction = this.direction,
+      pickupLocation = this.pickupLocation,
+      deliveryLocation = this.deliveryLocation,
       truckLicensePlate = this.truckLicensePlate,
       reclamation = this.reclamation,
       note = this.note?.copy(),
@@ -141,4 +154,9 @@ data class CancellationReason(
   init {
       require(value.isNotBlank()) { "Een reden van annulering is verplicht." }
   }
+}
+
+enum class WeightTicketDirection {
+  INBOUND,   // Material coming in (e.g. waste delivered)
+  OUTBOUND,  // Material going out (e.g. processed metal leaving site)
 }

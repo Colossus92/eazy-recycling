@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import java.util.UUID
+import java.util.*
 
 object TestCompanyFactory {
 
@@ -30,4 +30,20 @@ object TestCompanyFactory {
       )
     )
   }
+
+  fun eazyRecycling() = CompanyDto(
+      id = UUID.fromString("6a683b2a-96d6-454c-8cae-4a7e2a03f249"),
+      name = "Eazy Recycling",
+      chamberOfCommerceId = "85217463",
+      vihbId = "123456VIXX",
+      processorId = "11987",
+      address = AddressDto(
+        streetName = "Straat",
+        buildingName = null,
+        buildingNumber = "8",
+        postalCode = "1234 AB",
+        city = "Rotterdam",
+        country = "Nederland"
+      )
+    )
 }

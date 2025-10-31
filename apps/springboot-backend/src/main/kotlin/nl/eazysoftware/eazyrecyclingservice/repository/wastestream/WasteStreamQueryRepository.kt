@@ -9,14 +9,12 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatusPo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
-import org.hibernate.Hibernate
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.nio.ByteBuffer
@@ -28,7 +26,8 @@ import java.util.*
 class WasteStreamQueryRepository(
   private val entityManager: EntityManager,
   private val jpaRepository: WasteStreamJpaRepository,
-  private val companyRepository: CompanyRepository
+  private val companyRepository: CompanyRepository,
+  private val pickupLocationMapper: PickupLocationMapper
 ) : GetAllWasteStreams, GetWasteStreamByNumber {
 
   override fun execute(): List<WasteStreamListView> {
@@ -139,7 +138,7 @@ class WasteStreamQueryRepository(
         )
       ),
       collectionType = wasteStream.wasteCollectionType,
-      pickupLocation = mapPickupLocation(wasteStream.pickupLocation),
+      pickupLocation = pickupLocationMapper.toView(wasteStream.pickupLocation),
       deliveryLocation = DeliveryLocationView(
         processorPartyId = wasteStream.processorParty.processorId!!,
         processor = CompanyViewMapper.map(wasteStream.processorParty)
@@ -157,47 +156,5 @@ class WasteStreamQueryRepository(
       ).toString(),
       lastActivityAt = wasteStream.lastActivityAt.toKotlinInstant().toDisplayTime()
     )
-  }
-
-  private fun mapPickupLocation(location: PickupLocationDto): PickupLocationView? {
-    return when (val dto = Hibernate.unproxy(location)) {
-      is PickupLocationDto.DutchAddressDto ->
-        PickupLocationView.DutchAddressView(
-          streetName = dto.streetName,
-          postalCode = dto.postalCode,
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country
-        )
-
-      is PickupLocationDto.ProximityDescriptionDto ->
-        PickupLocationView.ProximityDescriptionView(
-          postalCodeDigits = dto.postalCode,
-          city = dto.city,
-          description = dto.description,
-          country = dto.country
-        )
-
-      is PickupLocationDto.PickupCompanyDto ->
-        PickupLocationView.PickupCompanyView(
-          company = CompanyViewMapper.map(dto.company)
-        )
-
-
-      is PickupLocationDto.PickupProjectLocationDto -> {
-        PickupLocationView.ProjectLocationView(
-          company = CompanyViewMapper.map(dto.company),
-          streetName = dto.streetName,
-          postalCode = dto.postalCode,
-          buildingNumber = dto.buildingNumber,
-          buildingNumberAddition = dto.buildingNumberAddition,
-          city = dto.city,
-          country = dto.country
-        )
-      }
-
-      else -> null
-    }
   }
 }

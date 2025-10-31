@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
 import kotlinx.datetime.Clock
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -41,6 +42,9 @@ class WeightTicketTest {
     id = WeightTicketId(1),
     consignorParty = Consignor.Company(companyId()),
     status = status,
+    direction = WeightTicketDirection.INBOUND,
+    pickupLocation = TestLocationFactory.createDutchAddress(),
+    deliveryLocation = TestLocationFactory.createCompanyAddress(),
     lines = EMPTY_LINES,
     carrierParty = companyId(),
     truckLicensePlate = LicensePlate("AB-123-CD"),
@@ -83,6 +87,9 @@ class WeightTicketTest {
       status = WeightTicketStatus.DRAFT,
       lines = SAMPLE_LINES,
       carrierParty = companyId(),
+      direction = WeightTicketDirection.INBOUND,
+      pickupLocation = TestLocationFactory.createDutchAddress(),
+      deliveryLocation = TestLocationFactory.createCompanyAddress(),
       truckLicensePlate = LicensePlate("AB-123-CD"),
       reclamation = "Reclamation",
       note = Note("note"),

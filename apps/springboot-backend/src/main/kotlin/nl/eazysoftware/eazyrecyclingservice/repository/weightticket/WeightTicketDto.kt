@@ -1,9 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.math.BigDecimal
 import java.time.Instant
+
 @Entity
 @Table(name = "weight_tickets")
 data class WeightTicketDto(
@@ -28,6 +31,18 @@ data class WeightTicketDto(
   @Column(name = "tarra_weight_unit", nullable = true)
   @Enumerated(EnumType.STRING)
   val tarraWeightUnit: WeightUnitDto?,
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "direction", nullable = false)
+  val direction: WeightTicketDirection,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
+  val pickupLocation: PickupLocationDto?,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
+  val deliveryLocation: PickupLocationDto?,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id")

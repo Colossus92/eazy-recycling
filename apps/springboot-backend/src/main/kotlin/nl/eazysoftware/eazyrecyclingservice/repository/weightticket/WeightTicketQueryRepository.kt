@@ -2,23 +2,20 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.toKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.application.query.ConsignorView
-import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWeightTickets
-import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketByNumber
-import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
-import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketLineView
-import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
+import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
 @Repository
 class WeightTicketQueryRepository(
-    private val entityManager: EntityManager,
-    private val jpaRepository: WeightTicketJpaRepository,
+  private val entityManager: EntityManager,
+  private val jpaRepository: WeightTicketJpaRepository,
+  private val pickupLocationMapper: PickupLocationMapper
 ) : GetAllWeightTickets, GetWeightTicketByNumber {
 
   override fun execute(): List<WeightTicketListView> {
@@ -64,6 +61,9 @@ class WeightTicketQueryRepository(
       tarraWeightValue = weightTicket.tarraWeightValue,
       tarraWeightUnit = weightTicket.tarraWeightUnit.toString(),
       carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },
+      direction = weightTicket.direction.name,
+      pickupLocation = weightTicket.pickupLocation?.let { pickupLocationMapper.toView(it) },
+      deliveryLocation = weightTicket.deliveryLocation?.let { pickupLocationMapper.toView(it) },
       truckLicensePlate = weightTicket.truckLicensePlate,
       reclamation = weightTicket.reclamation,
       note = weightTicket.note,

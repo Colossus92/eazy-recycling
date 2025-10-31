@@ -9,12 +9,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 
 @Component
 class WeightTicketMapper(
   private val companyRepository: CompanyRepository,
+  private val pickupLocationMapper: PickupLocationMapper,
 ) {
 
   fun toDomain(dto: WeightTicketDto): WeightTicket {
@@ -22,6 +24,9 @@ class WeightTicketMapper(
       id = WeightTicketId(dto.id),
       carrierParty = dto.carrierParty?.id?.let { CompanyId(it) },
       consignorParty = Consignor.Company(CompanyId(dto.consignorParty.id!!)),
+      direction = dto.direction,
+      pickupLocation = dto.pickupLocation?.let { pickupLocationMapper.toDomain(it) },
+      deliveryLocation = dto.deliveryLocation?.let { pickupLocationMapper.toDomain(it) },
       truckLicensePlate = dto.truckLicensePlate?.let { LicensePlate(it) },
       reclamation = dto.reclamation,
       note = dto.note?.let { Note(it) },
@@ -71,6 +76,9 @@ class WeightTicketMapper(
       reclamation = domain.reclamation,
       note = domain.note?.description,
       status = toDtoStatus(domain.status),
+      direction = domain.direction,
+      pickupLocation = domain.pickupLocation?.let { pickupLocationMapper.toDto(it) },
+      deliveryLocation = domain.deliveryLocation?.let { pickupLocationMapper.toDto(it) },
       createdAt = domain.createdAt.toJavaInstant(),
       updatedAt = domain.updatedAt?.toJavaInstant(),
       weightedAt = domain.weightedAt?.toJavaInstant(),
