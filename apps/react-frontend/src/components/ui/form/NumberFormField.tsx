@@ -10,6 +10,7 @@ import { NumberInput } from '@/components/ui/form/NumberInput.tsx';
 interface TextFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
   placeholder?: string;
+  value?: string;
   formHook?: FormProps<TFieldValues>;
   disabled?: boolean;
   step: number | 'any';
@@ -26,6 +27,7 @@ export const NumberFormField = <TFieldValues extends FieldValues>({
   title,
   placeholder,
   formHook,
+  value,
   disabled,
   step,
 }: TextFormFieldProps<TFieldValues>) => {
@@ -42,6 +44,7 @@ export const NumberFormField = <TFieldValues extends FieldValues>({
           errors: formHook?.errors,
         }}
         step={step}
+        defaultValue={value}
         disabled={disabled}
       />
       {fieldError && (
