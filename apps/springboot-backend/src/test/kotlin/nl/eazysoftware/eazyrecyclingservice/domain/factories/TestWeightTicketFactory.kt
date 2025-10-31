@@ -1,10 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.ConsignorRequest
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WeightRequest
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WeightTicketLineRequest
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WeightTicketRequest
-import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.WeightUnitRequest
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.*
 import java.util.*
 
 object TestWeightTicketFactory {
@@ -19,6 +15,7 @@ object TestWeightTicketFactory {
     ): WeightTicketRequest {
         return WeightTicketRequest(
             consignorParty = ConsignorRequest.CompanyConsignor(consignorCompanyId),
+            tarraWeight = null,
             lines = lines,
             carrierParty = carrierParty,
             truckLicensePlate = truckLicensePlate,

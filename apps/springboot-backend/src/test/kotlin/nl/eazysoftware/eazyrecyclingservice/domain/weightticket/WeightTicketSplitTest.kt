@@ -160,6 +160,7 @@ class WeightTicketSplitTest {
                     )
                 )
             ),
+            tarraWeight = null,
             carrierParty = carrier,
             truckLicensePlate = licensePlate,
             reclamation = reclamation,
@@ -176,6 +177,7 @@ class WeightTicketSplitTest {
 
         // Then - New ticket should have same metadata
         assertThat(newTicket.consignorParty).isEqualTo(consignor)
+        assertThat(newTicket.tarraWeight).isNull()
         assertThat(newTicket.carrierParty).isEqualTo(carrier)
         assertThat(newTicket.truckLicensePlate).isEqualTo(licensePlate)
         assertThat(newTicket.reclamation).isEqualTo(reclamation)
@@ -279,6 +281,7 @@ class WeightTicketSplitTest {
             lines = WeightTicketLines(emptyList()),
             carrierParty = null,
             truckLicensePlate = null,
+            tarraWeight = null,
             reclamation = null,
             note = null,
             createdAt = Clock.System.now()
@@ -352,6 +355,7 @@ class WeightTicketSplitTest {
             consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
             status = status,
             lines = WeightTicketLines(lines),
+            tarraWeight = null,
             carrierParty = CompanyId(UUID.randomUUID()),
             truckLicensePlate = LicensePlate("AB-123-CD"),
             reclamation = "Test reclamation",

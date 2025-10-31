@@ -7,18 +7,13 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
-import java.math.BigDecimal
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import java.math.BigDecimal
 import java.util.*
 import kotlin.test.assertFailsWith
 
@@ -52,6 +47,7 @@ class WeightTicketTest {
     reclamation = "Reclamation",
     note = Note("note"),
     createdAt = Clock.System.now(),
+    tarraWeight = null,
   )
 
   @Test
@@ -90,6 +86,7 @@ class WeightTicketTest {
       truckLicensePlate = LicensePlate("AB-123-CD"),
       reclamation = "Reclamation",
       note = Note("note"),
+      tarraWeight = Weight(BigDecimal("50.00"), Weight.WeightUnit.KILOGRAM),
       createdAt = Clock.System.now(),
     )
 

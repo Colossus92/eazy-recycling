@@ -213,6 +213,8 @@ create table if not exists weight_tickets (
                                  consignor_party_id uuid not null,
                                  carrier_party_id uuid,
                                  truck_license_plate text,
+                                 tarra_weight_value numeric(10,2),
+                                 tarra_weight_unit text,
                                  reclamation text,
                                  note text,
                                  status text not null,
