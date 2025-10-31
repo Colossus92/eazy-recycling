@@ -107,13 +107,13 @@ class WeightTicket(
     this.lines = WeightTicketLines(originalLines)
     this.updatedAt = Clock.System.now()
 
-    // 4. Return new aggregate (ID will be assigned by repository)
+    // 4. Return new aggregate
     return WeightTicket(
       id = newId,
       consignorParty = this.consignorParty,
       status = WeightTicketStatus.DRAFT,
       lines = WeightTicketLines(newLines),
-      tarraWeight = this.tarraWeight,
+      tarraWeight = null,
       carrierParty = this.carrierParty,
       direction = this.direction,
       pickupLocation = this.pickupLocation,

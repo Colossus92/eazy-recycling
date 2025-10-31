@@ -17,6 +17,8 @@ import { WeightTicketLinesSection } from './WeightTicketLinesSection';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { useEffect, useState } from 'react';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
+import { RadioFormField } from '@/components/ui/form/RadioFormField';
+import { CompanyAddressInput } from '@/components/ui/form/CompanyAddressInput';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
@@ -121,6 +123,20 @@ export const WeightTicketForm = ({
                         ) : (
                             <div className={'flex flex-col items-start self-stretch gap-4'}>
                                 {data?.status && <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />}
+                                <RadioFormField
+                                    title={'Richting'}
+                                    options={[
+                                        { value: 'INBOUND', label: 'Inkomend' },
+                                        { value: 'OUTBOUND', label: 'Uitgaand' },
+                                    ]}
+                                    testId="direction"
+                                    disabled={isDisabled}
+                                    formHook={{
+                                        name: 'direction',
+                                        rules: { required: 'Richting is verplicht' },
+                                        errors: formContext.formState.errors,
+                                    }}
+                                />
                                 <div className="w-1/2">
                                     <SelectFormField
                                         title={'Opdrachtgever'}
@@ -163,6 +179,36 @@ export const WeightTicketForm = ({
                                         }}
                                     />
                                 </div>
+                                <CompanyAddressInput
+                                    formContext={formContext}
+                                    fieldNames={{
+                                        companyId: 'pickupCompanyId',
+                                        branchId: 'pickupCompanyBranchId',
+                                        street: 'pickupStreet',
+                                        buildingNumber: 'pickupBuildingNumber',
+                                        postalCode: 'pickupPostalCode',
+                                        city: 'pickupCity',
+                                    }}
+                                    title="Ophaallocatie"
+                                    includeBranches={true}
+                                    testId="pickup-location-select"
+                                    required={false}
+                                />
+                                <CompanyAddressInput
+                                    formContext={formContext}
+                                    fieldNames={{
+                                        companyId: 'deliveryCompanyId',
+                                        branchId: 'deliveryCompanyBranchId',
+                                        street: 'deliveryStreet',
+                                        buildingNumber: 'deliveryBuildingNumber',
+                                        postalCode: 'deliveryPostalCode',
+                                        city: 'deliveryCity',
+                                    }}
+                                    title="Afleverlocatie"
+                                    includeBranches={true}
+                                    testId="delivery-location-select"
+                                    required={false}
+                                />
                                 <WeightTicketLinesSection disabled={isDisabled} />
                                 <div className="flex items-start self-stretch gap-4">
                                     <NumberFormField

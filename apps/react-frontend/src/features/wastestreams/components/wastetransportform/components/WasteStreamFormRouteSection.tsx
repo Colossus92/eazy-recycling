@@ -52,7 +52,6 @@ export const WasteStreamFormRouteSection = () => {
       />
       <ConsignorClassificationSelect
         formHook={{
-          register: formContext.register,
           name: 'consignorClassification',
           rules: { required: 'Afzender type is verplicht' },
           errors: formContext.formState.errors,
