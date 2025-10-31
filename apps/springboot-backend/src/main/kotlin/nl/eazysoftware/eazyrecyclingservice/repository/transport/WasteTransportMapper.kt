@@ -66,7 +66,7 @@ class WasteTransportMapper(
       wasteContainer = domain.wasteContainer?.let {
         entityManager.getReference(
           WasteContainerDto::class.java,
-          it.uuid
+          it.id
         )
       },
       truck = domain.truck?.let { entityManager.getReference(Truck::class.java, it.value) },
@@ -98,7 +98,7 @@ class WasteTransportMapper(
       goodsItem = dto.goodsItem
         ?.let { toDomain(it) }
         ?: throw IllegalStateException("Afvaltransport met nummer ${dto.displayNumber} heeft geen afval"),
-      wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.uuid!!) },
+      wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.id) },
       containerOperation = dto.containerOperation,
       truck = dto.truck?.let { LicensePlate(it.licensePlate) },
       driver = dto.driver?.let { UserId(it.id) },

@@ -8,7 +8,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
 @RequestMapping("/containers")
@@ -32,7 +31,7 @@ class WasteContainerController(
 
   @GetMapping("/{id}")
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getContainerById(@PathVariable id: UUID): WasteContainerView {
+  fun getContainerById(@PathVariable id: String): WasteContainerView {
     return wasteContainerService.getContainerById(id).toView()
 
   }
@@ -40,26 +39,24 @@ class WasteContainerController(
   @DeleteMapping("/{id}")
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  fun deleteContainer(@PathVariable id: UUID) {
+  fun deleteContainer(@PathVariable id: String) {
     wasteContainerService.deleteContainer(id)
   }
 
   @PutMapping("/{id}")
   @PreAuthorize(HAS_ANY_ROLE)
   @ResponseStatus(HttpStatus.OK)
-  fun updateContainer(@PathVariable id: UUID, @RequestBody request: WasteContainerRequest): WasteContainerView {
+  fun updateContainer(@PathVariable id: String, @RequestBody request: WasteContainerRequest): WasteContainerView {
     return wasteContainerService.updateContainer(id, request.toDomain()).toView()
   }
 
   data class WasteContainerRequest(
-    val uuid: UUID,
     val id: String,
     val location: WasteContainer.ContainerLocation?,
     val notes: String?,
   ) {
     fun toDomain() = WasteContainer(
-      wasteContainerId = WasteContainerId(uuid),
-      id = id,
+      wasteContainerId = WasteContainerId(id),
       location = location,
       notes = notes
     )

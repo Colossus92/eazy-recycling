@@ -1,11 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model
 
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import java.util.UUID
+import java.util.*
 
 data class WasteContainer(
   val wasteContainerId: WasteContainerId,
-  val id: String,
   val location: ContainerLocation?,
   val notes: String?,
 ) {
@@ -20,5 +19,5 @@ data class WasteContainer(
 }
 
 data class WasteContainerId(
-  val uuid: UUID,
+  val id: String,
 )

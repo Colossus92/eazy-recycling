@@ -244,7 +244,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "1122 GH",
       deliveryCity = "Delivery City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "New Container Transport"
     )
 
@@ -287,7 +287,7 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "New Waste Transport",
       wasteStreamNumber = testWasteStream.number,
       weight = 1000.0,
@@ -345,7 +345,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "5566 KL",
       deliveryCity = "Updated Delivery City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Updated Container Transport"
     )
 
@@ -375,7 +375,7 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Original Waste Transport",
       wasteStreamNumber = testWasteStream.number,
       weight = 1000.0,
@@ -404,7 +404,7 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Updated Waste Transport",
       wasteStreamNumber = testWasteStream.number,
       weight = 2000.0,
@@ -469,7 +469,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "1122 GH",
       deliveryCity = "Delivery City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Non-existent Transport"
     )
 
@@ -618,7 +618,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "5678 CD",
       deliveryCity = "Branch City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Original Transport with Branches"
     )
 
@@ -656,7 +656,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "5678 CD",
       deliveryCity = "Branch City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Updated Transport with Branches"
     )
 
@@ -714,7 +714,7 @@ class TransportControllerIntegrationTest(
       deliveryPostalCode = "5678 CD",
       deliveryCity = "Branch City",
       truckId = testTruck.licensePlate,
-      containerId = testContainer.uuid,
+      containerId = testContainer.id,
       note = "Invalid Branch-Company Relationship"
     )
 

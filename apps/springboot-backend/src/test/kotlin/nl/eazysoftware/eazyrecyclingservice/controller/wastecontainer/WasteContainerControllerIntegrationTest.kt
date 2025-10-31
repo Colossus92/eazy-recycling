@@ -189,7 +189,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             postalCode = "3333CC",
             country = "Retrieve Country"
         )
-        val containerId = wasteContainerRepository.save(container).uuid!!
+        val containerId = wasteContainerRepository.save(container).id
 
         // When & Then
         securedMockMvc.get("/containers/$containerId")
@@ -222,7 +222,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             postalCode = "4444DD",
             country = "Delete Country"
         )
-        val containerId = wasteContainerRepository.save(container).uuid!!
+        val containerId = wasteContainerRepository.save(container).id
 
         // When & Then
         securedMockMvc.delete("/containers/$containerId")
@@ -246,10 +246,9 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             postalCode = "5555EE",
             country = "Original Country"
         )
-        val containerId = wasteContainerRepository.save(originalContainer).uuid!!
+        val containerId = wasteContainerRepository.save(originalContainer).id
 
         val updatedContainer = WasteContainerController.WasteContainerRequest(
-            uuid = containerId,
             id = "UPDATE-ME",
             location = WasteContainer.ContainerLocation(
                 companyId = null,
@@ -288,7 +287,6 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val nonExistentId = UUID.randomUUID()
         val container = WasteContainerController.WasteContainerRequest(
-            uuid = nonExistentId,
             id = "NON-EXISTENT",
             location = WasteContainer.ContainerLocation(
                 companyId = null,

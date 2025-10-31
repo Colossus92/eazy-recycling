@@ -15,7 +15,7 @@ data class WasteTransportRequest(
   val driverId: UUID?,
   val carrierPartyId: UUID,
   val truckId: String?,
-  val containerId: UUID?,
+  val containerId: String?,
   val note: String,
   val wasteStreamNumber: String?,
   @field:Min(0)

@@ -2,10 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
 import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
-import java.util.UUID
+import java.util.*
 
 data class WasteContainerView(
-  val uuid: UUID,
   val id: String,
   val location: ContainerLocationView,
   val notes: String?,
@@ -18,8 +17,7 @@ data class ContainerLocationView(
 )
 
 fun WasteContainer.toView() = WasteContainerView(
-  uuid = this.wasteContainerId.uuid,
-  id = this.id,
+  id = this.wasteContainerId.id,
   location = ContainerLocationView(
     companyId = this.location?.companyId,
     companyName = this.location?.companyName,

@@ -11,8 +11,7 @@ class WasteContainerMapper {
 
     fun toDomain(dto: WasteContainerDto): WasteContainer {
         return WasteContainer(
-            wasteContainerId = WasteContainerId(dto.uuid!!),
-            id = dto.id,
+            wasteContainerId = WasteContainerId(dto.id),
             location = WasteContainer.ContainerLocation(
                 companyId = dto.company?.id,
                 companyName = dto.company?.name,

@@ -19,7 +19,6 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.util.*
 import java.util.stream.Stream
 
 @SpringBootTest
@@ -33,7 +32,7 @@ class WasteContainerControllerSecurityTest : BaseIntegrationTest() {
     @Autowired
     private lateinit var wasteContainerRepository: WasteContainerRepository
 
-    private lateinit var testContainerId: UUID
+    private lateinit var testContainerId: String
     private lateinit var testContainer: WasteContainerDto
 
     @BeforeEach
@@ -43,7 +42,7 @@ class WasteContainerControllerSecurityTest : BaseIntegrationTest() {
             notes = "Test container"
         )
         val savedContainer = wasteContainerRepository.save(testContainer)
-        testContainerId = savedContainer.uuid!!
+        testContainerId = savedContainer.id
     }
 
     @AfterEach
@@ -97,7 +96,7 @@ class WasteContainerControllerSecurityTest : BaseIntegrationTest() {
         expectedStatus: Int
     ) {
         // Replace {id} placeholder with actual ID
-        val resolvedEndpoint = endpoint.replace("{id}", testContainerId.toString())
+        val resolvedEndpoint = endpoint.replace("{id}", testContainerId)
 
         val request = when (method) {
             "GET" -> get(resolvedEndpoint)

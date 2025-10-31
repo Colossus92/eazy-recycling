@@ -157,7 +157,7 @@ class GetTransportByIdService(
     )
   }
 
-  private fun mapWasteContainer(containerId: UUID) =
+  private fun mapWasteContainer(containerId: String) =
     wasteContainerService.getContainerById(containerId).toView()
 
   private fun mapGoodsItem(goodsItem: GoodsItem, wasteStream: WasteStream): GoodsItemView {
@@ -190,7 +190,7 @@ class GetTransportByIdService(
     transportHours = containerTransport.transportHours?.inWholeSeconds?.toDouble()?.div(3600),
     sequenceNumber = containerTransport.sequenceNumber,
     updatedAt = containerTransport.updatedAt,
-    wasteContainer = containerTransport.wasteContainer?.let { mapWasteContainer(it.uuid) },
+    wasteContainer = containerTransport.wasteContainer?.let { mapWasteContainer(it.id) },
     containerOperation = containerTransport.containerOperation,
   )
 
@@ -217,7 +217,7 @@ class GetTransportByIdService(
       transportHours = wasteTransport.transportHours?.inWholeSeconds?.toDouble()?.div(3600),
       sequenceNumber = wasteTransport.sequenceNumber,
       updatedAt = wasteTransport.updatedAt,
-      wasteContainer = wasteTransport.wasteContainer?.let { mapWasteContainer(it.uuid) },
+      wasteContainer = wasteTransport.wasteContainer?.let { mapWasteContainer(it.id) },
       containerOperation = wasteTransport.containerOperation,
       goodsItem = mapGoodsItem(wasteTransport.goodsItem, wasteStream),
       consigneeParty = mapCompany(wasteStream.deliveryLocation.processorPartyId),

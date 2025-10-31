@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport.containertrans
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 class ContainerTransportRequest(
     val consignorPartyId: UUID,
@@ -30,6 +30,6 @@ class ContainerTransportRequest(
     val deliveryCity: String,
     val deliveryDescription: String? = null,
     val truckId: String?,
-    val containerId: UUID?,
+    val containerId: String?,
     val note: String,
 )

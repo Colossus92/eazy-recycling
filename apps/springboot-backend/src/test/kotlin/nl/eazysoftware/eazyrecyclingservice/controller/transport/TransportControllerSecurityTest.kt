@@ -422,7 +422,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
           deliveryPostalCode = "5678 CD",
           deliveryCity = "Delivery City",
           truckId = "TRUCK-123",
-          containerId = UUID.randomUUID(),
+          containerId = "40M001",
           note = "Test container transport"
         )
 
@@ -438,7 +438,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             driverId = testDriverId,
             carrierPartyId = carrier.id!!,
             truckId = "TRUCK-123",
-            containerId = UUID.randomUUID(),
+            containerId = "40M001",
             note = "Test waste transport",
             wasteStreamNumber = testWasteStream.number,
             weight = 10.0,

@@ -35,14 +35,14 @@ class WasteContainerService(
             .map { wasteContainerMapper.toDomain(it) }
     }
 
-    fun getContainerById(id: UUID): WasteContainer {
+    fun getContainerById(id: String): WasteContainer {
         return wasteContainerRepository.findById(id)
             .orElseThrow { (EntityNotFoundException("Container with id $id not found")) }
             .let { wasteContainerMapper.toDomain(it) }
     }
 
     @Transactional
-    fun updateContainer(id: UUID, container: WasteContainer): WasteContainer {
+    fun updateContainer(id: String, container: WasteContainer): WasteContainer {
         wasteContainerRepository.findById(id)
             .orElseThrow { (EntityNotFoundException("Container with id $id not found")) }
 
@@ -53,14 +53,13 @@ class WasteContainerService(
         return container
     }
 
-    fun deleteContainer(id: UUID) {
+    fun deleteContainer(id: String) {
         wasteContainerRepository.deleteById(id)
     }
 
     private fun toDto(container: WasteContainer): WasteContainerDto {
         val dto = WasteContainerDto(
-            uuid = container.wasteContainerId.uuid,
-            id = container.id,
+            id = container.wasteContainerId.id,
             notes = container.notes,
         )
 

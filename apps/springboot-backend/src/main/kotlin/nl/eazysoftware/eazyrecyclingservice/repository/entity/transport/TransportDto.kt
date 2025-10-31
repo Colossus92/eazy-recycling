@@ -61,7 +61,7 @@ data class TransportDto(
   val containerOperation: ContainerOperation? = null,
 
   @OneToOne
-  @JoinColumn(name = "container_id", referencedColumnName = "uuid")
+  @JoinColumn(name = "container_id", referencedColumnName = "id")
   val wasteContainer: WasteContainerDto? = null,
 
   @ManyToOne
