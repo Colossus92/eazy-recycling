@@ -75,21 +75,41 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
                 ? 'text-color-text-disabled'
                 : 'text-color-text-secondary'
             )}
-            classNames={{
-              control: ({ isFocused }) =>
-                clsx(
-                  'h-10 rounded-radius-md border border-solid w-full bg-color-surface-primary',
-                  disabled
-                    ? 'border-color-border-primary cursor-not-allowed'
+            styles={{
+              control: (base, state) => ({
+                ...base,
+                minHeight: '40px',
+                height: '40px',
+                borderRadius: '8px',
+                borderWidth: '1px',
+                borderStyle: 'solid',
+                borderColor: disabled
+                  ? '#E3E8F3'
+                  : error
+                    ? '#F04438'
+                    : state.isFocused
+                      ? '#1E77F8'
+                      : '#E3E8F3',
+                backgroundColor: '#FFFFFF',
+                cursor: disabled ? 'not-allowed' : 'default',
+                boxShadow: 'none',
+                '&:hover': {
+                  borderColor: disabled
+                    ? '#E3E8F3'
                     : error
-                      ? 'border-color-status-error-dark'
-                      : clsx(
-                          'border-color-border-primary',
-                          isFocused ? 'border-color-primary' : '',
-                          !isFocused &&
-                            'hover:bg-color-brand-light hover:border-color-brand-dark'
-                        )
-                ),
+                      ? '#F04438'
+                      : '#1E77F8',
+                  backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
+                },
+              }),
+              input: (base) => ({
+                ...base,
+                'input:focus': {
+                  boxShadow: 'none',
+                },
+              }),
+            }}
+            classNames={{
               placeholder: () => clsx('text-color-text-disabled', 'italic'),
               option: ({ isSelected, isFocused }) =>
                 clsx(
