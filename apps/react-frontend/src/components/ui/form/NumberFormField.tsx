@@ -6,6 +6,7 @@ import {
   UseFormRegister,
 } from 'react-hook-form';
 import { NumberInput } from '@/components/ui/form/NumberInput.tsx';
+import { getFieldError } from '@/utils/formErrorUtils';
 
 interface TextFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
@@ -31,10 +32,10 @@ export const NumberFormField = <TFieldValues extends FieldValues>({
   disabled,
   step,
 }: TextFormFieldProps<TFieldValues>) => {
-  const fieldError = formHook?.errors?.[formHook?.name]?.message?.toString();
+  const fieldError = getFieldError(formHook?.errors, formHook?.name);
   return (
     <div className="flex flex-col items-start self-stretch gap-1">
-      <span className="text-subtitle-2">{title}</span>
+      <span className="text-caption-2">{title}</span>
       <NumberInput
         placeholder={placeholder}
         formHook={{

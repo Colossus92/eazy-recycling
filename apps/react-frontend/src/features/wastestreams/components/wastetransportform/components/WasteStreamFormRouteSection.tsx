@@ -1,26 +1,14 @@
 import { useFormContext } from 'react-hook-form';
-import { useMemo } from 'react';
-import {
-  CompanyAddressInput,
-  FieldNames,
-} from '@/components/ui/form/CompanyAddressInput.tsx';
 import { WasteStreamFormValues } from '@/features/wastestreams/components/wastetransportform/hooks/useWasteStreamFormHook.ts';
 import { useQuery } from '@tanstack/react-query';
 import { Company } from '@/api/services/companyService';
 import { companyService } from '@/api/services/companyService.ts';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { ConsignorClassificationSelect } from '@/features/planning/forms/wastetransportform/ConsignorClassificationSelect';
+import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 
 export const WasteStreamFormRouteSection = () => {
   const formContext = useFormContext<WasteStreamFormValues>();
-  const pickupFieldNames = useMemo<FieldNames<WasteStreamFormValues>>(() => ({
-    companyId: 'pickupCompanyId',
-    branchId: 'pickupCompanyBranchId',
-    street: 'pickupStreet',
-    buildingNumber: 'pickupBuildingNumber',
-    postalCode: 'pickupPostalCode',
-    city: 'pickupCity',
-  }), []);
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
     queryFn: () => companyService.getAll(),
@@ -58,12 +46,10 @@ export const WasteStreamFormRouteSection = () => {
           control: formContext.control,
         }}
       />
-      <CompanyAddressInput
-        formContext={formContext}
-        fieldNames={pickupFieldNames}
-        title="Locatie van herkomst"
-        testId="pickup-company-address"
-        includeBranches
+      <AddressFormField
+        control={formContext.control}
+        name="pickupLocation"
+        label="Locatie van herkomst"
       />
       <SelectFormField
         title={'Verwerker (bestemming)'}

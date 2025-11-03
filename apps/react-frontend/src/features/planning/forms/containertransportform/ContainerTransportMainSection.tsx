@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
 import { companyService, Company } from '@/api/services/companyService.ts';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
-import { AddressFormField } from '@/components/ui/form/AddressFormField';
 
 export const ContainerTransportMainSection = () => {
   const {
@@ -51,11 +50,6 @@ export const ContainerTransportMainSection = () => {
         type="hidden"
         {...register('containerOperation')}
         value="DELIVERY"
-      />
-      <AddressFormField
-        control={control}
-        name="carrierPartyId"
-        label="Locatie"
       />
     </div>
   );
