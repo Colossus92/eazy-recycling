@@ -1,16 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 
 object TestLocationFactory {
 
   fun createDutchAddress() = Location.DutchAddress(
     address = Address(
-      streetName = "Stadstraat",
+      streetName = StreetName("Stadstraat"),
       postalCode = DutchPostalCode("1234 AB"),
       buildingNumber = "2",
       city = City("Test City"),
@@ -24,7 +21,7 @@ object TestLocationFactory {
       companyId = CompanyId(company.id!!),
       name = company.name,
       address = Address(
-        streetName = company.address.streetName!!,
+        streetName = StreetName(company.address.streetName!!),
         postalCode = DutchPostalCode(company.address.postalCode),
         buildingNumber = company.address.buildingNumber,
         city = company.address.city?.let { City(it) }!!,

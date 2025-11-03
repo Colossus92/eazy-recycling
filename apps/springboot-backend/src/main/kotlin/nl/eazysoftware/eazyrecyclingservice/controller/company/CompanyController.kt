@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -67,7 +68,7 @@ class CompanyController(
       CreateProjectLocationCommand(
         CompanyId(id),
         Address(
-          streetName = projectLocation.streetName,
+          streetName = StreetName(projectLocation.streetName),
           buildingNumber = projectLocation.buildingNumber,
           buildingNumberAddition = projectLocation.buildingNumberAddition,
           postalCode = DutchPostalCode(projectLocation.postalCode),
@@ -100,7 +101,7 @@ class CompanyController(
         companyId = CompanyId(companyId),
         projectLocationId = branchId,
         address = Address(
-          streetName = branch.streetName,
+          streetName = StreetName(branch.streetName),
           buildingNumber = branch.buildingNumber,
           buildingNumberAddition = branch.buildingNumberAddition,
           postalCode = DutchPostalCode(branch.postalCode),

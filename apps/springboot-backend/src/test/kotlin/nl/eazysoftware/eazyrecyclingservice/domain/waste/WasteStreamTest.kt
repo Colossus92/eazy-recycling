@@ -68,7 +68,7 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "2",
             city = City("Test City"),
@@ -257,7 +257,7 @@ class WasteStreamTest {
         collectionType = collectionType,
         pickupLocation = Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             city = City("Test city"),
@@ -282,7 +282,7 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             city = City("Test city"),
@@ -307,7 +307,7 @@ class WasteStreamTest {
         collectionType = WasteCollectionType.DEFAULT,
         pickupLocation = Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             city = City("Test city"),
@@ -350,7 +350,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "",
             city = City("Test city"),
@@ -365,7 +365,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             country = "Belgium",
@@ -381,7 +381,7 @@ class WasteStreamTest {
       assertDoesNotThrow {
         Location.DutchAddress(
           address = Address(
-            streetName = "Stadstraat",
+            streetName = StreetName("Stadstraat"),
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             buildingNumberAddition = "A",

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 
 data class AddressRequest(
   @field:NotBlank val street: String,
@@ -17,7 +18,7 @@ data class AddressRequest(
   @field:NotBlank val country: String
 ) {
   fun toDomain() = Address(
-    street,
+    StreetName(street),
     buildingNumber,
     buildingNumberAddition,
     DutchPostalCode(postalCode),

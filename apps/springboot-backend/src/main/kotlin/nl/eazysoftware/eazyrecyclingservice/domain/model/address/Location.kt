@@ -25,7 +25,7 @@ sealed interface Location {
       require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: ${address.country}" }
     }
 
-    fun streetName(): String = address.streetName
+    fun streetName(): String = address.streetName.value
     fun buildingNumber(): String = address.buildingNumber
     fun buildingNumberAddition(): String? = address.buildingNumberAddition
     fun postalCode(): DutchPostalCode = address.postalCode
@@ -83,7 +83,7 @@ sealed interface Location {
       require(address.country == "Nederland") { "Het land dient Nederland te zijn, maar was: ${address.country}" }
     }
 
-    fun streetName(): String = address.streetName
+    fun streetName(): String = address.streetName.value
     fun buildingNumber(): String = address.buildingNumber
     fun buildingNumberAddition(): String? = address.buildingNumberAddition
     fun postalCode(): DutchPostalCode = address.postalCode
@@ -137,7 +137,7 @@ class LocationFactory(
       id = UUID.randomUUID(),
       companyId = companyId,
       address = Address(
-        streetName = streetName,
+        streetName = StreetName(streetName),
         postalCode = postalCode
           ?.let { DutchPostalCode(it) }
           ?: throw IllegalArgumentException("De postcode is verplicht "),
@@ -156,8 +156,8 @@ class LocationFactory(
         companyId = companyId,
         name = company.name,
         address = Address(
-          streetName = company.address.streetName
-            ?: throw IllegalArgumentException("Bedrijf heeft geen straatnaam, maar dit is verplicht"),
+          streetName = StreetName(company.address.streetName
+            ?: throw IllegalArgumentException("Bedrijf heeft geen straatnaam, maar dit is verplicht")),
           postalCode = DutchPostalCode(company.address.postalCode),
           buildingNumber = company.address.buildingNumber,
           buildingNumberAddition = company.address.buildingName,
@@ -170,7 +170,7 @@ class LocationFactory(
 
     if (streetName?.isNotBlank() == true) return DutchAddress(
       address = Address(
-        streetName = streetName,
+        streetName = StreetName(streetName),
         postalCode = postalCode
           ?.let { DutchPostalCode(it) }
           ?: throw IllegalArgumentException("De postcode is verplicht "),

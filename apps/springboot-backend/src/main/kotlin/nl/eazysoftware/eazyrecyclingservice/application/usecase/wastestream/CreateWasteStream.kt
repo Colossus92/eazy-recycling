@@ -120,7 +120,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
   return when (this) {
     is PickupLocationCommand.DutchAddressCommand -> Location.DutchAddress(
       address = Address(
-        streetName = streetName,
+        streetName = StreetName(streetName),
         postalCode = DutchPostalCode(postalCode),
         buildingNumber = buildingNumber,
         buildingNumberAddition = buildingNumberAddition,
@@ -140,7 +140,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
       id = id,
       companyId = companyId,
       address = Address(
-        streetName = streetName,
+        streetName = StreetName(streetName),
         postalCode = DutchPostalCode(postalCode),
         buildingNumber = buildingNumber,
         buildingNumberAddition = buildingNumberAddition,
@@ -155,7 +155,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
         companyId = companyId,
         name = company.name,
         address = Address(
-          streetName = company.address.streetName ?: throw IllegalStateException("Het bedrijf heet geen straatnaam, dit is verplicth"),
+          streetName = StreetName(company.address.streetName ?: throw IllegalStateException("Het bedrijf heet geen straatnaam, dit is verplicth")),
           postalCode = DutchPostalCode(company.address.postalCode),
           buildingNumber = company.address.buildingNumber,
           buildingNumberAddition = company.address.buildingName,

@@ -131,7 +131,7 @@ class CompanyService(
         return CompanyBranchResponse(
           id = branch.id,
           address = AddressDto (
-            streetName = branch.address.streetName,
+            streetName = branch.address.streetName.value,
             buildingNumber = branch.address.buildingNumber,
             postalCode = branch.address.postalCode.value,
             city = branch.address.city.value,

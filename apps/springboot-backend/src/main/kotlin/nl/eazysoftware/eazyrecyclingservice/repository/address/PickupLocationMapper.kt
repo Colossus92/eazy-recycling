@@ -2,10 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.address
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
@@ -27,7 +24,7 @@ class PickupLocationMapper(
     return when (val unproxied = Hibernate.unproxy(dto)) {
       is PickupLocationDto.DutchAddressDto -> DutchAddress(
         address = Address(
-          streetName = unproxied.streetName,
+          streetName = StreetName(unproxied.streetName),
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
@@ -47,7 +44,7 @@ class PickupLocationMapper(
         companyId = CompanyId(unproxied.company.id!!),
         name = unproxied.company.name,
         address = Address(
-          streetName = unproxied.streetName,
+          streetName = StreetName(unproxied.streetName),
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
@@ -59,7 +56,7 @@ class PickupLocationMapper(
       is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
         id = UUID.fromString(unproxied.id),
         address = Address(
-          streetName = unproxied.streetName,
+          streetName = StreetName(unproxied.streetName),
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
@@ -184,7 +181,7 @@ class PickupLocationMapper(
       PickupLocationDto.PickupCompanyDto(
         company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
         name = domain.name,
-        streetName = domain.address.streetName,
+        streetName = domain.address.streetName.value,
         buildingNumber = domain.address.buildingNumber,
         buildingNumberAddition = domain.address.buildingNumberAddition,
         postalCode = domain.address.postalCode.value,

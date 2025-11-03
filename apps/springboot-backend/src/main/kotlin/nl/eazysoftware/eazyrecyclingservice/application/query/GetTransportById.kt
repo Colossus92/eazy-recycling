@@ -79,7 +79,7 @@ class GetTransportByIdService(
             vihbId = company.vihbId,
             processorId = company.processorId,
             address = AddressView(
-              street = location.address.streetName,
+              street = location.address.streetName.value,
               houseNumber = location.address.buildingNumber,
               houseNumberAddition = location.address.buildingNumberAddition,
               postalCode = location.address.postalCode.value,
