@@ -1,6 +1,7 @@
 import { FieldValues, UseFormReturn, Path } from 'react-hook-form';
 import { useState } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
+import { AxiosError } from 'axios';
 
 interface UseFormStepNavigationProps<T extends FieldValues> {
   formContext: UseFormReturn<T>;
@@ -46,9 +47,14 @@ export function useFormStepNavigation<T extends FieldValues>({
           setStep(0);
         } catch (error) {
           console.error('Error submitting form:', error);
-          toastService.error(
-            `Er is een fout opgetreden bij het ${isEditMode ? 'bijwerken' : 'aanmaken'} van het transport`
-          );
+          
+          let errorMessage = `Er is een fout opgetreden bij het ${isEditMode ? 'bijwerken' : 'aanmaken'} van het transport`;
+          
+          if (error instanceof AxiosError && error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+          
+          toastService.error(errorMessage);
         }
       }
     } else {

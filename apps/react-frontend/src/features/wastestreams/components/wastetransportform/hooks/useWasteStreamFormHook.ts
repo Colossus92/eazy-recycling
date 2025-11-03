@@ -10,6 +10,7 @@ import { wasteStreamService } from '@/api/services/wasteStreamService.ts';
 import { WasteStreamDetailViewConsignorParty } from '@/api/client/models/waste-stream-detail-view-consignor-party';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
 import { pickupLocationViewToFormValue, locationFormValueToPickupLocationRequest } from '@/types/forms/locationConverters';
+import { AxiosError } from 'axios';
 
 export interface WasteStreamFormValues {
     /**
@@ -101,11 +102,16 @@ export function useWasteStreamForm(
                 onSuccess();
             }
         },
-        onError: (error) => {
+        onError: (error: unknown) => {
             console.error('Error submitting form:', error);
-            toastService.error(
-                `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het afvalstroomnummer`
-            );
+            
+            let errorMessage = `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het afvalstroomnummer`;
+            
+            if (error instanceof AxiosError && error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+            
+            toastService.error(errorMessage);
         },
     });
 
