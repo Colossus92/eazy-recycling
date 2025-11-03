@@ -35,6 +35,10 @@ export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
                             name: `${String(name)}.buildingNumber` as Path<TFieldValues>,
                             rules: { 
                                 required: 'Huisnummer is verplicht', 
+                                min: {
+                                    value: 1,
+                                    message: 'Ongeldig'
+                                },
                                 maxLength: {
                                     value: 10,
                                     message: 'Huisnummer mag maximaal 10 tekens bevatten'

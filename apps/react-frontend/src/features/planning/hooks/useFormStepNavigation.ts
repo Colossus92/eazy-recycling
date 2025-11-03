@@ -47,14 +47,6 @@ export function useFormStepNavigation<T extends FieldValues>({
           setStep(0);
         } catch (error) {
           console.error('Error submitting form:', error);
-          
-          let errorMessage = `Er is een fout opgetreden bij het ${isEditMode ? 'bijwerken' : 'aanmaken'} van het transport`;
-          
-          if (error instanceof AxiosError && error.response?.data?.message) {
-            errorMessage = error.response.data.message;
-          }
-          
-          toastService.error(errorMessage);
         }
       }
     } else {

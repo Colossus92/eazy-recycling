@@ -6,6 +6,7 @@ import {
     createEmptyLocationFormValue,
 } from '@/types/forms/LocationFormValue';
 import { DutchAddressInput } from './DutchAddressInput';
+import { CompanyLocationInput } from './CompanyLocationInput';
 
 interface AddressFormFieldProps<TFieldValues extends FieldValues> {
     /**
@@ -153,51 +154,48 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
 
                         {/* Conditional Fields Based on Location Type */}
                         {currentType === 'dutch_address' && (
-                            <DutchAddressInput 
+                            <DutchAddressInput
                                 name={name}
                             />
                         )}
 
-            {currentType === 'company' && (
-                <div className="w-full flex flex-col gap-3">
-                    {/* TODO: Implement Company Selector */}
-                    <div className="text-sm text-gray-500">
-                        Company selector will be implemented here
-                    </div>
-                </div>
-            )}
+                        {currentType === 'company' && (
+                            <CompanyLocationInput
+                                name={name}
+                            />
+                        )}
 
-            {currentType === 'project_location' && (
-                <div className="w-full flex flex-col gap-3">
-                    {/* TODO: Implement Project Location Fields */}
-                    <div className="text-sm text-gray-500">
-                        Project location fields will be implemented here
-                    </div>
-                </div>
-            )}
+                        {currentType === 'project_location' && (
+                            <div className="w-full flex flex-col gap-3">
+                                {/* TODO: Implement Project Location Fields */}
+                                <div className="text-sm text-gray-500">
+                                    Project location fields will be implemented here
+                                </div>
+                            </div>
+                        )}
 
-            {currentType === 'proximity' && (
-                <div className="w-full flex flex-col gap-3">
-                    {/* TODO: Implement Proximity Description Fields */}
-                    <div className="text-sm text-gray-500">
-                        Proximity description fields will be implemented here
-                    </div>
-                </div>
-            )}
+                        {currentType === 'proximity' && (
+                            <div className="w-full flex flex-col gap-3">
+                                {/* TODO: Implement Proximity Description Fields */}
+                                <div className="text-sm text-gray-500">
+                                    Proximity description fields will be implemented here
+                                </div>
+                            </div>
+                        )}
 
-            {currentType === 'none' && (
-                <div className="w-full">
-                    <div className="text-sm text-gray-500">Geen locatie geselecteerd</div>
-                </div>
-            )}
+                        {currentType === 'none' && (
+                            <div className="w-full">
+                                <div className="text-sm text-gray-500">Geen locatie geselecteerd</div>
+                            </div>
+                        )}
 
-            {/* Error Display */}
-            {fieldState.error && (
-                <div className="text-sm text-red-600">{fieldState.error.message}</div>
-            )}
-          </div >
-        );
-      }}
-    />
-  );
+                        {/* Error Display */}
+                        {fieldState.error && (
+                            <div className="text-sm text-red-600">{fieldState.error.message}</div>
+                        )}
+                    </div >
+                );
+            }}
+        />
+    );
 };
