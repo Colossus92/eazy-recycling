@@ -62,7 +62,7 @@ export const ListboxFormField = ({
 
     return (
         <div className="flex flex-col items-start self-stretch gap-1" data-testid={testId}>
-            <span className="text-caption-1">{title}</span>
+            <span className="text-caption-2">{title}</span>
             <Listbox value={selected} onChange={handleChange} disabled={disabled}>
                 <ListboxButton
                     className={clsx(

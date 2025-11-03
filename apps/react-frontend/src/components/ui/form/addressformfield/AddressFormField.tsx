@@ -87,7 +87,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
             }}
             render={({ field, fieldState }) => {
                 const currentLocation = field.value as LocationFormValue;
-                const currentType = currentLocation?.type || 'none';
+                const currentType = currentLocation?.type || 'company';
 
                 const handleTypeChange = (newType: LocationType) => {
                     const newLocation = createEmptyLocationFormValue(newType);
@@ -112,7 +112,6 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                             />
                         </div>
 
-                        {/* Conditional Fields Based on Location Type */}
                         {currentType === 'dutch_address' && (
                             <DutchAddressInput
                                 name={name}
