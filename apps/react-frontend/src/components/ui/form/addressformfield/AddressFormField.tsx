@@ -37,6 +37,11 @@ interface AddressFormFieldProps<TFieldValues extends FieldValues> {
      * Optional test ID for e2e testing
      */
     testId?: string;
+
+    /**
+     * Whether the 'Geen locatie' option is allowed
+     */
+    isNoLocationAllowed?: boolean;
 }
 
 const locationTypeOptions = [
@@ -69,7 +74,12 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
     required = false,
     disabled = false,
     testId = 'address-form-field',
+    isNoLocationAllowed = false,
 }: AddressFormFieldProps<TFieldValues>) => {
+    const filteredLocationTypeOptions = locationTypeOptions.filter(
+        (option) => option.value !== 'none' || isNoLocationAllowed
+    );
+
     return (
         <Controller
             control={control}
@@ -134,7 +144,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                         <div className="w-full">
                             <ListboxFormField
                                 title="Type locatie"
-                                options={locationTypeOptions}
+                                options={filteredLocationTypeOptions}
                                 value={currentType}
                                 onChange={(value) => handleTypeChange(value as LocationType)}
                                 disabled={disabled}
