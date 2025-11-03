@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.*
@@ -205,6 +206,7 @@ sealed class PickupLocationRequest {
 
   data class ProximityDescriptionRequest(
     @field:NotBlank(message = "Omschrijving is verplicht")
+    @field:Size(max = 200, message = "Omschrijving mag maximaal 200 tekens bevatten")
     val description: String,
 
     @field:NotBlank(message = "Postcode cijfers zijn verplicht")
@@ -212,9 +214,11 @@ sealed class PickupLocationRequest {
     val postalCodeDigits: String,
 
     @field:NotBlank(message = "Stad is verplicht")
+    @field:Size(max = 24, message = "Plaats mag maximaal 24 tekens bevatten")
     val city: String,
 
     @field:NotBlank(message = "Land is verplicht")
+    @field:Size(max = 43, message = "Plaats mag maximaal 43 tekens bevatten")
     val country: String
   ) : PickupLocationRequest() {
     override fun toCommand() = PickupLocationCommand.ProximityDescriptionCommand(

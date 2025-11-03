@@ -149,12 +149,13 @@ class PickupLocationMapper(
   private fun createProximity(
     domain: ProximityDescription
   ): PickupLocationDto.ProximityDescriptionDto {
-    return PickupLocationDto.ProximityDescriptionDto(
+    val newLocation = PickupLocationDto.ProximityDescriptionDto(
       description = domain.description,
       postalCode = domain.postalCodeDigits,
       city = domain.city,
       country = domain.country
     )
+    return pickupLocationRepository.save(newLocation)
   }
 
   private fun findOrCreateDutchAddress(address: DutchAddress): PickupLocationDto.DutchAddressDto {

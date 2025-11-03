@@ -7,6 +7,7 @@ import {
 } from 'react-hook-form';
 import clsx from 'clsx';
 import { formInputClasses } from '@/styles/formInputClasses.ts';
+import { getFieldError } from '@/utils/formErrorUtils';
 
 interface TextAreaFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
@@ -33,13 +34,13 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
   testId,
 }: TextAreaFormFieldProps<TFieldValues>) => {
   const { register, name, rules, errors } = formHook;
-  const error = errors[name]?.message as string;
+  const fieldError = getFieldError(formHook?.errors, formHook?.name);
   const textColorClasses = disabled
     ? formInputClasses.text.disabled
     : formInputClasses.text.default;
   const borderColorClasses = disabled
     ? formInputClasses.border.disabled
-    : error
+    : fieldError
       ? formInputClasses.border.error
       : formInputClasses.border.default;
   const backgroundClasses = disabled
@@ -66,8 +67,8 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
         data-testid={testId}
         {...register(name, rules)}
       />
-      {error && <span className="text-caption-1 text-color-status-error-dark">
-        {error}
+      {fieldError && <span className="text-caption-1 text-color-status-error-dark">
+        {fieldError}
       </span>}
     </div>
   );

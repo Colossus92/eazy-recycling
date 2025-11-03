@@ -7,6 +7,7 @@ import {
 } from '@/types/forms/LocationFormValue';
 import { DutchAddressInput } from './DutchAddressInput';
 import { CompanyLocationInput } from './CompanyLocationInput';
+import { ProximityLocationInput } from './ProximityLocationInput';
 
 interface AddressFormFieldProps<TFieldValues extends FieldValues> {
     /**
@@ -176,10 +177,9 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
 
                         {currentType === 'proximity' && (
                             <div className="w-full flex flex-col gap-3">
-                                {/* TODO: Implement Proximity Description Fields */}
-                                <div className="text-sm text-gray-500">
-                                    Proximity description fields will be implemented here
-                                </div>
+                                <ProximityLocationInput
+                                    name={name}
+                                />
                             </div>
                         )}
 

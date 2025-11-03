@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
@@ -39,6 +40,19 @@ class GlobalExceptionHandler {
   fun handleDuplicateKeyException(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> {
     val errorResponse = ErrorResponse(
       message = ex.message ?: "Ongeldige invoer",
+    )
+
+    logException(ex)
+
+    return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException::class)
+  fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+    val errors = ex.bindingResult.fieldErrors.joinToString(", ") { "${it.defaultMessage}" }
+
+    val errorResponse = ErrorResponse(
+      message = errors.ifEmpty { "Validatie mislukt" },
     )
 
     logException(ex)

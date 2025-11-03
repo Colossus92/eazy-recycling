@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { FieldValues } from 'react-hook-form';
 import { FormProps } from './TextFormField.tsx';
 import { formInputClasses } from '@/styles/formInputClasses.ts';
+import { getFieldError } from '@/utils/formErrorUtils';
 
 interface InputProps<TFieldValues extends FieldValues>
   extends InputHTMLAttributes<HTMLInputElement> {
@@ -19,12 +20,13 @@ export const TextInput = <TFieldValues extends FieldValues>({
   formHook,
   ...props
 }: InputProps<TFieldValues>) => {
+  const fieldError = getFieldError(formHook?.errors, formHook?.name);
   const textColorClasses = disabled
     ? formInputClasses.text.disabled
     : formInputClasses.text.default;
   const borderColorClasses = disabled
     ? formInputClasses.border.disabled
-    : formHook?.errors?.[formHook.name as keyof TFieldValues]
+    : fieldError
       ? formInputClasses.border.error
       : formInputClasses.border.default;
   const backgroundClasses = disabled
