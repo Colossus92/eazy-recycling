@@ -152,6 +152,7 @@ fun PickupLocationDto.toPickupLocationView(): PickupLocationView {
     )
 
     is PickupLocationDto.PickupProjectLocationDto -> PickupLocationView.ProjectLocationView(
+      id = unproxied.id,
       company = CompanyViewMapper.map(unproxied.company),
       streetName = unproxied.streetName,
       buildingNumber = unproxied.buildingNumber,

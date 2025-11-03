@@ -91,6 +91,7 @@ class GetTransportByIdService(
       }
 
       is Location.ProjectLocation -> PickupLocationView.ProjectLocationView(
+        id = location.id.toString(),
         company = mapCompany(location.companyId.uuid),
         streetName = location.streetName(),
         postalCode = location.postalCode().value,

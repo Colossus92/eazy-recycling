@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMap
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROJECT_LOCATION
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
@@ -99,7 +100,7 @@ class WasteStreamQueryRepository(
           ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
         "${company.name}, ${company.address.city}"
       }
-
+      PROJECT_LOCATION -> "${columns[7]} ${columns[8]}, ${columns[10]}"
       NO_PICKUP -> "Geen herkomstlocatie"
       else -> throw IllegalStateException("Unexpected pickup location type: $locationType")
     }

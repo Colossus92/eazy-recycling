@@ -52,10 +52,6 @@ const locationTypeOptions = [
         label: 'Bedrijf',
     },
     {
-        value: 'project_location',
-        label: 'Project locatie',
-    },
-    {
         value: 'dutch_address',
         label: 'Handmatig adres',
     },
@@ -88,52 +84,15 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
             name={name}
             rules={{
                 required: required ? 'Locatie is verplicht' : undefined,
-                validate: (value: LocationFormValue) => {
-                    // Basic validation - can be extended
-                    if (!value || !value.type) {
-                        return 'Locatietype is verplicht';
-                    }
-
-                    // Type-specific validation will go here
-                    switch (value.type) {
-                        case 'dutch_address':
-                            // TODO: Implement validation
-                            break;
-                        case 'company':
-                            // TODO: Implement validation
-                            break;
-                        case 'project_location':
-                            // TODO: Implement validation
-                            break;
-                        case 'proximity':
-                            // TODO: Implement validation
-                            break;
-                        case 'none':
-                            // No validation needed
-                            break;
-                    }
-
-                    return true;
-                },
             }}
             render={({ field, fieldState }) => {
                 const currentLocation = field.value as LocationFormValue;
                 const currentType = currentLocation?.type || 'none';
 
                 const handleTypeChange = (newType: LocationType) => {
-                    // When type changes, create a new empty location of that type
                     const newLocation = createEmptyLocationFormValue(newType);
                     field.onChange(newLocation);
                 };
-
-                // Helper function for updating individual fields within the location
-                // Will be used when implementing the specific field inputs
-                // const handleFieldChange = (fieldName: string, fieldValue: any) => {
-                //   field.onChange({
-                //     ...currentLocation,
-                //     [fieldName]: fieldValue,
-                //   });
-                // };
 
                 return (
                     <div
@@ -147,7 +106,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                             <ListboxFormField
                                 title="Type locatie"
                                 options={filteredLocationTypeOptions}
-                                value={currentType}
+                                value={currentType === 'project_location' ? 'company' : currentType}
                                 onChange={(value) => handleTypeChange(value as LocationType)}
                                 disabled={disabled}
                             />
@@ -160,19 +119,10 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                             />
                         )}
 
-                        {currentType === 'company' && (
+                        {(currentType === 'company' || currentType === 'project_location') && (
                             <CompanyLocationInput
                                 name={name}
                             />
-                        )}
-
-                        {currentType === 'project_location' && (
-                            <div className="w-full flex flex-col gap-3">
-                                {/* TODO: Implement Project Location Fields */}
-                                <div className="text-sm text-gray-500">
-                                    Project location fields will be implemented here
-                                </div>
-                            </div>
                         )}
 
                         {currentType === 'proximity' && (
@@ -191,7 +141,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
 
                         {/* Error Display */}
                         {fieldState.error && (
-                            <div className="text-sm text-red-600">{fieldState.error.message}</div>
+                            <span className="text-caption-1 text-color-status-error-dark">{fieldState.error.message}</span>
                         )}
                     </div >
                 );

@@ -112,6 +112,7 @@ class PickupLocationMapper(
 
       is PickupLocationDto.PickupProjectLocationDto -> {
         PickupLocationView.ProjectLocationView(
+          id = dto.id,
           company = CompanyViewMapper.map(dto.company),
           streetName = dto.streetName,
           postalCode = dto.postalCode,

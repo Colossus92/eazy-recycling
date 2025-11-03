@@ -39,6 +39,7 @@ sealed class PickupLocationView {
   ) : PickupLocationView()
 
   data class ProjectLocationView(
+    val id: String,
     val company: CompanyView,
     val streetName: String,
     val postalCode: String,

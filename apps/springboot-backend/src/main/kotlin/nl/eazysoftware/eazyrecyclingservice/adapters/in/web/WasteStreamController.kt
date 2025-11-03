@@ -231,7 +231,6 @@ sealed class PickupLocationRequest {
 
   data class ProjectLocationRequest(
 
-    @field:NotBlank(message = "Projectlocatie ID is verplicht")
     val id: UUID,
 
     val companyId: UUID,
