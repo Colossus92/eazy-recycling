@@ -39,7 +39,6 @@ export const WasteTransportForm = ({
       onSubmit: async (data) => {
         await mutation.mutateAsync(data);
       },
-      isEditMode: !!transportId,
       isSubmitting: mutation.isPending,
     });
 

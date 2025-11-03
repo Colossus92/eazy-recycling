@@ -37,7 +37,6 @@ export const WasteStreamForm = ({
       onSubmit: async (data) => {
         await mutation.mutateAsync(data);
       },
-      isEditMode: !!wasteStreamNumber,
       isSubmitting: mutation.isPending,
     });
 

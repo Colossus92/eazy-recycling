@@ -1,13 +1,11 @@
 import { FieldValues, UseFormReturn, Path } from 'react-hook-form';
 import { useState } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
-import { AxiosError } from 'axios';
 
 interface UseFormStepNavigationProps<T extends FieldValues> {
   formContext: UseFormReturn<T>;
   fieldsToValidate: Array<Array<Path<T>>>;
   onSubmit: (data: T) => Promise<void> | void;
-  isEditMode?: boolean;
   isSubmitting?: boolean;
 }
 
@@ -15,7 +13,6 @@ export function useFormStepNavigation<T extends FieldValues>({
   formContext,
   fieldsToValidate,
   onSubmit,
-  isEditMode = false,
   isSubmitting = false,
 }: UseFormStepNavigationProps<T>) {
   const [step, setStep] = useState(0);

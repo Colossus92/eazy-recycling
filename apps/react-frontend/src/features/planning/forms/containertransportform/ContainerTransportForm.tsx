@@ -38,7 +38,6 @@ export const ContainerTransportForm = ({
       onSubmit: async (data) => {
         await mutation.mutateAsync(data);
       },
-      isEditMode: !!transportId,
       isSubmitting: mutation.isPending,
     });
 
