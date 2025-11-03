@@ -68,7 +68,7 @@ export const ListboxFormField = ({
                     className={clsx(
                         'relative flex h-10 items-center self-stretch w-full rounded-md bg-color-surface-primary gap-2 py-2 px-3 text-left text-body-1 text-color-text-secondary',
                         'border border-color-border-primary text-color-text-secondary',
-                        'hover:bg-color-brand-light hover:border-color-brand-dark hover:text-color-brand-dark',
+                        'hover:bg-color-brand-light hover:border-color-brand-dark hover:text-color-text-secondary',
                         'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25'
                     )}
                 >
