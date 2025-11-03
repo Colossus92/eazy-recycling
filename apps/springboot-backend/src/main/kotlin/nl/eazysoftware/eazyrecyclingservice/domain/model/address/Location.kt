@@ -175,20 +175,13 @@ class LocationFactory(
           ?.let { DutchPostalCode(it) }
           ?: throw IllegalArgumentException("De postcode is verplicht "),
         buildingNumber = buildingNumber
-          ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
+          ?: throw IllegalArgumentException("Een huisnummer is verplicht in een adres"),
         buildingNumberAddition = buildingNumberAddition,
-        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht in een adres"),
         country = "Nederland"
       )
     )
 
     return NoLocation
-  }
-}
-
-data class City(val value: String) {
-  init {
-    require(value.isNotBlank()) { "De stad is verplicht" }
-    require(value.length <= 24) { "De stad mag maximaal 24 tekens bevatten, maar was: $value" }
   }
 }

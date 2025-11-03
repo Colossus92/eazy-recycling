@@ -22,3 +22,10 @@ data class StreetName(val value: String) {
     require(value.length <= 24) { "De straatnaam mag maximaal 24 tekens bevatten, maar was: $value" }
   }
 }
+
+data class City(val value: String) {
+  init {
+    require(value.isNotBlank()) { "De stad is verplicht" }
+    require(value.length <= 24) { "De stad mag maximaal 24 tekens bevatten, maar was: $value" }
+  }
+}
