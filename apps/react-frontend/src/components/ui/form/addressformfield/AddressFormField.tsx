@@ -8,6 +8,7 @@ import {
 import { DutchAddressInput } from './DutchAddressInput';
 import { CompanyLocationInput } from './CompanyLocationInput';
 import { ProximityLocationInput } from './ProximityLocationInput';
+import Warning from '@/assets/icons/Warning.svg?react';
 
 interface AddressFormFieldProps<TFieldValues extends FieldValues> {
     /**
@@ -44,6 +45,11 @@ interface AddressFormFieldProps<TFieldValues extends FieldValues> {
      * Whether the 'Geen locatie' option is allowed
      */
     isNoLocationAllowed?: boolean;
+
+    /**
+     * Entity for which the address is being set
+     */
+    entity?: 'transport' | 'afvalstroomnummer';
 }
 
 const locationTypeOptions = [
@@ -73,11 +79,11 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
     disabled = false,
     testId = 'address-form-field',
     isNoLocationAllowed = false,
+    entity = 'transport',
 }: AddressFormFieldProps<TFieldValues>) => {
     const filteredLocationTypeOptions = locationTypeOptions.filter(
         (option) => option.value !== 'none' || isNoLocationAllowed
     );
-
     return (
         <Controller
             control={control}
@@ -133,8 +139,13 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                         )}
 
                         {currentType === 'none' && (
-                            <div className="w-full">
-                                <div className="text-sm text-gray-500">Geen locatie geselecteerd</div>
+                            <div className="w-full flex py-2 pl-2 pr-3 gap-2 border border-solid border-color-border-hover rounded-radius-md items-center ">
+                                <Warning className='size-6 text-color-text-secondary'/>
+                                <div className="flex flex-col gap-1 flex-1 items-start">
+                                    <span className="text-subtitle-2">Geen locatie geselecteerd</span>
+                                    <span className="text-caption-1">Dit {entity} zal niet aan een locatie van herkomst worden toegewezen</span>
+                                </div>
+                                
                             </div>
                         )}
 

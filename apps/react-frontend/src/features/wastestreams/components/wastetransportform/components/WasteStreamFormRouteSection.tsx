@@ -28,6 +28,7 @@ export const WasteStreamFormRouteSection = () => {
         control={formContext.control}
         name="pickupLocation"
         label="Locatie van herkomst"
+        entity="afvalstroomnummer"
       />
       <ProcessorPartySelectFormField
         name="processorPartyId"

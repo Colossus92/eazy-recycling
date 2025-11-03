@@ -12,7 +12,7 @@ export const Note = ({ note }: NoteProps) => {
         'flex items-center self-stretch gap-2 py-2 pl-2 pr-3 border border-solid border-color-status-warning-primary bg-color-status-warning-light rounded-radius-sm'
       }
     >
-      <Warning />
+      <Warning className='text-color-status-warning-primary' />
       <span className={'text-body-2'}>{note}</span>
     </div>
   );
