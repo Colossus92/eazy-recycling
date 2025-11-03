@@ -33,7 +33,7 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
   formHook,
   testId,
 }: TextAreaFormFieldProps<TFieldValues>) => {
-  const { register, name, rules, errors } = formHook;
+  const { register, name, rules } = formHook;
   const fieldError = getFieldError(formHook?.errors, formHook?.name);
   const textColorClasses = disabled
     ? formInputClasses.text.disabled
