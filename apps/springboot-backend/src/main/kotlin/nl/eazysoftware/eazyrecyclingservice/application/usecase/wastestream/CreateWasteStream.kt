@@ -1,9 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
@@ -127,7 +124,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
         postalCode = DutchPostalCode(postalCode),
         buildingNumber = buildingNumber,
         buildingNumberAddition = buildingNumberAddition,
-        city = city,
+        city = City(city),
         country = country
       )
     )
@@ -135,7 +132,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
     is PickupLocationCommand.ProximityDescriptionCommand -> Location.ProximityDescription(
       description = description,
       postalCodeDigits = postalCodeDigits,
-      city = city,
+      city = City(city),
       country = country
     )
 
@@ -147,7 +144,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
         postalCode = DutchPostalCode(postalCode),
         buildingNumber = buildingNumber,
         buildingNumberAddition = buildingNumberAddition,
-        city = city,
+        city = City(city),
         country = country
       )
     )
@@ -162,7 +159,7 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
           postalCode = DutchPostalCode(company.address.postalCode),
           buildingNumber = company.address.buildingNumber,
           buildingNumberAddition = company.address.buildingName,
-          city = company.address.city ?: throw IllegalStateException("Het bedrijf heet geen stad, dit is verplicth"),
+          city = company.address.city?.let { City(it) } ?: throw IllegalStateException("Het bedrijf heet geen stad, dit is verplicth"),
           country = company.address.country ?: "Nederland"
         ),
       )

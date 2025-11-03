@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
@@ -279,7 +280,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
                     streetName = "Test Street",
                     postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
                     buildingNumber = "1",
-                    city = "Test City"
+                    city = City("Test City")
                 )
             ),
             pickupDateTime = kotlinx.datetime.Clock.System.now(),
@@ -288,7 +289,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
                     streetName = "Test Street",
                     postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode("1234AB"),
                     buildingNumber = "1",
-                    city = "Test City"
+                    city = City("Test City")
                 )
             ),
             deliveryDateTime = kotlinx.datetime.Clock.System.now(),

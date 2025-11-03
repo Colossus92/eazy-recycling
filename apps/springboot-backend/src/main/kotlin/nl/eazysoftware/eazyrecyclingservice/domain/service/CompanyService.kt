@@ -134,7 +134,7 @@ class CompanyService(
             streetName = branch.address.streetName,
             buildingNumber = branch.address.buildingNumber,
             postalCode = branch.address.postalCode.value,
-            city = branch.address.city,
+            city = branch.address.city.value,
             country = branch.address.country
           ),
           companyId = branch.companyId.uuid,

@@ -6,6 +6,7 @@ import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -47,7 +48,7 @@ class WasteTransportMapper(
               streetName = it.address.streetName ?: throw IllegalStateException("Bedrijf heeft geen straatnaam, maar dit is verplicht"),
               buildingNumber = it.address.buildingNumber,
               buildingNumberAddition = it.address.buildingName,
-              city = it.address.city ?: throw IllegalStateException("Bedrijf heeft geen stad, maar dit is verplicht"),
+              city = it.address.city?.let { value -> City(value) } ?: throw IllegalStateException("Bedrijf heeft geen stad, maar dit is verplicht"),
               country = it.address.country ?: "Nederland",
               postalCode = DutchPostalCode(it.address.postalCode)
             )

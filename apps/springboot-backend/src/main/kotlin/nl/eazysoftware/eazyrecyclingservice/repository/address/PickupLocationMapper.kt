@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.address
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
@@ -30,7 +31,7 @@ class PickupLocationMapper(
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
-          city = unproxied.city,
+          city = City(unproxied.city),
           country = unproxied.country,
         )
       )
@@ -38,7 +39,7 @@ class PickupLocationMapper(
       is PickupLocationDto.ProximityDescriptionDto -> ProximityDescription(
         description = unproxied.description,
         postalCodeDigits = unproxied.postalCode,
-        city = unproxied.city,
+        city = City(unproxied.city),
         country = unproxied.country
       )
 
@@ -50,7 +51,7 @@ class PickupLocationMapper(
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
-          city = unproxied.city,
+          city = City(unproxied.city),
           country = unproxied.country,
         )
       )
@@ -62,7 +63,7 @@ class PickupLocationMapper(
           postalCode = DutchPostalCode(unproxied.postalCode),
           buildingNumber = unproxied.buildingNumber,
           buildingNumberAddition = unproxied.buildingNumberAddition,
-          city = unproxied.city,
+          city = City(unproxied.city),
           country = unproxied.country,
         ),
         companyId = CompanyId(unproxied.company.id!!)
@@ -139,7 +140,7 @@ class PickupLocationMapper(
       buildingNumber = location.buildingNumber(),
       buildingNumberAddition = location.buildingNumberAddition(),
       postalCode = location.postalCode().value,
-      city = location.city(),
+      city = location.city().value,
       country = location.country()
     )
 
@@ -153,7 +154,7 @@ class PickupLocationMapper(
     val newLocation = PickupLocationDto.ProximityDescriptionDto(
       description = domain.description,
       postalCode = domain.postalCodeDigits,
-      city = domain.city,
+      city = domain.city.value,
       country = domain.country
     )
     return pickupLocationRepository.save(newLocation)
@@ -187,7 +188,7 @@ class PickupLocationMapper(
         buildingNumber = domain.address.buildingNumber,
         buildingNumberAddition = domain.address.buildingNumberAddition,
         postalCode = domain.address.postalCode.value,
-        city = domain.address.city,
+        city = domain.address.city.value,
         country = domain.address.country,
       )
     )

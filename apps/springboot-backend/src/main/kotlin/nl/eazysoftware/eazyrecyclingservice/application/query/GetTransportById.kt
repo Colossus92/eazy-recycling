@@ -61,7 +61,7 @@ class GetTransportByIdService(
 
       is Location.ProximityDescription -> PickupLocationView.ProximityDescriptionView(
         postalCodeDigits = location.postalCodeDigits,
-        city = location.city,
+        city = location.city.value,
         description = location.description,
         country = location.country
       )
@@ -83,7 +83,7 @@ class GetTransportByIdService(
               houseNumber = location.address.buildingNumber,
               houseNumberAddition = location.address.buildingNumberAddition,
               postalCode = location.address.postalCode.value,
-              city = location.address.city,
+              city = location.address.city.value,
               country = location.address.country
             )
           )
@@ -97,7 +97,7 @@ class GetTransportByIdService(
         postalCode = location.postalCode().value,
         buildingNumber = location.buildingNumber(),
         buildingNumberAddition = location.buildingNumberAddition(),
-        city = location.city(),
+        city = location.city().value,
         country = location.country()
       )
 

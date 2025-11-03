@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -12,7 +13,7 @@ object TestLocationFactory {
       streetName = "Stadstraat",
       postalCode = DutchPostalCode("1234 AB"),
       buildingNumber = "2",
-      city = "Test City",
+      city = City("Test City"),
     ),
   )
 
@@ -26,7 +27,7 @@ object TestLocationFactory {
         streetName = company.address.streetName!!,
         postalCode = DutchPostalCode(company.address.postalCode),
         buildingNumber = company.address.buildingNumber,
-        city = company.address.city!!,
+        city = company.address.city?.let { City(it) }!!,
         country = company.address.country!!,
       ),
     )
@@ -35,7 +36,7 @@ object TestLocationFactory {
   fun createProximityDescription() =
     Location.ProximityDescription(
       "1234",
-      "Stad",
+      City("Stad"),
       "Nabijheidsbeschrijving"
     )
 }

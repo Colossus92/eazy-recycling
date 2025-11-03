@@ -3,10 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.waste
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
@@ -74,7 +71,7 @@ class WasteStreamTest {
             streetName = "Stadstraat",
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "2",
-            city = "Test City",
+            city = City("Test City"),
           )
         ),
         deliveryLocation = destinationLocation(),
@@ -263,7 +260,7 @@ class WasteStreamTest {
             streetName = "Stadstraat",
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
-            city = "Test city",
+            city = City("Test city"),
           ),
         ),
         deliveryLocation = destinationLocation(),
@@ -288,7 +285,7 @@ class WasteStreamTest {
             streetName = "Stadstraat",
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
-            city = "Test city",
+            city = City("Test city"),
           ),
         ),
         deliveryLocation = destinationLocation(),
@@ -313,7 +310,7 @@ class WasteStreamTest {
             streetName = "Stadstraat",
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
-            city = "Test city",
+            city = City("Test city"),
           ),
         ),
         deliveryLocation = destinationLocation(),
@@ -356,7 +353,7 @@ class WasteStreamTest {
             streetName = "Stadstraat",
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "",
-            city = "Test city",
+            city = City("Test city"),
           ),
         )
       }
@@ -372,7 +369,7 @@ class WasteStreamTest {
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             country = "Belgium",
-            city = "Test city"
+            city = City("Test city")
           ),
         )
       }
@@ -388,7 +385,7 @@ class WasteStreamTest {
             postalCode = DutchPostalCode("1234 AB"),
             buildingNumber = "123",
             buildingNumberAddition = "A",
-            city = "Test city"
+            city = City("Test city")
           ),
         )
       }
@@ -402,7 +399,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "1234 AB",
-          "Stad",
+          City("Stad"),
           "Nabijheidsbeschrijving"
         )
       }
@@ -414,7 +411,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "123",
-          "Stad",
+          City("Stad"),
           "Nabijheidsbeschrijving"
         )
       }
@@ -426,7 +423,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "12345",
-          "Stad",
+          City("Stad"),
           "Nabijheidsbeschrijving"
         )
       }
@@ -438,7 +435,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "1234a",
-          "Stad",
+          City("Stad"),
           "Nabijheidsbeschrijving"
         )
       }
@@ -450,11 +447,11 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "1234",
-          "",
+          City(""),
           "Nabijheidsbeschrijving"
         )
       }
-      assertThat(exception.message).isEqualTo("De stad moet een waarde hebben")
+      assertThat(exception.message).isEqualTo("De stad is verplicht")
     }
 
     @Test
@@ -462,7 +459,7 @@ class WasteStreamTest {
       val exception = assertFailsWith<IllegalArgumentException> {
         Location.ProximityDescription(
           "1234",
-          "Stad",
+          City("Stad"),
           ""
         )
       }

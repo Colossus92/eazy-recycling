@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 
 data class AddressRequest(
@@ -20,6 +21,6 @@ data class AddressRequest(
     buildingNumber,
     buildingNumberAddition,
     DutchPostalCode(postalCode),
-    city,
+    City(city),
     country)
 }

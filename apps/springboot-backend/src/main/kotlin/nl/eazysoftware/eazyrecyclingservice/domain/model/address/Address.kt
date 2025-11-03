@@ -5,7 +5,7 @@ data class Address(
   val buildingNumber: String,
   val buildingNumberAddition: String? = null,
   val postalCode: DutchPostalCode,
-  val city: String,
+  val city: City,
   val country: String = "Nederland",
 ) {
   init {
@@ -14,9 +14,6 @@ data class Address(
     }
     require(!buildingNumber.isBlank()){
       "Huisnummer moet een waarde hebben."
-    }
-    require(!city.isBlank()){
-      "Woonplaats moet een waarde hebben."
     }
   }
 }

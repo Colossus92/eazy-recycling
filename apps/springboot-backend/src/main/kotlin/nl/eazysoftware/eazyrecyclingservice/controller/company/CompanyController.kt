@@ -3,17 +3,12 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.CreateProjectLocationCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.DeleteProjectLocationCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.ProjectLocationResult
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.UpdateProjectLocationCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
@@ -76,7 +71,7 @@ class CompanyController(
           buildingNumber = projectLocation.buildingNumber,
           buildingNumberAddition = projectLocation.buildingNumberAddition,
           postalCode = DutchPostalCode(projectLocation.postalCode),
-          city = projectLocation.city,
+          city = City(projectLocation.city),
           country = projectLocation.country
         )))
 
@@ -109,7 +104,7 @@ class CompanyController(
           buildingNumber = branch.buildingNumber,
           buildingNumberAddition = branch.buildingNumberAddition,
           postalCode = DutchPostalCode(branch.postalCode),
-          city = branch.city,
+          city = City(branch.city),
           country = branch.country
         )
       )

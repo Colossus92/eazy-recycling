@@ -29,7 +29,7 @@ sealed interface Location {
     fun buildingNumber(): String = address.buildingNumber
     fun buildingNumberAddition(): String? = address.buildingNumberAddition
     fun postalCode(): DutchPostalCode = address.postalCode
-    fun city(): String = address.city
+    fun city(): String = address.city.value
     fun country(): String = address.country
   }
 
@@ -39,7 +39,7 @@ sealed interface Location {
    */
   data class ProximityDescription(
     val postalCodeDigits: String,
-    val city: String,
+    val city: City,
     val description: String,
     val country: String = "Nederland"
   ) : Location {
@@ -47,8 +47,10 @@ sealed interface Location {
       require(postalCodeDigits.matches(Regex("\\d{4}"))) {
         "Voor een nabijheidsbeschrijving moet de postcode alleen vier cijfers bevatten, maar was: $postalCodeDigits"
       }
-      require(city.isNotBlank()) { "De stad moet een waarde hebben" }
       require(description.isNotBlank()) { "De nabijheidsbeschrijving is verplicht" }
+      require(description.length <= 200) {
+        "De nabijheidsbeschrijving mag maximaal 200 tekens bevatten, maar was: ${description.length}"
+      }
     }
   }
 
@@ -85,7 +87,7 @@ sealed interface Location {
     fun buildingNumber(): String = address.buildingNumber
     fun buildingNumberAddition(): String? = address.buildingNumberAddition
     fun postalCode(): DutchPostalCode = address.postalCode
-    fun city(): String = address.city
+    fun city(): City = address.city
     fun country(): String = address.country
 
 
@@ -127,7 +129,7 @@ class LocationFactory(
     if (description?.isNotBlank() == true) return ProximityDescription(
       postalCodeDigits = postalCode
         ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
-      city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+      city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
       description = description,
       country = "Nederland"
     )
@@ -142,7 +144,7 @@ class LocationFactory(
         buildingNumber = buildingNumber
           ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
         buildingNumberAddition = buildingNumberAddition,
-        city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
         country = "Nederland"
       )
     )
@@ -159,7 +161,7 @@ class LocationFactory(
           postalCode = DutchPostalCode(company.address.postalCode),
           buildingNumber = company.address.buildingNumber,
           buildingNumberAddition = company.address.buildingName,
-          city = company.address.city
+          city = company.address.city?.let { City(it) }
             ?: throw IllegalArgumentException("Bedrijf heeft geen stad, maar dit is verplicht"),
           country = "Nederland"
         )
@@ -175,11 +177,18 @@ class LocationFactory(
         buildingNumber = buildingNumber
           ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
         buildingNumberAddition = buildingNumberAddition,
-        city = city ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
+        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
         country = "Nederland"
       )
     )
 
     return NoLocation
+  }
+}
+
+data class City(val value: String) {
+  init {
+    require(value.isNotBlank()) { "De stad is verplicht" }
+    require(value.length <= 24) { "De stad mag maximaal 24 tekens bevatten, maar was: $value" }
   }
 }
