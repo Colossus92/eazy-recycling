@@ -2,16 +2,16 @@ import { FormDialog } from "@/components/ui/dialog/FormDialog";
 import { useErrorHandling } from "@/hooks/useErrorHandling";
 import { FormEvent, useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { fallbackRender } from "@/utils/fallbackRender";
 import { FormTopBar } from "@/components/ui/form/FormTopBar";
 import { TextFormField } from "@/components/ui/form/TextFormField";
 import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
 import { WasteContainerRequest, WasteContainerView } from "@/api/client/models";
-import { Company, companyService } from "@/api/services/companyService";
-import { useQuery } from "@tanstack/react-query";
 import { TextAreaFormField } from "@/components/ui/form/TextAreaFormField";
-import { CompanyAddressInput } from "@/components/ui/form/CompanyAddressInput";
+import { AddressFormField } from "@/components/ui/form/addressformfield/AddressFormField";
+import { LocationFormValue } from "@/types/forms/LocationFormValue";
+import { pickupLocationViewToFormValue, locationFormValueToPickupLocationRequest } from "@/types/forms/locationConverters";
 
 interface WasteContainerFormProps {
     isOpen: boolean;
@@ -24,107 +24,58 @@ interface WasteContainerFormProps {
 export interface WasteContainerFormValues {
     id: string;
     containerType: string;
-    companyId?: string;
-    street: string;
-    buildingNumber: string;
-    postalCode?: string;
-    city: string;
+    location: LocationFormValue;
     notes?: string;
 }
 
 function toWasteContainer(
-    data: WasteContainerFormValues,
-    companies: Company[]
+    data: WasteContainerFormValues
 ): WasteContainerRequest {
     const container: WasteContainerRequest = {
         id: data.id,
-        location: {
-            address: {
-                streetName: data.street,
-                buildingNumber: data.buildingNumber,
-                postalCode: data.postalCode || '',
-                city: data.city,
-                country: 'Nederland',
-            }
-        },
+        location: locationFormValueToPickupLocationRequest(data.location),
         notes: data.notes,
     };
-
-    if (data.companyId) {
-        const company = companies.find((c) => c.id === data.companyId);
-        if (company) {
-            container.location = {
-                companyId: company.id,
-                companyName: company.name,
-                address: {
-                    streetName: data.street,
-                    buildingNumber: data.buildingNumber,
-                    postalCode: data.postalCode || '',
-                    city: data.city,
-                    country: 'Nederland',
-                }
-            };
-        }
-    }
 
     return container;
 }
 
 export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: WasteContainerFormProps) => {
     const { handleError, ErrorDialogComponent } = useErrorHandling();
-    const {
-        register,
-        handleSubmit,
-        reset,
-        watch,
-        setValue,
-        formState: { errors },
-        control,
-    } = useForm<WasteContainerFormValues>();
-
-    const { data: companies = [] } = useQuery<Company[]>({
-        queryKey: ['companies'],
-        queryFn: () => companyService.getAll(),
-    });
+    const formContext = useForm<WasteContainerFormValues>();
 
     // Reset form when initialData changes (for edit mode)
     useEffect(() => {
         if (initialData) {
-            reset({
+            formContext.reset({
                 id: initialData.id,
-                companyId: initialData?.location?.companyId,
-                street: initialData?.location?.addressView?.street,
-                buildingNumber: initialData?.location?.addressView?.houseNumber,
-                postalCode: initialData?.location?.addressView?.postalCode,
-                city: initialData?.location?.addressView?.city,
+                containerType: '',
+                location: pickupLocationViewToFormValue(initialData.location),
                 notes: initialData.notes,
             });
         } else {
             // Clear form when creating new container
-            reset({
+            formContext.reset({
                 id: '',
-                companyId: '',
-                street: '',
-                buildingNumber: '',
-                postalCode: '',
-                city: '',
+                containerType: '',
+                location: { type: 'none' },
                 notes: '',
             });
         }
-    }, [initialData, reset]);
+    }, [initialData, formContext.reset]);
 
 
 
     const cancel = () => {
-        reset({ id: '', companyId: '', street: '', buildingNumber: '', postalCode: '', city: '', notes: '', });
+        formContext.reset({ id: '', containerType: '', location: { type: 'none' }, notes: '' });
         onCancel();
     }
 
     const submitForm = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await handleSubmit(async (data) => {
+        await formContext.handleSubmit(async (data) => {
             try {
-                await onSubmit(toWasteContainer(data, companies));
+                await onSubmit(toWasteContainer(data));
                 cancel();
             } catch (error) {
                 handleError(error);
@@ -135,56 +86,54 @@ export const WasteContainerForm = ({ isOpen, setIsOpen, onCancel, onSubmit, init
     return (
         <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
             <ErrorBoundary fallbackRender={fallbackRender}>
-                <form
-                    className="flex flex-col items-center self-stretch"
-                    onSubmit={(e) => submitForm(e)}
-                >
-                    <FormTopBar title={initialData ? "Container bewerken" : "Container toevoegen"} onClick={cancel} />
-                    <div className="flex flex-col items-center self-stretch p-4 gap-4">
-                        <TextFormField
-                            title={'Containerkenmerk'}
-                            placeholder={'Vul kenmerk in'}
-                            disabled={Boolean(initialData?.id)}
-                            formHook={{
-                                register,
-                                name: 'id',
-                                rules: {
-                                    required: 'Kenmerk is verplicht',
-                                    validate: (value?: string) => {
-                                        const trimmed = value?.trim() || '';
-                                        return trimmed !== '' || 'Kenmerk mag niet leeg zijn';
+                <FormProvider {...formContext}>
+                    <form
+                        className="flex flex-col items-center self-stretch"
+                        onSubmit={(e) => submitForm(e)}
+                    >
+                        <FormTopBar title={initialData ? "Container bewerken" : "Container toevoegen"} onClick={cancel} />
+                        <div className="flex flex-col items-center self-stretch p-4 gap-4">
+                            <TextFormField
+                                title={'Containerkenmerk'}
+                                placeholder={'Vul kenmerk in'}
+                                disabled={Boolean(initialData?.id)}
+                                formHook={{
+                                    register: formContext.register,
+                                    name: 'id',
+                                    rules: {
+                                        required: 'Kenmerk is verplicht',
+                                        validate: ((value: string) => {
+                                            const trimmed = value?.trim() || '';
+                                            return trimmed !== '' || 'Kenmerk mag niet leeg zijn';
+                                        }) as any,
                                     },
-                                },
-                                errors,
-                            }}
-                        />
+                                    errors: formContext.formState.errors,
+                                }}
+                            />
 
-                        <CompanyAddressInput
-                            formContext={{ register, formState: { errors }, control, watch, setValue } as any}
-                            fieldNames={{
-                                companyId: 'companyId',
-                                street: 'street',
-                                buildingNumber: 'buildingNumber',
-                                postalCode: 'postalCode',
-                                city: 'city',
-                            }}
-                            required={false}
-                        />
+                            <AddressFormField
+                                control={formContext.control}
+                                name="location"
+                                label="Locatie van container"
+                                required={false}
+                                isNoLocationAllowed={true}
+                            />
 
-                        <TextAreaFormField
-                            title={'Opmerkingen'}
-                            placeholder={'Plaats opmerkingen'}
-                            formHook={{
-                                register,
-                                name: 'notes',
-                                rules: {},
-                                errors,
-                            }}
-                            value={initialData?.notes}
-                        />
-                    </div>
-                    <FormActionButtons onClick={cancel} item={undefined} />
-                </form>
+                            <TextAreaFormField
+                                title={'Opmerkingen'}
+                                placeholder={'Plaats opmerkingen'}
+                                formHook={{
+                                    register: formContext.register,
+                                    name: 'notes',
+                                    rules: {},
+                                    errors: formContext.formState.errors,
+                                }}
+                                value={initialData?.notes}
+                            />
+                        </div>
+                        <FormActionButtons onClick={cancel} item={undefined} />
+                    </form>
+                </FormProvider>
                 <ErrorDialogComponent />
             </ErrorBoundary>
         </FormDialog>

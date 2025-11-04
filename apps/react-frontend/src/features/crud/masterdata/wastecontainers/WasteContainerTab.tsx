@@ -9,14 +9,29 @@ import { WasteContainerForm } from "./WasteContainerForm";
 import { WasteContainerView } from "@/api/client";
 
 function getWasteContainerLocation(container: WasteContainerView): string {
-  if (container.location?.companyName) {
-    return `${container.location.companyName}, ${container.location.addressView?.city}`;
+  if (!container.location) {
+    return '';
   }
-  if (container.location?.addressView) {
-    const address = container.location.addressView;
-    return `${address.street} ${address.houseNumber}, ${address.city}`;
+
+  const location = container.location as any;
+  console.log(JSON.stringify(location));
+  switch (location.type) {
+    case 'dutch_address':
+      return `${location.streetName} ${location.buildingNumber}${location.buildingNumberAddition ? ' ' + location.buildingNumberAddition : ''}, ${location.postalCode} ${location.city}`;
+
+    case 'company':
+      return `${location.company?.name || ''}${location.company?.name && location.company?.address?.city ? ', ' + location.company.address.city : ''}`;
+
+    case 'project_location':
+      return `${location.company?.name || ''} - ${location.streetName} ${location.buildingNumber}${location.buildingNumberAddition ? ' ' + location.buildingNumberAddition : ''}, ${location.postalCode} ${location.city}`;
+
+    case 'proximity':
+      return `${location.description}${location.postalCodeDigits ? ' (' + location.postalCodeDigits + ')' : ''}, ${location.city}`;
+
+    case 'no_pickup':
+    default:
+      return '';
   }
-  return '';
 }
 
 export const WasteContainersTab = () => {
