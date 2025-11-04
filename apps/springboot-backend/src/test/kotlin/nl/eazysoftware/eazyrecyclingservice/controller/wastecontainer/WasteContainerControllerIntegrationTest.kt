@@ -2,13 +2,13 @@ package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
-import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainer
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -40,7 +40,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
-    private lateinit var wasteContainerRepository: WasteContainerRepository
+    private lateinit var wasteContainerRepository: WasteContainerJpaRepository
 
     @Autowired
     private lateinit var companyRepository: CompanyRepository
@@ -59,20 +59,14 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should successfully create a container with address`() {
         // Given
-        val address = AddressRequest(
-            streetName = "Test Street",
-            buildingNumber = "123",
-            city = "Test City",
-            postalCode = "1234AB",
-            country = "Test Country"
-        )
-
-        val containerRequest = CreateContainerRequest(
+        val containerRequest = WasteContainerRequest(
             id = "CONTAINER-001",
-            location = CreateContainerRequest.ContainerLocation(
-                companyId = null,
-                companyName = null,
-                address = address
+            location = PickupLocationRequest.DutchAddressRequest(
+                streetName = "Test Street",
+                buildingNumber = "123",
+                city = "Test City",
+                postalCode = "1234AB",
+                country = "Nederland"
             ),
             notes = "Test container with address"
         )
@@ -89,9 +83,8 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         assertThat(savedContainers).hasSize(1)
         assertThat(savedContainers[0].id).isEqualTo("CONTAINER-001")
         assertThat(savedContainers[0].notes).isEqualTo("Test container with address")
-        assertThat(savedContainers[0].address).isNotNull
-        assertThat(savedContainers[0].address?.streetName).isEqualTo("Test Street")
-        assertThat(savedContainers[0].company).isNull()
+        assertThat(savedContainers[0].location).isNotNull
+        assertThat((savedContainers[0].location as PickupLocationDto.DutchAddressDto).streetName).isEqualTo("Test Street")
     }
 
     @Test
@@ -104,17 +97,15 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
                 buildingNumber = "456",
                 city = "Company City",
                 postalCode = "5678CD",
-                country = "Company Country"
+                country = "Nederland"
             )
         )
         companyRepository.save(company)
 
-        val containerRequest = CreateContainerRequest(
+        val containerRequest = WasteContainerRequest(
             id = "CONTAINER-002",
-            location = CreateContainerRequest.ContainerLocation(
-                companyId = company.id,
-                companyName = company.name,
-                address = null
+            location = PickupLocationRequest.PickupCompanyRequest(
+                companyId = company.id!!,
             ),
             notes = "Test container with company"
         )
@@ -131,9 +122,8 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         assertThat(savedContainers).hasSize(1)
         assertThat(savedContainers[0].id).isEqualTo("CONTAINER-002")
         assertThat(savedContainers[0].notes).isEqualTo("Test container with company")
-        assertThat(savedContainers[0].address).isNull()
-        assertThat(savedContainers[0].company).isNotNull
-        assertThat(savedContainers[0].company?.id).isEqualTo(company.id)
+        assertThat(savedContainers[0].location).isNotNull
+        assertThat((savedContainers[0].location as PickupLocationDto.PickupCompanyDto).company.id).isEqualTo(company.id)
     }
 
     @Test
@@ -141,26 +131,28 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val container1 = WasteContainerDto(
             id = "GET-ALL-1",
-            notes = "First test container"
-        )
-        container1.address = AddressDto(
+          location = PickupLocationDto.DutchAddressDto(
             streetName = "First Street",
             buildingNumber = "1",
+            buildingNumberAddition = null,
             city = "First City",
             postalCode = "1111AA",
-            country = "First Country"
+            country = "Nederland"
+          ),
+            notes = "First test container"
         )
 
         val container2 = WasteContainerDto(
             id = "GET-ALL-2",
-            notes = "Second test container"
-        )
-        container2.address = AddressDto(
+          location = PickupLocationDto.DutchAddressDto(
             streetName = "Second Street",
             buildingNumber = "2",
+            buildingNumberAddition = null,
             city = "Second City",
             postalCode = "2222BB",
-            country = "Second Country"
+            country = "Nederland"
+          ),
+            notes = "Second test container"
         )
 
         wasteContainerRepository.saveAll(listOf(container1, container2))
@@ -180,15 +172,17 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val container = WasteContainerDto(
             id = "GET-ONE",
-            notes = "Test container to retrieve"
-        )
-        container.address = AddressDto(
+          location = PickupLocationDto.DutchAddressDto(
             streetName = "Retrieve Street",
             buildingNumber = "123",
+            buildingNumberAddition = null,
             city = "Retrieve City",
             postalCode = "3333CC",
-            country = "Retrieve Country"
+            country = "Nederland"
+          ),
+            notes = "Test container to retrieve"
         )
+
         val containerId = wasteContainerRepository.save(container).id
 
         // When & Then
@@ -197,7 +191,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value("GET-ONE"))
             .andExpect(jsonPath("$.notes").value("Test container to retrieve"))
-            .andExpect(jsonPath("$.location.addressView.street").value("Retrieve Street"))
+            .andExpect(jsonPath("$.location.streetName").value("Retrieve Street"))
     }
 
     @Test
@@ -213,15 +207,17 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val container = WasteContainerDto(
             id = "DELETE-ME",
+            location = PickupLocationDto.DutchAddressDto(
+              streetName = "Delete Street",
+              buildingNumber = "123",
+              buildingNumberAddition = null,
+              city = "Delete City",
+              postalCode = "4444DD",
+              country = "Nederland"
+            ),
             notes = "Test container to delete"
         )
-        container.address = AddressDto(
-            streetName = "Delete Street",
-            buildingNumber = "123",
-            city = "Delete City",
-            postalCode = "4444DD",
-            country = "Delete Country"
-        )
+
         val containerId = wasteContainerRepository.save(container).id
 
         // When & Then
@@ -237,29 +233,27 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val originalContainer = WasteContainerDto(
             id = "UPDATE-ME",
-            notes = "Original notes"
-        )
-        originalContainer.address = AddressDto(
+          location = PickupLocationDto.DutchAddressDto(
             streetName = "Original Street",
             buildingNumber = "123",
+            buildingNumberAddition = null,
             city = "Original City",
             postalCode = "5555EE",
-            country = "Original Country"
+            country = "Nederland"
+          ),
+            notes = "Original notes"
         )
+
         val containerId = wasteContainerRepository.save(originalContainer).id
 
-        val updatedContainer = WasteContainerController.WasteContainerRequest(
+        val updatedContainer = WasteContainerRequest(
             id = "UPDATE-ME",
-            location = WasteContainer.ContainerLocation(
-                companyId = null,
-                companyName = null,
-                address = AddressDto(
+            location = PickupLocationRequest.DutchAddressRequest(
                     streetName = "Updated Street",
                     buildingNumber = "456",
                     city = "Updated City",
                     postalCode = "6666FF",
-                    country = "Updated Country"
-                )
+                    country = "Nederland"
             ),
             notes = "Updated notes"
         )
@@ -272,32 +266,28 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value("UPDATE-ME"))
             .andExpect(jsonPath("$.notes").value("Updated notes"))
-            .andExpect(jsonPath("$.location.addressView.street").value("Updated Street"))
+            .andExpect(jsonPath("$.location.streetName").value("Updated Street"))
 
         // Verify container was updated in the database
         val savedContainer = wasteContainerRepository.findByIdOrNull(containerId)
         assertThat(savedContainer).isNotNull
         assertThat(savedContainer?.id).isEqualTo("UPDATE-ME")
         assertThat(savedContainer?.notes).isEqualTo("Updated notes")
-        assertThat(savedContainer?.address?.streetName).isEqualTo("Updated Street")
+        assertThat((savedContainer?.location as PickupLocationDto.DutchAddressDto).streetName).isEqualTo("Updated Street")
     }
 
     @Test
     fun `should return not found when updating non-existent container`() {
         // Given
         val nonExistentId = UUID.randomUUID()
-        val container = WasteContainerController.WasteContainerRequest(
+        val container = WasteContainerRequest(
             id = "NON-EXISTENT",
-            location = WasteContainer.ContainerLocation(
-                companyId = null,
-                companyName = null,
-                address = AddressDto(
+            location = PickupLocationRequest.DutchAddressRequest(
                     streetName = "Non-existent Street",
                     buildingNumber = "789",
                     city = "Non-existent City",
                     postalCode = "7777GG",
-                    country = "Non-existent Country"
-                )
+                    country = "Nederland"
             ),
             notes = "Non-existent container"
         )

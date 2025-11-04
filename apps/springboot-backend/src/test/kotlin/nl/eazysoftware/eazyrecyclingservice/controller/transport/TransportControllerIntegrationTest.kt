@@ -19,12 +19,12 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRep
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest

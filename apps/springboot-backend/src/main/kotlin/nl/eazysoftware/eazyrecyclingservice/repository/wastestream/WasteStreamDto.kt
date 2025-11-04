@@ -28,7 +28,7 @@ data class WasteStreamDto(
   @Column(name = "waste_collection_type", nullable = false)
   val wasteCollectionType: String,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
   val pickupLocation: PickupLocationDto,
 

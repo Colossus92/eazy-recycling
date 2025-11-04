@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
@@ -12,12 +11,13 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportDisplayNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.time.ZoneId
@@ -27,7 +27,7 @@ class ContainerTransportMapper(
   private val companyRepository: CompanyRepository,
   private val pickupLocationMapper: PickupLocationMapper,
   private val truckRepository: TruckRepository,
-  private val containerRepository: WasteContainerRepository,
+  private val containerRepository: WasteContainerJpaRepository,
   private val entityManager: EntityManager,
 ) {
 

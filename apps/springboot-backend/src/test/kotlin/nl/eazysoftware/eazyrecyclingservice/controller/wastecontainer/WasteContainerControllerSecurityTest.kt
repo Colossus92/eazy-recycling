@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.repository.WasteContainerRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +30,7 @@ class WasteContainerControllerSecurityTest : BaseIntegrationTest() {
     private lateinit var mockMvc: MockMvc
 
     @Autowired
-    private lateinit var wasteContainerRepository: WasteContainerRepository
+    private lateinit var wasteContainerRepository: WasteContainerJpaRepository
 
     private lateinit var testContainerId: String
     private lateinit var testContainer: WasteContainerDto

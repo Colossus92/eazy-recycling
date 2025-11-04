@@ -14,7 +14,6 @@ import java.util.*
 
 @Component
 class PickupLocationMapper(
-  private var pickupLocationRepository: PickupLocationRepository,
   private var entityManager: EntityManager,
 ) {
 
@@ -133,7 +132,6 @@ class PickupLocationMapper(
       city = location.city().value,
       country = location.country()
     )
-    .apply { pickupLocationRepository.save(this) }
 
   private fun mapAndSave(domain: ProximityDescription) = PickupLocationDto.ProximityDescriptionDto(
     description = domain.description,
@@ -141,7 +139,6 @@ class PickupLocationMapper(
     city = domain.city.value,
     country = domain.country
   )
-    .apply { pickupLocationRepository.save(this) }
 
   private fun mapAndSave(address: DutchAddress) = PickupLocationDto.DutchAddressDto(
     streetName = address.streetName(),
@@ -151,7 +148,6 @@ class PickupLocationMapper(
     city = address.city(),
     country = address.country()
   )
-    .apply { pickupLocationRepository.save(this) }
 
   private fun mapAndSave(domain: Company) = PickupLocationDto.PickupCompanyDto(
     company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
@@ -163,9 +159,5 @@ class PickupLocationMapper(
     city = domain.address.city.value,
     country = domain.address.country,
   )
-    .apply {
-      pickupLocationRepository.save(this)
-        .also { pickupLocationRepository.flush() }
-    }
 
 }

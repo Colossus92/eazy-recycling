@@ -82,13 +82,7 @@ create table if not exists trucks (
 create table if not exists waste_containers (
                            id text,
                            notes text,
-                           building_name text,
-                           building_number text,
-                           city text,
-                           country text,
-                           postal_code text,
-                           street_name text,
-                           location_company_id uuid,
+                           location_id text,
                            primary key (id)
 );
 

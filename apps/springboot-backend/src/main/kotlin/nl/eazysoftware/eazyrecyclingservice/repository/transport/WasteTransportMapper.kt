@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -12,14 +11,15 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
 import org.springframework.stereotype.Component
 import java.time.ZoneId

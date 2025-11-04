@@ -5,10 +5,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
@@ -34,19 +34,18 @@ data class TransportDto(
   val consignorParty: CompanyDto,
 
   /**
-   * The party executing the transport.
    */
   @ManyToOne
   @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
   val carrierParty: CompanyDto,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
   val pickupLocation: PickupLocationDto,
 
   val pickupDateTime: Instant,
 
-  @OneToOne
+  @OneToOne(cascade = [CascadeType.ALL])
   @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
   val deliveryLocation: PickupLocationDto,
 

@@ -1,9 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.application.query.mappers.CompanyViewMapper
+import nl.eazysoftware.eazyrecyclingservice.application.query.mappers.PickupLocationViewMapper
+import nl.eazysoftware.eazyrecyclingservice.application.query.mappers.WasteContainerViewMapper
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayString
-import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.toView
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
@@ -16,7 +17,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProfileRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,6 +36,9 @@ class GetTransportByIdService(
   private val profileRepository: ProfileRepository,
   private val truckRepository: TruckRepository,
   private val wasteContainerService: WasteContainerService,
+  private val pickupLocationViewMapper: PickupLocationViewMapper,
+  private val wasteContainerViewMapper: WasteContainerViewMapper,
+  private val companyViewMapper: CompanyViewMapper,
 ) : GetTransportById {
 
   override fun execute(transportId: UUID): TransportDetailView {
@@ -48,93 +51,18 @@ class GetTransportByIdService(
       ?: throw EntityNotFoundException("Transport met id $transportId niet gevonden")
   }
 
-  private fun mapLocation(location: Location): PickupLocationView {
-    return when (location) {
-      is Location.DutchAddress -> PickupLocationView.DutchAddressView(
-        streetName = location.streetName(),
-        postalCode = location.postalCode().value,
-        buildingNumber = location.buildingNumber(),
-        buildingNumberAddition = location.buildingNumberAddition(),
-        city = location.city(),
-        country = location.country()
-      )
-
-      is Location.ProximityDescription -> PickupLocationView.ProximityDescriptionView(
-        postalCodeDigits = location.postalCodeDigits,
-        city = location.city.value,
-        description = location.description,
-        country = location.country
-      )
-
-      is Location.Company -> {
-        val id = location.companyId.uuid
-        val company = companyRepository.findByIdOrNull(id)
-          ?: throw EntityNotFoundException("Bedrijf met id $id niet gevonden")
-
-        return PickupLocationView.PickupCompanyView(
-          company = CompanyView(
-            id = id,
-            name = location.name,
-            chamberOfCommerceId = company.chamberOfCommerceId,
-            vihbId = company.vihbId,
-            processorId = company.processorId,
-            address = AddressView(
-              street = location.address.streetName.value,
-              houseNumber = location.address.buildingNumber,
-              houseNumberAddition = location.address.buildingNumberAddition,
-              postalCode = location.address.postalCode.value,
-              city = location.address.city.value,
-              country = location.address.country
-            )
-          )
-        )
-      }
-
-      is Location.ProjectLocationSnapshot -> PickupLocationView.ProjectLocationView(
-        id = location.projectLocationId.uuid.toString(),
-        company = mapCompany(location.companyId.uuid),
-        streetName = location.streetName(),
-        postalCode = location.postalCode().value,
-        buildingNumber = location.buildingNumber(),
-        buildingNumberAddition = location.buildingNumberAddition(),
-        city = location.city().value,
-        country = location.country()
-      )
-
-      is Location.NoLocation -> PickupLocationView.NoPickupView()
-    }
-  }
-
   private fun mapCompany(companyId: UUID): CompanyView {
     val company = companyRepository.findByIdOrNull(companyId)
       ?: throw EntityNotFoundException("Bedrijf met id $companyId niet gevonden")
 
-    return toCompanyView(company)
+    return companyViewMapper.map(company)
   }
 
   private fun mapCompany(processorPartyId: ProcessorPartyId): CompanyView {
     val company = companyRepository.findByProcessorId(processorPartyId.number)
       ?: throw EntityNotFoundException("Bedrijf met verwerkersnummer $processorPartyId niet gevonden")
 
-    return toCompanyView(company)
-  }
-
-  private fun toCompanyView(company: CompanyDto): CompanyView {
-    return CompanyView(
-      id = company.id!!,
-      name = company.name,
-      chamberOfCommerceId = company.chamberOfCommerceId,
-      vihbId = company.vihbId,
-      processorId = company.processorId,
-      address = AddressView(
-        street = company.address.streetName ?: "Niet bekend",
-        houseNumber = company.address.buildingNumber,
-        houseNumberAddition = company.address.buildingName,
-        postalCode = company.address.postalCode,
-        city = company.address.city ?: "",
-        country = company.address.country ?: "Nederland"
-      )
-      )
+    return companyViewMapper.map(company)
   }
 
   private fun mapDriver(driverId: UUID): DriverView {
@@ -159,7 +87,7 @@ class GetTransportByIdService(
   }
 
   private fun mapWasteContainer(containerId: String) =
-    wasteContainerService.getContainerById(containerId).toView()
+    wasteContainerViewMapper.map(wasteContainerService.getContainerById(containerId))
 
   private fun mapGoodsItem(goodsItem: GoodsItem, wasteStream: WasteStream): GoodsItemView {
     return GoodsItemView(
@@ -179,9 +107,9 @@ class GetTransportByIdService(
     displayNumber = containerTransport.displayNumber?.value,
     consignorParty = mapCompany(containerTransport.consignorParty.uuid),
     carrierParty = mapCompany(containerTransport.carrierParty.uuid),
-    pickupLocation = mapLocation(containerTransport.pickupLocation),
+    pickupLocation = pickupLocationViewMapper.mapLocation(containerTransport.pickupLocation),
     pickupDateTime = containerTransport.pickupDateTime.toDisplayString(),
-    deliveryLocation = mapLocation(containerTransport.deliveryLocation),
+    deliveryLocation = pickupLocationViewMapper.mapLocation(containerTransport.deliveryLocation),
     deliveryDateTime = containerTransport.deliveryDateTime?.toDisplayString(),
     transportType = containerTransport.transportType.name,
     status = containerTransport.getStatus(),
@@ -206,7 +134,7 @@ class GetTransportByIdService(
         else -> throw IllegalArgumentException("Op dit moment worden alleen bedrijven als opdrachtgever ondersteund")
       },
       carrierParty = mapCompany(wasteTransport.carrierParty.uuid),
-      pickupLocation = mapLocation(wasteStream.pickupLocation),
+      pickupLocation = pickupLocationViewMapper.mapLocation(wasteStream.pickupLocation),
       pickupDateTime = wasteTransport.pickupDateTime.toDisplayString(),
       deliveryLocation = mapWasteDeliveryLocation(wasteStream.deliveryLocation),
       deliveryDateTime = wasteTransport.deliveryDateTime?.toDisplayString(),

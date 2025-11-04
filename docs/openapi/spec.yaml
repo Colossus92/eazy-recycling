@@ -868,7 +868,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateContainerRequest"
+              $ref: "#/components/schemas/WasteContainerRequest"
         required: true
       responses:
         "201":
@@ -1658,41 +1658,18 @@ components:
       required:
       - code
       - description
-    AddressDto:
-      type: object
-      properties:
-        streetName:
-          type: string
-        buildingName:
-          type: string
-        buildingNumber:
-          type: string
-        city:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
-      required:
-      - buildingNumber
-      - postalCode
-    ContainerLocation:
-      type: object
-      properties:
-        companyId:
-          type: string
-          format: uuid
-        companyName:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
     WasteContainerRequest:
       type: object
       properties:
         id:
           type: string
         location:
-          $ref: "#/components/schemas/ContainerLocation"
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/PickupCompanyRequest"
+          - $ref: "#/components/schemas/ProjectLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
         notes:
           type: string
       required:
@@ -1718,28 +1695,150 @@ components:
       - houseNumber
       - postalCode
       - street
-    ContainerLocationView:
+    CompanyView:
       type: object
       properties:
-        companyId:
+        id:
           type: string
           format: uuid
-        companyName:
+        name:
           type: string
-        addressView:
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        address:
           $ref: "#/components/schemas/AddressView"
+      required:
+      - address
+      - id
+      - name
+    DutchAddressView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          streetName:
+            type: string
+          postalCode:
+            type: string
+          buildingNumber:
+            type: string
+          buildingNumberAddition:
+            type: string
+          city:
+            type: string
+          country:
+            type: string
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    NoPickupView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+    PickupCompanyView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          company:
+            $ref: "#/components/schemas/CompanyView"
+      required:
+      - company
+    PickupLocationView:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    ProjectLocationView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          id:
+            type: string
+          company:
+            $ref: "#/components/schemas/CompanyView"
+          streetName:
+            type: string
+          postalCode:
+            type: string
+          buildingNumber:
+            type: string
+          buildingNumberAddition:
+            type: string
+          city:
+            type: string
+          country:
+            type: string
+      required:
+      - buildingNumber
+      - city
+      - company
+      - country
+      - id
+      - postalCode
+      - streetName
+    ProximityDescriptionView:
+      allOf:
+      - $ref: "#/components/schemas/PickupLocationView"
+      - type: object
+        properties:
+          postalCodeDigits:
+            type: string
+          city:
+            type: string
+          description:
+            type: string
+          country:
+            type: string
+      required:
+      - city
+      - country
+      - description
+      - postalCodeDigits
     WasteContainerView:
       type: object
       properties:
         id:
           type: string
         location:
-          $ref: "#/components/schemas/ContainerLocationView"
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressView"
+          - $ref: "#/components/schemas/NoPickupView"
+          - $ref: "#/components/schemas/PickupCompanyView"
+          - $ref: "#/components/schemas/ProjectLocationView"
+          - $ref: "#/components/schemas/ProximityDescriptionView"
         notes:
           type: string
       required:
       - id
-      - location
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingName:
+          type: string
+        buildingNumber:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - postalCode
     CompanyDto:
       type: object
       properties:
@@ -2019,10 +2118,8 @@ components:
       properties:
         id:
           type: string
-        company:
-          $ref: "#/components/schemas/CompanyDto"
-        address:
-          $ref: "#/components/schemas/AddressDto"
+        location:
+          $ref: "#/components/schemas/PickupLocationDto"
         notes:
           type: string
       required:
@@ -2043,17 +2140,6 @@ components:
           format: uuid
       required:
       - transportId
-    CreateContainerRequest:
-      type: object
-      properties:
-        id:
-          type: string
-        location:
-          $ref: "#/components/schemas/ContainerLocation"
-        notes:
-          type: string
-      required:
-      - id
     CompanyRequest:
       type: object
       properties:
@@ -2113,26 +2199,6 @@ components:
             $ref: "#/components/schemas/CompanyView"
       required:
       - company
-    CompanyView:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        chamberOfCommerceId:
-          type: string
-        vihbId:
-          type: string
-        processorId:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressView"
-      required:
-      - address
-      - id
-      - name
     ConsignorView:
       discriminator:
         propertyName: type
@@ -2141,29 +2207,6 @@ components:
           type: string
       required:
       - type
-    DutchAddressView:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationView"
-      - type: object
-        properties:
-          streetName:
-            type: string
-          postalCode:
-            type: string
-          buildingNumber:
-            type: string
-          buildingNumberAddition:
-            type: string
-          city:
-            type: string
-          country:
-            type: string
-      required:
-      - buildingNumber
-      - city
-      - country
-      - postalCode
-      - streetName
     LocalDate:
       type: object
       properties:
@@ -2322,76 +2365,9 @@ components:
       - nanosecond
       - second
       - value$kotlinx_datetime
-    NoPickupView:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationView"
     PersonConsignorView:
       allOf:
       - $ref: "#/components/schemas/ConsignorView"
-    PickupCompanyView:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationView"
-      - type: object
-        properties:
-          company:
-            $ref: "#/components/schemas/CompanyView"
-      required:
-      - company
-    PickupLocationView:
-      discriminator:
-        propertyName: type
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    ProjectLocationView:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationView"
-      - type: object
-        properties:
-          id:
-            type: string
-          company:
-            $ref: "#/components/schemas/CompanyView"
-          streetName:
-            type: string
-          postalCode:
-            type: string
-          buildingNumber:
-            type: string
-          buildingNumberAddition:
-            type: string
-          city:
-            type: string
-          country:
-            type: string
-      required:
-      - buildingNumber
-      - city
-      - company
-      - country
-      - id
-      - postalCode
-      - streetName
-    ProximityDescriptionView:
-      allOf:
-      - $ref: "#/components/schemas/PickupLocationView"
-      - type: object
-        properties:
-          postalCodeDigits:
-            type: string
-          city:
-            type: string
-          description:
-            type: string
-          country:
-            type: string
-      required:
-      - city
-      - country
-      - description
-      - postalCodeDigits
     WeightTicketDetailView:
       type: object
       properties:
@@ -2655,12 +2631,12 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        nanosecondsOfSecond:
-          type: integer
-          format: int32
         epochSeconds:
           type: integer
           format: int64
+        nanosecondsOfSecond:
+          type: integer
+          format: int32
         value$kotlinx_datetime:
           type: string
           format: date-time
