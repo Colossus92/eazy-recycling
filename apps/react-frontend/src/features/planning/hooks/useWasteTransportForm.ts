@@ -153,6 +153,10 @@ export function useWasteTransportForm(
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['planning'] });
+      
+      if (transportId) {
+        await queryClient.invalidateQueries({ queryKey: ['transport', transportId] });
+      }
 
       toastService.success(
         !data ? 'Transport aangemaakt' : 'Transport bijgewerkt'

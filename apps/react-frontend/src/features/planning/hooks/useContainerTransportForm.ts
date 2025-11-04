@@ -87,6 +87,9 @@ export function useContainerTransportForm(
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['planning'] });
+      if (transportId) {
+        queryClient.invalidateQueries({ queryKey: ['transport', transportId] });
+      }
 
       toastService.success(
         !data ? 'Transport bijgewerkt' : 'Transport aangemaakt'

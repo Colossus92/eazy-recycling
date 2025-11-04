@@ -99,17 +99,13 @@ export const resolveLocationAddress = (
 
 
   // Fallback: try to extract address directly if it exists
-  if (locationAny.address) {
+  if (locationAny.type === 'proximity') {
     return {
-      street:
-        locationAny.address.street || locationAny.address.streetName || '',
-      houseNumber:
-        locationAny.address.houseNumber ||
-        locationAny.address.buildingNumber ||
-        '',
-      postalCode: locationAny.address.postalCode || '',
-      city: locationAny.address.city || '',
-      country: locationAny.address.country,
+      street: locationAny.description,
+      houseNumber: '',
+      postalCode: locationAny.postalCodeDigits,
+      city: locationAny.city,
+      country: locationAny.country,
     };
   }
 
