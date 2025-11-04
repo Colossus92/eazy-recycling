@@ -1168,7 +1168,6 @@ components:
           id:
             type: string
             format: uuid
-            minLength: 1
           companyId:
             type: string
             format: uuid
@@ -1205,17 +1204,20 @@ components:
         properties:
           description:
             type: string
-            minLength: 1
+            maxLength: 200
+            minLength: 0
           postalCodeDigits:
             type: string
             minLength: 1
             pattern: "^[0-9]{4}$"
           city:
             type: string
-            minLength: 1
+            maxLength: 24
+            minLength: 0
           country:
             type: string
-            minLength: 1
+            maxLength: 43
+            minLength: 0
       required:
       - city
       - country
@@ -1479,42 +1481,20 @@ components:
         carrierPartyId:
           type: string
           format: uuid
-        pickupCompanyId:
-          type: string
-          format: uuid
-        pickupProjectLocationId:
-          type: string
-          format: uuid
-        pickupStreet:
-          type: string
-        pickupBuildingNumber:
-          type: string
-        pickupBuildingNumberAddition:
-          type: string
-        pickupPostalCode:
-          type: string
-        pickupCity:
-          type: string
-        pickupDescription:
-          type: string
-        deliveryCompanyId:
-          type: string
-          format: uuid
-        deliveryProjectLocationId:
-          type: string
-          format: uuid
-        deliveryStreet:
-          type: string
-        deliveryBuildingNumber:
-          type: string
-        deliveryBuildingNumberAddition:
-          type: string
-        deliveryPostalCode:
-          type: string
-        deliveryCity:
-          type: string
-        deliveryDescription:
-          type: string
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/PickupCompanyRequest"
+          - $ref: "#/components/schemas/ProjectLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+        deliveryLocation:
+          oneOf:
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/PickupCompanyRequest"
+          - $ref: "#/components/schemas/ProjectLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
         truckId:
           type: string
         containerId:
@@ -1525,12 +1505,10 @@ components:
       - carrierPartyId
       - consignorPartyId
       - containerOperation
-      - deliveryBuildingNumber
-      - deliveryCity
-      - deliveryPostalCode
-      - deliveryStreet
+      - deliveryLocation
       - note
       - pickupDateTime
+      - pickupLocation
       - transportType
     UpdateContainerTransportResponse:
       type: object
@@ -1790,21 +1768,27 @@ components:
       properties:
         streetName:
           type: string
-          minLength: 1
+          maxLength: 43
+          minLength: 0
         buildingNumberAddition:
           type: string
+          maxLength: 6
+          minLength: 0
         buildingNumber:
           type: string
-          minLength: 1
+          maxLength: 10
+          minLength: 0
         postalCode:
           type: string
           pattern: "^\\d{4}\\s[A-Z]{2}$"
         city:
           type: string
-          minLength: 1
+          maxLength: 24
+          minLength: 0
         country:
           type: string
-          minLength: 1
+          maxLength: 40
+          minLength: 0
       required:
       - buildingNumber
       - city
@@ -2366,6 +2350,8 @@ components:
       - $ref: "#/components/schemas/PickupLocationView"
       - type: object
         properties:
+          id:
+            type: string
           company:
             $ref: "#/components/schemas/CompanyView"
           streetName:
@@ -2385,6 +2371,7 @@ components:
       - city
       - company
       - country
+      - id
       - postalCode
       - streetName
     ProximityDescriptionView:
@@ -2668,12 +2655,12 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        epochSeconds:
-          type: integer
-          format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
+        epochSeconds:
+          type: integer
+          format: int64
         value$kotlinx_datetime:
           type: string
           format: date-time

@@ -2,19 +2,19 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
 import jakarta.persistence.EntityNotFoundException
 import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDomain
 import nl.eazysoftware.eazyrecyclingservice.domain.model.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.LocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 interface UpdateContainerTransport {
   fun handle(cmd: UpdateContainerTransportCommand): UpdateContainerTransportResult
@@ -28,23 +28,9 @@ data class UpdateContainerTransportCommand(
   val transportId: TransportId,
   val consignorParty: CompanyId,
   val carrierParty: CompanyId,
-  val pickupCompanyId: CompanyId? = null,
-  val pickupProjectLocationId: UUID? = null,
-  val pickupStreetName: String?,
-  val pickupBuildingNumber: String?,
-  val pickupBuildingNumberAddition: String? = null,
-  val pickupPostalCode: String?,
-  val pickupCity: String?,
-  val pickupDescription: String? = null,
+  val pickupLocation: PickupLocationCommand,
   val pickupDateTime: Instant,
-  val deliveryCompanyId: CompanyId?,
-  val deliveryProjectLocationId: UUID? = null,
-  val deliveryStreetName: String,
-  val deliveryBuildingNumber: String,
-  val deliveryBuildingNumberAddition: String? = null,
-  val deliveryPostalCode: String,
-  val deliveryCity: String,
-  val deliveryDescription: String? = null,
+  val deliveryLocation: PickupLocationCommand,
   val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
@@ -62,9 +48,9 @@ data class UpdateContainerTransportResult(
 @Service
 class UpdateContainerTransportService(
   private val containerTransports: ContainerTransports,
-  private val locations: ProjectLocations,
-  private val locationFactory: LocationFactory,
+  private val projectLocations: ProjectLocations,
   private val pdfGenerationClient: PdfGenerationClient,
+  private val companyService: CompanyService,
 ) : UpdateContainerTransport {
 
   @Transactional
@@ -84,9 +70,9 @@ class UpdateContainerTransportService(
       displayNumber = existingTransport.displayNumber,
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
-      pickupLocation = createPickupLocation(cmd),
+      pickupLocation = cmd.pickupLocation.toDomain(companyService, projectLocations),
       pickupDateTime = cmd.pickupDateTime,
-      deliveryLocation = createDeliveryLocation(cmd),
+      deliveryLocation = cmd.deliveryLocation.toDomain(companyService, projectLocations),
       deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
@@ -105,60 +91,6 @@ class UpdateContainerTransportService(
     return UpdateContainerTransportResult(
       transportId = savedTransport.transportId,
       status = savedTransport.getStatus().name
-    )
-  }
-
-  private fun createDeliveryLocation(cmd: UpdateContainerTransportCommand): Location = createLocation(
-    cmd.deliveryProjectLocationId,
-    cmd.deliveryCompanyId,
-    cmd.deliveryStreetName,
-    cmd.deliveryBuildingNumber,
-    cmd.deliveryBuildingNumberAddition,
-    cmd.deliveryPostalCode,
-    cmd.deliveryCity,
-    cmd.deliveryDescription
-  )
-
-  private fun createPickupLocation(cmd: UpdateContainerTransportCommand): Location = createLocation(
-    cmd.pickupProjectLocationId,
-    cmd.pickupCompanyId,
-    cmd.pickupStreetName,
-    cmd.pickupBuildingNumber,
-    cmd.pickupBuildingNumberAddition,
-    cmd.pickupPostalCode,
-    cmd.pickupCity,
-    cmd.pickupDescription
-  )
-
-  private fun createLocation(
-    projectLocationId: UUID? = null,
-    companyId: CompanyId?,
-    streetName: String?,
-    buildingNumber: String?,
-    buildingNumberAddition: String? = null,
-    postalCode: String?,
-    city: String?,
-    description: String? = null,
-  ): Location {
-    if (projectLocationId != null) {
-      val existingLocation = locations.findById(projectLocationId)
-        ?: throw EntityNotFoundException("Geen projectlocatie gevonden voor id ${projectLocationId}")
-
-      require(existingLocation.companyId == companyId) {
-        "Projectlocatie met id ${projectLocationId} is niet van bedrijf met id ${companyId?.uuid}"
-      }
-
-      return existingLocation.toSnapshot()
-    }
-
-    return locationFactory.create(
-      companyId = companyId,
-      streetName = streetName,
-      buildingNumber = buildingNumber,
-      buildingNumberAddition = buildingNumberAddition,
-      postalCode = postalCode,
-      description = description,
-      city = city
     )
   }
 }

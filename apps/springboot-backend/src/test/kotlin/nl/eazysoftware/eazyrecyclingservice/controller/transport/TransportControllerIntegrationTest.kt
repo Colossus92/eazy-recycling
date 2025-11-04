@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.CreateContainerTransportResponse
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportResponse
@@ -45,7 +46,7 @@ import java.time.ZoneId
 import java.util.*
 
 class TransportControllerIntegrationTest(
-    @param:Autowired private val transactionTemplate: TransactionTemplate
+  @param:Autowired private val transactionTemplate: TransactionTemplate
 ) : BaseIntegrationTest() {
 
   @Autowired
@@ -241,16 +242,12 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Pickup Street",
-      pickupBuildingNumber = "789",
-      pickupPostalCode = "9012 EF",
-      pickupCity = "Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Delivery Street",
-      deliveryBuildingNumber = "101",
-      deliveryPostalCode = "1122 GH",
-      deliveryCity = "Delivery City",
+      pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
+      deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "New Container Transport"
@@ -342,16 +339,12 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Updated Pickup Street",
-      pickupBuildingNumber = "999",
-      pickupPostalCode = "3344 IJ",
-      pickupCity = "Updated Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Updated Delivery Street",
-      deliveryBuildingNumber = "888",
-      deliveryPostalCode = "5566 KL",
-      deliveryCity = "Updated Delivery City",
+      pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
+      deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Updated Container Transport"
@@ -466,16 +459,12 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupStreet = "Pickup Street",
-      pickupBuildingNumber = "789",
-      pickupPostalCode = "9012 EF",
-      pickupCity = "Pickup City",
-      deliveryCompanyId = testCompany.id,
-      deliveryStreet = "Delivery Street",
-      deliveryBuildingNumber = "101",
-      deliveryPostalCode = "1122 GH",
-      deliveryCity = "Delivery City",
+      pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
+      deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Non-existent Transport"
@@ -613,18 +602,12 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = testBranch.id,
-      pickupStreet = "Branch Street",
-      pickupBuildingNumber = "456",
-      pickupPostalCode = "5678 CD",
-      pickupCity = "Branch City",
-      deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = testBranch.id,
-      deliveryStreet = "Branch Street",
-      deliveryBuildingNumber = "456",
-      deliveryPostalCode = "5678 CD",
-      deliveryCity = "Branch City",
+      pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
+      deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Original Transport with Branches"
@@ -651,18 +634,12 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = testBranch.id,
-      pickupStreet = "Branch Street",
-      pickupBuildingNumber = "456",
-      pickupPostalCode = "5678 CD",
-      pickupCity = "Branch City",
-      deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = testBranch.id,
-      deliveryStreet = "Branch Street",
-      deliveryBuildingNumber = "456",
-      deliveryPostalCode = "5678 CD",
-      deliveryCity = "Branch City",
+      pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
+      deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+        companyId = testCompany.id!!,
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Updated Transport with Branches"
@@ -709,18 +686,26 @@ class TransportControllerIntegrationTest(
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
-      pickupCompanyId = anotherCompany.id, // Different company
-      pickupProjectLocationId = testBranch.id, // Branch belongs to testCompany
-      pickupStreet = "Branch Street",
-      pickupBuildingNumber = "456",
-      pickupPostalCode = "5678 CD",
-      pickupCity = "Branch City",
-      deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = testBranch.id,
-      deliveryStreet = "Branch Street",
-      deliveryBuildingNumber = "456",
-      deliveryPostalCode = "5678 CD",
-      deliveryCity = "Branch City",
+      pickupLocation = PickupLocationRequest.ProjectLocationRequest(
+        id = anotherCompany.id!!,
+        companyId = testCompany.id!!,
+        streetName = "Branch Street",
+        buildingNumber = "456",
+        buildingNumberAddition = null,
+        postalCode = "5678 CD",
+        city = "Branch City",
+        country = "Nederland",
+      ),
+      deliveryLocation = PickupLocationRequest.ProjectLocationRequest(
+        id = testBranch.id,
+        companyId = testCompany.id!!,
+        streetName = "Branch Street",
+        buildingNumber = "456",
+        buildingNumberAddition = null,
+        postalCode = "5678 CD",
+        city = "Branch City",
+        country = "Nederland",
+      ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Invalid Branch-Company Relationship"
@@ -731,8 +716,8 @@ class TransportControllerIntegrationTest(
       "/transport/container",
       objectMapper.writeValueAsString(request)
     )
-      .andExpect(status().isBadRequest)
-      .andExpect(jsonPath("$.message").value(containsString("is niet van bedrijf")))
+      .andExpect(status().isNotFound)
+      .andExpect(jsonPath("$.message").value(containsString("Geen projectlocatie gevonden met id")))
 
     // Verify no transport was saved
     val savedTransports = transportRepository.findAll()

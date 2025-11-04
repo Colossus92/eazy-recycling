@@ -1,12 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
-import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import org.springframework.data.repository.findByIdOrNull
-import org.springframework.stereotype.Component
 
 /**
  * Origin location of waste with three possible variants based on Dutch regulations
@@ -90,65 +85,5 @@ sealed interface Location {
     fun postalCode(): DutchPostalCode = address.postalCode
     fun city(): City = address.city
     fun country(): String = address.country
-  }
-}
-
-@Component
-class LocationFactory(
-  private val companyRepository: CompanyRepository,
-) {
-
-  fun create(
-    companyId: CompanyId? = null,
-    streetName: String? = null,
-    buildingNumber: String? = null,
-    buildingNumberAddition: String? = null,
-    postalCode: String? = null,
-    description: String? = null,
-    city: String? = null,
-  ): Location {
-
-    if (description?.isNotBlank() == true) return ProximityDescription(
-      postalCodeDigits = postalCode
-        ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
-      city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
-      description = description,
-      country = "Nederland"
-    )
-
-    if (companyId != null) {
-      val company = companyRepository.findByIdOrNull(companyId.uuid)
-        ?: throw EntityNotFoundException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
-      return Company(
-        companyId = companyId,
-        name = company.name,
-        address = Address(
-          streetName = StreetName(company.address.streetName
-            ?: throw IllegalArgumentException("Bedrijf heeft geen straatnaam, maar dit is verplicht")),
-          postalCode = DutchPostalCode(company.address.postalCode),
-          buildingNumber = company.address.buildingNumber,
-          buildingNumberAddition = company.address.buildingName,
-          city = company.address.city?.let { City(it) }
-            ?: throw IllegalArgumentException("Bedrijf heeft geen stad, maar dit is verplicht"),
-          country = "Nederland"
-        )
-      )
-    }
-
-    if (streetName?.isNotBlank() == true) return DutchAddress(
-      address = Address(
-        streetName = StreetName(streetName),
-        postalCode = postalCode
-          ?.let { DutchPostalCode(it) }
-          ?: throw IllegalArgumentException("De postcode is verplicht "),
-        buildingNumber = buildingNumber
-          ?: throw IllegalArgumentException("Een huisnummer is verplicht in een adres"),
-        buildingNumberAddition = buildingNumberAddition,
-        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht in een adres"),
-        country = "Nederland"
-      )
-    )
-
-    return NoLocation
   }
 }

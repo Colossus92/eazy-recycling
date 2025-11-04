@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
@@ -413,16 +414,12 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
           containerOperation = ContainerOperation.DELIVERY,
           driverId = testDriverId,
           carrierPartyId = carrier.id!!,
-          pickupCompanyId = pickupCompany.id!!,
-          pickupStreet = "Pickup Street",
-          pickupBuildingNumber = "1",
-          pickupPostalCode = "1234 AB",
-          pickupCity = "Pickup City",
-          deliveryCompanyId = deliveryCompany.id!!,
-          deliveryStreet = "Delivery Street",
-          deliveryBuildingNumber = "2",
-          deliveryPostalCode = "5678 CD",
-          deliveryCity = "Delivery City",
+          pickupLocation = PickupLocationRequest.PickupCompanyRequest(
+            companyId = pickupCompany.id!!,
+          ),
+          deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
+            companyId = deliveryCompany.id!!,
+          ),
           truckId = "TRUCK-123",
           containerId = "40M001",
           note = "Test container transport"
