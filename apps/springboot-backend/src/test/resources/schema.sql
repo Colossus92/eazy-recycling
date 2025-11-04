@@ -14,16 +14,18 @@ create table if not exists companies (
                            primary key (id)
 );
 
-create table if not exists company_branches (
+create table if not exists company_project_locations (
                          id uuid not null,
                          company_id uuid not null,
                          street_name text not null,
                          postal_code text not null,
                          city text not null,
-                         updated_at timestamp(6),
-                         building_name text,
+                         building_number_addition text,
                          building_number text not null,
-                         country text
+                         country text,
+                         created_at timestamp with time zone not null default now(),
+                         updated_at timestamp with time zone,
+                         primary key (id)
 );
 
 

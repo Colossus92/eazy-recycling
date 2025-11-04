@@ -8,6 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import org.springframework.stereotype.Service
@@ -39,6 +40,7 @@ data class WeightTicketResult(val id: WeightTicketId)
 @Service
 class CreateWeightTicketService(
   private val weightTicketRepo: WeightTickets,
+  private val projectLocations: ProjectLocations,
   private val companyService: CompanyService
 ) : CreateWeightTicket {
 
@@ -53,8 +55,8 @@ class CreateWeightTicketService(
       tarraWeight = cmd.tarraWeight,
       carrierParty = cmd.carrierParty,
       direction = cmd.direction,
-      pickupLocation = cmd.pickupLocation?.toDomain(companyService),
-      deliveryLocation = cmd.deliveryLocation?.toDomain(companyService),
+      pickupLocation = cmd.pickupLocation?.toDomain(companyService, projectLocations),
+      deliveryLocation = cmd.deliveryLocation?.toDomain(companyService, projectLocations),
       truckLicensePlate = cmd.truckLicensePlate,
       reclamation = cmd.reclamation,
       note = cmd.note,

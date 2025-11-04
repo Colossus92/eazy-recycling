@@ -2,7 +2,7 @@ spring:
   # Datasource will be provided by Testcontainers @ServiceConnection
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

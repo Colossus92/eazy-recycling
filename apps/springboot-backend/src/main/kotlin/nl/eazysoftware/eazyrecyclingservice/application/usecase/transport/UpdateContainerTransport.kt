@@ -148,7 +148,7 @@ class UpdateContainerTransportService(
         "Projectlocatie met id ${projectLocationId} is niet van bedrijf met id ${companyId?.uuid}"
       }
 
-      return existingLocation
+      return existingLocation.toSnapshot()
     }
 
     return locationFactory.create(

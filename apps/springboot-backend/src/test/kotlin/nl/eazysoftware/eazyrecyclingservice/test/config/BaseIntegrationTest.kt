@@ -8,13 +8,13 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * Base class for integration tests using PostgreSQL Testcontainers.
- * 
+ *
  * Provides:
  * - Real PostgreSQL database via Testcontainers
  * - MockMvc configuration for controller tests
  * - Test profile activation
  * - Transactional rollback for test isolation
- * 
+ *
  * Usage:
  * ```kotlin
  * @SpringBootTest

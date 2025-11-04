@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.ProjectLocationResult
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
-import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -19,13 +19,12 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Transactional
 class CompanyControllerIntegrationTest @Autowired constructor(
   val mockMvc: MockMvc,
   val objectMapper: ObjectMapper,
@@ -34,11 +33,12 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 ) : BaseIntegrationTest() {
   private lateinit var securedMockMvc: SecuredMockMvc
   private lateinit var testCompany: CompanyDto
-  private lateinit var testBranches: List<PickupLocationDto.PickupProjectLocationDto>
+  private lateinit var testBranches: List<CompanyProjectLocationDto>
 
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
+    companyRepository.deleteAll()
 
     // Create a test company with branches for includeBranches tests
     testCompany = companyRepository.save(
@@ -58,19 +58,21 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     // Create test branches
-    val branch1 = PickupLocationDto.PickupProjectLocationDto(
-      id = UUID.randomUUID().toString(),
+    val branch1 = CompanyProjectLocationDto(
+      id = UUID.randomUUID(),
       company = testCompany,
       streetName = "Branch Street",
       buildingNumber = "42",
       buildingNumberAddition = null,
       postalCode = "5678CD",
       city = "Rotterdam",
-      country = "Nederland"
+      country = "Nederland",
+      createdAt = Instant.now(),
+      updatedAt = null,
     )
 
-    val branch2 = PickupLocationDto.PickupProjectLocationDto(
-      id = UUID.randomUUID().toString(),
+    val branch2 = CompanyProjectLocationDto(
+      id = UUID.randomUUID(),
       company = testCompany,
       streetName = "Another Street",
       buildingNumber = "99",
@@ -78,6 +80,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       postalCode = "9876ZY",
       city = "Utrecht",
       country = "Nederland",
+      createdAt = Instant.now(),
+      updatedAt = null,
     )
 
     testBranches = listOf(
@@ -191,15 +195,17 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val secondCompanyBranch = projectLocationRepository.save(
-      PickupLocationDto.PickupProjectLocationDto(
-        id = UUID.randomUUID().toString(),
+      CompanyProjectLocationDto(
+        id = UUID.randomUUID(),
         company = secondCompany,
         streetName = "Second Branch St",
         buildingNumber = "22",
         buildingNumberAddition = null,
         postalCode = "8765DC",
         city = "Groningen",
-        country = "Nederland"
+        country = "Nederland",
+        createdAt = Instant.now(),
+        updatedAt = null,
       )
     )
 
@@ -671,7 +677,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       country = "Nederland"
     )
 
-    securedMockMvc.put("/companies/${company.id}/branches/${result.projectLocationId}", objectMapper.writeValueAsString(updateRequest))
+    securedMockMvc.put(
+      "/companies/${company.id}/branches/${result.projectLocationId}",
+      objectMapper.writeValueAsString(updateRequest)
+    )
       .andExpect(status().isNoContent)
 
     // Verify the branch was updated correctly

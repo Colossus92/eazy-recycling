@@ -114,9 +114,9 @@ CREATE OR REPLACE FUNCTION "public"."custom_access_token_hook"("event" "jsonb") 
   roles jsonb;
 begin
   -- Get all roles for the user as a JSON array
-  select jsonb_agg(role) 
+  select jsonb_agg(role)
   into roles
-  from public.user_roles 
+  from public.user_roles
   where user_id = (event->>'user_id')::uuid;
 
   -- Fallback to an empty array if no roles are found
@@ -148,8 +148,8 @@ begin
   -- Insert basic profile
   insert into public.profiles (id, first_name, last_name)
   values (
-    new.id, 
-    new.raw_user_meta_data->>'first_name', 
+    new.id,
+    new.raw_user_meta_data->>'first_name',
     new.raw_user_meta_data->>'last_name'
   );
 
@@ -1194,5 +1194,5 @@ CREATE POLICY "Authenticated can list and upload bd9ltp_1" ON "storage"."objects
 
 CREATE POLICY "Authenticated can list and upload bd9ltp_2" ON "storage"."objects" FOR UPDATE TO "authenticated" USING (("bucket_id" = 'waybills'::"text"));
 
-
+CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
 

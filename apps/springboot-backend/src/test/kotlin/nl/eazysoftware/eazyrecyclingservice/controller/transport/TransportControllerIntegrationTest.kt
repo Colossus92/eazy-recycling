@@ -14,7 +14,9 @@ import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
-import nl.eazysoftware.eazyrecyclingservice.repository.address.ProjectLocationJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.container.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
@@ -37,6 +39,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.support.TransactionTemplate
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
@@ -66,6 +69,9 @@ class TransportControllerIntegrationTest(
   private lateinit var projectLocationJpaRepository: ProjectLocationJpaRepository
 
   @Autowired
+  private lateinit var pickupLocationRepository: PickupLocationRepository
+
+  @Autowired
   private lateinit var wasteStreamJpaRepository: WasteStreamJpaRepository
 
   @Autowired
@@ -79,7 +85,7 @@ class TransportControllerIntegrationTest(
   private lateinit var testTruck: Truck
   private lateinit var testDriver: ProfileDto
   private lateinit var testContainer: WasteContainerDto
-  private lateinit var testBranch: PickupLocationDto.PickupProjectLocationDto
+  private lateinit var testBranch: CompanyProjectLocationDto
   private lateinit var testWasteStream: WasteStreamDto
 
   @BeforeEach
@@ -100,15 +106,17 @@ class TransportControllerIntegrationTest(
     )
 
     // Create test branch
-    testBranch = PickupLocationDto.PickupProjectLocationDto(
-      id = UUID.randomUUID().toString(),
+    testBranch = CompanyProjectLocationDto(
+      id = UUID.randomUUID(),
       company = testCompany,
       streetName = "Branch Street",
       buildingNumberAddition = null,
       buildingNumber = "456",
       postalCode = "5678CD",
       city = "Branch City",
-      country = "Nederland"
+      country = "Nederland",
+      createdAt = Instant.now(),
+      updatedAt = null,
     )
 
     // Create test location
@@ -124,7 +132,7 @@ class TransportControllerIntegrationTest(
     transactionTemplate.execute {
       testCompany = companyRepository.save(testCompany)
       testBranch = projectLocationJpaRepository.save(testBranch)
-      testLocation = projectLocationJpaRepository.save(testLocation)
+      testLocation = pickupLocationRepository.save(testLocation)
     }
 
 
@@ -162,7 +170,7 @@ class TransportControllerIntegrationTest(
 
     // Reload testCompany to ensure it's managed
     val managedCompany = companyRepository.findById(testCompany.id!!).get()
-    val managedLocation = projectLocationJpaRepository.findById(testLocation.id).get()
+    val managedLocation = pickupLocationRepository.findById(testLocation.id).get()
 
     // Create test waste stream
     testWasteStream = TestWasteStreamFactory.createTestWasteStreamDto(
@@ -606,13 +614,13 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = UUID.fromString(testBranch.id),
+      pickupProjectLocationId = testBranch.id,
       pickupStreet = "Branch Street",
       pickupBuildingNumber = "456",
       pickupPostalCode = "5678 CD",
       pickupCity = "Branch City",
       deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = UUID.fromString(testBranch.id),
+      deliveryProjectLocationId = testBranch.id,
       deliveryStreet = "Branch Street",
       deliveryBuildingNumber = "456",
       deliveryPostalCode = "5678 CD",
@@ -644,13 +652,13 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       pickupCompanyId = testCompany.id,
-      pickupProjectLocationId = UUID.fromString(testBranch.id),
+      pickupProjectLocationId = testBranch.id,
       pickupStreet = "Branch Street",
       pickupBuildingNumber = "456",
       pickupPostalCode = "5678 CD",
       pickupCity = "Branch City",
       deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = UUID.fromString(testBranch.id),
+      deliveryProjectLocationId = testBranch.id,
       deliveryStreet = "Branch Street",
       deliveryBuildingNumber = "456",
       deliveryPostalCode = "5678 CD",
@@ -702,13 +710,13 @@ class TransportControllerIntegrationTest(
       driverId = testDriver.id,
       carrierPartyId = testCompany.id!!,
       pickupCompanyId = anotherCompany.id, // Different company
-      pickupProjectLocationId = UUID.fromString(testBranch.id), // Branch belongs to testCompany
+      pickupProjectLocationId = testBranch.id, // Branch belongs to testCompany
       pickupStreet = "Branch Street",
       pickupBuildingNumber = "456",
       pickupPostalCode = "5678 CD",
       pickupCity = "Branch City",
       deliveryCompanyId = testCompany.id,
-      deliveryProjectLocationId = UUID.fromString(testBranch.id),
+      deliveryProjectLocationId = testBranch.id,
       deliveryStreet = "Branch Street",
       deliveryBuildingNumber = "456",
       deliveryPostalCode = "5678 CD",

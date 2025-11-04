@@ -2,14 +2,15 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.address
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
 interface CreateProjectLocation  {
   fun handle(cmd: CreateProjectLocationCommand): ProjectLocationResult
@@ -45,8 +46,8 @@ class CreateProjectLocationService(
     companyRepository.findById(cmd.companyId.uuid)
       .orElseThrow { EntityNotFoundException("Bedrijf met id ${cmd.companyId.uuid} niet gevonden") }
 
-    val location = Location.ProjectLocation(
-      id = UUID.randomUUID(),
+    val location = CompanyProjectLocation(
+      id = ProjectLocationId(UUID.randomUUID()),
       companyId = cmd.companyId,
       address = cmd.address,
     )
@@ -55,7 +56,7 @@ class CreateProjectLocationService(
 
     return ProjectLocationResult(
       companyId = location.companyId.uuid,
-      projectLocationId = location.id,
+      projectLocationId = location.id.uuid,
     )
   }
 }

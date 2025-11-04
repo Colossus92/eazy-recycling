@@ -1,8 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
+import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import org.springframework.stereotype.Service
@@ -77,6 +79,7 @@ data class CreateWasteStreamResult(
 class CreateWasteStreamService(
   private val wasteStreamRepo: WasteStreams,
   private val companyService: CompanyService,
+  private val projectLocations: ProjectLocations,
   private val numberGenerator: WasteStreamNumberGenerator = WasteStreamNumberGenerator(),
 ) : CreateWasteStream {
 
@@ -88,7 +91,7 @@ class CreateWasteStreamService(
     val wasteStreamNumber = numberGenerator.generateNext(processorId, highestExisting)
 
     // Convert command to domain Location using LocationFactory
-    val pickupLocation = cmd.pickupLocation.toDomain(companyService)
+    val pickupLocation = cmd.pickupLocation.toDomain(companyService, projectLocations)
 
     val wasteStream = WasteStream(
       wasteStreamNumber = wasteStreamNumber,
@@ -116,7 +119,7 @@ class CreateWasteStreamService(
  * Extension function to convert PickupLocationCommand to domain Location.
  * Uses LocationFactory for PickupCompanyCommand to fetch address from database.
  */
-fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
+fun PickupLocationCommand.toDomain(companyService: CompanyService, projectLocations: ProjectLocations): Location {
   return when (this) {
     is PickupLocationCommand.DutchAddressCommand -> Location.DutchAddress(
       address = Address(
@@ -136,18 +139,9 @@ fun PickupLocationCommand.toDomain(companyService: CompanyService): Location {
       country = country
     )
 
-    is PickupLocationCommand.ProjectLocationCommand -> Location.ProjectLocation(
-      id = id,
-      companyId = companyId,
-      address = Address(
-        streetName = StreetName(streetName),
-        postalCode = DutchPostalCode(postalCode),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        city = City(city),
-        country = country
-      )
-    )
+    is PickupLocationCommand.ProjectLocationCommand -> projectLocations.findById(id)
+      ?.toSnapshot()
+      ?: throw EntityNotFoundException("Geen projectlocatie gevonden met id $id")
 
     is PickupLocationCommand.PickupCompanyCommand -> {
       val company = companyService.findById(companyId.uuid.toString())

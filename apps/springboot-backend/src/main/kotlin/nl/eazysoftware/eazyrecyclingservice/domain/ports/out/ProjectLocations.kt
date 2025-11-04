@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import java.util.*
 
 interface ProjectLocations {
@@ -13,14 +13,14 @@ interface ProjectLocations {
     buildingNumber: String,
   ): Boolean
 
-  fun create(location: Location.ProjectLocation)
+  fun create(location: CompanyProjectLocation)
 
-  fun findAll(): List<Location.ProjectLocation>
+  fun findAll(): List<CompanyProjectLocation>
 
-  fun findById(id: UUID): Location.ProjectLocation?
+  fun findById(id: UUID): CompanyProjectLocation?
 
   fun deleteById(id: UUID)
 
-  fun update(location: Location.ProjectLocation)
+  fun update(location: CompanyProjectLocation)
 
 }

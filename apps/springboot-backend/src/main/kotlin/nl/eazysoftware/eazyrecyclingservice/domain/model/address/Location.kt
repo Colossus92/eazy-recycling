@@ -1,11 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.address
 
+import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import java.util.*
 
 /**
  * Origin location of waste with three possible variants based on Dutch regulations
@@ -74,8 +75,8 @@ sealed interface Location {
    * A specific physical address that belongs to a company (e.g., construction site, branch office, project location)
    * Combines a full Dutch address with company ownership
    */
-  data class ProjectLocation(
-    val id: UUID,
+  data class ProjectLocationSnapshot(
+    val projectLocationId: ProjectLocationId,
     val companyId: CompanyId,
     val address: Address,
   ) : Location {
@@ -89,25 +90,6 @@ sealed interface Location {
     fun postalCode(): DutchPostalCode = address.postalCode
     fun city(): City = address.city
     fun country(): String = address.country
-
-
-    /**
-     * Entity equality based on identity (ID), not attributes
-     * Two ProjectLocations are the same entity if they have the same ID
-     */
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (other !is ProjectLocation) return false
-
-      return id == other.id
-    }
-
-    override fun hashCode(): Int {
-      var result = id.hashCode()
-      result = 31 * result + companyId.hashCode()
-      result = 31 * result + address.hashCode()
-      return result
-    }
   }
 }
 
@@ -133,25 +115,10 @@ class LocationFactory(
       description = description,
       country = "Nederland"
     )
-    if (companyId != null && streetName?.isNotBlank() == true) return ProjectLocation(
-      id = UUID.randomUUID(),
-      companyId = companyId,
-      address = Address(
-        streetName = StreetName(streetName),
-        postalCode = postalCode
-          ?.let { DutchPostalCode(it) }
-          ?: throw IllegalArgumentException("De postcode is verplicht "),
-        buildingNumber = buildingNumber
-          ?: throw IllegalArgumentException("De vier cijfers van een postcode zijn verplicht bij een nabijheidsbeschrijving"),
-        buildingNumberAddition = buildingNumberAddition,
-        city = city?.let { City(it) } ?: throw IllegalArgumentException("De stad is verplicht bij een nabijheidsbeschrijving"),
-        country = "Nederland"
-      )
-    )
 
     if (companyId != null) {
       val company = companyRepository.findByIdOrNull(companyId.uuid)
-        ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
+        ?: throw EntityNotFoundException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
       return Company(
         companyId = companyId,
         name = company.name,

@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -125,11 +125,9 @@ class CompanyService(
     val companyId: UUID,
   ) {
     companion object {
-      fun from(branch: Location.ProjectLocation): CompanyBranchResponse {
-        requireNotNull(branch.id) { "Branch must have an ID" }
-
+      fun from(branch: CompanyProjectLocation): CompanyBranchResponse {
         return CompanyBranchResponse(
-          id = branch.id,
+          id = branch.id.uuid,
           address = AddressDto (
             streetName = branch.address.streetName.value,
             buildingNumber = branch.address.buildingNumber,

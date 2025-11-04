@@ -5,18 +5,16 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.hibernate.Hibernate
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
 class PickupLocationMapper(
   private var pickupLocationRepository: PickupLocationRepository,
-  private var companyRepository: CompanyRepository,
   private var entityManager: EntityManager,
 ) {
 
@@ -53,8 +51,8 @@ class PickupLocationMapper(
         )
       )
 
-      is PickupLocationDto.PickupProjectLocationDto -> ProjectLocation(
-        id = UUID.fromString(unproxied.id),
+      is PickupLocationDto.PickupProjectLocationDto -> ProjectLocationSnapshot(
+        projectLocationId = ProjectLocationId(UUID.fromString(unproxied.id)),
         address = Address(
           streetName = StreetName(unproxied.streetName),
           postalCode = DutchPostalCode(unproxied.postalCode),
@@ -74,10 +72,10 @@ class PickupLocationMapper(
 
   fun toDto(location: Location): PickupLocationDto {
     return when (location) {
-      is DutchAddress -> findOrCreateDutchAddress(location)
-      is ProximityDescription -> createProximity(location)
-      is Company -> createCompany(location)
-      is ProjectLocation -> findOrCreateProjectLocation(location)
+      is DutchAddress -> mapAndSave(location)
+      is ProximityDescription -> mapAndSave(location)
+      is Company -> mapAndSave(location)
+      is ProjectLocationSnapshot -> mapAndSave(location)
       is NoLocation -> PickupLocationDto.NoPickupLocationDto()
     }
   }
@@ -125,14 +123,9 @@ class PickupLocationMapper(
     }
   }
 
-
-  private fun findOrCreateProjectLocation(location: ProjectLocation): PickupLocationDto.PickupProjectLocationDto {
-    val company = companyRepository.findByIdOrNull(location.companyId.uuid)
-      ?: throw IllegalArgumentException("Geen bedrijf gevonden met id: ${location.companyId}")
-
-    val newLocation = PickupLocationDto.PickupProjectLocationDto(
-      id = location.id.toString(),
-      company = company,
+  private fun mapAndSave(location: ProjectLocationSnapshot) = PickupLocationDto.PickupProjectLocationDto(
+      id = location.projectLocationId.uuid.toString(),
+      company = entityManager.getReference(CompanyDto::class.java, location.companyId.uuid),
       streetName = location.streetName(),
       buildingNumber = location.buildingNumber(),
       buildingNumberAddition = location.buildingNumberAddition(),
@@ -140,58 +133,39 @@ class PickupLocationMapper(
       city = location.city().value,
       country = location.country()
     )
+    .apply { pickupLocationRepository.save(this) }
 
-    return pickupLocationRepository.save(newLocation)
-  }
+  private fun mapAndSave(domain: ProximityDescription) = PickupLocationDto.ProximityDescriptionDto(
+    description = domain.description,
+    postalCode = domain.postalCodeDigits,
+    city = domain.city.value,
+    country = domain.country
+  )
+    .apply { pickupLocationRepository.save(this) }
 
+  private fun mapAndSave(address: DutchAddress) = PickupLocationDto.DutchAddressDto(
+    streetName = address.streetName(),
+    buildingNumber = address.buildingNumber(),
+    buildingNumberAddition = address.buildingNumberAddition(),
+    postalCode = address.postalCode().value,
+    city = address.city(),
+    country = address.country()
+  )
+    .apply { pickupLocationRepository.save(this) }
 
-  private fun createProximity(
-    domain: ProximityDescription
-  ): PickupLocationDto.ProximityDescriptionDto {
-    val newLocation = PickupLocationDto.ProximityDescriptionDto(
-      description = domain.description,
-      postalCode = domain.postalCodeDigits,
-      city = domain.city.value,
-      country = domain.country
-    )
-    return pickupLocationRepository.save(newLocation)
-  }
-
-  private fun findOrCreateDutchAddress(address: DutchAddress): PickupLocationDto.DutchAddressDto {
-    return pickupLocationRepository.findDutchAddressByPostalCodeAndBuildingNumber(
-      address.postalCode().value,
-      address.buildingNumber()
-    ) ?: run {
-      val newLocation = PickupLocationDto.DutchAddressDto(
-        streetName = address.streetName(),
-        buildingNumber = address.buildingNumber(),
-        buildingNumberAddition = address.buildingNumberAddition(),
-        postalCode = address.postalCode().value,
-        city = address.city(),
-        country = address.country()
-      )
-      pickupLocationRepository.save(newLocation)
+  private fun mapAndSave(domain: Company) = PickupLocationDto.PickupCompanyDto(
+    company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
+    name = domain.name,
+    streetName = domain.address.streetName.value,
+    buildingNumber = domain.address.buildingNumber,
+    buildingNumberAddition = domain.address.buildingNumberAddition,
+    postalCode = domain.address.postalCode.value,
+    city = domain.address.city.value,
+    country = domain.address.country,
+  )
+    .apply {
+      pickupLocationRepository.save(this)
+        .also { pickupLocationRepository.flush() }
     }
-  }
-
-  private fun createCompany(
-    domain: Company
-  ): PickupLocationDto.PickupCompanyDto {
-    val saved = pickupLocationRepository.save(
-      PickupLocationDto.PickupCompanyDto(
-        company = entityManager.getReference(CompanyDto::class.java, domain.companyId.uuid),
-        name = domain.name,
-        streetName = domain.address.streetName.value,
-        buildingNumber = domain.address.buildingNumber,
-        buildingNumberAddition = domain.address.buildingNumberAddition,
-        postalCode = domain.address.postalCode.value,
-        city = domain.address.city.value,
-        country = domain.address.country,
-      )
-    )
-    pickupLocationRepository.flush()
-
-    return saved
-  }
 
 }

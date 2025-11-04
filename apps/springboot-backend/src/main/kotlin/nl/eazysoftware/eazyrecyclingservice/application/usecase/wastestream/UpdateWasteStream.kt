@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import org.springframework.stereotype.Service
@@ -14,6 +15,7 @@ interface UpdateWasteStream {
 @Service
 class UpdateWasteStreamService(
   private val wasteStreamRepo: WasteStreams,
+  private val projectLocations: ProjectLocations,
   private val companyService: CompanyService,
 ) : UpdateWasteStream {
 
@@ -23,7 +25,7 @@ class UpdateWasteStreamService(
             ?: throw EntityNotFoundException("Afvalstroom met nummer ${wasteStreamNumber.number} bestaat niet")
 
         // Convert command to domain Location using LocationFactory
-        val pickupLocation = cmd.pickupLocation.toDomain(companyService)
+        val pickupLocation = cmd.pickupLocation.toDomain(companyService, projectLocations)
 
         wasteStream.update(
             wasteType = cmd.wasteType,
