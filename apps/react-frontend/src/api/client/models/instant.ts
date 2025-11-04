@@ -28,10 +28,10 @@ export interface Instant {
     'value'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Instant
      */
-    'nanosecondsOfSecond': number;
+    'value$kotlinx_datetime': string;
     /**
      * 
      * @type {number}
@@ -40,9 +40,9 @@ export interface Instant {
     'epochSeconds': number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof Instant
      */
-    'value$kotlinx_datetime': string;
+    'nanosecondsOfSecond': number;
 }
 

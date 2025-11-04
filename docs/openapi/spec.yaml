@@ -1153,8 +1153,15 @@ components:
       required:
       - companyId
     PickupLocationRequest:
+      description: Pickup location request with different address types
       discriminator:
         propertyName: type
+      oneOf:
+      - $ref: "#/components/schemas/DutchAddressRequest"
+      - $ref: "#/components/schemas/ProjectLocationRequest"
+      - $ref: "#/components/schemas/ProximityDescriptionRequest"
+      - $ref: "#/components/schemas/PickupCompanyRequest"
+      - $ref: "#/components/schemas/NoPickupLocationRequest"
       properties:
         type:
           type: string
@@ -1271,19 +1278,9 @@ components:
           - INBOUND
           - OUTBOUND
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         deliveryLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         truckLicensePlate:
           type: string
         reclamation:
@@ -1309,12 +1306,7 @@ components:
         collectionType:
           type: string
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         processorPartyId:
           type: string
           pattern: "^[0-9]{5}$"
@@ -1482,19 +1474,9 @@ components:
           type: string
           format: uuid
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         deliveryLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         truckId:
           type: string
         containerId:
@@ -1664,12 +1646,7 @@ components:
         id:
           type: string
         location:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+          $ref: "#/components/schemas/PickupLocationRequest"
         notes:
           type: string
       required:
@@ -1751,8 +1728,15 @@ components:
       required:
       - company
     PickupLocationView:
+      description: Pickup location information with different address types
       discriminator:
         propertyName: type
+      oneOf:
+      - $ref: "#/components/schemas/DutchAddressView"
+      - $ref: "#/components/schemas/ProximityDescriptionView"
+      - $ref: "#/components/schemas/PickupCompanyView"
+      - $ref: "#/components/schemas/ProjectLocationView"
+      - $ref: "#/components/schemas/NoPickupView"
       properties:
         type:
           type: string
@@ -1811,12 +1795,7 @@ components:
         id:
           type: string
         location:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         notes:
           type: string
       required:
@@ -2248,12 +2227,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2316,15 +2295,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2354,11 +2333,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2393,19 +2372,9 @@ components:
         direction:
           type: string
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         deliveryLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         truckLicensePlate:
           type: string
         reclamation:
@@ -2512,12 +2481,7 @@ components:
         collectionType:
           type: string
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         deliveryLocation:
           $ref: "#/components/schemas/DeliveryLocationView"
         consignorParty:
@@ -2631,15 +2595,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond
@@ -2657,21 +2621,11 @@ components:
         carrierParty:
           $ref: "#/components/schemas/CompanyView"
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         pickupDateTime:
           type: string
         deliveryLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         deliveryDateTime:
           type: string
         transportType:
@@ -2750,19 +2704,9 @@ components:
           type: string
           format: date-time
         pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         deliveryLocation:
-          oneOf:
-          - $ref: "#/components/schemas/DutchAddressView"
-          - $ref: "#/components/schemas/NoPickupView"
-          - $ref: "#/components/schemas/PickupCompanyView"
-          - $ref: "#/components/schemas/ProjectLocationView"
-          - $ref: "#/components/schemas/ProximityDescriptionView"
+          $ref: "#/components/schemas/PickupLocationView"
         containerId:
           type: string
         status:

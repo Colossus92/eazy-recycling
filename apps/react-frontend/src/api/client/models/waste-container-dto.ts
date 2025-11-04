@@ -15,10 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { AddressDto } from './address-dto';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { CompanyDto } from './company-dto';
+import type { PickupLocationDto } from './pickup-location-dto';
 
 /**
  * 
@@ -34,16 +31,10 @@ export interface WasteContainerDto {
     'id': string;
     /**
      * 
-     * @type {CompanyDto}
+     * @type {PickupLocationDto}
      * @memberof WasteContainerDto
      */
-    'company'?: CompanyDto;
-    /**
-     * 
-     * @type {AddressDto}
-     * @memberof WasteContainerDto
-     */
-    'address'?: AddressDto;
+    'location'?: PickupLocationDto;
     /**
      * 
      * @type {string}

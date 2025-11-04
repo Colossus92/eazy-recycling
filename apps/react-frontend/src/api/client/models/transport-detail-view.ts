@@ -27,13 +27,13 @@ import type { GoodsItemView } from './goods-item-view';
 import type { Instant } from './instant';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { PickupLocationView } from './pickup-location-view';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { TruckView } from './truck-view';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WasteContainerView } from './waste-container-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { WeightTicketDetailViewPickupLocation } from './weight-ticket-detail-view-pickup-location';
 
 /**
  * 
@@ -67,10 +67,10 @@ export interface TransportDetailView {
     'carrierParty': CompanyView;
     /**
      * 
-     * @type {WeightTicketDetailViewPickupLocation}
+     * @type {PickupLocationView}
      * @memberof TransportDetailView
      */
-    'pickupLocation': WeightTicketDetailViewPickupLocation;
+    'pickupLocation': PickupLocationView;
     /**
      * 
      * @type {string}
@@ -79,10 +79,10 @@ export interface TransportDetailView {
     'pickupDateTime': string;
     /**
      * 
-     * @type {WeightTicketDetailViewPickupLocation}
+     * @type {PickupLocationView}
      * @memberof TransportDetailView
      */
-    'deliveryLocation': WeightTicketDetailViewPickupLocation;
+    'deliveryLocation': PickupLocationView;
     /**
      * 
      * @type {string}

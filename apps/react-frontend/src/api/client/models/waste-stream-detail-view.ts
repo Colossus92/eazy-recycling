@@ -24,13 +24,13 @@ import type { DeliveryLocationView } from './delivery-location-view';
 import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { PickupLocationView } from './pickup-location-view';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WasteTypeView } from './waste-type-view';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { WeightTicketDetailViewPickupLocation } from './weight-ticket-detail-view-pickup-location';
 
 /**
  * 
@@ -58,10 +58,10 @@ export interface WasteStreamDetailView {
     'collectionType': string;
     /**
      * 
-     * @type {WeightTicketDetailViewPickupLocation}
+     * @type {PickupLocationView}
      * @memberof WasteStreamDetailView
      */
-    'pickupLocation'?: WeightTicketDetailViewPickupLocation;
+    'pickupLocation'?: PickupLocationView;
     /**
      * 
      * @type {DeliveryLocationView}

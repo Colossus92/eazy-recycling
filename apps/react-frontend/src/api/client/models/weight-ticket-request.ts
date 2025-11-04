@@ -15,13 +15,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { PickupLocationRequest } from './pickup-location-request';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WeightTicketLineRequest } from './weight-ticket-line-request';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -67,16 +67,16 @@ export interface WeightTicketRequest {
     'direction': WeightTicketRequestDirectionEnum;
     /**
      * 
-     * @type {WeightTicketRequestPickupLocation}
+     * @type {PickupLocationRequest}
      * @memberof WeightTicketRequest
      */
-    'pickupLocation'?: WeightTicketRequestPickupLocation;
+    'pickupLocation'?: PickupLocationRequest;
     /**
      * 
-     * @type {WeightTicketRequestPickupLocation}
+     * @type {PickupLocationRequest}
      * @memberof WeightTicketRequest
      */
-    'deliveryLocation'?: WeightTicketRequestPickupLocation;
+    'deliveryLocation'?: PickupLocationRequest;
     /**
      * 
      * @type {string}

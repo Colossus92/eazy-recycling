@@ -94,6 +94,12 @@ export interface LocalDateTime {
     'date': LocalDate;
     /**
      * 
+     * @type {string}
+     * @memberof LocalDateTime
+     */
+    'value$kotlinx_datetime': string;
+    /**
+     * 
      * @type {number}
      * @memberof LocalDateTime
      */
@@ -104,12 +110,6 @@ export interface LocalDateTime {
      * @memberof LocalDateTime
      */
     'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalDateTime
-     */
-    'value$kotlinx_datetime': string;
 }
 
 export const LocalDateTimeMonthEnum = {

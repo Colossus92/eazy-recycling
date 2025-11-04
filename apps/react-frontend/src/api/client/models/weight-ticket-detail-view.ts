@@ -21,10 +21,10 @@ import type { CompanyView } from './company-view';
 import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
+import type { PickupLocationView } from './pickup-location-view';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WeightTicketDetailViewPickupLocation } from './weight-ticket-detail-view-pickup-location';
+import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketLineView } from './weight-ticket-line-view';
@@ -85,16 +85,16 @@ export interface WeightTicketDetailView {
     'direction': string;
     /**
      * 
-     * @type {WeightTicketDetailViewPickupLocation}
+     * @type {PickupLocationView}
      * @memberof WeightTicketDetailView
      */
-    'pickupLocation'?: WeightTicketDetailViewPickupLocation;
+    'pickupLocation'?: PickupLocationView;
     /**
      * 
-     * @type {WeightTicketDetailViewPickupLocation}
+     * @type {PickupLocationView}
      * @memberof WeightTicketDetailView
      */
-    'deliveryLocation'?: WeightTicketDetailViewPickupLocation;
+    'deliveryLocation'?: PickupLocationView;
     /**
      * 
      * @type {string}

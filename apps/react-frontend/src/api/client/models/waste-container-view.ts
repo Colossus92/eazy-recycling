@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { ContainerLocationView } from './container-location-view';
+import type { PickupLocationView } from './pickup-location-view';
 
 /**
  * 
@@ -31,10 +31,10 @@ export interface WasteContainerView {
     'id': string;
     /**
      * 
-     * @type {ContainerLocationView}
+     * @type {PickupLocationView}
      * @memberof WasteContainerView
      */
-    'location': ContainerLocationView;
+    'location'?: PickupLocationView;
     /**
      * 
      * @type {string}
