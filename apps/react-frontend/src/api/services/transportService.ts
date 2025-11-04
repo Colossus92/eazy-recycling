@@ -6,22 +6,17 @@ import {
   TransportFinishedRequest,
   WasteTransportControllerApi,
   WasteTransportRequest,
-  WeightTicketDetailViewPickupLocation,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
-import {
-  CreateContainerTransportRequestContainerOperationEnum
-} from '@/api/client/models/create-container-transport-request';
-import {
-  CreateWasteTransportRequestContainerOperationEnum,
-} from '@/api/client/models/create-waste-transport-request';
+import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
+import { CreateWasteTransportRequestContainerOperationEnum } from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
 import { format } from 'date-fns';
 import { apiInstance } from './apiInstance';
 import {
   locationFormValueToPickupLocationRequest,
-  pickupLocationViewToFormValue
+  pickupLocationViewToFormValue,
 } from '@/types/forms/locationConverters';
 
 const transportApi = new TransportControllerApi(apiInstance.config);
@@ -97,7 +92,6 @@ export const resolveLocationAddress = (
     };
   }
 
-
   // Fallback: try to extract address directly if it exists
   if (locationAny.type === 'proximity') {
     return {
@@ -120,7 +114,7 @@ export const resolveLocationAddress = (
  * @returns The company ID or undefined if not a company location
  */
 export const resolveLocationCompanyId = (
-  location: WeightTicketDetailViewPickupLocation
+  location: PickupLocationView
 ): string | undefined => {
   const locationAny = location as any;
 
@@ -157,8 +151,12 @@ export const formValuesToCreateContainerTransportRequest = (
       formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
     pickupDateTime: formValues.pickupDateTime,
     deliveryDateTime: formValues.deliveryDateTime,
-    pickupLocation: locationFormValueToPickupLocationRequest(formValues.pickupLocation),
-    deliveryLocation: locationFormValueToPickupLocationRequest(formValues.deliveryLocation),
+    pickupLocation: locationFormValueToPickupLocationRequest(
+      formValues.pickupLocation
+    ),
+    deliveryLocation: locationFormValueToPickupLocationRequest(
+      formValues.deliveryLocation
+    ),
     truckId: formValues.truckId,
     driverId: formValues.driverId,
     containerId: formValues.containerId,
@@ -212,10 +210,16 @@ export const formValuesToCreateWasteTransportRequest = (
   return request;
 };
 
-export const transportDtoToWasteTransportFormValues = (transport: TransportDetailView) => {
+export const transportDtoToWasteTransportFormValues = (
+  transport: TransportDetailView
+) => {
   const goods = transport.goodsItem;
-  const pickupLocationAddress = resolveLocationAddress(transport.pickupLocation);
-  const deliveryLocationAddress = resolveLocationAddress(transport.deliveryLocation);
+  const pickupLocationAddress = resolveLocationAddress(
+    transport.pickupLocation
+  );
+  const deliveryLocationAddress = resolveLocationAddress(
+    transport.deliveryLocation
+  );
 
   const formValues: WasteTransportFormValues = {
     consignorPartyId: transport.consignorParty?.id || '',
@@ -226,7 +230,10 @@ export const transportDtoToWasteTransportFormValues = (transport: TransportDetai
     pickupBuildingNumber: pickupLocationAddress?.houseNumber || '',
     pickupPostalCode: pickupLocationAddress?.postalCode || '',
     pickupCity: pickupLocationAddress?.city || '',
-    pickupDateTime: format(new Date(transport.pickupDateTime), "yyyy-MM-dd'T'HH:mm"),
+    pickupDateTime: format(
+      new Date(transport.pickupDateTime),
+      "yyyy-MM-dd'T'HH:mm"
+    ),
     deliveryCompanyId: deliveryLocationAddress?.companyId || '',
     // deliveryCompanyBranchId: data.deliveryCompanyBranch?.id || '',
     deliveryStreet: deliveryLocationAddress?.street || '',
