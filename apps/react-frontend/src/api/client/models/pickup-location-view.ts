@@ -13,30 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { CompanyView } from './company-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { DutchAddressView } from './dutch-address-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { NoPickupView } from './no-pickup-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PickupCompanyView } from './pickup-company-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ProjectLocationView } from './project-location-view';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ProximityDescriptionView } from './proximity-description-view';
 
 /**
- * @type PickupLocationView
- * Pickup location information with different address types
+ * 
  * @export
+ * @interface PickupLocationView
  */
-export type PickupLocationView = { type: 'DutchAddressView' } & DutchAddressView | { type: 'NoPickupView' } & NoPickupView | { type: 'PickupCompanyView' } & PickupCompanyView | { type: 'ProjectLocationView' } & ProjectLocationView | { type: 'ProximityDescriptionView' } & ProximityDescriptionView;
-
+export interface PickupLocationView {
+    /**
+     * 
+     * @type {string}
+     * @memberof PickupLocationView
+     */
+    'type': string;
+}
 

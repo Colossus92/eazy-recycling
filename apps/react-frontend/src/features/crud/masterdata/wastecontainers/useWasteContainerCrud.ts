@@ -5,19 +5,36 @@ import { useMemo, useState } from 'react';
 
 const queryKey = 'containers';
 
+function getLocationSearchText(location: any): string {
+  if (!location) {
+    return '';
+  }
+
+  switch (location.type) {
+    case 'dutch_address':
+      return `${location.streetName || ''} ${location.buildingNumber || ''} ${location.postalCode || ''} ${location.city || ''}`;
+
+    case 'company':
+      return `${location.company?.name || ''} ${location.company?.address?.city || ''}`;
+
+    case 'project_location':
+      return `${location.company?.name || ''} ${location.streetName || ''} ${location.buildingNumber || ''} ${location.postalCode || ''} ${location.city || ''}`;
+
+    case 'proximity':
+      return `${location.description || ''} ${location.postalCodeDigits || ''} ${location.city || ''}`;
+
+    case 'no_pickup':
+    default:
+      return '';
+  }
+}
+
 function filter(container: WasteContainerView, query: string) {
+  const lowerQuery = query.toLowerCase();
   return (
-    container.id.toLowerCase().includes(query.toLowerCase()) ||
-    container.location?.companyName
-      ?.toLowerCase()
-      .includes(query.toLowerCase()) ||
-    container.location?.addressView?.street
-      ?.toLowerCase()
-      .includes(query.toLowerCase()) ||
-    container.location?.addressView?.city
-      ?.toLowerCase()
-      .includes(query.toLowerCase()) ||
-    container.notes?.toLowerCase().includes(query.toLowerCase())
+    container.id.toLowerCase().includes(lowerQuery) ||
+    getLocationSearchText(container.location).toLowerCase().includes(lowerQuery) ||
+    container.notes?.toLowerCase().includes(lowerQuery)
   );
 }
 

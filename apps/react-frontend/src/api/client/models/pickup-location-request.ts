@@ -13,27 +13,18 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { DutchAddressRequest } from './dutch-address-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { NoPickupLocationRequest } from './no-pickup-location-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { PickupCompanyRequest } from './pickup-company-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ProjectLocationRequest } from './project-location-request';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { ProximityDescriptionRequest } from './proximity-description-request';
 
 /**
- * @type PickupLocationRequest
- * Pickup location request with different address types
+ * 
  * @export
+ * @interface PickupLocationRequest
  */
-export type PickupLocationRequest = { type: 'DutchAddressRequest' } & DutchAddressRequest | { type: 'NoPickupLocationRequest' } & NoPickupLocationRequest | { type: 'PickupCompanyRequest' } & PickupCompanyRequest | { type: 'ProjectLocationRequest' } & ProjectLocationRequest | { type: 'ProximityDescriptionRequest' } & ProximityDescriptionRequest;
-
+export interface PickupLocationRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof PickupLocationRequest
+     */
+    'type': string;
+}
 

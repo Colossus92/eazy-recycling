@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationView } from './pickup-location-view';
+import type { WasteContainerViewLocation } from './waste-container-view-location';
 
 /**
  * 
@@ -49,16 +49,16 @@ export interface DriverPlanningItem {
     'deliveryDateTime'?: string;
     /**
      * 
-     * @type {PickupLocationView}
+     * @type {WasteContainerViewLocation}
      * @memberof DriverPlanningItem
      */
-    'pickupLocation': PickupLocationView;
+    'pickupLocation': WasteContainerViewLocation;
     /**
      * 
-     * @type {PickupLocationView}
+     * @type {WasteContainerViewLocation}
      * @memberof DriverPlanningItem
      */
-    'deliveryLocation': PickupLocationView;
+    'deliveryLocation': WasteContainerViewLocation;
     /**
      * 
      * @type {string}

@@ -21,7 +21,7 @@ import type { CompanyView } from './company-view';
 import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationView } from './pickup-location-view';
+import type { WasteContainerViewLocation } from './waste-container-view-location';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detail-view-consignor-party';
@@ -85,16 +85,16 @@ export interface WeightTicketDetailView {
     'direction': string;
     /**
      * 
-     * @type {PickupLocationView}
+     * @type {WasteContainerViewLocation}
      * @memberof WeightTicketDetailView
      */
-    'pickupLocation'?: PickupLocationView;
+    'pickupLocation'?: WasteContainerViewLocation;
     /**
      * 
-     * @type {PickupLocationView}
+     * @type {WasteContainerViewLocation}
      * @memberof WeightTicketDetailView
      */
-    'deliveryLocation'?: PickupLocationView;
+    'deliveryLocation'?: WasteContainerViewLocation;
     /**
      * 
      * @type {string}

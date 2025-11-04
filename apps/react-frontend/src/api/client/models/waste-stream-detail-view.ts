@@ -24,7 +24,7 @@ import type { DeliveryLocationView } from './delivery-location-view';
 import type { LocalDateTime } from './local-date-time';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationView } from './pickup-location-view';
+import type { WasteContainerViewLocation } from './waste-container-view-location';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WasteTypeView } from './waste-type-view';
@@ -58,10 +58,10 @@ export interface WasteStreamDetailView {
     'collectionType': string;
     /**
      * 
-     * @type {PickupLocationView}
+     * @type {WasteContainerViewLocation}
      * @memberof WasteStreamDetailView
      */
-    'pickupLocation'?: PickupLocationView;
+    'pickupLocation'?: WasteContainerViewLocation;
     /**
      * 
      * @type {DeliveryLocationView}

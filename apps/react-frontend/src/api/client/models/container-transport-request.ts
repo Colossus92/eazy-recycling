@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationRequest } from './pickup-location-request';
+import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -67,16 +67,16 @@ export interface ContainerTransportRequest {
     'carrierPartyId': string;
     /**
      * 
-     * @type {PickupLocationRequest}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof ContainerTransportRequest
      */
-    'pickupLocation': PickupLocationRequest;
+    'pickupLocation': WeightTicketRequestPickupLocation;
     /**
      * 
-     * @type {PickupLocationRequest}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof ContainerTransportRequest
      */
-    'deliveryLocation': PickupLocationRequest;
+    'deliveryLocation': WeightTicketRequestPickupLocation;
     /**
      * 
      * @type {string}

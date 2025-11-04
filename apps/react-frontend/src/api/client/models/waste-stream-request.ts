@@ -15,10 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationRequest } from './pickup-location-request';
+import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
+import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -52,10 +52,10 @@ export interface WasteStreamRequest {
     'collectionType': string;
     /**
      * 
-     * @type {PickupLocationRequest}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof WasteStreamRequest
      */
-    'pickupLocation': PickupLocationRequest;
+    'pickupLocation': WeightTicketRequestPickupLocation;
     /**
      * 
      * @type {string}

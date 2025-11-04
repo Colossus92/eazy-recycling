@@ -87,6 +87,7 @@ models/user-response.ts
 models/user-role-dto.ts
 models/waste-container-dto.ts
 models/waste-container-request.ts
+models/waste-container-view-location.ts
 models/waste-container-view.ts
 models/waste-stream-detail-view.ts
 models/waste-stream-list-view.ts
@@ -100,4 +101,5 @@ models/weight-ticket-line-request.ts
 models/weight-ticket-line-view.ts
 models/weight-ticket-list-view.ts
 models/weight-ticket-request-consignor-party.ts
+models/weight-ticket-request-pickup-location.ts
 models/weight-ticket-request.ts

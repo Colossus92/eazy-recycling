@@ -15,7 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { PickupLocationRequest } from './pickup-location-request';
+import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -31,10 +31,10 @@ export interface WasteContainerRequest {
     'id': string;
     /**
      * 
-     * @type {PickupLocationRequest}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof WasteContainerRequest
      */
-    'location'?: PickupLocationRequest;
+    'location'?: WeightTicketRequestPickupLocation;
     /**
      * 
      * @type {string}
