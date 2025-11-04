@@ -119,7 +119,6 @@ describe('WasteContainerForm Tests', () => {
       expect(mockOnSubmit).not.toHaveBeenCalled();
       expect(mockOnCancel).not.toHaveBeenCalled();
     });
-
   });
 
   describe('Form Behavior', () => {
@@ -149,7 +148,7 @@ describe('WasteContainerForm Tests', () => {
           buildingNumber: '99',
           postalCode: '1111 AA',
           city: 'Edit City',
-          country: 'Nederland'
+          country: 'Nederland',
         } as any,
       };
 
@@ -165,7 +164,9 @@ describe('WasteContainerForm Tests', () => {
       );
 
       expect(screen.getByText('Container bewerken')).toBeInTheDocument();
-      const idInput = screen.getByPlaceholderText('Vul kenmerk in') as HTMLInputElement;
+      const idInput = screen.getByPlaceholderText(
+        'Vul kenmerk in'
+      ) as HTMLInputElement;
       expect(idInput).toBeDisabled();
       expect(idInput).toHaveValue('CONT-004');
     });
@@ -207,6 +208,5 @@ describe('WasteContainerForm Tests', () => {
       // This is expected behavior with the current implementation
       expect(mockOnCancel).toHaveBeenCalledTimes(2);
     });
-
   });
 });

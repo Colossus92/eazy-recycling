@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
@@ -156,17 +155,6 @@ sealed class ConsignorRequest {
   }
 }
 
-@Schema(
-  name = "PickupLocationRequest",
-  description = "Pickup location request with different address types",
-  oneOf = [
-    PickupLocationRequest.DutchAddressRequest::class,
-    PickupLocationRequest.ProjectLocationRequest::class,
-    PickupLocationRequest.ProximityDescriptionRequest::class,
-    PickupLocationRequest.PickupCompanyRequest::class,
-    PickupLocationRequest.NoPickupLocationRequest::class
-  ]
-)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,

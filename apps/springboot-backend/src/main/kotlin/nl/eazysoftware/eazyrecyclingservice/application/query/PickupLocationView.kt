@@ -2,19 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(
-  name = "PickupLocationView",
-  description = "Pickup location information with different address types",
-  oneOf = [
-    PickupLocationView.DutchAddressView::class,
-    PickupLocationView.ProximityDescriptionView::class,
-    PickupLocationView.PickupCompanyView::class,
-    PickupLocationView.ProjectLocationView::class,
-    PickupLocationView.NoPickupView::class
-  ]
-)
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
