@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import {
   CompanyView,
-  PickupLocationView,
   WeightTicketDetailView,
   WeightTicketDetailViewConsignorParty,
   WeightTicketRequest,
@@ -11,6 +10,11 @@ import {
   WeightTicketRequestTarraWeightUnitEnum,
 } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
+import { LocationFormValue, createEmptyLocationFormValue } from '@/types/forms/LocationFormValue';
+import {
+  pickupLocationViewToFormValue,
+  locationFormValueToPickupLocationRequest,
+} from '@/types/forms/locationConverters';
 
 export interface WeightTicketLineFormValues {
   wasteStreamNumber: string;
@@ -28,18 +32,8 @@ export interface WeightTicketFormValues {
   tarraWeightValue?: number;
   tarraWeightUnit?: string;
   direction: string;
-  pickupCompanyId: string;
-  pickupCompanyBranchId?: string;
-  pickupStreet: string;
-  pickupBuildingNumber: string;
-  pickupPostalCode: string;
-  pickupCity: string;
-  deliveryCompanyId: string;
-  deliveryCompanyBranchId?: string;
-  deliveryStreet: string;
-  deliveryBuildingNumber: string;
-  deliveryPostalCode: string;
-  deliveryCity: string;
+  pickupLocation: LocationFormValue;
+  deliveryLocation: LocationFormValue;
 }
 
 export function useWeightTicketForm(
@@ -58,18 +52,8 @@ export function useWeightTicketForm(
       tarraWeightValue: undefined,
       tarraWeightUnit: undefined,
       direction: 'INBOUND',
-      pickupCompanyId: '',
-      pickupCompanyBranchId: '',
-      pickupStreet: '',
-      pickupBuildingNumber: '',
-      pickupPostalCode: '',
-      pickupCity: '',
-      deliveryCompanyId: '',
-      deliveryCompanyBranchId: '',
-      deliveryStreet: '',
-      deliveryBuildingNumber: '',
-      deliveryPostalCode: '',
-      deliveryCity: '',
+      pickupLocation: createEmptyLocationFormValue('none'),
+      deliveryLocation: createEmptyLocationFormValue('none'),
     },
   });
 
@@ -124,18 +108,8 @@ export function useWeightTicketForm(
       tarraWeightValue: NaN,
       tarraWeightUnit: undefined,
       direction: 'INBOUND',
-      pickupCompanyId: '',
-      pickupCompanyBranchId: '',
-      pickupStreet: '',
-      pickupBuildingNumber: '',
-      pickupPostalCode: '',
-      pickupCity: '',
-      deliveryCompanyId: '',
-      deliveryCompanyBranchId: '',
-      deliveryStreet: '',
-      deliveryBuildingNumber: '',
-      deliveryPostalCode: '',
-      deliveryCity: '',
+      pickupLocation: createEmptyLocationFormValue('none'),
+      deliveryLocation: createEmptyLocationFormValue('none'),
     });
   };
 
@@ -148,62 +122,6 @@ export function useWeightTicketForm(
   };
 }
 
-/**
- * Resolves location address from WeightTicketDetailViewPickupLocation
- */
-const resolveLocationAddress = (
-  location?: PickupLocationView
-): {
-  companyId?: string;
-  branchId?: string;
-  street: string;
-  buildingNumber: string;
-  postalCode: string;
-  city: string;
-} => {
-  if (!location) {
-    return { street: '', buildingNumber: '', postalCode: '', city: '' };
-  }
-
-  const locationAny = location as any;
-
-  // Handle PickupCompanyView (type === 'company')
-  if (locationAny.type === 'company' && locationAny.company?.address) {
-    const address = locationAny.company.address;
-    return {
-      companyId: locationAny.company.id,
-      street: address.street || '',
-      buildingNumber: address.houseNumber || '',
-      postalCode: address.postalCode || '',
-      city: address.city || '',
-    };
-  }
-
-  // Handle DutchAddressView (type === 'dutch_address')
-  if (locationAny.type === 'dutch_address') {
-    return {
-      street: locationAny.streetName || locationAny.street || '',
-      buildingNumber:
-        locationAny.buildingNumber || locationAny.houseNumber || '',
-      postalCode: locationAny.postalCode || '',
-      city: locationAny.city || '',
-    };
-  }
-
-  // Handle ProjectLocationView (type === 'project_location')
-  if (locationAny.type === 'project_location') {
-    return {
-      companyId: locationAny.company?.id,
-      branchId: locationAny.id,
-      street: locationAny.streetName || '',
-      buildingNumber: locationAny.buildingNumber || '',
-      postalCode: locationAny.postalCode || '',
-      city: locationAny.city || '',
-    };
-  }
-
-  return { street: '', buildingNumber: '', postalCode: '', city: '' };
-};
 
 /**
  * Type guard to check if consignorParty is a company
@@ -237,12 +155,6 @@ const weightTicketDetailsToFormValues = (
   const consignorCompany = resolveConsignorCompany(
     weightTicketDetails.consignorParty
   );
-  const pickupLocationAddress = resolveLocationAddress(
-    weightTicketDetails.pickupLocation
-  );
-  const deliveryLocationAddress = resolveLocationAddress(
-    weightTicketDetails.deliveryLocation
-  );
 
   return {
     consignorPartyId: consignorCompany.id || '',
@@ -258,18 +170,12 @@ const weightTicketDetailsToFormValues = (
     tarraWeightValue: weightTicketDetails.tarraWeightValue,
     tarraWeightUnit: weightTicketDetails.tarraWeightUnit,
     direction: weightTicketDetails.direction || 'INBOUND',
-    pickupCompanyId: pickupLocationAddress.companyId || '',
-    pickupCompanyBranchId: pickupLocationAddress.branchId || '',
-    pickupStreet: pickupLocationAddress.street,
-    pickupBuildingNumber: pickupLocationAddress.buildingNumber,
-    pickupPostalCode: pickupLocationAddress.postalCode,
-    pickupCity: pickupLocationAddress.city,
-    deliveryCompanyId: deliveryLocationAddress.companyId || '',
-    deliveryCompanyBranchId: deliveryLocationAddress.branchId || '',
-    deliveryStreet: deliveryLocationAddress.street,
-    deliveryBuildingNumber: deliveryLocationAddress.buildingNumber,
-    deliveryPostalCode: deliveryLocationAddress.postalCode,
-    deliveryCity: deliveryLocationAddress.city,
+    pickupLocation: pickupLocationViewToFormValue(
+      weightTicketDetails.pickupLocation
+    ),
+    deliveryLocation: pickupLocationViewToFormValue(
+      weightTicketDetails.deliveryLocation
+    ),
   };
 };
 
@@ -279,52 +185,6 @@ const weightTicketDetailsToFormValues = (
 const formValuesToWeightTicketRequest = (
   formValues: WeightTicketFormValues
 ): WeightTicketRequest => {
-  // Build pickup location
-  let pickupLocation: any = undefined;
-  if (formValues.pickupCompanyBranchId) {
-    pickupLocation = {
-      type: 'project_location',
-      companyId: formValues.pickupCompanyId,
-      projectLocationId: formValues.pickupCompanyBranchId,
-    };
-  } else if (formValues.pickupCompanyId) {
-    pickupLocation = {
-      type: 'company',
-      companyId: formValues.pickupCompanyId,
-    };
-  } else if (formValues.pickupStreet) {
-    pickupLocation = {
-      type: 'dutch_address',
-      streetName: formValues.pickupStreet,
-      buildingNumber: formValues.pickupBuildingNumber,
-      postalCode: formValues.pickupPostalCode,
-      city: formValues.pickupCity,
-    };
-  }
-
-  // Build delivery location
-  let deliveryLocation: any = undefined;
-  if (formValues.deliveryCompanyBranchId) {
-    deliveryLocation = {
-      type: 'project_location',
-      companyId: formValues.deliveryCompanyId,
-      projectLocationId: formValues.deliveryCompanyBranchId,
-    };
-  } else if (formValues.deliveryCompanyId) {
-    deliveryLocation = {
-      type: 'company',
-      companyId: formValues.deliveryCompanyId,
-    };
-  } else if (formValues.deliveryStreet) {
-    deliveryLocation = {
-      type: 'dutch_address',
-      streetName: formValues.deliveryStreet,
-      buildingNumber: formValues.deliveryBuildingNumber,
-      postalCode: formValues.deliveryPostalCode,
-      city: formValues.deliveryCity,
-    };
-  }
-
   return {
     consignorParty: {
       type: 'company',
@@ -346,7 +206,11 @@ const formValuesToWeightTicketRequest = (
     direction:
       (formValues.direction as WeightTicketRequestDirectionEnum) ||
       WeightTicketRequestDirectionEnum.Inbound,
-    pickupLocation,
-    deliveryLocation,
+    pickupLocation: locationFormValueToPickupLocationRequest(
+      formValues.pickupLocation
+    ),
+    deliveryLocation: locationFormValueToPickupLocationRequest(
+      formValues.deliveryLocation
+    ),
   };
 };

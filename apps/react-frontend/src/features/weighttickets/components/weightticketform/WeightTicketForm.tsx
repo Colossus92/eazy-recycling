@@ -18,7 +18,7 @@ import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { useEffect, useState } from 'react';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { RadioFormField } from '@/components/ui/form/RadioFormField';
-import { CompanyAddressInput } from '@/components/ui/form/CompanyAddressInput';
+import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 
 interface WeightTicketFormProps {
     isOpen: boolean;
@@ -179,35 +179,21 @@ export const WeightTicketForm = ({
                                         }}
                                     />
                                 </div>
-                                <CompanyAddressInput
-                                    formContext={formContext}
-                                    fieldNames={{
-                                        companyId: 'pickupCompanyId',
-                                        branchId: 'pickupCompanyBranchId',
-                                        street: 'pickupStreet',
-                                        buildingNumber: 'pickupBuildingNumber',
-                                        postalCode: 'pickupPostalCode',
-                                        city: 'pickupCity',
-                                    }}
-                                    title="Ophaallocatie"
-                                    includeBranches={true}
+                                <AddressFormField
+                                    name="pickupLocation"
+                                    control={formContext.control}
+                                    label="Ophaallocatie"
                                     testId="pickup-location-select"
                                     required={false}
+                                    isNoLocationAllowed={true}
                                 />
-                                <CompanyAddressInput
-                                    formContext={formContext}
-                                    fieldNames={{
-                                        companyId: 'deliveryCompanyId',
-                                        branchId: 'deliveryCompanyBranchId',
-                                        street: 'deliveryStreet',
-                                        buildingNumber: 'deliveryBuildingNumber',
-                                        postalCode: 'deliveryPostalCode',
-                                        city: 'deliveryCity',
-                                    }}
-                                    title="Afleverlocatie"
-                                    includeBranches={true}
+                                <AddressFormField
+                                    name="deliveryLocation"
+                                    control={formContext.control}
+                                    label="Afleverlocatie"
                                     testId="delivery-location-select"
                                     required={false}
+                                    isNoLocationAllowed={true}
                                 />
                                 <WeightTicketLinesSection disabled={isDisabled} />
                                 <div className="flex items-start self-stretch gap-4">
