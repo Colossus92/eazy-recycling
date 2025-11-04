@@ -1194,5 +1194,4 @@ CREATE POLICY "Authenticated can list and upload bd9ltp_1" ON "storage"."objects
 
 CREATE POLICY "Authenticated can list and upload bd9ltp_2" ON "storage"."objects" FOR UPDATE TO "authenticated" USING (("bucket_id" = 'waybills'::"text"));
 
-CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
 
