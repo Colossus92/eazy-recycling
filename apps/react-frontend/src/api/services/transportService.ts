@@ -19,6 +19,10 @@ import { ContainerTransportFormValues } from '@/features/planning/hooks/useConta
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
 import { format } from 'date-fns';
 import { apiInstance } from './apiInstance';
+import {
+  locationFormValueToPickupLocationRequest,
+  pickupLocationViewToFormValue
+} from '@/types/forms/locationConverters';
 
 const transportApi = new TransportControllerApi(apiInstance.config);
 const containerTransportApi = new ContainerTransportControllerApi(
@@ -56,7 +60,7 @@ export const resolveLocationAddress = (
   const locationAny = location as any;
 
   // Handle PickupCompanyView (type === 'company')
-  if (locationAny.type === 'company' && locationAny.company?.address) {
+  if (locationAny.type === 'company') {
     const address = locationAny.company.address;
     return {
       companyId: locationAny.company.id,
@@ -80,18 +84,19 @@ export const resolveLocationAddress = (
     };
   }
 
-  // Handle DutchAddressView (type === 'project_location')
+  // Handle ProjectLocationView (type === 'project_location')
   if (locationAny.type === 'project_location') {
     return {
       companyId: locationAny.company.id,
       companyName: locationAny.company.name,
       street: locationAny.streetName,
       houseNumber: locationAny.buildingNumber,
-      postalCode: locationAny.postalCode ,
+      postalCode: locationAny.postalCode,
       city: locationAny.city,
       country: locationAny.country,
     };
   }
+
 
   // Fallback: try to extract address directly if it exists
   if (locationAny.address) {
@@ -156,72 +161,28 @@ export const formValuesToCreateContainerTransportRequest = (
       formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
     pickupDateTime: formValues.pickupDateTime,
     deliveryDateTime: formValues.deliveryDateTime,
-    pickupStreet: '',
-    pickupBuildingNumber: '',
-    pickupPostalCode: '',
-    pickupCity: '',
+    pickupLocation: locationFormValueToPickupLocationRequest(formValues.pickupLocation),
+    deliveryLocation: locationFormValueToPickupLocationRequest(formValues.deliveryLocation),
     truckId: formValues.truckId,
     driverId: formValues.driverId,
     containerId: formValues.containerId,
     note: formValues.note || '',
     transportType: 'CONTAINER',
-    deliveryStreet: '',
-    deliveryBuildingNumber: '',
-    deliveryPostalCode: '',
-    deliveryCity: '',
   };
 
-  //TODO should be possible to just send all available fields
-
-  if (formValues.pickupCompanyBranchId) {
-    request.pickupProjectLocationId = formValues.pickupCompanyBranchId;
-    request.pickupCompanyId = formValues.pickupCompanyId;
-  } else if (formValues.pickupCompanyId) {
-    request.pickupCompanyId = formValues.pickupCompanyId;
-  } else if (formValues.pickupStreet) {
-    request.pickupStreet = formValues.pickupStreet;
-    request.pickupBuildingNumber = formValues.pickupBuildingNumber;
-    request.pickupPostalCode = formValues.pickupPostalCode;
-    request.pickupCity = formValues.pickupCity;
-  }
-
-  if (formValues.deliveryCompanyBranchId) {
-    request.deliveryProjectLocationId = formValues.deliveryCompanyBranchId;
-    request.deliveryCompanyId = formValues.deliveryCompanyId;
-  } else if (formValues.deliveryCompanyId) {
-    request.deliveryCompanyId = formValues.deliveryCompanyId;
-  } else if (formValues.deliveryStreet) {
-    request.deliveryStreet = formValues.deliveryStreet;
-    request.deliveryBuildingNumber = formValues.deliveryBuildingNumber;
-    request.deliveryPostalCode = formValues.deliveryPostalCode;
-    request.deliveryCity = formValues.deliveryCity;
-  }
   return request;
 };
 
 export const transportDetailViewToContainerTransportFormValues = (
   data: TransportDetailView
 ) => {
-  const pickupLocationAddress = resolveLocationAddress(data.pickupLocation);
-  const deliveryLocationAddress = resolveLocationAddress(data.deliveryLocation);
-
   const formValues: ContainerTransportFormValues = {
     consignorPartyId: data.consignorParty?.id || '',
     carrierPartyId: data.carrierParty?.id || '',
     containerOperation: data.containerOperation || '',
-    pickupCompanyId: pickupLocationAddress?.companyId || '',
-    // pickupCompanyBranchId: data.pickupCompanyBranch?.id || '', //TODO
-    pickupStreet: pickupLocationAddress?.street || '',
-    pickupBuildingNumber: pickupLocationAddress?.houseNumber || '',
-    pickupPostalCode: pickupLocationAddress?.postalCode || '',
-    pickupCity: pickupLocationAddress?.city || '',
+    pickupLocation: pickupLocationViewToFormValue(data.pickupLocation),
     pickupDateTime: data.pickupDateTime,
-    deliveryCompanyId: deliveryLocationAddress?.companyId || '',
-    // deliveryCompanyBranchId: data.deliveryCompanyBranch?.id || '',
-    deliveryStreet: deliveryLocationAddress?.street || '',
-    deliveryBuildingNumber: deliveryLocationAddress?.houseNumber || '',
-    deliveryPostalCode: deliveryLocationAddress?.postalCode || '',
-    deliveryCity: deliveryLocationAddress?.city || '',
+    deliveryLocation: pickupLocationViewToFormValue(data.deliveryLocation),
     deliveryDateTime: data.deliveryDateTime,
     truckId: data.truck?.licensePlate || '',
     driverId: data.driver?.id || '',

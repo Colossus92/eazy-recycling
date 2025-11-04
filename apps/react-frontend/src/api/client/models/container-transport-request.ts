@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
  * 
@@ -64,100 +67,16 @@ export interface ContainerTransportRequest {
     'carrierPartyId': string;
     /**
      * 
-     * @type {string}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof ContainerTransportRequest
      */
-    'pickupCompanyId'?: string;
+    'pickupLocation': WeightTicketRequestPickupLocation;
     /**
      * 
-     * @type {string}
+     * @type {WeightTicketRequestPickupLocation}
      * @memberof ContainerTransportRequest
      */
-    'pickupProjectLocationId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupStreet'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupBuildingNumber'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupBuildingNumberAddition'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupPostalCode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupCity'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'pickupDescription'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryCompanyId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryProjectLocationId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryStreet': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryBuildingNumber': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryBuildingNumberAddition'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryPostalCode': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryCity': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContainerTransportRequest
-     */
-    'deliveryDescription'?: string;
+    'deliveryLocation': WeightTicketRequestPickupLocation;
     /**
      * 
      * @type {string}

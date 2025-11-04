@@ -49,9 +49,6 @@ export class TransportDetailsDrawerComponent extends BaseComponent {
     if (isVisible) {
       await this.closeButton.click();
       await expect(this.drawerContent).toBeHidden({ timeout: 5000 });
-      console.log('Transport details drawer closed');
-    } else {
-      console.log('Drawer already closed, no action needed');
     }
   }
 

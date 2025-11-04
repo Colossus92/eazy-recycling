@@ -94,6 +94,43 @@ export function useWasteTransportForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
+  
+  const formContext = useForm<WasteTransportFormValues>({
+    defaultValues: {
+      consignorPartyId: '',
+      consigneePartyId: '',
+      carrierPartyId: '',
+      transportType: 'WASTE',
+      containerOperation: '',
+      pickupPartyId: '',
+      pickupCompanyId: '',
+      pickupCompanyBranchId: '',
+      pickupStreet: '',
+      pickupBuildingNumber: '',
+      pickupPostalCode: '',
+      pickupCity: '',
+      pickupDateTime: '',
+      deliveryCompanyId: '',
+      deliveryCompanyBranchId: '',
+      deliveryStreet: '',
+      deliveryBuildingNumber: '',
+      deliveryPostalCode: '',
+      deliveryCity: '',
+      deliveryDateTime: '',
+      truckId: '',
+      driverId: '',
+      containerId: '',
+      wasteStreamNumber: '',
+      weight: 0,
+      unit: 'kg',
+      quantity: 0,
+      goodsName: '',
+      processingMethodCode: '',
+      euralCode: '',
+      note: '',
+    },
+  });
+  
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],
     queryFn: async () => {
@@ -104,9 +141,6 @@ export function useWasteTransportForm(
       return response;
     },
     enabled: !!transportId,
-  });
-  const formContext = useForm<WasteTransportFormValues>({
-    defaultValues: data,
   });
   const mutation = useMutation({
     mutationFn: async (data: WasteTransportFormValues) => {

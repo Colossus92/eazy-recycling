@@ -81,7 +81,6 @@ export const PlanningCard = ({
 
     setIsFormOpen(true);
   };
-
   return (
     <>
       <div

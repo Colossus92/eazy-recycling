@@ -6,25 +6,16 @@ import {
   transportService,
 } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
+import { LocationFormValue } from '@/types/forms/LocationFormValue';
 
 export interface ContainerTransportFormValues {
   consignorPartyId: string;
   carrierPartyId: string;
   containerOperation: string;
   transportType: string;
-  pickupCompanyId: string;
-  pickupCompanyBranchId?: string;
-  pickupStreet: string;
-  pickupBuildingNumber: string;
-  pickupPostalCode: string;
-  pickupCity: string;
+  pickupLocation: LocationFormValue;
   pickupDateTime: string;
-  deliveryCompanyId: string;
-  deliveryCompanyBranchId?: string;
-  deliveryStreet: string;
-  deliveryBuildingNumber: string;
-  deliveryPostalCode: string;
-  deliveryCity: string;
+  deliveryLocation: LocationFormValue;
   deliveryDateTime?: string;
   truckId: string;
   driverId: string;
@@ -37,26 +28,10 @@ const fieldsToValidate: Array<Array<keyof ContainerTransportFormValues>> = [
   ['consignorPartyId', 'carrierPartyId', 'containerOperation'],
 
   // Step 1: Pickup section fields
-  [
-    'pickupCompanyId',
-    'pickupCompanyBranchId',
-    'pickupStreet',
-    'pickupBuildingNumber',
-    'pickupPostalCode',
-    'pickupCity',
-    'pickupDateTime',
-  ],
+  ['pickupLocation', 'pickupDateTime'],
 
   // Step 2: Delivery section fields
-  [
-    'deliveryCompanyId',
-    'deliveryCompanyBranchId',
-    'deliveryStreet',
-    'deliveryBuildingNumber',
-    'deliveryPostalCode',
-    'deliveryCity',
-    'deliveryDateTime',
-  ],
+  ['deliveryLocation', 'deliveryDateTime'],
 
   // Step 3: Transport details
   ['truckId', 'driverId', 'containerId', 'note'],
@@ -67,6 +42,24 @@ export function useContainerTransportForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
+  
+  const formContext = useForm<ContainerTransportFormValues>({
+    defaultValues: {
+      consignorPartyId: '',
+      carrierPartyId: '',
+      containerOperation: '',
+      transportType: 'CONTAINER',
+      pickupLocation: { type: 'none' },
+      pickupDateTime: '',
+      deliveryLocation: { type: 'none' },
+      deliveryDateTime: '',
+      truckId: '',
+      driverId: '',
+      containerId: '',
+      note: '',
+    },
+  });
+  
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],
     queryFn: async () => {
@@ -75,12 +68,9 @@ export function useContainerTransportForm(
         transportDetailViewToContainerTransportFormValues(response);
       formContext.reset(formValues);
 
-      return formValues;
+      return response; // Return the original response, not the form values
     },
     enabled: !!transportId,
-  });
-  const formContext = useForm<ContainerTransportFormValues>({
-    defaultValues: data,
   });
   const mutation = useMutation({
     mutationFn: async (data: ContainerTransportFormValues) => {

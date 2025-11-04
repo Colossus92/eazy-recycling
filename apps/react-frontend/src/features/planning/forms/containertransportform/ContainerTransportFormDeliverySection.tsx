@@ -1,33 +1,18 @@
-import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
-import {
-  CompanyAddressInput,
-  FieldNames,
-} from '@/components/ui/form/CompanyAddressInput.tsx';
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput.tsx';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
+import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 
 export const ContainerTransportFormDeliverySection = () => {
   const formContext = useFormContext<ContainerTransportFormValues>();
-  const deliveryFieldnames: FieldNames<ContainerTransportFormValues> = useMemo(
-    () => ({
-      companyId: 'deliveryCompanyId',
-      branchId: 'deliveryCompanyBranchId',
-      street: 'deliveryStreet',
-      buildingNumber: 'deliveryBuildingNumber',
-      postalCode: 'deliveryPostalCode',
-      city: 'deliveryCity',
-    }),
-    []
-  );
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>
-      <CompanyAddressInput
-        formContext={formContext}
-        fieldNames={deliveryFieldnames}
-        title="Afleverlocatie"
-        includeBranches
+      <AddressFormField
+        control={formContext.control}
+        name="deliveryLocation"
+        label="Afleverlocatie"
+        entity="transport"
       />
 
       <DateTimeInput

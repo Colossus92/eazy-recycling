@@ -80,6 +80,7 @@ export const TransportDetailsDrawer = ({
   const containerText = data?.wasteContainer?.id
     ? data.wasteContainer.id
     : 'Geen container toegewezen';
+
   return (
     <Drawer
       title={'Transport details'}
