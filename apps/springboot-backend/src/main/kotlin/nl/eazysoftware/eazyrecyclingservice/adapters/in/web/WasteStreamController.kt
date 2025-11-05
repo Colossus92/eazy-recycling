@@ -32,8 +32,6 @@ class WasteStreamController(
   private val validateWasteStream: ValidateWasteStream,
 ) {
 
-  private val log = org.slf4j.LoggerFactory.getLogger(WasteStreamController::class.java)
-
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@Valid @RequestBody request: WasteStreamRequest): CreateWasteStreamResponse {
