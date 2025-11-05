@@ -5,15 +5,19 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidati
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 /**
  * Use case for validating a waste stream against the external Amice validation service.
  * This validates that the waste stream data will be accepted when reported.
+ * 
+ * Only active when amice.enabled=true
  */
 @Service
 @Transactional(readOnly = true)
+@ConditionalOnProperty(name = ["amice.enabled"], havingValue = "true", matchIfMissing = false)
 class ValidateWasteStream(
   private val wasteStreams: WasteStreams,
   private val wasteStreamValidator: WasteStreamValidator

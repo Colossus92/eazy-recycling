@@ -1,8 +1,6 @@
-alter table "public"."waste_containers" add column "location_id" text;
+alter table "public"."companies" drop column "building_name";
 
-alter table "public"."waste_containers" add constraint "waste_containers_location_id_fkey" FOREIGN KEY (location_id) REFERENCES public.pickup_locations(id) not valid;
-
-alter table "public"."waste_containers" validate constraint "waste_containers_location_id_fkey";
+alter table "public"."companies" add column "building_number_addition" character varying;
 
 set check_function_bodies = off;
 
@@ -66,7 +64,3 @@ begin
   return new;
 end$function$
 ;
-
-CREATE TRIGGER tr_check_filters BEFORE INSERT OR UPDATE ON realtime.subscription FOR EACH ROW EXECUTE FUNCTION realtime.subscription_check_filters();
-
-

@@ -30,6 +30,7 @@ springdoc:
     enabled: false
 
 amice:
+  enabled: ${AMICE_ENABLED:false}
   url: ${AMICE_URL:}
   username: ${AMICE_USERNAME:}
   password: ${AMICE_PASSWORD:}

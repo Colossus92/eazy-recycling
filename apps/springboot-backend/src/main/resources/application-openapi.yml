@@ -23,3 +23,5 @@ supabase:
 springdoc:
   api-docs:
     enabled: true
+
+amice.enabled: false

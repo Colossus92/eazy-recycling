@@ -5,9 +5,9 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenA
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenAfvalstroomNummerServiceSoap
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 import org.springframework.core.io.Resource
 import java.net.Authenticator
 import java.net.PasswordAuthentication
@@ -21,8 +21,11 @@ import javax.net.ssl.TrustManagerFactory
 /**
  * Configuration for SOAP clients used to communicate with external Amice services.
  * Configures both client certificate authentication (PFX/PKCS12) and HTTP Basic Authentication.
+ * 
+ * Only active when amice.enabled=true
  */
 @Configuration
+@ConditionalOnProperty(name = ["amice.enabled"], havingValue = "true", matchIfMissing = false)
 class SoapClientConfiguration {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -56,7 +59,6 @@ class SoapClientConfiguration {
   }
 
   @Bean
-  @Profile("!test")
   fun toetsenAfvalstroomNummerServiceSoap(@Value("#{@amiceToetsenUrl}") serviceUrl: String?): ToetsenAfvalstroomNummerServiceSoap? {
     if (serviceUrl.isNullOrBlank()) {
       logger.warn("Amice SOAP client not initialized: amice.url is not configured")
