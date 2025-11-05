@@ -5,8 +5,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,7 +30,7 @@ data class ProjectLocationResult(
 @Service
 class CreateProjectLocationService(
   private val projectLocations: ProjectLocations,
-  private val companyRepository: CompanyRepository, //TODO replace with domain ports
+  private val companies: Companies, //TODO replace with domain ports
 ) : CreateProjectLocation {
 
   @Transactional
@@ -43,8 +43,8 @@ class CreateProjectLocationService(
     ) {
       throw DuplicateKeyException("Er bestaat al een vestiging op dit adres (postcode en huisnummer) voor dit bedrijf.")
     }
-    companyRepository.findById(cmd.companyId.uuid)
-      .orElseThrow { EntityNotFoundException("Bedrijf met id ${cmd.companyId.uuid} niet gevonden") }
+    companies.findById(cmd.companyId)
+      ?: throw EntityNotFoundException("Bedrijf met id ${cmd.companyId.uuid} niet gevonden")
 
     val location = CompanyProjectLocation(
       id = ProjectLocationId(UUID.randomUUID()),

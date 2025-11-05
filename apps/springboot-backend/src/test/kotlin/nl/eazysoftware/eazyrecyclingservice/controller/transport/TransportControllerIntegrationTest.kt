@@ -10,12 +10,12 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -61,7 +61,7 @@ class TransportControllerIntegrationTest(
   private lateinit var transportRepository: TransportRepository
 
   @Autowired
-  private lateinit var companyRepository: CompanyRepository
+  private lateinit var companyRepository: CompanyJpaRepository
 
   @Autowired
   private lateinit var entityManager: EntityManager

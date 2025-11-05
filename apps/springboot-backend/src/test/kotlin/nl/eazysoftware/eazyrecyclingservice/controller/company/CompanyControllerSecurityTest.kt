@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController.CompanyRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -38,7 +38,7 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
-    private lateinit var companyRepository: CompanyRepository
+    private lateinit var companyRepository: CompanyJpaRepository
 
     private lateinit var testCompanyId: UUID
     private lateinit var testCompany: CompanyDto
@@ -51,7 +51,7 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
             vihbId = "123456VIHB",
             address = AddressDto(
                 streetName = "Test Street",
-                buildingName = "Test Building",
+                buildingNumberAddition = "Test Building",
                 buildingNumber = "123",
                 postalCode = "1234 AB",
                 city = "Test City",

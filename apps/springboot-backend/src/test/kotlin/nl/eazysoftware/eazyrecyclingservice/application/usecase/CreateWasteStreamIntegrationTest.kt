@@ -9,7 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.*
@@ -34,7 +34,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   private lateinit var wasteStreamRepo: WasteStreams
 
   @Autowired
-  private lateinit var companyRepository: CompanyRepository
+  private lateinit var companyRepository: CompanyJpaRepository
 
   @Autowired
   private lateinit var transactionTemplate: TransactionTemplate

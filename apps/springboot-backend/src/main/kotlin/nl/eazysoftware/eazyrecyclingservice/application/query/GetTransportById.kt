@@ -6,15 +6,16 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.mappers.PickupLoca
 import nl.eazysoftware.eazyrecyclingservice.application.query.mappers.WasteContainerViewMapper
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayString
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProfileRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -32,7 +33,7 @@ class GetTransportByIdService(
   private val containerTransports: ContainerTransports,
   private val wasteTransports: WasteTransports,
   private val wasteStreams: WasteStreams,
-  private val companyRepository: CompanyRepository,
+  private val companies: Companies,
   private val profileRepository: ProfileRepository,
   private val truckRepository: TruckRepository,
   private val wasteContainerService: WasteContainerService,
@@ -51,15 +52,15 @@ class GetTransportByIdService(
       ?: throw EntityNotFoundException("Transport met id $transportId niet gevonden")
   }
 
-  private fun mapCompany(companyId: UUID): CompanyView {
-    val company = companyRepository.findByIdOrNull(companyId)
+  private fun mapCompany(companyId: CompanyId): CompanyView {
+    val company = companies.findById(companyId)
       ?: throw EntityNotFoundException("Bedrijf met id $companyId niet gevonden")
 
     return companyViewMapper.map(company)
   }
 
   private fun mapCompany(processorPartyId: ProcessorPartyId): CompanyView {
-    val company = companyRepository.findByProcessorId(processorPartyId.number)
+    val company = companies.findByProcessorId(processorPartyId.number)
       ?: throw EntityNotFoundException("Bedrijf met verwerkersnummer $processorPartyId niet gevonden")
 
     return companyViewMapper.map(company)
@@ -105,8 +106,8 @@ class GetTransportByIdService(
   private fun toView(containerTransport: ContainerTransport) = TransportDetailView(
     id = containerTransport.transportId.uuid,
     displayNumber = containerTransport.displayNumber?.value,
-    consignorParty = mapCompany(containerTransport.consignorParty.uuid),
-    carrierParty = mapCompany(containerTransport.carrierParty.uuid),
+    consignorParty = mapCompany(containerTransport.consignorParty),
+    carrierParty = mapCompany(containerTransport.carrierParty),
     pickupLocation = pickupLocationViewMapper.mapLocation(containerTransport.pickupLocation),
     pickupDateTime = containerTransport.pickupDateTime.toDisplayString(),
     deliveryLocation = pickupLocationViewMapper.mapLocation(containerTransport.deliveryLocation),
@@ -130,10 +131,10 @@ class GetTransportByIdService(
       id = wasteTransport.transportId.uuid,
       displayNumber = wasteTransport.displayNumber?.value,
       consignorParty = when(val consignor = wasteStream.consignorParty) {
-        is Consignor.Company -> mapCompany(consignor.id.uuid)
+        is Consignor.Company -> mapCompany(consignor.id)
         else -> throw IllegalArgumentException("Op dit moment worden alleen bedrijven als opdrachtgever ondersteund")
       },
-      carrierParty = mapCompany(wasteTransport.carrierParty.uuid),
+      carrierParty = mapCompany(wasteTransport.carrierParty),
       pickupLocation = pickupLocationViewMapper.mapLocation(wasteStream.pickupLocation),
       pickupDateTime = wasteTransport.pickupDateTime.toDisplayString(),
       deliveryLocation = mapWasteDeliveryLocation(wasteStream.deliveryLocation),
@@ -150,7 +151,7 @@ class GetTransportByIdService(
       containerOperation = wasteTransport.containerOperation,
       goodsItem = mapGoodsItem(wasteTransport.goodsItem, wasteStream),
       consigneeParty = mapCompany(wasteStream.deliveryLocation.processorPartyId),
-      pickupParty = mapCompany(wasteStream.pickupParty.uuid),
+      pickupParty = mapCompany(wasteStream.pickupParty),
     )
   }
 

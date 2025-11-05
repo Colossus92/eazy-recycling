@@ -8,15 +8,16 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
-import org.springframework.data.repository.findByIdOrNull
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import org.springframework.stereotype.Component
 
 @Component
 class WeightTicketMapper(
-  private val companyRepository: CompanyRepository,
+  private val companies: Companies,
   private val pickupLocationMapper: PickupLocationMapper,
+  private val companyMapper: CompanyMapper,
 ) {
 
   fun toDomain(dto: WeightTicketDto): WeightTicket {
@@ -52,10 +53,10 @@ class WeightTicketMapper(
   }
 
   fun toDto(domain: WeightTicket): WeightTicketDto {
-    val carrierParty = domain.carrierParty?.uuid
-      ?.let { companyRepository.findByIdOrNull(it) ?: throw IllegalStateException("Transporteur niet gevonden: ${it}") }
+    val carrierParty = domain.carrierParty
+      ?.let { companies.findById(it) ?: throw IllegalStateException("Transporteur niet gevonden: ${it.uuid}") }
     val consignorParty = when (val consignor = domain.consignorParty) {
-      is Consignor.Company -> companyRepository.findByIdOrNull(consignor.id.uuid)
+      is Consignor.Company -> companies.findById(consignor.id)
         ?: throw IllegalArgumentException("Opdrachtgever niet gevonden: ${consignor.id.uuid}")
 
       Consignor.Person -> throw IllegalArgumentException("Particuliere opdrachtgever wordt nog niet ondersteund.")
@@ -64,14 +65,14 @@ class WeightTicketMapper(
     // Step 1: Create the parent DTO without goods
     val weightTicketDto = WeightTicketDto(
       id = domain.id.number,
-      consignorParty = consignorParty,
+      consignorParty = companyMapper.toDto(consignorParty),
       lines = toDto(domain.lines),
       tarraWeightValue = domain.tarraWeight?.value,
       tarraWeightUnit = when(domain.tarraWeight?.unit) {
         Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
         null -> null
       },
-      carrierParty = carrierParty,
+      carrierParty = carrierParty?.let { companyMapper.toDto(carrierParty) },
       truckLicensePlate = domain.truckLicensePlate?.value,
       reclamation = domain.reclamation,
       note = domain.note?.description,

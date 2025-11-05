@@ -5,14 +5,13 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
 import nl.eazysoftware.eazyrecyclingservice.application.query.CompanyView
 import nl.eazysoftware.eazyrecyclingservice.application.query.PickupLocationView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
-import org.springframework.data.repository.findByIdOrNull
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class PickupLocationViewMapper(
-  private val companyRepository: CompanyRepository,
+  private val companies: Companies,
   private val companyViewMapper: CompanyViewMapper,
 ) {
 
@@ -36,16 +35,16 @@ class PickupLocationViewMapper(
 
       is Location.Company -> {
         val id = location.companyId.uuid
-        val company = companyRepository.findByIdOrNull(id)
+        val company = companies.findById(location.companyId)
           ?: throw EntityNotFoundException("Bedrijf met id $id niet gevonden")
 
         return PickupLocationView.PickupCompanyView(
           company = CompanyView(
-              id = id,
+              id = location.companyId.uuid,
               name = location.name,
               chamberOfCommerceId = company.chamberOfCommerceId,
-              vihbId = company.vihbId,
-              processorId = company.processorId,
+              vihbId = company.vihbNumber?.value,
+              processorId = company.processorId?.number,
               address = AddressView(
                   street = location.address.streetName.value,
                   houseNumber = location.address.buildingNumber,
@@ -60,7 +59,7 @@ class PickupLocationViewMapper(
 
       is Location.ProjectLocationSnapshot -> PickupLocationView.ProjectLocationView(
         id = location.projectLocationId.uuid.toString(),
-        company = mapCompany(location.companyId.uuid),
+        company = mapCompany(location.companyId),
         streetName = location.streetName(),
         postalCode = location.postalCode().value,
         buildingNumber = location.buildingNumber(),
@@ -73,8 +72,8 @@ class PickupLocationViewMapper(
     }
   }
 
-  private fun mapCompany(companyId: UUID): CompanyView {
-    val company = companyRepository.findByIdOrNull(companyId)
+  private fun mapCompany(companyId: CompanyId): CompanyView {
+    val company = companies.findById(companyId)
       ?: throw EntityNotFoundException("Bedrijf met id $companyId niet gevonden")
 
     return companyViewMapper.map(company)

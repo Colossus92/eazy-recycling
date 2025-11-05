@@ -8,9 +8,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -46,7 +46,7 @@ data class CreateContainerTransportResult(
 class CreateContainerTransportService(
   private val containerTransports: ContainerTransports,
   private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
-  private val companyService: CompanyService,
+  private val companies: Companies,
   private val projectLocations: ProjectLocations,
 ) : CreateContainerTransport {
 
@@ -58,9 +58,9 @@ class CreateContainerTransportService(
       displayNumber = displayNumber,
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
-      pickupLocation = cmd.pickupLocation.toDomain(companyService, projectLocations),
+      pickupLocation = cmd.pickupLocation.toDomain(companies, projectLocations),
       pickupDateTime = cmd.pickupDateTime,
-      deliveryLocation = cmd.deliveryLocation.toDomain(companyService, projectLocations),
+      deliveryLocation = cmd.deliveryLocation.toDomain(companies, projectLocations),
       deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,

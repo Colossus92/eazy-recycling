@@ -13,7 +13,9 @@ interface WeightTicketLinesSectionProps {
   disabled?: boolean;
 }
 
-export const WeightTicketLinesSection = ({ disabled = false }: WeightTicketLinesSectionProps) => {
+export const WeightTicketLinesSection = ({
+  disabled = false,
+}: WeightTicketLinesSectionProps) => {
   const formContext = useFormContext<WeightTicketFormValues>();
   const {
     control,
@@ -96,7 +98,13 @@ export const WeightTicketLinesSection = ({ disabled = false }: WeightTicketLines
           onClick={handleAddLine}
           disabled={!hasConsignorSelected || disabled}
           className="flex items-center justify-center w-8 h-8 rounded-radius-sm bg-color-primary text-color-on-primary hover:bg-color-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title={disabled ? 'Kan niet bewerken in deze status' : !hasConsignorSelected ? 'Selecteer eerst een opdrachtgever' : 'Voeg weging toe'}
+          title={
+            disabled
+              ? 'Kan niet bewerken in deze status'
+              : !hasConsignorSelected
+                ? 'Selecteer eerst een opdrachtgever'
+                : 'Voeg weging toe'
+          }
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -119,14 +127,18 @@ export const WeightTicketLinesSection = ({ disabled = false }: WeightTicketLines
             >
               <div className="flex justify-between items-center self-stretch">
                 <span className="text-body-2 font-medium">
-                  Weging {index + 1}
+                  Materiaal {index + 1}
                 </span>
                 <button
                   type="button"
                   onClick={() => remove(index)}
                   disabled={disabled}
                   className="flex items-center justify-center w-6 h-6 rounded-radius-sm text-color-error hover:bg-color-error hover:text-color-on-error disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  title={disabled ? 'Kan niet bewerken in deze status' : 'Verwijder weging'}
+                  title={
+                    disabled
+                      ? 'Kan niet bewerken in deze status'
+                      : 'Verwijder weging'
+                  }
                 >
                   <TrashSimple className="w-4 h-4" />
                 </button>
@@ -198,9 +210,7 @@ export const WeightTicketLinesSection = ({ disabled = false }: WeightTicketLines
                 </div>
 
                 <div className="flex flex-col items-start gap-2">
-                  <label className="text-caption-2">
-                    Eenheid
-                  </label>
+                  <label className="text-caption-2">Eenheid</label>
                   <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
                     kg
                   </div>

@@ -8,9 +8,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
@@ -21,7 +22,8 @@ import org.springframework.stereotype.Component
 class WasteStreamMapper(
   @PersistenceContext private var entityManager: EntityManager,
   private var pickupLocationMapper: PickupLocationMapper,
-  private var companyRepository: CompanyRepository,
+  private var companies: Companies,
+  private val companyMapper: CompanyMapper,
 ) {
 
   fun toDomain(dto: WasteStreamDto): WasteStream {
@@ -66,7 +68,8 @@ class WasteStreamMapper(
       ),
       wasteCollectionType = domain.collectionType.name,
       pickupLocation = pickupLocationMapper.toDto(domain.pickupLocation),
-      processorParty = companyRepository.findByProcessorId(domain.deliveryLocation.processorPartyId.number)
+      processorParty = companies.findByProcessorId(domain.deliveryLocation.processorPartyId.number)
+        ?.let { companyMapper.toDto(it) }
         ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: ${domain.deliveryLocation.processorPartyId.number}"),
       consignorParty = when (val consignor = domain.consignorParty) {
         is Consignor.Company -> entityManager.getReference(CompanyDto::class.java, consignor.id.uuid)

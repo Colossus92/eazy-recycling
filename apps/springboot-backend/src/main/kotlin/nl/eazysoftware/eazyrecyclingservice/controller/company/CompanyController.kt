@@ -3,7 +3,10 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
@@ -12,8 +15,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -22,43 +25,75 @@ import java.util.*
 @RestController
 @RequestMapping("/companies")
 class CompanyController(
-  val companyService: CompanyService,
-  val createProjectLocation: CreateProjectLocation,
-  val deleteProjectLocation: DeleteProjectLocation,
-  val updateProjectLocation: UpdateProjectLocation,
+  private val createCompanyUseCase: CreateCompany,
+  private val updateCompanyUseCase: UpdateCompany,
+  private val deleteCompanyUseCase: DeleteCompany,
+  private val getAllCompaniesQuery: GetAllCompanies,
+  private val getCompanyByIdQuery: GetCompanyById,
+  private val createProjectLocation: CreateProjectLocation,
+  private val deleteProjectLocation: DeleteProjectLocation,
+  private val updateProjectLocation: UpdateProjectLocation,
 ) {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  fun createCompany(@Valid @RequestBody company: CompanyRequest): CompanyDto {
-    return companyService.create(company)
+  fun createCompany(@Valid @RequestBody request: CompanyRequest): CompanyResult {
+    val command = CreateCompanyCommand(
+      name = request.name,
+      chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },
+      vihbNumber = request.vihbId?.takeIf { it.isNotBlank() }?.let { VihbNumber(it) },
+      processorId = null,
+      address = Address(
+        streetName = StreetName(request.address.streetName),
+        buildingNumber = request.address.buildingNumber,
+        buildingNumberAddition = request.address.buildingNumberAddition,
+        postalCode = DutchPostalCode(request.address.postalCode),
+        city = City(request.address.city),
+        country = request.address.country
+      )
+    )
+    return createCompanyUseCase.handle(command)
   }
 
   @GetMapping
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompanyService.CompanyResponse> {
-    return companyService.findAll(includeBranches)
+  fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompanyService.CompanyView> {
+    return getAllCompaniesQuery.handle(includeBranches)
   }
 
   @GetMapping("/{id}")
-
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getById(@PathVariable("id") id: String): CompanyDto {
-    return companyService.findById(id)
+  fun getById(@PathVariable("id") id: String): CompanyService.CompanyView {
+    return getCompanyByIdQuery.handle(CompanyId(UUID.fromString(id)))
   }
 
   @DeleteMapping("/{id}")
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun deleteCompany(@PathVariable("id") id: String) {
-    companyService.delete(id)
+    deleteCompanyUseCase.handle(CompanyId(UUID.fromString(id)))
   }
 
   @PutMapping("/{id}")
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  fun updateCompany(@PathVariable("id") id: String, @RequestBody company: CompanyDto): CompanyDto {
-    return companyService.update(id, company)
+  fun updateCompany(@PathVariable("id") id: String, @Valid @RequestBody request: CompanyRequest): CompanyResult {
+    val command = UpdateCompanyCommand(
+      companyId = CompanyId(UUID.fromString(id)),
+      name = request.name,
+      chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },
+      vihbNumber = request.vihbId?.takeIf { it.isNotBlank() }?.let { VihbNumber(it) },
+      processorId = null,
+      address = Address(
+        streetName = StreetName(request.address.streetName),
+        buildingNumber = request.address.buildingNumber,
+        buildingNumberAddition = request.address.buildingNumberAddition,
+        postalCode = DutchPostalCode(request.address.postalCode),
+        city = City(request.address.city),
+        country = request.address.country
+      )
+    )
+    return updateCompanyUseCase.handle(command)
   }
 
   @PostMapping("/{id}/branches")

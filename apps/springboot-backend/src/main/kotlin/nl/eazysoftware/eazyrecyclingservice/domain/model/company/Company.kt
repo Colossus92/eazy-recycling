@@ -1,6 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.company
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+
 data class Company(
   val companyId: CompanyId,
-  val vihbNumber: VihbNumber,
+  val name: String,
+  val chamberOfCommerceId: String?,
+  val vihbNumber: VihbNumber?,
+  val processorId: ProcessorPartyId?,
+  val address: Address,
 )

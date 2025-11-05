@@ -22,7 +22,7 @@ object TestCompanyFactory {
       processorId = processorId,
       address = AddressDto(
         streetName = "Test Street",
-        buildingName = "Test Building",
+        buildingNumberAddition = "Test Building",
         buildingNumber = "123",
         postalCode = "1234AB",
         city = "Test City",
@@ -39,7 +39,7 @@ object TestCompanyFactory {
       processorId = "11987",
       address = AddressDto(
         streetName = "Straat",
-        buildingName = null,
+        buildingNumberAddition = null,
         buildingNumber = "8",
         postalCode = "1234 AB",
         city = "Rotterdam",

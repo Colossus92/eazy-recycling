@@ -8,13 +8,13 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatusPolicy
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.COMPANY
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.DUTCH_ADDRESS
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROJECT_LOCATION
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.PROXIMITY_DESC
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
@@ -27,7 +27,7 @@ import java.util.*
 class WasteStreamQueryRepository(
   private val entityManager: EntityManager,
   private val jpaRepository: WasteStreamJpaRepository,
-  private val companyRepository: CompanyRepository,
+  private val companyRepository: CompanyJpaRepository,
   private val pickupLocationMapper: PickupLocationMapper
 ) : GetAllWasteStreams, GetWasteStreamByNumber {
 

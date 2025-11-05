@@ -6,8 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainer
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/containers")
 class WasteContainerController(
   private val wasteContainerService: WasteContainerService,
-  private val companyService: CompanyService,
+  private val companies: Companies,
   private val projectLocations: ProjectLocations,
   private val wasteContainerViewMapper: WasteContainerViewMapper,
 ) {
@@ -59,7 +59,7 @@ class WasteContainerController(
 
   fun toDomain(request: WasteContainerRequest) = WasteContainer(
     wasteContainerId = WasteContainerId(request.id),
-    location = request.location?.toCommand()?.toDomain(companyService, projectLocations),
+    location = request.location?.toCommand()?.toDomain(companies, projectLocations),
     notes = request.notes
   )
 }

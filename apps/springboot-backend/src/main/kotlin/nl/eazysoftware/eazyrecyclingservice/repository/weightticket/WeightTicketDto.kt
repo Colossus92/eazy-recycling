@@ -36,15 +36,15 @@ data class WeightTicketDto(
   @Column(name = "direction", nullable = false)
   val direction: WeightTicketDirection,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
   val pickupLocation: PickupLocationDto?,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
   @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
   val deliveryLocation: PickupLocationDto?,
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id")
   val carrierParty: CompanyDto?,
 

@@ -12,9 +12,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportDisp
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
@@ -24,8 +25,9 @@ import java.time.ZoneId
 
 @Component
 class ContainerTransportMapper(
-  private val companyRepository: CompanyRepository,
+  private val companies: Companies,
   private val pickupLocationMapper: PickupLocationMapper,
+  private val companyMapper: CompanyMapper,
   private val truckRepository: TruckRepository,
   private val containerRepository: WasteContainerJpaRepository,
   private val entityManager: EntityManager,
@@ -54,16 +56,16 @@ class ContainerTransportMapper(
   }
 
   fun toDto(domain: ContainerTransport): TransportDto {
-    val consignorCompany = companyRepository.findByIdOrNull(domain.consignorParty.uuid)
+    val consignorCompany = companies.findById(domain.consignorParty)
       ?: throw IllegalArgumentException("Consignor company not found: ${domain.consignorParty.uuid}")
-    val carrierCompany = companyRepository.findByIdOrNull(domain.carrierParty.uuid)
+    val carrierCompany = companies.findById(domain.carrierParty)
       ?: throw IllegalArgumentException("Carrier company not found: ${domain.carrierParty.uuid}")
 
     return TransportDto(
       id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
-      consignorParty = consignorCompany,
-      carrierParty = carrierCompany,
+      consignorParty = companyMapper.toDto(consignorCompany),
+      carrierParty = companyMapper.toDto(carrierCompany),
       pickupLocation = pickupLocationMapper.toDto(domain.pickupLocation),
       pickupDateTime = domain.pickupDateTime.toJavaInstant(),
       deliveryLocation = pickupLocationMapper.toDto(domain.deliveryLocation),

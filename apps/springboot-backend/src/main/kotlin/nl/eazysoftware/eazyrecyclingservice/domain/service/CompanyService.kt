@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.hibernate.exception.ConstraintViolationException
@@ -16,17 +16,18 @@ import java.util.*
 
 @Service
 class CompanyService(
-  private val companyRepository: CompanyRepository,
+  private val companyRepository: CompanyJpaRepository,
   private val companyBranchRepository: ProjectLocations,
 ) {
   fun create(company: CompanyController.CompanyRequest): CompanyDto {
     val companyDto = CompanyDto(
+      id = UUID.randomUUID(),
       name = company.name,
       chamberOfCommerceId = company.chamberOfCommerceId,
       vihbId = company.vihbId,
       address = AddressDto(
         streetName = company.address.streetName,
-        buildingName = company.address.buildingNumberAddition,
+        buildingNumberAddition = company.address.buildingNumberAddition,
         buildingNumber = company.address.buildingNumber,
         postalCode = company.address.postalCode,
         city = company.address.city,
@@ -43,8 +44,8 @@ class CompanyService(
     }
   }
 
-  fun findAll(includeBranches: Boolean): List<CompanyResponse> {
-    val companies = companyRepository.findAll().map { CompanyResponse.from(it) }
+  fun findAll(includeBranches: Boolean): List<CompanyView> {
+    val companies = companyRepository.findAll().map { CompanyView.from(it) }
     if (includeBranches) {
       val branches = companyBranchRepository.findAll()
         .map { branch -> CompanyBranchResponse.from(branch) }
@@ -88,7 +89,7 @@ class CompanyService(
       || cause.constraintName?.contains("companies_vihb_number_key") == true)
   }
 
-  data class CompanyResponse(
+  data class CompanyView(
     val id: UUID,
     val chamberOfCommerceId: String?,
     val vihbId: String?,
@@ -101,19 +102,34 @@ class CompanyService(
     ) {
 
     companion object {
-      fun from(company: CompanyDto): CompanyResponse {
-        if (company.id == null) {
-          throw IllegalArgumentException("Bedrijf met naam ${company.name} en heeft geen id")
-        }
-
-        return CompanyResponse(
-          id = company.id!!,
+      fun from(company: CompanyDto): CompanyView {
+        return CompanyView(
+          id = company.id,
           chamberOfCommerceId = company.chamberOfCommerceId,
           vihbId = company.vihbId,
           name = company.name,
           address = company.address,
           processorId = company.processorId,
           updatedAt = company.updatedAt,
+        )
+      }
+
+      fun fromDomain(company: nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company): CompanyView {
+        return CompanyView(
+          id = company.companyId.uuid,
+          chamberOfCommerceId = company.chamberOfCommerceId,
+          vihbId = company.vihbNumber?.value,
+          name = company.name,
+          address = AddressDto(
+            streetName = company.address.streetName.value,
+            buildingNumber = company.address.buildingNumber,
+            buildingNumberAddition = company.address.buildingNumberAddition,
+            postalCode = company.address.postalCode.value,
+            city = company.address.city.value,
+            country = company.address.country
+          ),
+          processorId = company.processorId?.number,
+          updatedAt = LocalDateTime.now(),
         )
       }
     }

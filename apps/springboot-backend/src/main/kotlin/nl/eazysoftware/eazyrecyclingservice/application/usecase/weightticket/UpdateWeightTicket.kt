@@ -3,9 +3,9 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDomain
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
-import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,7 +17,7 @@ interface UpdateWeightTicket {
 class UpdateWeightTicketService(
   private val weightTickets: WeightTickets,
   private val projectLocations: ProjectLocations,
-  private val companyService: CompanyService,
+  private val companies: Companies,
 ) : UpdateWeightTicket {
 
   @Transactional
@@ -31,8 +31,8 @@ class UpdateWeightTicketService(
       carrierParty = cmd.carrierParty,
       consignorParty = cmd.consignorParty,
       direction = cmd.direction,
-      pickupLocation = cmd.pickupLocation?.toDomain(companyService, projectLocations),
-      deliveryLocation = cmd.deliveryLocation?.toDomain(companyService, projectLocations),
+      pickupLocation = cmd.pickupLocation?.toDomain(companies, projectLocations),
+      deliveryLocation = cmd.deliveryLocation?.toDomain(companies, projectLocations),
       truckLicensePlate = cmd.truckLicensePlate,
       reclamation = cmd.reclamation,
       note = cmd.note,

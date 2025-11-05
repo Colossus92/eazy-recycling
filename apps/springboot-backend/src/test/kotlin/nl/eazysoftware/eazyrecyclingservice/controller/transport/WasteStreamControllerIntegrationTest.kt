@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -30,7 +30,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var wasteStreamRepository: WasteStreamJpaRepository
 
   @Autowired
-  private lateinit var companyRepository: CompanyRepository
+  private lateinit var companyRepository: CompanyJpaRepository
 
   private lateinit var testCompany: CompanyDto
 

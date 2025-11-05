@@ -3,8 +3,8 @@ package nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
@@ -43,7 +43,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var wasteContainerRepository: WasteContainerJpaRepository
 
     @Autowired
-    private lateinit var companyRepository: CompanyRepository
+    private lateinit var companyRepository: CompanyJpaRepository
 
     @BeforeEach
     fun setup() {

@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -24,9 +24,9 @@ import java.util.*
 @ActiveProfiles("test")
 @Transactional
 class CompanyBranchControllerTest @Autowired constructor(
-    val mockMvc: MockMvc,
-    val objectMapper: ObjectMapper,
-    val companyRepository: CompanyRepository,
+  val mockMvc: MockMvc,
+  val objectMapper: ObjectMapper,
+  val companyRepository: CompanyJpaRepository,
 ) : BaseIntegrationTest() {
     private lateinit var securedMockMvc: SecuredMockMvc
     private lateinit var testCompany: CompanyDto
@@ -43,7 +43,7 @@ class CompanyBranchControllerTest @Autowired constructor(
                 vihbId = "VIHB123",
                 address = AddressDto(
                     streetName = "Main St",
-                    buildingName = "HQ",
+                    buildingNumberAddition = "HQ",
                     buildingNumber = "1",
                     postalCode = "1234 AB",
                     city = "Amsterdam",

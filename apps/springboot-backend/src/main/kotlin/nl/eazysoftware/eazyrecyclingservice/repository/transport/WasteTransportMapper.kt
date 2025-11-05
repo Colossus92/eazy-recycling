@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.toJavaInstant
 import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
@@ -12,7 +12,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
@@ -28,27 +28,20 @@ import java.time.ZoneId
 class WasteTransportMapper(
   private val wasteStreamRepository: WasteStreamRepository,
   private val locationMapper: PickupLocationMapper,
-  private val companyRepository: CompanyRepository,
+  private val companies: Companies,
   private val entityManager: EntityManager,
 ) {
 
   fun toDto(domain: WasteTransport): TransportDto {
     val wasteStream = wasteStreamRepository.findByNumber(domain.goodsItem.wasteStreamNumber)
       ?: throw IllegalArgumentException("Afvalstroomnummer niet gevonden: ${domain.goodsItem.wasteStreamNumber.number}")
-    val deliveryLocation = companyRepository.findByProcessorId(wasteStream.deliveryLocation.processorPartyId.number)
+    val deliveryLocation = companies.findByProcessorId(wasteStream.deliveryLocation.processorPartyId.number)
       ?.let {
-        it.id?.let { id ->
+        it.companyId.let { id ->
           Location.Company(
-            CompanyId(id),
+            id,
             name = it.name,
-            address = Address(
-              streetName = StreetName(it.address.streetName ?: throw IllegalStateException("Bedrijf heeft geen straatnaam, maar dit is verplicht")),
-              buildingNumber = it.address.buildingNumber,
-              buildingNumberAddition = it.address.buildingName,
-              city = it.address.city?.let { value -> City(value) } ?: throw IllegalStateException("Bedrijf heeft geen stad, maar dit is verplicht"),
-              country = it.address.country ?: "Nederland",
-              postalCode = DutchPostalCode(it.address.postalCode)
-            )
+            address = it.address,
           )
         }
       }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.CancelWeightTicketRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
-import nl.eazysoftware.eazyrecyclingservice.repository.CompanyRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -31,7 +31,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var weightTicketRepository: WeightTicketJpaRepository
 
     @Autowired
-    private lateinit var companyRepository: CompanyRepository
+    private lateinit var companyRepository: CompanyJpaRepository
 
     private lateinit var testConsignorCompany: CompanyDto
     private lateinit var testCarrierCompany: CompanyDto
