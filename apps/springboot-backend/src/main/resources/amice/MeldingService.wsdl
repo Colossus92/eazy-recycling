@@ -1,0 +1,680 @@
+<wsdl:definitions xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://amice.lma.nl/AmiceWebServices3/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  targetNamespace="http://amice.lma.nl/AmiceWebServices3/">
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze WebService biedt een aantal functies om meldingen als XML-berichten aan het AMICE systeem aan te bieden.</wsdl:documentation>
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://amice.lma.nl/AmiceWebServices3/">
+      <s:element name="EersteOntvangstMelding">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Meldingen" type="tns:ArrayOfMessageEersteOntvangstMelding"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfMessageEersteOntvangstMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MessageEersteOntvangstMelding" nillable="true" type="tns:MessageEersteOntvangstMelding"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MessageEersteOntvangstMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="RouteInzameling" type="s:boolean"/>
+          <s:element minOccurs="1" maxOccurs="1" name="InzamelaarsRegeling" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Ontdoener" type="tns:Ontdoener"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstPostcode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummerToevoeging" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstWoonplaats" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstStraatnaam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstNabijheidsBeschrijving" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstLand" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieOntvangst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afzender" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Inzamelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Bemiddelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="VerwerkingsMethode" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Ontdoener">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:Bedrijf">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="IsParticulier" type="s:boolean"/>
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="Bedrijf">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelsregisternummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Naam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Land" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="EersteOntvangstMeldingResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="EersteOntvangstMeldingResult" type="s:boolean"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MaandelijkseOntvangstMelding">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Meldingen" type="tns:ArrayOfMessageMaandelijkseOntvangstMelding"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfMessageMaandelijkseOntvangstMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MessageMaandelijkseOntvangstMelding" type="tns:MessageMaandelijkseOntvangstMelding"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MessageMaandelijkseOntvangstMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="MaandelijkseOntvangstMeldingResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="MaandelijkseOntvangstMeldingResult" type="s:boolean"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NulMelding">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Verwerkersnummer" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NulMeldingResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="NulMeldingResult" type="s:boolean"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AfgifteMelding">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="Meldingen" type="tns:ArrayOfMessageAfgifteMelding"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfMessageAfgifteMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MessageAfgifteMelding" type="tns:MessageAfgifteMelding"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MessageAfgifteMelding">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="EersteAfnemer" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="WijzeVanNuttigeToepassing" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GNcode" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="AfgifteMeldingResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="AfgifteMeldingResult" type="s:boolean"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="MeldingSessie">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="RetourberichtViaEmail" nillable="true" type="s:boolean"/>
+            <s:element minOccurs="0" maxOccurs="1" name="EersteOntvangstMeldingen" type="tns:EersteOntvangstMeldingenDetails"/>
+            <s:element minOccurs="0" maxOccurs="1" name="MaandelijkseOntvangstMeldingen" type="tns:MaandelijkseOntvangstMeldingenDetails"/>
+            <s:element minOccurs="0" maxOccurs="1" name="AfgifteMeldingen" type="tns:AfgifteMeldingenDetails"/>
+            <s:element minOccurs="0" maxOccurs="1" name="NulMelding" type="tns:NulMeldingDetails"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="EersteOntvangstMeldingenDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="EersteOntvangstMelding" nillable="true" type="tns:EersteOntvangstMeldingDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="EersteOntvangstMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="RouteInzameling" type="s:boolean"/>
+          <s:element minOccurs="1" maxOccurs="1" name="InzamelaarsRegeling" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Ontdoener" type="tns:Ontdoener"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstStraatnaam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummerToevoeging" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstPostcode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstWoonplaats" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstNabijheidsBeschrijving" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstLand" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieOntvangst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afzender" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Inzamelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Bemiddelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="VerwerkingsMethode" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MaandelijkseOntvangstMeldingenDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MaandelijkseOntvangstMelding" nillable="true" type="tns:MaandelijkseOntvangstMeldingDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="MaandelijkseOntvangstMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AfgifteMeldingenDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="AfgifteMelding" type="tns:AfgifteMeldingDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AfgifteMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="EersteAfnemer" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="WijzeVanNuttigeToepassing" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TotaalGewicht" type="s:int"/>
+          <s:element minOccurs="1" maxOccurs="1" name="AantalVrachten" type="s:short"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GNcode" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="NulMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Verwerkersnummer" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="MeldingSessieResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="MeldingSessieResponseDetails" nillable="true" type="tns:MeldingSessieResponseDetails"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="MeldingSessieResponseDetails">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="MeldingSessieResult" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingSessieFout" type="tns:FoutDetails"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingSessieUUID" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="RetourberichtViaEmail" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AanvraagGegevens" type="tns:AanvraagGegevensMSRDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="FoutDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="FoutCode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="FoutOmschrijving" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AanvraagGegevensMSRDetails">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumTijdRequest" type="s:dateTime"/>
+          <s:element minOccurs="0" maxOccurs="1" name="UsernameRequest" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="OpvragenResultaatVerwerkingMeldingSessie">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="MeldingSessieUUID" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="OpvragenResultaatVerwerkingMeldingSessieResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="OpvragenResultaatVerwerkingMeldingSessieResponseDetails" nillable="true" type="tns:OpvragenResultaatVerwerkingMeldingSessieResponseDetails"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="OpvragenResultaatVerwerkingMeldingSessieResponseDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="AanvraagGegevens" type="tns:AanvraagGegevensUUIDDetails"/>
+          <s:choice minOccurs="0" maxOccurs="unbounded">
+            <s:element minOccurs="0" maxOccurs="1" name="AanvraagFout" type="tns:FoutDetails"/>
+            <s:element minOccurs="0" maxOccurs="1" name="StatusMeldingSessie" type="tns:StatusMeldingSessieDetails"/>
+          </s:choice>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AanvraagGegevensUUIDDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingSessieUUID" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumTijdRequest" type="s:dateTime"/>
+          <s:element minOccurs="0" maxOccurs="1" name="UsernameRequest" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="StatusMeldingSessieDetails">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="RetourberichtViaEmail" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="EersteOntvangstMeldingen" type="tns:VerwerkingEersteOntvangstMeldingDetails"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MaandelijkseOntvangstMeldingen" type="tns:VerwerkingMaandelijkseOntvangstMeldingDetails"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="AfgifteMeldingen" type="tns:VerwerkingAfgifteMeldingDetails"/>
+          <s:element minOccurs="0" maxOccurs="1" name="NulMelding" type="tns:VerwerkingNulMeldingDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VerwerkingEersteOntvangstMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingUUID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieOntvangst" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="RouteInzameling" type="s:boolean"/>
+          <s:element minOccurs="1" maxOccurs="1" name="InzamelaarsRegeling" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Ontdoener" type="tns:Ontdoener"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstStraatnaam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummerToevoeging" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstPostcode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstWoonplaats" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstNabijheidsBeschrijving" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstLand" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afzender" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Inzamelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Bemiddelaar" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="VerwerkingsMethode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TotaalGewicht" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AantalVrachten" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingOntvangst" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingVerwerkt" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TechnischAkkoord" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldWijze" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MeldingFouten" type="tns:FoutDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VerwerkingMaandelijkseOntvangstMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingUUID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TotaalGewicht" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AantalVrachten" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingOntvangst" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingVerwerkt" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TechnischAkkoord" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldWijze" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MeldingFouten" type="tns:FoutDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VerwerkingAfgifteMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingUUID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="EersteAfnemer" type="tns:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="GNcode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="WijzeVanNuttigeToepassing" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="TotaalGewicht" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="AantalVrachten" nillable="true" type="s:int"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingOntvangst" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingVerwerkt" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TechnischAkkoord" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldWijze" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MeldingFouten" type="tns:FoutDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="VerwerkingNulMeldingDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingUUID" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldingsNummerMelder" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="VerwerkersNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="PeriodeMelding" type="s:string"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingOntvangst" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="DatumMeldingVerwerkt" type="s:dateTime"/>
+          <s:element minOccurs="1" maxOccurs="1" name="TechnischAkkoord" type="s:boolean"/>
+          <s:element minOccurs="0" maxOccurs="1" name="MeldWijze" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="MeldingFouten" type="tns:FoutDetails"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="boolean" type="s:boolean"/>
+      <s:element name="OpvragenResultaatVerwerkingMeldingSessieResponseDetails" nillable="true" type="tns:OpvragenResultaatVerwerkingMeldingSessieResponseDetails"/>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="EersteOntvangstMeldingSoapIn">
+    <wsdl:part name="parameters" element="tns:EersteOntvangstMelding"/>
+  </wsdl:message>
+  <wsdl:message name="EersteOntvangstMeldingSoapOut">
+    <wsdl:part name="parameters" element="tns:EersteOntvangstMeldingResponse"/>
+  </wsdl:message>
+  <wsdl:message name="MaandelijkseOntvangstMeldingSoapIn">
+    <wsdl:part name="parameters" element="tns:MaandelijkseOntvangstMelding"/>
+  </wsdl:message>
+  <wsdl:message name="MaandelijkseOntvangstMeldingSoapOut">
+    <wsdl:part name="parameters" element="tns:MaandelijkseOntvangstMeldingResponse"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingSoapIn">
+    <wsdl:part name="parameters" element="tns:NulMelding"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingSoapOut">
+    <wsdl:part name="parameters" element="tns:NulMeldingResponse"/>
+  </wsdl:message>
+  <wsdl:message name="AfgifteMeldingSoapIn">
+    <wsdl:part name="parameters" element="tns:AfgifteMelding"/>
+  </wsdl:message>
+  <wsdl:message name="AfgifteMeldingSoapOut">
+    <wsdl:part name="parameters" element="tns:AfgifteMeldingResponse"/>
+  </wsdl:message>
+  <wsdl:message name="MeldingSessieSoapIn">
+    <wsdl:part name="parameters" element="tns:MeldingSessie"/>
+  </wsdl:message>
+  <wsdl:message name="MeldingSessieSoapOut">
+    <wsdl:part name="parameters" element="tns:MeldingSessieResponse"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieSoapIn">
+    <wsdl:part name="parameters" element="tns:OpvragenResultaatVerwerkingMeldingSessie"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieSoapOut">
+    <wsdl:part name="parameters" element="tns:OpvragenResultaatVerwerkingMeldingSessieResponse"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingHttpGetIn">
+    <wsdl:part name="MeldingsNummerMelder" type="s:string"/>
+    <wsdl:part name="PeriodeMelding" type="s:string"/>
+    <wsdl:part name="Verwerkersnummer" type="s:string"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingHttpGetOut">
+    <wsdl:part name="Body" element="tns:boolean"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieHttpGetIn">
+    <wsdl:part name="MeldingSessieUUID" type="s:string"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieHttpGetOut">
+    <wsdl:part name="Body" element="tns:OpvragenResultaatVerwerkingMeldingSessieResponseDetails"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingHttpPostIn">
+    <wsdl:part name="MeldingsNummerMelder" type="s:string"/>
+    <wsdl:part name="PeriodeMelding" type="s:string"/>
+    <wsdl:part name="Verwerkersnummer" type="s:string"/>
+  </wsdl:message>
+  <wsdl:message name="NulMeldingHttpPostOut">
+    <wsdl:part name="Body" element="tns:boolean"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieHttpPostIn">
+    <wsdl:part name="MeldingSessieUUID" type="s:string"/>
+  </wsdl:message>
+  <wsdl:message name="OpvragenResultaatVerwerkingMeldingSessieHttpPostOut">
+    <wsdl:part name="Body" element="tns:OpvragenResultaatVerwerkingMeldingSessieResponseDetails"/>
+  </wsdl:message>
+  <wsdl:portType name="MeldingServiceSoap">
+    <wsdl:operation name="EersteOntvangstMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met eerste ontvangstmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:EersteOntvangstMeldingSoapIn"/>
+      <wsdl:output message="tns:EersteOntvangstMeldingSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="MaandelijkseOntvangstMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:MaandelijkseOntvangstMeldingSoapIn"/>
+      <wsdl:output message="tns:MaandelijkseOntvangstMeldingSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="NulMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:NulMeldingSoapIn"/>
+      <wsdl:output message="tns:NulMeldingSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="AfgifteMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met afgiftemeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:AfgifteMeldingSoapIn"/>
+      <wsdl:output message="tns:AfgifteMeldingSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="MeldingSessie">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een meldingsessie met daarin een lijst met eerste ontvangstmeldingen, maandelijkse ontvangstmeldingen of afgiftemeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:MeldingSessieSoapIn"/>
+      <wsdl:output message="tns:MeldingSessieSoapOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een meldingsessie Guid aan het AMICE systeem aan.<br /><b>Returns</b><br />In de response is het resultaat van de verwerking van de meldingsessie opgenomen.</wsdl:documentation>
+      <wsdl:input message="tns:OpvragenResultaatVerwerkingMeldingSessieSoapIn"/>
+      <wsdl:output message="tns:OpvragenResultaatVerwerkingMeldingSessieSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="MeldingServiceHttpGet">
+    <wsdl:operation name="NulMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:NulMeldingHttpGetIn"/>
+      <wsdl:output message="tns:NulMeldingHttpGetOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een meldingsessie Guid aan het AMICE systeem aan.<br /><b>Returns</b><br />In de response is het resultaat van de verwerking van de meldingsessie opgenomen.</wsdl:documentation>
+      <wsdl:input message="tns:OpvragenResultaatVerwerkingMeldingSessieHttpGetIn"/>
+      <wsdl:output message="tns:OpvragenResultaatVerwerkingMeldingSessieHttpGetOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="MeldingServiceHttpPost">
+    <wsdl:operation name="NulMelding">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:input message="tns:NulMeldingHttpPostIn"/>
+      <wsdl:output message="tns:NulMeldingHttpPostOut"/>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een meldingsessie Guid aan het AMICE systeem aan.<br /><b>Returns</b><br />In de response is het resultaat van de verwerking van de meldingsessie opgenomen.</wsdl:documentation>
+      <wsdl:input message="tns:OpvragenResultaatVerwerkingMeldingSessieHttpPostIn"/>
+      <wsdl:output message="tns:OpvragenResultaatVerwerkingMeldingSessieHttpPostOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MeldingServiceSoap" type="tns:MeldingServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="EersteOntvangstMelding">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/EersteOntvangstMelding" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MaandelijkseOntvangstMelding">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/MaandelijkseOntvangstMelding" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NulMelding">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/NulMelding" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AfgifteMelding">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/AfgifteMelding" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MeldingSessie">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/MeldingSessie" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/OpvragenResultaatVerwerkingMeldingSessie" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="MeldingServiceSoap12" type="tns:MeldingServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="EersteOntvangstMelding">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/EersteOntvangstMelding" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MaandelijkseOntvangstMelding">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/MaandelijkseOntvangstMelding" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NulMelding">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/NulMelding" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AfgifteMelding">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/AfgifteMelding" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="MeldingSessie">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/MeldingSessie" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/OpvragenResultaatVerwerkingMeldingSessie" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="MeldingServiceHttpGet" type="tns:MeldingServiceHttpGet">
+    <http:binding verb="GET"/>
+    <wsdl:operation name="NulMelding">
+      <http:operation location="/NulMelding"/>
+      <wsdl:input>
+        <http:urlEncoded/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <http:operation location="/OpvragenResultaatVerwerkingMeldingSessie"/>
+      <wsdl:input>
+        <http:urlEncoded/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="MeldingServiceHttpPost" type="tns:MeldingServiceHttpPost">
+    <http:binding verb="POST"/>
+    <wsdl:operation name="NulMelding">
+      <http:operation location="/NulMelding"/>
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded"/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="OpvragenResultaatVerwerkingMeldingSessie">
+      <http:operation location="/OpvragenResultaatVerwerkingMeldingSessie"/>
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded"/>
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MeldingService">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze WebService biedt een aantal functies om meldingen als XML-berichten aan het AMICE systeem aan te bieden.</wsdl:documentation>
+    <wsdl:port name="MeldingServiceSoap" binding="tns:MeldingServiceSoap">
+      <soap:address location="https://test.lma.nl/Amice.WebService3/MeldingService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="MeldingServiceSoap12" binding="tns:MeldingServiceSoap12">
+      <soap12:address location="https://test.lma.nl/Amice.WebService3/MeldingService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="MeldingServiceHttpGet" binding="tns:MeldingServiceHttpGet">
+      <http:address location="https://test.lma.nl/Amice.WebService3/MeldingService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="MeldingServiceHttpPost" binding="tns:MeldingServiceHttpPost">
+      <http:address location="https://test.lma.nl/Amice.WebService3/MeldingService.asmx"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

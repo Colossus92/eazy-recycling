@@ -28,3 +28,12 @@ cors:
 springdoc:
   api-docs:
     enabled: false
+
+amice:
+  url: ${AMICE_URL:}
+  username: ${AMICE_USERNAME:}
+  password: ${AMICE_PASSWORD:}
+  certificate:
+    enabled: ${AMICE_CERTIFICATE_ENABLED:false}
+    path: ${AMICE_CERTIFICATE_PATH:classpath:certificates/test-amice.pfx}
+    password: ${AMICE_CERTIFICATE_PASSWORD:}

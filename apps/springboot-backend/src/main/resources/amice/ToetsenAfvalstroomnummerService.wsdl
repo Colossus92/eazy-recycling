@@ -1,0 +1,185 @@
+<wsdl:definitions xmlns:tns="http://amice.lma.nl/AmiceWebServices3/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:s1="http://amice.lma.nl/AmiceWebService3/" xmlns:s="http://www.w3.org/2001/XMLSchema"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  targetNamespace="http://amice.lma.nl/AmiceWebServices3/">
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Omschrijving - Deze WebService biedt de functie om stamgegevens van een afvalstroomnummer te toetsen.</wsdl:documentation>
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://amice.lma.nl/AmiceWebServices3/">
+      <s:import namespace="http://amice.lma.nl/AmiceWebService3/"/>
+      <s:element name="ToetsenAfvalstroomNummer">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AfvalstroomNummer" type="s:string"/>
+            <s:element minOccurs="1" maxOccurs="1" name="RouteInzameling" type="s:boolean"/>
+            <s:element minOccurs="1" maxOccurs="1" name="InzamelaarsRegeling" type="s:boolean"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Ontdoener" type="tns:Ontdoener"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstPostcode" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummer" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstHuisnummerToevoeging" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstWoonplaats" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstStraatnaam" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstNabijheidsBeschrijving" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieHerkomstLand" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="LocatieOntvangst" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Afzender" type="tns:Bedrijf"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Inzamelaar" type="tns:Bedrijf"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Handelaar" type="tns:Bedrijf"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Bemiddelaar" type="tns:Bedrijf"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Vervoerders" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="Afvalstof" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+            <s:element minOccurs="0" maxOccurs="1" name="VerwerkingsMethode" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="Ontdoener">
+        <s:complexContent mixed="false">
+          <s:extension base="tns:Bedrijf">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="IsParticulier" type="s:boolean"/>
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="Bedrijf">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelsregisternummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Naam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Land" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ToetsenAfvalstroomNummerResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" ref="s1:ToetsenAfvalstroomNummerResult"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://amice.lma.nl/AmiceWebService3/">
+      <s:element name="ToetsenAfvalstroomNummerResult" type="s1:ToetsenAfvalstroomNummerResponse"/>
+      <s:complexType name="ToetsenAfvalstroomNummerResponse">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="ToetsenAfvalstroomNummerRetourBerichtDetails" type="s1:ToetsenAfvalstroomNummerRetourBerichtDetails"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="ToetsenAfvalstroomNummerResponseResult" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ToetsenAfvalstroomNummerRetourBerichtDetails">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="AanvraagGegevens" type="s1:AanvraagGegevens"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="AfvalstroomGegevensValide" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="unbounded" form="unqualified" name="Fout" type="s1:Fout"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="AanvraagGegevens">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="AfvalstroomNummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="RouteInzameling" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="InzamelaarsRegeling" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Ontdoener" type="s1:Ontdoener"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstPostcode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstHuisnummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstHuisnummerToevoeging" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstWoonplaats" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstStraatnaam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstNabijheidsBeschrijving" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieHerkomstLand" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="LocatieOntvangst" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Afzender" type="s1:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Inzamelaar" type="s1:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Handelaar" type="s1:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Bemiddelaar" type="s1:Bedrijf"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Vervoerders" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Afvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="GebruikelijkeNaamAfvalstof" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="VerwerkingsMethode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="DatumTijdRequest" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="UserNameRequest" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Ontdoener">
+        <s:complexContent mixed="false">
+          <s:extension base="s1:Bedrijf">
+            <s:sequence>
+              <s:element minOccurs="1" maxOccurs="1" name="IsParticulier" type="s:boolean"/>
+            </s:sequence>
+          </s:extension>
+        </s:complexContent>
+      </s:complexType>
+      <s:complexType name="Bedrijf">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Handelsregisternummer" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Naam" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" name="Land" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Fout">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="FoutCode" type="s:string"/>
+          <s:element minOccurs="0" maxOccurs="1" form="unqualified" name="Foutomschrijving" type="s:string"/>
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ToetsenAfvalstroomNummerSoapIn">
+    <wsdl:part name="parameters" element="tns:ToetsenAfvalstroomNummer"/>
+  </wsdl:message>
+  <wsdl:message name="ToetsenAfvalstroomNummerSoapOut">
+    <wsdl:part name="parameters" element="tns:ToetsenAfvalstroomNummerResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="ToetsenAfvalstroomNummerServiceSoap">
+    <wsdl:operation name="ToetsenAfvalstroomNummer">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Omschrijving - Via deze functie in de XML interface kan worden getoetst of stamgegevens van een afvalstroomnummer zullen worden geaccepteerd zodra deze op een later tijdstip m.b.v. een eerste ontvangstmelding worden gemeld. Dit zal alleen kunnen voor afvalstroomnummers waarvoor het betreffende account geautoriseerd is om te melden.</wsdl:documentation>
+      <wsdl:input message="tns:ToetsenAfvalstroomNummerSoapIn"/>
+      <wsdl:output message="tns:ToetsenAfvalstroomNummerSoapOut"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="ToetsenAfvalstroomNummerServiceHttpGet"/>
+  <wsdl:portType name="ToetsenAfvalstroomNummerServiceHttpPost"/>
+  <wsdl:binding name="ToetsenAfvalstroomNummerServiceSoap" type="tns:ToetsenAfvalstroomNummerServiceSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ToetsenAfvalstroomNummer">
+      <soap:operation soapAction="http://amice.lma.nl/AmiceWebServices3/ToetsenAfvalstroomNummer" style="document"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ToetsenAfvalstroomNummerServiceSoap12" type="tns:ToetsenAfvalstroomNummerServiceSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ToetsenAfvalstroomNummer">
+      <soap12:operation soapAction="http://amice.lma.nl/AmiceWebServices3/ToetsenAfvalstroomNummer" style="document"/>
+      <wsdl:input>
+        <soap12:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ToetsenAfvalstroomNummerServiceHttpGet" type="tns:ToetsenAfvalstroomNummerServiceHttpGet">
+    <http:binding verb="GET"/>
+  </wsdl:binding>
+  <wsdl:binding name="ToetsenAfvalstroomNummerServiceHttpPost" type="tns:ToetsenAfvalstroomNummerServiceHttpPost">
+    <http:binding verb="POST"/>
+  </wsdl:binding>
+  <wsdl:service name="ToetsenAfvalstroomNummerService">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Omschrijving - Deze WebService biedt de functie om stamgegevens van een afvalstroomnummer te toetsen.</wsdl:documentation>
+    <wsdl:port name="ToetsenAfvalstroomNummerServiceSoap" binding="tns:ToetsenAfvalstroomNummerServiceSoap">
+      <soap:address location="https://test.lma.nl/Amice.WebService3/ToetsenAfvalstroomnummerService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="ToetsenAfvalstroomNummerServiceSoap12" binding="tns:ToetsenAfvalstroomNummerServiceSoap12">
+      <soap12:address location="https://test.lma.nl/Amice.WebService3/ToetsenAfvalstroomnummerService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="ToetsenAfvalstroomNummerServiceHttpGet" binding="tns:ToetsenAfvalstroomNummerServiceHttpGet">
+      <http:address location="https://test.lma.nl/Amice.WebService3/ToetsenAfvalstroomnummerService.asmx"/>
+    </wsdl:port>
+    <wsdl:port name="ToetsenAfvalstroomNummerServiceHttpPost" binding="tns:ToetsenAfvalstroomNummerServiceHttpPost">
+      <http:address location="https://test.lma.nl/Amice.WebService3/ToetsenAfvalstroomnummerService.asmx"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -40,3 +40,6 @@ out/
 .kotlin
 
 .env*
+
+### Certificates ###
+src/main/resources/certificates/

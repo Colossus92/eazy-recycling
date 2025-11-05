@@ -8,6 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
     id("dev.nx.gradle.project-graph") version("0.1.4")
     id("org.springdoc.openapi-gradle-plugin") version("1.9.0")
+    id("com.github.bjornvester.wsdl2java") version "2.0.2"
 }
 group = "nl.eazysoftware"
 version = "0.0.1"
@@ -42,6 +43,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springVersion")
     implementation("org.springframework.ws:spring-ws-core:4.0.11")
+
+    // JAXB for SOAP client
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.4")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
+    implementation("jakarta.xml.ws:jakarta.xml.ws-api:4.0.2")
+    implementation("com.sun.xml.ws:jaxws-rt:4.0.3")
     // Database
     runtimeOnly("org.postgresql:postgresql:42.7.5")
     runtimeOnly("com.h2database:h2:2.3.232")
@@ -71,7 +78,7 @@ dependencies {
     implementation("nl.eazysoftware:eba-schema:0.0.1")
 
     // Environment variables
-    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+  implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
     // Mapstruct
     implementation("org.mapstruct:mapstruct:1.6.3")
@@ -149,4 +156,12 @@ tasks.withType<Jar> {
 // Configure bootRun to use local profile by default
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     args("--spring.profiles.active=local")
+}
+
+// Configure WSDL2Java for SOAP client generation
+wsdl2java {
+    wsdlDir = layout.projectDirectory.dir("src/main/resources/amice")
+    includes = listOf("ToetsenAfvalstroomnummerService.wsdl")
+    generatedSourceDir = layout.buildDirectory.dir("generated/sources/wsdl2java")
+    packageName = "nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated"
 }

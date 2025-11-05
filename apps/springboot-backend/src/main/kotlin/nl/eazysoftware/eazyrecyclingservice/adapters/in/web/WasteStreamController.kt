@@ -12,6 +12,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ValidationRequestData
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamService
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
@@ -27,7 +29,10 @@ class WasteStreamController(
   private val createWasteStream: CreateWasteStream,
   private val updateWasteStream: UpdateWasteStream,
   private val deleteWasteStream: DeleteWasteStream,
+  private val validateWasteStream: ValidateWasteStream,
 ) {
+
+  private val log = org.slf4j.LoggerFactory.getLogger(WasteStreamController::class.java)
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -72,6 +77,17 @@ class WasteStreamController(
     wasteStreamNumber: String
   ) {
     deleteWasteStream.handle(DeleteWasteStreamCommand(WasteStreamNumber(wasteStreamNumber)))
+  }
+
+  @PostMapping("/{wasteStreamNumber}/validate")
+  fun validateWasteStreamNumber(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String
+  ): WasteStreamValidationResponse {
+    val result = validateWasteStream.handle(ValidateWasteStreamCommand(WasteStreamNumber(wasteStreamNumber)))
+    return WasteStreamValidationResponse.from(result)
   }
 }
 
@@ -271,5 +287,120 @@ sealed class PickupLocationRequest {
 
   class NoPickupLocationRequest : PickupLocationRequest() {
     override fun toCommand() = PickupLocationCommand.NoPickupLocationCommand
+  }
+}
+
+data class WasteStreamValidationResponse(
+  val isValid: Boolean,
+  val errors: List<ValidationErrorResponse>,
+  val requestData: ValidationRequestDataResponse?
+) {
+  companion object {
+    fun from(result: WasteStreamValidationResult): WasteStreamValidationResponse {
+      return WasteStreamValidationResponse(
+        isValid = result.isValid,
+        errors = result.errors.map { ValidationErrorResponse(it.code, it.description) },
+        requestData = result.requestData?.let { ValidationRequestDataResponse.from(it) }
+      )
+    }
+  }
+}
+
+data class ValidationErrorResponse(
+  val code: String,
+  val description: String
+)
+
+data class ValidationRequestDataResponse(
+  val wasteStreamNumber: String,
+  val routeCollection: String?,
+  val collectorsScheme: String?,
+  val consignor: ConsignorDataResponse?,
+  val pickupLocation: PickupLocationDataResponse?,
+  val deliveryLocation: String?,
+  val consignorParty: CompanyDataResponse?,
+  val collectorParty: CompanyDataResponse?,
+  val dealerParty: CompanyDataResponse?,
+  val brokerParty: CompanyDataResponse?,
+  val wasteCode: String?,
+  val wasteName: String?,
+  val processingMethod: String?
+) {
+  companion object {
+    fun from(data: ValidationRequestData): ValidationRequestDataResponse {
+      return ValidationRequestDataResponse(
+        wasteStreamNumber = data.wasteStreamNumber,
+        routeCollection = data.routeCollection,
+        collectorsScheme = data.collectorsScheme,
+        consignor = data.consignor?.let { ConsignorDataResponse.from(it) },
+        pickupLocation = data.pickupLocation?.let { PickupLocationDataResponse.from(it) },
+        deliveryLocation = data.deliveryLocation,
+        consignorParty = data.consignorParty?.let { CompanyDataResponse.from(it) },
+        collectorParty = data.collectorParty?.let { CompanyDataResponse.from(it) },
+        dealerParty = data.dealerParty?.let { CompanyDataResponse.from(it) },
+        brokerParty = data.brokerParty?.let { CompanyDataResponse.from(it) },
+        wasteCode = data.wasteCode,
+        wasteName = data.wasteName,
+        processingMethod = data.processingMethod
+      )
+    }
+  }
+}
+
+data class ConsignorDataResponse(
+  val companyRegistrationNumber: String?,
+  val name: String?,
+  val country: String?,
+  val isPrivate: Boolean
+) {
+  companion object {
+    fun from(data: nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ConsignorData): ConsignorDataResponse {
+      return ConsignorDataResponse(
+        companyRegistrationNumber = data.companyRegistrationNumber,
+        name = data.name,
+        country = data.country,
+        isPrivate = data.isPrivate
+      )
+    }
+  }
+}
+
+data class PickupLocationDataResponse(
+  val postalCode: String?,
+  val buildingNumber: String?,
+  val buildingNumberAddition: String?,
+  val city: String?,
+  val streetName: String?,
+  val proximityDescription: String?,
+  val country: String?
+) {
+  companion object {
+    fun from(data: nl.eazysoftware.eazyrecyclingservice.domain.ports.out.PickupLocationData): PickupLocationDataResponse {
+      return PickupLocationDataResponse(
+        postalCode = data.postalCode,
+        buildingNumber = data.buildingNumber,
+        buildingNumberAddition = data.buildingNumberAddition,
+        city = data.city,
+        streetName = data.streetName,
+        proximityDescription = data.proximityDescription,
+        country = data.country
+      )
+    }
+  }
+}
+
+data class CompanyDataResponse(
+  val companyRegistrationNumber: String?,
+  val name: String?,
+  val country: String?
+) {
+  companion object {
+    fun from(data: nl.eazysoftware.eazyrecyclingservice.domain.ports.out.CompanyData): CompanyDataResponse {
+      return CompanyDataResponse(
+        companyRegistrationNumber = data.companyRegistrationNumber,
+        name = data.name,
+        country = data.country
+      )
+    }
   }
 }
