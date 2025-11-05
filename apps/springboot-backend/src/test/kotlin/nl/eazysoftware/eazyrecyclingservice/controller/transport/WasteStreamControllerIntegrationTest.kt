@@ -49,7 +49,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `should create waste stream`() {
     // Given
     val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
 
@@ -78,7 +78,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `should not fail when creating multiple waste streams for same processor`() {
     // Given - waste stream numbers are now auto-generated sequentially
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
 
@@ -111,11 +111,11 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `can get all waste streams`() {
     // Given - create multiple waste streams
     val firstRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
     val secondRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Plastic"
     )
 
@@ -143,7 +143,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `can get waste stream by number with full details`() {
     // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
     val createResult = securedMockMvc.post(
@@ -172,7 +172,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `can update created waste stream`() {
     // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
     val createResult = securedMockMvc.post(
@@ -200,7 +200,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   fun `can delete created waste stream`() {
     // Given - create waste stream and extract generated number
     val wasteStreamDto = TestWasteStreamFactory.createTestWasteStreamRequest(
-      companyId = testCompany.id!!,
+      companyId = testCompany.id,
       name = "Glass"
     )
     val createResult = securedMockMvc.post(

@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.ProjectLocationResult
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.CompanyResult
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
@@ -10,11 +11,13 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -43,9 +46,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a test company with branches for includeBranches tests
     testCompany = companyRepository.save(
       CompanyDto(
+        id = UUID.randomUUID(),
         name = "Test Company BV",
         chamberOfCommerceId = "12345678",
-        vihbId = "VIHB123",
+        vihbId = "123456VIHB",
         address = AddressDto(
           streetName = "Main St",
           buildingNumberAddition = "HQ",
@@ -110,13 +114,21 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
   @Test
   fun `create company - success`() {
-    val req = companyRequest()
-    securedMockMvc.post(
+    val req = companyRequest(
+      vihbId = "101125VIHB"
+    )
+    val mvcResult = securedMockMvc.post(
       "/companies",
       objectMapper.writeValueAsString(req)
     )
       .andExpect(status().isCreated)
-      .andExpect(jsonPath("$.chamberOfCommerceId").value(req.chamberOfCommerceId))
+      .andReturn()
+
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
+    val company = companyRepository.findByIdOrNull(created.companyId)
+
+    assertThat(company).isNotNull
+    assertThat(company?.chamberOfCommerceId).isEqualTo(req.chamberOfCommerceId)
   }
 
   @Test
@@ -180,9 +192,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Create a second company with its own branch
     val secondCompany = companyRepository.save(
       CompanyDto(
+        id = UUID.randomUUID(),
         name = "Second Company BV",
         chamberOfCommerceId = "87654321",
-        vihbId = "VIHB321",
+        vihbId = "654321VIHB",
         address = AddressDto(
           streetName = "Second St",
           buildingNumberAddition = "HQ2",
@@ -229,18 +242,18 @@ class CompanyControllerIntegrationTest @Autowired constructor(
   fun `get company by id - success`() {
     val req = companyRequest(
       chamberOfCommerceId = "55667788",
-      vihbId = "654321XXXX"
+      vihbId = "654321XXXB"
     )
     val mvcResult = securedMockMvc.post(
       "/companies",
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
-    securedMockMvc.get("/companies/${created.id}")
+    securedMockMvc.get("/companies/${created.companyId}")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(created.id.toString()))
+      .andExpect(jsonPath("$.id").value(created.companyId.toString()))
   }
 
   @Test
@@ -260,15 +273,19 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
-    val updated = created.copy(name = "Updated BV")
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
+    val updated = req.copy(name = "Updated BV")
 
     securedMockMvc.put(
-      "/companies/${created.id}",
+      "/companies/${created.companyId}",
       objectMapper.writeValueAsString(updated)
     )
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.name").value("Updated BV"))
+
+    val updatedCompany = companyRepository.findByIdOrNull(created.companyId)
+
+    assertThat(updatedCompany).isNotNull
+    assertThat(updatedCompany?.name).isEqualTo("Updated BV")
   }
 
   @Test
@@ -306,16 +323,16 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
-    securedMockMvc.delete("/companies/${created.id}")
+    securedMockMvc.delete("/companies/${created.companyId}")
       .andExpect(status().isNoContent)
   }
 
   @Test
-  fun `delete company - not found returns 204`() {
+  fun `delete company - not found returns 404`() {
     securedMockMvc.delete("/companies/00000000-0000-0000-0000-000000000000")
-      .andExpect(status().isNoContent)
+      .andExpect(status().isNotFound)
   }
 
   @Test
@@ -330,7 +347,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for the company
     val branchRequest = AddressRequest(
@@ -343,14 +360,14 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val branchResult = securedMockMvc.post(
-      "/companies/${company.id}/branches",
+      "/companies/${company.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
     val response = objectMapper.readValue(branchResult.response.contentAsString, ProjectLocationResult::class.java)
 
     // Delete the branch
-    securedMockMvc.delete("/companies/${company.id}/branches/${response.projectLocationId}")
+    securedMockMvc.delete("/companies/${company.companyId}/branches/${response.projectLocationId}")
       .andExpect(status().isNoContent)
   }
 
@@ -375,11 +392,11 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     val nonExistentBranchId = UUID.randomUUID()
 
-    securedMockMvc.delete("/companies/${company.id}/branches/$nonExistentBranchId")
+    securedMockMvc.delete("/companies/${company.companyId}/branches/$nonExistentBranchId")
       .andExpect(status().isNotFound)
   }
 
@@ -395,7 +412,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req1)
     )
       .andReturn()
-    val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
+    val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyResult::class.java)
 
     // Create second company
     val req2 = companyRequest(
@@ -407,7 +424,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req2)
     )
       .andReturn()
-    val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
+    val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for company2
     val branchRequest = AddressRequest(
@@ -420,14 +437,14 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val branchResult = securedMockMvc.post(
-      "/companies/${company2.id}/branches",
+      "/companies/${company2.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
     val response = objectMapper.readValue(branchResult.response.contentAsString, ProjectLocationResult::class.java)
 
     // Try to delete the branch using company1's ID (should fail)
-    securedMockMvc.delete("/companies/${company1.id}/branches/${response.companyId}")
+    securedMockMvc.delete("/companies/${company1.companyId}/branches/${response.companyId}")
       .andExpect(status().isNotFound)
   }
 
@@ -443,7 +460,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for the company
     val branchRequest = AddressRequest(
@@ -456,13 +473,13 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.post(
-      "/companies/${company.id}/branches",
+      "/companies/${company.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andExpect(status().isOk)
 
     // Delete the company (should also delete its branches)
-    securedMockMvc.delete("/companies/${company.id}")
+    securedMockMvc.delete("/companies/${company.companyId}")
       .andExpect(status().isNoContent)
   }
 
@@ -478,7 +495,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for the company
     val branchRequest = AddressRequest(
@@ -491,7 +508,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val branchResult = securedMockMvc.post(
-      "/companies/${company.id}/branches",
+      "/companies/${company.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
@@ -509,7 +526,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.put(
-      "/companies/${company.id}/branches/${projectlocationResult.projectLocationId}",
+      "/companies/${company.companyId}/branches/${projectlocationResult.projectLocationId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isNoContent)
@@ -517,10 +534,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated by fetching companies with branches
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("200"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("2000BB"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.streetName").value("Updated Street"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumber").value("200"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("2000BB"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
 
   @Test
@@ -556,7 +573,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     val nonExistentBranchId = UUID.randomUUID()
 
@@ -570,7 +587,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.put(
-      "/companies/${company.id}/branches/$nonExistentBranchId",
+      "/companies/${company.companyId}/branches/$nonExistentBranchId",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isNotFound)
@@ -588,7 +605,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req1)
     )
       .andReturn()
-    val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyDto::class.java)
+    val company1 = objectMapper.readValue(mvcResult1.response.contentAsString, CompanyResult::class.java)
 
     // Create second company
     val req2 = companyRequest(
@@ -600,7 +617,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req2)
     )
       .andReturn()
-    val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyDto::class.java)
+    val company2 = objectMapper.readValue(mvcResult2.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for company2
     val branchRequest = AddressRequest(
@@ -613,7 +630,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val response = securedMockMvc.post(
-      "/companies/${company2.id}/branches",
+      "/companies/${company2.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
@@ -630,7 +647,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.put(
-      "/companies/${company1.id}/branches/${result.projectLocationId}",
+      "/companies/${company1.companyId}/branches/${result.projectLocationId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isBadRequest)
@@ -648,7 +665,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       objectMapper.writeValueAsString(req)
     )
       .andReturn()
-    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyDto::class.java)
+    val company = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
 
     // Create a branch for the company
     val branchRequest = AddressRequest(
@@ -661,7 +678,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     val response = securedMockMvc.post(
-      "/companies/${company.id}/branches",
+      "/companies/${company.companyId}/branches",
       objectMapper.writeValueAsString(branchRequest)
     )
       .andReturn()
@@ -678,7 +695,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     )
 
     securedMockMvc.put(
-      "/companies/${company.id}/branches/${result.projectLocationId}",
+      "/companies/${company.companyId}/branches/${result.projectLocationId}",
       objectMapper.writeValueAsString(updateRequest)
     )
       .andExpect(status().isNoContent)
@@ -686,10 +703,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated correctly
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.streetName").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingName").value(null))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.buildingNumber").value("600"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.postalCode").value("6000FF"))
-      .andExpect(jsonPath("$[?(@.id == '${company.id}')].branches[0].address.city").value("Updated City"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.streetName").value("Updated Street"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumberAddition").value(null))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumber").value("600"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("6000FF"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
 }

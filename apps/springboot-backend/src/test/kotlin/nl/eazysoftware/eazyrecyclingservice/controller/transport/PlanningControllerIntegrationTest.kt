@@ -55,6 +55,7 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
 
         // Create test company
         testCompany = CompanyDto(
+            id = UUID.randomUUID(),
             name = "Test Company",
             address = AddressDto(
                 streetName = "Company Street",

@@ -12,70 +12,70 @@ import java.time.LocalDateTime
 import java.util.*
 
 object TransportDtoHelper {
-    fun transport(
-        truck: Truck?,
-        pickupDateTime: LocalDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-        driver: ProfileDto?  = driver1,
-        ): TransportDto =
-        TransportDto(
-            id = UUID.randomUUID(),
-            displayNumber = "T-001",
-            consignorParty = company,
-            carrierParty = company,
-            pickupLocation = pickupLocation,
-            pickupDateTime = pickupDateTime.toCetInstant(),
-            deliveryLocation = deliveryLocation,
-            deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0).toCetInstant(),
-            transportType = TransportType.WASTE,
-            truck = truck,
-            driver = driver,
-            note = "Test transport 1",
-            sequenceNumber = 1
-        )
-
-    val driver1 = ProfileDto(
-        id = UUID.randomUUID(),
-        firstName = "John",
-        lastName = "Doe",
+  fun transport(
+    truck: Truck?,
+    pickupDateTime: LocalDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
+    driver: ProfileDto? = driver1,
+  ): TransportDto =
+    TransportDto(
+      id = UUID.randomUUID(),
+      displayNumber = "T-001",
+      consignorParty = company,
+      carrierParty = company,
+      pickupLocation = pickupLocation,
+      pickupDateTime = pickupDateTime.toCetInstant(),
+      deliveryLocation = deliveryLocation,
+      deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0).toCetInstant(),
+      transportType = TransportType.WASTE,
+      truck = truck,
+      driver = driver,
+      note = "Test transport 1",
+      sequenceNumber = 1
     )
 
-    val driver2 = ProfileDto(
-        id = UUID.randomUUID(),
-        firstName = "Jane",
-        lastName = "Smith",
-    )
+  val driver1 = ProfileDto(
+    id = UUID.randomUUID(),
+    firstName = "John",
+    lastName = "Doe",
+  )
 
-    val company = CompanyDto(
-        id = UUID.randomUUID(),
-        name = "Test Company",
-      address = AddressDto(
-        streetName = "Main Street",
-        buildingNumber = "10",
-        postalCode = "1234 AB",
-        city = "Amsterdam",
-        country = "Netherlands"
-      )
-    )
+  val driver2 = ProfileDto(
+    id = UUID.randomUUID(),
+    firstName = "Jane",
+    lastName = "Smith",
+  )
 
-    val pickupLocation = PickupLocationDto.PickupProjectLocationDto(
-        id = UUID.randomUUID().toString(),
-        company = company,
-        streetName = "Main Street",
-        buildingNumber = "10",
-        buildingNumberAddition = null,
-        postalCode = "1234 AB",
-        city = "Amsterdam",
-        country = "Netherlands"
+  val company = CompanyDto(
+    id = UUID.randomUUID(),
+    name = "Test Company",
+    address = AddressDto(
+      streetName = "Main Street",
+      buildingNumber = "10",
+      postalCode = "1234 AB",
+      city = "Amsterdam",
+      country = "Netherlands"
     )
+  )
 
-    val deliveryLocation = PickupLocationDto.PickupProjectLocationDto(
-        id = UUID.randomUUID().toString(),
-        company = company,
-        streetName = "Second Street",
-        buildingNumberAddition = null,
-        buildingNumber = "20",
-        postalCode = "5678 CD",
-        city = "Rotterdam",
-        country = "Netherlands"
-    )
+  val pickupLocation = PickupLocationDto.PickupProjectLocationDto(
+    id = UUID.randomUUID().toString(),
+    company = company,
+    streetName = "Main Street",
+    buildingNumber = "10",
+    buildingNumberAddition = null,
+    postalCode = "1234 AB",
+    city = "Amsterdam",
+    country = "Netherlands"
+  )
+
+  val deliveryLocation = PickupLocationDto.PickupProjectLocationDto(
+    id = UUID.randomUUID().toString(),
+    company = company,
+    streetName = "Second Street",
+    buildingNumberAddition = null,
+    buildingNumber = "20",
+    postalCode = "5678 CD",
+    city = "Rotterdam",
+    country = "Netherlands"
+  )
 }

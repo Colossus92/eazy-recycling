@@ -38,9 +38,10 @@ class CompanyBranchControllerTest @Autowired constructor(
         // Create a test company for branch tests
         testCompany = companyRepository.save(
             CompanyDto(
+                id = UUID.randomUUID(),
                 name = "Test Company BV",
                 chamberOfCommerceId = "12345678",
-                vihbId = "VIHB123",
+                vihbId = "123456VIHB",
                 address = AddressDto(
                     streetName = "Main St",
                     buildingNumberAddition = "HQ",

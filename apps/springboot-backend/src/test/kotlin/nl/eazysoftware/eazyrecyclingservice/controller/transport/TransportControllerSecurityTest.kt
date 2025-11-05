@@ -275,8 +275,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         val mockContainerTransport = ContainerTransport(
             transportId = TransportId(testTransportId),
             displayNumber = null,
-            consignorParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(consignor.id!!),
-            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            consignorParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(consignor.id),
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id),
             pickupLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
                 address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
                     streetName = StreetName("Test Street"),
@@ -311,7 +311,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         val mockWasteTransport = WasteTransport(
             transportId = TransportId(testTransportId),
             displayNumber = null,
-            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id!!),
+            carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id),
             pickupDateTime = kotlinx.datetime.Clock.System.now(),
             deliveryDateTime = kotlinx.datetime.Clock.System.now(),
             transportType = TransportType.WASTE,
@@ -407,18 +407,18 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
 
     private fun createContainerTransportRequestJson(): String {
         val request = ContainerTransportRequest(
-          consignorPartyId = consignor.id!!,
+          consignorPartyId = consignor.id,
           pickupDateTime = LocalDateTime.now(),
           deliveryDateTime = LocalDateTime.now().plusDays(1),
           transportType = TransportType.CONTAINER,
           containerOperation = ContainerOperation.DELIVERY,
           driverId = testDriverId,
-          carrierPartyId = carrier.id!!,
+          carrierPartyId = carrier.id,
           pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-            companyId = pickupCompany.id!!,
+            companyId = pickupCompany.id,
           ),
           deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-            companyId = deliveryCompany.id!!,
+            companyId = deliveryCompany.id,
           ),
           truckId = "TRUCK-123",
           containerId = "40M001",
@@ -435,7 +435,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             containerOperation = ContainerOperation.PICKUP,
             transportType = TransportType.WASTE,
             driverId = testDriverId,
-            carrierPartyId = carrier.id!!,
+            carrierPartyId = carrier.id,
             truckId = "TRUCK-123",
             containerId = "40M001",
             note = "Test waste transport",

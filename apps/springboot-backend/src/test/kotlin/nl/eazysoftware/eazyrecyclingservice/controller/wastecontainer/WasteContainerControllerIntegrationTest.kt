@@ -91,6 +91,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
     fun `should successfully create a container with company reference`() {
         // Given
         val company = CompanyDto(
+          id = UUID.randomUUID(),
             name = "Test Company",
             address = AddressDto(
                 streetName = "Company Street",
@@ -105,7 +106,7 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         val containerRequest = WasteContainerRequest(
             id = "CONTAINER-002",
             location = PickupLocationRequest.PickupCompanyRequest(
-                companyId = company.id!!,
+                companyId = company.id,
             ),
             notes = "Test container with company"
         )

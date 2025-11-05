@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import nl.eazysoftware.eazyrecyclingservice.application.query.CompleteCompanyView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
@@ -15,8 +16,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.service.CompanyService
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -58,13 +60,13 @@ class CompanyController(
 
   @GetMapping
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompanyService.CompanyView> {
+  fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompleteCompanyView> {
     return getAllCompaniesQuery.handle(includeBranches)
   }
 
   @GetMapping("/{id}")
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getById(@PathVariable("id") id: String): CompanyService.CompanyView {
+  fun getById(@PathVariable("id") id: String): CompleteCompanyView {
     return getCompanyByIdQuery.handle(CompanyId(UUID.fromString(id)))
   }
 
@@ -161,4 +163,26 @@ class CompanyController(
     @field:Valid
     val address: AddressRequest,
   )
+
+  data class CompanyBranchResponse(
+    val id: UUID,
+    val address: AddressDto,
+    val companyId: UUID,
+  ) {
+    companion object {
+      fun from(branch: CompanyProjectLocation): CompanyBranchResponse {
+        return CompanyBranchResponse(
+          id = branch.id.uuid,
+          address = AddressDto (
+            streetName = branch.address.streetName.value,
+            buildingNumber = branch.address.buildingNumber,
+            postalCode = branch.address.postalCode.value,
+            city = branch.address.city.value,
+            country = branch.address.country
+          ),
+          companyId = branch.companyId.uuid,
+        )
+      }
+    }
+  }
 }

@@ -1,16 +1,16 @@
 create table if not exists companies (
                            updated_at timestamp(6),
                            id uuid not null,
-                           building_name varchar(255),
-                           building_number varchar(255),
-                           chamber_of_commerce_id varchar(255) unique,
-                           city varchar(255),
-                           country varchar(255),
-                           name varchar(255),
-                           postal_code varchar(255),
-                           street_name varchar(255),
+                           building_number_addition text,
+                           building_number text,
+                           chamber_of_commerce_id text unique,
+                           city text,
+                           country text,
+                           name text,
+                           postal_code text,
+                           street_name text,
                            processor_id text,
-                           vihb_id varchar(255) unique,
+                           vihb_id text unique,
                            primary key (id)
 );
 

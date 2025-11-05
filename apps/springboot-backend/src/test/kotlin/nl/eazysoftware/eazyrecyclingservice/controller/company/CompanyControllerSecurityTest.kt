@@ -46,12 +46,13 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
     @BeforeEach
     fun setup() {
         testCompany = CompanyDto(
+            id = UUID.randomUUID(),
             name = "Test Company",
             chamberOfCommerceId = "12345678",
             vihbId = "123456VIHB",
             address = AddressDto(
                 streetName = "Test Street",
-                buildingNumberAddition = "Test Building",
+                buildingNumberAddition = "A",
                 buildingNumber = "123",
                 postalCode = "1234 AB",
                 city = "Test City",
@@ -59,7 +60,7 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
             )
         )
         val savedCompany = companyRepository.save(testCompany)
-        testCompanyId = savedCompany.id!!
+        testCompanyId = savedCompany.id
     }
 
     @AfterEach

@@ -8,7 +8,7 @@ object TestCompanyFactory {
 
 
   fun createTestCompany(
-    id: UUID? = null,
+    id: UUID = UUID.randomUUID(),
     chamberOfCommerceId: String? = "12345678",
     vihbId: String? = "987654VIHB",
     processorId: String? = "12345",

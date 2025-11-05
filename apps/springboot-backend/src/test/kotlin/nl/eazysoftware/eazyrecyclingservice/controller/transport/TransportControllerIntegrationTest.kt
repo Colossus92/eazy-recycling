@@ -95,6 +95,7 @@ class TransportControllerIntegrationTest(
 
     // Create test company
     testCompany = CompanyDto(
+      id = UUID.randomUUID(),
       name = "Test Company",
       processorId = "12345",
       address = AddressDto(
@@ -170,7 +171,7 @@ class TransportControllerIntegrationTest(
     entityManager.clear()
 
     // Reload testCompany to ensure it's managed
-    val managedCompany = companyRepository.findById(testCompany.id!!).get()
+    val managedCompany = companyRepository.findById(testCompany.id).get()
     val managedLocation = pickupLocationRepository.findById(testLocation.id).get()
 
     // Create test waste stream
@@ -235,18 +236,18 @@ class TransportControllerIntegrationTest(
   fun `should create container transport`() {
     // Given
     val request = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
@@ -290,7 +291,7 @@ class TransportControllerIntegrationTest(
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "New Waste Transport",
@@ -332,18 +333,18 @@ class TransportControllerIntegrationTest(
     val savedTransport = transportRepository.save(transport)
 
     val updateRequest = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
@@ -374,7 +375,7 @@ class TransportControllerIntegrationTest(
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Original Waste Transport",
@@ -403,7 +404,7 @@ class TransportControllerIntegrationTest(
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Updated Waste Transport",
@@ -452,18 +453,18 @@ class TransportControllerIntegrationTest(
     // Given
     val nonExistentId = UUID.randomUUID()
     val updateRequest = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
@@ -595,18 +596,18 @@ class TransportControllerIntegrationTest(
   fun `should update container transport with branch references`() {
     // Given
     val createRequest = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
@@ -627,18 +628,18 @@ class TransportControllerIntegrationTest(
     )
 
     val updateRequest = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(3),
       deliveryDateTime = LocalDateTime.now().plusDays(4),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       deliveryLocation = PickupLocationRequest.PickupCompanyRequest(
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
       ),
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
@@ -667,6 +668,7 @@ class TransportControllerIntegrationTest(
     // Given
     // Create a second company
     val anotherCompany = CompanyDto(
+      id = UUID.randomUUID(),
       name = "Another Company",
       address = AddressDto(
         streetName = "Another Street",
@@ -679,16 +681,16 @@ class TransportControllerIntegrationTest(
     companyRepository.save(anotherCompany)
 
     val request = ContainerTransportRequest(
-      consignorPartyId = testCompany.id!!,
+      consignorPartyId = testCompany.id,
       pickupDateTime = LocalDateTime.now().plusDays(1),
       deliveryDateTime = LocalDateTime.now().plusDays(2),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
-      carrierPartyId = testCompany.id!!,
+      carrierPartyId = testCompany.id,
       pickupLocation = PickupLocationRequest.ProjectLocationRequest(
-        id = anotherCompany.id!!,
-        companyId = testCompany.id!!,
+        id = anotherCompany.id,
+        companyId = testCompany.id,
         streetName = "Branch Street",
         buildingNumber = "456",
         buildingNumberAddition = null,
@@ -698,7 +700,7 @@ class TransportControllerIntegrationTest(
       ),
       deliveryLocation = PickupLocationRequest.ProjectLocationRequest(
         id = testBranch.id,
-        companyId = testCompany.id!!,
+        companyId = testCompany.id,
         streetName = "Branch Street",
         buildingNumber = "456",
         buildingNumberAddition = null,
