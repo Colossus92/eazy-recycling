@@ -81,20 +81,22 @@ export function useWasteStreamForm(
             euralCode: '',
         }
     });
-    const mutation = useMutation({
-        mutationFn: async (data: WasteStreamFormValues) => {
-            const request = formValuesToCreateWasteStreamRequest(data);
-            if (!!data && wasteStreamNumber) {
-                return wasteStreamService.update(wasteStreamNumber, request);
+    
+    // Draft mutation - saves without validation
+    const draftMutation = useMutation({
+        mutationFn: async (formData: WasteStreamFormValues) => {
+            const request = formValuesToCreateWasteStreamRequest(formData);
+            if (wasteStreamNumber) {
+                return wasteStreamService.updateDraft(wasteStreamNumber, request);
             } else {
-                return wasteStreamService.create(request);
+                return wasteStreamService.createDraft(request);
             }
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
 
             toastService.success(
-                !data ? 'Afvalstroomnummer aangemaakt' : 'Afvalstroomnummer bijgewerkt'
+                !data ? 'Afvalstroomnummer concept aangemaakt' : 'Afvalstroomnummer concept bijgewerkt'
             );
             resetForm();
 
@@ -103,9 +105,53 @@ export function useWasteStreamForm(
             }
         },
         onError: (error: unknown) => {
-            console.error('Error submitting form:', error);
+            console.error('Error saving draft:', error);
             
-            let errorMessage = `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het afvalstroomnummer`;
+            let errorMessage = `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het concept`;
+            
+            if (error instanceof AxiosError && error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+            
+            toastService.error(errorMessage);
+        },
+    });
+    
+    // Validate mutation - saves and validates
+    const validateMutation = useMutation({
+        mutationFn: async (formData: WasteStreamFormValues) => {
+            const request = formValuesToCreateWasteStreamRequest(formData);
+            if (wasteStreamNumber) {
+                return wasteStreamService.updateAndValidate(wasteStreamNumber, request);
+            } else {
+                return wasteStreamService.createAndValidate(request);
+            }
+        },
+        onSuccess: async (validationResponse) => {
+            await queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
+
+            if (validationResponse?.isValid) {
+                toastService.success(
+                    !data ? 'Afvalstroomnummer aangemaakt en gevalideerd' : 'Afvalstroomnummer bijgewerkt en gevalideerd'
+                );
+                resetForm();
+                
+                if (onSuccess) {
+                    onSuccess();
+                }
+            } else {
+                // Show validation errors
+                const errorMessages = validationResponse?.errors
+                    ?.map(err => `${err.code}: ${err.description}`)
+                    .join('\n') || 'Validatie fouten gevonden';
+                    
+                toastService.error(`Validatie mislukt:\n${errorMessages}`);
+            }
+        },
+        onError: (error: unknown) => {
+            console.error('Error validating:', error);
+            
+            let errorMessage = `Er is een fout opgetreden bij het valideren van het afvalstroomnummer`;
             
             if (error instanceof AxiosError && error.response?.data?.message) {
                 errorMessage = error.response.data.message;
@@ -131,7 +177,8 @@ export function useWasteStreamForm(
     return {
         formContext,
         fieldsToValidate,
-        mutation,
+        draftMutation,
+        validateMutation,
         data,
         isLoading,
         resetForm

@@ -1,7 +1,7 @@
-import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
+  import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { Stepper } from '@/components/ui/form/multistep/Stepper.tsx';
-import { FormNavigation } from '@/features/planning/forms/FormNavigation.tsx';
+import { FormNavigationWithDraft } from '@/features/planning/forms/FormNavigationWithDraft.tsx';
 import { useFormStepNavigation } from '@/features/planning/hooks/useFormStepNavigation';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { KeyboardEvent } from 'react';
@@ -27,17 +27,22 @@ export const WasteStreamForm = ({
     isLoading,
     formContext,
     fieldsToValidate,
-    mutation,
+    draftMutation,
+    validateMutation,
     resetForm
   } = useWasteStreamForm(wasteStreamNumber, () => setIsOpen(false));
-  const { step, navigateToStep, next, back, reset: resetStepper, isSubmitting } =
+  
+  const isSubmitting = draftMutation.isPending || validateMutation.isPending;
+  
+  const { step, navigateToStep, next, back, reset: resetStepper } =
     useFormStepNavigation({
       formContext,
       fieldsToValidate,
-      onSubmit: async (data) => {
-        await mutation.mutateAsync(data);
+      onSubmit: async () => {
+        // This will be called by the navigation buttons
+        // but we'll handle the actual submission in handleSaveDraft and handleSaveAndValidate
       },
-      isSubmitting: mutation.isPending,
+      isSubmitting,
     });
 
   const onCancel = () => {
@@ -50,6 +55,22 @@ export const WasteStreamForm = ({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       next();
+    }
+  };
+  
+  const handleSaveDraft = async () => {
+    const isValid = await formContext.trigger();
+    if (isValid) {
+      const formData = formContext.getValues();
+      await draftMutation.mutateAsync(formData);
+    }
+  };
+  
+  const handleSaveAndValidate = async () => {
+    const isValid = await formContext.trigger();
+    if (isValid) {
+      const formData = formContext.getValues();
+      await validateMutation.mutateAsync(formData);
     }
   };
 
@@ -92,12 +113,14 @@ export const WasteStreamForm = ({
                   steps[step]
                 )}
               </div>
-              <FormNavigation
+              <FormNavigationWithDraft
                 step={step}
                 totalSteps={steps.length - 1}
                 onNext={next}
                 onBack={back}
                 onCancel={onCancel}
+                onSaveDraft={handleSaveDraft}
+                onSaveAndValidate={handleSaveAndValidate}
                 isSubmitting={isSubmitting}
               />
             </form>

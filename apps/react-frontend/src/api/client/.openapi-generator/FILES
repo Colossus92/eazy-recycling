@@ -1,4 +1,5 @@
 api.ts
+apis/amice-controller-api.ts
 apis/company-controller-api.ts
 apis/container-transport-controller-api.ts
 apis/driver-controller-api.ts
@@ -24,11 +25,13 @@ models/cancel-weight-ticket-request.ts
 models/company-branch-response.ts
 models/company-consignor-view.ts
 models/company-consignor.ts
+models/company-data-response.ts
 models/company-dto.ts
 models/company-request.ts
 models/company-result.ts
 models/company-view.ts
 models/complete-company-view.ts
+models/consignor-data-response.ts
 models/consignor-request.ts
 models/consignor-view.ts
 models/container-transport-request.ts
@@ -58,6 +61,7 @@ models/person-consignor-view.ts
 models/person-consignor.ts
 models/pickup-company-request.ts
 models/pickup-company-view.ts
+models/pickup-location-data-response.ts
 models/pickup-location-dto.ts
 models/pickup-location-request.ts
 models/pickup-location-view.ts
@@ -86,6 +90,8 @@ models/update-user-request.ts
 models/update-waste-transport-response.ts
 models/user-response.ts
 models/user-role-dto.ts
+models/validation-error-response.ts
+models/validation-request-data-response.ts
 models/waste-container-dto.ts
 models/waste-container-request.ts
 models/waste-container-view-location.ts
@@ -93,6 +99,7 @@ models/waste-container-view.ts
 models/waste-stream-detail-view.ts
 models/waste-stream-list-view.ts
 models/waste-stream-request.ts
+models/waste-stream-validation-response.ts
 models/waste-transport-request.ts
 models/waste-type-view.ts
 models/weight-request.ts

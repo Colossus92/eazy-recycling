@@ -12,6 +12,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamService
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
@@ -24,16 +25,25 @@ import java.util.*
 @PreAuthorize(HAS_ANY_ROLE)
 class WasteStreamController(
   private val wasteStreamService: WasteStreamService,
-  private val createWasteStream: CreateWasteStream,
+  private val createDraftWasteStream: CreateDraftWasteStream,
   private val updateWasteStream: UpdateWasteStream,
-  private val deleteWasteStream: DeleteWasteStream
+  private val deleteWasteStream: DeleteWasteStream,
+  private val createActiveWasteStream: CreateAndActivateWasteStreamService,
+  private val updateAndValidateWasteStream: UpdateAndValidateWasteStream
 ) {
 
-  @PostMapping
+  @PostMapping("/concept")
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@Valid @RequestBody request: WasteStreamRequest): CreateWasteStreamResponse {
-    val result = createWasteStream.handle(request.toCommand())
+    val result = createDraftWasteStream.handle(request.toCommand())
     return CreateWasteStreamResponse(wasteStreamNumber = result.wasteStreamNumber.number)
+  }
+
+  @PostMapping("/active")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createAndValidate(@Valid @RequestBody request: WasteStreamRequest): WasteStreamValidationResponse {
+    val result = createActiveWasteStream.handle(request.toCommand())
+    return WasteStreamValidationResponse.from(result)
   }
 
   @GetMapping
@@ -51,7 +61,7 @@ class WasteStreamController(
     return wasteStreamService.getWasteStreamByNumber(WasteStreamNumber(wasteStreamNumber))
   }
 
-  @PutMapping("/{wasteStreamNumber}")
+  @PutMapping("/{wasteStreamNumber}/concept")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun update(
     @PathVariable
@@ -61,6 +71,18 @@ class WasteStreamController(
     @Valid @RequestBody request: WasteStreamRequest
   ) {
     updateWasteStream.handle(WasteStreamNumber(wasteStreamNumber), request.toCommand())
+  }
+
+  @PutMapping("/{wasteStreamNumber}/active")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  fun updateAndValidate(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String,
+    @Valid @RequestBody request: WasteStreamRequest
+  ): WasteStreamValidationResult {
+    return updateAndValidateWasteStream.handle(WasteStreamNumber(wasteStreamNumber), request.toCommand())
   }
 
   @DeleteMapping("/{wasteStreamNumber}")

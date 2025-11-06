@@ -17,44 +17,26 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface CompanyDataResponse
  */
-export interface LocalTime {
+export interface CompanyDataResponse {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof CompanyDataResponse
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
+    'companyRegistrationNumber'?: string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof CompanyDataResponse
      */
-    'value$kotlinx_datetime': string;
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDataResponse
+     */
+    'country'?: string;
 }
 

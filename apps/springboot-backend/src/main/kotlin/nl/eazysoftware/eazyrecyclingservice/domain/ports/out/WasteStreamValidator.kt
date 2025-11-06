@@ -20,18 +20,21 @@ interface WasteStreamValidator {
  * Result of waste stream validation
  */
 data class WasteStreamValidationResult(
+  val wasteStreamNumber: String,
   val isValid: Boolean,
   val errors: List<ValidationError>,
   val requestData: ValidationRequestData?
 ) {
   companion object {
     fun valid(requestData: ValidationRequestData) = WasteStreamValidationResult(
+      wasteStreamNumber = requestData.wasteStreamNumber,
       isValid = true,
       errors = emptyList(),
       requestData = requestData
     )
 
-    fun invalid(errors: List<ValidationError>, requestData: ValidationRequestData?) = WasteStreamValidationResult(
+    fun invalid(wasteStreamNumber: String, errors: List<ValidationError>, requestData: ValidationRequestData?) = WasteStreamValidationResult(
+      wasteStreamNumber = wasteStreamNumber,
       isValid = false,
       errors = errors,
       requestData = requestData

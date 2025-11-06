@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
-interface CreateWasteStream {
+interface CreateDraftWasteStream {
   fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult
 }
 
@@ -76,12 +76,12 @@ data class CreateWasteStreamResult(
 )
 
 @Service
-class CreateWasteStreamService(
+class CreateDraftWasteStreamService(
   private val wasteStreamRepo: WasteStreams,
   private val companies: Companies,
   private val projectLocations: ProjectLocations,
   private val numberGenerator: WasteStreamNumberGenerator = WasteStreamNumberGenerator(),
-) : CreateWasteStream {
+) : CreateDraftWasteStream {
 
   @Transactional
   override fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult {

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 /**
  * SOAP adapter for waste stream validation using the Amice ToetsenAfvalstroomnummer service.
  * This is an outbound adapter in hexagonal architecture.
- * 
+ *
  * Only active when amice.enabled=true
  */
 @Component
@@ -31,6 +31,7 @@ class AmiceWasteStreamValidatorAdapter(
     if (soapClient == null) {
       logger.error("Amice SOAP client is not configured. Please set amice.url environment variable.")
       return WasteStreamValidationResult.invalid(
+        wasteStreamNumber = wasteStream.wasteStreamNumber.number,
         errors = listOf(ValidationError("SOAP_NOT_CONFIGURED", "Amice validatieservice is niet geconfigureerd")),
         requestData = null
       )
@@ -52,6 +53,7 @@ class AmiceWasteStreamValidatorAdapter(
       logger.error("Exception message: ${e.message}")
       e.printStackTrace()
       WasteStreamValidationResult.invalid(
+        wasteStreamNumber = wasteStream.wasteStreamNumber.number,
         errors = listOf(ValidationError("SOAP_ERROR", "Fout bij aanroepen validatieservice: ${e.javaClass.simpleName} - ${e.message}")),
         requestData = null
       )
@@ -183,6 +185,7 @@ class AmiceWasteStreamValidatorAdapter(
 
     if (result == null) {
       return WasteStreamValidationResult.invalid(
+        wasteStreamNumber = response.toetsenAfvalstroomNummerResult.toetsenAfvalstroomNummerRetourBerichtDetails.aanvraagGegevens.afvalstroomNummer,
         errors = listOf(ValidationError("NO_RESULT", "Geen resultaat ontvangen van validatieservice")),
         requestData = null
       )
@@ -203,7 +206,11 @@ class AmiceWasteStreamValidatorAdapter(
     return if (isValid) {
       WasteStreamValidationResult.valid(requestData!!)
     } else {
-      WasteStreamValidationResult.invalid(errors, requestData)
+      WasteStreamValidationResult.invalid(
+        wasteStreamNumber = response.toetsenAfvalstroomNummerResult.toetsenAfvalstroomNummerRetourBerichtDetails.aanvraagGegevens.afvalstroomNummer,
+        errors,
+        requestData
+      )
     }
   }
 

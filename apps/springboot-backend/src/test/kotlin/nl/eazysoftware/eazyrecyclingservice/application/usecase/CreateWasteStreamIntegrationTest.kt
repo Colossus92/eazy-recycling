@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateWasteStream
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateDraftWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
@@ -28,7 +28,7 @@ import java.util.*
 class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
 
   @Autowired
-  private lateinit var createWasteStream: CreateWasteStream
+  private lateinit var createDraftWasteStream: CreateDraftWasteStream
 
   @Autowired
   private lateinit var wasteStreamRepo: WasteStreams
@@ -72,7 +72,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
     val command = createTestCommand(processorId)
 
     // When
-    val result = createWasteStream.handle(command)
+    val result = createDraftWasteStream.handle(command)
 
     // Then
     assertEquals("123450000001", result.wasteStreamNumber.number)
@@ -88,9 +88,9 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
     val command3 = createTestCommand(processorId)
 
     // When
-    val result1 = createWasteStream.handle(command1)
-    val result2 = createWasteStream.handle(command2)
-    val result3 = createWasteStream.handle(command3)
+    val result1 = createDraftWasteStream.handle(command1)
+    val result2 = createDraftWasteStream.handle(command2)
+    val result3 = createDraftWasteStream.handle(command3)
 
     // Then
     assertEquals("123450000001", result1.wasteStreamNumber.number)
@@ -105,17 +105,17 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
 
     // Create waste streams with gaps in numbering
     val command1 = createTestCommand(processorId)
-    createWasteStream.handle(command1) // 999990000001
+    createDraftWasteStream.handle(command1) // 999990000001
 
     val command2 = createTestCommand(processorId)
-    createWasteStream.handle(command2) // 999990000002
+    createDraftWasteStream.handle(command2) // 999990000002
 
     val command3 = createTestCommand(processorId)
-    createWasteStream.handle(command3) // 999990000003
+    createDraftWasteStream.handle(command3) // 999990000003
 
     // When - verify next number after existing sequence
     val command4 = createTestCommand(processorId)
-    val result = createWasteStream.handle(command4)
+    val result = createDraftWasteStream.handle(command4)
 
     // Then
     assertEquals("123450000004", result.wasteStreamNumber.number)
@@ -128,7 +128,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
     val command = createTestCommand(processorId)
 
     // When
-    val result = createWasteStream.handle(command)
+    val result = createDraftWasteStream.handle(command)
 
     // Then
     val persisted = wasteStreamRepo.findByNumber(result.wasteStreamNumber)

@@ -30,11 +30,11 @@ springdoc:
     enabled: false
 
 amice:
-  enabled: ${AMICE_ENABLED:false}
+  enabled: ${AMICE_ENABLED:true}
   url: ${AMICE_URL:}
   username: ${AMICE_USERNAME:}
   password: ${AMICE_PASSWORD:}
   certificate:
-    enabled: ${AMICE_CERTIFICATE_ENABLED:false}
+    enabled: ${AMICE_CERTIFICATE_ENABLED:true}
     path: ${AMICE_CERTIFICATE_PATH:classpath:certificates/test-amice.pfx}
     password: ${AMICE_PASSWORD:}

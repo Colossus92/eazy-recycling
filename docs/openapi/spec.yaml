@@ -644,6 +644,25 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateWasteStreamResponse"
+  /waste-streams/{wasteStreamNumber}/validate:
+    post:
+      tags:
+      - amice-controller
+      operationId: validateWasteStreamNumber
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamValidationResponse"
   /users:
     get:
       tags:
@@ -1838,7 +1857,7 @@ components:
           minLength: 0
         postalCode:
           type: string
-          pattern: "^\\d{4}\\s[A-Z]{2}$"
+          pattern: "^\\d{4}\\s?[A-Z]{2}$"
         city:
           type: string
           maxLength: 24
@@ -1932,6 +1951,100 @@ components:
           type: string
       required:
       - wasteStreamNumber
+    CompanyDataResponse:
+      type: object
+      properties:
+        companyRegistrationNumber:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+    ConsignorDataResponse:
+      type: object
+      properties:
+        companyRegistrationNumber:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        isPrivate:
+          type: boolean
+      required:
+      - isPrivate
+    PickupLocationDataResponse:
+      type: object
+      properties:
+        postalCode:
+          type: string
+        buildingNumber:
+          type: string
+        buildingNumberAddition:
+          type: string
+        city:
+          type: string
+        streetName:
+          type: string
+        proximityDescription:
+          type: string
+        country:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
+    ValidationRequestDataResponse:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        routeCollection:
+          type: string
+        collectorsScheme:
+          type: string
+        consignor:
+          $ref: "#/components/schemas/ConsignorDataResponse"
+        pickupLocation:
+          $ref: "#/components/schemas/PickupLocationDataResponse"
+        deliveryLocation:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDataResponse"
+        collectorParty:
+          $ref: "#/components/schemas/CompanyDataResponse"
+        dealerParty:
+          $ref: "#/components/schemas/CompanyDataResponse"
+        brokerParty:
+          $ref: "#/components/schemas/CompanyDataResponse"
+        wasteCode:
+          type: string
+        wasteName:
+          type: string
+        processingMethod:
+          type: string
+      required:
+      - wasteStreamNumber
+    WasteStreamValidationResponse:
+      type: object
+      properties:
+        isValid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationErrorResponse"
+        requestData:
+          $ref: "#/components/schemas/ValidationRequestDataResponse"
+      required:
+      - errors
+      - isValid
     CreateUserRequest:
       type: object
       properties:
@@ -2263,12 +2376,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2331,15 +2444,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2369,11 +2482,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -2646,15 +2759,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond
