@@ -21,7 +21,7 @@ import javax.net.ssl.TrustManagerFactory
 /**
  * Configuration for SOAP clients used to communicate with external Amice services.
  * Configures both client certificate authentication (PFX/PKCS12) and HTTP Basic Authentication.
- * 
+ *
  * Only active when amice.enabled=true
  */
 @Configuration
@@ -119,7 +119,10 @@ class SoapClientConfiguration {
   private fun configureSslContext() {
     try {
       logger.info("Configuring SSL context with client certificate from: ${certificatePath.filename}")
-
+      logger.info(
+        "Cert resource: desc={}, exists={}, readable={}, clazz={}",
+        certificatePath.description, certificatePath.exists(), certificatePath.isReadable, certificatePath::class.java.name
+      )
       // Load the PFX/PKCS12 certificate
       val keyStore = KeyStore.getInstance("PKCS12")
       certificatePath.inputStream.use { inputStream ->

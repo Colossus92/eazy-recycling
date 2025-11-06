@@ -96,7 +96,7 @@ services:
         value: "true"
       - key: AMICE_CERTIFICATE_PATH
         scope: RUN_AND_BUILD_TIME
-        value: /tmp/client.pfx
+        value: file:/tmp/client.pfx
     http_port: 8080
     image:
       registry: colossus92
