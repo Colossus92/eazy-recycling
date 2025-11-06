@@ -139,7 +139,7 @@ class CompanyControllerValidationTest {
 
         assertThat(violations).hasSize(1)
         assertThat(violations).extracting(ConstraintViolation<*>::getMessage).containsExactly(
-            tuple("Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
+            tuple("Postcode moet bestaan uit 4 cijfers gevolgd door 2 hoofdletters")
         )
     }
 
@@ -234,13 +234,13 @@ class CompanyControllerValidationTest {
             "0000 AA",        // edge case with lowest values
             "5678 XY",        // mixed letters
             "1111 BB",        // repeated digits and letters
+            "1234AB",         // no space
         )
 
         @JvmStatic
         fun invalidPostalCodes() = listOf(
             "123 AB",         // 3 digits (too few)
             "12345 AB",       // 5 digits (too many)
-            "1234AB",         // no space
             "1234  AB",       // double space
             "1234 ab",        // lowercase letters
             "1234 Ab",        // mixed case letters
