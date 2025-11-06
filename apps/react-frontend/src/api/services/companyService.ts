@@ -1,32 +1,29 @@
 import { CompanyControllerApi } from "../client";
 import { apiInstance } from "./apiInstance";
-import { CompanyRequest, CompanyResponse, CompanyBranchResponse, AddressRequest } from "../client/models";
+import { CompanyRequest, CompleteCompanyView, CompanyBranchResponse, AddressRequest } from "../client/models";
 
 const companyApi = new CompanyControllerApi(apiInstance.config)
-export type Company = CompanyResponse;
+export type Company = CompleteCompanyView;
 export type CompanyBranch = CompanyBranchResponse
+
+
+const mapCompanyToCompanyRequest = (company: Company): CompanyRequest => {
+  return {
+    ...company,
+    address: {
+      ...company.address,
+      streetName: company.address.street,
+      buildingNumber: company.address.houseNumber,
+      buildingNumberAddition: company.address.houseNumberAddition,
+    },
+  };
+};
+
 
 export const companyService = {
     getAll: (includeBranches: boolean = false) => companyApi.getCompanies(includeBranches).then((r) => r.data),
-    create: (c: Omit<Company, 'id'>) => {
-        if (!c.name || !c.address || !c.address.streetName || !c.address.buildingNumber || !c.address.postalCode || !c.address.city) {
-            throw new Error('Ongeldige bedrijfsgegevens');
-        }
-
-        const companyRequest: CompanyRequest = {
-            name: c.name,
-            address: {
-                streetName: c.address.streetName,
-                buildingNumber: c.address.buildingNumber,
-                postalCode: c.address.postalCode,
-                city: c.address.city,
-                country: 'Nederland',
-            },
-            chamberOfCommerceId: c.chamberOfCommerceId,
-            vihbId: c.vihbId,
-        }
-
-        return companyApi.createCompany(companyRequest).then((r) => r.data)
+    create: (c: Company) => {
+        return companyApi.createCompany(mapCompanyToCompanyRequest(c)).then((r) => r.data)
     },
     update: (company: Company) => {
         if (!company.id) {
@@ -34,7 +31,7 @@ export const companyService = {
         }
 
 
-        return companyApi.updateCompany(company.id, company).then((r) => r.data)
+        return companyApi.updateCompany(company.id, mapCompanyToCompanyRequest(company)).then((r) => r.data)
     },
     delete: (id: string) => companyApi.deleteCompany(id),
     createBranch: (companyId: string, companyBranch: CompanyBranch) => {
@@ -50,16 +47,17 @@ export const companyService = {
 
 function mapToCompanyBranchRequest(companyBranch: CompanyBranchResponse): AddressRequest {
     if (!companyBranch.address 
-        || !companyBranch.address.streetName 
-        || !companyBranch.address.buildingNumber 
+        || !companyBranch.address.street 
+        || !companyBranch.address.houseNumber 
         || !companyBranch.address.postalCode 
         || !companyBranch.address.city ) {
         throw new Error('Ongeldige vestigingsgegevens');
     }
     
     return {
-        streetName: companyBranch.address.streetName,
-        buildingNumber: companyBranch.address.buildingNumber,
+        streetName: companyBranch.address.street,
+        buildingNumber: companyBranch.address.houseNumber,
+        buildingNumberAddition: companyBranch.address.houseNumberAddition,
         postalCode: companyBranch.address.postalCode,
         city: companyBranch.address.city,
         country: 'Nederland',

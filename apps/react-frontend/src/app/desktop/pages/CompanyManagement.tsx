@@ -90,7 +90,7 @@ export const CompanyManagement = () => {
                 </div>
               );
             } else if (col.key === 'address') {
-              content = `${branch.address.streetName} ${branch.address.buildingNumber}, ${branch.address.city}`;
+              content = `${branch.address.street} ${branch.address.houseNumber}${branch.address.houseNumberAddition ?? ''} ${branch.address.city}`;
             }
 
             return (

@@ -13,32 +13,17 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { AddressView } from './address-view';
 
 /**
  * 
  * @export
- * @interface CompanyBranchResponse
+ * @interface CompanyResult
  */
-export interface CompanyBranchResponse {
+export interface CompanyResult {
     /**
      * 
      * @type {string}
-     * @memberof CompanyBranchResponse
-     */
-    'id': string;
-    /**
-     * 
-     * @type {AddressView}
-     * @memberof CompanyBranchResponse
-     */
-    'address': AddressView;
-    /**
-     * 
-     * @type {string}
-     * @memberof CompanyBranchResponse
+     * @memberof CompanyResult
      */
     'companyId': string;
 }

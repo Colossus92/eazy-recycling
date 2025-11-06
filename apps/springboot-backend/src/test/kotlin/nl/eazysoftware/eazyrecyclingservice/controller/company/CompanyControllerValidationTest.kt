@@ -31,6 +31,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             validChamberOfCommerceId,
             "123456VIHB",
+            null,
             "Company",
             AddressRequest(
                 "Main St",
@@ -50,6 +51,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             invalidChamberOfCommerceId,
             "123456VIHB",
+          null,
             "Company",
             AddressRequest(
                 "Main St",
@@ -72,6 +74,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             "12345678",
             validVihbId,
+          null,
             "Company",
             addressRequest,
         )
@@ -85,6 +88,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             "12345678",
             invalidVihbId,
+          null,
             "Company",
             addressRequest,
         )
@@ -101,6 +105,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             "12345678",
             "123456VIHB",
+          null,
             "Company",
             AddressRequest(
                 "Main St",
@@ -120,6 +125,7 @@ class CompanyControllerValidationTest {
         val company = CompanyController.CompanyRequest(
             "12345678",
             "123456VIHB",
+            null,
             "Company",
             AddressRequest(
                 "Main St",
@@ -134,6 +140,37 @@ class CompanyControllerValidationTest {
         assertThat(violations).hasSize(1)
         assertThat(violations).extracting(ConstraintViolation<*>::getMessage).containsExactly(
             tuple("Postcode moet bestaan uit 4 cijfers gevolgd door een spatie en 2 hoofdletters")
+        )
+    }
+
+    @ParameterizedTest
+    @MethodSource("validProcessorIds")
+    fun `valid processor id should not have any violations`(validProcessorId: String?) {
+        val company = CompanyController.CompanyRequest(
+            "12345678",
+            "123456VIHB",
+            validProcessorId,
+            "Company",
+            addressRequest,
+        )
+        val violations = validator.validate(company)
+        assertThat(violations).isEmpty()
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidProcessorIds")
+    fun `invalid processor id should have a violation`(invalidProcessorId: String) {
+        val company = CompanyController.CompanyRequest(
+            "12345678",
+            "123456VIHB",
+            invalidProcessorId,
+            "Company",
+            addressRequest,
+        )
+        val violations = validator.validate(company)
+        assertThat(violations).hasSize(1)
+        assertThat(violations).extracting(ConstraintViolation<*>::getMessage).containsExactly(
+            tuple("Verwerkersnummer moet bestaan uit 5 cijfers, of leeg zijn")
         )
     }
 
@@ -220,6 +257,31 @@ class CompanyControllerValidationTest {
             "",               // empty string
             "ABCD EF",        // all letters in digit section
             "1234 12",        // all digits in letter section
+        )
+
+        @JvmStatic
+        fun validProcessorIds() = listOf(
+            "12345",          // standard 5 digits
+            "00000",          // edge case with all zeros
+            "99999",          // edge case with all nines
+            "54321",          // mixed digits
+            null,             // null is valid
+            ""                // empty string is valid
+        )
+
+        @JvmStatic
+        fun invalidProcessorIds() = listOf(
+            "1234",           // 4 digits (too few)
+            "123456",         // 6 digits (too many)
+            "1234A",          // contains letter
+            "12 345",         // contains space
+            "12-345",         // contains dash
+            "12.345",         // contains dot
+            "A2345",          // letter at start
+            "1234A",          // letter at end
+            " 12345",         // leading space
+            "12345 ",         // trailing space
+            "12 345",         // space in middle
         )
 
     }

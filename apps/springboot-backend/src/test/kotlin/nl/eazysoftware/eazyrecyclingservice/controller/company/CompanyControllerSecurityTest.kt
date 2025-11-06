@@ -124,6 +124,7 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
                     chamberOfCommerceId = "87654321",
                     vihbId = "654321VIHB",
                     name = "New Test Company",
+                    processorId = "12345",
                     address = AddressRequest(
                         streetName = "Test Street",
                         buildingNumber = "123",

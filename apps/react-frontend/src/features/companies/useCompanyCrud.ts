@@ -18,14 +18,15 @@ export const useCompanyCrud = () => {
       companies.filter((company: Company) => {
         return (
           company.name?.toLowerCase().includes(query.toLowerCase()) ||
-          company.address?.streetName
+          company.address?.street
             ?.toLowerCase()
             .includes(query.toLowerCase()) ||
           company.address?.city?.toLowerCase().includes(query.toLowerCase()) ||
           company.chamberOfCommerceId
             ?.toLowerCase()
             .includes(query.toLowerCase()) ||
-          company.vihbId?.toLowerCase().includes(query.toLowerCase())
+          company.vihbId?.toLowerCase().includes(query.toLowerCase())||
+          company.processorId?.toLowerCase().includes(query.toLowerCase())
         );
       }),
     [companies, query]
@@ -35,7 +36,7 @@ export const useCompanyCrud = () => {
   const [deleting, setDeleting] = useState<Company | undefined>(undefined);
 
   const createMutation = useMutation({
-    mutationFn: (item: Omit<Company, 'id'>) => companyService.create(item),
+    mutationFn: (item: Company) => companyService.create(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['companies'] })

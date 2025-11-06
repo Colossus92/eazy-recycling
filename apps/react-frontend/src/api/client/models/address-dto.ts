@@ -25,13 +25,7 @@ export interface AddressDto {
      * @type {string}
      * @memberof AddressDto
      */
-    'streetName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof AddressDto
-     */
-    'buildingName'?: string;
+    'streetName': string;
     /**
      * 
      * @type {string}
@@ -43,7 +37,13 @@ export interface AddressDto {
      * @type {string}
      * @memberof AddressDto
      */
-    'city'?: string;
+    'buildingNumberAddition'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddressDto
+     */
+    'city': string;
     /**
      * 
      * @type {string}
@@ -55,6 +55,6 @@ export interface AddressDto {
      * @type {string}
      * @memberof AddressDto
      */
-    'country'?: string;
+    'country': string;
 }
 

@@ -26,8 +26,9 @@ models/company-consignor-view.ts
 models/company-consignor.ts
 models/company-dto.ts
 models/company-request.ts
-models/company-response.ts
+models/company-result.ts
 models/company-view.ts
+models/complete-company-view.ts
 models/consignor-request.ts
 models/consignor-view.ts
 models/container-transport-request.ts

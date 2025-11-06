@@ -102,6 +102,7 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     chamberOfCommerceId = chamberOfCommerceId,
     vihbId = vihbId,
     name = name,
+    processorId = "12345",
     address = AddressRequest(
       streetName = "Main St",
       buildingNumberAddition = "HQ",
@@ -534,8 +535,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated by fetching companies with branches
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.streetName").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumber").value("200"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("200"))
       .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("2000BB"))
       .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
@@ -703,9 +704,9 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated correctly
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.streetName").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumberAddition").value(null))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.buildingNumber").value("600"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumberAddition").value(null))
+      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("600"))
       .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("6000FF"))
       .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }

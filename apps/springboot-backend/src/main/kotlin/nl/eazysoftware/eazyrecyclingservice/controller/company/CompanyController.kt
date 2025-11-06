@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
 import nl.eazysoftware.eazyrecyclingservice.application.query.CompleteCompanyView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
@@ -17,8 +18,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -45,7 +46,7 @@ class CompanyController(
       name = request.name,
       chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },
       vihbNumber = request.vihbId?.takeIf { it.isNotBlank() }?.let { VihbNumber(it) },
-      processorId = null,
+      processorId = request.processorId?.let { ProcessorPartyId(it) },
       address = Address(
         streetName = StreetName(request.address.streetName),
         buildingNumber = request.address.buildingNumber,
@@ -85,7 +86,7 @@ class CompanyController(
       name = request.name,
       chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },
       vihbNumber = request.vihbId?.takeIf { it.isNotBlank() }?.let { VihbNumber(it) },
-      processorId = null,
+      processorId = request.processorId?.let { ProcessorPartyId(it) },
       address = Address(
         streetName = StreetName(request.address.streetName),
         buildingNumber = request.address.buildingNumber,
@@ -158,6 +159,10 @@ class CompanyController(
       message = "VIHB nummer moet bestaan uit 6 cijfers en 4 letters (VIHBX), of leeg zijn"
     )
     val vihbId: String?,
+
+    @field:Pattern(regexp = "^$|^[\\d]{5}$", message = "Verwerkersnummer moet bestaan uit 5 cijfers, of leeg zijn")
+    val processorId: String?,
+
     @field:NotBlank
     val name: String,
     @field:Valid
@@ -166,16 +171,17 @@ class CompanyController(
 
   data class CompanyBranchResponse(
     val id: UUID,
-    val address: AddressDto,
+    val address: AddressView,
     val companyId: UUID,
   ) {
     companion object {
       fun from(branch: CompanyProjectLocation): CompanyBranchResponse {
         return CompanyBranchResponse(
           id = branch.id.uuid,
-          address = AddressDto (
-            streetName = branch.address.streetName.value,
-            buildingNumber = branch.address.buildingNumber,
+          address = AddressView (
+            street = branch.address.streetName.value,
+            houseNumber = branch.address.buildingNumber,
+            houseNumberAddition = branch.address.buildingNumberAddition,
             postalCode = branch.address.postalCode.value,
             city = branch.address.city.value,
             country = branch.address.country

@@ -437,7 +437,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CompanyDto"
+                $ref: "#/components/schemas/CompleteCompanyView"
     put:
       tags:
       - company-controller
@@ -452,7 +452,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CompanyDto"
+              $ref: "#/components/schemas/CompanyRequest"
         required: true
       responses:
         "200":
@@ -460,7 +460,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CompanyDto"
+                $ref: "#/components/schemas/CompanyResult"
     delete:
       tags:
       - company-controller
@@ -892,7 +892,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CompanyResponse"
+                  $ref: "#/components/schemas/CompleteCompanyView"
     post:
       tags:
       - company-controller
@@ -909,7 +909,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CompanyDto"
+                $ref: "#/components/schemas/CompanyResult"
   /companies/{id}/branches:
     post:
       tags:
@@ -1821,47 +1821,6 @@ components:
           type: string
       required:
       - id
-    AddressDto:
-      type: object
-      properties:
-        streetName:
-          type: string
-        buildingName:
-          type: string
-        buildingNumber:
-          type: string
-        city:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
-      required:
-      - buildingNumber
-      - postalCode
-    CompanyDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        chamberOfCommerceId:
-          type: string
-        vihbId:
-          type: string
-        processorId:
-          type: string
-        name:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-      - address
-      - name
-      - updatedAt
     AddressRequest:
       type: object
       properties:
@@ -1894,6 +1853,34 @@ components:
       - country
       - postalCode
       - streetName
+    CompanyRequest:
+      type: object
+      properties:
+        chamberOfCommerceId:
+          type: string
+          pattern: "^$|^[\\d]{8}$"
+        vihbId:
+          type: string
+          pattern: "^$|^[0-9]{6}[VIHBX]{4}$"
+        processorId:
+          type: string
+          pattern: "^$|^[\\d]{5}$"
+        name:
+          type: string
+          minLength: 1
+        address:
+          $ref: "#/components/schemas/AddressRequest"
+      required:
+      - address
+      - name
+    CompanyResult:
+      type: object
+      properties:
+        companyId:
+          type: string
+          format: uuid
+      required:
+      - companyId
     CreateWeightTicketResponse:
       type: object
       properties:
@@ -2014,6 +2001,51 @@ components:
           format: double
       required:
       - hours
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingNumber:
+          type: string
+        buildingNumberAddition:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    CompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - address
+      - id
+      - name
+      - updatedAt
     GoodsItemDto:
       type: object
       properties:
@@ -2140,23 +2172,6 @@ components:
           format: uuid
       required:
       - transportId
-    CompanyRequest:
-      type: object
-      properties:
-        chamberOfCommerceId:
-          type: string
-          pattern: "^$|^[\\d]{8}$"
-        vihbId:
-          type: string
-          pattern: "^$|^[0-9]{6}[VIHBX]{4}$"
-        name:
-          type: string
-          minLength: 1
-        address:
-          $ref: "#/components/schemas/AddressRequest"
-      required:
-      - address
-      - name
     ProjectLocationResult:
       type: object
       properties:
@@ -2248,12 +2263,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2316,15 +2331,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2354,11 +2369,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2631,15 +2646,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond
@@ -2784,7 +2799,7 @@ components:
           type: string
           format: uuid
         address:
-          $ref: "#/components/schemas/AddressDto"
+          $ref: "#/components/schemas/AddressView"
         companyId:
           type: string
           format: uuid
@@ -2792,7 +2807,7 @@ components:
       - address
       - companyId
       - id
-    CompanyResponse:
+    CompleteCompanyView:
       type: object
       properties:
         id:
@@ -2805,7 +2820,7 @@ components:
         name:
           type: string
         address:
-          $ref: "#/components/schemas/AddressDto"
+          $ref: "#/components/schemas/AddressView"
         processorId:
           type: string
         updatedAt:

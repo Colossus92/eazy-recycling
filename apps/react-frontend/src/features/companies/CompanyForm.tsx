@@ -21,24 +21,29 @@ export interface CompanyFormValues extends FieldValues {
   name: string;
   street: string;
   houseNumber: string;
+  houseNumberAddition: string;
   postalCode: string;
   city: string;
   chamberOfCommerceId: string;
   vihbId: string;
+  processorId?: string;
 }
 
 function toCompany(data: CompanyFormValues): Company {
   const company: Company = {
     id: data.id || '',
     address: {
-      streetName: data.street,
-      buildingNumber: data.houseNumber,
+      street: data.street,
+      houseNumber: data.houseNumber,
+      houseNumberAddition: data.houseNumberAddition,
       postalCode: data.postalCode,
       city: data.city,
+      country: 'Nederland',
     },
     chamberOfCommerceId: data.chamberOfCommerceId?.trim() || undefined,
     name: data.name,
     vihbId: data.vihbId?.trim() || undefined,
+    processorId: data.processorId?.trim() || undefined,
     updatedAt: new Date().toISOString(),
     branches: [],
   };
@@ -64,12 +69,14 @@ export const CompanyForm = ({
       ? {
           id: company.id,
           name: company.name,
-          street: company.address.streetName,
-          houseNumber: company.address.buildingNumber,
+          street: company.address.street,
+          houseNumber: company.address.houseNumber,
+          houseNumberAddition: company.address.houseNumberAddition,
           postalCode: company.address.postalCode,
           city: company.address.city,
           chamberOfCommerceId: company.chamberOfCommerceId || '',
           vihbId: company.vihbId || '',
+          processorId: company.processorId || '',
         }
       : undefined,
   });
@@ -132,7 +139,7 @@ export const CompanyForm = ({
                   },
                   errors,
                 }}
-                value={company?.address.streetName}
+                value={company?.address.street}
               />
             </div>
             <div className={'flex-1'}>
@@ -151,7 +158,7 @@ export const CompanyForm = ({
                   },
                   errors,
                 }}
-                value={company?.address.buildingNumber}
+                value={company?.address.houseNumber}
               />
             </div>
           </div>
@@ -221,6 +228,28 @@ export const CompanyForm = ({
                 errors,
               }}
               value={company?.vihbId || undefined}
+            />
+          </div>
+          <div className={'flex items-start gap-4 self-stretch w-1/2'}>
+            <TextFormField
+              title={'Vewerkersnummer'}
+              placeholder={'Vul vewerkersnummer in'}
+              formHook={{
+                register,
+                name: 'processorId',
+                rules: {
+                  validate: (value: string) => {
+                    const trimmed = value?.trim() || '';
+                    if (trimmed === '') return true;
+                    return (
+                      /^\d{5}$/.test(trimmed) ||
+                      'Vewerkersnummer moet 5 cijfers bevatten of leeg zijn'
+                    );
+                  },
+                },
+                errors,
+              }}
+              value={company?.processorId || undefined}
             />
           </div>
         </div>

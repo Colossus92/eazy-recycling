@@ -40,6 +40,12 @@ export interface CompanyRequest {
      * @type {string}
      * @memberof CompanyRequest
      */
+    'processorId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyRequest
+     */
     'name': string;
     /**
      * 

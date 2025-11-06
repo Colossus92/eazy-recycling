@@ -8,6 +8,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { CompanyBranch } from '@/api/services/companyService';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
 
 interface CompanyBranchFormProps {
   onCancel: () => void;
@@ -21,6 +22,7 @@ export interface CompanyBranchFormValues extends FieldValues {
   companyId: string;
   street: string;
   houseNumber: string;
+  houseNumberAddition?: string;
   postalCode: string;
   city: string;
 }
@@ -29,10 +31,12 @@ function toCompanyBranch(data: CompanyBranchFormValues): CompanyBranch {
   const companyBranch: CompanyBranch = {
     id: data.id || '',
     address: {
-      streetName: data.street,
-      buildingNumber: data.houseNumber,
+      street: data.street,
+      houseNumber: data.houseNumber,
+      houseNumberAddition: data.houseNumberAddition,
       postalCode: data.postalCode,
       city: data.city,
+      country: 'Nederland',
     },
     companyId: data.companyId,
   };
@@ -56,13 +60,14 @@ export const CompanyBranchForm = ({
   } = useForm<CompanyBranchFormValues>({
     defaultValues: companyBranch
       ? {
-          id: companyBranch.id,
-          companyId: companyBranch.companyId,
-          street: companyBranch.address.streetName,
-          houseNumber: companyBranch.address.buildingNumber,
-          postalCode: companyBranch.address.postalCode,
-          city: companyBranch.address.city,
-        }
+        id: companyBranch.id,
+        companyId: companyBranch.companyId,
+        street: companyBranch.address.street,
+        houseNumber: companyBranch.address.houseNumber,
+        houseNumberAddition: companyBranch.address.houseNumberAddition,
+        postalCode: companyBranch.address.postalCode,
+        city: companyBranch.address.city,
+      }
       : undefined,
   });
 
@@ -94,52 +99,74 @@ export const CompanyBranchForm = ({
         />
         <div className="flex flex-col items-center self-stretch p-4 gap-4">
           <div className={'flex items-start gap-4 self-stretch'}>
-            <div className={'w-[70%]'}>
-              <TextFormField
-                title={'Straat'}
-                placeholder={'Vul straat in'}
-                formHook={{
-                  register,
-                  name: 'street',
-                  rules: {
-                    required: 'Straat is verplicht',
-                    validate: (value: string) => {
-                      const trimmed = value?.trim() || '';
-                      return trimmed !== '' || 'Straat mag niet leeg zijn';
-                    },
-                  },
-                  errors,
-                }}
-                value={companyBranch?.address.streetName}
+            <div className={'w-1/2'}>
+              <PostalCodeFormField
+                register={register}
+                setValue={setValue}
+                name="postalCode"
+                errors={errors}
+                value={companyBranch?.address.postalCode}
               />
             </div>
-            <div className={'flex-1'}>
-              <TextFormField
-                title={'Huisnummer'}
-                placeholder={'Nr.'}
+            <div className="flex items-start gap-4 w-1/2">
+              <NumberFormField
+                title={'Nummer'}
+                placeholder={''}
+                step={1}
                 formHook={{
                   register,
                   name: 'houseNumber',
                   rules: {
                     required: 'Huisnummer is verplicht',
-                    validate: (value: string) => {
-                      const trimmed = value?.trim() || '';
-                      return trimmed !== '' || 'Huisnummer mag niet leeg zijn';
+                    min: {
+                      value: 1,
+                      message: 'Ongeldig'
                     },
+                    maxLength: {
+                      value: 10,
+                      message: 'Huisnummer mag maximaal 10 tekens bevatten'
+                    }
+
                   },
                   errors,
                 }}
-                value={companyBranch?.address.buildingNumber}
+                value={companyBranch?.address.houseNumber}
+              />
+              <TextFormField
+                title={'Toevoeging'}
+                placeholder={''}
+                formHook={{
+                  register,
+                  name: 'houseNumberAddition',
+                  rules: {
+                    maxLength: {
+                      value: 6,
+                      message: 'Toevoeging mag maximaal 6 tekens bevatten'
+                    }
+                  },
+                  errors,
+                }}
+                value={companyBranch?.address.houseNumberAddition}
               />
             </div>
           </div>
           <div className={'flex items-start gap-4 self-stretch'}>
-            <PostalCodeFormField
-              register={register}
-              setValue={setValue}
-              name="postalCode"
-              errors={errors}
-              value={companyBranch?.address.postalCode}
+            <TextFormField
+              title={'Straat'}
+              placeholder={'Vul straat in'}
+              formHook={{
+                register,
+                name: 'street',
+                rules: {
+                  required: 'Straat is verplicht',
+                  validate: (value: string) => {
+                    const trimmed = value?.trim() || '';
+                    return trimmed !== '' || 'Straat mag niet leeg zijn';
+                  },
+                },
+                errors,
+              }}
+              value={companyBranch?.address.street}
             />
             <TextFormField
               title={'Plaats'}

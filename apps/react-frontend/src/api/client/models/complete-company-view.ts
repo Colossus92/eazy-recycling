@@ -15,55 +15,64 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { AddressDto } from './address-dto';
+import type { AddressView } from './address-view';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CompanyBranchResponse } from './company-branch-response';
 
 /**
  * 
  * @export
- * @interface CompanyDto
+ * @interface CompleteCompanyView
  */
-export interface CompanyDto {
+export interface CompleteCompanyView {
     /**
      * 
      * @type {string}
-     * @memberof CompanyDto
+     * @memberof CompleteCompanyView
      */
     'id': string;
     /**
      * 
      * @type {string}
-     * @memberof CompanyDto
+     * @memberof CompleteCompanyView
      */
     'chamberOfCommerceId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CompanyDto
+     * @memberof CompleteCompanyView
      */
     'vihbId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CompanyDto
+     * @memberof CompleteCompanyView
+     */
+    'name': string;
+    /**
+     * 
+     * @type {AddressView}
+     * @memberof CompleteCompanyView
+     */
+    'address': AddressView;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
      */
     'processorId'?: string;
     /**
      * 
      * @type {string}
-     * @memberof CompanyDto
-     */
-    'name': string;
-    /**
-     * 
-     * @type {AddressDto}
-     * @memberof CompanyDto
-     */
-    'address': AddressDto;
-    /**
-     * 
-     * @type {string}
-     * @memberof CompanyDto
+     * @memberof CompleteCompanyView
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {Array<CompanyBranchResponse>}
+     * @memberof CompleteCompanyView
+     */
+    'branches': Array<CompanyBranchResponse>;
 }
 
