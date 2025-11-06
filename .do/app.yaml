@@ -97,6 +97,11 @@ services:
       - key: AMICE_CERTIFICATE_PATH
         scope: RUN_AND_BUILD_TIME
         value: file:/tmp/client.pfx
+    health_check:
+      failure_threshold: 20
+      period_seconds: 10
+      success_threshold: 1
+      timeout_seconds: 1
     http_port: 8080
     image:
       registry: colossus92
