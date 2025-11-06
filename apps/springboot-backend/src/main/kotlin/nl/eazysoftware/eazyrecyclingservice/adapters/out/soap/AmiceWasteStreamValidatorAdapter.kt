@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.out.soap
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
@@ -99,9 +100,9 @@ class AmiceWasteStreamValidatorAdapter(
     }
 
     // Waste type information
-    request.afvalstof = wasteStream.wasteType.euralCode.code
+    request.afvalstof = wasteStream.wasteType.euralCode.code.replace(" ", "")
     request.gebruikelijkeNaamAfvalstof = wasteStream.wasteType.name
-    request.verwerkingsMethode = wasteStream.wasteType.processingMethod.code
+    request.verwerkingsMethode = wasteStream.wasteType.processingMethod.code.replace(".", "")
 
     return request
   }
@@ -114,7 +115,9 @@ class AmiceWasteStreamValidatorAdapter(
         val company = companies.findById(consignor.id)
         if (company != null) {
           ontdoener.handelsregisternummer = company.chamberOfCommerceId
-          ontdoener.naam = company.name
+          if (company.address.country != "Nederland") {
+            ontdoener.naam = company.name
+          }
           ontdoener.land = company.address.country
         }
         ontdoener.isIsParticulier = false
@@ -165,13 +168,15 @@ class AmiceWasteStreamValidatorAdapter(
     }
   }
 
-  private fun mapCompanyToBedrijf(companyId: nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId): Bedrijf {
+  private fun mapCompanyToBedrijf(companyId: CompanyId): Bedrijf {
     val bedrijf = Bedrijf()
     val company = companies.findById(companyId)
 
     if (company != null) {
       bedrijf.handelsregisternummer = company.chamberOfCommerceId
-      bedrijf.naam = company.name
+      if (company.address.country != "Nederland") {
+        bedrijf.naam = company.name
+      }
       bedrijf.land = company.address.country
     }
 
@@ -197,7 +202,7 @@ class AmiceWasteStreamValidatorAdapter(
       )
     } ?: emptyList()
 
-    val isValid = details?.afvalstroomGegevensValide?.equals("Ja", ignoreCase = true) ?: false
+    val isValid = details?.afvalstroomGegevensValide?.equals("True", ignoreCase = true) ?: false
 
     val requestData = details?.aanvraagGegevens?.let { mapRequestData(it) }
 

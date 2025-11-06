@@ -83,5 +83,11 @@ export interface WasteStreamListView {
      * @memberof WasteStreamListView
      */
     'lastActivityAt': LocalDateTime;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof WasteStreamListView
+     */
+    'isEditable': boolean;
 }
 

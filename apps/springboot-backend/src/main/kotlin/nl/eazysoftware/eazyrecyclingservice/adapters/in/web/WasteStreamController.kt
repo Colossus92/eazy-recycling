@@ -12,10 +12,12 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ValidationRequestData
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamService
 import org.hibernate.validator.constraints.Length
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -29,7 +31,7 @@ class WasteStreamController(
   private val updateWasteStream: UpdateWasteStream,
   private val deleteWasteStream: DeleteWasteStream,
   private val createActiveWasteStream: CreateAndActivateWasteStreamService,
-  private val updateAndValidateWasteStream: UpdateAndValidateWasteStream
+  private val updateAndActivateWasteStream: UpdateAndActivateWasteStream
 ) {
 
   @PostMapping("/concept")
@@ -41,9 +43,14 @@ class WasteStreamController(
 
   @PostMapping("/active")
   @ResponseStatus(HttpStatus.CREATED)
-  fun createAndValidate(@Valid @RequestBody request: WasteStreamRequest): WasteStreamValidationResponse {
+  fun createAndValidate(@Valid @RequestBody request: WasteStreamRequest): ResponseEntity<WasteStreamValidationResponse> {
     val result = createActiveWasteStream.handle(request.toCommand())
-    return WasteStreamValidationResponse.from(result)
+    val response = WasteStreamValidationResponse.from(result)
+
+    if (!result.isValid) {
+      return ResponseEntity<WasteStreamValidationResponse>(response, HttpStatus.CONFLICT)
+    }
+    return ResponseEntity<WasteStreamValidationResponse>(response, HttpStatus.OK)
   }
 
   @GetMapping
@@ -81,8 +88,14 @@ class WasteStreamController(
     @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
     wasteStreamNumber: String,
     @Valid @RequestBody request: WasteStreamRequest
-  ): WasteStreamValidationResult {
-    return updateAndValidateWasteStream.handle(WasteStreamNumber(wasteStreamNumber), request.toCommand())
+  ): ResponseEntity<WasteStreamValidationResponse> {
+    val result = updateAndActivateWasteStream.handle(WasteStreamNumber(wasteStreamNumber), request.toCommand())
+    val response = WasteStreamValidationResponse.from(result)
+
+    if (!result.isValid) {
+      return ResponseEntity<WasteStreamValidationResponse>(response, HttpStatus.CONFLICT)
+    }
+    return ResponseEntity<WasteStreamValidationResponse>(response, HttpStatus.OK)
   }
 
   @DeleteMapping("/{wasteStreamNumber}")
@@ -349,6 +362,63 @@ data class CompanyDataResponse(
         companyRegistrationNumber = data.companyRegistrationNumber,
         name = data.name,
         country = data.country
+      )
+    }
+  }
+}
+
+data class WasteStreamValidationResponse(
+  val isValid: Boolean,
+  val errors: List<ValidationErrorResponse>,
+  val requestData: ValidationRequestDataResponse?
+) {
+  companion object {
+    fun from(result: WasteStreamValidationResult): WasteStreamValidationResponse {
+      return WasteStreamValidationResponse(
+        isValid = result.isValid,
+        errors = result.errors.map { ValidationErrorResponse(it.code, it.description) },
+        requestData = result.requestData?.let { ValidationRequestDataResponse.from(it) }
+      )
+    }
+  }
+}
+
+data class ValidationErrorResponse(
+  val code: String,
+  val description: String
+)
+
+data class ValidationRequestDataResponse(
+  val wasteStreamNumber: String,
+  val routeCollection: String?,
+  val collectorsScheme: String?,
+  val consignor: ConsignorDataResponse?,
+  val pickupLocation: PickupLocationDataResponse?,
+  val deliveryLocation: String?,
+  val consignorParty: CompanyDataResponse?,
+  val collectorParty: CompanyDataResponse?,
+  val dealerParty: CompanyDataResponse?,
+  val brokerParty: CompanyDataResponse?,
+  val wasteCode: String?,
+  val wasteName: String?,
+  val processingMethod: String?
+) {
+  companion object {
+    fun from(data: ValidationRequestData): ValidationRequestDataResponse {
+      return ValidationRequestDataResponse(
+        wasteStreamNumber = data.wasteStreamNumber,
+        routeCollection = data.routeCollection,
+        collectorsScheme = data.collectorsScheme,
+        consignor = data.consignor?.let { ConsignorDataResponse.from(it) },
+        pickupLocation = data.pickupLocation?.let { PickupLocationDataResponse.from(it) },
+        deliveryLocation = data.deliveryLocation,
+        consignorParty = data.consignorParty?.let { CompanyDataResponse.from(it) },
+        collectorParty = data.collectorParty?.let { CompanyDataResponse.from(it) },
+        dealerParty = data.dealerParty?.let { CompanyDataResponse.from(it) },
+        brokerParty = data.brokerParty?.let { CompanyDataResponse.from(it) },
+        wasteCode = data.wasteCode,
+        wasteName = data.wasteName,
+        processingMethod = data.processingMethod
       )
     }
   }

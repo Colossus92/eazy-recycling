@@ -1,11 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
-import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -77,81 +77,18 @@ data class CreateWasteStreamResult(
 
 @Service
 class CreateDraftWasteStreamService(
-  private val wasteStreamRepo: WasteStreams,
-  private val companies: Companies,
-  private val projectLocations: ProjectLocations,
-  private val numberGenerator: WasteStreamNumberGenerator = WasteStreamNumberGenerator(),
+  private val wasteStreamFactory: WasteStreamFactory,
+  private val wasteStreams: WasteStreams,
 ) : CreateDraftWasteStream {
 
   @Transactional
   override fun handle(cmd: WasteStreamCommand): CreateWasteStreamResult {
-    // Generate the next sequential waste stream number for this processor
-    val processorId = cmd.deliveryLocation.processorPartyId
-    val highestExisting = wasteStreamRepo.findHighestNumberForProcessor(processorId)
-    val wasteStreamNumber = numberGenerator.generateNext(processorId, highestExisting)
+    val wasteStream = wasteStreamFactory.createDraft(cmd)
 
-    // Convert command to domain Location using LocationFactory
-    val pickupLocation = cmd.pickupLocation.toDomain(companies, projectLocations)
-
-    val wasteStream = WasteStream(
-      wasteStreamNumber = wasteStreamNumber,
-      wasteType = cmd.wasteType,
-      collectionType = cmd.collectionType,
-      pickupLocation = pickupLocation,
-      deliveryLocation = cmd.deliveryLocation,
-      consignorParty = cmd.consignorParty,
-      consignorClassification = ConsignorClassification.fromCode(cmd.consignorClassification),
-      pickupParty = cmd.pickupParty,
-      dealerParty = cmd.dealerParty,
-      collectorParty = cmd.collectorParty,
-      brokerParty = cmd.brokerParty
-    )
-
-    wasteStreamRepo.save(wasteStream)
+    wasteStreams.save(wasteStream)
 
     return CreateWasteStreamResult(
       wasteStreamNumber = wasteStream.wasteStreamNumber
     )
-  }
-}
-
-/**
- * Extension function to convert PickupLocationCommand to domain Location.
- * Uses LocationFactory for PickupCompanyCommand to fetch address from database.
- */
-fun PickupLocationCommand.toDomain(companies: Companies, projectLocations: ProjectLocations): Location {
-  return when (this) {
-    is PickupLocationCommand.DutchAddressCommand -> Location.DutchAddress(
-      address = Address(
-        streetName = StreetName(streetName),
-        postalCode = DutchPostalCode(postalCode),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        city = City(city),
-        country = country
-      )
-    )
-
-    is PickupLocationCommand.ProximityDescriptionCommand -> Location.ProximityDescription(
-      description = description,
-      postalCodeDigits = postalCodeDigits,
-      city = City(city),
-      country = country
-    )
-
-    is PickupLocationCommand.ProjectLocationCommand -> projectLocations.findById(id)
-      ?.toSnapshot()
-      ?: throw EntityNotFoundException("Geen projectlocatie gevonden met id $id")
-
-    is PickupLocationCommand.PickupCompanyCommand -> {
-      val company = companies.findById(companyId) ?: throw EntityNotFoundException("Geen bedrijf gevonden voor bedrijf met id ${companyId.uuid}")
-      Location.Company(
-        companyId = companyId,
-        name = company.name,
-        address = company.address,
-      )
-    }
-
-    is PickupLocationCommand.NoPickupLocationCommand -> Location.NoLocation
   }
 }

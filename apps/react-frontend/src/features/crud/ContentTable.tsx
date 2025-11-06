@@ -68,7 +68,10 @@ export const ContentTable = <T, S = T>({
               return (
                 <React.Fragment key={index}>
                   {/* Main row */}
-                  <tr className="text-body-2 border-b border-solid border-color-border-primary">
+                  <tr
+                    className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
+                    onDoubleClick={() => onEdit(item)}
+                  >
                     {data.columns.map((col, colIndex) => (
                       <td className="p-4" key={String(col.key)}>
                         <div className="flex items-center gap-2">

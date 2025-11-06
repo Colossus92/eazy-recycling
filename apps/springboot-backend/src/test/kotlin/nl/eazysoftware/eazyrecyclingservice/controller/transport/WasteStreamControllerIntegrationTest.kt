@@ -55,7 +55,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     val result = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamRequest)
     )
       .andExpect(status().isCreated)
@@ -84,7 +84,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     // When - create first waste stream
     val result1 = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
@@ -94,7 +94,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     // When - create second waste stream (should get next sequential number)
     val result2 = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
@@ -120,12 +120,12 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     )
 
     securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(firstRequest)
     ).andExpect(status().isCreated)
 
     securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(secondRequest)
     ).andExpect(status().isCreated)
 
@@ -147,7 +147,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       name = "Glass"
     )
     val createResult = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
@@ -176,7 +176,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       name = "Glass"
     )
     val createResult = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)
@@ -190,7 +190,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     // Then
     securedMockMvc.put(
-      "/waste-streams/${wasteStreamNumber}",
+      "/waste-streams/${wasteStreamNumber}/concept",
       objectMapper.writeValueAsString(updatedRequest)
     )
       .andExpect(status().isNoContent)
@@ -204,7 +204,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       name = "Glass"
     )
     val createResult = securedMockMvc.post(
-      "/waste-streams",
+      "/waste-streams/concept",
       objectMapper.writeValueAsString(wasteStreamDto)
     )
       .andExpect(status().isCreated)

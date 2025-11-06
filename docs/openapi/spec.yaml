@@ -92,7 +92,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/WasteStreamValidationResult"
+                $ref: "#/components/schemas/WasteStreamValidationResponse"
   /users/{id}:
     get:
       tags:
@@ -606,25 +606,6 @@ paths:
       responses:
         "204":
           description: No Content
-  /waste-streams/{wasteStreamNumber}/validate:
-    post:
-      tags:
-      - amice-controller
-      operationId: validateWasteStreamNumber
-      parameters:
-      - name: wasteStreamNumber
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: "^[0-9]{12}$"
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WasteStreamValidationResponse"
   /waste-streams/concept:
     post:
       tags:
@@ -1413,7 +1394,7 @@ components:
       - pickupParty
       - processingMethodCode
       - processorPartyId
-    CompanyData:
+    CompanyDataResponse:
       type: object
       properties:
         companyRegistrationNumber:
@@ -1422,7 +1403,7 @@ components:
           type: string
         country:
           type: string
-    ConsignorData:
+    ConsignorDataResponse:
       type: object
       properties:
         companyRegistrationNumber:
@@ -1435,7 +1416,7 @@ components:
           type: boolean
       required:
       - isPrivate
-    PickupLocationData:
+    PickupLocationDataResponse:
       type: object
       properties:
         postalCode:
@@ -1452,7 +1433,7 @@ components:
           type: string
         country:
           type: string
-    ValidationError:
+    ValidationErrorResponse:
       type: object
       properties:
         code:
@@ -1462,7 +1443,7 @@ components:
       required:
       - code
       - description
-    ValidationRequestData:
+    ValidationRequestDataResponse:
       type: object
       properties:
         wasteStreamNumber:
@@ -1472,19 +1453,19 @@ components:
         collectorsScheme:
           type: string
         consignor:
-          $ref: "#/components/schemas/ConsignorData"
+          $ref: "#/components/schemas/ConsignorDataResponse"
         pickupLocation:
-          $ref: "#/components/schemas/PickupLocationData"
+          $ref: "#/components/schemas/PickupLocationDataResponse"
         deliveryLocation:
           type: string
         consignorParty:
-          $ref: "#/components/schemas/CompanyData"
+          $ref: "#/components/schemas/CompanyDataResponse"
         collectorParty:
-          $ref: "#/components/schemas/CompanyData"
+          $ref: "#/components/schemas/CompanyDataResponse"
         dealerParty:
-          $ref: "#/components/schemas/CompanyData"
+          $ref: "#/components/schemas/CompanyDataResponse"
         brokerParty:
-          $ref: "#/components/schemas/CompanyData"
+          $ref: "#/components/schemas/CompanyDataResponse"
         wasteCode:
           type: string
         wasteName:
@@ -1493,23 +1474,20 @@ components:
           type: string
       required:
       - wasteStreamNumber
-    WasteStreamValidationResult:
+    WasteStreamValidationResponse:
       type: object
       properties:
-        wasteStreamNumber:
-          type: string
         isValid:
           type: boolean
         errors:
           type: array
           items:
-            $ref: "#/components/schemas/ValidationError"
+            $ref: "#/components/schemas/ValidationErrorResponse"
         requestData:
-          $ref: "#/components/schemas/ValidationRequestData"
+          $ref: "#/components/schemas/ValidationRequestDataResponse"
       required:
       - errors
       - isValid
-      - wasteStreamNumber
     UpdateUserRequest:
       type: object
       properties:
@@ -2086,100 +2064,6 @@ components:
           minLength: 1
       required:
       - cancellationReason
-    CompanyDataResponse:
-      type: object
-      properties:
-        companyRegistrationNumber:
-          type: string
-        name:
-          type: string
-        country:
-          type: string
-    ConsignorDataResponse:
-      type: object
-      properties:
-        companyRegistrationNumber:
-          type: string
-        name:
-          type: string
-        country:
-          type: string
-        isPrivate:
-          type: boolean
-      required:
-      - isPrivate
-    PickupLocationDataResponse:
-      type: object
-      properties:
-        postalCode:
-          type: string
-        buildingNumber:
-          type: string
-        buildingNumberAddition:
-          type: string
-        city:
-          type: string
-        streetName:
-          type: string
-        proximityDescription:
-          type: string
-        country:
-          type: string
-    ValidationErrorResponse:
-      type: object
-      properties:
-        code:
-          type: string
-        description:
-          type: string
-      required:
-      - code
-      - description
-    ValidationRequestDataResponse:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-        routeCollection:
-          type: string
-        collectorsScheme:
-          type: string
-        consignor:
-          $ref: "#/components/schemas/ConsignorDataResponse"
-        pickupLocation:
-          $ref: "#/components/schemas/PickupLocationDataResponse"
-        deliveryLocation:
-          type: string
-        consignorParty:
-          $ref: "#/components/schemas/CompanyDataResponse"
-        collectorParty:
-          $ref: "#/components/schemas/CompanyDataResponse"
-        dealerParty:
-          $ref: "#/components/schemas/CompanyDataResponse"
-        brokerParty:
-          $ref: "#/components/schemas/CompanyDataResponse"
-        wasteCode:
-          type: string
-        wasteName:
-          type: string
-        processingMethod:
-          type: string
-      required:
-      - wasteStreamNumber
-    WasteStreamValidationResponse:
-      type: object
-      properties:
-        isValid:
-          type: boolean
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/ValidationErrorResponse"
-        requestData:
-          $ref: "#/components/schemas/ValidationRequestDataResponse"
-      required:
-      - errors
-      - isValid
     CreateWasteStreamResponse:
       type: object
       properties:
@@ -2518,12 +2402,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2586,15 +2470,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2624,11 +2508,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -2734,11 +2618,14 @@ components:
           type: string
         lastActivityAt:
           $ref: "#/components/schemas/LocalDateTime"
+        isEditable:
+          type: boolean
       required:
       - consignorPartyId
       - consignorPartyName
       - deliveryLocation
       - euralCode
+      - isEditable
       - lastActivityAt
       - pickupLocation
       - processingMethodCode
@@ -2901,15 +2788,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
-        epochSeconds:
-          type: integer
-          format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
+        epochSeconds:
+          type: integer
+          format: int64
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond

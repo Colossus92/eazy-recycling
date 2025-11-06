@@ -71,6 +71,11 @@ class WasteStreamQueryRepository(
         is Instant -> lastActivityAtRaw
         else -> throw IllegalStateException("Unexpected type for last_activity_at: ${lastActivityAtRaw?.javaClass}")
       }
+      val effectiveStatus = EffectiveStatusPolicy.compute(
+        WasteStreamStatus.valueOf(status),
+        lastActivityAt.toKotlinInstant(),
+        Clock.System.now()
+      ).toString()
       WasteStreamListView(
         wasteStreamNumber = columns[0] as String,
         wasteName = columns[1] as String,
@@ -81,11 +86,8 @@ class WasteStreamQueryRepository(
         pickupLocation = formatPickupLocation(columns),
         deliveryLocation = "${columns[12]} ${columns[13]}, ${columns[14]}",
         lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
-        status = EffectiveStatusPolicy.compute(
-          WasteStreamStatus.valueOf(status),
-          lastActivityAt.toKotlinInstant(),
-          Clock.System.now()
-        ).toString(),
+        status = effectiveStatus,
+        isEditable = effectiveStatus == WasteStreamStatus.DRAFT.name,
       )
     }
   }

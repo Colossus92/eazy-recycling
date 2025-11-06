@@ -14,7 +14,6 @@
 
 
 
-export * from './apis/amice-controller-api';
 export * from './apis/company-controller-api';
 export * from './apis/container-transport-controller-api';
 export * from './apis/driver-controller-api';

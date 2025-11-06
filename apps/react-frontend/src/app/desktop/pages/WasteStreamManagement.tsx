@@ -15,7 +15,10 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
-import { WasteStreamStatusTag, WasteStreamStatusTagProps } from '@/features/wastestreams/components/WasteStreamStatusTag';
+import {
+  WasteStreamStatusTag,
+  WasteStreamStatusTagProps,
+} from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import { WasteStreamFilterForm } from '@/features/wastestreams/components/WasteStreamFilterForm';
 
@@ -33,19 +36,62 @@ export const WasteStreamManagement = () => {
   const { read, form, deletion } = useWasteStreamCrud();
 
   const columns: Column[] = [
-    { key: 'wasteStreamNumber', label: 'Afvalstroomnummer', accessor: (item) => item.wasteStreamNumber, title: (item) => item.wasteStreamNumber, width: '14%' },
-    { key: 'wasteName', label: 'Gebruikelijke benaming', accessor: (item) => item.wasteName, title: (item) => item.wasteName, width: '14%' },
-    { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'pickupLocation', label: 'Herkomstlocatie', accessor: (item) => item.pickupLocation, title: (item) => item.pickupLocation, width: '25%' },
-    { key: 'deliveryLocation', label: 'Bestemmingslocatie', accessor: (item) => item.deliveryLocation, title: (item) => item.deliveryLocation, width: '25%' },
-    { key: 'status', label: 'Status', accessor: (item) => <WasteStreamStatusTag status={item.status as WasteStreamStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
+    {
+      key: 'wasteStreamNumber',
+      label: 'Afvalstroomnummer',
+      accessor: (item) => item.wasteStreamNumber,
+      title: (item) => item.wasteStreamNumber,
+      width: '14%',
+    },
+    {
+      key: 'wasteName',
+      label: 'Gebruikelijke benaming',
+      accessor: (item) => item.wasteName,
+      title: (item) => item.wasteName,
+      width: '14%',
+    },
+    {
+      key: 'consignorPartyName',
+      label: 'Afzender',
+      accessor: (item) => item.consignorPartyName,
+      title: (item) => item.consignorPartyName,
+      width: '14%',
+    },
+    {
+      key: 'pickupLocation',
+      label: 'Herkomstlocatie',
+      accessor: (item) => item.pickupLocation,
+      title: (item) => item.pickupLocation,
+      width: '25%',
+    },
+    {
+      key: 'deliveryLocation',
+      label: 'Bestemmingslocatie',
+      accessor: (item) => item.deliveryLocation,
+      title: (item) => item.deliveryLocation,
+      width: '25%',
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      accessor: (item) => (
+        <WasteStreamStatusTag
+          status={item.status as WasteStreamStatusTagProps['status']}
+        />
+      ),
+      title: (item) => item.status,
+      width: '8%',
+    },
   ];
 
   return (
     <>
-      <ContentContainer title={"Afvalstroomnummers"}>
+      <ContentContainer title={'Afvalstroomnummers'}>
         <div className="flex-1 flex flex-col items-start self-stretch pt-4 gap-4 border border-solid rounded-radius-xl border-color-border-primary bg-color-surface-primary overflow-hidden">
-          <ContentTitleBar setQuery={read.setQuery} setIsFilterOpen={read.filter.setIsFilterOpen}>
+          <ContentTitleBar
+            setQuery={read.setQuery}
+            setIsFilterOpen={read.filter.setIsFilterOpen}
+          >
             <Button
               variant={'primary'}
               icon={Plus}
@@ -84,7 +130,10 @@ export const WasteStreamManagement = () => {
                   <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
                     <tr className="text-subtitle-1">
                       {columns.map((col) => (
-                        <th className={'px-4 py-3 text-left'} key={String(col.key)}>
+                        <th
+                          className={'px-4 py-3 text-left'}
+                          key={String(col.key)}
+                        >
                           {col.label}
                         </th>
                       ))}
@@ -94,26 +143,45 @@ export const WasteStreamManagement = () => {
                   <tbody>
                     {read.items
                       .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                      .map((item, index) => (
-                        <tr key={index} className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                          onDoubleClick={() => form.openForEdit(item)}
-                          >
-                          {columns.map((col) => (
-                            <td className="p-4 truncate" key={String(col.key)} title={col.title(item)}>
-                              {col.accessor(item)}
-                            </td>
-                          ))}
-                          <td className="p-4 text-center">
-                            {item.status !== 'INACTIVE' && item.status !== 'EXPIRED' &&
-                              <ActionMenu<WasteStreamListView>
-                                onEdit={item.status === 'DRAFT' ? form.openForEdit : undefined}
-                                onDelete={(wasteStream) => deletion.initiate(wasteStream)}
-                                item={item}
-                              />
+                      .map((item, index) => {
+                        return (
+                          <tr
+                            key={index}
+                            className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
+                            onDoubleClick={() =>
+                              item.isEditable
+                                ? form.openForEdit(item)
+                                : Promise.resolve()
                             }
-                          </td>
-                        </tr>
-                      ))}
+                          >
+                            {columns.map((col) => (
+                              <td
+                                className="p-4 truncate"
+                                key={String(col.key)}
+                                title={col.title(item)}
+                              >
+                                {col.accessor(item)}
+                              </td>
+                            ))}
+                            <td className="p-4 text-center">
+                              {item.status !== 'INACTIVE' &&
+                                item.status !== 'EXPIRED' && (
+                                  <ActionMenu<WasteStreamListView>
+                                    onEdit={
+                                      item.isEditable
+                                        ? form.openForEdit
+                                        : undefined
+                                    }
+                                    onDelete={(wasteStream) =>
+                                      deletion.initiate(wasteStream)
+                                    }
+                                    item={item}
+                                  />
+                                )}
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                   <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
                     <tr className="text-body-2 bg-color-surface-primary">
@@ -141,10 +209,9 @@ export const WasteStreamManagement = () => {
         isOpen={Boolean(deletion.item)}
         setIsOpen={deletion.cancel}
         onDelete={() =>
-          deletion.item &&
-          deletion.confirm(deletion.item.wasteStreamNumber)
+          deletion.item && deletion.confirm(deletion.item.wasteStreamNumber)
         }
-        title={"Afvalstroomnummer verwijderen"}
+        title={'Afvalstroomnummer verwijderen'}
         description={`Weet u zeker dat u afvalstroomnummer met code ${deletion.item?.wasteStreamNumber} wilt verwijderen?`}
       />
       <WasteStreamForm

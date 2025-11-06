@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import kotlinx.datetime.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class WasteStreamListView(
     val wasteStreamNumber: String,
@@ -14,4 +14,5 @@ data class WasteStreamListView(
     val deliveryLocation: String,
     val status: String,
     val lastActivityAt: LocalDateTime,
+    val isEditable: Boolean,
 )

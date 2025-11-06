@@ -4,7 +4,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidati
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.IllegalStateException
 
 interface CreateAndActivateWasteStream {
   fun handle(cmd: WasteStreamCommand): WasteStreamValidationResult
@@ -12,18 +11,17 @@ interface CreateAndActivateWasteStream {
 
 @Service
 class CreateAndActivateWasteStreamService(
-  private val createDraftWasteStream: CreateDraftWasteStream,
+  private val wasteStreamFactory: WasteStreamFactory,
   private val validateWasteStream: ValidateWasteStream,
   private val wasteStreams: WasteStreams,
 ) : CreateAndActivateWasteStream {
 
   @Transactional
   override fun handle(cmd: WasteStreamCommand): WasteStreamValidationResult {
-    val wasteStreamResult = createDraftWasteStream.handle(cmd)
-    val validationResult = validateWasteStream.handle(ValidateWasteStreamCommand(wasteStreamResult.wasteStreamNumber))
+    val wasteStream = wasteStreamFactory.createDraft(cmd)
+    val validationResult = validateWasteStream.handle(ValidateWasteStreamCommand(wasteStream))
 
     if (validationResult.isValid) {
-      val wasteStream = wasteStreams.findByNumber(wasteStreamResult.wasteStreamNumber) ?: throw IllegalStateException("Fout bij ophalen van afvalstroomnummer ${wasteStreamResult.wasteStreamNumber.number}")
       wasteStream.activate()
       wasteStreams.save(wasteStream)
     }

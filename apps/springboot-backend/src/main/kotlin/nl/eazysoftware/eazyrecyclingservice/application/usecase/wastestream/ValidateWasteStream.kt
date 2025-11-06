@@ -1,9 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class ValidateWasteStream(
-  private val wasteStreams: WasteStreams,
   private val wasteStreamValidator: WasteStreamValidator
 ) {
 
@@ -31,15 +29,12 @@ class ValidateWasteStream(
    * @throws IllegalArgumentException if the waste stream does not exist
    */
   fun handle(command: ValidateWasteStreamCommand): WasteStreamValidationResult {
-    logger.info("Validating waste stream: ${command.wasteStreamNumber.number}")
+    logger.info("Validating waste stream: ${command.wasteStream.wasteStreamNumber.number}")
 
-    val wasteStream = wasteStreams.findByNumber(command.wasteStreamNumber)
-      ?: throw IllegalArgumentException("Afvalstroom met nummer ${command.wasteStreamNumber.number} niet gevonden")
-
-    return wasteStreamValidator.validate(wasteStream)
+    return wasteStreamValidator.validate(command.wasteStream)
   }
 }
 
 data class ValidateWasteStreamCommand(
-  val wasteStreamNumber: WasteStreamNumber
+  val wasteStream: WasteStream
 )
