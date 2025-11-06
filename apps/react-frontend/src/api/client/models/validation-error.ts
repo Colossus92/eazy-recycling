@@ -17,32 +17,20 @@
 /**
  * 
  * @export
- * @interface Instant
+ * @interface ValidationError
  */
-export interface Instant {
+export interface ValidationError {
     /**
      * 
      * @type {string}
-     * @memberof Instant
+     * @memberof ValidationError
      */
-    'value'?: string;
+    'code': string;
     /**
      * 
      * @type {string}
-     * @memberof Instant
+     * @memberof ValidationError
      */
-    'value$kotlinx_datetime': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Instant
-     */
-    'epochSeconds': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Instant
-     */
-    'nanosecondsOfSecond': number;
+    'description': string;
 }
 

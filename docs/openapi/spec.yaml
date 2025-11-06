@@ -47,25 +47,7 @@ paths:
       responses:
         "204":
           description: No Content
-  /waste-streams/{wasteStreamNumber}:
-    get:
-      tags:
-      - waste-stream-controller
-      operationId: getWasteStreamByNumber
-      parameters:
-      - name: wasteStreamNumber
-        in: path
-        required: true
-        schema:
-          type: string
-          pattern: "^[0-9]{12}$"
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/WasteStreamDetailView"
+  /waste-streams/{wasteStreamNumber}/concept:
     put:
       tags:
       - waste-stream-controller
@@ -86,10 +68,11 @@ paths:
       responses:
         "204":
           description: No Content
-    delete:
+  /waste-streams/{wasteStreamNumber}/active:
+    put:
       tags:
       - waste-stream-controller
-      operationId: delete
+      operationId: updateAndValidate
       parameters:
       - name: wasteStreamNumber
         in: path
@@ -97,9 +80,19 @@ paths:
         schema:
           type: string
           pattern: "^[0-9]{12}$"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteStreamRequest"
+        required: true
       responses:
         "204":
           description: No Content
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamValidationResult"
   /users/{id}:
     get:
       tags:
@@ -613,20 +606,26 @@ paths:
       responses:
         "204":
           description: No Content
-  /waste-streams:
-    get:
+  /waste-streams/{wasteStreamNumber}/validate:
+    post:
       tags:
-      - waste-stream-controller
-      operationId: getWasteStreams
+      - amice-controller
+      operationId: validateWasteStreamNumber
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
       responses:
         "200":
           description: OK
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/WasteStreamListView"
+                $ref: "#/components/schemas/WasteStreamValidationResponse"
+  /waste-streams/concept:
     post:
       tags:
       - waste-stream-controller
@@ -644,21 +643,20 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateWasteStreamResponse"
-  /waste-streams/{wasteStreamNumber}/validate:
+  /waste-streams/active:
     post:
       tags:
-      - amice-controller
-      operationId: validateWasteStreamNumber
-      parameters:
-      - name: wasteStreamNumber
-        in: path
+      - waste-stream-controller
+      operationId: createAndValidate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WasteStreamRequest"
         required: true
-        schema:
-          type: string
-          pattern: "^[0-9]{12}$"
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           content:
             '*/*':
               schema:
@@ -954,6 +952,53 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
+  /waste-streams:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: getWasteStreams
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteStreamListView"
+  /waste-streams/{wasteStreamNumber}:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: getWasteStreamByNumber
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WasteStreamDetailView"
+    delete:
+      tags:
+      - waste-stream-controller
+      operationId: delete
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "204":
+          description: No Content
   /users/drivers:
     get:
       tags:
@@ -1368,6 +1413,103 @@ components:
       - pickupParty
       - processingMethodCode
       - processorPartyId
+    CompanyData:
+      type: object
+      properties:
+        companyRegistrationNumber:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+    ConsignorData:
+      type: object
+      properties:
+        companyRegistrationNumber:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        isPrivate:
+          type: boolean
+      required:
+      - isPrivate
+    PickupLocationData:
+      type: object
+      properties:
+        postalCode:
+          type: string
+        buildingNumber:
+          type: string
+        buildingNumberAddition:
+          type: string
+        city:
+          type: string
+        streetName:
+          type: string
+        proximityDescription:
+          type: string
+        country:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+      - code
+      - description
+    ValidationRequestData:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        routeCollection:
+          type: string
+        collectorsScheme:
+          type: string
+        consignor:
+          $ref: "#/components/schemas/ConsignorData"
+        pickupLocation:
+          $ref: "#/components/schemas/PickupLocationData"
+        deliveryLocation:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyData"
+        collectorParty:
+          $ref: "#/components/schemas/CompanyData"
+        dealerParty:
+          $ref: "#/components/schemas/CompanyData"
+        brokerParty:
+          $ref: "#/components/schemas/CompanyData"
+        wasteCode:
+          type: string
+        wasteName:
+          type: string
+        processingMethod:
+          type: string
+      required:
+      - wasteStreamNumber
+    WasteStreamValidationResult:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        isValid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationError"
+        requestData:
+          $ref: "#/components/schemas/ValidationRequestData"
+      required:
+      - errors
+      - isValid
+      - wasteStreamNumber
     UpdateUserRequest:
       type: object
       properties:
@@ -1944,13 +2086,6 @@ components:
           minLength: 1
       required:
       - cancellationReason
-    CreateWasteStreamResponse:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-      required:
-      - wasteStreamNumber
     CompanyDataResponse:
       type: object
       properties:
@@ -2045,6 +2180,13 @@ components:
       required:
       - errors
       - isValid
+    CreateWasteStreamResponse:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+      required:
+      - wasteStreamNumber
     CreateUserRequest:
       type: object
       properties:
@@ -2376,12 +2518,12 @@ components:
         dayOfYear:
           type: integer
           format: int32
-        monthNumber:
-          type: integer
-          format: int32
         value$kotlinx_datetime:
           type: string
           format: date
+        monthNumber:
+          type: integer
+          format: int32
       required:
       - dayOfMonth
       - dayOfWeek
@@ -2444,15 +2586,15 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - dayOfMonth
@@ -2482,11 +2624,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2759,15 +2901,15 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         epochSeconds:
           type: integer
           format: int64
         nanosecondsOfSecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - epochSeconds
       - nanosecondsOfSecond

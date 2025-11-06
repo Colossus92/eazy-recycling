@@ -8,7 +8,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ValidationRequestData
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import org.hibernate.validator.constraints.Length
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController
 
 /**
  * REST controller for Amice integration endpoints.
- * Only active when amice.enabled=true
+ * When amice.enabled=false, validation requests will throw UnsupportedOperationException.
  */
 @RestController
 @PreAuthorize(HAS_ANY_ROLE)
-@ConditionalOnProperty(name = ["amice.enabled"], havingValue = "true", matchIfMissing = false)
 class AmiceController(
   private val validateWasteStream: ValidateWasteStream
 ) {

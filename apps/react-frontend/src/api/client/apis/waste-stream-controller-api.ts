@@ -29,6 +29,10 @@ import type { WasteStreamDetailView } from '../models';
 import type { WasteStreamListView } from '../models';
 // @ts-ignore
 import type { WasteStreamRequest } from '../models';
+// @ts-ignore
+import type { WasteStreamValidationResponse } from '../models';
+// @ts-ignore
+import type { WasteStreamValidationResult } from '../models';
 /**
  * WasteStreamControllerApi - axios parameter creator
  * @export
@@ -81,7 +85,46 @@ export const WasteStreamControllerApiAxiosParamCreator = function (configuration
         create1: async (wasteStreamRequest: WasteStreamRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'wasteStreamRequest' is not null or undefined
             assertParamExists('create1', 'wasteStreamRequest', wasteStreamRequest)
-            const localVarPath = `/waste-streams`;
+            const localVarPath = `/waste-streams/concept`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(wasteStreamRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAndValidate: async (wasteStreamRequest: WasteStreamRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'wasteStreamRequest' is not null or undefined
+            assertParamExists('createAndValidate', 'wasteStreamRequest', wasteStreamRequest)
+            const localVarPath = `/waste-streams/active`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -193,7 +236,50 @@ export const WasteStreamControllerApiAxiosParamCreator = function (configuration
             assertParamExists('update1', 'wasteStreamNumber', wasteStreamNumber)
             // verify required parameter 'wasteStreamRequest' is not null or undefined
             assertParamExists('update1', 'wasteStreamRequest', wasteStreamRequest)
-            const localVarPath = `/waste-streams/{wasteStreamNumber}`
+            const localVarPath = `/waste-streams/{wasteStreamNumber}/concept`
+                .replace(`{${"wasteStreamNumber"}}`, encodeURIComponent(String(wasteStreamNumber)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(wasteStreamRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} wasteStreamNumber 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateAndValidate: async (wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'wasteStreamNumber' is not null or undefined
+            assertParamExists('updateAndValidate', 'wasteStreamNumber', wasteStreamNumber)
+            // verify required parameter 'wasteStreamRequest' is not null or undefined
+            assertParamExists('updateAndValidate', 'wasteStreamRequest', wasteStreamRequest)
+            const localVarPath = `/waste-streams/{wasteStreamNumber}/active`
                 .replace(`{${"wasteStreamNumber"}}`, encodeURIComponent(String(wasteStreamNumber)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -260,6 +346,18 @@ export const WasteStreamControllerApiFp = function(configuration?: Configuration
         },
         /**
          * 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createAndValidate(wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteStreamValidationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createAndValidate(wasteStreamRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WasteStreamControllerApi.createAndValidate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {string} wasteStreamNumber 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -294,6 +392,19 @@ export const WasteStreamControllerApiFp = function(configuration?: Configuration
             const localVarOperationServerBasePath = operationServerMap['WasteStreamControllerApi.update1']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @param {string} wasteStreamNumber 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateAndValidate(wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteStreamValidationResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateAndValidate(wasteStreamNumber, wasteStreamRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WasteStreamControllerApi.updateAndValidate']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -324,6 +435,15 @@ export const WasteStreamControllerApiFactory = function (configuration?: Configu
         },
         /**
          * 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createAndValidate(wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<WasteStreamValidationResponse> {
+            return localVarFp.createAndValidate(wasteStreamRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {string} wasteStreamNumber 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -348,6 +468,16 @@ export const WasteStreamControllerApiFactory = function (configuration?: Configu
          */
         update1(wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.update1(wasteStreamNumber, wasteStreamRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} wasteStreamNumber 
+         * @param {WasteStreamRequest} wasteStreamRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateAndValidate(wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig): AxiosPromise<WasteStreamValidationResult> {
+            return localVarFp.updateAndValidate(wasteStreamNumber, wasteStreamRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -383,6 +513,17 @@ export class WasteStreamControllerApi extends BaseAPI {
 
     /**
      * 
+     * @param {WasteStreamRequest} wasteStreamRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WasteStreamControllerApi
+     */
+    public createAndValidate(wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig) {
+        return WasteStreamControllerApiFp(this.configuration).createAndValidate(wasteStreamRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {string} wasteStreamNumber 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -412,6 +553,18 @@ export class WasteStreamControllerApi extends BaseAPI {
      */
     public update1(wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig) {
         return WasteStreamControllerApiFp(this.configuration).update1(wasteStreamNumber, wasteStreamRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} wasteStreamNumber 
+     * @param {WasteStreamRequest} wasteStreamRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WasteStreamControllerApi
+     */
+    public updateAndValidate(wasteStreamNumber: string, wasteStreamRequest: WasteStreamRequest, options?: RawAxiosRequestConfig) {
+        return WasteStreamControllerApiFp(this.configuration).updateAndValidate(wasteStreamNumber, wasteStreamRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

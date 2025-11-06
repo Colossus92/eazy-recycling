@@ -17,44 +17,32 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface ConsignorData
  */
-export interface LocalTime {
+export interface ConsignorData {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof ConsignorData
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'companyRegistrationNumber'?: string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof ConsignorData
      */
-    'value$kotlinx_datetime': string;
+    'name'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof ConsignorData
      */
-    'nanosecond': number;
+    'country'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ConsignorData
+     */
+    'isPrivate': boolean;
 }
 

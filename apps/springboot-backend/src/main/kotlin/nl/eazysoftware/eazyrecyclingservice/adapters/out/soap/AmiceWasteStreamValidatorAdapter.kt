@@ -7,7 +7,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionTy
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 /**
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component
  * Only active when amice.enabled=true
  */
 @Component
-@ConditionalOnProperty(name = ["amice.enabled"], havingValue = "true", matchIfMissing = false)
 class AmiceWasteStreamValidatorAdapter(
   private val soapClient: ToetsenAfvalstroomNummerServiceSoap?,
   private val companies: Companies
