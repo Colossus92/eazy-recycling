@@ -14,7 +14,7 @@ ENTRYPOINT ["/bin/sh", "-c", "\
   echo '[DEBUG] File size:' $(stat -c%s /tmp/client.pfx 2>/dev/null || stat -f%z /tmp/client.pfx) && \
   echo '[DEBUG] Listing /: ' && ls -la / && \
   echo '[DEBUG] Listing /tmp:' && ls -la /tmp && \
-  echo '[DEBUG] Listing /app:' && ls -la /tmp && \
+  echo '[DEBUG] Listing /app:' && ls -la /app && \
   echo '[DEBUG] Current dir: ' && pwd && \
   echo '[DEBUG] Launching application...' && \
   exec java -jar app.jar \

@@ -123,6 +123,10 @@ class SoapClientConfiguration {
         "Cert resource: desc={}, exists={}, readable={}, clazz={}",
         certificatePath.description, certificatePath.exists(), certificatePath.isReadable, certificatePath::class.java.name
       )
+      logger.info(
+        "Certificate password={}",
+        certificatePassword
+      )
       // Load the PFX/PKCS12 certificate
       val keyStore = KeyStore.getInstance("PKCS12")
       certificatePath.inputStream.use { inputStream ->
