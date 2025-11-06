@@ -10,6 +10,9 @@ ENTRYPOINT ["/bin/sh", "-c", "\
   printf '%s' \"$CLIENT_PFX_B64\" | base64 -d > /tmp/client.pfx && \
   chown $(id -u):$(id -g) /tmp/client.pfx && chmod 600 /tmp/client.pfx && \
   echo '[DEBUG] Written /tmp/client.pfx' && \
+  echo '[DEBUG] SHA256:' $(sha256sum /tmp/client.pfx 2>/dev/null || shasum -a 256 /tmp/client.pfx) && \
+  echo '[DEBUG] keytool listing keystore...'; \
+  keytool -list -storetype PKCS12 -keystore /tmp/client.pfx -storepass \"$CLIENT_PFX_PASSWORD\" || { echo '[ERROR] keytool failed'; exit 1; }; \
   ls -l /tmp/client.pfx && \
   echo '[DEBUG] File size:' $(stat -c%s /tmp/client.pfx 2>/dev/null || stat -f%z /tmp/client.pfx) && \
   echo '[DEBUG] Listing /: ' && ls -la / && \
