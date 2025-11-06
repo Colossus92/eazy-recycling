@@ -5,8 +5,12 @@ data class EuralCode(
 ) {
 
   init {
-      require(!code.isBlank()) {
-        "Euralcode moet een waarde hebben"
-      }
+    val codeWithoutSpaces = code.replace(" ", "")
+    require(codeWithoutSpaces.take(6).all { it.isDigit() }) {
+      "De eerste 6 tekens van de eural code moeten cijfers zijn"
+    }
+    require(codeWithoutSpaces.length == 6 || (codeWithoutSpaces.length == 7 && codeWithoutSpaces.endsWith("*"))) {
+      "Eural code moet 6 cijfers bevatten, eventueel gevolgd door *, spaties zijn toegestaan"
+    }
   }
 }
