@@ -7,7 +7,7 @@ export type Company = CompleteCompanyView;
 export type CompanyBranch = CompanyBranchResponse
 
 
-const mapCompanyToCompanyRequest = (company: Company): CompanyRequest => {
+const mapCompanyToCompanyRequest = (company: Omit<Company, 'id'>): CompanyRequest => {
   return {
     ...company,
     address: {
@@ -22,7 +22,7 @@ const mapCompanyToCompanyRequest = (company: Company): CompanyRequest => {
 
 export const companyService = {
     getAll: (includeBranches: boolean = false) => companyApi.getCompanies(includeBranches).then((r) => r.data),
-    create: (c: Company) => {
+    create: (c: Omit<Company, 'id'>) => {
         return companyApi.createCompany(mapCompanyToCompanyRequest(c)).then((r) => r.data)
     },
     update: (company: Company) => {

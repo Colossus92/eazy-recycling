@@ -22,10 +22,12 @@ const mockCompanies: Company[] = [
     id: 'comp-1',
     name: 'Acme Recycling',
     address: {
-      streetName: 'Recycling Lane',
-      buildingNumber: '123',
+      street: 'Recycling Lane',
+      houseNumber: '123',
+      houseNumberAddition: undefined,
       postalCode: '1234 AB',
       city: 'Amsterdam',
+      country: 'Nederland',
     },
     chamberOfCommerceId: '12345678',
     vihbId: '123456VIHB',
@@ -36,10 +38,12 @@ const mockCompanies: Company[] = [
     id: 'comp-2',
     name: 'Green Solutions',
     address: {
-      streetName: 'Eco Street',
-      buildingNumber: '45',
+      street: 'Eco Street',
+      houseNumber: '45',
+      houseNumberAddition: undefined,
       postalCode: '5678 CD',
       city: 'Rotterdam',
+      country: 'Nederland',
     },
     chamberOfCommerceId: '87654321',
     vihbId: '654321VIHB',
@@ -114,10 +118,10 @@ describe('CompanyForm', () => {
       mockCompany.name
     );
     expect(screen.getByPlaceholderText('Vul straat in')).toHaveValue(
-      mockCompany.address.streetName
+      mockCompany.address.street
     );
     expect(screen.getByPlaceholderText('Nr.')).toHaveValue(
-      mockCompany.address.buildingNumber
+      mockCompany.address.houseNumber
     );
     expect(screen.getByPlaceholderText('Vul postcode in')).toHaveValue(
       mockCompany.address.postalCode
@@ -219,8 +223,8 @@ describe('CompanyForm', () => {
         expect.objectContaining({
           name: 'Test Company',
           address: expect.objectContaining({
-            streetName: 'Test Street',
-            buildingNumber: '42',
+            street: 'Test Street',
+            houseNumber: '42',
             postalCode: '1234 ZZ',
             city: 'Test City',
           }),
@@ -318,8 +322,8 @@ describe('CompanyForm', () => {
         expect.objectContaining({
           name: 'Test Company',
           address: expect.objectContaining({
-            streetName: 'Test Street',
-            buildingNumber: '42',
+            street: 'Test Street',
+            houseNumber: '42',
             postalCode: '1234 ZZ',
             city: 'Test City',
           }),

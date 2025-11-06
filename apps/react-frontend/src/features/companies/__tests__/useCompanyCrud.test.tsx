@@ -12,10 +12,12 @@ vi.mock('@/api/services/companyService.ts', () => {
       id: 'comp-1',
       name: 'Acme Recycling',
       address: {
-        streetName: 'Recycling Lane',
-        buildingNumber: '123',
+        street: 'Recycling Lane',
+        houseNumber: '123',
+        houseNumberAddition: undefined,
         postalCode: '1234 AB',
         city: 'Amsterdam',
+        country: 'Nederland',
       },
       chamberOfCommerceId: 'KVK123456',
       vihbId: 'VIHB789',
@@ -26,10 +28,12 @@ vi.mock('@/api/services/companyService.ts', () => {
       id: 'comp-2',
       name: 'Green Solutions',
       address: {
-        streetName: 'Eco Street',
-        buildingNumber: '45',
+        street: 'Eco Street',
+        houseNumber: '45',
+        houseNumberAddition: undefined,
         postalCode: '5678 CD',
         city: 'Rotterdam',
+        country: 'Nederland',
       },
       chamberOfCommerceId: 'KVK654321',
       vihbId: 'VIHB987',
@@ -40,10 +44,12 @@ vi.mock('@/api/services/companyService.ts', () => {
       id: 'comp-3',
       name: 'Circular Economy BV',
       address: {
-        streetName: 'Sustainability Road',
-        buildingNumber: '78',
+        street: 'Sustainability Road',
+        houseNumber: '78',
+        houseNumberAddition: undefined,
         postalCode: '9012 EF',
         city: 'Utrecht',
+        country: 'Nederland',
       },
       chamberOfCommerceId: 'KVK789012',
       vihbId: 'VIHB345',
@@ -137,7 +143,7 @@ describe('useCompanyCrud', () => {
 
     expect(result.current.displayedCompanies.length).toBe(1);
     expect(
-      result.current.displayedCompanies[0]?.address?.streetName?.toLowerCase()
+      result.current.displayedCompanies[0]?.address?.street?.toLowerCase()
     ).toContain('eco');
 
     // Search by chamber of commerce ID
@@ -204,16 +210,22 @@ describe('useCompanyCrud', () => {
     const initialLength = result.current.displayedCompanies.length;
 
     const newCompany = {
+      id: '12345678-1234-1234-1234-123456789012',
       name: 'Test Company',
       address: {
-        streetName: 'Test Street',
-        buildingNumber: '42',
+        street: 'Test Street',
+        houseNumber: '42',
+        houseNumberAddition: undefined,
         postalCode: '1234 ZZ',
         city: 'Testville',
+        country: 'Nederland',
       },
       chamberOfCommerceId: 'KVK999999',
       vihbId: 'VIHB999',
-    } as Omit<Company, 'id'>;
+      updatedAt: '2025-01-01T00:00:00.000Z',
+      branches: [],
+      processorId: '12345',
+    } as Company;
 
     await act(async () => {
       await result.current.create(newCompany);
@@ -319,16 +331,19 @@ describe('useCompanyCrud', () => {
       .mockRejectedValueOnce(mockError);
 
     const newCompany = {
+      id: '12345678-1234-1234-1234-123456789012',
       name: 'Test Company',
       address: {
-        streetName: 'Test Street',
-        buildingNumber: '42',
+        street: 'Test Street',
+        houseNumber: '42',
+        houseNumberAddition: undefined,
         postalCode: '1234 ZZ',
         city: 'Testville',
+        country: 'Nederland',
       },
       chamberOfCommerceId: 'KVK999999',
       vihbId: 'VIHB999',
-    } as Omit<Company, 'id'>;
+    } as Company;
 
     // Attempt to create and expect it to fail
     await expect(result.current.create(newCompany)).rejects.toThrow(

@@ -77,7 +77,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
       },
       ...selectedCompany.branches.map((branch) => ({
         value: branch.id || '',
-        label: `${branch.address.streetName} ${branch.address.buildingNumber}, ${branch.address.city}`,
+        label: `${branch.address.street} ${branch.address.houseNumber}, ${branch.address.city}`,
       })),
     ];
 
@@ -162,14 +162,14 @@ export const CompanyAddressInput = <T extends FieldValues>({
       const selectedBranch = selectedCompany.branches.find(
         (branch) => branch.id === watchBranchId
       );
-      if (selectedBranch && selectedBranch.address && selectedBranch.address.streetName && selectedBranch.address.buildingNumber && selectedBranch.address.postalCode && selectedBranch.address.city) {
+      if (selectedBranch && selectedBranch.address && selectedBranch.address.street && selectedBranch.address.houseNumber && selectedBranch.address.postalCode && selectedBranch.address.city) {
         setValue(
           fieldNames.street,
-          mapToFormValue(selectedBranch.address.streetName)
+          mapToFormValue(selectedBranch.address.street)
         );
         setValue(
           fieldNames.buildingNumber,
-          mapToFormValue(selectedBranch.address.buildingNumber)
+          mapToFormValue(selectedBranch.address.houseNumber)
         );
         setValue(
           fieldNames.postalCode,
@@ -181,14 +181,14 @@ export const CompanyAddressInput = <T extends FieldValues>({
     }
 
     // Otherwise, use company address (headquarter)
-    if (selectedCompany && selectedCompany.address && selectedCompany.address.streetName && selectedCompany.address.buildingNumber && selectedCompany.address.postalCode && selectedCompany.address.city) {
+    if (selectedCompany && selectedCompany.address && selectedCompany.address.street && selectedCompany.address.houseNumber && selectedCompany.address.postalCode && selectedCompany.address.city) {
       setValue(
         fieldNames.street,
-        mapToFormValue(selectedCompany.address.streetName)
+        mapToFormValue(selectedCompany.address.street)
       );
       setValue(
         fieldNames.buildingNumber,
-        mapToFormValue(selectedCompany.address.buildingNumber)
+        mapToFormValue(selectedCompany.address.houseNumber)
       );
       setValue(
         fieldNames.postalCode,

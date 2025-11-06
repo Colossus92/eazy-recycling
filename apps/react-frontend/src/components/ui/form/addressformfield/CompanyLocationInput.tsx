@@ -67,7 +67,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
             },
             ...selectedCompany.branches.map((branch) => ({
                 value: branch.id,
-                label: `${branch.address.streetName} ${branch.address.buildingNumber}, ${branch.address.city}`,
+                label: `${branch.address.street} ${branch.address.houseNumber}${branch.address.houseNumberAddition ?? ''}, ${branch.address.city}`,
             })),
         ];
 
@@ -161,9 +161,9 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                 projectLocationId: projectLocationId,
                 companyId: watchCompanyId,
                 companyName: selectedCompany.name,
-                streetName: selectedBranch.address.streetName || '',
-                buildingNumber: selectedBranch.address.buildingNumber || '',
-                buildingNumberAddition: selectedBranch.address.buildingName || '',
+                streetName: selectedBranch.address.street || '',
+                buildingNumber: selectedBranch.address.houseNumber || '',
+                buildingNumberAddition: selectedBranch.address.houseNumberAddition || '',
                 postalCode: selectedBranch.address.postalCode || '',
                 city: selectedBranch.address.city || '',
                 country: selectedBranch.address.country || 'Nederland',

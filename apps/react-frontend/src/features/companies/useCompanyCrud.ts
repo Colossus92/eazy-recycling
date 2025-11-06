@@ -36,7 +36,7 @@ export const useCompanyCrud = () => {
   const [deleting, setDeleting] = useState<Company | undefined>(undefined);
 
   const createMutation = useMutation({
-    mutationFn: (item: Company) => companyService.create(item),
+    mutationFn: (item: Omit<Company, 'id'>) => companyService.create(item),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['companies'] })
