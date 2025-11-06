@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button/Button.tsx';
+import { SplitButton } from '@/components/ui/button/SplitButton.tsx';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 
@@ -45,28 +46,17 @@ export const FormNavigationWithDraft = ({
         )}
       </div>
       {step === totalSteps ? (
-        <>
-          <div className={'flex-1'}>
-            <Button
-              variant={'secondary'}
-              label={isSubmitting ? 'Opslaan...' : 'Opslaan als concept'}
-              onClick={onSaveDraft}
-              fullWidth={true}
-              disabled={isSubmitting}
-              data-testid="save-draft-button"
-            />
-          </div>
-          <div className={'flex-1'}>
-            <Button
-              variant={'primary'}
-              label={isSubmitting ? 'Valideren...' : 'Opslaan en valideren'}
-              onClick={onSaveAndValidate}
-              fullWidth={true}
-              disabled={isSubmitting}
-              data-testid="save-validate-button"
-            />
-          </div>
-        </>
+        <div className={'flex-1'}>
+          <SplitButton
+            primaryLabel={isSubmitting ? 'Valideren...' : 'Opslaan en valideren'}
+            secondaryLabel={isSubmitting ? 'Opslaan...' : 'Opslaan als concept'}
+            onPrimaryClick={() => onSaveAndValidate?.()}
+            onSecondaryClick={() => onSaveDraft?.()}
+            disabled={isSubmitting}
+            isSubmitting={isSubmitting}
+            fullWidth={true}
+          />
+        </div>
       ) : (
         <div className={'flex-1'}>
           <Button
