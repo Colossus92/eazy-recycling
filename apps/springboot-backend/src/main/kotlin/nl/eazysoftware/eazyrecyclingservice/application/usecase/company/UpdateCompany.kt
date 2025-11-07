@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.company
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 
 interface UpdateCompany {
   fun handle(cmd: UpdateCompanyCommand): CompanyResult
+  fun handleRestore(companyId: CompanyId, cmd: UpdateCompanyCommand): CompanyResult
 }
 
 @Service
@@ -47,5 +49,14 @@ class UpdateCompanyService(
     companies.update(updatedCompany)
 
     return CompanyResult(companyId = cmd.companyId.uuid)
+  }
+
+  @Transactional
+  override fun handleRestore(companyId: CompanyId, cmd: UpdateCompanyCommand): CompanyResult {
+    // First, restore the soft-deleted company
+    companies.restore(companyId)
+
+    // Then update it with the new data
+    return handle(cmd)
   }
 }

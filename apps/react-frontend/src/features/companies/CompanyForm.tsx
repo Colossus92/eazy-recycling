@@ -1,5 +1,5 @@
 import { FieldValues, useForm } from 'react-hook-form';
-import { FormEvent } from 'react';
+import { FormEvent, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { Company } from '@/api/services/companyService';
@@ -9,11 +9,20 @@ import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
 import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
+import { RestoreCompanyDialog } from './RestoreCompanyDialog';
+import { AxiosError } from 'axios';
 
 interface CompanyFormProps {
   onCancel: () => void;
-  onSubmit: (data: Company) => void;
+  onSubmit: (data: Company, restoreCompanyId?: string) => void;
   company?: Company;
+}
+
+interface SoftDeleteConflict {
+  message: string;
+  deletedCompanyId: string;
+  conflictField: string;
+  conflictValue: string;
 }
 
 export interface CompanyFormValues extends FieldValues {
@@ -57,6 +66,8 @@ export const CompanyForm = ({
   company,
 }: CompanyFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
+  const [softDeleteConflict, setSoftDeleteConflict] = useState<SoftDeleteConflict | null>(null);
+  const [pendingFormData, setPendingFormData] = useState<CompanyFormValues | null>(null);
 
   const {
     register,
@@ -88,9 +99,39 @@ export const CompanyForm = ({
         await onSubmit(toCompany(data));
         onCancel();
       } catch (error) {
+        // Check if this is a soft-delete conflict
+        if (error instanceof AxiosError && error.response?.status === 409) {
+          const conflictData = error.response.data as SoftDeleteConflict;
+          if (conflictData.deletedCompanyId) {
+            // This is a soft-delete conflict
+            setSoftDeleteConflict(conflictData);
+            setPendingFormData(data);
+            return; // Don't show error dialog, show restore dialog instead
+          }
+        }
         handleError(error);
       }
     })();
+  };
+
+  const handleRestoreConfirm = async () => {
+    if (!softDeleteConflict || !pendingFormData) return;
+    
+    try {
+      await onSubmit(toCompany(pendingFormData), softDeleteConflict.deletedCompanyId);
+      setSoftDeleteConflict(null);
+      setPendingFormData(null);
+      onCancel();
+    } catch (error) {
+      setSoftDeleteConflict(null);
+      setPendingFormData(null);
+      handleError(error);
+    }
+  };
+
+  const handleRestoreCancel = () => {
+    setSoftDeleteConflict(null);
+    setPendingFormData(null);
   };
 
   return (
@@ -255,6 +296,13 @@ export const CompanyForm = ({
         </div>
         <FormActionButtons onClick={onCancel} item={company} />
       </form>
+
+      <RestoreCompanyDialog
+        isOpen={softDeleteConflict !== null}
+        onClose={handleRestoreCancel}
+        onConfirm={handleRestoreConfirm}
+        conflictMessage={softDeleteConflict?.message || ''}
+      />
 
       <ErrorDialogComponent />
     </ErrorBoundary>

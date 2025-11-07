@@ -15,6 +15,9 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
   fun findAllByDeletedAtIsNull(): List<CompanyDto>
   fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
   fun findByProcessorIdAndDeletedAtIsNull(processorId: String): CompanyDto?
+  fun findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId: String): CompanyDto?
+  fun findByVihbIdAndDeletedAtNotNull(vihbId: String): CompanyDto?
+  fun findByProcessorIdAndDeletedAtNotNull(processorId: String): CompanyDto?
 }
 
 @Repository
@@ -62,5 +65,30 @@ class CompanyRepository(
   override fun existsByVihbNumber(vihbNumber: String): Boolean {
     return jpaRepository.findAllByDeletedAtIsNull()
       .any { it.vihbId == vihbNumber }
+  }
+
+  override fun findDeletedByChamberOfCommerceId(chamberOfCommerceId: String): Company? {
+    return jpaRepository.findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId)
+      ?.let { companyMapper.toDomain(it) }
+  }
+
+  override fun findDeletedByVihbNumber(vihbNumber: String): Company? {
+    return jpaRepository.findByVihbIdAndDeletedAtNotNull(vihbNumber)
+      ?.let { companyMapper.toDomain(it) }
+  }
+
+  override fun findDeletedByProcessorId(processorId: String): Company? {
+    return jpaRepository.findByProcessorIdAndDeletedAtNotNull(processorId)
+      ?.let { companyMapper.toDomain(it) }
+  }
+
+  override fun restore(companyId: CompanyId): Company {
+    val dto = jpaRepository.findByIdOrNull(companyId.uuid)
+      ?: throw IllegalArgumentException("Bedrijf met id ${companyId.uuid} niet gevonden")
+    if (dto.deletedAt == null) {
+      throw IllegalStateException("Bedrijf met id ${companyId.uuid} is niet verwijderd")
+    }
+    val restoredDto = jpaRepository.save(dto.copy(deletedAt = null))
+    return companyMapper.toDomain(restoredDto)
   }
 }

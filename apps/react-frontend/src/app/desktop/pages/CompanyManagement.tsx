@@ -124,7 +124,7 @@ export const CompanyManagement = () => {
           add: {
             open: isAdding,
             onClose: () => setIsAdding(false),
-            onSave: create,
+            onSave: (company: Omit<Company, 'id'>) => create(company),
           },
           update: {
             open: !!editing,
@@ -148,13 +148,26 @@ export const CompanyManagement = () => {
         }}
         additionalActions={additionalActions}
         expandableConfig={expandableConfig}
-        renderForm={(close, onSubmit, itemToEdit) => (
-          <CompanyForm
-            onCancel={close}
-            onSubmit={onSubmit}
-            company={itemToEdit}
-          />
-        )}
+        renderForm={(close, onSubmit, itemToEdit) => {
+          // Wrapper to handle the restoreCompanyId parameter
+          const handleSubmit = async (data: Company, restoreCompanyId?: string) => {
+            if (itemToEdit) {
+              // For updates, use the regular update function
+              await onSubmit(data);
+            } else {
+              // For creates, pass the restoreCompanyId to create function
+              await create(data, restoreCompanyId);
+            }
+          };
+
+          return (
+            <CompanyForm
+              onCancel={close}
+              onSubmit={handleSubmit}
+              company={itemToEdit}
+            />
+          );
+        }}
         renderEmptyState={(open) => (
           <EmptyState
             icon={BuildingOffice}

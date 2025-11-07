@@ -36,7 +36,8 @@ export const useCompanyCrud = () => {
   const [deleting, setDeleting] = useState<Company | undefined>(undefined);
 
   const createMutation = useMutation({
-    mutationFn: (item: Omit<Company, 'id'>) => companyService.create(item),
+    mutationFn: ({ item, restoreCompanyId }: { item: Omit<Company, 'id'>; restoreCompanyId?: string }) => 
+      companyService.create(item, restoreCompanyId),
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['companies'] })
@@ -62,9 +63,9 @@ export const useCompanyCrud = () => {
     },
   });
 
-  const create = async (item: Omit<Company, 'id'>): Promise<void> => {
+  const create = async (item: Omit<Company, 'id'>, restoreCompanyId?: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      createMutation.mutate(item, {
+      createMutation.mutate({ item, restoreCompanyId }, {
         onSuccess: () => resolve(),
         onError: (error) => reject(error),
       });

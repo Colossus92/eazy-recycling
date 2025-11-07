@@ -41,7 +41,32 @@ class CompanyController(
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  fun createCompany(@Valid @RequestBody request: CompanyRequest): CompanyResult {
+  fun createCompany(
+    @Valid @RequestBody request: CompanyRequest,
+    @RequestParam(required = false) restoreCompanyId: String?
+  ): CompanyResult {
+    // If restoreCompanyId is provided, restore the soft-deleted company and update it
+    if (restoreCompanyId != null) {
+      val companyId = CompanyId(UUID.fromString(restoreCompanyId))
+      val updateCommand = UpdateCompanyCommand(
+        companyId = companyId,
+        name = request.name,
+        chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },
+        vihbNumber = request.vihbId?.takeIf { it.isNotBlank() }?.let { VihbNumber(it) },
+        processorId = request.processorId?.let { ProcessorPartyId(it) },
+        address = Address(
+          streetName = StreetName(request.address.streetName),
+          buildingNumber = request.address.buildingNumber,
+          buildingNumberAddition = request.address.buildingNumberAddition,
+          postalCode = DutchPostalCode(request.address.postalCode),
+          city = City(request.address.city),
+          country = request.address.country
+        )
+      )
+      return updateCompanyUseCase.handleRestore(companyId, updateCommand)
+    }
+
+    // Otherwise, create a new company
     val command = CreateCompanyCommand(
       name = request.name,
       chamberOfCommerceId = request.chamberOfCommerceId?.takeIf { it.isNotBlank() },

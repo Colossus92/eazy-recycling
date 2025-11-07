@@ -19,7 +19,7 @@ class CreateCompanyService(
 
   @Transactional
   override fun handle(cmd: CreateCompanyCommand): CompanyResult {
-    // Validate uniqueness constraints
+    // Check for conflicts with active companies
     cmd.chamberOfCommerceId?.let { kvk ->
       if (companies.existsByChamberOfCommerceId(kvk)) {
         throw DuplicateKeyException("KVK nummer $kvk is al in gebruik.")
@@ -29,6 +29,40 @@ class CreateCompanyService(
     cmd.vihbNumber?.let { vihb ->
       if (companies.existsByVihbNumber(vihb.value)) {
         throw DuplicateKeyException("VIHB nummer ${vihb.value} is al in gebruik.")
+      }
+    }
+
+    // Check for conflicts with soft-deleted companies
+    cmd.chamberOfCommerceId?.let { kvk ->
+      companies.findDeletedByChamberOfCommerceId(kvk)?.let { deletedCompany ->
+        throw SoftDeletedCompanyConflictException(
+          deletedCompanyId = deletedCompany.companyId,
+          conflictField = "chamberOfCommerceId",
+          conflictValue = kvk,
+          message = "KVK nummer $kvk is gekoppeld aan een verwijderd bedrijf."
+        )
+      }
+    }
+
+    cmd.vihbNumber?.let { vihb ->
+      companies.findDeletedByVihbNumber(vihb.value)?.let { deletedCompany ->
+        throw SoftDeletedCompanyConflictException(
+          deletedCompanyId = deletedCompany.companyId,
+          conflictField = "vihbNumber",
+          conflictValue = vihb.value,
+          message = "VIHB nummer ${vihb.value} is gekoppeld aan een verwijderd bedrijf."
+        )
+      }
+    }
+
+    cmd.processorId?.let { processorId ->
+      companies.findDeletedByProcessorId(processorId.number)?.let { deletedCompany ->
+        throw SoftDeletedCompanyConflictException(
+          deletedCompanyId = deletedCompany.companyId,
+          conflictField = "processorId",
+          conflictValue = processorId.number,
+          message = "Verwerkersnummer ${processorId.number} is gekoppeld aan een verwijderd bedrijf."
+        )
       }
     }
 

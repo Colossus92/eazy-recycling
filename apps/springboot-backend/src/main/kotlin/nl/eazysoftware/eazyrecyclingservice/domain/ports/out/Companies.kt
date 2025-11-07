@@ -12,4 +12,8 @@ interface Companies {
   fun existsByChamberOfCommerceId(chamberOfCommerceId: String): Boolean
   fun existsByVihbNumber(vihbNumber: String): Boolean
   fun findByProcessorId(processorId: String): Company?
+  fun findDeletedByChamberOfCommerceId(chamberOfCommerceId: String): Company?
+  fun findDeletedByVihbNumber(vihbNumber: String): Company?
+  fun findDeletedByProcessorId(processorId: String): Company?
+  fun restore(companyId: CompanyId): Company
 }

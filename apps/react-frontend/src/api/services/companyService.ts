@@ -22,8 +22,9 @@ const mapCompanyToCompanyRequest = (company: Omit<Company, 'id'>): CompanyReques
 
 export const companyService = {
     getAll: (includeBranches: boolean = false) => companyApi.getCompanies(includeBranches).then((r) => r.data),
-    create: (c: Omit<Company, 'id'>) => {
-        return companyApi.createCompany(mapCompanyToCompanyRequest(c)).then((r) => r.data)
+    create: (c: Omit<Company, 'id'>, restoreCompanyId?: string) => {
+        const config = restoreCompanyId ? { params: { restoreCompanyId } } : undefined;
+        return companyApi.createCompany(mapCompanyToCompanyRequest(c), config).then((r) => r.data)
     },
     update: (company: Company) => {
         if (!company.id) {
