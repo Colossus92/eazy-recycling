@@ -11,6 +11,7 @@ create table if not exists companies (
                            street_name text,
                            processor_id text,
                            vihb_id text unique,
+                           deleted_at timestamp with time zone,
                            primary key (id)
 );
 
