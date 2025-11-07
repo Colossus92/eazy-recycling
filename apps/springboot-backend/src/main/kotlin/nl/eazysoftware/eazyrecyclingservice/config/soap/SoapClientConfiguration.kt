@@ -1,6 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.config.soap
 
+import jakarta.annotation.PostConstruct
 import jakarta.xml.ws.BindingProvider
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.MeldingService
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.MeldingServiceSoap
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenAfvalstroomNummerService
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenAfvalstroomNummerServiceSoap
 import org.slf4j.LoggerFactory
@@ -58,6 +61,15 @@ class SoapClientConfiguration {
     }
   }
 
+  @Bean("amiceMeldingUrl")
+  fun amiceMeldingUrl(): String? {
+    return if (amiceBaseUrl.isNotBlank()) {
+      "$amiceBaseUrl/MeldingService.asmx"
+    } else {
+      null
+    }
+  }
+
   @Bean
   fun toetsenAfvalstroomNummerServiceSoap(@Value("#{@amiceToetsenUrl}") serviceUrl: String?): ToetsenAfvalstroomNummerServiceSoap? {
     if (serviceUrl.isNullOrBlank()) {
@@ -66,16 +78,6 @@ class SoapClientConfiguration {
     }
 
     logger.info("Initializing Amice SOAP client for URL: $serviceUrl")
-
-    // Configure SSL context with client certificate if enabled
-    if (certificateEnabled) {
-      configureSslContext()
-    }
-
-    // Configure HTTP Basic Authentication
-    if (username.isNotBlank() && password.isNotBlank()) {
-      configureBasicAuthentication()
-    }
 
     val service = ToetsenAfvalstroomNummerService(
       URI(serviceUrl).toURL()
@@ -101,9 +103,61 @@ class SoapClientConfiguration {
     requestContext["com.sun.xml.ws.connect.timeout"] = 30000 // 30 seconds
     requestContext["com.sun.xml.ws.request.timeout"] = 60000 // 60 seconds
 
-    logger.info("SOAP client initialized successfully")
+    logger.info("ToetsenAfvalstroomNummer SOAP client initialized successfully")
     return port
   }
+
+  @Bean
+  fun meldingServiceSoap(@Value("#{@amiceMeldingUrl}") serviceUrl: String?): MeldingServiceSoap? {
+    if (serviceUrl.isNullOrBlank()) {
+      logger.warn("Amice Melding SOAP client not initialized: amice.url is not configured")
+      return null
+    }
+
+    logger.info("Initializing Amice Melding SOAP client for URL: $serviceUrl")
+
+    // SSL and authentication are already configured globally by toetsenAfvalstroomNummerServiceSoap
+    val service = MeldingService(
+      URI(serviceUrl).toURL()
+    )
+
+    val port = service.meldingServiceSoap
+
+    // Configure the binding provider
+    val bindingProvider = port as BindingProvider
+    val requestContext = bindingProvider.requestContext
+
+    // Set endpoint URL
+    requestContext[BindingProvider.ENDPOINT_ADDRESS_PROPERTY] = serviceUrl
+
+    // Set HTTP Basic Authentication credentials
+    if (username.isNotBlank() && password.isNotBlank()) {
+      requestContext[BindingProvider.USERNAME_PROPERTY] = username
+      requestContext[BindingProvider.PASSWORD_PROPERTY] = password
+      logger.info("Configured HTTP Basic Authentication for Melding service")
+    }
+
+    // Configure timeouts
+    requestContext["com.sun.xml.ws.connect.timeout"] = 30000 // 30 seconds
+    requestContext["com.sun.xml.ws.request.timeout"] = 60000 // 60 seconds
+
+    logger.info("MeldingService SOAP client initialized successfully")
+    return port
+  }
+
+  @PostConstruct
+  fun initializeGlobalConfiguration() {
+    // Configure SSL context with client certificate if enabled
+    if (certificateEnabled) {
+      configureSslContext()
+    }
+
+    // Configure HTTP Basic Authentication globally
+    if (username.isNotBlank() && password.isNotBlank()) {
+      configureBasicAuthentication()
+    }
+  }
+
 
   private fun configureBasicAuthentication() {
     logger.info("Configuring HTTP Basic Authentication for user: $username")

@@ -1,0 +1,43 @@
+title Monthly LMA declaration
+
+
+control Cron
+boundary API
+rparticipant "DeclarationService" as DS
+rparticipant "FirstReceivalService" as FRS
+rparticipant "MonthlyDeclarationService" as MDS
+database DB
+rparticipant "LMASessionervice" as LSS
+boundary LMA
+
+
+
+
+Cron->Cron: Month +2 weeks
+Cron->API: declare(date)
+API->DS: declare(date)
+DS->FRS: trigger(date)
+FRS->DB: getNewWasteStreamWeights()
+DB-->FRS: new waste stream wights
+FRS->FRS: construct declarations
+FRS->DB: store declarations
+
+
+DS->MDS: trigger(date)
+MDS->DB: getMontlyWeights(date)
+DB-->MDS: monthly weights
+MDS->MDS: construct declarations
+FRS->DB: Store declarations
+
+LSS->DB: check for new declarations
+DB-->LSS: new declarations
+LSS->LMA: submit declarations
+LMA-->LSS: response status + id
+LSS->DB: store sessions
+
+Cron->LSS: check session status
+LSS->DB: check open sessions
+DB-->LSS: open sessions
+LSS->LMA: request session status
+LMA-->LSS: return session status
+LSS->DB: update sessions status

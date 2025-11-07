@@ -77,6 +77,9 @@ dependencies {
     // EBA Schema Library
     implementation("nl.eazysoftware:eba-schema:0.0.1")
 
+    // Amice SOAP Client Libraries
+    implementation("nl.eazysoftware:amice-toetsen-client:0.0.1")
+
     // Environment variables
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
@@ -161,7 +164,7 @@ tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
 // Configure WSDL2Java for SOAP client generation
 wsdl2java {
     wsdlDir = layout.projectDirectory.dir("src/main/resources/amice")
-    includes = listOf("ToetsenAfvalstroomnummerService.wsdl")
+    includes = listOf("ToetsenAfvalstroomnummerService.wsdl", "MeldingService.wsdl")
     generatedSourceDir = layout.buildDirectory.dir("generated/sources/wsdl2java")
     packageName = "nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated"
 }

@@ -457,17 +457,17 @@
       <wsdl:output message="tns:EersteOntvangstMeldingSoapOut"/>
     </wsdl:operation>
     <wsdl:operation name="MaandelijkseOntvangstMelding">
-      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met maandelijkse ontvangstmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
       <wsdl:input message="tns:MaandelijkseOntvangstMeldingSoapIn"/>
       <wsdl:output message="tns:MaandelijkseOntvangstMeldingSoapOut"/>
     </wsdl:operation>
     <wsdl:operation name="NulMelding">
-      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
       <wsdl:input message="tns:NulMeldingSoapIn"/>
       <wsdl:output message="tns:NulMeldingSoapOut"/>
     </wsdl:operation>
     <wsdl:operation name="AfgifteMelding">
-      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met afgiftemeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met afgiftemeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
       <wsdl:input message="tns:AfgifteMeldingSoapIn"/>
       <wsdl:output message="tns:AfgifteMeldingSoapOut"/>
     </wsdl:operation>
@@ -484,7 +484,7 @@
   </wsdl:portType>
   <wsdl:portType name="MeldingServiceHttpGet">
     <wsdl:operation name="NulMelding">
-      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
       <wsdl:input message="tns:NulMeldingHttpGetIn"/>
       <wsdl:output message="tns:NulMeldingHttpGetOut"/>
     </wsdl:operation>
@@ -496,7 +496,7 @@
   </wsdl:portType>
   <wsdl:portType name="MeldingServiceHttpPost">
     <wsdl:operation name="NulMelding">
-      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br>Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br><b>Returns</b><br>'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"><b>Omschrijving</b><br />Deze functie biedt een lijst met maandelijkse ontvangstnulmeldingen aan het AMICE systeem aan. Terugkoppeling over de inhoud van de lijst met meldingen gebeurt met een XML-bericht via E-mail.<br /><b>Returns</b><br />'True' indien de lijst met meldingen is ontvangen, 'False' indien de lijst met meldingen niet kan worden verwerkt in het AMICE systeem.</wsdl:documentation>
       <wsdl:input message="tns:NulMeldingHttpPostIn"/>
       <wsdl:output message="tns:NulMeldingHttpPostOut"/>
     </wsdl:operation>
