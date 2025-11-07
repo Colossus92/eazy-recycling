@@ -9,6 +9,7 @@ import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
 import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { RestoreCompanyDialog } from './RestoreCompanyDialog';
 import { AxiosError } from 'axios';
 
@@ -164,53 +165,76 @@ export const CompanyForm = ({
             value={company?.name}
           />
           <div className={'flex items-start gap-4 self-stretch'}>
-            <div className={'w-[70%]'}>
-              <TextFormField
-                title={'Straat'}
-                placeholder={'Vul straat in'}
-                formHook={{
-                  register,
-                  name: 'street',
-                  rules: {
-                    required: 'Straat is verplicht',
-                    validate: (value: string) => {
-                      const trimmed = value?.trim() || '';
-                      return trimmed !== '' || 'Straat mag niet leeg zijn';
-                    },
-                  },
-                  errors,
-                }}
-                value={company?.address.street}
+            <div className={'flex items-start flex-grow w-1/2'}>
+              <PostalCodeFormField
+                register={register}
+                setValue={setValue}
+                name="postalCode"
+                errors={errors}
+                value={company?.address.postalCode}
               />
             </div>
-            <div className={'flex-1'}>
-              <TextFormField
-                title={'Huisnummer'}
-                placeholder={'Nr.'}
+            <div className={'flex items-start gap-4 w-1/2'}>
+              <NumberFormField
+                title={'Nummer'}
+                placeholder={''}
+                step={1}
                 formHook={{
                   register,
                   name: 'houseNumber',
                   rules: {
                     required: 'Huisnummer is verplicht',
-                    validate: (value: string) => {
-                      const trimmed = value?.trim() || '';
-                      return trimmed !== '' || 'Huisnummer mag niet leeg zijn';
+                    min: {
+                      value: 1,
+                      message: 'Ongeldig'
                     },
+                    maxLength: {
+                      value: 10,
+                      message: 'Huisnummer mag maximaal 10 tekens bevatten'
+                    }
                   },
                   errors,
                 }}
                 value={company?.address.houseNumber}
               />
+              <TextFormField
+                title={'Toevoeging'}
+                placeholder={''}
+                formHook={{
+                  register,
+                  name: 'houseNumberAddition',
+                  rules: {
+                    maxLength: {
+                      value: 6,
+                      message: 'Toevoeging mag maximaal 6 tekens bevatten'
+                    }
+                  },
+                  errors,
+                }}
+                value={company?.address.houseNumberAddition}
+              />
             </div>
           </div>
           <div className={'flex items-start gap-4 self-stretch'}>
-            <PostalCodeFormField
-              register={register}
-              setValue={setValue}
-              name="postalCode"
-              errors={errors}
-              value={company?.address.postalCode}
+            <TextFormField
+              title={'Straat'}
+              placeholder={'Vul straatnaam in'}
+              formHook={{
+                register,
+                name: 'street',
+                rules: {
+                  required: 'Straat is verplicht',
+                  maxLength: {
+                    value: 43,
+                    message: 'Straatnaam mag maximaal 43 tekens bevatten'
+                  }
+                },
+                errors,
+              }}
+              value={company?.address.street}
             />
+          </div>
+          <div className={'flex items-start gap-4 self-stretch'}>
             <TextFormField
               title={'Plaats'}
               placeholder={'Vul Plaats in'}
@@ -219,10 +243,10 @@ export const CompanyForm = ({
                 name: 'city',
                 rules: {
                   required: 'Plaats is verplicht',
-                  validate: (value: string) => {
-                    const trimmed = value?.trim() || '';
-                    return trimmed !== '' || 'Plaats mag niet leeg zijn';
-                  },
+                  maxLength: {
+                    value: 24,
+                    message: 'Plaats mag maximaal 24 tekens bevatten'
+                  }
                 },
                 errors,
               }}
