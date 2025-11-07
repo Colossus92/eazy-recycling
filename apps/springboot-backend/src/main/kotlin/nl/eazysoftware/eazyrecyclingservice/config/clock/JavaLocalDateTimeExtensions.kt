@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.config.clock
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toKotlinInstant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import kotlin.time.Instant
+import kotlin.time.toKotlinInstant
 
 fun LocalDateTime.toCetKotlinInstant(): Instant {
   return this.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant()

@@ -1,8 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
-import kotlinx.datetime.Clock
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatusPolicy
@@ -22,6 +20,8 @@ import java.nio.ByteBuffer
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.time.Clock
+import kotlin.time.toKotlinInstant
 
 @Repository
 class WasteStreamQueryRepository(

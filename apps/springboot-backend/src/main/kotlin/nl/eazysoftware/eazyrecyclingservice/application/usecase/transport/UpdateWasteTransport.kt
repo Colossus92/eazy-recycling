@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
 import jakarta.persistence.EntityNotFoundException
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
@@ -10,6 +9,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 interface UpdateWasteTransport {
   fun handle(cmd: UpdateWasteTransportCommand): UpdateWasteTransportResult
@@ -69,7 +70,7 @@ class UpdateWasteTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = existingTransport.transportHours,
-      updatedAt = kotlinx.datetime.Clock.System.now(),
+      updatedAt = Clock.System.now(),
       sequenceNumber = existingTransport.sequenceNumber
     )
 

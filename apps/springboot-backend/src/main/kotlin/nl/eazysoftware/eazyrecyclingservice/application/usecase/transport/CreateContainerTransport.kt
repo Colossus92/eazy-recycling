@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDomain
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -14,6 +13,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 interface CreateContainerTransport {
   fun handle(cmd: CreateContainerTransportCommand): CreateContainerTransportResult
@@ -69,7 +70,7 @@ class CreateContainerTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = null,
-      updatedAt = kotlinx.datetime.Clock.System.now(),
+      updatedAt = Clock.System.now(),
       sequenceNumber = 9999 // Create as last in line
     )
 

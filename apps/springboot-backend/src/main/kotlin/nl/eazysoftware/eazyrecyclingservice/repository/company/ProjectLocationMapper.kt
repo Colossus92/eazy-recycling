@@ -1,8 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.company
 
 import jakarta.persistence.EntityManager
-import kotlinx.datetime.toJavaInstant
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
@@ -12,6 +10,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectL
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.stereotype.Component
+import kotlin.time.toJavaInstant
+import kotlin.time.toKotlinInstant
 
 @Component
 class ProjectLocationMapper(

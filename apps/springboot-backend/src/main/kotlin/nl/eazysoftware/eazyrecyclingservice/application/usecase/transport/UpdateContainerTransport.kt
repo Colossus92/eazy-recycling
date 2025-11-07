@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
 import jakarta.persistence.EntityNotFoundException
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDomain
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -15,6 +14,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 interface UpdateContainerTransport {
   fun handle(cmd: UpdateContainerTransportCommand): UpdateContainerTransportResult
@@ -81,7 +82,7 @@ class UpdateContainerTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = existingTransport.transportHours,
-      updatedAt = kotlinx.datetime.Clock.System.now(),
+      updatedAt = Clock.System.now(),
       sequenceNumber = existingTransport.sequenceNumber
     )
 

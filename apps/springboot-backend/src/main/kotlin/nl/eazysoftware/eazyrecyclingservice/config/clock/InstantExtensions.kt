@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.config.clock
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.Instant as KotlinxInstant
 import java.time.Instant as JavaInstant
+import kotlin.time.Instant as KotlinxInstant
 
 /**
  * Extension functions for converting between java.time.Instant (JPA) and kotlinx.datetime.Instant (domain).

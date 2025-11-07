@@ -47,6 +47,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.stream.Stream
+import kotlin.time.Clock
 
 class TransportControllerSecurityTest : BaseIntegrationTest() {
 
@@ -285,7 +286,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
                     city = City("Test City")
                 )
             ),
-            pickupDateTime = kotlinx.datetime.Clock.System.now(),
+            pickupDateTime = Clock.System.now(),
             deliveryLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
                 address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
                     streetName = StreetName("Test Street"),
@@ -294,7 +295,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
                     city = City("Test City")
                 )
             ),
-            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            deliveryDateTime = Clock.System.now(),
             transportType = TransportType.CONTAINER,
             wasteContainer = null,
             containerOperation = ContainerOperation.DELIVERY,
@@ -302,7 +303,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             driver = UserId(testDriverId),
             note = Note("Test note"),
             transportHours = null,
-            updatedAt = kotlinx.datetime.Clock.System.now(),
+            updatedAt = Clock.System.now(),
             sequenceNumber = 1
         )
         whenever(containerTransports.findById(TransportId(testTransportId))).thenReturn(mockContainerTransport)
@@ -312,8 +313,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             transportId = TransportId(testTransportId),
             displayNumber = null,
             carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id),
-            pickupDateTime = kotlinx.datetime.Clock.System.now(),
-            deliveryDateTime = kotlinx.datetime.Clock.System.now(),
+            pickupDateTime = Clock.System.now(),
+            deliveryDateTime = Clock.System.now(),
             transportType = TransportType.WASTE,
             goodsItem = GoodsItem(
                 wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
@@ -327,7 +328,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             driver = UserId(testDriverId),
             note = Note("Test note"),
             transportHours = null,
-            updatedAt = kotlinx.datetime.Clock.System.now(),
+            updatedAt = Clock.System.now(),
             sequenceNumber = 1
         )
         whenever(wasteTransports.findById(TransportId(testTransportId))).thenReturn(mockWasteTransport)
@@ -399,7 +400,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
             note = "Test transport",
             transportHours = null,
             sequenceNumber = 1,
-            updatedAt = kotlinx.datetime.Clock.System.now(),
+            updatedAt = Clock.System.now(),
             wasteContainer = null,
             containerOperation = ContainerOperation.DELIVERY
         )

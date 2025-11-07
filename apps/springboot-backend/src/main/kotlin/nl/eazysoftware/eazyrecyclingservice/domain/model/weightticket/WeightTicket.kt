@@ -1,13 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class WeightTicket(
   val id: WeightTicketId,

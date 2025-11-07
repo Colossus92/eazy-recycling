@@ -1,10 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class WasteStream(
   val wasteStreamNumber: WasteStreamNumber,

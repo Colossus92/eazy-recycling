@@ -1,8 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.transport
 
 import jakarta.persistence.EntityManager
-import kotlinx.datetime.toJavaInstant
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -23,6 +21,8 @@ import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteConta
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
 import org.springframework.stereotype.Component
 import java.time.ZoneId
+import kotlin.time.toJavaInstant
+import kotlin.time.toKotlinInstant
 
 @Component
 class WasteTransportMapper(
@@ -82,7 +82,7 @@ class WasteTransportMapper(
     return WasteTransport(
       transportId = TransportId(dto.id),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
-      carrierParty = CompanyId(dto.carrierParty.id!!),
+      carrierParty = CompanyId(dto.carrierParty.id),
       pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
       deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
       transportType = dto.transportType,

@@ -1,10 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.WasteContainerView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportStatus
 import java.util.*
+import kotlin.time.Instant
 
 /**
  * View model for container transport details.

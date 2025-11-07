@@ -52,9 +52,7 @@ dependencies {
   // Database
   runtimeOnly("org.postgresql:postgresql:42.7.5")
   runtimeOnly("com.h2database:h2:2.3.232")
-  implementation(platform("io.github.jan-tennert.supabase:bom:3.1.4")) {
-    (this as ExternalModuleDependency).exclude("org.jetbrains.kotlinx", "kotlinx-serialization-core-jvm")
-  }
+  implementation(platform("io.github.jan-tennert.supabase:bom:3.2.6"))
   implementation("io.github.jan-tennert.supabase:postgrest-kt")
   implementation("io.github.jan-tennert.supabase:auth-kt")
   implementation("io.github.jan-tennert.supabase:functions-kt")
@@ -64,15 +62,15 @@ dependencies {
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.2")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate6:2.19.0")
   implementation("io.ktor:ktor-client-cio:3.1.2")
-  implementation(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.0"))
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.8.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.8.0")
-  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.8.0")
+  implementation(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.9.0"))
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
   implementation("jakarta.validation:jakarta.validation-api:3.1.1")
 
-  implementation("org.apache.pdfbox:pdfbox:2.0.30")
   // Code
-  implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.10")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.21")
 
   // EBA Schema Library
   implementation("nl.eazysoftware:eba-schema:0.0.1")
@@ -85,7 +83,7 @@ dependencies {
   kapt("org.mapstruct:mapstruct-processor:1.6.3")
 
   // Documentation
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
 
   // Testing
   testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion") {
@@ -110,7 +108,10 @@ allprojects {
 
 kotlin {
   compilerOptions {
-    freeCompilerArgs.addAll("-Xjsr305=strict")
+    freeCompilerArgs.addAll(
+      "-Xjsr305=strict",
+                  "-opt-in=kotlin.time.ExperimentalTime"
+    )
   }
 }
 

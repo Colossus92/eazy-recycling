@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.company
 
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
+import kotlin.time.Instant
 
 data class Company(
   val companyId: CompanyId,

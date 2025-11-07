@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport
 
 import jakarta.validation.Valid
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateWasteTransport
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateWasteTransportCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateWasteTransport
@@ -26,6 +25,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.ZoneId
 import java.util.*
+import kotlin.time.Clock
+import kotlin.time.toKotlinInstant
 
 @RestController
 @RequestMapping("/transport")
@@ -112,7 +113,7 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
     carrierParty = CompanyId(this.carrierPartyId),
     pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
-      ?: kotlinx.datetime.Clock.System.now(),
+      ?: Clock.System.now(),
     transportType = this.transportType,
     goodsItem = GoodsItem(
       wasteStreamNumber = WasteStreamNumber(this.wasteStreamNumber),
@@ -141,7 +142,7 @@ fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTranspo
     carrierParty = CompanyId(this.carrierPartyId),
     pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
-      ?: kotlinx.datetime.Clock.System.now(),
+      ?: Clock.System.now(),
     transportType = this.transportType,
     goodsItem = GoodsItem(
       wasteStreamNumber = WasteStreamNumber(this.wasteStreamNumber),

@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.EntityManager
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
@@ -10,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMap
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import kotlin.time.toKotlinInstant
 
 @Repository
 class WeightTicketQueryRepository(

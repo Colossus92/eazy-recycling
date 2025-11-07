@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
-import kotlinx.datetime.toKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -12,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import org.springframework.stereotype.Component
+import kotlin.time.toKotlinInstant
 
 @Component
 class WeightTicketMapper(
@@ -24,7 +24,7 @@ class WeightTicketMapper(
     return WeightTicket(
       id = WeightTicketId(dto.id),
       carrierParty = dto.carrierParty?.id?.let { CompanyId(it) },
-      consignorParty = Consignor.Company(CompanyId(dto.consignorParty.id!!)),
+      consignorParty = Consignor.Company(CompanyId(dto.consignorParty.id)),
       direction = dto.direction,
       pickupLocation = dto.pickupLocation?.let { pickupLocationMapper.toDomain(it) },
       deliveryLocation = dto.deliveryLocation?.let { pickupLocationMapper.toDomain(it) },

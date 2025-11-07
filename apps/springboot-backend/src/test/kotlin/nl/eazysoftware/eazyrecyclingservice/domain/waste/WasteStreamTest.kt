@@ -1,7 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -16,6 +14,8 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
 import java.util.*
 import kotlin.test.assertFailsWith
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class WasteStreamTest {
 

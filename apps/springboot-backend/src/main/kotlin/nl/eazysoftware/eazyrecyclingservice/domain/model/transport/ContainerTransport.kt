@@ -1,12 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.transport
 
-import kotlinx.datetime.Instant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 class ContainerTransport(
   val transportId: TransportId,

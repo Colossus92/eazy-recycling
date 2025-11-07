@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
 import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.Instant
 import kotlinx.datetime.plus
 import nl.eazysoftware.eazyrecyclingservice.config.clock.TimeConfiguration
+import kotlin.time.Instant
 
 enum class WasteStreamStatus {
   DRAFT,

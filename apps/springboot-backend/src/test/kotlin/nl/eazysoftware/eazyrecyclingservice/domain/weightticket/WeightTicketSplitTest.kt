@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
-import kotlinx.datetime.Clock
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -16,6 +15,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import java.math.BigDecimal
 import java.util.*
 import kotlin.test.assertFailsWith
+import kotlin.time.Clock
 
 class WeightTicketSplitTest {
 
