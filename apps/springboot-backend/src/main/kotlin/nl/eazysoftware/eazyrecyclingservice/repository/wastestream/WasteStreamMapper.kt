@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
@@ -16,6 +15,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import org.hibernate.Hibernate
 import org.springframework.stereotype.Component
+import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component

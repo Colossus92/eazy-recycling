@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.company
 
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
@@ -12,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.springframework.stereotype.Component
+import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component

@@ -21,7 +21,7 @@ class ProjectLocationMapper(
   fun toDomain(dto: CompanyProjectLocationDto): CompanyProjectLocation {
     return CompanyProjectLocation(
       id = ProjectLocationId(dto.id),
-      companyId = CompanyId(dto.company.id!!),
+      companyId = CompanyId(dto.company.id),
       address = Address(
         streetName = StreetName(dto.streetName),
         buildingNumber = dto.buildingNumber,

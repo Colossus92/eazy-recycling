@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -11,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import org.springframework.stereotype.Component
+import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
