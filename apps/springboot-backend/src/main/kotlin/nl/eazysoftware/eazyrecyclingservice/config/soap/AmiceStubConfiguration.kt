@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.config.soap
 
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.*
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.*
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummerServiceSoap
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

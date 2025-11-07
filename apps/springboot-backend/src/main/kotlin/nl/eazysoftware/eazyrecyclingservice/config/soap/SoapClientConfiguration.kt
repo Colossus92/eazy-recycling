@@ -2,10 +2,10 @@ package nl.eazysoftware.eazyrecyclingservice.config.soap
 
 import jakarta.annotation.PostConstruct
 import jakarta.xml.ws.BindingProvider
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.MeldingService
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.MeldingServiceSoap
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenAfvalstroomNummerService
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.ToetsenAfvalstroomNummerServiceSoap
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MeldingService
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MeldingServiceSoap
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummerService
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummerServiceSoap
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty

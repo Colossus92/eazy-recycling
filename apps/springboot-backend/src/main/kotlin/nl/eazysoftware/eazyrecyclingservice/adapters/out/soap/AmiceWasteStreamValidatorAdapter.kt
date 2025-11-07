@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.out.soap
 
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.*
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
