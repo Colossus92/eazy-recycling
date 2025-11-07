@@ -1,5 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.company
 
+import kotlinx.coroutines.delay
+import kotlinx.datetime.toKotlinInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toJavaInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
@@ -17,7 +20,7 @@ class CompanyMapper {
 
   fun toDomain(dto: CompanyDto): Company {
     return Company(
-      companyId = CompanyId(dto.id!!),
+      companyId = CompanyId(dto.id),
       name = dto.name,
       chamberOfCommerceId = dto.chamberOfCommerceId,
       vihbNumber = dto.vihbId?.let { VihbNumber(it) },
@@ -29,7 +32,8 @@ class CompanyMapper {
         postalCode = DutchPostalCode(dto.address.postalCode),
         city = City(dto.address.city),
         country = dto.address.country
-      )
+      ),
+      deletedAt = dto.deletedAt?.toKotlinInstant(),
     )
   }
 
@@ -47,7 +51,8 @@ class CompanyMapper {
         postalCode = domain.address.postalCode.value,
         city = domain.address.city.value,
         country = domain.address.country
-      )
+      ),
+      deletedAt = domain.deletedAt?.toJavaInstant()
     )
   }
 }

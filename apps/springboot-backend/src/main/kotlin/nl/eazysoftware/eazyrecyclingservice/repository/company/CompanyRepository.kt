@@ -7,17 +7,20 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.time.Instant
 import java.util.*
 
-interface CompanyJpaRepository: JpaRepository<CompanyDto, UUID> {
+interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
 
-    fun findByProcessorId(processorId: String): CompanyDto?
+  fun findAllByDeletedAtIsNull(): List<CompanyDto>
+  fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
+  fun findByProcessorIdAndDeletedAtIsNull(processorId: String): CompanyDto?
 }
 
 @Repository
 class CompanyRepository(
-    private val jpaRepository: CompanyJpaRepository,
-    private val companyMapper: CompanyMapper,
+  private val jpaRepository: CompanyJpaRepository,
+  private val companyMapper: CompanyMapper,
 ) : Companies {
 
   override fun create(company: Company): Company {
@@ -27,17 +30,17 @@ class CompanyRepository(
   }
 
   override fun findAll(): List<Company> {
-    return jpaRepository.findAll()
+    return jpaRepository.findAllByDeletedAtIsNull()
       .map { companyMapper.toDomain(it) }
   }
 
   override fun findById(companyId: CompanyId): Company? {
-    return jpaRepository.findByIdOrNull(companyId.uuid)
+    return jpaRepository.findByIdAndDeletedAtIsNull((companyId.uuid))
       ?.let { companyMapper.toDomain(it) }
   }
 
   override fun findByProcessorId(processorId: String) =
-    jpaRepository.findByProcessorId(processorId)
+    jpaRepository.findByProcessorIdAndDeletedAtIsNull(processorId)
       ?.let { companyMapper.toDomain(it) }
 
   override fun update(company: Company): Company {
@@ -47,16 +50,17 @@ class CompanyRepository(
   }
 
   override fun deleteById(companyId: CompanyId) {
-    jpaRepository.deleteById(companyId.uuid)
+    jpaRepository.findByIdAndDeletedAtIsNull((companyId.uuid))
+      ?.let { jpaRepository.save(it.copy(deletedAt = Instant.now())) }
   }
 
   override fun existsByChamberOfCommerceId(chamberOfCommerceId: String): Boolean {
-    return jpaRepository.findAll()
+    return jpaRepository.findAllByDeletedAtIsNull()
       .any { it.chamberOfCommerceId == chamberOfCommerceId }
   }
 
   override fun existsByVihbNumber(vihbNumber: String): Boolean {
-    return jpaRepository.findAll()
+    return jpaRepository.findAllByDeletedAtIsNull()
       .any { it.vihbId == vihbNumber }
   }
 }

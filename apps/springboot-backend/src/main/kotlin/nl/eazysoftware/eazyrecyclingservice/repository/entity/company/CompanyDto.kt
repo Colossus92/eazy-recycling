@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.entity.company
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -21,9 +21,13 @@ data class CompanyDto(
     val processorId: String? = null,
 
     val name: String,
+
     @Embedded
     val address: AddressDto,
 
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "deleted_at", nullable = true)
+    val deletedAt: Instant? = null,
+
+    val updatedAt: Instant = Instant.now(),
 
     )
