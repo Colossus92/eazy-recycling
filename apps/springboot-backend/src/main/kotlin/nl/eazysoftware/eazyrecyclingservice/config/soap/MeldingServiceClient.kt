@@ -2,6 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.config.soap
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MeldingSessie
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MeldingSessieResponse
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessie
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessieResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -18,15 +20,21 @@ class MeldingServiceClient(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  private val soapAction = "http://amice.lma.nl/AmiceWebServices3/MeldingSessie"
-
   fun apply(body: MeldingSessie): MeldingSessieResponse {
     logger.info("Calling SOAP service to declare waste streams")
 
-    return webServiceTemplate.marshalSendAndReceive(
-      "$amiceBaseUrl/MeldingService.asmx",
-      body,
-      SoapActionCallback(soapAction)
-    ) as MeldingSessieResponse
+    return marshalSendAndReceive(body, "http://amice.lma.nl/AmiceWebServices3/MeldingSessie") as MeldingSessieResponse
   }
+
+  fun requestStatus(body: OpvragenResultaatVerwerkingMeldingSessie): OpvragenResultaatVerwerkingMeldingSessieResponse {
+    logger.info("Calling SOAP service to request status for waste streams")
+
+    return marshalSendAndReceive(body, "http://amice.lma.nl/AmiceWebServices3/OpvragenResultaatVerwerkingMeldingSessie") as OpvragenResultaatVerwerkingMeldingSessieResponse
+  }
+
+  private fun marshalSendAndReceive(body: Any, soapAction: String): Any? = webServiceTemplate.marshalSendAndReceive(
+    "$amiceBaseUrl/MeldingService.asmx",
+    body,
+    SoapActionCallback(soapAction)
+  )
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.YearMonth
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessieResponse
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
@@ -13,6 +14,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyI
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SessionResults
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -26,7 +28,13 @@ import java.util.*
 @RequestMapping("/amice")
 class AmiceController(
   private val firstReceivalDeclarator: FirstReceivalDeclarator,
+  private val sessionResults: SessionResults,
 ) {
+
+  @GetMapping("/{sessionId}")
+  fun requestSessionResult(@PathVariable sessionId: UUID): OpvragenResultaatVerwerkingMeldingSessieResponse {
+    return sessionResults.retrieve(sessionId)
+  }
 
   /**
    * Test endpoint for declaring first receivals to Amice.
@@ -115,7 +123,6 @@ class AmiceController(
   }
 
   // Request/Response DTOs
-
   data class DeclareFirstReceivalsRequest(
     @field:NotEmpty(message = "At least one declaration is required")
     val declarations: List<ReceivalDeclarationRequest>

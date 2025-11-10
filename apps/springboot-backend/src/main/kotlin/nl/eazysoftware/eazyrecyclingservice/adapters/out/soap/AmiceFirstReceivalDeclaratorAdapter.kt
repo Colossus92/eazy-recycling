@@ -129,8 +129,6 @@ class AmiceFirstReceivalDeclaratorAdapter(
         message.locatieHerkomstPostcode = location.postalCode().value
         message.locatieHerkomstHuisnummer = location.buildingNumber()
         message.locatieHerkomstHuisnummerToevoeging = location.buildingNumberAddition()
-        message.locatieHerkomstWoonplaats = location.city()
-        message.locatieHerkomstStraatnaam = location.streetName()
         message.locatieHerkomstLand = location.country()
       }
       is Location.ProximityDescription -> {
