@@ -83,12 +83,14 @@ dependencies {
   kapt("org.mapstruct:mapstruct-processor:1.6.3")
 
   // Documentation
+  @Suppress("GradleDependency")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
 
   // Testing
   testImplementation("org.springframework.boot:spring-boot-starter-test:$springVersion") {
     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
   }
+  @Suppress("GradleDependency")
   testImplementation("org.springframework.boot:spring-boot-testcontainers:$springVersion")
   testImplementation("org.springframework.security:spring-security-test:6.5.6")
   testImplementation("org.testcontainers:postgresql:1.21.3")
