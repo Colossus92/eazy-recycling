@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 
 interface FirstReceivalDeclarator {
@@ -11,7 +10,7 @@ interface FirstReceivalDeclarator {
 
 data class ReceivalDeclaration(
   val wasteStream: WasteStream,
-  val transporters: List<Company>,
+  val transporters: List<String>,
   val totalWeight: Int,
   val totalShipments: Short,
   val yearMonth: YearMonth

@@ -78,9 +78,8 @@ class AmiceFirstReceivalDeclaratorAdapter(
       message.bemiddelaar = mapCompanyToBedrijf(it)
     }
 
-    // Transporters (Vervoerders) - comma-separated list of chamber of commerce numbers
+    // Transporters (Vervoerders) - comma-separated list of vihb numbers
     message.vervoerders = receivalDeclaration.transporters
-      .mapNotNull { it.chamberOfCommerceId }
       .joinToString(",")
 
     // Waste type information

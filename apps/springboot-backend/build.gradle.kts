@@ -44,11 +44,19 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springVersion")
   implementation("org.springframework.ws:spring-ws-core:4.0.11")
 
+  // Apache HttpClient for WebServiceTemplate with SSL support
+  implementation("org.apache.httpcomponents:httpclient:4.5.14")
+  implementation("org.springframework.ws:spring-ws-support:4.0.11")
+
   // JAXB for SOAP client
   implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.4")
   implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
   implementation("jakarta.xml.ws:jakarta.xml.ws-api:4.0.2")
+  implementation("com.sun.xml.ws:jaxws-tools:4.0.3")
+  implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.4")
+  implementation("jakarta.activation:jakarta.activation-api:2.1.4")
   implementation("com.sun.xml.ws:jaxws-rt:4.0.3")
+
   // Database
   runtimeOnly("org.postgresql:postgresql:42.7.5")
   runtimeOnly("com.h2database:h2:2.3.232")

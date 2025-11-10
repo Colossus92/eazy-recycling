@@ -20,6 +20,14 @@ spring:
         schema-generation.scripts.create-target: schema.sql
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.time_zone: UTC
+  ssl:
+    bundle:
+      jks:
+        amice-client:
+          keystore:
+            location: ${AMICE_CERTIFICATE_PATH:classpath:certificates/test-amice.pfx}
+            password: ${AMICE_PASSWORD:}
+            type: PKCS12
 
 # CORS Configuration
 cors:
@@ -34,7 +42,3 @@ amice:
   url: ${AMICE_URL:}
   username: ${AMICE_USERNAME:}
   password: ${AMICE_PASSWORD:}
-  certificate:
-    enabled: ${AMICE_CERTIFICATE_ENABLED:true}
-    path: ${AMICE_CERTIFICATE_PATH:classpath:certificates/test-amice.pfx}
-    password: ${AMICE_PASSWORD:}

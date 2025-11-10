@@ -25,7 +25,7 @@ class AmiceSessionService(
 
     try {
       val success = response.isMeldingSessieResult
-      logger.info("First receival declaration result: success=$success")
+      logger.info("First receival declaration result: success=$success, sessionId=${response.meldingSessieUUID}, response=$response")
 
       if (!success) {
         throw IllegalStateException("First receival declaration failed")
