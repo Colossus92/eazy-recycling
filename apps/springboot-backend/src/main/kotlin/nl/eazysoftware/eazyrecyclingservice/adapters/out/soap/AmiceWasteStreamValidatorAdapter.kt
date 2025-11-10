@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.adapters.out.soap
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.*
+import nl.eazysoftware.eazyrecyclingservice.config.soap.ToetsenAfvalstroomNummerClient
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
@@ -8,7 +9,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionTy
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
+import org.springframework.ws.soap.client.SoapFaultClientException
 
 /**
  * SOAP adapter for waste stream validation using the Amice ToetsenAfvalstroomnummer service.
@@ -17,8 +20,9 @@ import org.springframework.stereotype.Component
  * Only active when amice.enabled=true
  */
 @Component
+@ConditionalOnProperty(name = ["amice.enabled"], havingValue = "true", matchIfMissing = false)
 class AmiceWasteStreamValidatorAdapter(
-  private val soapClient: ToetsenAfvalstroomNummerServiceSoap?,
+  private val toetsenAfvalstroomNummerClient: ToetsenAfvalstroomNummerClient,
   private val companies: Companies
 ) : WasteStreamValidator {
 
@@ -27,30 +31,23 @@ class AmiceWasteStreamValidatorAdapter(
   override fun validate(wasteStream: WasteStream): WasteStreamValidationResult {
     logger.info("Validating waste stream number: ${wasteStream.wasteStreamNumber.number}")
 
-    if (soapClient == null) {
-      logger.error("Amice SOAP client is not configured. Please set amice.url environment variable.")
-      return WasteStreamValidationResult.invalid(
-        wasteStreamNumber = wasteStream.wasteStreamNumber.number,
-        errors = listOf(ValidationError("SOAP_NOT_CONFIGURED", "Amice validatieservice is niet geconfigureerd")),
-        requestData = null
-      )
-    }
-
     return try {
-      val request = mapToSoapRequest(wasteStream)
-
-      logger.info("Calling SOAP service to validate waste stream")
-      val response = soapClient.toetsenAfvalstroomNummer(request)
-      logger.info("Received response from SOAP service")
-
+      val body = mapToSoapRequest(wasteStream)
+      val response = toetsenAfvalstroomNummerClient.validate(body)
       val result = mapToValidationResult(response)
       logger.info("Validation result: isValid=${result.isValid}, errors=${result.errors.size}")
       result
+    } catch (e: SoapFaultClientException) {
+      logger.error("SOAP Fault received: faultCode={}, faultString={}", e.faultCode, e.faultStringOrReason)
+      WasteStreamValidationResult.invalid(
+        wasteStreamNumber = wasteStream.wasteStreamNumber.number,
+        errors = listOf(ValidationError("SOAP_FAULT", "SOAP Fault: ${e.faultStringOrReason}")),
+        requestData = null
+      )
     } catch (e: Exception) {
       logger.error("Error calling SOAP validation service for waste stream ${wasteStream.wasteStreamNumber.number}", e)
       logger.error("Exception type: ${e.javaClass.name}")
       logger.error("Exception message: ${e.message}")
-      e.printStackTrace()
       WasteStreamValidationResult.invalid(
         wasteStreamNumber = wasteStream.wasteStreamNumber.number,
         errors = listOf(ValidationError("SOAP_ERROR", "Fout bij aanroepen validatieservice: ${e.javaClass.simpleName} - ${e.message}")),

@@ -35,8 +35,6 @@ import java.io.ByteArrayOutputStream
  * - Clean separation of concerns
  * - Better debugging and logging
  *
- * Based on: https://zoltanaltfatter.com/2016/04/30/soap-over-https-with-client-certificate-authentication/
- *
  * Only active when amice.enabled=true
  */
 @Configuration
@@ -47,8 +45,6 @@ class WebServiceTemplateConfiguration(
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  @Value("\${amice.url:}")
-  private lateinit var amiceBaseUrl: String
 
   @Value("\${amice.username:}")
   private lateinit var username: String
@@ -249,29 +245,5 @@ class WebServiceTemplateConfiguration(
     }
 
     return credentialsProvider
-  }
-
-  /**
-   * Bean for ToetsenAfvalstroomnummer service endpoint URL.
-   */
-  @Bean("amiceToetsenEndpoint")
-  fun amiceToetsenEndpoint(): String {
-    return if (amiceBaseUrl.isNotBlank()) {
-      "$amiceBaseUrl/ToetsenAfvalstroomnummerService.asmx"
-    } else {
-      throw IllegalStateException("amice.url is not configured")
-    }
-  }
-
-  /**
-   * Bean for Melding service endpoint URL.
-   */
-  @Bean("amiceMeldingEndpoint")
-  fun amiceMeldingEndpoint(): String {
-    return if (amiceBaseUrl.isNotBlank()) {
-      "$amiceBaseUrl/MeldingService.asmx"
-    } else {
-      throw IllegalStateException("amice.url is not configured")
-    }
   }
 }
