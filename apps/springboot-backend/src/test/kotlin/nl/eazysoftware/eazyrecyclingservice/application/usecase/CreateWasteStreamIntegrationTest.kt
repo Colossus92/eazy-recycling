@@ -12,8 +12,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -132,7 +134,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
 
     // Then
     val persisted = wasteStreamRepo.findByNumber(result.wasteStreamNumber)
-    assertNotNull(persisted)
+    assertThat(persisted).isNotNull
     assertEquals("123450000001", persisted?.wasteStreamNumber?.number)
     assertEquals(command.wasteType.name, persisted?.wasteType?.name)
   }

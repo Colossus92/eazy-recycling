@@ -1,7 +1,7 @@
 plugins {
   kotlin("jvm") version "2.1.20"
   kotlin("plugin.spring") version "2.1.20"
-  id("org.springframework.boot") version "3.4.5"
+  id("org.springframework.boot") version "3.5.7"
   id("io.spring.dependency-management") version "1.1.7"
   kotlin("plugin.jpa") version "2.1.20"
   kotlin("kapt") version "2.1.20"
@@ -90,14 +90,14 @@ dependencies {
     exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
   }
   testImplementation("org.springframework.boot:spring-boot-testcontainers:$springVersion")
-  testImplementation("org.springframework.security:spring-security-test:6.5.0")
-  testImplementation("org.testcontainers:postgresql:1.20.5")
+  testImplementation("org.springframework.security:spring-security-test:6.5.6")
+  testImplementation("org.testcontainers:postgresql:1.21.3")
   testImplementation("io.rest-assured:rest-assured")
-  testImplementation("org.testcontainers:junit-jupiter:1.20.5")
+  testImplementation("org.testcontainers:junit-jupiter:1.21.3")
   testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.10")
-  testImplementation("org.junit.platform:junit-platform-launcher:1.11.4")
+  testImplementation("org.junit.platform:junit-platform-launcher")
 }
 
 allprojects {
