@@ -6,6 +6,9 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessieResponse
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummer
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummerResponse
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -40,6 +43,15 @@ class AmiceStubConfiguration {
       }
 
       override fun requestStatus(body: OpvragenResultaatVerwerkingMeldingSessie): OpvragenResultaatVerwerkingMeldingSessieResponse {
+        throw unsupportedOperationException
+      }
+    }
+  }
+
+  @Bean
+  fun WasteStreamValidator(): WasteStreamValidator {
+    return object : WasteStreamValidator {
+      override fun validate(wasteStream: WasteStream): WasteStreamValidationResult {
         throw unsupportedOperationException
       }
     }

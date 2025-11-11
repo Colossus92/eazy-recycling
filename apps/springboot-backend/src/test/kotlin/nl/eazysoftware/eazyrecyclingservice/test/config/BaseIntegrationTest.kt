@@ -1,11 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.test.config
 
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -30,8 +28,4 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("test")
 @Import(PostgresTestContainersConfig::class)
 @Transactional
-class BaseIntegrationTest {
-
-  @MockitoBean
-  private lateinit var wasteStreamValidator: WasteStreamValidator
-}
+abstract class BaseIntegrationTest
