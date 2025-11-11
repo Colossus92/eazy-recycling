@@ -194,6 +194,8 @@ create table if not exists weight_tickets (
                                  pickup_location_id text,
                                  delivery_location_id text,
                                  truck_license_plate text,
+                                 second_weighing_value numeric(10,2),
+                                 second_weighing_unit text,
                                  tarra_weight_value numeric(10,2),
                                  tarra_weight_unit text,
                                  reclamation text,

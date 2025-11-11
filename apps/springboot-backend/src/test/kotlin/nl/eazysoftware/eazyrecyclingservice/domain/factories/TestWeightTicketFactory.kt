@@ -19,6 +19,8 @@ object TestWeightTicketFactory {
       direction = WeightTicketDirection.INBOUND,
       pickupLocation = null,
       deliveryLocation = null,
+      secondWeighingValue = null,
+      secondWeighingUnit = null,
       tarraWeightValue = null,
       tarraWeightUnit = null,
       lines = lines,

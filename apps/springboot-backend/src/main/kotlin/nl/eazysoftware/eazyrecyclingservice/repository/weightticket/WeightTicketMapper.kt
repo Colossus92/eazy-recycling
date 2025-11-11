@@ -40,6 +40,15 @@ class WeightTicketMapper(
         .map { it.toDomain() }
         .toMutableList()
         .let { WeightTicketLines(it) },
+      secondWeighing = dto.secondWeighingValue?.let {
+        Weight(
+          it,
+          when (dto.secondWeighingUnit) {
+            WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
+            null -> throw IllegalStateException("Tweede weging eenheid is niet gevonden voor weegbon met nummer ${dto.id}")
+          },
+        )
+      },
       tarraWeight = dto.tarraWeightValue?.let {
         Weight(
           it,
@@ -67,11 +76,10 @@ class WeightTicketMapper(
       id = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
       lines = toDto(domain.lines),
+      secondWeighingValue = domain.secondWeighing?.value,
+      secondWeighingUnit = toDto(domain.secondWeighing?.unit),
       tarraWeightValue = domain.tarraWeight?.value,
-      tarraWeightUnit = when(domain.tarraWeight?.unit) {
-        Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
-        null -> null
-      },
+      tarraWeightUnit = toDto(domain.tarraWeight?.unit),
       carrierParty = carrierParty?.let { companyMapper.toDto(carrierParty) },
       truckLicensePlate = domain.truckLicensePlate?.value,
       reclamation = domain.reclamation,
@@ -87,6 +95,13 @@ class WeightTicketMapper(
     )
 
     return weightTicketDto
+  }
+
+  private fun toDto(domain: Weight.WeightUnit?): WeightUnitDto? {
+    return when (domain) {
+      Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
+      null -> null
+    }
   }
 
   private fun toDto(domain: WeightTicketLines): List<WeightTicketLineDto> {

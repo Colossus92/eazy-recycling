@@ -141,6 +141,8 @@ data class WeightTicketRequest(
   val lines: List<WeightTicketLineRequest>,
   val tarraWeightValue: String?,
   val tarraWeightUnit: WeightUnitRequest?,
+  val secondWeighingValue: String?,
+  val secondWeighingUnit: WeightUnitRequest?,
   val carrierParty: UUID?,
   val direction: WeightTicketDirection,
   val pickupLocation: PickupLocationRequest?,
@@ -152,15 +154,8 @@ data class WeightTicketRequest(
   fun toCommand(): WeightTicketCommand {
     return WeightTicketCommand(
       lines = lines.toDomain(),
-      tarraWeight = tarraWeightValue?.let {
-        Weight(
-          BigDecimal(tarraWeightValue),
-          when (tarraWeightUnit) {
-            WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
-            null -> throw IllegalArgumentException("Tarra gewicht eenheid is verplicht bij het opgeven van een gewicht")
-          }
-        )
-      },
+      secondWeighing = secondWeighingValue?.let { toWeight(it, secondWeighingUnit) },
+      tarraWeight = tarraWeightValue?.let { toWeight(it, tarraWeightUnit) },
       consignorParty = consignorParty.toDomain(),
       carrierParty = carrierParty?.let { CompanyId(it) },
       direction = direction,
@@ -171,6 +166,14 @@ data class WeightTicketRequest(
       note = note?.let { Note(it) },
     )
   }
+
+  private fun toWeight(value: String, unit: WeightUnitRequest?): Weight = Weight(
+    BigDecimal(value),
+    when (unit) {
+      WeightUnitRequest.KG -> Weight.WeightUnit.KILOGRAM
+      null -> throw IllegalArgumentException("Eenheid is verplicht bij het opgeven van een gewicht")
+    }
+  )
 }
 
 data class CreateWeightTicketResponse(val id: Long)

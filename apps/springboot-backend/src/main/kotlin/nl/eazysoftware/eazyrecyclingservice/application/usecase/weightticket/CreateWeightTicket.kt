@@ -24,6 +24,7 @@ interface CreateWeightTicket {
  */
 data class WeightTicketCommand(
   val lines: WeightTicketLines,
+  val secondWeighing: Weight?,
   val tarraWeight: Weight?,
   val consignorParty: Consignor,
   val carrierParty: CompanyId?,
@@ -52,6 +53,7 @@ class CreateWeightTicketService(
       id = id,
       consignorParty = cmd.consignorParty,
       lines = cmd.lines,
+      secondWeighing = cmd.secondWeighing,
       tarraWeight = cmd.tarraWeight,
       carrierParty = cmd.carrierParty,
       direction = cmd.direction,

@@ -166,6 +166,7 @@ class WeightTicketSplitTest {
                     )
                 )
             ),
+            secondWeighing = null,
             tarraWeight = null,
             carrierParty = carrier,
             truckLicensePlate = licensePlate,
@@ -292,6 +293,7 @@ class WeightTicketSplitTest {
             lines = WeightTicketLines(emptyList()),
             carrierParty = null,
             truckLicensePlate = null,
+            secondWeighing = null,
             tarraWeight = null,
             reclamation = null,
             note = null,
@@ -369,6 +371,7 @@ class WeightTicketSplitTest {
             pickupLocation = TestLocationFactory.createDutchAddress(),
             deliveryLocation = TestLocationFactory.createCompanyAddress(),
             lines = WeightTicketLines(lines),
+            secondWeighing = null,
             tarraWeight = null,
             carrierParty = CompanyId(UUID.randomUUID()),
             truckLicensePlate = LicensePlate("AB-123-CD"),

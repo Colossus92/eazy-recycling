@@ -25,6 +25,13 @@ data class WeightTicketDto(
   )
   val lines: List<WeightTicketLineDto> = emptyList(),
 
+  @Column(name = "second_weighing_value", nullable = true)
+  val secondWeighingValue: BigDecimal?,
+
+  @Column(name = "second_weighing_unit", nullable = true)
+  @Enumerated(EnumType.STRING)
+  val secondWeighingUnit: WeightUnitDto?,
+
   @Column(name = "tarra_weight_value", nullable = true)
   val tarraWeightValue: BigDecimal?,
 

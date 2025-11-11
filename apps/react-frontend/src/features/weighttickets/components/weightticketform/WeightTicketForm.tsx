@@ -16,263 +16,287 @@ import { useWeightTicketForm } from './useWeigtTicketFormHook';
 import { WeightTicketLinesTab } from './WeightTicketLinesTab';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { useEffect, useState } from 'react';
-import { TabGroup, TabList, TabPanels, TabPanel } from '@headlessui/react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
 import { RadioFormField } from '@/components/ui/form/RadioFormField';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 
 interface WeightTicketFormProps {
-    isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
-    weightTicketNumber?: number;
-    status?: string;
-    onDelete: (id: number) => void;
-    onSplit?: (id: number) => void;
-    onComplete?: (id: number) => void;
-    noDialog?: boolean;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  weightTicketNumber?: number;
+  status?: string;
+  onDelete: (id: number) => void;
+  onSplit?: (id: number) => void;
+  onComplete?: (id: number) => void;
+  noDialog?: boolean;
 }
 
 export const WeightTicketForm = ({
-    isOpen,
-    setIsOpen,
-    weightTicketNumber,
-    status,
-    onDelete,
-    onSplit,
-    onComplete,
-    noDialog = false,
+  isOpen,
+  setIsOpen,
+  weightTicketNumber,
+  status,
+  onDelete,
+  onSplit,
+  onComplete,
+  noDialog = false,
 }: WeightTicketFormProps) => {
-    const {
-        data,
-        isLoading,
-        formContext,
-        mutation,
-        resetForm
-    } = useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
-    const [isDisabled, setIsDisabled] = useState(false);
+  const { data, isLoading, formContext, mutation, resetForm } =
+    useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
+  const [isDisabled, setIsDisabled] = useState(false);
 
-    const handleClose = (value: boolean) => {
-        if (!value) {
-            resetForm();
-        }
-        setIsOpen(value);
-    };
-
-    const handleCancel = () => {
-        resetForm();
-        setIsOpen(false);
-    };
-
-    useEffect(() => {
-        setIsDisabled(Boolean((data?.status || status) && (data?.status || status) !== 'DRAFT'));
-    }, [data?.status, status]);
-
-    const { data: companies = [] } = useQuery<Company[]>({
-        queryKey: ['companies'],
-        queryFn: () => companyService.getAll(),
-    });
-    const companyOptions = companies.map((company) => ({
-        value: company.id || '',
-        label: company.name,
-    }));
-
-    const onSubmit = formContext.handleSubmit(async (formValues) => {
-        // Filter out empty lines (lines where wasteStreamNumber is empty)
-        const filteredFormValues = {
-            ...formValues,
-            lines: formValues.lines.filter(
-                (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
-            ),
-        };
-
-        await mutation.mutateAsync(filteredFormValues);
-    });
-
-    const handleSubmit = isDisabled ? (e: React.FormEvent) => e.preventDefault() : onSubmit;
-
-    // Detect errors in each tab
-    const errors = formContext.formState.errors;
-    
-    const algemeneenHasError = !!(
-        errors.direction ||
-        errors.consignorPartyId ||
-        errors.carrierPartyId ||
-        errors.truckLicensePlate ||
-        errors.reclamation ||
-        errors.note
-    );
-
-    console.log(algemeneenHasError)
-
-    const sorteerweginHasError = !!(errors.lines && Array.isArray(errors.lines) && errors.lines.some(e => e));
-
-    const routeHasError = !!(errors.pickupLocation || errors.deliveryLocation);
-
-    const formContent = (
-        <div className={'w-full h-[90vh]'}>
-            <FormProvider {...formContext}>
-                <form
-                    className="flex flex-col items-center self-stretch h-full"
-                    onSubmit={handleSubmit}
-                >
-                    <FormTopBar
-                        title={
-                            data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'
-                        }
-                        actions={
-                            data && (
-                                <WeightTicketFormActionMenu
-                                    weightTicket={data}
-                                    onDelete={onDelete}
-                                    onSplit={onSplit}
-                                    onComplete={onComplete}
-                                />
-                            )
-                        }
-                        onClick={handleCancel}
-                    />
-                    <div
-                        className={'flex flex-col items-start self-stretch flex-1 gap-5 p-4 min-h-0'}
-                    >
-                        {data?.cancellationReason && <Note note={data?.cancellationReason} />}
-                        {isLoading ? (
-                            <div className="flex justify-center items-center w-full p-8">
-                                <p>Weegbon laden...</p>
-                            </div>
-                        ) : (
-                            <div className={'flex flex-col items-start self-stretch gap-4 flex-1 min-h-0'}>
-                                {data?.status && <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />}
-                                <TabGroup className="w-full flex-1 flex flex-col min-h-0">
-                                    <TabList className="relative z-10">
-                                        <Tab label="Algemeen" hasError={algemeneenHasError} />
-                                        <Tab label="Sorteerweging" hasError={sorteerweginHasError} />
-                                        <Tab label="Route" hasError={routeHasError} />
-                                    </TabList>
-                                    <TabPanels className="flex flex-col flex-1 bg-color-surface-primary border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary pt-4 gap-4 min-h-0 -mt-[2px] overflow-y-auto">
-                                        <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
-                                            <RadioFormField
-                                                title={'Richting'}
-                                                options={[
-                                                    { value: 'INBOUND', label: 'Inkomend' },
-                                                    { value: 'OUTBOUND', label: 'Uitgaand' },
-                                                ]}
-                                                testId="direction"
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    name: 'direction',
-                                                    rules: { required: 'Richting is verplicht' },
-                                                    errors: formContext.formState.errors,
-                                                }}
-                                            />
-                                            <div className="w-1/2">
-                                                <SelectFormField
-                                                    title={'Opdrachtgever'}
-                                                    placeholder={'Selecteer een opdrachtgever'}
-                                                    options={companyOptions}
-                                                    testId="consignor-party-select"
-                                                    disabled={isDisabled}
-                                                    formHook={{
-                                                        register: formContext.register,
-                                                        name: 'consignorPartyId',
-                                                        rules: { required: 'Opdrachtgever is verplicht' },
-                                                        errors: formContext.formState.errors,
-                                                        control: formContext.control,
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="w-1/2">
-                                                <SelectFormField
-                                                    title={'Vervoerder'}
-                                                    placeholder={'Selecteer een vervoerder'}
-                                                    options={companyOptions}
-                                                    testId="carrier-party-select"
-                                                    disabled={isDisabled}
-                                                    formHook={{
-                                                        register: formContext.register,
-                                                        name: 'carrierPartyId',
-                                                        errors: formContext.formState.errors,
-                                                        control: formContext.control,
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="w-1/2">
-                                                <TruckSelectFormField
-                                                    disabled={isDisabled}
-                                                    formHook={{
-                                                        register: formContext.register,
-                                                        name: 'truckLicensePlate',
-                                                        errors: formContext.formState.errors,
-                                                        control: formContext.control,
-                                                    }}
-                                                />
-                                            </div>
-                                            <TextFormField
-                                                title={'Reclamatie'}
-                                                placeholder={'Vul reclamatie in'}
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    register: formContext.register,
-                                                    name: 'reclamation',
-                                                    errors: formContext.formState.errors,
-                                                }}
-                                            />
-                                            <TextAreaFormField
-                                                title={'Opmerkingen'}
-                                                placeholder={'Plaats opmerkingen'}
-                                                disabled={isDisabled}
-                                                formHook={{
-                                                    register: formContext.register,
-                                                    name: 'note',
-                                                    rules: {},
-                                                    errors: formContext.formState.errors,
-                                                }}
-                                            />
-                                        </TabPanel>
-                                        <TabPanel className="px-4 pb-4">
-                                            <WeightTicketLinesTab disabled={isDisabled} />
-                                        </TabPanel>
-                                        <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
-                                            <AddressFormField
-                                                name="pickupLocation"
-                                                control={formContext.control}
-                                                label="Ophaallocatie"
-                                                testId="pickup-location-select"
-                                                required={false}
-                                                isNoLocationAllowed={true}
-                                            />
-                                            <AddressFormField
-                                                name="deliveryLocation"
-                                                control={formContext.control}
-                                                label="Afleverlocatie"
-                                                testId="delivery-location-select"
-                                                required={false}
-                                                isNoLocationAllowed={true}
-                                            />
-                                        </TabPanel>
-                                    </TabPanels>
-                                </TabGroup>
-                            </div>
-                        )}
-                    </div>
-                    <FormActionButtons onClick={handleCancel} item={data} disabled={isDisabled} />
-                </form>
-            </FormProvider>
-        </div>
-    );
-
-    if (noDialog) {
-        return (
-            <ErrorBoundary fallbackRender={fallbackRender}>
-                {formContent}
-            </ErrorBoundary>
-        );
+  const handleClose = (value: boolean) => {
+    if (!value) {
+      resetForm();
     }
+    setIsOpen(value);
+  };
 
-    return (
-        <ErrorBoundary fallbackRender={fallbackRender}>
-            <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
-                {formContent}
-            </FormDialog>
-        </ErrorBoundary>
+  const handleCancel = () => {
+    resetForm();
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    setIsDisabled(
+      Boolean((data?.status || status) && (data?.status || status) !== 'DRAFT')
     );
+  }, [data?.status, status]);
+
+  const { data: companies = [] } = useQuery<Company[]>({
+    queryKey: ['companies'],
+    queryFn: () => companyService.getAll(),
+  });
+  const companyOptions = companies.map((company) => ({
+    value: company.id || '',
+    label: company.name,
+  }));
+
+  const onSubmit = formContext.handleSubmit(async (formValues) => {
+    // Filter out empty lines (lines where wasteStreamNumber is empty)
+    const filteredFormValues = {
+      ...formValues,
+      lines: formValues.lines.filter(
+        (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
+      ),
+    };
+
+    await mutation.mutateAsync(filteredFormValues);
+  });
+
+  const handleSubmit = isDisabled
+    ? (e: React.FormEvent) => e.preventDefault()
+    : onSubmit;
+
+  // Detect errors in each tab
+  const errors = formContext.formState.errors;
+
+  const algemeneenHasError = !!(
+    errors.direction ||
+    errors.consignorPartyId ||
+    errors.carrierPartyId ||
+    errors.truckLicensePlate ||
+    errors.reclamation ||
+    errors.note
+  );
+
+  const sorteerweginHasError = !!(
+    errors.lines &&
+    Array.isArray(errors.lines) &&
+    errors.lines.some((e) => e)
+  );
+
+  const routeHasError = !!(errors.pickupLocation || errors.deliveryLocation);
+
+  const formContent = (
+    <div className={'w-full h-[90vh]'}>
+      <FormProvider {...formContext}>
+        <form
+          className="flex flex-col items-center self-stretch h-full"
+          onSubmit={handleSubmit}
+        >
+          <FormTopBar
+            title={data ? `Weegbon ${data.id}` : 'Nieuw Weegbon'}
+            actions={
+              data && (
+                <WeightTicketFormActionMenu
+                  weightTicket={data}
+                  onDelete={onDelete}
+                  onSplit={onSplit}
+                  onComplete={onComplete}
+                />
+              )
+            }
+            onClick={handleCancel}
+          />
+          <div
+            className={
+              'flex flex-col items-start self-stretch flex-1 gap-5 p-4 min-h-0'
+            }
+          >
+            {data?.cancellationReason && (
+              <Note note={data?.cancellationReason} />
+            )}
+            {isLoading ? (
+              <div className="flex justify-center items-center w-full p-8">
+                <p>Weegbon laden...</p>
+              </div>
+            ) : (
+              <div
+                className={
+                  'flex flex-col items-start self-stretch gap-4 flex-1 min-h-0'
+                }
+              >
+                {data?.status && (
+                  <WeightTicketStatusTag
+                    status={
+                      data.status as
+                        | 'DRAFT'
+                        | 'COMPLETED'
+                        | 'INVOICED'
+                        | 'CANCELLED'
+                    }
+                  />
+                )}
+                <TabGroup className="w-full flex-1 flex flex-col min-h-0">
+                  <TabList className="relative z-10">
+                    <Tab label="Algemeen" hasError={algemeneenHasError} />
+                    <Tab
+                      label="Sorteerweging"
+                      hasError={sorteerweginHasError}
+                    />
+                    <Tab label="Route" hasError={routeHasError} />
+                  </TabList>
+                  <TabPanels className="flex flex-col flex-1 bg-color-surface-primary border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary pt-4 gap-4 min-h-0 -mt-[2px] overflow-y-auto">
+                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                      <RadioFormField
+                        title={'Richting'}
+                        options={[
+                          { value: 'INBOUND', label: 'Inkomend' },
+                          { value: 'OUTBOUND', label: 'Uitgaand' },
+                        ]}
+                        testId="direction"
+                        disabled={isDisabled}
+                        formHook={{
+                          name: 'direction',
+                          rules: { required: 'Richting is verplicht' },
+                          errors: formContext.formState.errors,
+                        }}
+                      />
+                      <div className="w-1/2">
+                        <SelectFormField
+                          title={'Opdrachtgever'}
+                          placeholder={'Selecteer een opdrachtgever'}
+                          options={companyOptions}
+                          testId="consignor-party-select"
+                          disabled={isDisabled}
+                          formHook={{
+                            register: formContext.register,
+                            name: 'consignorPartyId',
+                            rules: { required: 'Opdrachtgever is verplicht' },
+                            errors: formContext.formState.errors,
+                            control: formContext.control,
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <SelectFormField
+                          title={'Vervoerder'}
+                          placeholder={'Selecteer een vervoerder'}
+                          options={companyOptions}
+                          testId="carrier-party-select"
+                          disabled={isDisabled}
+                          formHook={{
+                            register: formContext.register,
+                            name: 'carrierPartyId',
+                            errors: formContext.formState.errors,
+                            control: formContext.control,
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <TruckSelectFormField
+                          disabled={isDisabled}
+                          formHook={{
+                            register: formContext.register,
+                            name: 'truckLicensePlate',
+                            errors: formContext.formState.errors,
+                            control: formContext.control,
+                          }}
+                        />
+                      </div>
+                      <TextFormField
+                        title={'Reclamatie'}
+                        placeholder={'Vul reclamatie in'}
+                        disabled={isDisabled}
+                        formHook={{
+                          register: formContext.register,
+                          name: 'reclamation',
+                          errors: formContext.formState.errors,
+                        }}
+                      />
+                      <TextAreaFormField
+                        title={'Opmerkingen'}
+                        placeholder={'Plaats opmerkingen'}
+                        disabled={isDisabled}
+                        formHook={{
+                          register: formContext.register,
+                          name: 'note',
+                          rules: {},
+                          errors: formContext.formState.errors,
+                        }}
+                      />
+                    </TabPanel>
+                    <TabPanel className="px-4 pb-4">
+                      <WeightTicketLinesTab disabled={isDisabled} />
+                    </TabPanel>
+                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                      <AddressFormField
+                        name="pickupLocation"
+                        control={formContext.control}
+                        label="Ophaallocatie"
+                        testId="pickup-location-select"
+                        required={false}
+                        isNoLocationAllowed={true}
+                      />
+                      <AddressFormField
+                        name="deliveryLocation"
+                        control={formContext.control}
+                        label="Afleverlocatie"
+                        testId="delivery-location-select"
+                        required={false}
+                        isNoLocationAllowed={true}
+                      />
+                    </TabPanel>
+                  </TabPanels>
+                </TabGroup>
+              </div>
+            )}
+          </div>
+          <FormActionButtons
+            onClick={handleCancel}
+            item={data}
+            disabled={isDisabled}
+          />
+        </form>
+      </FormProvider>
+    </div>
+  );
+
+  if (noDialog) {
+    return (
+      <ErrorBoundary fallbackRender={fallbackRender}>
+        {formContent}
+      </ErrorBoundary>
+    );
+  }
+
+  return (
+    <ErrorBoundary fallbackRender={fallbackRender}>
+      <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
+        {formContent}
+      </FormDialog>
+    </ErrorBoundary>
+  );
 };

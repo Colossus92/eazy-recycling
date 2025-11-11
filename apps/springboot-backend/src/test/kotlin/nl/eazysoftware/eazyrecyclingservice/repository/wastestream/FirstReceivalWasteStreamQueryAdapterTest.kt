@@ -406,6 +406,8 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       id = System.currentTimeMillis() + (Math.random() * 1000).toLong(),
       consignorParty = companyRepository.getReferenceById(consignorCompanyId),
       lines = ticketLines,
+      secondWeighingValue = null,
+      secondWeighingUnit = null,
       tarraWeightValue = null,
       tarraWeightUnit = null,
       direction = WeightTicketDirection.INBOUND,

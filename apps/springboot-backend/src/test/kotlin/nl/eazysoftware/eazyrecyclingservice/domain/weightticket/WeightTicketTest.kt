@@ -52,6 +52,7 @@ class WeightTicketTest {
     note = Note("note"),
     createdAt = Clock.System.now(),
     tarraWeight = null,
+    secondWeighing = null,
   )
 
   @Test
@@ -94,6 +95,7 @@ class WeightTicketTest {
       reclamation = "Reclamation",
       note = Note("note"),
       tarraWeight = Weight(BigDecimal("50.00"), Weight.WeightUnit.KILOGRAM),
+      secondWeighing = Weight(BigDecimal("10.00"), Weight.WeightUnit.KILOGRAM),
       createdAt = Clock.System.now(),
     )
 

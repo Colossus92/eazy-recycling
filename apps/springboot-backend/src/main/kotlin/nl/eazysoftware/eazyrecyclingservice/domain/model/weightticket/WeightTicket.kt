@@ -17,6 +17,7 @@ class WeightTicket(
    * The weight of any kind of container (waste container, truck) without waste
    */
   var tarraWeight: Weight?,
+  var secondWeighing: Weight?,
   var lines: WeightTicketLines,
   var carrierParty: CompanyId?,
   var direction: WeightTicketDirection,
@@ -52,6 +53,7 @@ class WeightTicket(
     direction: WeightTicketDirection = this.direction,
     pickupLocation: Location? = this.pickupLocation,
     deliveryLocation: Location? = this.deliveryLocation,
+    secondWeighing: Weight? = this.secondWeighing,
     tarraWeight: Weight? = this.tarraWeight,
     truckLicensePlate: LicensePlate? = this.truckLicensePlate,
     reclamation: String? = this.reclamation,
@@ -62,6 +64,7 @@ class WeightTicket(
     }
     this.lines = lines
     this.tarraWeight = tarraWeight
+    this.secondWeighing = secondWeighing
     this.direction = direction
     this.pickupLocation = pickupLocation
     this.deliveryLocation = deliveryLocation
@@ -113,6 +116,7 @@ class WeightTicket(
       consignorParty = this.consignorParty,
       status = WeightTicketStatus.DRAFT,
       lines = WeightTicketLines(newLines),
+      secondWeighing = null,
       tarraWeight = null,
       carrierParty = this.carrierParty,
       direction = this.direction,
