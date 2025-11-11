@@ -5,9 +5,10 @@ import clsx from "clsx";
 interface TabProps {
     label: string;
     disabled?: boolean;
+    hasError?: boolean;
 }
 
-export const Tab = ({ label, disabled = false }: TabProps) => {
+export const Tab = ({ label, disabled = false, hasError = false }: TabProps) => {
 
     return (
         <TabHeadless as={Fragment} disabled={disabled}>
@@ -18,8 +19,13 @@ export const Tab = ({ label, disabled = false }: TabProps) => {
                         selected && [
                             "border-x border-t border-b border-t-color-border-primary border-x-color-border-primary",
                             "border-b-color-surface-primary",
-                            "text-color-brand-primary",
-                            "bg-color-surface-primary",
+                            hasError ? [
+                                "text-color-status-error-dark",
+                                "bg-color-surface-primary",
+                            ] : [
+                                "text-color-brand-primary",
+                                "bg-color-surface-primary",
+                            ],
                         ],
                         hover && !disabled && !selected && [
                             "text-color-brand-primary",
@@ -30,7 +36,8 @@ export const Tab = ({ label, disabled = false }: TabProps) => {
                             "cursor-not-allowed"
                         ],
                         
-                        !selected && !hover && !disabled && "text-color-text-secondary"
+                        !selected && !hover && !disabled && hasError && "text-color-status-error-primary",
+                        !selected && !hover && !disabled && !hasError && "text-color-text-secondary"
                     )}
                     disabled={disabled}
                 >

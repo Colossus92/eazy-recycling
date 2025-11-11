@@ -8,14 +8,15 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamListView } from '@/api/client';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
 
-interface WeightTicketLinesSectionProps {
+interface WeightTicketLinesTabProps {
   disabled?: boolean;
 }
 
-export const WeightTicketLinesSection = ({
+export const WeightTicketLinesTab = ({
   disabled = false,
-}: WeightTicketLinesSectionProps) => {
+}: WeightTicketLinesTabProps) => {
   const formContext = useFormContext<WeightTicketFormValues>();
   const {
     control,
@@ -215,9 +216,53 @@ export const WeightTicketLinesSection = ({
                     kg
                   </div>
                 </div>
+
               </div>
+
             </div>
           ))}
+          <div className="flex items-start self-stretch gap-4">
+            <NumberFormField
+              title={'Weging 2'}
+              placeholder={'Vul weging 2 in'}
+              step={0.01}
+              disabled={disabled}
+              formHook={{
+                register: formContext.register,
+                name: 'secondWeightValue',
+                errors: formContext.formState.errors,
+              }}
+            />
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-caption-2">
+                Eenheid
+              </label>
+              <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
+                kg
+              </div>
+            </div>
+          </div>
+          <div className="flex items-start self-stretch gap-4">
+            <NumberFormField
+              title={'Tarra'}
+              placeholder={'Vul tarra in'}
+              step={0.01}
+              disabled={disabled}
+              formHook={{
+                register: formContext.register,
+                name: 'tarraWeightValue',
+                errors: formContext.formState.errors,
+              }}
+            />
+            <div className="flex flex-col items-start gap-2">
+              <label className="text-caption-2">
+                Eenheid
+              </label>
+              <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
+                kg
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

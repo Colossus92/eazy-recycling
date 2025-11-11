@@ -31,6 +31,8 @@ export interface WeightTicketFormValues {
   lines: WeightTicketLineFormValues[];
   tarraWeightValue?: number;
   tarraWeightUnit?: string;
+  secondWeightValue?: number;
+  secondWeightUnit?: string;
   direction: string;
   pickupLocation: LocationFormValue;
   deliveryLocation: LocationFormValue;
@@ -51,6 +53,8 @@ export function useWeightTicketForm(
       lines: [],
       tarraWeightValue: undefined,
       tarraWeightUnit: undefined,
+      secondWeightValue: undefined,
+      secondWeightUnit: undefined,
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -107,6 +111,8 @@ export function useWeightTicketForm(
       lines: [],
       tarraWeightValue: NaN,
       tarraWeightUnit: undefined,
+      secondWeightValue: NaN,
+      secondWeightUnit: undefined,
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
