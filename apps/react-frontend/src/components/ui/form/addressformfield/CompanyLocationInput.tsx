@@ -189,6 +189,10 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                 backgroundColor: '#F3F8FF',
             },
         }),
+        menuPortal: (base: any) => ({
+            ...base,
+            zIndex: 9999,
+        }),
         input: (base: any) => ({
             ...base,
             'input:focus': {
@@ -233,6 +237,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                                 noOptionsMessage={() => 'Geen opties beschikbaar'}
                                 id="company-location-select"
                                 data-testid="company-location-select"
+                                menuPortalTarget={document.body}
                                 className="w-full text-body-1 text-color-text-secondary"
                                 styles={selectStyles}
                                 classNames={selectClassNames}
@@ -272,6 +277,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                                 noOptionsMessage={() => 'Geen opties beschikbaar'}
                                 id="project-location-select"
                                 data-testid="project-location-select"
+                                menuPortalTarget={document.body}
                                 className="w-full text-body-1 text-color-text-secondary"
                                 styles={selectStyles}
                                 classNames={selectClassNames}

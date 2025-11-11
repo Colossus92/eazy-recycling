@@ -69,6 +69,7 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
             classNamePrefix="react-select"
             noOptionsMessage={() => 'Geen opties beschikbaar'}
             id={testId || `select-${name}`}
+            menuPortalTarget={document.body}
             className={clsx(
               'w-full text-body-1',
               disabled
@@ -101,6 +102,10 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
                       : '#1E77F8',
                   backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
                 },
+              }),
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999,
               }),
               input: (base) => ({
                 ...base,

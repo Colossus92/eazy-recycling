@@ -25,7 +25,7 @@ export const FormNavigationWithDraft = ({
   isSubmitting = false,
 }: FormNavigationWithDraftProps) => {
   return (
-    <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
+    <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary relative z-0">
       <div className={'flex-1'}>
         {step === 0 ? (
           <Button
