@@ -47,6 +47,7 @@ export const NumberFormField = <TFieldValues extends FieldValues>({
         step={step}
         defaultValue={value}
         disabled={disabled}
+        data-testid={formHook?.name}
       />
       {fieldError && (
         <span className="text-caption-1 text-color-status-error-dark">

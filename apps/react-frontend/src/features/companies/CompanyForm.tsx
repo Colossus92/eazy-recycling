@@ -44,7 +44,7 @@ function toCompany(data: CompanyFormValues): Company {
     id: data.id || '',
     address: {
       street: data.street,
-      houseNumber: data.houseNumber,
+      houseNumber: String(data.houseNumber),
       houseNumberAddition: data.houseNumberAddition,
       postalCode: data.postalCode,
       city: data.city,

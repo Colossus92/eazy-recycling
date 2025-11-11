@@ -87,7 +87,7 @@ describe('CompanyForm', () => {
     // Check form fields
     expect(screen.getByText('Bedrijfsnaam')).toBeInTheDocument();
     expect(screen.getByText('Straat')).toBeInTheDocument();
-    expect(screen.getByText('Huisnummer')).toBeInTheDocument();
+    expect(screen.getByTestId('houseNumber')).toBeInTheDocument();
     expect(screen.getByText('Postcode')).toBeInTheDocument();
     expect(screen.getByText('Plaats')).toBeInTheDocument();
     expect(screen.getByText('KvK nummer')).toBeInTheDocument();
@@ -117,11 +117,11 @@ describe('CompanyForm', () => {
     expect(screen.getByPlaceholderText('Vul bedrijfsnaam in')).toHaveValue(
       mockCompany.name
     );
-    expect(screen.getByPlaceholderText('Vul straat in')).toHaveValue(
+    expect(screen.getByPlaceholderText('Vul straatnaam in')).toHaveValue(
       mockCompany.address.street
     );
-    expect(screen.getByPlaceholderText('Nr.')).toHaveValue(
-      mockCompany.address.houseNumber
+    expect(screen.getByTestId('houseNumber')).toHaveValue(
+      Number(mockCompany.address.houseNumber)
     );
     expect(screen.getByPlaceholderText('Vul postcode in')).toHaveValue(
       mockCompany.address.postalCode
@@ -191,10 +191,10 @@ describe('CompanyForm', () => {
       'Test Company'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('Vul straat in'),
+      screen.getByPlaceholderText('Vul straatnaam in'),
       'Test Street'
     );
-    await userEvent.type(screen.getByPlaceholderText('Nr.'), '42');
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
     await userEvent.type(
       screen.getByPlaceholderText('Vul postcode in'),
       '1234 ZZ'
@@ -297,10 +297,10 @@ describe('CompanyForm', () => {
       'Test Company'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('Vul straat in'),
+      screen.getByPlaceholderText('Vul straatnaam in'),
       'Test Street'
     );
-    await userEvent.type(screen.getByPlaceholderText('Nr.'), '42');
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
     await userEvent.type(
       screen.getByPlaceholderText('Vul postcode in'),
       '1234 ZZ'
@@ -350,10 +350,10 @@ describe('CompanyForm', () => {
       'Test Company'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('Vul straat in'),
+      screen.getByPlaceholderText('Vul straatnaam in'),
       'Test Street'
     );
-    await userEvent.type(screen.getByPlaceholderText('Nr.'), '42');
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
     await userEvent.type(
       screen.getByPlaceholderText('Vul postcode in'),
       '1234 ZZ'
@@ -455,10 +455,10 @@ describe('CompanyForm', () => {
       'Test Company'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('Vul straat in'),
+      screen.getByPlaceholderText('Vul straatnaam in'),
       'Test Street'
     );
-    await userEvent.type(screen.getByPlaceholderText('Nr.'), '42');
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
     await userEvent.type(
       screen.getByPlaceholderText('Vul postcode in'),
       '1234 ZZ'
@@ -499,10 +499,10 @@ describe('CompanyForm', () => {
       'Test Company'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('Vul straat in'),
+      screen.getByPlaceholderText('Vul straatnaam in'),
       'Test Street'
     );
-    await userEvent.type(screen.getByPlaceholderText('Nr.'), '42');
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
     await userEvent.type(
       screen.getByPlaceholderText('Vul postcode in'),
       '1234 ZZ'
