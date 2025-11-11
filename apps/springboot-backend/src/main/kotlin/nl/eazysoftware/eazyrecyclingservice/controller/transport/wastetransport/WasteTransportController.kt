@@ -84,6 +84,7 @@ class WasteTransportController(
           }
         }
       }
+
       else -> throw ResponseStatusException(
         HttpStatus.FORBIDDEN,
         "Geen toegang: Je moet ingelogd zijn om dit transport te zien"
@@ -105,7 +106,7 @@ data class UpdateWasteTransportResponse(
  * Extension function to map request to create command
  */
 fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
-  require(this.wasteStreamNumber != null) {
+  require(this.goods.isNotEmpty()) {
     "Afvalstroomnummer is verplicht voor een afvaltransport"
   }
 
@@ -115,12 +116,14 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
       ?: Clock.System.now(),
     transportType = this.transportType,
-    goodsItem = GoodsItem(
-      wasteStreamNumber = WasteStreamNumber(this.wasteStreamNumber),
-      netNetWeight = this.weight,
-      unit = this.unit,
-      quantity = this.quantity
-    ),
+    goods = this.goods.map {
+      GoodsItem(
+        wasteStreamNumber = WasteStreamNumber(it.wasteStreamNumber),
+        netNetWeight = it.weight,
+        unit = it.unit,
+        quantity = it.quantity
+      )
+    },
     wasteContainer = this.containerId?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
     truck = this.truckId?.let { LicensePlate(it) },
@@ -133,7 +136,7 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
  * Extension function to map request to update command
  */
 fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTransportCommand {
-  require(this.wasteStreamNumber != null) {
+  require(this.goods.isNotEmpty()) {
     "Afvalstroomnummer is verplicht voor een afvaltransport"
   }
 
@@ -144,12 +147,14 @@ fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTranspo
     deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
       ?: Clock.System.now(),
     transportType = this.transportType,
-    goodsItem = GoodsItem(
-      wasteStreamNumber = WasteStreamNumber(this.wasteStreamNumber),
-      netNetWeight = this.weight,
-      unit = this.unit,
-      quantity = this.quantity
-    ),
+    goods = this.goods.map {
+      GoodsItem(
+        wasteStreamNumber = WasteStreamNumber(it.wasteStreamNumber),
+        netNetWeight = it.weight,
+        unit = it.unit,
+        quantity = it.quantity
+      )
+    },
     wasteContainer = this.containerId?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
     truck = this.truckId?.let { LicensePlate(it) },

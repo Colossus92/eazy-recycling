@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.exception
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.SoftDeletedCompanyConflictException
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.IncompatibleWasteStreamsException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DuplicateKeyException
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import java.util.*
 
 @ControllerAdvice
 class GlobalExceptionHandler {
@@ -86,6 +86,17 @@ class GlobalExceptionHandler {
     logException(ex)
 
     return ResponseEntity(response, HttpStatus.CONFLICT)
+  }
+
+  @ExceptionHandler(IncompatibleWasteStreamsException::class)
+  fun handleIncompatibleWasteStreamsException(ex: IncompatibleWasteStreamsException): ResponseEntity<ErrorResponse> {
+    val errorResponse = ErrorResponse(
+      message = ex.message ?: "Deze actie brengt de data in een ongeldige staat en is niet toegestaan",
+    )
+
+    logException(ex)
+
+    return ResponseEntity(errorResponse, HttpStatus.CONFLICT)
   }
 
   private fun logException(ex: Exception) {

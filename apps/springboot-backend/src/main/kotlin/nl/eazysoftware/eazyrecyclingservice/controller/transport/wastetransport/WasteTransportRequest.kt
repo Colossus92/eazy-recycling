@@ -17,7 +17,11 @@ data class WasteTransportRequest(
   val truckId: String?,
   val containerId: String?,
   val note: String,
-  val wasteStreamNumber: String?,
+  val goods: List<GoodsRequest>,
+)
+
+data class GoodsRequest(
+  val wasteStreamNumber: String,
   @field:Min(0)
   val weight: Double,
   @field:NotBlank

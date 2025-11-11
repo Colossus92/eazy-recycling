@@ -1,13 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.goods
 
-import jakarta.persistence.*
+import jakarta.persistence.Embeddable
 
-@Entity
-@Table(name = "goods_items")
-data class GoodsItemDto(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+@Embeddable
+data class TransportGoodsDto(
+
     val wasteStreamNumber: String,
     val netNetWeight: Double,
     val unit: String,

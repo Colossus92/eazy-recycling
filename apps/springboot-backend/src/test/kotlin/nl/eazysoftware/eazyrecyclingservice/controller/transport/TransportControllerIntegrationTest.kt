@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequ
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.CreateContainerTransportResponse
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportResponse
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.GoodsRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
@@ -19,7 +20,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaReposit
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -295,10 +296,14 @@ class TransportControllerIntegrationTest(
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "New Waste Transport",
-      wasteStreamNumber = testWasteStream.number,
-      weight = 1000.0,
-      unit = "KG",
-      quantity = 1,
+      goods = listOf(
+        GoodsRequest(
+          wasteStreamNumber = testWasteStream.number,
+          weight = 1000.0,
+          unit = "KG",
+          quantity = 1,
+        )
+      ),
     )
 
     // When & Then
@@ -322,7 +327,7 @@ class TransportControllerIntegrationTest(
     assertThat(savedTransports[0].id).isEqualTo(createResult.transportId)
     assertThat(savedTransports[0].note).isEqualTo("New Waste Transport")
     assertThat(savedTransports[0].transportType).isEqualTo(TransportType.WASTE)
-    assertThat(savedTransports[0].goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
+    assertThat(savedTransports[0].goods?.first()?.wasteStreamNumber).isEqualTo(testWasteStream.number)
     assertThat(savedTransports[0].containerOperation).isEqualTo(ContainerOperation.PICKUP)
   }
 
@@ -379,10 +384,14 @@ class TransportControllerIntegrationTest(
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Original Waste Transport",
-      wasteStreamNumber = testWasteStream.number,
-      weight = 1000.0,
-      unit = "KG",
-      quantity = 1,
+      goods = listOf(
+        GoodsRequest(
+          wasteStreamNumber = testWasteStream.number,
+          weight = 1000.0,
+          unit = "KG",
+          quantity = 1,
+        )
+      ),
     )
 
     val createResponse = securedMockMvc.post(
@@ -408,10 +417,14 @@ class TransportControllerIntegrationTest(
       truckId = testTruck.licensePlate,
       containerId = testContainer.id,
       note = "Updated Waste Transport",
-      wasteStreamNumber = testWasteStream.number,
-      weight = 2000.0,
-      unit = "KG",
-      quantity = 2,
+      goods = listOf(
+        GoodsRequest(
+          wasteStreamNumber = testWasteStream.number,
+          weight = 2000.0,
+          unit = "KG",
+          quantity = 2,
+        )
+      ),
     )
 
     // When & Then
@@ -428,9 +441,9 @@ class TransportControllerIntegrationTest(
     val updatedTransport = transportRepository.findByIdOrNull(createResult.transportId)
     assertThat(updatedTransport).isNotNull
     assertThat(updatedTransport?.note).isEqualTo("Updated Waste Transport")
-    assertThat(updatedTransport?.goodsItem?.wasteStreamNumber).isEqualTo(testWasteStream.number)
-    assertThat(updatedTransport?.goodsItem?.netNetWeight).isEqualTo(2000.0)
-    assertThat(updatedTransport?.goodsItem?.quantity).isEqualTo(2)
+    assertThat(updatedTransport?.goods?.first()?.wasteStreamNumber).isEqualTo(testWasteStream.number)
+    assertThat(updatedTransport?.goods?.first()?.netNetWeight).isEqualTo(2000.0)
+    assertThat(updatedTransport?.goods?.first()?.quantity).isEqualTo(2)
     assertThat(updatedTransport?.containerOperation).isEqualTo(ContainerOperation.DELIVERY)
   }
 
@@ -726,7 +739,7 @@ class TransportControllerIntegrationTest(
     assertThat(savedTransports).isEmpty()
   }
 
-  private fun createTestTransport(note: String, goodsItem: GoodsItemDto? = null): TransportDto {
+  private fun createTestTransport(note: String, goodsItem: TransportGoodsDto? = null): TransportDto {
     return TransportDto(
       id = UUID.randomUUID(),
       consignorParty = testCompany,
@@ -740,7 +753,7 @@ class TransportControllerIntegrationTest(
       truck = testTruck,
       driver = testDriver,
       note = note,
-      goodsItem = goodsItem,
+      goods = goodsItem?.let { listOf(it) } ?: emptyList(),
       sequenceNumber = 1,
     )
   }

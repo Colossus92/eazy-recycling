@@ -10,7 +10,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
@@ -90,7 +89,9 @@ class GetTransportByIdService(
   private fun mapWasteContainer(containerId: String) =
     wasteContainerViewMapper.map(wasteContainerService.getContainerById(containerId))
 
-  private fun mapGoodsItem(goodsItem: GoodsItem, wasteStream: WasteStream): GoodsItemView {
+  private fun mapGoodsItem(goodsItem: GoodsItem): GoodsItemView {
+    val wasteStream = wasteStreams.findByNumber(goodsItem.wasteStreamNumber)
+      ?: throw IllegalStateException("Geen afvalstroomnummer ${goodsItem.wasteStreamNumber} gevonden")
     return GoodsItemView(
       wasteStreamNumber = wasteStream.wasteStreamNumber.number,
       name = wasteStream.wasteType.name,
@@ -125,12 +126,16 @@ class GetTransportByIdService(
   )
 
   private fun toView(wasteTransport: WasteTransport): TransportDetailView {
-    val wasteStream = wasteStreams.findByNumber(wasteTransport.goodsItem.wasteStreamNumber)
-      ?: throw IllegalStateException("Geen afvalstroomnummer ${wasteTransport.goodsItem.wasteStreamNumber} gevonden")
+    val wasteStream = wasteTransport.goods
+      .first()
+      .let {
+        wasteStreams.findByNumber(it.wasteStreamNumber)
+          ?: throw IllegalStateException("Geen afvalstroomnummer ${wasteTransport.goods.first().wasteStreamNumber} gevonden")
+      }
     return TransportDetailView(
       id = wasteTransport.transportId.uuid,
       displayNumber = wasteTransport.displayNumber?.value,
-      consignorParty = when(val consignor = wasteStream.consignorParty) {
+      consignorParty = when (val consignor = wasteStream.consignorParty) {
         is Consignor.Company -> mapCompany(consignor.id)
         else -> throw IllegalArgumentException("Op dit moment worden alleen bedrijven als opdrachtgever ondersteund")
       },
@@ -149,14 +154,14 @@ class GetTransportByIdService(
       updatedAt = wasteTransport.updatedAt,
       wasteContainer = wasteTransport.wasteContainer?.let { mapWasteContainer(it.id) },
       containerOperation = wasteTransport.containerOperation,
-      goodsItem = mapGoodsItem(wasteTransport.goodsItem, wasteStream),
+      goodsItem = wasteTransport.goods.map { mapGoodsItem(it) },
       consigneeParty = mapCompany(wasteStream.deliveryLocation.processorPartyId),
       pickupParty = mapCompany(wasteStream.pickupParty),
     )
   }
 
   private fun mapWasteDeliveryLocation(deliveryLocation: WasteDeliveryLocation) = PickupLocationView.PickupCompanyView(
-      company = mapCompany(deliveryLocation.processorPartyId)
-    )
+    company = mapCompany(deliveryLocation.processorPartyId)
+  )
 
 }

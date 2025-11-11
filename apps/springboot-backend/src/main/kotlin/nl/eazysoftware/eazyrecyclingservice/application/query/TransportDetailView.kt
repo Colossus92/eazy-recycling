@@ -31,7 +31,7 @@ data class TransportDetailView(
   val containerOperation: ContainerOperation?,
 
   // Waste transport specific details
-  val goodsItem: GoodsItemView? = null,
+  val goodsItem: List<GoodsItemView>? = null,
   val consigneeParty: CompanyView? = null,
   val pickupParty: CompanyView? = null,
 )

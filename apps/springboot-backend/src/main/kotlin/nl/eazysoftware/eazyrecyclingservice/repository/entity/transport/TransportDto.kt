@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
@@ -73,9 +73,12 @@ data class TransportDto(
 
   val note: String,
 
-  @OneToOne(cascade = [CascadeType.ALL])
-  @JoinColumn(name = "goods_item_id", referencedColumnName = "id", nullable = true)
-  val goodsItem: GoodsItemDto? = null,
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(
+    name = "transport_goods",
+    joinColumns = [JoinColumn(name = "transport_id")]
+  )
+  val goods: List<TransportGoodsDto>? = null,
 
   @Column(name = "transport_hours")
   val transportHours: Double? = null,

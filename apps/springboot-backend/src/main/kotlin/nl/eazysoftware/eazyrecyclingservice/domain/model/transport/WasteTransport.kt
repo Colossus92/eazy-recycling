@@ -28,7 +28,7 @@ class WasteTransport(
 
   val transportType: TransportType = TransportType.WASTE,
 
-  val goodsItem: GoodsItem,
+  val goods: List<GoodsItem>,
 
   val wasteContainer: WasteContainerId?,
 
@@ -51,6 +51,12 @@ class WasteTransport(
 
   ) : Transport {
 
+  init {
+      require(goods.isNotEmpty()) {
+        "Een afvaltransport moet afval bevatten"
+      }
+  }
+
   /**
    * Get the current status of this transport.
    * Delegates to the domain service for status calculation.
@@ -69,7 +75,7 @@ class WasteTransport(
       pickupDateTime: Instant,
       deliveryDateTime: Instant,
       transportType: TransportType = TransportType.WASTE,
-      goodsItem: GoodsItem,
+      goodsItem: List<GoodsItem>,
       wasteContainer: WasteContainerId?,
       containerOperation: ContainerOperation?,
       truck: LicensePlate?,
@@ -86,7 +92,7 @@ class WasteTransport(
         pickupDateTime = pickupDateTime,
         deliveryDateTime = deliveryDateTime,
         transportType = transportType,
-        goodsItem = goodsItem,
+        goods = goodsItem,
         wasteContainer = wasteContainer,
         containerOperation = containerOperation,
         truck = truck,

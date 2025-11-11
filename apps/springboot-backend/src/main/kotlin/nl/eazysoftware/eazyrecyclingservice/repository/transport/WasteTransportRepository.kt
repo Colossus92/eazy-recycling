@@ -22,7 +22,7 @@ class WasteTransportRepository(
   override fun findById(transportId: TransportId): WasteTransport? {
     val dto: TransportDto? = jpaRepository.findByIdOrNull(transportId.uuid)
 
-    return if (dto?.goodsItem != null) {
+    return if (dto?.goods?.isNotEmpty() == true) {
       wasteTransportMapper.toDomain(dto)
     } else {
       null
@@ -31,7 +31,7 @@ class WasteTransportRepository(
 
   override fun findAll() =
     jpaRepository.findAll()
-      .filter { it.goodsItem != null }
+      .filter { it.goods != null }
       .map { wasteTransportMapper.toDomain(it) }
 
   override fun delete(transportId: TransportId) {

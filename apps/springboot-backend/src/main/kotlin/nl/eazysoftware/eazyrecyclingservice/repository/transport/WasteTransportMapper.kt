@@ -13,7 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.GoodsItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -33,8 +33,9 @@ class WasteTransportMapper(
 ) {
 
   fun toDto(domain: WasteTransport): TransportDto {
-    val wasteStream = wasteStreamRepository.findByNumber(domain.goodsItem.wasteStreamNumber)
-      ?: throw IllegalArgumentException("Afvalstroomnummer niet gevonden: ${domain.goodsItem.wasteStreamNumber.number}")
+    val firstWasteStreamNumber = domain.goods.first().wasteStreamNumber
+    val wasteStream = wasteStreamRepository.findByNumber(firstWasteStreamNumber)
+      ?: throw IllegalArgumentException("Afvalstroomnummer niet gevonden: ${firstWasteStreamNumber.number}")
     val deliveryLocation = companies.findByProcessorId(wasteStream.deliveryLocation.processorPartyId.number)
       ?.let {
         it.companyId.let { id ->
@@ -63,7 +64,7 @@ class WasteTransportMapper(
       truck = domain.truck?.let { entityManager.getReference(Truck::class.java, it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
-      goodsItem = toDto(domain.goodsItem),
+      goods = toDto(domain.goods),
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
       updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber,
@@ -86,7 +87,7 @@ class WasteTransportMapper(
       pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
       deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
       transportType = dto.transportType,
-      goodsItem = dto.goodsItem
+      goods = dto.goods
         ?.let { toDomain(it) }
         ?: throw IllegalStateException("Afvaltransport met nummer ${dto.displayNumber} heeft geen afval"),
       wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.id) },
@@ -100,17 +101,23 @@ class WasteTransportMapper(
     )
   }
 
-  private fun toDto(goodsItem: GoodsItem) = GoodsItemDto(
-    wasteStreamNumber = goodsItem.wasteStreamNumber.number,
-    netNetWeight = goodsItem.netNetWeight,
-    unit = goodsItem.unit,
-    quantity = goodsItem.quantity
-  )
+  private fun toDto(goodsItem: List<GoodsItem>) =
+    goodsItem.map {
+      TransportGoodsDto(
+        wasteStreamNumber = it.wasteStreamNumber.number,
+        netNetWeight = it.netNetWeight,
+        unit = it.unit,
+        quantity = it.quantity,
+      )
+    }
 
-  private fun toDomain(goodsItemDto: GoodsItemDto) = GoodsItem(
-    wasteStreamNumber = WasteStreamNumber(goodsItemDto.wasteStreamNumber),
-    netNetWeight = goodsItemDto.netNetWeight,
-    unit = goodsItemDto.unit,
-    quantity = goodsItemDto.quantity
-  )
+  private fun toDomain(transportGoodsDto: List<TransportGoodsDto>) =
+    transportGoodsDto.map {
+      GoodsItem(
+        wasteStreamNumber = WasteStreamNumber(it.wasteStreamNumber),
+        netNetWeight = it.netNetWeight,
+        unit = it.unit,
+        quantity = it.quantity
+      )
+    }
 }
