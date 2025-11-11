@@ -4,14 +4,17 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.ToetsenAfvalstroomNummerResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
 import org.springframework.ws.client.core.WebServiceTemplate
 import org.springframework.ws.soap.client.core.SoapActionCallback
 
-@Component
-class ToetsenAfvalstroomNummerClient(
+interface ToetsenAfvalstroomNummerClient {
+  
+  fun validate(body: ToetsenAfvalstroomNummer): ToetsenAfvalstroomNummerResponse
+}
+
+class AmiceToetsenAfvalstroomNummerClient(
   private val webServiceTemplate: WebServiceTemplate,
-) {
+) : ToetsenAfvalstroomNummerClient {
 
   @Value("\${amice.url:}")
   private lateinit var amiceBaseUrl: String
@@ -20,7 +23,7 @@ class ToetsenAfvalstroomNummerClient(
 
   private val soapAction = "http://amice.lma.nl/AmiceWebServices3/ToetsenAfvalstroomNummer"
 
-  fun validate(body: ToetsenAfvalstroomNummer): ToetsenAfvalstroomNummerResponse {
+  override fun validate(body: ToetsenAfvalstroomNummer): ToetsenAfvalstroomNummerResponse {
     logger.info("Calling SOAP service to validate waste stream ${body.afvalstroomNummer}")
 
     return webServiceTemplate.marshalSendAndReceive(

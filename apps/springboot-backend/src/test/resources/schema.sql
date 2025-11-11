@@ -217,3 +217,33 @@ create table if not exists weight_ticket_lines (
                                  constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id),
                                  constraint fk_weight_ticket_lines_waste_stream foreign key (waste_stream_number) references waste_streams(number)
 );
+
+
+create table lma_declaration_sessions (
+                                                   "id" uuid not null,
+                                                   "type" text not null,
+                                                   "declaration_ids" text[] not null,
+                                                   "status" text not null,
+                                                   "errors" text[],
+                                                   "created_at" timestamp with time zone not null,
+                                                   "processed_at" timestamp with time zone
+);
+
+create table lma_declarations (
+                                           "id" text not null,
+                                           "waste_stream_number" text not null,
+                                           "period" text not null,
+                                           "transporters" text[] not null,
+                                           "total_weight" bigint not null,
+                                           "total_shipments" bigint not null,
+                                           "created_at" timestamp with time zone not null default now()
+);
+
+create table monthly_waste_declaration_jobs (
+                                   id uuid not null,
+                                   job_type text not null,
+                                   year_month text not null,
+                                   status text not null,
+                                   created_at timestamp with time zone not null,
+                                   fulfilled_at timestamp with time zone
+);

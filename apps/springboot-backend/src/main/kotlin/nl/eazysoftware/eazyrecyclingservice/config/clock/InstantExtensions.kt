@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.config.clock
 
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -19,4 +20,9 @@ fun Instant.toDisplayTime(): LocalDateTime {
 
 fun Instant.toDisplayString(): String {
   return this.toDisplayTime().toString()
+}
+
+fun Instant.toYearMonth(): YearMonth {
+  val dateTime = this.toLocalDateTime(TimeConfiguration.DISPLAY_TIMEZONE_KX)
+  return YearMonth(dateTime.year, dateTime.month)
 }

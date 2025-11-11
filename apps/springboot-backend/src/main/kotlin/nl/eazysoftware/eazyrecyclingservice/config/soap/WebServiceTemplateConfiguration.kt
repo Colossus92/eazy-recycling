@@ -246,4 +246,14 @@ class WebServiceTemplateConfiguration(
 
     return credentialsProvider
   }
+
+  @Bean
+  fun meldingServiceClient(): MeldingServiceClient {
+    return AmiceMeldingServiceClient(amiceWebServiceTemplate())
+  }
+
+  @Bean
+  fun toetsenAfvalstroomNummerClient(): ToetsenAfvalstroomNummerClient {
+    return AmiceToetsenAfvalstroomNummerClient(amiceWebServiceTemplate())
+  }
 }

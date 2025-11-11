@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
 import org.springframework.context.event.EventListener
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -27,6 +28,7 @@ import java.util.*
   info = Info(title = "Eazy Recycling Backend Service", version = "0.0.1"),
   security = [SecurityRequirement(name = "bearerAuth")]
 )
+@EnableScheduling
 @SpringBootApplication
 class Application {
     @PostConstruct

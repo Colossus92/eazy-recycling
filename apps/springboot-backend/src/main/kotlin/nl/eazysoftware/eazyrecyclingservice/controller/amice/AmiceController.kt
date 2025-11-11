@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SessionResults
 import org.springframework.http.HttpStatus
@@ -28,8 +29,15 @@ import java.util.*
 @RequestMapping("/amice")
 class AmiceController(
   private val firstReceivalDeclarator: FirstReceivalDeclarator,
+  private val monthlyWasteDeclarator: MonthlyWasteDeclarator,
   private val sessionResults: SessionResults,
 ) {
+
+  @PostMapping
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  fun monthlyReport() {
+    monthlyWasteDeclarator.declare()
+  }
 
   @GetMapping("/{sessionId}")
   fun requestSessionResult(@PathVariable sessionId: UUID): OpvragenResultaatVerwerkingMeldingSessieResponse {
