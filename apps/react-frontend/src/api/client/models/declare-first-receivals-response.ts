@@ -17,32 +17,26 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface DeclareFirstReceivalsResponse
  */
-export interface GoodsRequest {
+export interface DeclareFirstReceivalsResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof DeclareFirstReceivalsResponse
+     */
+    'success': boolean;
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof DeclareFirstReceivalsResponse
      */
-    'wasteStreamNumber': string;
+    'message': string;
     /**
      * 
-     * @type {number}
-     * @memberof GoodsRequest
+     * @type {Array<string>}
+     * @memberof DeclareFirstReceivalsResponse
      */
-    'weight': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsRequest
-     */
-    'unit': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'quantity': number;
+    'declaredWasteStreamNumbers': Array<string>;
 }
 

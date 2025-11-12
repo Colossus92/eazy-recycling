@@ -22,7 +22,11 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
-import type { WasteStreamValidationResponse } from '../models';
+import type { DeclareFirstReceivalsRequest } from '../models';
+// @ts-ignore
+import type { DeclareFirstReceivalsResponse } from '../models';
+// @ts-ignore
+import type { OpvragenResultaatVerwerkingMeldingSessieResponse } from '../models';
 /**
  * AmiceControllerApi - axios parameter creator
  * @export
@@ -31,15 +35,14 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
     return {
         /**
          * 
-         * @param {string} wasteStreamNumber 
+         * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        validateWasteStreamNumber: async (wasteStreamNumber: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'wasteStreamNumber' is not null or undefined
-            assertParamExists('validateWasteStreamNumber', 'wasteStreamNumber', wasteStreamNumber)
-            const localVarPath = `/waste-streams/{wasteStreamNumber}/validate`
-                .replace(`{${"wasteStreamNumber"}}`, encodeURIComponent(String(wasteStreamNumber)));
+        declareFirstReceivals: async (declareFirstReceivalsRequest: DeclareFirstReceivalsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'declareFirstReceivalsRequest' is not null or undefined
+            assertParamExists('declareFirstReceivals', 'declareFirstReceivalsRequest', declareFirstReceivalsRequest)
+            const localVarPath = `/amice/declare-first-receivals`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -48,6 +51,79 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
             }
 
             const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(declareFirstReceivalsRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        monthlyReport: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/amice`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        requestSessionResult: async (sessionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionId' is not null or undefined
+            assertParamExists('requestSessionResult', 'sessionId', sessionId)
+            const localVarPath = `/amice/{sessionId}`
+                .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -78,14 +154,37 @@ export const AmiceControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {string} wasteStreamNumber 
+         * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async validateWasteStreamNumber(wasteStreamNumber: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WasteStreamValidationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.validateWasteStreamNumber(wasteStreamNumber, options);
+        async declareFirstReceivals(declareFirstReceivalsRequest: DeclareFirstReceivalsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeclareFirstReceivalsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.declareFirstReceivals(declareFirstReceivalsRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.validateWasteStreamNumber']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.declareFirstReceivals']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async monthlyReport(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.monthlyReport(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.monthlyReport']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OpvragenResultaatVerwerkingMeldingSessieResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.requestSessionResult(sessionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.requestSessionResult']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -100,12 +199,29 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
-         * @param {string} wasteStreamNumber 
+         * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        validateWasteStreamNumber(wasteStreamNumber: string, options?: RawAxiosRequestConfig): AxiosPromise<WasteStreamValidationResponse> {
-            return localVarFp.validateWasteStreamNumber(wasteStreamNumber, options).then((request) => request(axios, basePath));
+        declareFirstReceivals(declareFirstReceivalsRequest: DeclareFirstReceivalsRequest, options?: RawAxiosRequestConfig): AxiosPromise<DeclareFirstReceivalsResponse> {
+            return localVarFp.declareFirstReceivals(declareFirstReceivalsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        monthlyReport(options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.monthlyReport(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} sessionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<OpvragenResultaatVerwerkingMeldingSessieResponse> {
+            return localVarFp.requestSessionResult(sessionId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -119,13 +235,34 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
 export class AmiceControllerApi extends BaseAPI {
     /**
      * 
-     * @param {string} wasteStreamNumber 
+     * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AmiceControllerApi
      */
-    public validateWasteStreamNumber(wasteStreamNumber: string, options?: RawAxiosRequestConfig) {
-        return AmiceControllerApiFp(this.configuration).validateWasteStreamNumber(wasteStreamNumber, options).then((request) => request(this.axios, this.basePath));
+    public declareFirstReceivals(declareFirstReceivalsRequest: DeclareFirstReceivalsRequest, options?: RawAxiosRequestConfig) {
+        return AmiceControllerApiFp(this.configuration).declareFirstReceivals(declareFirstReceivalsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmiceControllerApi
+     */
+    public monthlyReport(options?: RawAxiosRequestConfig) {
+        return AmiceControllerApiFp(this.configuration).monthlyReport(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} sessionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmiceControllerApi
+     */
+    public requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig) {
+        return AmiceControllerApiFp(this.configuration).requestSessionResult(sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

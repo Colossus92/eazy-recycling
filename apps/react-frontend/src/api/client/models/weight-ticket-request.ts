@@ -58,6 +58,18 @@ export interface WeightTicketRequest {
      * @type {string}
      * @memberof WeightTicketRequest
      */
+    'secondWeighingValue'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
+    'secondWeighingUnit'?: WeightTicketRequestSecondWeighingUnitEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
     'carrierParty'?: string;
     /**
      * 
@@ -102,6 +114,11 @@ export const WeightTicketRequestTarraWeightUnitEnum = {
 } as const;
 
 export type WeightTicketRequestTarraWeightUnitEnum = typeof WeightTicketRequestTarraWeightUnitEnum[keyof typeof WeightTicketRequestTarraWeightUnitEnum];
+export const WeightTicketRequestSecondWeighingUnitEnum = {
+    Kg: 'KG'
+} as const;
+
+export type WeightTicketRequestSecondWeighingUnitEnum = typeof WeightTicketRequestSecondWeighingUnitEnum[keyof typeof WeightTicketRequestSecondWeighingUnitEnum];
 export const WeightTicketRequestDirectionEnum = {
     Inbound: 'INBOUND',
     Outbound: 'OUTBOUND'

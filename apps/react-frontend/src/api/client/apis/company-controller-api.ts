@@ -83,10 +83,11 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
         /**
          * 
          * @param {CompanyRequest} companyRequest 
+         * @param {string} [restoreCompanyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCompany: async (companyRequest: CompanyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createCompany: async (companyRequest: CompanyRequest, restoreCompanyId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'companyRequest' is not null or undefined
             assertParamExists('createCompany', 'companyRequest', companyRequest)
             const localVarPath = `/companies`;
@@ -104,6 +105,10 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (restoreCompanyId !== undefined) {
+                localVarQueryParameter['restoreCompanyId'] = restoreCompanyId;
+            }
 
 
     
@@ -388,11 +393,12 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {CompanyRequest} companyRequest 
+         * @param {string} [restoreCompanyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createCompany(companyRequest: CompanyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompanyResult>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createCompany(companyRequest, options);
+        async createCompany(companyRequest: CompanyRequest, restoreCompanyId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompanyResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCompany(companyRequest, restoreCompanyId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['CompanyControllerApi.createCompany']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -496,11 +502,12 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
         /**
          * 
          * @param {CompanyRequest} companyRequest 
+         * @param {string} [restoreCompanyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createCompany(companyRequest: CompanyRequest, options?: RawAxiosRequestConfig): AxiosPromise<CompanyResult> {
-            return localVarFp.createCompany(companyRequest, options).then((request) => request(axios, basePath));
+        createCompany(companyRequest: CompanyRequest, restoreCompanyId?: string, options?: RawAxiosRequestConfig): AxiosPromise<CompanyResult> {
+            return localVarFp.createCompany(companyRequest, restoreCompanyId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -585,12 +592,13 @@ export class CompanyControllerApi extends BaseAPI {
     /**
      * 
      * @param {CompanyRequest} companyRequest 
+     * @param {string} [restoreCompanyId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CompanyControllerApi
      */
-    public createCompany(companyRequest: CompanyRequest, options?: RawAxiosRequestConfig) {
-        return CompanyControllerApiFp(this.configuration).createCompany(companyRequest, options).then((request) => request(this.axios, this.basePath));
+    public createCompany(companyRequest: CompanyRequest, restoreCompanyId?: string, options?: RawAxiosRequestConfig) {
+        return CompanyControllerApiFp(this.configuration).createCompany(companyRequest, restoreCompanyId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

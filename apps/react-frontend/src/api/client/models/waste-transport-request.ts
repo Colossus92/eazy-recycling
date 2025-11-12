@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { GoodsRequest } from './goods-request';
 
 /**
  * 
@@ -76,28 +79,10 @@ export interface WasteTransportRequest {
     'note': string;
     /**
      * 
-     * @type {string}
+     * @type {Array<GoodsRequest>}
      * @memberof WasteTransportRequest
      */
-    'wasteStreamNumber'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof WasteTransportRequest
-     */
-    'weight': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof WasteTransportRequest
-     */
-    'unit': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof WasteTransportRequest
-     */
-    'quantity': number;
+    'goods': Array<GoodsRequest>;
 }
 
 export const WasteTransportRequestContainerOperationEnum = {

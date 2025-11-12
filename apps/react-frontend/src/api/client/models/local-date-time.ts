@@ -45,9 +45,10 @@ export interface LocalDateTime {
      */
     'year': number;
     /**
-     * 
+     * Use the \'day\' property instead
      * @type {number}
      * @memberof LocalDateTime
+     * @deprecated
      */
     'dayOfMonth': number;
     /**
@@ -96,6 +97,13 @@ export interface LocalDateTime {
      * 
      * @type {number}
      * @memberof LocalDateTime
+     */
+    'day': number;
+    /**
+     * Use the \'month\' property instead
+     * @type {number}
+     * @memberof LocalDateTime
+     * @deprecated
      */
     'monthNumber': number;
     /**

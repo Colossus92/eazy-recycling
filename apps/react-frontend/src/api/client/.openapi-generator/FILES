@@ -1,4 +1,5 @@
 api.ts
+apis/amice-controller-api.ts
 apis/company-controller-api.ts
 apis/container-transport-controller-api.ts
 apis/driver-controller-api.ts
@@ -17,6 +18,7 @@ base.ts
 common.ts
 configuration.ts
 index.ts
+models/aanvraag-gegevens-uuiddetails.ts
 models/address-dto.ts
 models/address-request.ts
 models/address-view.ts
@@ -31,6 +33,7 @@ models/company-result.ts
 models/company-view.ts
 models/complete-company-view.ts
 models/consignor-data-response.ts
+models/consignor-party-request.ts
 models/consignor-request.ts
 models/consignor-view.ts
 models/container-transport-request.ts
@@ -40,6 +43,9 @@ models/create-user-request.ts
 models/create-waste-stream-response.ts
 models/create-waste-transport-response.ts
 models/create-weight-ticket-response.ts
+models/declare-first-receivals-request.ts
+models/declare-first-receivals-response.ts
+models/delivery-location-request.ts
 models/delivery-location-view.ts
 models/driver-planning-item.ts
 models/driver-view.ts
@@ -47,8 +53,8 @@ models/dutch-address-request.ts
 models/dutch-address-view.ts
 models/eural-code-view.ts
 models/eural.ts
-models/goods-item-dto.ts
 models/goods-item-view.ts
+models/goods-request.ts
 models/index.ts
 models/instant.ts
 models/local-date-time.ts
@@ -56,6 +62,8 @@ models/local-date.ts
 models/local-time.ts
 models/no-pickup-location-request.ts
 models/no-pickup-view.ts
+models/opvragen-resultaat-verwerking-melding-sessie-response-details.ts
+models/opvragen-resultaat-verwerking-melding-sessie-response.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
 models/pickup-company-request.ts
@@ -75,12 +83,15 @@ models/project-location-result.ts
 models/project-location-view.ts
 models/proximity-description-request.ts
 models/proximity-description-view.ts
+models/receival-declaration-request-pickup-location.ts
+models/receival-declaration-request.ts
 models/signature-status-view.ts
 models/split-weight-ticket-request.ts
 models/split-weight-ticket-response.ts
 models/transport-detail-view.ts
 models/transport-dto.ts
 models/transport-finished-request.ts
+models/transport-goods-dto.ts
 models/transport-reorder-request.ts
 models/truck-view.ts
 models/truck.ts
@@ -100,6 +111,7 @@ models/waste-stream-list-view.ts
 models/waste-stream-request.ts
 models/waste-stream-validation-response.ts
 models/waste-transport-request.ts
+models/waste-type-request.ts
 models/waste-type-view.ts
 models/weight-request.ts
 models/weight-ticket-detail-view-consignor-party.ts

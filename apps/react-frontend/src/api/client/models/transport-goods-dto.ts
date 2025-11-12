@@ -17,31 +17,31 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface TransportGoodsDto
  */
-export interface GoodsRequest {
+export interface TransportGoodsDto {
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof TransportGoodsDto
      */
     'wasteStreamNumber': string;
     /**
      * 
      * @type {number}
-     * @memberof GoodsRequest
+     * @memberof TransportGoodsDto
      */
-    'weight': number;
+    'netNetWeight': number;
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof TransportGoodsDto
      */
     'unit': string;
     /**
      * 
      * @type {number}
-     * @memberof GoodsRequest
+     * @memberof TransportGoodsDto
      */
     'quantity': number;
 }

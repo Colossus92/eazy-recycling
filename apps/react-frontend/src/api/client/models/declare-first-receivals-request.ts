@@ -13,36 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ReceivalDeclarationRequest } from './receival-declaration-request';
 
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface DeclareFirstReceivalsRequest
  */
-export interface GoodsRequest {
+export interface DeclareFirstReceivalsRequest {
     /**
      * 
-     * @type {string}
-     * @memberof GoodsRequest
+     * @type {Array<ReceivalDeclarationRequest>}
+     * @memberof DeclareFirstReceivalsRequest
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'weight': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsRequest
-     */
-    'unit': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'quantity': number;
+    'declarations': Array<ReceivalDeclarationRequest>;
 }
 

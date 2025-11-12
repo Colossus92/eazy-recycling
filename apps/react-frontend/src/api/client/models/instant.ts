@@ -22,27 +22,15 @@
 export interface Instant {
     /**
      * 
-     * @type {string}
-     * @memberof Instant
-     */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Instant
-     */
-    'nanosecondsOfSecond': number;
-    /**
-     * 
      * @type {number}
      * @memberof Instant
      */
     'epochSeconds': number;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof Instant
      */
-    'value$kotlinx_datetime': string;
+    'nanosecondsOfSecond': number;
 }
 

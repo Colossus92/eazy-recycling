@@ -151,10 +151,10 @@ export interface TransportDetailView {
     'containerOperation'?: TransportDetailViewContainerOperationEnum;
     /**
      * 
-     * @type {GoodsItemView}
+     * @type {Array<GoodsItemView>}
      * @memberof TransportDetailView
      */
-    'goodsItem'?: GoodsItemView;
+    'goodsItem'?: Array<GoodsItemView>;
     /**
      * 
      * @type {CompanyView}

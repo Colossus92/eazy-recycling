@@ -17,32 +17,14 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface DeliveryLocationRequest
  */
-export interface GoodsRequest {
+export interface DeliveryLocationRequest {
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof DeliveryLocationRequest
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'weight': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GoodsRequest
-     */
-    'unit': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'quantity': number;
+    'processorPartyId': string;
 }
 

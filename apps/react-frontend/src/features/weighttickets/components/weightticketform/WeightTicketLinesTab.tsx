@@ -8,11 +8,24 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 import { wasteStreamService } from '@/api/services/wasteStreamService';
 import { WasteStreamListView } from '@/api/client';
-import { NumberFormField } from '@/components/ui/form/NumberFormField';
+import { NumberInput } from '@/components/ui/form/NumberInput';
 
 interface WeightTicketLinesTabProps {
   disabled?: boolean;
 }
+
+const UnitBadge = () => (
+  <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
+    kg
+  </div>
+);
+
+const LineRow = () => (
+  <>
+    <div></div>
+    <div className="w-full col-span-3 h-px bg-color-border-hover"></div>
+  </>
+)
 
 export const WeightTicketLinesTab = ({
   disabled = false,
@@ -70,6 +83,12 @@ export const WeightTicketLinesTab = ({
     name: 'tarraWeightValue',
   });
 
+  // Watch line weight values to trigger recalculation
+  const lineWeights = useWatch({
+    control,
+    name: 'lines',
+  });
+
   // Fetch waste streams
   const { data: wasteStreams = [] } = useQuery<WasteStreamListView[]>({
     queryKey: ['wasteStreams'],
@@ -86,11 +105,11 @@ export const WeightTicketLinesTab = ({
 
   // Calculate Weging 1 (sum of all line weights)
   const weging1 = useMemo(() => {
-    return fields.reduce((sum, field) => {
+    return lineWeights.reduce((sum, field) => {
       const weight = parseFloat(field.weightValue as string) || 0;
       return sum + weight;
     }, 0);
-  }, [fields]);
+  }, [lineWeights]);
 
   // Calculate Bruto (Weging 1 - Weging 2)
   const bruto = useMemo(() => {
@@ -98,12 +117,11 @@ export const WeightTicketLinesTab = ({
     return weging1 - weging2;
   }, [weging1, secondWeightValue]);
 
-  // Calculate Netto (Weging 2 - Tarra)
+  // Calculate Netto (Bruto - Tarra)
   const netto = useMemo(() => {
-    const weging2 = parseFloat(secondWeightValue as unknown as string) || 0;
     const tarra = parseFloat(tarraWeightValue as unknown as string) || 0;
-    return weging2 - tarra;
-  }, [secondWeightValue, tarraWeightValue]);
+    return bruto - tarra;
+  }, [bruto, tarraWeightValue]);
 
   const wasteStreamOptions = useMemo(() => {
     return filteredWasteStreams.map((ws) => ({
@@ -235,7 +253,7 @@ export const WeightTicketLinesTab = ({
                           // Validate number format if value exists
                           if (
                             stringValue &&
-                            !/^\d+(\.\d+)?$/.test(stringValue)
+                            !/^\d+([.,]\d+)?$/.test(stringValue)
                           ) {
                             return 'Voer een geldig getal in';
                           }
@@ -249,106 +267,86 @@ export const WeightTicketLinesTab = ({
 
                 <div className="flex flex-col items-start gap-2">
                   <label className="text-caption-2">Eenheid</label>
-                  <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                    kg
-                  </div>
+                  <UnitBadge />
                 </div>
               </div>
             </div>
           ))}
-          <div className="flex items-start self-stretch gap-4">
-            <NumberFormField
-              title={'Weging 2'}
-              placeholder={'Vul weging 2 in'}
-              step={0.01}
-              disabled={disabled}
-              formHook={{
-                register: formContext.register,
-                name: 'secondWeightValue',
-                errors: formContext.formState.errors,
-              }}
-            />
-            <div className="flex flex-col items-start gap-2">
-              <label className="text-caption-2">Eenheid</label>
-              <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                kg
-              </div>
+          {/* Summary */}
+          <div className="grid grid-cols-[auto_1fr_auto_auto] gap-4 gap-y-2 self-stretch w-1/2">
+            {/* Weging 1 */}
+            <span className="text-caption-2 self-center">Weging 1</span>
+            <div className="flex flex-col items-start gap-1">
+              <NumberInput
+                placeholder={'0'}
+                value={weging1.toFixed(2)}
+                disabled={true}
+                data-testid={"weging-1-disabled-input"}
+              />
             </div>
-          </div>
-          <div className="flex items-start self-stretch gap-4">
-            <NumberFormField
-              title={'Tarra'}
-              placeholder={'Vul tarra in'}
-              step={0.01}
-              disabled={disabled}
-              formHook={{
-                register: formContext.register,
-                name: 'tarraWeightValue',
-                errors: formContext.formState.errors,
-              }}
-            />
-            <div className="flex flex-col items-start gap-2">
-              <label className="text-caption-2">Eenheid</label>
-              <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                kg
-              </div>
-            </div>
-          </div>
+            <UnitBadge />
+            <div></div>
 
-          {/* Weight Overview Section */}
-          <div className="flex flex-col items-start self-stretch gap-4 p-4 bg-color-surface-secondary rounded-radius-md border border-color-border">
-            <span className="text-subtitle-1">Weging Overzicht</span>
-
-            <div className="flex items-start self-stretch gap-4">
-              <div className="flex-1">
-                <div className="flex flex-col items-start gap-2">
-                  <label className="text-caption-2">Weging 1</label>
-                  <div className="flex items-center justify-center w-full px-3 py-2 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                    {weging1.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <label className="text-caption-2">Eenheid</label>
-                <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                  kg
-                </div>
-              </div>
+            {/* Weging 2 - with minus sign and underline */}
+            <span className="text-caption-2 self-center">Weging 2</span>
+            <div className="flex flex-col items-start gap-1">
+              <NumberInput
+                placeholder={'Vul weging 2 in'}
+                step={0.01}
+                disabled={disabled}
+                formHook={{
+                  register: formContext.register,
+                  name: 'secondWeightValue',
+                  errors: formContext.formState.errors,
+                }}
+              />
             </div>
-
-            <div className="flex items-start self-stretch gap-4">
-              <div className="flex-1">
-                <div className="flex flex-col items-start gap-2">
-                  <label className="text-caption-2">Bruto</label>
-                  <div className="flex items-center justify-center w-full px-3 py-2 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                    {bruto.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <label className="text-caption-2">Eenheid</label>
-                <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                  kg
-                </div>
-              </div>
+            <UnitBadge />
+            <span className="text-body-1 text-color-text-secondary self-center">−</span>
+            <LineRow />
+            {/* Bruto */}
+            <span className="text-caption-2 self-center">Bruto</span>
+            <div className="flex flex-col items-start gap-1">
+              <NumberInput
+                placeholder={'0'}
+                value={bruto.toFixed(2)}
+                disabled={true}
+                data-testid={"bruto-disabled-input"}
+              />
             </div>
+            <UnitBadge />
+            <div></div>
 
-            <div className="flex items-start self-stretch gap-4">
-              <div className="flex-1">
-                <div className="flex flex-col items-start gap-2">
-                  <label className="text-caption-2">Netto</label>
-                  <div className="flex items-center justify-center w-full px-3 py-2 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                    {netto.toFixed(2)}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-start gap-2">
-                <label className="text-caption-2">Eenheid</label>
-                <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
-                  kg
-                </div>
-              </div>
+            {/* Tarra - with minus sign and underline */}
+            <span className="text-caption-2 self-center">Tarra</span>
+            <div className="flex flex-col items-start gap-1">
+              <NumberInput
+                placeholder={'Vul tarra in'}
+                step={'0.01'}
+                disabled={disabled}
+                formHook={{
+                  register: formContext.register,
+                  name: 'tarraWeightValue',
+                  errors: formContext.formState.errors,
+                }}
+              />
             </div>
+            <UnitBadge />
+            <span className="text-body-1 text-color-text-secondary self-center">−</span>
+            <LineRow />
+
+            {/* Netto */}
+            <span className="text-caption-2 self-center">Netto</span>
+            <div className="flex flex-col items-start gap-1">
+              <NumberInput
+                placeholder={'0'}
+                value={netto.toFixed(2)}
+                disabled={true}
+                data-testid={"netto-disabled-input"}
+              />
+            </div>
+            <UnitBadge />
+            <div></div>
           </div>
         </div>
       )}

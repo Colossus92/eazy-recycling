@@ -74,6 +74,24 @@ export const WeightTicketForm = ({
   }));
 
   const onSubmit = formContext.handleSubmit(async (formValues) => {
+    // Calculate netto to validate it's not below 0
+    const weging1 = formValues.lines.reduce((sum, field) => {
+      const weight = parseFloat(field.weightValue as string) || 0;
+      return sum + weight;
+    }, 0);
+    const weging2 = parseFloat(formValues.secondWeightValue as unknown as string) || 0;
+    const bruto = weging1 - weging2;
+    const tarra = parseFloat(formValues.tarraWeightValue as unknown as string) || 0;
+    const netto = bruto - tarra;
+
+    if (netto < 0) {
+      formContext.setError('tarraWeightValue', {
+        type: 'manual',
+        message: 'Netto gewicht kan niet negatief zijn',
+      });
+      return;
+    }
+
     // Filter out empty lines (lines where wasteStreamNumber is empty)
     const filteredFormValues = {
       ...formValues,

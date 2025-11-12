@@ -17,32 +17,20 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface ConsignorPartyRequest
  */
-export interface GoodsRequest {
+export interface ConsignorPartyRequest {
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof ConsignorPartyRequest
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'weight': number;
+    'type': string;
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof ConsignorPartyRequest
      */
-    'unit': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'quantity': number;
+    'companyId'?: string;
 }
 

@@ -895,6 +895,12 @@ paths:
       tags:
       - company-controller
       operationId: createCompany
+      parameters:
+      - name: restoreCompanyId
+        in: query
+        required: false
+        schema:
+          type: string
       requestBody:
         content:
           application/json:
@@ -933,6 +939,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
+  /amice:
+    post:
+      tags:
+      - amice-controller
+      operationId: monthlyReport
+      responses:
+        "200":
+          description: OK
+  /amice/declare-first-receivals:
+    post:
+      tags:
+      - amice-controller
+      operationId: declareFirstReceivals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeclareFirstReceivalsRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DeclareFirstReceivalsResponse"
   /waste-streams:
     get:
       tags:
@@ -1132,6 +1164,25 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
+  /amice/{sessionId}:
+    get:
+      tags:
+      - amice-controller
+      operationId: requestSessionResult
+      parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OpvragenResultaatVerwerkingMeldingSessieResponse"
 components:
   schemas:
     CompanyConsignor:
@@ -1304,6 +1355,12 @@ components:
         tarraWeightValue:
           type: string
         tarraWeightUnit:
+          type: string
+          enum:
+          - KG
+        secondWeighingValue:
+          type: string
+        secondWeighingUnit:
           type: string
           enum:
           - KG
@@ -1524,6 +1581,27 @@ components:
       - displayName
       - licensePlate
       - updatedAt
+    GoodsRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        weight:
+          type: number
+          format: double
+          minimum: 0
+        unit:
+          type: string
+          minLength: 1
+        quantity:
+          type: integer
+          format: int32
+          minimum: 0
+      required:
+      - quantity
+      - unit
+      - wasteStreamNumber
+      - weight
     WasteTransportRequest:
       type: object
       properties:
@@ -1557,28 +1635,17 @@ components:
           type: string
         note:
           type: string
-        wasteStreamNumber:
-          type: string
-        weight:
-          type: number
-          format: double
-          minimum: 0
-        unit:
-          type: string
-          minLength: 1
-        quantity:
-          type: integer
-          format: int32
-          minimum: 0
+        goods:
+          type: array
+          items:
+            $ref: "#/components/schemas/GoodsRequest"
       required:
       - carrierPartyId
       - containerOperation
+      - goods
       - note
       - pickupDateTime
-      - quantity
       - transportType
-      - unit
-      - weight
     UpdateWasteTransportResponse:
       type: object
       properties:
@@ -2177,6 +2244,9 @@ components:
           type: string
         address:
           $ref: "#/components/schemas/AddressDto"
+        deletedAt:
+          type: string
+          format: date-time
         updatedAt:
           type: string
           format: date-time
@@ -2185,27 +2255,6 @@ components:
       - id
       - name
       - updatedAt
-    GoodsItemDto:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        wasteStreamNumber:
-          type: string
-        netNetWeight:
-          type: number
-          format: double
-        unit:
-          type: string
-        quantity:
-          type: integer
-          format: int32
-      required:
-      - netNetWeight
-      - quantity
-      - unit
-      - wasteStreamNumber
     PickupLocationDto:
       type: object
       properties:
@@ -2255,8 +2304,10 @@ components:
           $ref: "#/components/schemas/ProfileDto"
         note:
           type: string
-        goodsItem:
-          $ref: "#/components/schemas/GoodsItemDto"
+        goods:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportGoodsDto"
         transportHours:
           type: number
           format: double
@@ -2284,6 +2335,24 @@ components:
       - sequenceNumber
       - status
       - transportType
+    TransportGoodsDto:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        netNetWeight:
+          type: number
+          format: double
+        unit:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+      required:
+      - netNetWeight
+      - quantity
+      - unit
+      - wasteStreamNumber
     WasteContainerDto:
       type: object
       properties:
@@ -2323,6 +2392,134 @@ components:
       required:
       - companyId
       - projectLocationId
+    ConsignorPartyRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          minLength: 1
+        companyId:
+          type: string
+      required:
+      - type
+    DeclareFirstReceivalsRequest:
+      type: object
+      properties:
+        declarations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReceivalDeclarationRequest"
+          minItems: 1
+      required:
+      - declarations
+    DeliveryLocationRequest:
+      type: object
+      properties:
+        processorPartyId:
+          type: string
+          minLength: 1
+          pattern: "^\\d{5}$"
+      required:
+      - processorPartyId
+    ReceivalDeclarationRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+          minLength: 1
+          pattern: "^\\d{12}$"
+        wasteType:
+          $ref: "#/components/schemas/WasteTypeRequest"
+        collectionType:
+          type: string
+          minLength: 1
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/PickupLocationRequest"
+          - $ref: "#/components/schemas/DutchAddressRequest"
+          - $ref: "#/components/schemas/NoPickupLocationRequest"
+          - $ref: "#/components/schemas/PickupCompanyRequest"
+          - $ref: "#/components/schemas/ProjectLocationRequest"
+          - $ref: "#/components/schemas/ProximityDescriptionRequest"
+        deliveryLocation:
+          $ref: "#/components/schemas/DeliveryLocationRequest"
+        consignorParty:
+          $ref: "#/components/schemas/ConsignorPartyRequest"
+        consignorClassification:
+          type: integer
+          format: int32
+        pickupParty:
+          type: string
+          minLength: 1
+        dealerParty:
+          type: string
+        collectorParty:
+          type: string
+        brokerParty:
+          type: string
+        transporterIds:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        totalWeight:
+          type: integer
+          format: int32
+        totalShipments:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+        month:
+          type: integer
+          format: int32
+      required:
+      - collectionType
+      - consignorClassification
+      - consignorParty
+      - deliveryLocation
+      - month
+      - pickupParty
+      - totalShipments
+      - totalWeight
+      - transporterIds
+      - wasteStreamNumber
+      - wasteType
+      - year
+    WasteTypeRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        euralCode:
+          type: string
+          minLength: 1
+          pattern: "^\\d{6}\\*?$"
+        processingMethod:
+          type: string
+          minLength: 1
+          pattern: "^[A-Z]\\.?\\d{2}$"
+      required:
+      - euralCode
+      - name
+      - processingMethod
+    DeclareFirstReceivalsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        declaredWasteStreamNumbers:
+          type: array
+          items:
+            type: string
+      required:
+      - declaredWasteStreamNumbers
+      - message
+      - success
     WeightTicketListView:
       type: object
       properties:
@@ -2374,6 +2571,8 @@ components:
         dayOfMonth:
           type: integer
           format: int32
+          deprecated: true
+          description: Use the 'day' property instead
         month:
           type: string
           enum:
@@ -2402,13 +2601,19 @@ components:
         dayOfYear:
           type: integer
           format: int32
+        day:
+          type: integer
+          format: int32
         monthNumber:
           type: integer
           format: int32
+          deprecated: true
+          description: Use the 'month' property instead
         value$kotlinx_datetime:
           type: string
           format: date
       required:
+      - day
       - dayOfMonth
       - dayOfWeek
       - dayOfYear
@@ -2431,6 +2636,8 @@ components:
         dayOfMonth:
           type: integer
           format: int32
+          deprecated: true
+          description: Use the 'day' property instead
         hour:
           type: integer
           format: int32
@@ -2470,9 +2677,14 @@ components:
           format: int32
         date:
           $ref: "#/components/schemas/LocalDate"
+        day:
+          type: integer
+          format: int32
         monthNumber:
           type: integer
           format: int32
+          deprecated: true
+          description: Use the 'month' property instead
         nanosecond:
           type: integer
           format: int32
@@ -2481,6 +2693,7 @@ components:
           format: date-time
       required:
       - date
+      - day
       - dayOfMonth
       - dayOfWeek
       - dayOfYear
@@ -2784,23 +2997,15 @@ components:
     Instant:
       type: object
       properties:
-        value:
-          type: string
-          format: date-time
-          writeOnly: true
-        nanosecondsOfSecond:
-          type: integer
-          format: int32
         epochSeconds:
           type: integer
           format: int64
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
+        nanosecondsOfSecond:
+          type: integer
+          format: int32
       required:
       - epochSeconds
       - nanosecondsOfSecond
-      - value$kotlinx_datetime
     TransportDetailView:
       type: object
       properties:
@@ -2863,7 +3068,9 @@ components:
           - EMPTY
           - DELIVERY
         goodsItem:
-          $ref: "#/components/schemas/GoodsItemView"
+          type: array
+          items:
+            $ref: "#/components/schemas/GoodsItemView"
         consigneeParty:
           $ref: "#/components/schemas/CompanyView"
         pickupParty:
@@ -2978,6 +3185,46 @@ components:
       - id
       - name
       - updatedAt
+    AanvraagGegevensUUIDDetails:
+      type: object
+      properties:
+        meldingSessieUUID:
+          type: string
+          xml:
+            name: MeldingSessieUUID
+        datumTijdRequest:
+          type: string
+          format: date-time
+          xml:
+            name: DatumTijdRequest
+        usernameRequest:
+          type: string
+          xml:
+            name: UsernameRequest
+      required:
+      - datumTijdRequest
+    OpvragenResultaatVerwerkingMeldingSessieResponse:
+      type: object
+      properties:
+        opvragenResultaatVerwerkingMeldingSessieResponseDetails:
+          $ref: "#/components/schemas/OpvragenResultaatVerwerkingMeldingSessieResponseDetails"
+          xml:
+            name: OpvragenResultaatVerwerkingMeldingSessieResponseDetails
+      required:
+      - opvragenResultaatVerwerkingMeldingSessieResponseDetails
+      xml:
+        name: OpvragenResultaatVerwerkingMeldingSessieResponse
+        namespace: http://amice.lma.nl/AmiceWebServices3/
+    OpvragenResultaatVerwerkingMeldingSessieResponseDetails:
+      type: object
+      properties:
+        aanvraagGegevens:
+          $ref: "#/components/schemas/AanvraagGegevensUUIDDetails"
+          xml:
+            name: AanvraagGegevens
+        aanvraagFoutOrStatusMeldingSessie:
+          type: array
+          items: {}
   securitySchemes:
     bearerAuth:
       type: http

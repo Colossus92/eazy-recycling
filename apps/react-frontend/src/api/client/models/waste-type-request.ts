@@ -17,32 +17,26 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface WasteTypeRequest
  */
-export interface GoodsRequest {
+export interface WasteTypeRequest {
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof WasteTypeRequest
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'weight': number;
+    'name': string;
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof WasteTypeRequest
      */
-    'unit': string;
+    'euralCode': string;
     /**
      * 
-     * @type {number}
-     * @memberof GoodsRequest
+     * @type {string}
+     * @memberof WasteTypeRequest
      */
-    'quantity': number;
+    'processingMethod': string;
 }
 

@@ -10,7 +10,7 @@ interface InputProps<TFieldValues extends FieldValues>
   disabled?: boolean;
   placeholder?: string;
   formHook?: FormProps<TFieldValues>;
-  step?: number | 'any';
+  step?: number | string;
 }
 
 export const NumberInput = <TFieldValues extends FieldValues>({
@@ -18,6 +18,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
   placeholder,
   formHook,
   step = 'any',
+  onBlur: propsOnBlur,
   ...props
 }: InputProps<TFieldValues>) => {
   const fieldError = getFieldError(formHook?.errors, formHook?.name);
@@ -33,6 +34,14 @@ export const NumberInput = <TFieldValues extends FieldValues>({
     ? formInputClasses.background.disabled
     : formInputClasses.background.hover;
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value && !isNaN(parseFloat(value))) {
+      e.target.value = parseFloat(value).toFixed(step === 'any' ? 1 : step as number);
+    }
+    propsOnBlur?.(e);
+  };
+
   return (
     <div className={clsx(formInputClasses.container, textColorClasses)}>
       <input
@@ -41,6 +50,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
         placeholder={placeholder}
         className={clsx(
           'h-10',
+          'text-right',
           formInputClasses.base,
           formInputClasses.padding.default,
           borderColorClasses,
@@ -59,6 +69,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
             } as any)
           : {})}
         {...props}
+        onBlur={handleBlur}
       />
     </div>
   );

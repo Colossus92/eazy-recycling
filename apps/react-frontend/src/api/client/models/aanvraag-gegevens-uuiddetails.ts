@@ -17,32 +17,26 @@
 /**
  * 
  * @export
- * @interface GoodsRequest
+ * @interface AanvraagGegevensUUIDDetails
  */
-export interface GoodsRequest {
+export interface AanvraagGegevensUUIDDetails {
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof AanvraagGegevensUUIDDetails
      */
-    'wasteStreamNumber': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GoodsRequest
-     */
-    'weight': number;
+    'meldingSessieUUID'?: string;
     /**
      * 
      * @type {string}
-     * @memberof GoodsRequest
+     * @memberof AanvraagGegevensUUIDDetails
      */
-    'unit': string;
+    'datumTijdRequest': string;
     /**
      * 
-     * @type {number}
-     * @memberof GoodsRequest
+     * @type {string}
+     * @memberof AanvraagGegevensUUIDDetails
      */
-    'quantity': number;
+    'usernameRequest'?: string;
 }
 
