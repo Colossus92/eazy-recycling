@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.amice
 
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SessionResults
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.MonthlyWasteDeclarationJobsJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
@@ -34,10 +34,10 @@ class AmiceControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var monthlyWasteDeclarationJobsRepository: MonthlyWasteDeclarationJobsJpaRepository
 
     @MockitoBean
-    private lateinit var firstReceivalDeclarator: FirstReceivalDeclarator
+    private lateinit var declareFirstReceivals: DeclareFirstReceivals
 
     @MockitoBean
-    private lateinit var sessionResults: SessionResults
+    private lateinit var amiceSessions: AmiceSessions
 
     @BeforeEach
     fun setup() {

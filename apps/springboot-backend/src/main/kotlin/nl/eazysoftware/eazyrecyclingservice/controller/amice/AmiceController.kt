@@ -6,16 +6,16 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessieResponse
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclaration
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SessionResults
+import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -28,9 +28,10 @@ import java.util.*
 @RestController
 @RequestMapping("/amice")
 class AmiceController(
-  private val firstReceivalDeclarator: FirstReceivalDeclarator,
+  private val declareFirstReceivals: DeclareFirstReceivals,
   private val monthlyWasteDeclarator: MonthlyWasteDeclarator,
-  private val sessionResults: SessionResults,
+  private val firstReceivalDeclarationFactory: ReceivalDeclarationFactory,
+  private val amiceSessions: AmiceSessions,
 ) {
 
   @PostMapping
@@ -41,7 +42,7 @@ class AmiceController(
 
   @GetMapping("/{sessionId}")
   fun requestSessionResult(@PathVariable sessionId: UUID): OpvragenResultaatVerwerkingMeldingSessieResponse {
-    return sessionResults.retrieve(sessionId)
+    return amiceSessions.retrieve(sessionId)
   }
 
   /**
@@ -83,7 +84,7 @@ class AmiceController(
         brokerParty = declaration.brokerParty?.let { CompanyId(UUID.fromString(it)) }
       )
 
-      ReceivalDeclaration(
+      firstReceivalDeclarationFactory.create(
         wasteStream = wasteStream,
         transporters = declaration.transporterIds,
         totalWeight = declaration.totalWeight,
@@ -93,7 +94,7 @@ class AmiceController(
     }
 
     // Call the declarator
-    firstReceivalDeclarator.declareFirstReceivals(receivalDeclarations)
+    declareFirstReceivals.declareFirstReceivals(receivalDeclarations)
 
     return DeclareFirstReceivalsResponse(
       success = true,

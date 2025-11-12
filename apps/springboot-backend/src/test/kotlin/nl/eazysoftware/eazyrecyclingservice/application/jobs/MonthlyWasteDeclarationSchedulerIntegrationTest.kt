@@ -1,7 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.MonthlyWasteDeclarationJobsJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.MonthlyWasteDeclarationJobsRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -36,10 +40,10 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
   private lateinit var firstReceivalWasteStreamQuery: FirstReceivalWasteStreamQuery
 
   @MockitoBean
-  private lateinit var firstReceivalDeclarator: FirstReceivalDeclarator
+  private lateinit var declareFirstReceivals: DeclareFirstReceivals
 
   @MockitoBean
-  private lateinit var sessionResults: SessionResults
+  private lateinit var amiceSessions: AmiceSessions
 
   @AfterEach
   fun cleanup() {
@@ -102,7 +106,7 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
     scheduler.processPendingJobs()
 
     // Then - verify the declarator was NOT called (empty list)
-    verify(firstReceivalDeclarator, never()).declareFirstReceivals(any())
+    verify(declareFirstReceivals, never()).declareFirstReceivals(any())
 
     // Verify the job was marked as completed
     val jobs = monthlyWasteDeclarationJobsJpaRepository.findAll()

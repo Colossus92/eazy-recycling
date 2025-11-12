@@ -1,5 +1,6 @@
-package nl.eazysoftware.eazyrecyclingservice.adapters.out.soap
+package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
 
+import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.Bedrijf
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
@@ -8,24 +9,42 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
+
+interface DeclareFirstReceivals {
+
+  fun declareFirstReceivals(receivalDeclarations: List<ReceivalDeclaration>)
+}
+
+data class ReceivalDeclaration(
+  val id: String,
+  val wasteStream: WasteStream,
+  val transporters: List<String>,
+  val totalWeight: Int,
+  val totalShipments: Short,
+  val yearMonth: YearMonth
+)
 
 /**
  * SOAP adapter for first receival declarations using the Amice Melding service.
  * This is an outbound adapter in hexagonal architecture.
  */
 @Component
-class AmiceFirstReceivalDeclaratorAdapter(
-  private val sessionService: AmiceSessionService,
+class DeclareFirstReceivalsService(
+  private val amiceSessions: AmiceSessions,
+  private val lmaDeclarations: LmaDeclarations,
   private val companies: Companies
-): FirstReceivalDeclarator {
+): DeclareFirstReceivals {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
+  @Transactional
   override fun declareFirstReceivals(
     receivalDeclarations: List<ReceivalDeclaration>
   ) {
@@ -33,7 +52,8 @@ class AmiceFirstReceivalDeclaratorAdapter(
 
     val message = receivalDeclarations.map { mapToSoapMessage(it) }
 
-    sessionService.declareFirstReceivals(message)
+    lmaDeclarations.saveAllPending(message)
+    amiceSessions.declareFirstReceivals(message)
   }
 
   @Suppress("DuplicatedCode")
@@ -44,6 +64,7 @@ class AmiceFirstReceivalDeclaratorAdapter(
     val wasteStream = receivalDeclaration.wasteStream
 
     // Basic waste stream information
+    message.meldingsNummerMelder = receivalDeclaration.id
     message.afvalstroomNummer = wasteStream.wasteStreamNumber.number
     message.isRouteInzameling = wasteStream.collectionType == WasteCollectionType.ROUTE
     message.isInzamelaarsRegeling = wasteStream.collectionType == WasteCollectionType.COLLECTORS_SCHEME

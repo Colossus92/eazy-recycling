@@ -429,11 +429,11 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
   private fun createLmaDeclaration(wasteStreamNumber: String, period: String) {
     jdbcTemplate.update(
       """
-      INSERT INTO lma_declarations (id, waste_stream_number, period, transporters,
-                                    total_weight, total_shipments, created_at)
-      VALUES (?, ?, ?, ARRAY[]::text[], 0, 0, NOW())
+      INSERT INTO lma_declarations (id, amice_uuid, waste_stream_number, period, transporters,
+                                    total_weight, total_shipments, created_at, errors, status)
+      VALUES (?, ?, ?, ?, ARRAY[]::text[], 0, 0, NOW(), ARRAY[]::text[], 'PENDING')
       """,
-      UUID.randomUUID().toString(), wasteStreamNumber, period
+      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period
     )
   }
 

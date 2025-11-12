@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalDeclarator
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJobs
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component
 class MonthlyWasteDeclarationScheduler(
   private val monthlyWasteDeclarationJobs: MonthlyWasteDeclarationJobs,
   private val firstReceivalWasteStreamQuery: FirstReceivalWasteStreamQuery,
-  private val firstReceivalDeclarator: FirstReceivalDeclarator
+  private val declareFirstReceivals: DeclareFirstReceivals
 ) {
 
   private val logger = LoggerFactory.getLogger(MonthlyWasteDeclarationScheduler::class.java)
@@ -76,7 +76,7 @@ class MonthlyWasteDeclarationScheduler(
     }
 
     // Trigger the declarator to process the declarations
-    firstReceivalDeclarator.declareFirstReceivals(receivalDeclarations)
+    declareFirstReceivals.declareFirstReceivals(receivalDeclarations)
 
     // Mark job as completed
     monthlyWasteDeclarationJobs.save(job.markCompleted())

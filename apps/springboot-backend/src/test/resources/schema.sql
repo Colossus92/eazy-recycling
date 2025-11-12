@@ -231,12 +231,16 @@ create table lma_declaration_sessions (
 
 create table lma_declarations (
                                            "id" text not null,
+                                           "amice_uuid" uuid,
                                            "waste_stream_number" text not null,
                                            "period" text not null,
                                            "transporters" text[] not null,
                                            "total_weight" bigint not null,
                                            "total_shipments" bigint not null,
-                                           "created_at" timestamp with time zone not null default now()
+                                           "created_at" timestamp with time zone not null default now(),
+                                           "errors" text[],
+                                           "status" text not null,
+                                           constraint lma_declarations_amice_uuid_unique unique ("amice_uuid")
 );
 
 create table monthly_waste_declaration_jobs (
@@ -247,3 +251,5 @@ create table monthly_waste_declaration_jobs (
                                    created_at timestamp with time zone not null,
                                    fulfilled_at timestamp with time zone
 );
+
+create sequence if not exists receival_declaration_id_seq start with 1 increment by 1 maxvalue 999999999999;

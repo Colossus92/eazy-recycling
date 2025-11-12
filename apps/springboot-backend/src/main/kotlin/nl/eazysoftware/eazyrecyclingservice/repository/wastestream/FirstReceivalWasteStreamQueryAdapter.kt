@@ -3,12 +3,13 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
+import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
@@ -32,7 +33,8 @@ import java.util.*
 class FirstReceivalWasteStreamQueryAdapter(
   private val entityManager: EntityManager,
   private val wasteStreamMapper: WasteStreamMapper,
-  private val companyRepository: CompanyJpaRepository
+  private val companyRepository: CompanyJpaRepository,
+  private val receivalDeclarationFactory: ReceivalDeclarationFactory,
 ) : FirstReceivalWasteStreamQuery {
 
   private val logger = LoggerFactory.getLogger(FirstReceivalWasteStreamQueryAdapter::class.java)
@@ -155,7 +157,7 @@ class FirstReceivalWasteStreamQueryAdapter(
       val totalShipments = result.totalShipments.toShort()
       val transporters = result.transporters?.toList() ?: emptyList()
 
-      ReceivalDeclaration(
+      receivalDeclarationFactory.create(
         wasteStream = wasteStream,
         transporters = transporters,
         totalWeight = totalWeight,
