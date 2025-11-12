@@ -226,3 +226,102 @@ class WeightTicketTest {
 
   private fun companyId(): CompanyId = CompanyId(UUID.randomUUID())
 }
+
+class CancellationReasonTest {
+
+  @Test
+  fun `can create cancellation reason with valid non-empty string`() {
+    assertDoesNotThrow {
+      CancellationReason("Valid reason")
+    }
+  }
+
+  @Test
+  fun `can create cancellation reason with single character`() {
+    assertDoesNotThrow {
+      CancellationReason("A")
+    }
+  }
+
+  @Test
+  fun `can create cancellation reason with special characters`() {
+    assertDoesNotThrow {
+      CancellationReason("Reason with special chars: !@#$%^&*()")
+    }
+  }
+
+  @Test
+  fun `can create cancellation reason with long text`() {
+    val longReason = "A".repeat(1000)
+    assertDoesNotThrow {
+      CancellationReason(longReason)
+    }
+  }
+
+  @Test
+  fun `cannot create cancellation reason with empty string`() {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      CancellationReason("")
+    }
+
+    assertThat(exception).hasMessageContaining("Een reden van annulering is verplicht.")
+  }
+
+  @Test
+  fun `cannot create cancellation reason with only whitespace`() {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      CancellationReason("   ")
+    }
+
+    assertThat(exception).hasMessageContaining("Een reden van annulering is verplicht.")
+  }
+
+  @Test
+  fun `cannot create cancellation reason with only tabs`() {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      CancellationReason("\t\t\t")
+    }
+
+    assertThat(exception).hasMessageContaining("Een reden van annulering is verplicht.")
+  }
+
+  @Test
+  fun `cannot create cancellation reason with only newlines`() {
+    val exception = assertFailsWith<IllegalArgumentException> {
+      CancellationReason("\n\n\n")
+    }
+
+    assertThat(exception).hasMessageContaining("Een reden van annulering is verplicht.")
+  }
+
+  @Test
+  fun `can create cancellation reason with mixed whitespace and text`() {
+    assertDoesNotThrow {
+      CancellationReason("  Valid reason with spaces  ")
+    }
+  }
+
+  @Test
+  fun `cancellation reason stores the value correctly`() {
+    val reason = "Test cancellation reason"
+    val cancellationReason = CancellationReason(reason)
+
+    assertThat(cancellationReason.value).isEqualTo(reason)
+  }
+
+  @Test
+  fun `cancellation reason is data class with proper equality`() {
+    val reason1 = CancellationReason("Same reason")
+    val reason2 = CancellationReason("Same reason")
+
+    assertThat(reason1).isEqualTo(reason2)
+  }
+
+  @Test
+  fun `cancellation reason with different values are not equal`() {
+    val reason1 = CancellationReason("Reason 1")
+    val reason2 = CancellationReason("Reason 2")
+
+    assertThat(reason1).isNotEqualTo(reason2)
+  }
+}

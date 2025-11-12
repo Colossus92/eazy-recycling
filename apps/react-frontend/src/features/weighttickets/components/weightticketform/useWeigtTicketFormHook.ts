@@ -8,6 +8,7 @@ import {
   WeightTicketRequest,
   WeightTicketRequestDirectionEnum,
   WeightTicketRequestTarraWeightUnitEnum,
+  WeightTicketRequestSecondWeighingUnitEnum,
 } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { LocationFormValue, createEmptyLocationFormValue } from '@/types/forms/LocationFormValue';
@@ -31,8 +32,8 @@ export interface WeightTicketFormValues {
   lines: WeightTicketLineFormValues[];
   tarraWeightValue?: number;
   tarraWeightUnit?: string;
-  secondWeightValue?: number;
-  secondWeightUnit?: string;
+  secondWeighingValue?: number;
+  secondWeighingUnit?: string;
   direction: string;
   pickupLocation: LocationFormValue;
   deliveryLocation: LocationFormValue;
@@ -53,8 +54,8 @@ export function useWeightTicketForm(
       lines: [],
       tarraWeightValue: undefined,
       tarraWeightUnit: undefined,
-      secondWeightValue: undefined,
-      secondWeightUnit: undefined,
+      secondWeighingValue: undefined,
+      secondWeighingUnit: undefined,
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -111,8 +112,8 @@ export function useWeightTicketForm(
       lines: [],
       tarraWeightValue: NaN,
       tarraWeightUnit: undefined,
-      secondWeightValue: NaN,
-      secondWeightUnit: undefined,
+      secondWeighingValue: NaN,
+      secondWeighingUnit: undefined,
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -173,6 +174,8 @@ const weightTicketDetailsToFormValues = (
       weightValue: line.weightValue?.toString() || '',
       weightUnit: line.weightUnit || 'KG',
     })),
+    secondWeighingValue: weightTicketDetails.secondWeighingValue,
+    secondWeighingUnit: weightTicketDetails.secondWeighingUnit,
     tarraWeightValue: weightTicketDetails.tarraWeightValue,
     tarraWeightUnit: weightTicketDetails.tarraWeightUnit,
     direction: weightTicketDetails.direction || 'INBOUND',
@@ -183,6 +186,16 @@ const weightTicketDetailsToFormValues = (
       weightTicketDetails.deliveryLocation
     ),
   };
+};
+
+/**
+ * Normalizes number values by converting commas to periods for backend compatibility
+ */
+const normalizeNumberForBackend = (value: string | number | undefined): string | undefined => {
+  if (value === undefined || value === null || value === '') return undefined;
+  const stringValue = String(value);
+  // Replace comma with period for backend
+  return stringValue.replace(',', '.');
 };
 
 /**
@@ -203,12 +216,14 @@ const formValuesToWeightTicketRequest = (
     lines: formValues.lines.map((line) => ({
       wasteStreamNumber: line.wasteStreamNumber,
       weight: {
-        value: line.weightValue,
+        value: normalizeNumberForBackend(line.weightValue) || '',
         unit: 'KG',
       },
     })),
-    tarraWeightValue: formValues.tarraWeightValue?.toString(),
+    tarraWeightValue: normalizeNumberForBackend(formValues.tarraWeightValue) || undefined,
     tarraWeightUnit: WeightTicketRequestTarraWeightUnitEnum.Kg,
+    secondWeighingValue: normalizeNumberForBackend(formValues.secondWeighingValue) || undefined,
+    secondWeighingUnit: WeightTicketRequestSecondWeighingUnitEnum.Kg,
     direction:
       (formValues.direction as WeightTicketRequestDirectionEnum) ||
       WeightTicketRequestDirectionEnum.Inbound,

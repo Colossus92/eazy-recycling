@@ -73,19 +73,30 @@ export const WeightTicketForm = ({
     label: company.name,
   }));
 
+  /**
+   * Helper function to parse number strings that may use comma or period as decimal separator
+   */
+  const parseNumber = (value: string | number | undefined): number => {
+    if (value === undefined || value === null || value === '') return 0;
+    if (typeof value === 'number') return value;
+    const normalizedValue = String(value).replace(',', '.');
+    const parsed = parseFloat(normalizedValue);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
   const onSubmit = formContext.handleSubmit(async (formValues) => {
     // Calculate netto to validate it's not below 0
     const weging1 = formValues.lines.reduce((sum, field) => {
-      const weight = parseFloat(field.weightValue as string) || 0;
+      const weight = parseNumber(field.weightValue as string);
       return sum + weight;
     }, 0);
-    const weging2 = parseFloat(formValues.secondWeightValue as unknown as string) || 0;
+    const weging2 = parseNumber(formValues.secondWeighingValue as unknown as string);
     const bruto = weging1 - weging2;
-    const tarra = parseFloat(formValues.tarraWeightValue as unknown as string) || 0;
+    const tarra = parseNumber(formValues.tarraWeightValue as unknown as string);
     const netto = bruto - tarra;
 
     if (netto < 0) {
-      formContext.setError('tarraWeightValue', {
+      formContext.setError('secondWeighingValue', {
         type: 'manual',
         message: 'Netto gewicht kan niet negatief zijn',
       });

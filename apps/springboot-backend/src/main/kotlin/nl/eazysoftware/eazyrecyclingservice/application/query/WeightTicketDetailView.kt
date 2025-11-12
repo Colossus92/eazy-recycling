@@ -8,6 +8,8 @@ data class WeightTicketDetailView(
   val consignorParty: ConsignorView,
   val status: String,
   val lines: List<WeightTicketLineView>,
+  val secondWeighingValue: BigDecimal?,
+  val secondWeighingUnit: String?,
   val tarraWeightValue: BigDecimal?,
   val tarraWeightUnit: String?,
   val carrierParty: CompanyView?,

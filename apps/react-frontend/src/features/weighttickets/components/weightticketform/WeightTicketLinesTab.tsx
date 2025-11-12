@@ -25,7 +25,21 @@ const LineRow = () => (
     <div></div>
     <div className="w-full col-span-3 h-px bg-color-border-hover"></div>
   </>
-)
+);
+
+/**
+ * Helper function to parse number strings that may use comma or period as decimal separator
+ * @param value - string value to parse
+ * @returns parsed number or 0 if invalid
+ */
+const parseNumber = (value: string | number | undefined): number => {
+  if (value === undefined || value === null || value === '') return 0;
+  if (typeof value === 'number') return value;
+  // Replace comma with period to handle both decimal separators
+  const normalizedValue = String(value).replace(',', '.');
+  const parsed = parseFloat(normalizedValue);
+  return isNaN(parsed) ? 0 : parsed;
+};
 
 export const WeightTicketLinesTab = ({
   disabled = false,
@@ -73,9 +87,9 @@ export const WeightTicketLinesTab = ({
   }, [consignorPartyId, append, remove]);
 
   // Watch weight values for calculations
-  const secondWeightValue = useWatch({
+  const secondWeighingValue = useWatch({
     control,
-    name: 'secondWeightValue',
+    name: 'secondWeighingValue',
   });
 
   const tarraWeightValue = useWatch({
@@ -106,20 +120,20 @@ export const WeightTicketLinesTab = ({
   // Calculate Weging 1 (sum of all line weights)
   const weging1 = useMemo(() => {
     return lineWeights.reduce((sum, field) => {
-      const weight = parseFloat(field.weightValue as string) || 0;
+      const weight = parseNumber(field.weightValue as string);
       return sum + weight;
     }, 0);
   }, [lineWeights]);
 
   // Calculate Bruto (Weging 1 - Weging 2)
   const bruto = useMemo(() => {
-    const weging2 = parseFloat(secondWeightValue as unknown as string) || 0;
+    const weging2 = parseNumber(secondWeighingValue as unknown as string);
     return weging1 - weging2;
-  }, [weging1, secondWeightValue]);
+  }, [weging1, secondWeighingValue]);
 
   // Calculate Netto (Bruto - Tarra)
   const netto = useMemo(() => {
-    const tarra = parseFloat(tarraWeightValue as unknown as string) || 0;
+    const tarra = parseNumber(tarraWeightValue as unknown as string);
     return bruto - tarra;
   }, [bruto, tarraWeightValue]);
 
@@ -292,17 +306,38 @@ export const WeightTicketLinesTab = ({
             <div className="flex flex-col items-start gap-1">
               <NumberInput
                 placeholder={'Vul weging 2 in'}
-                step={0.01}
+                step={'0.01'}
                 disabled={disabled}
                 formHook={{
                   register: formContext.register,
-                  name: 'secondWeightValue',
+                  name: 'secondWeighingValue',
+                  rules: {
+                    validate: (value) => {
+                      if (value === undefined || value === null || value === '') return true;
+                      const numValue = parseNumber(value as string);
+                      if (numValue < 0) {
+                        return 'Weging 2 kan niet negatief zijn';
+                      }
+                      return true;
+                    },
+                  },
                   errors: formContext.formState.errors,
                 }}
               />
             </div>
             <UnitBadge />
             <span className="text-body-1 text-color-text-secondary self-center">−</span>
+
+            {formContext.formState.errors.secondWeighingValue && (
+              <>
+                <div></div>
+                <div className='col-span-3'>
+                  <span className="text-caption-2 text-color-status-error-dark">
+                    {formContext.formState.errors.secondWeighingValue.message as string}
+                  </span>
+                </div>
+              </>
+            )}
             <LineRow />
             {/* Bruto */}
             <span className="text-caption-2 self-center">Bruto</span>
@@ -327,14 +362,33 @@ export const WeightTicketLinesTab = ({
                 formHook={{
                   register: formContext.register,
                   name: 'tarraWeightValue',
+                  rules: {
+                    validate: (value) => {
+                      if (value === undefined || value === null || value === '') return true;
+                      const numValue = parseNumber(value as string);
+                      if (numValue < 0) {
+                        return 'Tarra kan niet negatief zijn';
+                      }
+                      return true;
+                    },
+                  },
                   errors: formContext.formState.errors,
                 }}
               />
             </div>
             <UnitBadge />
             <span className="text-body-1 text-color-text-secondary self-center">−</span>
+            {formContext.formState.errors.tarraWeightValue && (
+              <>
+                <div></div>
+                <div className='col-span-3'>
+                  <span className="text-caption-2 text-color-status-error-dark">
+                    {formContext.formState.errors.tarraWeightValue.message as string}
+                  </span>
+                </div>
+              </>
+            )}
             <LineRow />
-
             {/* Netto */}
             <span className="text-caption-2 self-center">Netto</span>
             <div className="flex flex-col items-start gap-1">
@@ -348,6 +402,11 @@ export const WeightTicketLinesTab = ({
             <UnitBadge />
             <div></div>
           </div>
+          {formContext.formState.errors.secondWeighingValue && (
+            <span className="text-caption-2 text-color-status-error-dark">
+              {formContext.formState.errors.secondWeighingValue.message as string}
+            </span>
+          )}
         </div>
       )}
     </div>

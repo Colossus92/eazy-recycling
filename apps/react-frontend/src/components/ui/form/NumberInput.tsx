@@ -13,6 +13,19 @@ interface InputProps<TFieldValues extends FieldValues>
   step?: number | string;
 }
 
+/**
+ * Helper function to parse number strings that may use comma or period as decimal separator
+ * @param value - string or number value to parse
+ * @returns parsed number or NaN if invalid
+ */
+const parseNumber = (value: string | number | undefined): number => {
+  if (value === undefined || value === null || value === '') return NaN;
+  if (typeof value === 'number') return value;
+  // Replace comma with period to handle both decimal separators
+  const normalizedValue = String(value).replace(',', '.');
+  return parseFloat(normalizedValue);
+};
+
 export const NumberInput = <TFieldValues extends FieldValues>({
   disabled = false,
   placeholder,
@@ -36,8 +49,20 @@ export const NumberInput = <TFieldValues extends FieldValues>({
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value && !isNaN(parseFloat(value))) {
-      e.target.value = parseFloat(value).toFixed(step === 'any' ? 1 : step as number);
+    const parsed = parseNumber(value);
+    if (!isNaN(parsed)) {
+      // Determine decimal places: if step is 'any' use 1, otherwise extract from step string
+      let decimalPlaces = 1;
+      if (step !== 'any' && typeof step === 'string') {
+        const stepStr = step;
+        const decimalIndex = stepStr.indexOf('.');
+        if (decimalIndex !== -1) {
+          decimalPlaces = stepStr.length - decimalIndex - 1;
+        }
+      } else if (typeof step === 'number') {
+        decimalPlaces = step;
+      }
+      e.target.value = parsed.toFixed(decimalPlaces);
     }
     propsOnBlur?.(e);
   };
@@ -63,7 +88,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
               ...(formHook?.rules || {}), 
               setValueAs: (v: string) => {
                 if (v === '' || v === null || v === undefined) return undefined;
-                const parsed = parseFloat(v);
+                const parsed = parseNumber(v);
                 return isNaN(parsed) ? undefined : parsed;
               }
             } as any)

@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
+import java.math.BigDecimal
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -31,6 +32,28 @@ class WeightTicket(
   var updatedAt: Instant? = null,
   var weightedAt: Instant? = null,
 ) {
+  init  {
+    check(isTotalWeightValid()) {
+      "Het totale gewicht mag niet kleiner zijn dan nul."
+    }
+
+    check((secondWeighing?.value ?: BigDecimal.ZERO) >= BigDecimal.ZERO) {
+      "Weging 2 mag niet kleiner zijn dan nul."
+    }
+    check((tarraWeight?.value ?: BigDecimal.ZERO) >= BigDecimal.ZERO) {
+      "Het tarra gewicht mag niet kleiner zijn dan nul."
+    }
+  }
+
+  fun isTotalWeightValid(): Boolean {
+    val secondWeighing = secondWeighing?.value ?: BigDecimal.ZERO
+    val tarraWeight = tarraWeight?.value ?: BigDecimal.ZERO
+
+    return (getTotalLinesWeight() - secondWeighing - tarraWeight) >= BigDecimal.ZERO
+  }
+
+  fun getTotalLinesWeight() = lines.getLines().sumOf { it.weight.value }
+
   fun cancel(cancellationReason: CancellationReason) {
     check(status != WeightTicketStatus.CANCELLED) {
       "Weegbon is al geannuleerd en kan niet opnieuw worden geannuleerd."

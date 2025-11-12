@@ -64,6 +64,18 @@ export interface WeightTicketDetailView {
      * @type {number}
      * @memberof WeightTicketDetailView
      */
+    'secondWeighingValue'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'secondWeighingUnit'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketDetailView
+     */
     'tarraWeightValue'?: number;
     /**
      * 

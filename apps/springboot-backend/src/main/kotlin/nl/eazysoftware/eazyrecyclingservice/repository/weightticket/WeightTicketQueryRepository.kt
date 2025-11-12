@@ -58,6 +58,8 @@ class WeightTicketQueryRepository(
           weightUnit = line.weightUnit.name,
         )
       },
+      secondWeighingValue = weightTicket.secondWeighingValue,
+      secondWeighingUnit = weightTicket.secondWeighingUnit.toString(),
       tarraWeightValue = weightTicket.tarraWeightValue,
       tarraWeightUnit = weightTicket.tarraWeightUnit.toString(),
       carrierParty = weightTicket.carrierParty?.let { CompanyViewMapper.map(it) },

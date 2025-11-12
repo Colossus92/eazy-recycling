@@ -181,7 +181,8 @@ create table if not exists pickup_locations (
                                  proximity_description text,
                                  city text,
                                  postal_code text,
-                                 company_id uuid
+                                 company_id uuid,
+                                 primary key (id)
 );
 
 create sequence if not exists weight_tickets_id_seq start with 1 increment by 1;

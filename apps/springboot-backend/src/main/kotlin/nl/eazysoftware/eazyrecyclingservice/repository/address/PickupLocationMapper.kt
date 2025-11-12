@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationType.NO_PICKUP
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.hibernate.Hibernate
@@ -75,7 +76,7 @@ class PickupLocationMapper(
       is ProximityDescription -> mapAndSave(location)
       is Company -> mapAndSave(location)
       is ProjectLocationSnapshot -> mapAndSave(location)
-      is NoLocation -> PickupLocationDto.NoPickupLocationDto()
+      is NoLocation -> entityManager.getReference(PickupLocationDto.NoPickupLocationDto::class.java, NO_PICKUP)
     }
   }
 
