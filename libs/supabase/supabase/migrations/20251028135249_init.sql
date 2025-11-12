@@ -6,7 +6,7 @@ SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
+SET check_function_bodies = off;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
@@ -106,10 +106,11 @@ CREATE TYPE "public"."units" AS ENUM (
 
 ALTER TYPE "public"."units" OWNER TO "postgres";
 
-
-CREATE OR REPLACE FUNCTION "public"."custom_access_token_hook"("event" "jsonb") RETURNS "jsonb"
-    LANGUAGE "plpgsql" STABLE
-    AS $$declare
+CREATE OR REPLACE FUNCTION public.custom_access_token_hook(event jsonb)
+  RETURNS jsonb
+  LANGUAGE plpgsql
+  STABLE
+AS $function$declare
   claims jsonb;
   roles jsonb;
 begin
@@ -134,38 +135,41 @@ begin
   event := jsonb_set(event, '{claims}', claims);
 
   return event;
-end;$$;
+end;$function$
+;
 
 
 ALTER FUNCTION "public"."custom_access_token_hook"("event" "jsonb") OWNER TO "postgres";
 
 
-CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    AS $$declare
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+  RETURNS trigger
+  LANGUAGE plpgsql
+  SECURITY DEFINER
+AS $function$declare
   role text;
 begin
   -- Insert basic profile
   insert into public.profiles (id, first_name, last_name)
   values (
-    new.id,
-    new.raw_user_meta_data->>'first_name',
-    new.raw_user_meta_data->>'last_name'
-  );
+           new.id,
+           new.raw_user_meta_data->>'first_name',
+           new.raw_user_meta_data->>'last_name'
+         );
 
   -- Insert roles if present and valid
   if jsonb_typeof(new.raw_user_meta_data->'roles') = 'array' then
     for role in select jsonb_array_elements_text(new.raw_user_meta_data->'roles')
-    loop
-      insert into public.user_roles (user_id, role)
-      values (new.id, role::public.app_roles)
-      on conflict do nothing;
-    end loop;
+      loop
+        insert into public.user_roles (user_id, role)
+        values (new.id, role::public.app_roles)
+        on conflict do nothing;
+      end loop;
   end if;
 
   return new;
-end$$;
-
+end$function$
+;
 
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
