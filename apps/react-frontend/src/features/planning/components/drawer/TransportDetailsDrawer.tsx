@@ -66,7 +66,7 @@ export const TransportDetailsDrawer = ({
     };
   }, [isDrawerOpen, onDelete]);
 
-  const goodsItem = data?.goodsItem;
+  const goodsItem = data?.goodsItem?.[0];
   const goodsItemText = goodsItem
     ? goodsItem?.name +
       ' - ' +

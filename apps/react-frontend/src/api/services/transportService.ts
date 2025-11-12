@@ -202,10 +202,12 @@ export const formValuesToCreateWasteTransportRequest = (
     containerId: formValues.containerId,
     note: formValues.note || '',
     transportType: 'WASTE',
-    wasteStreamNumber: formValues.wasteStreamNumber,
-    weight: formValues.weight,
-    unit: 'kg',
-    quantity: formValues.quantity,
+    goods: [{
+      wasteStreamNumber: formValues.wasteStreamNumber || '',
+      weight: formValues.weight,
+      unit: 'kg',
+      quantity: formValues.quantity,
+    }],
   };
   return request;
 };
@@ -213,7 +215,8 @@ export const formValuesToCreateWasteTransportRequest = (
 export const transportDtoToWasteTransportFormValues = (
   transport: TransportDetailView
 ) => {
-  const goods = transport.goodsItem;
+  // TODO allow for multiple goods
+  const goods = transport.goodsItem?.[0];
   const pickupLocationAddress = resolveLocationAddress(
     transport.pickupLocation
   );

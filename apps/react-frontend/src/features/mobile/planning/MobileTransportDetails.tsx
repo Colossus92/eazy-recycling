@@ -14,7 +14,7 @@ interface MobileTransportDetailsProps {
 }
 
 const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
-  const goodsItem = transport?.goodsItem;
+  const goodsItem = transport?.goodsItem?.[0];
   const goodsItemText = goodsItem
     ? goodsItem?.name +
       ' - ' +
