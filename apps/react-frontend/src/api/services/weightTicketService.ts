@@ -14,4 +14,5 @@ export const weightTicketService = {
     cancel: (weightTicketId: number, cancelWeightTicketRequest: CancelWeightTicketRequest) => weightTicketApi.cancel(weightTicketId, cancelWeightTicketRequest).then((r) => r.data),
     complete: (weightTicketNumber: number) => weightTicketApi.complete(weightTicketNumber).then((r) => r.data),
     split: (weightTicketId: number, splitWeightTicketRequest: SplitWeightTicketRequest) => weightTicketApi.split(weightTicketId, splitWeightTicketRequest).then((r) => r.data),
+    copy: (weightTicketId: number) => weightTicketApi.copy(weightTicketId).then((r) => r.data),
 };

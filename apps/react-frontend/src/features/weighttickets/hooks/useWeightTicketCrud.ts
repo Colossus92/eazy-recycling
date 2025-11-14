@@ -1,4 +1,4 @@
-import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse, CopyWeightTicketResponse } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -25,6 +25,8 @@ export function useWeightTicketCrud() {
   const [itemToDelete, setItemToDelete] = useState<number | undefined>(undefined);
   const [itemToSplit, setItemToSplit] = useState<number | undefined>(undefined);
   const [splitResponse, setSplitResponse] = useState<SplitWeightTicketResponse | undefined>(undefined);
+  const [itemToCopy, setItemToCopy] = useState<number | undefined>(undefined);
+  const [copyResponse, setCopyResponse] = useState<CopyWeightTicketResponse | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
     isDraft: false,
@@ -154,6 +156,35 @@ export function useWeightTicketCrud() {
     });
   };
 
+  const copyMutation = useMutation({
+    mutationFn: ({ weightTicketId }: { weightTicketId: number }) =>
+      weightTicketService.copy(weightTicketId),
+    onSuccess: (data) => {
+      queryClient
+        .invalidateQueries({ queryKey: ['weightTickets'] })
+        .then(() => {
+          setCopyResponse(data);
+          setItemToCopy(undefined);
+        });
+    },
+    onError: (error: any) => {
+      const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het kopiëren';
+      setErrorMessage(message);
+    },
+  });
+
+  const copy = async (weightTicketId: number): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      copyMutation.mutate({ weightTicketId }, {
+        onSuccess: () => {
+          setItemToCopy(undefined);
+          resolve();
+        },
+        onError: (error) => reject(error),
+      });
+    });
+  };
+
   const completeMutation = useMutation({
     mutationFn: ({ weightTicketNumber }: { weightTicketNumber: number }) => weightTicketService.complete(weightTicketNumber),
     onSuccess: async (_, { weightTicketNumber }) => {
@@ -237,6 +268,14 @@ export function useWeightTicketCrud() {
       confirm: split,
       cancel: () => setItemToSplit(undefined),
       clearResponse: () => setSplitResponse(undefined),
+    },
+    copy: {
+      item: itemToCopy,
+      response: copyResponse,
+      initiate: setItemToCopy,
+      confirm: copy,
+      cancel: () => setItemToCopy(undefined),
+      clearResponse: () => setCopyResponse(undefined),
     },
     error: {
       message: errorMessage,

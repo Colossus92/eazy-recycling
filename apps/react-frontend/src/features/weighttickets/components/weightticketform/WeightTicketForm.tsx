@@ -28,6 +28,7 @@ interface WeightTicketFormProps {
   status?: string;
   onDelete: (id: number) => void;
   onSplit?: (id: number) => void;
+  onCopy?: (id: number) => void;
   onComplete?: (id: number) => void;
   noDialog?: boolean;
 }
@@ -39,6 +40,7 @@ export const WeightTicketForm = ({
   status,
   onDelete,
   onSplit,
+  onCopy,
   onComplete,
   noDialog = false,
 }: WeightTicketFormProps) => {
@@ -153,6 +155,7 @@ export const WeightTicketForm = ({
                   weightTicket={data}
                   onDelete={onDelete}
                   onSplit={onSplit}
+                  onCopy={onCopy}
                   onComplete={onComplete}
                 />
               )

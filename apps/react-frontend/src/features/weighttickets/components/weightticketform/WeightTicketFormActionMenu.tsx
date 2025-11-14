@@ -1,5 +1,6 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import CheckCircleOutline from '@/assets/icons/CheckCircleOutline.svg?react';
+import IcBaselineContentCopy from '@/assets/icons/IcBaselineContentCopy.svg?react';
 import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
 import { WeightTicketDetailView } from '@/api/client/models';
 
@@ -7,6 +8,7 @@ interface WeightTicketFormActionMenuProps {
     weightTicket: WeightTicketDetailView;
     onDelete: (id: number) => void;
     onSplit?: (id: number) => void;
+    onCopy?: (id: number) => void;
     onComplete?: (id: number) => void;
 }
 
@@ -14,6 +16,7 @@ export const WeightTicketFormActionMenu = ({
     weightTicket,
     onDelete,
     onSplit,
+    onCopy,
     onComplete,
 }: WeightTicketFormActionMenuProps) => {
     const actions = [];
@@ -23,6 +26,15 @@ export const WeightTicketFormActionMenu = ({
                 label: 'Splitsen',
                 icon: Plus,
                 onClick: () => onSplit(weightTicket.id),
+            }
+        );
+    }
+    if (weightTicket.status === 'DRAFT' && onCopy) {
+        actions.push(
+            {
+                label: 'Kopiëren',
+                icon: IcBaselineContentCopy,
+                onClick: () => onCopy(weightTicket.id),
             }
         );
     }

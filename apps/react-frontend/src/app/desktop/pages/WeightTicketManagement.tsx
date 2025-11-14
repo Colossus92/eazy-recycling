@@ -34,16 +34,16 @@ export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDualFormOpen, setIsDualFormOpen] = useState(false);
-  const { read, form, deletion, split, error } = useWeightTicketCrud();
+  const { read, form, deletion, split, copy, error } = useWeightTicketCrud();
 
-  // Handle opening the dual form after split
+  // Handle opening the dual form after split or copy
   useEffect(() => {
-    if (split.response) {
+    if (split.response || copy.response) {
       form.close(); // Close the single form
       setIsDualFormOpen(true); // Open the dual form
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [split.response]);
+  }, [split.response, copy.response]);
 
   const columns: Column[] = [
     { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
@@ -160,7 +160,7 @@ export const WeightTicketManagement = () => {
         weightTicketId={split.item}
         onSplit={split.confirm}
       />
-      {!split.response ? (
+      {!split.response && !copy.response ? (
         <WeightTicketForm
           isOpen={form.isOpen}
           setIsOpen={form.close}
@@ -169,8 +169,9 @@ export const WeightTicketManagement = () => {
           onDelete={deletion.initiate}
           onComplete={form.complete}
           onSplit={split.initiate}
+          onCopy={copy.confirm}
         />
-      ) : (
+      ) : split.response ? (
         <WeightTicketDualForm
           isOpen={isDualFormOpen}
           setIsOpen={setIsDualFormOpen}
@@ -180,6 +181,20 @@ export const WeightTicketManagement = () => {
           onSplit={split.initiate}
           onClose={() => {
             split.clearResponse();
+            setIsDualFormOpen(false);
+          }}
+          onComplete={form.complete}
+        />
+      ) : (
+        <WeightTicketDualForm
+          isOpen={isDualFormOpen}
+          setIsOpen={setIsDualFormOpen}
+          originalWeightTicketId={copy.response!.originalWeightTicketId}
+          newWeightTicketId={copy.response!.newWeightTicketId}
+          onDelete={deletion.initiate}
+          onSplit={split.initiate}
+          onClose={() => {
+            copy.clearResponse();
             setIsDualFormOpen(false);
           }}
           onComplete={form.complete}
