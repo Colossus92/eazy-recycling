@@ -127,6 +127,12 @@ export interface TransportDetailView {
     'transportHours'?: number;
     /**
      * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
+    'driverNote'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof TransportDetailView
      */

@@ -5,6 +5,7 @@ import { resolveLocationAddress, transportService } from '@/api/services/transpo
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
+import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
 import { TransportDetailView } from '@/api/client';
 
@@ -25,7 +26,8 @@ export const MobileReportFinishedPage = () => {
   const queryClient = useQueryClient();
 
   const reportFinishedMutation = useMutation({
-    mutationFn: (hours: number) => transportService.reportFinished(state.transport.id!, { hours }),
+    mutationFn: (data: { hours: number; driverNote: string }) =>
+      transportService.reportFinished(state.transport.id!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['transport', state.transport.id],
@@ -37,14 +39,14 @@ export const MobileReportFinishedPage = () => {
     },
   });
 
-  const onSubmit = (data: { hours: number }) => {
-    reportFinishedMutation.mutate(data.hours);
+  const onSubmit = (data: { hours: number; driverNote: string }) => {
+    reportFinishedMutation.mutate(data);
   };
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<{ hours: number }>();
+  } = useForm<{ hours: number; driverNote: string }>();
 
   return (
     <div className="flex flex-col w-full">
@@ -86,6 +88,21 @@ export const MobileReportFinishedPage = () => {
               />
               <span className="text-caption-1">
                 Het aantal uren dat het uitvoeren van het transport duurde.
+              </span>
+            </div>
+            <div className="flex flex-col items-start self-stretch gap-1">
+              <TextAreaFormField
+                title="Opmerking chauffeur"
+                placeholder="Voer hier eventuele opmerkingen in..."
+                rows={4}
+                formHook={{
+                  register,
+                  name: 'driverNote',
+                  errors,
+                }}
+              />
+              <span className="text-caption-1">
+                Optionele opmerkingen van de chauffeur over het transport.
               </span>
             </div>
           </div>

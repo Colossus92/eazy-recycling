@@ -26,5 +26,11 @@ export interface TransportFinishedRequest {
      * @memberof TransportFinishedRequest
      */
     'hours': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportFinishedRequest
+     */
+    'driverNote': string;
 }
 

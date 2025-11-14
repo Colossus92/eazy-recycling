@@ -47,7 +47,7 @@ export function useContainerTransportForm(
     defaultValues: {
       consignorPartyId: '',
       carrierPartyId: '',
-      containerOperation: '',
+      containerOperation: 'DELIVERY',
       transportType: 'CONTAINER',
       pickupLocation: { type: 'none' },
       pickupDateTime: '',

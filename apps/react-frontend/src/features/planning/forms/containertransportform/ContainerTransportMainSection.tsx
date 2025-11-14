@@ -49,7 +49,7 @@ export const ContainerTransportMainSection = () => {
       <input
         type="hidden"
         {...register('containerOperation')}
-        value="DELIVERY"
+        defaultValue="DELIVERY"
       />
     </div>
   );

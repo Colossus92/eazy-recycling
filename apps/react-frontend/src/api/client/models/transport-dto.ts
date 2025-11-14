@@ -139,6 +139,12 @@ export interface TransportDto {
      * @type {string}
      * @memberof TransportDto
      */
+    'driverNote'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDto
+     */
     'updatedAt'?: string;
     /**
      * 

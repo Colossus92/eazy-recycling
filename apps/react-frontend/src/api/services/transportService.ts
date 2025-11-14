@@ -173,7 +173,7 @@ export const transportDetailViewToContainerTransportFormValues = (
   const formValues: ContainerTransportFormValues = {
     consignorPartyId: data.consignorParty?.id || '',
     carrierPartyId: data.carrierParty?.id || '',
-    containerOperation: data.containerOperation || '',
+    containerOperation: data.containerOperation || 'DELIVERY',
     pickupLocation: pickupLocationViewToFormValue(data.pickupLocation),
     pickupDateTime: data.pickupDateTime,
     deliveryLocation: pickupLocationViewToFormValue(data.deliveryLocation),
