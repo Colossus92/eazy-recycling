@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
 
 /**
  * Port for querying waste streams that need to be declared for the first time.
@@ -11,10 +11,6 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
  * - It has never been declared before (no previous declarations exist)
  * - The waste stream is in ACTIVE status
  *
- * TODO: Detailed query specifications need to be defined:
- * - Exact criteria for "first receival"
- * - Relationship with transport records
- * - Declaration history tracking
  */
 interface FirstReceivalWasteStreamQuery {
 
@@ -25,5 +21,5 @@ interface FirstReceivalWasteStreamQuery {
    * @param yearMonth The year-month period to query for
    * @return List of receival declarations for first-time waste streams
    */
-  fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<ReceivalDeclaration>
+  fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<FirstReceivalDeclaration>
 }

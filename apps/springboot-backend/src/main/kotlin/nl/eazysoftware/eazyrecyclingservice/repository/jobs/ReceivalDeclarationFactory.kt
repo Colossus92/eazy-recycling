@@ -1,7 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclarationIdGenerator
 import org.springframework.stereotype.Component
@@ -17,9 +17,9 @@ class ReceivalDeclarationFactory(
     totalWeight: Int,
     totalShipments: Short,
     yearMonth: YearMonth
-  ): ReceivalDeclaration {
+  ): FirstReceivalDeclaration {
     val id = idGenerator.nextId()
-    return ReceivalDeclaration(
+    return FirstReceivalDeclaration(
       id = id,
       wasteStream = wasteStream,
       transporters = transporters,

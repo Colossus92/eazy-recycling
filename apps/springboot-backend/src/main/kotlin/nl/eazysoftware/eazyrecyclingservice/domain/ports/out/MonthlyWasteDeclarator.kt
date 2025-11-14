@@ -28,7 +28,7 @@ class MonthlyWasteDeclaratorService(
       jobType = JobType.FIRST_RECEIVALS,
       yearMonth = now.toYearMonth(),
       status = MonthlyWasteDeclarationJob.Status.PENDING,
-      created = Clock.System.now(),
+      created = now,
       fulfilled = null
     )
 
@@ -36,7 +36,7 @@ class MonthlyWasteDeclaratorService(
       jobType = JobType.MONTHLY_RECEIVALS,
       yearMonth = now.toYearMonth(),
       status = MonthlyWasteDeclarationJob.Status.PENDING,
-      created = Clock.System.now(),
+      created = now,
       fulfilled = null
     )
 

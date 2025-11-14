@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
@@ -14,8 +15,12 @@ interface LmaDeclarationJpaRepository : JpaRepository<LmaDeclarationDto, String>
 class LmaDeclarationRepository(
   private val jpaRepository: LmaDeclarationJpaRepository
 ) : LmaDeclarations {
-  override fun saveAllPending(firstReceivals: List<EersteOntvangstMeldingDetails>) {
-    LmaDeclarationMapper.map(firstReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
+  override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
+    LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
+  }
+
+  override fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>) {
+    LmaDeclarationMapper.mapMonthlyReceivals(monthlyReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
   }
 
   override fun findByIds(ids: List<String>): List<LmaDeclarationDto> {
@@ -30,7 +35,7 @@ class LmaDeclarationRepository(
 
 object LmaDeclarationMapper {
 
-  fun map(
+  fun mapFirstReceivals(
     firstReceivals: List<EersteOntvangstMeldingDetails>,
     status: LmaDeclarationDto.Status
   ) = firstReceivals.map { firstReceival ->
@@ -41,6 +46,22 @@ object LmaDeclarationMapper {
       transporters = firstReceival.vervoerders.split(",").map { it.trim() },
       totalWeight = firstReceival.totaalGewicht.toLong(),
       totalShipments = firstReceival.aantalVrachten.toLong(),
+      createdAt = Clock.System.now().toJavaInstant(),
+      status = status,
+    )
+  }
+
+  fun mapMonthlyReceivals(
+    monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>,
+    status: LmaDeclarationDto.Status,
+  ) = monthlyReceivals.map { monthlyReceival ->
+    LmaDeclarationDto(
+      id = monthlyReceival.meldingsNummerMelder,
+      wasteStreamNumber = monthlyReceival.afvalstroomNummer,
+      period = monthlyReceival.periodeMelding,
+      transporters = monthlyReceival.vervoerders.split(",").map { it.trim() },
+      totalWeight = monthlyReceival.totaalGewicht.toLong(),
+      totalShipments = monthlyReceival.aantalVrachten.toLong(),
       createdAt = Clock.System.now().toJavaInstant(),
       status = status,
     )

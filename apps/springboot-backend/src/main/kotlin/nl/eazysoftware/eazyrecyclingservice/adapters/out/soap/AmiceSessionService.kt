@@ -19,11 +19,13 @@ class AmiceSessionService(
 
   @Transactional
   override fun declareFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>): Boolean {
-    val content = EersteOntvangstMeldingenDetails()
-    content.eersteOntvangstMelding.addAll(firstReceivals)
-    val melding = MeldingSessie()
-    melding.isRetourberichtViaEmail = false
-    melding.eersteOntvangstMeldingen = content
+    val content = EersteOntvangstMeldingenDetails().apply {
+      eersteOntvangstMelding.addAll(firstReceivals)
+    }
+    val melding = MeldingSessie().apply {
+      isRetourberichtViaEmail = false
+      eersteOntvangstMeldingen = content
+    }
 
     val response = meldingServiceClient.apply(melding)
     lmaDeclarationSessions.saveFirstReceivalSession(response.meldingSessieResponseDetails, firstReceivals.map { it.meldingsNummerMelder })
@@ -37,6 +39,35 @@ class AmiceSessionService(
       }
     } catch (e: Exception) {
       logger.error("Error calling SOAP melding service for waste streams ${firstReceivals.joinToString(", ") { it.afvalstroomNummer }}", e)
+      throw e
+    }
+
+    return response.meldingSessieResponseDetails.isMeldingSessieResult
+  }
+
+  @Transactional
+  override fun declareMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>): Boolean {
+    val content = MaandelijkseOntvangstMeldingenDetails().apply {
+      maandelijkseOntvangstMelding.addAll(monthlyReceivals)
+    }
+    val melding = MeldingSessie().apply {
+      isRetourberichtViaEmail = false
+      maandelijkseOntvangstMeldingen = content
+    }
+
+    val response = meldingServiceClient.apply(melding)
+    lmaDeclarationSessions.saveFirstReceivalSession(response.meldingSessieResponseDetails, monthlyReceivals.map { it.meldingsNummerMelder })
+
+    try {
+      val success = response.meldingSessieResponseDetails.isMeldingSessieResult
+      logger.info("Monthly receival declaration result: success=$success, sessionId=${response.meldingSessieResponseDetails.meldingSessieUUID}, response=$response")
+
+      if (!success) {
+        throw IllegalStateException("Het doen van een maandelijkse ontvangst melding is niet gelukt")
+      }
+    } catch (e: Exception) {
+      logger.error("Error calling SOAP melding service for waste streams ${monthlyReceivals.joinToString(", ") { it.afvalstroomNummer }}", e
+      )
       throw e
     }
 

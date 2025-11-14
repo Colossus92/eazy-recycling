@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
@@ -39,7 +39,7 @@ class FirstReceivalWasteStreamQueryAdapter(
 
   private val logger = LoggerFactory.getLogger(FirstReceivalWasteStreamQueryAdapter::class.java)
 
-  override fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<ReceivalDeclaration> {
+  override fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<FirstReceivalDeclaration> {
     logger.info("Finding first receival declarations for yearMonth={}", yearMonth)
 
     // Create proper OffsetDateTime objects for the month boundaries
@@ -79,7 +79,7 @@ class FirstReceivalWasteStreamQueryAdapter(
       LEFT JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
         AND wt.weighted_at >= :startOfMonth
         AND wt.weighted_at < :endOfMonth
-        AND wt.status != 'CANCELLED'
+        AND wt.status IN ('COMPLETED', 'INVOICED')
       LEFT JOIN companies c ON c.id = wt.carrier_party_id
       LEFT JOIN lma_declarations d ON d.waste_stream_number = ws.number
       WHERE proc.processor_id = '08797'

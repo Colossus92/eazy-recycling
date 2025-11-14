@@ -2,9 +2,13 @@ package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareMonthlyReceivals
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.MonthlyWasteDeclarationJobsJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.MonthlyWasteDeclarationJobsRepository
@@ -41,6 +45,12 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
 
   @MockitoBean
   private lateinit var declareFirstReceivals: DeclareFirstReceivals
+
+  @MockitoBean
+  private lateinit var monthlyReceivalWasteStreamQuery: MonthlyReceivalWasteStreamQuery
+
+  @MockitoBean
+  private lateinit var declareMonthlyReceivals: DeclareMonthlyReceivals
 
   @MockitoBean
   private lateinit var amiceSessions: AmiceSessions
@@ -98,7 +108,7 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
     monthlyWasteDeclarationJobsRepository.save(pendingJob)
 
     // Mock the query to return some declarations
-    val mockDeclarations = listOf<ReceivalDeclaration>()  // Empty list - declarator should NOT be called
+    val mockDeclarations = listOf<FirstReceivalDeclaration>()  // Empty list - declarator should NOT be called
     whenever(firstReceivalWasteStreamQuery.findFirstReceivalDeclarations(yearMonth))
       .thenReturn(mockDeclarations)
 
@@ -115,7 +125,7 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should process pending MONTHLY_RECEIVALS job and mark as completed`() {
+  fun `should process pending MONTHLY_RECEIVALS job with no declarations and mark as completed`() {
     // Given - a pending MONTHLY_RECEIVALS job exists
     val yearMonth = YearMonth(2025, 11)
     val pendingJob = MonthlyWasteDeclarationJob(
@@ -127,10 +137,14 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
     )
     monthlyWasteDeclarationJobsRepository.save(pendingJob)
 
+    // Mock the query to return empty list (no monthly receivals to declare)
+    whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(yearMonth))
+      .thenReturn(emptyList())
+
     // When - the scheduler processes pending jobs
     scheduler.processPendingJobs()
 
-    // Then - verify the job was marked as completed (implementation is not yet done, but marks as completed)
+    // Then - verify the job was marked as completed
     val jobs = monthlyWasteDeclarationJobsJpaRepository.findAll()
     assertThat(jobs).hasSize(1)
 
@@ -138,6 +152,89 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
     assertThat(processedJob.status).isEqualTo(MonthlyWasteDeclarationJob.Status.COMPLETED)
     assertThat(processedJob.fulfilledAt).isNotNull()
     assertThat(processedJob.jobType).isEqualTo(MonthlyWasteDeclarationJob.JobType.MONTHLY_RECEIVALS)
+    assertThat(processedJob.yearMonth).isEqualTo(yearMonth)
+
+    // Verify the query was called
+    verify(monthlyReceivalWasteStreamQuery).findMonthlyReceivalDeclarations(yearMonth)
+    // Verify the declarator was NOT called (empty list)
+    verify(declareMonthlyReceivals, never()).declare(any())
+  }
+
+  @Test
+  fun `should process pending MONTHLY_RECEIVALS job with declarations and call declarator`() {
+    // Given - a pending MONTHLY_RECEIVALS job exists
+    val yearMonth = YearMonth(2025, 11)
+    val pendingJob = MonthlyWasteDeclarationJob(
+      jobType = MonthlyWasteDeclarationJob.JobType.MONTHLY_RECEIVALS,
+      yearMonth = yearMonth,
+      status = MonthlyWasteDeclarationJob.Status.PENDING,
+      created = Clock.System.now(),
+      fulfilled = null
+    )
+    monthlyWasteDeclarationJobsRepository.save(pendingJob)
+
+    // Mock the query to return some declarations
+    val mockDeclarations = listOf(
+      MonthlyReceivalDeclaration(
+        id = "DECL-001",
+        wasteStreamNumber = WasteStreamNumber("123456789012"),
+        transporters = listOf("VIHB001", "VIHB002"),
+        totalWeight = 5000,
+        totalShipments = 10,
+        yearMonth = yearMonth
+      ),
+      MonthlyReceivalDeclaration(
+        id = "DECL-002",
+        wasteStreamNumber = WasteStreamNumber("987654321098"),
+        transporters = listOf("VIHB003"),
+        totalWeight = 3000,
+        totalShipments = 5,
+        yearMonth = yearMonth
+      )
+    )
+    whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(yearMonth))
+      .thenReturn(mockDeclarations)
+
+    // When - the scheduler processes pending jobs
+    scheduler.processPendingJobs()
+
+    // Then - verify the declarator was called with the declarations
+    verify(declareMonthlyReceivals).declare(mockDeclarations)
+
+    // Verify the job was marked as completed
+    val jobs = monthlyWasteDeclarationJobsJpaRepository.findAll()
+    assertThat(jobs).hasSize(1)
+    assertThat(jobs.first().status).isEqualTo(MonthlyWasteDeclarationJob.Status.COMPLETED)
+    assertThat(jobs.first().fulfilledAt).isNotNull()
+  }
+
+  @Test
+  fun `should mark MONTHLY_RECEIVALS job as failed when exception occurs`() {
+    // Given - a pending MONTHLY_RECEIVALS job exists
+    val yearMonth = YearMonth(2025, 11)
+    val pendingJob = MonthlyWasteDeclarationJob(
+      jobType = MonthlyWasteDeclarationJob.JobType.MONTHLY_RECEIVALS,
+      yearMonth = yearMonth,
+      status = MonthlyWasteDeclarationJob.Status.PENDING,
+      created = Clock.System.now(),
+      fulfilled = null
+    )
+    monthlyWasteDeclarationJobsRepository.save(pendingJob)
+
+    // Mock the query to throw an exception
+    whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(yearMonth))
+      .thenThrow(RuntimeException("Database connection failed"))
+
+    // When - the scheduler processes pending jobs
+    scheduler.processPendingJobs()
+
+    // Then - verify the job was marked as failed
+    val jobs = monthlyWasteDeclarationJobsJpaRepository.findAll()
+    assertThat(jobs).hasSize(1)
+
+    val processedJob = jobs.first()
+    assertThat(processedJob.status).isEqualTo(MonthlyWasteDeclarationJob.Status.FAILED)
+    assertThat(processedJob.fulfilledAt).isNotNull()
   }
 
   @Test
@@ -160,8 +257,10 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
     )
     monthlyWasteDeclarationJobsRepository.save(firstReceivalsJob, monthlyReceivalsJob)
 
-    // Mock the query
+    // Mock the queries
     whenever(firstReceivalWasteStreamQuery.findFirstReceivalDeclarations(any()))
+      .thenReturn(emptyList())
+    whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(any()))
       .thenReturn(emptyList())
 
     // When - the scheduler processes pending jobs

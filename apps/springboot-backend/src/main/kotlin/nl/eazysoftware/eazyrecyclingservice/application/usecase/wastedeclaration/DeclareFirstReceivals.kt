@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional
 
 interface DeclareFirstReceivals {
 
-  fun declareFirstReceivals(receivalDeclarations: List<ReceivalDeclaration>)
+  fun declareFirstReceivals(firstReceivalDeclarations: List<FirstReceivalDeclaration>)
 }
 
-data class ReceivalDeclaration(
+data class FirstReceivalDeclaration(
   val id: String,
   val wasteStream: WasteStream,
   val transporters: List<String>,
@@ -32,8 +32,7 @@ data class ReceivalDeclaration(
 )
 
 /**
- * SOAP adapter for first receival declarations using the Amice Melding service.
- * This is an outbound adapter in hexagonal architecture.
+ * Adapter for first receival declarations using the Amice Melding service.
  */
 @Component
 class DeclareFirstReceivalsService(
@@ -46,25 +45,25 @@ class DeclareFirstReceivalsService(
 
   @Transactional
   override fun declareFirstReceivals(
-    receivalDeclarations: List<ReceivalDeclaration>
+    firstReceivalDeclarations: List<FirstReceivalDeclaration>
   ) {
-    logger.info("Declaring first receival for waste streams: ${receivalDeclarations.joinToString(", ") { it.wasteStream.wasteStreamNumber.number }}")
+    logger.info("Declaring first receival for waste streams: ${firstReceivalDeclarations.joinToString(", ") { it.wasteStream.wasteStreamNumber.number }}")
 
-    val message = receivalDeclarations.map { mapToSoapMessage(it) }
+    val message = firstReceivalDeclarations.map { mapToSoapMessage(it) }
 
-    lmaDeclarations.saveAllPending(message)
+    lmaDeclarations.saveAllPendingFirstReceivals(message)
     amiceSessions.declareFirstReceivals(message)
   }
 
   @Suppress("DuplicatedCode")
   private fun mapToSoapMessage(
-    receivalDeclaration: ReceivalDeclaration
+    firstReceivalDeclaration: FirstReceivalDeclaration
   ): EersteOntvangstMeldingDetails {
     val message = EersteOntvangstMeldingDetails()
-    val wasteStream = receivalDeclaration.wasteStream
+    val wasteStream = firstReceivalDeclaration.wasteStream
 
     // Basic waste stream information
-    message.meldingsNummerMelder = receivalDeclaration.id
+    message.meldingsNummerMelder = firstReceivalDeclaration.id
     message.afvalstroomNummer = wasteStream.wasteStreamNumber.number
     message.isRouteInzameling = wasteStream.collectionType == WasteCollectionType.ROUTE
     message.isInzamelaarsRegeling = wasteStream.collectionType == WasteCollectionType.COLLECTORS_SCHEME
@@ -100,7 +99,7 @@ class DeclareFirstReceivalsService(
     }
 
     // Transporters (Vervoerders) - comma-separated list of vihb numbers
-    message.vervoerders = receivalDeclaration.transporters
+    message.vervoerders = firstReceivalDeclaration.transporters
       .joinToString(",")
 
     // Waste type information
@@ -109,11 +108,11 @@ class DeclareFirstReceivalsService(
     message.verwerkingsMethode = wasteStream.wasteType.processingMethod.code.replace(".", "")
 
     // Declaration details
-    message.totaalGewicht = receivalDeclaration.totalWeight
-    message.aantalVrachten = receivalDeclaration.totalShipments
+    message.totaalGewicht = firstReceivalDeclaration.totalWeight
+    message.aantalVrachten = firstReceivalDeclaration.totalShipments
 
     // Period in format MMYYYY (e.g., 112025 for November 2025)
-    val yearMonth = receivalDeclaration.yearMonth
+    val yearMonth = firstReceivalDeclaration.yearMonth
     message.periodeMelding = "${yearMonth.month.number.toString().padStart(2, '0')}${yearMonth.year}"
 
     return message

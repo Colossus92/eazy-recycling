@@ -1,7 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareMonthlyReceivals
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJobs
 import org.slf4j.LoggerFactory
@@ -19,7 +21,9 @@ import org.springframework.stereotype.Component
 class MonthlyWasteDeclarationScheduler(
   private val monthlyWasteDeclarationJobs: MonthlyWasteDeclarationJobs,
   private val firstReceivalWasteStreamQuery: FirstReceivalWasteStreamQuery,
-  private val declareFirstReceivals: DeclareFirstReceivals
+  private val declareFirstReceivals: DeclareFirstReceivals,
+  private val monthlyReceivalWasteStreamQuery: MonthlyReceivalWasteStreamQuery,
+  private val declareMonthlyReceivals: DeclareMonthlyReceivals
 ) {
 
   private val logger = LoggerFactory.getLogger(MonthlyWasteDeclarationScheduler::class.java)
@@ -85,9 +89,25 @@ class MonthlyWasteDeclarationScheduler(
   }
 
   private fun processMonthlyReceivalsJob(job: MonthlyWasteDeclarationJob) {
-    logger.info("Processing MONTHLY_RECEIVALS job for yearMonth={} - NOT YET IMPLEMENTED", job.yearMonth)
+    logger.info("Processing MONTHLY_RECEIVALS job for yearMonth={}", job.yearMonth)
 
-    // For now, mark as completed to prevent infinite retries
+    // Query for all waste streams that need monthly receival declarations
+    val receivalDeclarations = monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(job.yearMonth)
+
+    logger.info("Found {} monthly receival declaration(s) for yearMonth={}", receivalDeclarations.size, job.yearMonth)
+
+    if (receivalDeclarations.isEmpty()) {
+      logger.info("No monthly receivals to declare for yearMonth={}", job.yearMonth)
+      monthlyWasteDeclarationJobs.save(job.markCompleted())
+      return
+    }
+
+    // Trigger the declarator to process the declarations
+    declareMonthlyReceivals.declare(receivalDeclarations)
+
+    // Mark job as completed
     monthlyWasteDeclarationJobs.save(job.markCompleted())
+
+    logger.info("Successfully completed MONTHLY_RECEIVALS job for yearMonth={}", job.yearMonth)
   }
 }
