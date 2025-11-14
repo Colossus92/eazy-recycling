@@ -5,9 +5,10 @@ interface EmptyStateProps {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   text: string;
   onClick: () => void;
+  showButton?: boolean;
 }
 
-export const EmptyState = ({ icon: Icon, text, onClick }: EmptyStateProps) => {
+export const EmptyState = ({ icon: Icon, text, onClick, showButton = true }: EmptyStateProps) => {
   return (
     <div className="flex flex-col flex-[1_0_0] justify-center items-center self-stretch gap-3 border-t border-solid border-color-border-primary">
       <div className="flex flex-col items-center gap-5">
@@ -17,12 +18,12 @@ export const EmptyState = ({ icon: Icon, text, onClick }: EmptyStateProps) => {
         <div className="flex flex-col items-center self-stretch gap-3">
           <span>{text}</span>
         </div>
-        <Button
+        {showButton && <Button
           variant={'secondary'}
           label={'Voeg toe'}
           icon={Plus}
           onClick={onClick}
-        />
+        />}
       </div>
     </div>
   );

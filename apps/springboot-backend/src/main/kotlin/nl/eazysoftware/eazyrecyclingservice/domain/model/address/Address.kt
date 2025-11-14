@@ -13,6 +13,8 @@ data class Address(
       "Huisnummer moet een waarde hebben."
     }
   }
+
+  fun toAddressLine() = "${streetName.value} $buildingNumber${buildingNumberAddition ?: ""}, ${city.value}"
 }
 
 

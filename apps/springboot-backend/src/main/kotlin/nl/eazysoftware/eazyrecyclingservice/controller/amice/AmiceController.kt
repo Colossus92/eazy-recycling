@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.YearMonth
+import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
@@ -44,8 +45,33 @@ class AmiceController(
   }
 
   @GetMapping
-  fun getDeclarations(pageable: Pageable): Page<LmaDeclaration> {
+  fun getDeclarations(pageable: Pageable): Page<LmaDeclarationView> {
     return lmaDeclarations.findAll(pageable)
+      .map { LmaDeclarationView.fromDomain(it) }
+  }
+
+  data class LmaDeclarationView(
+    val wasteStreamNumber: String,
+    val period: String,
+    val totalWeight: Int,
+    val totalShipments: Int,
+    val status: String,
+    val wasteName: String,
+    val pickupLocation: String,
+  ) {
+    companion object {
+      fun fromDomain(lmaDeclaration: LmaDeclaration): LmaDeclarationView {
+        return LmaDeclarationView(
+          wasteStreamNumber = lmaDeclaration.wasteStreamNumber.number,
+          period = "${lmaDeclaration.period.month.number.toString().padStart(2, '0')}-${lmaDeclaration.period.year}",
+          totalWeight = lmaDeclaration.totalWeight,
+          totalShipments = lmaDeclaration.totalTransports,
+          status = lmaDeclaration.status,
+          wasteName = lmaDeclaration.wasteName,
+          pickupLocation = lmaDeclaration.pickupLocation.toAddressLine(),
+        )
+      }
+    }
   }
 
   /**
@@ -123,12 +149,14 @@ class AmiceController(
         )
         Location.DutchAddress(address)
       }
+
       "PROXIMITY_DESCRIPTION" -> Location.ProximityDescription(
         postalCodeDigits = location.postalCodeDigits!!,
         city = nl.eazysoftware.eazyrecyclingservice.domain.model.address.City(location.city!!),
         description = location.description!!,
         country = "Nederland"
       )
+
       "NO_LOCATION" -> Location.NoLocation
       else -> throw IllegalArgumentException("Invalid pickup location type: ${location.type}")
     }

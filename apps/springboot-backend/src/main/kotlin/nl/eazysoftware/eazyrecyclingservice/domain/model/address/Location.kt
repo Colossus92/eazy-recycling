@@ -10,6 +10,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocation
  */
 sealed interface Location {
 
+  fun toAddressLine(): String
+
   /**
    * Variant 1: Dutch address with full postal code
    * Requires: NL + postal code (4 digits + 2 letters) + house number
@@ -27,7 +29,11 @@ sealed interface Location {
     fun postalCode(): DutchPostalCode = address.postalCode
     fun city(): String = address.city.value
     fun country(): String = address.country
+
+    override fun toAddressLine() =
+      streetName() + " " + buildingNumber() + " " + buildingNumberAddition() + ", " + city()
   }
+
 
   /**
    * Variant 2: Proximity description for unusual addressing
@@ -39,6 +45,8 @@ sealed interface Location {
     val description: String,
     val country: String = "Nederland"
   ) : Location {
+    override fun toAddressLine() = "$description, $city"
+
     init {
       require(postalCodeDigits.matches(Regex("\\d{4}"))) {
         "Voor een nabijheidsbeschrijving moet de postcode alleen vier cijfers bevatten, maar was: $postalCodeDigits"
@@ -53,7 +61,9 @@ sealed interface Location {
   /**
    * Variant 3: No origin location for route collection, collectors scheme, or private disposers
    */
-  data object NoLocation : Location
+  data object NoLocation : Location {
+    override fun toAddressLine() = "Geen locatie"
+  }
 
   /**
    * Variant 4: Company location reference
@@ -63,7 +73,9 @@ sealed interface Location {
     val companyId: CompanyId,
     val name: String,
     val address: Address,
-  ) : Location
+  ) : Location {
+    override fun toAddressLine() = address.toAddressLine()
+  }
 
   /**
    * Variant 5: Project/Branch location
@@ -85,5 +97,7 @@ sealed interface Location {
     fun postalCode(): DutchPostalCode = address.postalCode
     fun city(): City = address.city
     fun country(): String = address.country
+
+    override fun toAddressLine() = address.toAddressLine()
   }
 }

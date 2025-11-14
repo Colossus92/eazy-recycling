@@ -26,7 +26,9 @@ import type { DeclareFirstReceivalsRequest } from '../models';
 // @ts-ignore
 import type { DeclareFirstReceivalsResponse } from '../models';
 // @ts-ignore
-import type { OpvragenResultaatVerwerkingMeldingSessieResponse } from '../models';
+import type { PageLmaDeclarationView } from '../models';
+// @ts-ignore
+import type { Pageable } from '../models';
 /**
  * AmiceControllerApi - axios parameter creator
  * @export
@@ -74,10 +76,13 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
+         * @param {Pageable} pageable 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        monthlyReport: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getDeclarations: async (pageable: Pageable, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pageable' is not null or undefined
+            assertParamExists('getDeclarations', 'pageable', pageable)
             const localVarPath = `/amice`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -86,13 +91,19 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (pageable !== undefined) {
+                for (const [key, value] of Object.entries(pageable)) {
+                    localVarQueryParameter[key] = value;
+                }
+            }
 
 
     
@@ -107,15 +118,11 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
-         * @param {string} sessionId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        requestSessionResult: async (sessionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'sessionId' is not null or undefined
-            assertParamExists('requestSessionResult', 'sessionId', sessionId)
-            const localVarPath = `/amice/{sessionId}`
-                .replace(`{${"sessionId"}}`, encodeURIComponent(String(sessionId)));
+        monthlyReport: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/amice`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -123,7 +130,7 @@ export const AmiceControllerApiAxiosParamCreator = function (configuration?: Con
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -166,6 +173,18 @@ export const AmiceControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {Pageable} pageable 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getDeclarations(pageable: Pageable, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PageLmaDeclarationView>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getDeclarations(pageable, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.getDeclarations']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -173,18 +192,6 @@ export const AmiceControllerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.monthlyReport(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.monthlyReport']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<OpvragenResultaatVerwerkingMeldingSessieResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.requestSessionResult(sessionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['AmiceControllerApi.requestSessionResult']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -208,20 +215,20 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
         },
         /**
          * 
+         * @param {Pageable} pageable 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getDeclarations(pageable: Pageable, options?: RawAxiosRequestConfig): AxiosPromise<PageLmaDeclarationView> {
+            return localVarFp.getDeclarations(pageable, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         monthlyReport(options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.monthlyReport(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} sessionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig): AxiosPromise<OpvragenResultaatVerwerkingMeldingSessieResponse> {
-            return localVarFp.requestSessionResult(sessionId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -246,23 +253,23 @@ export class AmiceControllerApi extends BaseAPI {
 
     /**
      * 
+     * @param {Pageable} pageable 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmiceControllerApi
+     */
+    public getDeclarations(pageable: Pageable, options?: RawAxiosRequestConfig) {
+        return AmiceControllerApiFp(this.configuration).getDeclarations(pageable, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AmiceControllerApi
      */
     public monthlyReport(options?: RawAxiosRequestConfig) {
         return AmiceControllerApiFp(this.configuration).monthlyReport(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} sessionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AmiceControllerApi
-     */
-    public requestSessionResult(sessionId: string, options?: RawAxiosRequestConfig) {
-        return AmiceControllerApiFp(this.configuration).requestSessionResult(sessionId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

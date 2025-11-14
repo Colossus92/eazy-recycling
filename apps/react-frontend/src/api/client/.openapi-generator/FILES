@@ -18,7 +18,6 @@ base.ts
 common.ts
 configuration.ts
 index.ts
-models/aanvraag-gegevens-uuiddetails.ts
 models/address-dto.ts
 models/address-request.ts
 models/address-view.ts
@@ -57,13 +56,15 @@ models/goods-item-view.ts
 models/goods-request.ts
 models/index.ts
 models/instant.ts
+models/lma-declaration-view.ts
 models/local-date-time.ts
 models/local-date.ts
 models/local-time.ts
 models/no-pickup-location-request.ts
 models/no-pickup-view.ts
-models/opvragen-resultaat-verwerking-melding-sessie-response-details.ts
-models/opvragen-resultaat-verwerking-melding-sessie-response.ts
+models/page-lma-declaration-view.ts
+models/pageable-object.ts
+models/pageable.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
 models/pickup-company-request.ts
@@ -86,6 +87,7 @@ models/proximity-description-view.ts
 models/receival-declaration-request-pickup-location.ts
 models/receival-declaration-request.ts
 models/signature-status-view.ts
+models/sort-object.ts
 models/split-weight-ticket-request.ts
 models/split-weight-ticket-response.ts
 models/transport-detail-view.ts

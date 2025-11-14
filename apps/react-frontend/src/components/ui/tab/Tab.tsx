@@ -15,7 +15,7 @@ export const Tab = ({ label, disabled = false, hasError = false }: TabProps) => 
             {({ hover, selected }) => (
                 <button 
                     className={clsx(
-                        "h-10 py-3 px-5 transition-colors text-button font-semibold rounded-t-radius-lg",
+                        "h-10 py-3 px-5 transition-colors text-button font-semibold rounded-t-radius-lg focus:outline-none",
                         selected && [
                             "border-x border-t border-b border-t-color-border-primary border-x-color-border-primary",
                             "border-b-color-surface-primary",
