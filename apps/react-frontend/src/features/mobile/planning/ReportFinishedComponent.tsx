@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { TransportDetailView } from '@/api/client';
 import { Button } from '@/components/ui/button/Button';
 import BxTimeFive from '@/assets/icons/BxTimeFive.svg?react';
+import { DriverNote } from '@/features/planning/components/note/DriverNote';
 
 interface ReportFinishedComponentProps {
   transport: TransportDetailView;
@@ -34,6 +35,7 @@ export const ReportFinishedComponent = ({
         </div>
         <span className="text-subtitle-2">{transport.transportHours} uur</span>
       </div>
+      {transport.driverNote && <DriverNote note={transport.driverNote} />}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import BxTimeFive from '@/assets/icons/BxTimeFive.svg?react';
 import { CompanyCard } from '@/components/ui/company/CompanyCard';
 import { toastService } from '@/components/ui/toast/toastService';
 import { Note } from '@/features/planning/components/note/Note';
+import { DriverNote } from '../note/DriverNote';
 
 interface TransportDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -165,6 +166,9 @@ export const TransportDetailsDrawer = ({
                     {data.transportHours.toString().replace('.', ',')} uur
                   </span>
                 </div>
+              )}
+              {data.driverNote && (
+                <DriverNote note={data.driverNote} />
               )}
             </div>
           </div>
