@@ -940,6 +940,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
   /amice:
+    get:
+      tags:
+      - amice-controller
+      operationId: getDeclarations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageLmaDeclarationDto"
     post:
       tags:
       - amice-controller
@@ -1164,25 +1181,6 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
-  /amice/{sessionId}:
-    get:
-      tags:
-      - amice-controller
-      operationId: requestSessionResult
-      parameters:
-      - name: sessionId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/OpvragenResultaatVerwerkingMeldingSessieResponse"
 components:
   schemas:
     CompanyConsignor:
@@ -2604,14 +2602,14 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -2680,9 +2678,6 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -2691,6 +2686,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -2721,11 +2719,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -3189,46 +3187,124 @@ components:
       - id
       - name
       - updatedAt
-    AanvraagGegevensUUIDDetails:
+    Pageable:
       type: object
       properties:
-        meldingSessieUUID:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    LmaDeclarationDto:
+      type: object
+      properties:
+        id:
           type: string
-          xml:
-            name: MeldingSessieUUID
-        datumTijdRequest:
+        amiceUUID:
+          type: string
+          format: uuid
+        wasteStreamNumber:
+          type: string
+        period:
+          type: string
+        transporters:
+          type: array
+          items:
+            type: string
+        totalWeight:
+          type: integer
+          format: int64
+        totalShipments:
+          type: integer
+          format: int64
+        createdAt:
           type: string
           format: date-time
-          xml:
-            name: DatumTijdRequest
-        usernameRequest:
-          type: string
-          xml:
-            name: UsernameRequest
-      required:
-      - datumTijdRequest
-    OpvragenResultaatVerwerkingMeldingSessieResponse:
-      type: object
-      properties:
-        opvragenResultaatVerwerkingMeldingSessieResponseDetails:
-          $ref: "#/components/schemas/OpvragenResultaatVerwerkingMeldingSessieResponseDetails"
-          xml:
-            name: OpvragenResultaatVerwerkingMeldingSessieResponseDetails
-      required:
-      - opvragenResultaatVerwerkingMeldingSessieResponseDetails
-      xml:
-        name: OpvragenResultaatVerwerkingMeldingSessieResponse
-        namespace: http://amice.lma.nl/AmiceWebServices3/
-    OpvragenResultaatVerwerkingMeldingSessieResponseDetails:
-      type: object
-      properties:
-        aanvraagGegevens:
-          $ref: "#/components/schemas/AanvraagGegevensUUIDDetails"
-          xml:
-            name: AanvraagGegevens
-        aanvraagFoutOrStatusMeldingSessie:
+        errors:
           type: array
-          items: {}
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+          - PENDING
+          - COMPLETED
+          - FAILED
+      required:
+      - createdAt
+      - id
+      - period
+      - status
+      - totalShipments
+      - totalWeight
+      - transporters
+      - wasteStreamNumber
+    PageLmaDeclarationDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/LmaDeclarationDto"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
   securitySchemes:
     bearerAuth:
       type: http

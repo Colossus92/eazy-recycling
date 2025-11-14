@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.OpvragenResultaatVerwerkingMeldingSessieResponse
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
@@ -13,9 +12,12 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
+import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -27,11 +29,12 @@ import java.util.*
  */
 @RestController
 @RequestMapping("/amice")
+@PreAuthorize(HAS_ADMIN_OR_PLANNER)
 class AmiceController(
   private val declareFirstReceivals: DeclareFirstReceivals,
   private val monthlyWasteDeclarator: MonthlyWasteDeclarator,
   private val firstReceivalDeclarationFactory: ReceivalDeclarationFactory,
-  private val amiceSessions: AmiceSessions,
+  private val lmaDeclarations: LmaDeclarations,
 ) {
 
   @PostMapping
@@ -40,9 +43,9 @@ class AmiceController(
     monthlyWasteDeclarator.declare()
   }
 
-  @GetMapping("/{sessionId}")
-  fun requestSessionResult(@PathVariable sessionId: UUID): OpvragenResultaatVerwerkingMeldingSessieResponse {
-    return amiceSessions.retrieve(sessionId)
+  @GetMapping
+  fun getDeclarations(pageable: Pageable): Page<LmaDeclarationDto?> {
+    return lmaDeclarations.findAll(pageable)
   }
 
   /**

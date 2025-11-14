@@ -3,17 +3,21 @@ package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import kotlin.time.Clock
 import kotlin.time.toJavaInstant
 
 interface LmaDeclarationJpaRepository : JpaRepository<LmaDeclarationDto, String>
-
+interface LmaDeclarationPageableRepository : PagingAndSortingRepository<LmaDeclarationDto, String>
 
 @Repository
 class LmaDeclarationRepository(
-  private val jpaRepository: LmaDeclarationJpaRepository
+  private val jpaRepository: LmaDeclarationJpaRepository,
+  private val pageableRepository: LmaDeclarationPageableRepository,
 ) : LmaDeclarations {
   override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
     LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
@@ -29,6 +33,10 @@ class LmaDeclarationRepository(
 
   override fun saveAll(declarations: List<LmaDeclarationDto>): List<LmaDeclarationDto> {
     return jpaRepository.saveAll(declarations)
+  }
+
+  override fun findAll(pageable: Pageable): Page<LmaDeclarationDto?> {
+    return pageableRepository.findAll(pageable)
   }
 }
 
