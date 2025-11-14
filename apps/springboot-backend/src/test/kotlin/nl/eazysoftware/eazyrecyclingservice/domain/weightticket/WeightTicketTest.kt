@@ -224,6 +224,165 @@ class WeightTicketTest {
     assertThat(exception).hasMessageContaining("Weegbon kan alleen worden voltooid als de status openstaand is")
   }
 
+  @Test
+  fun `can copy weight ticket with all fields`() {
+    val originalTicket = WeightTicket(
+      id = WeightTicketId(1),
+      consignorParty = Consignor.Company(companyId()),
+      status = WeightTicketStatus.COMPLETED,
+      lines = SAMPLE_LINES,
+      carrierParty = companyId(),
+      direction = WeightTicketDirection.INBOUND,
+      pickupLocation = TestLocationFactory.createDutchAddress(),
+      deliveryLocation = TestLocationFactory.createCompanyAddress(),
+      truckLicensePlate = LicensePlate("AB-123-CD"),
+      reclamation = "Reclamation",
+      note = Note("note"),
+      tarraWeight = Weight(BigDecimal("50.00"), Weight.WeightUnit.KILOGRAM),
+      secondWeighing = Weight(BigDecimal("10.00"), Weight.WeightUnit.KILOGRAM),
+      createdAt = Clock.System.now(),
+    )
+
+    val newId = WeightTicketId(999)
+    val copiedTicket = originalTicket.copy(newId)
+
+    assertThat(copiedTicket.id).isEqualTo(newId)
+    assertThat(copiedTicket.status).isEqualTo(WeightTicketStatus.DRAFT)
+    assertThat(copiedTicket.consignorParty).isEqualTo(originalTicket.consignorParty)
+    assertThat(copiedTicket.lines.getLines().first().waste).isEqualTo(originalTicket.lines.getLines().first().waste)
+    assertThat(copiedTicket.lines.getLines().first().weight).isEqualTo(originalTicket.lines.getLines().first().weight)
+    assertThat(copiedTicket.lines.getLines().size).isEqualTo(originalTicket.lines.getLines().size)
+    assertThat(copiedTicket.carrierParty).isEqualTo(originalTicket.carrierParty)
+    assertThat(copiedTicket.direction).isEqualTo(originalTicket.direction)
+    assertThat(copiedTicket.pickupLocation).isEqualTo(originalTicket.pickupLocation)
+    assertThat(copiedTicket.deliveryLocation).isEqualTo(originalTicket.deliveryLocation)
+    assertThat(copiedTicket.truckLicensePlate).isEqualTo(originalTicket.truckLicensePlate)
+    assertThat(copiedTicket.reclamation).isEqualTo(originalTicket.reclamation)
+    assertThat(copiedTicket.note).isEqualTo(originalTicket.note)
+    assertThat(copiedTicket.tarraWeight).isEqualTo(originalTicket.tarraWeight)
+    assertThat(copiedTicket.secondWeighing).isEqualTo(originalTicket.secondWeighing)
+  }
+
+  @Test
+  fun `copied weight ticket has new creation timestamp`() {
+    val originalTicket = weightTicket()
+    val originalCreatedAt = originalTicket.createdAt
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.createdAt).isNotEqualTo(originalCreatedAt)
+  }
+
+  @Test
+  fun `copied weight ticket has null updatedAt`() {
+    val originalTicket = weightTicket().apply {
+      updatedAt = Clock.System.now()
+    }
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.updatedAt).isNull()
+  }
+
+  @Test
+  fun `copied weight ticket has null weightedAt`() {
+    val originalTicket = weightTicket().apply {
+      weightedAt = Clock.System.now()
+    }
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.weightedAt).isNull()
+  }
+
+  @Test
+  fun `copied weight ticket always has draft status regardless of original status`() {
+    val completedTicket = weightTicket(WeightTicketStatus.COMPLETED)
+    val invoicedTicket = weightTicket(WeightTicketStatus.INVOICED)
+    val cancelledTicket = weightTicket(WeightTicketStatus.CANCELLED)
+
+    val copiedFromCompleted = completedTicket.copy(WeightTicketId(1))
+    val copiedFromInvoiced = invoicedTicket.copy(WeightTicketId(2))
+    val copiedFromCancelled = cancelledTicket.copy(WeightTicketId(3))
+
+    assertThat(copiedFromCompleted.status).isEqualTo(WeightTicketStatus.DRAFT)
+    assertThat(copiedFromInvoiced.status).isEqualTo(WeightTicketStatus.DRAFT)
+    assertThat(copiedFromCancelled.status).isEqualTo(WeightTicketStatus.DRAFT)
+  }
+
+  @Test
+  fun `copied weight ticket with empty lines`() {
+    val originalTicket = weightTicket().apply {
+      lines = EMPTY_LINES
+    }
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.lines.isEmpty()).isTrue()
+    assertThat(copiedTicket.lines.getLines()).isEmpty()
+  }
+
+  @Test
+  fun `copied weight ticket with multiple lines`() {
+    val multipleLines = WeightTicketLines(
+      listOf(
+        WeightTicketLine(
+          waste = WasteStreamNumber("111111111111"),
+          weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
+        ),
+        WeightTicketLine(
+          waste = WasteStreamNumber("222222222222"),
+          weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
+        ),
+        WeightTicketLine(
+          waste = WasteStreamNumber("333333333333"),
+          weight = Weight(BigDecimal("300.00"), Weight.WeightUnit.KILOGRAM)
+        )
+      )
+    )
+    val originalTicket = weightTicket().apply {
+      lines = multipleLines
+    }
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.lines.getLines()).hasSize(3)
+    assertThat(copiedTicket.lines.getLines()[0].waste.number).isEqualTo("111111111111")
+    assertThat(copiedTicket.lines.getLines()[1].waste.number).isEqualTo("222222222222")
+    assertThat(copiedTicket.lines.getLines()[2].waste.number).isEqualTo("333333333333")
+  }
+
+  @Test
+  fun `copied weight ticket with null optional fields`() {
+    val originalTicket = WeightTicket(
+      id = WeightTicketId(1),
+      consignorParty = Consignor.Company(companyId()),
+      status = WeightTicketStatus.DRAFT,
+      lines = EMPTY_LINES,
+      carrierParty = null,
+      direction = WeightTicketDirection.INBOUND,
+      pickupLocation = null,
+      deliveryLocation = null,
+      truckLicensePlate = null,
+      reclamation = null,
+      note = null,
+      tarraWeight = null,
+      secondWeighing = null,
+      createdAt = Clock.System.now(),
+    )
+
+    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+
+    assertThat(copiedTicket.carrierParty).isNull()
+    assertThat(copiedTicket.pickupLocation).isNull()
+    assertThat(copiedTicket.deliveryLocation).isNull()
+    assertThat(copiedTicket.truckLicensePlate).isNull()
+    assertThat(copiedTicket.reclamation).isNull()
+    assertThat(copiedTicket.note).isNull()
+    assertThat(copiedTicket.tarraWeight).isNull()
+    assertThat(copiedTicket.secondWeighing).isNull()
+  }
+
   private fun companyId(): CompanyId = CompanyId(UUID.randomUUID())
 }
 

@@ -570,6 +570,25 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SplitWeightTicketResponse"
+  /weight-tickets/{weightTicketId}/copy:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: copy
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CopyWeightTicketResponse"
   /weight-tickets/{weightTicketId}/complete:
     post:
       tags:
@@ -939,31 +958,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
-  /amice:
-    get:
-      tags:
-      - amice-controller
-      operationId: getDeclarations
-      parameters:
-      - name: pageable
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Pageable"
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageLmaDeclarationView"
-    post:
-      tags:
-      - amice-controller
-      operationId: monthlyReport
-      responses:
-        "200":
-          description: OK
   /amice/declare-first-receivals:
     post:
       tags:
@@ -1181,6 +1175,24 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/DriverPlanningItem"
+  /amice:
+    get:
+      tags:
+      - amice-controller
+      operationId: getDeclarations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageLmaDeclarationView"
 components:
   schemas:
     CompanyConsignor:
@@ -2110,6 +2122,18 @@ components:
       - newWeightTicketPercentage
       - originalWeightTicketPercentage
     SplitWeightTicketResponse:
+      type: object
+      properties:
+        originalWeightTicketId:
+          type: integer
+          format: int64
+        newWeightTicketId:
+          type: integer
+          format: int64
+      required:
+      - newWeightTicketId
+      - originalWeightTicketId
+    CopyWeightTicketResponse:
       type: object
       properties:
         originalWeightTicketId:

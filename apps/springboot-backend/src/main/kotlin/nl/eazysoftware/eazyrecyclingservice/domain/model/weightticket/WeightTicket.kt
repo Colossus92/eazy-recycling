@@ -162,6 +162,30 @@ class WeightTicket(
     this.status = WeightTicketStatus.COMPLETED
     this.updatedAt = Clock.System.now()
   }
+
+  fun copy(newId: WeightTicketId): WeightTicket {
+    return WeightTicket(
+      id = newId,
+      consignorParty = this.consignorParty,
+      status = WeightTicketStatus.DRAFT,
+      lines = WeightTicketLines(this.lines.getLines().map { line ->
+        WeightTicketLine(
+          waste = line.waste,
+          weight = line.weight
+        )
+      }),
+      secondWeighing = this.secondWeighing,
+      tarraWeight = this.tarraWeight,
+      carrierParty = this.carrierParty,
+      direction = this.direction,
+      pickupLocation = this.pickupLocation,
+      deliveryLocation = this.deliveryLocation,
+      truckLicensePlate = this.truckLicensePlate,
+      reclamation = this.reclamation,
+      note = this.note?.copy(),
+      createdAt = Clock.System.now()
+    )
+  }
 }
 
 enum class WeightTicketStatus {

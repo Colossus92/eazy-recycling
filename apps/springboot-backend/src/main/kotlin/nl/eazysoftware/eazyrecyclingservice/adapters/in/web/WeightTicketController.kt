@@ -31,6 +31,7 @@ class WeightTicketController(
   private val updateWeightTicket: UpdateWeightTicket,
   private val cancelWeightTicket: CancelWeightTicket,
   private val splitWeightTicket: SplitWeightTicket,
+  private val copyWeightTicket: CopyWeightTicket,
   private val completeWeightTicket: CompleteWeightTicket,
 ) {
   @PostMapping
@@ -114,6 +115,25 @@ class WeightTicketController(
       )
     )
   }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/{weightTicketId}/copy")
+  @ResponseStatus(HttpStatus.OK)
+  fun copy(
+    @PathVariable
+    weightTicketId: Long,
+  ): CopyWeightTicketResponse {
+    val newTicketId = copyWeightTicket.handle(
+      CopyWeightTicketCommand(
+        WeightTicketId(weightTicketId)
+      )
+    )
+
+    return CopyWeightTicketResponse(
+      originalWeightTicketId = weightTicketId,
+      newWeightTicketId = newTicketId.number,
+    )
+  }
 }
 
 data class SplitWeightTicketRequest(
@@ -127,6 +147,11 @@ data class SplitWeightTicketRequest(
 )
 
 data class SplitWeightTicketResponse(
+  val originalWeightTicketId: Long,
+  val newWeightTicketId: Long,
+)
+
+data class CopyWeightTicketResponse(
   val originalWeightTicketId: Long,
   val newWeightTicketId: Long,
 )
