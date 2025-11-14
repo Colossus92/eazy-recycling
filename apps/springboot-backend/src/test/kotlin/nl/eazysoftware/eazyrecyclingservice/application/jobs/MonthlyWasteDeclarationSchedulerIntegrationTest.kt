@@ -32,7 +32,7 @@ import kotlin.time.toKotlinInstant
 class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
 
   @Autowired
-  private lateinit var scheduler: MonthlyWasteDeclarationScheduler
+  private lateinit var scheduler: WasteDeclarationJobProcessScheduler
 
   @Autowired
   private lateinit var monthlyWasteDeclarationJobsJpaRepository: MonthlyWasteDeclarationJobsJpaRepository

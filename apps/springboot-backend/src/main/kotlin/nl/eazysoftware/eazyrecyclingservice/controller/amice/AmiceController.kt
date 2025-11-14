@@ -38,12 +38,6 @@ class AmiceController(
   private val lmaDeclarations: LmaDeclarations,
 ) {
 
-  @PostMapping
-  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  fun monthlyReport() {
-    monthlyWasteDeclarator.declare()
-  }
-
   @GetMapping
   fun getDeclarations(pageable: Pageable): Page<LmaDeclarationView> {
     return lmaDeclarations.findAll(pageable)

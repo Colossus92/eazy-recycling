@@ -1,113 +1,34 @@
 package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareMonthlyReceivals
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyReceivalWasteStreamQuery
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJobs
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 /**
- * Scheduled job that processes pending monthly waste declaration jobs.
- *
- * Runs every 10 minutes to check for pending jobs and processes them according to their type:
- * - FIRST_RECEIVALS: Triggers the FirstReceivalDeclarator
- * - MONTHLY_RECEIVALS: To be implemented
+ * Scheduler that triggers monthly waste declaration on the 20th day of each month at 2:00 AM.
+ * Uses cron expression: "0 0 2 20 * *" (minute hour day month day-of-week year)
  */
 @Component
 class MonthlyWasteDeclarationScheduler(
-  private val monthlyWasteDeclarationJobs: MonthlyWasteDeclarationJobs,
-  private val firstReceivalWasteStreamQuery: FirstReceivalWasteStreamQuery,
-  private val declareFirstReceivals: DeclareFirstReceivals,
-  private val monthlyReceivalWasteStreamQuery: MonthlyReceivalWasteStreamQuery,
-  private val declareMonthlyReceivals: DeclareMonthlyReceivals
+  private val monthlyWasteDeclarator: MonthlyWasteDeclarator
 ) {
 
-  private val logger = LoggerFactory.getLogger(MonthlyWasteDeclarationScheduler::class.java)
+  private val logger = LoggerFactory.getLogger(javaClass)
 
   /**
-   * Processes pending monthly waste declaration jobs every 10 minutes.
+   * Triggers the monthly waste declaration.
+   * Runs on the 20th day of every month at 2:00 AM.
    */
-  @Scheduled(cron = "0 */10 * * * *")
-  fun processPendingJobs() {
-    logger.info("Starting monthly waste declaration job processing")
-
-    val pendingJobs = monthlyWasteDeclarationJobs.findPending()
-
-    if (pendingJobs.isEmpty()) {
-      logger.debug("No pending monthly waste declaration jobs found")
-      return
-    }
-
-    logger.info("Found {} pending monthly waste declaration job(s)", pendingJobs.size)
-
-    pendingJobs.forEach { job ->
-      processJob(job)
-    }
-
-    logger.info("Completed monthly waste declaration job processing")
-  }
-
-  private fun processJob(job: MonthlyWasteDeclarationJob) {
-    logger.info("Processing job: id={}, type={}, yearMonth={}", job.id, job.jobType, job.yearMonth)
-
+  @Scheduled(cron = "0 0 2 20 * *")
+  fun triggerMonthlyWasteDeclaration() {
     try {
-      when (job.jobType) {
-        MonthlyWasteDeclarationJob.JobType.FIRST_RECEIVALS -> processFirstReceivalsJob(job)
-        MonthlyWasteDeclarationJob.JobType.MONTHLY_RECEIVALS -> processMonthlyReceivalsJob(job)
-      }
+      logger.info("Starting monthly waste declaration job")
+      monthlyWasteDeclarator.declare()
+      logger.info("Monthly waste declaration job completed successfully")
     } catch (e: Exception) {
-      logger.error("Failed to process job: id={}, type={}", job.id, job.jobType, e)
-      monthlyWasteDeclarationJobs.save(job.markFailed())
+      logger.error("Monthly waste declaration job failed", e)
+      throw e
     }
-  }
-
-  private fun processFirstReceivalsJob(job: MonthlyWasteDeclarationJob) {
-    logger.info("Processing FIRST_RECEIVALS job for yearMonth={}", job.yearMonth)
-
-    // Query for all waste streams that need to be declared for the first time
-    val receivalDeclarations = firstReceivalWasteStreamQuery.findFirstReceivalDeclarations(job.yearMonth)
-
-    logger.info("Found {} first receival declaration(s) for yearMonth={}", receivalDeclarations.size, job.yearMonth)
-
-    if (receivalDeclarations.isEmpty()) {
-      logger.info("No first receivals to declare for yearMonth={}", job.yearMonth)
-      monthlyWasteDeclarationJobs.save(job.markCompleted())
-      return
-    }
-
-    // Trigger the declarator to process the declarations
-    declareFirstReceivals.declareFirstReceivals(receivalDeclarations)
-
-    // Mark job as completed
-    monthlyWasteDeclarationJobs.save(job.markCompleted())
-
-    logger.info("Successfully completed FIRST_RECEIVALS job for yearMonth={}", job.yearMonth)
-  }
-
-  private fun processMonthlyReceivalsJob(job: MonthlyWasteDeclarationJob) {
-    logger.info("Processing MONTHLY_RECEIVALS job for yearMonth={}", job.yearMonth)
-
-    // Query for all waste streams that need monthly receival declarations
-    val receivalDeclarations = monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(job.yearMonth)
-
-    logger.info("Found {} monthly receival declaration(s) for yearMonth={}", receivalDeclarations.size, job.yearMonth)
-
-    if (receivalDeclarations.isEmpty()) {
-      logger.info("No monthly receivals to declare for yearMonth={}", job.yearMonth)
-      monthlyWasteDeclarationJobs.save(job.markCompleted())
-      return
-    }
-
-    // Trigger the declarator to process the declarations
-    declareMonthlyReceivals.declare(receivalDeclarations)
-
-    // Mark job as completed
-    monthlyWasteDeclarationJobs.save(job.markCompleted())
-
-    logger.info("Successfully completed MONTHLY_RECEIVALS job for yearMonth={}", job.yearMonth)
   }
 }
