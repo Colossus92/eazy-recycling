@@ -15,7 +15,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyI
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -33,7 +32,6 @@ import java.util.*
 @PreAuthorize(HAS_ADMIN_OR_PLANNER)
 class AmiceController(
   private val declareFirstReceivals: DeclareFirstReceivals,
-  private val monthlyWasteDeclarator: MonthlyWasteDeclarator,
   private val firstReceivalDeclarationFactory: ReceivalDeclarationFactory,
   private val lmaDeclarations: LmaDeclarations,
 ) {
