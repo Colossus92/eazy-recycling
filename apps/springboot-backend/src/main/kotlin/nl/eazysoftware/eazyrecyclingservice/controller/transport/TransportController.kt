@@ -55,10 +55,13 @@ class TransportController(
 
         checkAuthorization(transport)
 
-        return transportService.markTransportAsFinished(id, request.hours)
+        return transportService.markTransportAsFinished(id, request.hours, request.driverNote)
     }
 
-    data class TransportFinishedRequest(val hours: Double)
+    data class TransportFinishedRequest(
+      val hours: Double,
+      val driverNote: String,
+    )
 
     private fun checkAuthorization(transport: TransportDetailView) {
         val authentication = SecurityContextHolder.getContext().authentication

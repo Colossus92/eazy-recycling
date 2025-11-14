@@ -68,7 +68,9 @@ create table if not exists transports (
                           note text,
                           container_operation text CHECK (container_operation IN ('EXCHANGE', 'EMPTY', 'PICKUP', 'DELIVERY', 'WAYBILL')),
                           sequence_number integer,
-                          transport_hours NUMERIC(3,1)
+                          transport_hours NUMERIC(3,1),
+                          driver_note text,
+                          primary key (id)
 );
 
 create table if not exists trucks (

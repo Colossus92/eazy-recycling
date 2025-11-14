@@ -25,6 +25,7 @@ data class TransportDetailView(
   val driver: DriverView?,
   val note: String,
   val transportHours: Double?,
+  val driverNote: String?,
   val sequenceNumber: Int,
   val updatedAt: Instant?,
   val wasteContainer: WasteContainerView?,

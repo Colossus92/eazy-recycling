@@ -73,6 +73,7 @@ class WasteTransportMapper(
         is Consignor.Company -> entityManager.getReference(CompanyDto::class.java, consignor.id.uuid)
         is Consignor.Person -> throw IllegalArgumentException("Person consignor is not yet supported in persistence layer")
       },
+      driverNote = domain.driverNote?.description,
       pickupLocation = locationMapper.toDto(wasteStream.pickupLocation),
       deliveryLocation = locationMapper.toDto(deliveryLocation),
     )
@@ -96,6 +97,7 @@ class WasteTransportMapper(
       driver = dto.driver?.let { UserId(it.id) },
       note = Note(dto.note),
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
+      driverNote = dto.driverNote?.let { Note(it) },
       updatedAt = dto.updatedAt?.toCetKotlinInstant(),
       sequenceNumber = dto.sequenceNumber,
     )

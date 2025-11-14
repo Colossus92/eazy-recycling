@@ -83,6 +83,9 @@ data class TransportDto(
   @Column(name = "transport_hours")
   val transportHours: Double? = null,
 
+  @Column(name = "driver_note")
+  val driverNote: String? = null,
+
   @Column(nullable = false)
   var updatedAt: LocalDateTime? = LocalDateTime.now(),
 

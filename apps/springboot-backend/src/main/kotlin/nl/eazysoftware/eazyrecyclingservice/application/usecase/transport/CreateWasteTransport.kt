@@ -69,6 +69,7 @@ class CreateWasteTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = null,
+      driverNote = null,
       sequenceNumber = 9999 // Create as last in line
     )
 

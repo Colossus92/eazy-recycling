@@ -304,6 +304,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       driver = UserId(testDriverId),
       note = Note("Test note"),
       transportHours = null,
+      driverNote = null,
       updatedAt = Clock.System.now(),
       sequenceNumber = 1
     )
@@ -331,6 +332,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       driver = UserId(testDriverId),
       note = Note("Test note"),
       transportHours = null,
+      driverNote = null,
       updatedAt = Clock.System.now(),
       sequenceNumber = 1
     )
@@ -402,6 +404,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       driver = DriverView(id = driverId, name = "Test Driver"),
       note = "Test transport",
       transportHours = null,
+      driverNote = null,
       sequenceNumber = 1,
       updatedAt = Clock.System.now(),
       wasteContainer = null,

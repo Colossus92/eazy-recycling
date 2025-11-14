@@ -46,6 +46,7 @@ class WasteTransportFactory(
     driver: UserId?,
     note: Note,
     transportHours: Duration?,
+    driverNote: Note?,
     sequenceNumber: Int,
   ): WasteTransport {
     validate(goods, wasteStreams)
@@ -65,6 +66,7 @@ class WasteTransportFactory(
       driver = driver,
       note = note,
       transportHours = transportHours,
+      driverNote = driverNote,
       updatedAt = Instant.DISTANT_PAST,
       sequenceNumber = sequenceNumber
     )
@@ -103,6 +105,7 @@ class WasteTransportFactory(
       driver = driver,
       note = note,
       transportHours = existing.transportHours,
+      driverNote = existing.driverNote,
       updatedAt = kotlin.time.Clock.System.now(),
       sequenceNumber = existing.sequenceNumber
     )

@@ -38,9 +38,17 @@ class WasteTransport(
 
   override val driver: UserId?,
 
+  /**
+   * Any notes related to the transport. Typically noted by a planner.
+   */
   val note: Note,
 
   override val transportHours: Duration?,
+
+  /**
+   * Any notes the driver has, after the transport completed.
+   */
+  val driverNote: Note?,
 
   val updatedAt: Instant?,
 
@@ -81,6 +89,7 @@ class WasteTransport(
       truck: LicensePlate?,
       driver: UserId?,
       note: Note,
+      driverNote: Note?,
       transportHours: Duration?,
       updatedAt: Instant?,
       sequenceNumber: Int,
@@ -99,6 +108,7 @@ class WasteTransport(
         driver = driver,
         note = note,
         transportHours = transportHours,
+        driverNote = driverNote,
         updatedAt = updatedAt,
         sequenceNumber = sequenceNumber
       )

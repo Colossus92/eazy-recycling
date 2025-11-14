@@ -45,9 +45,17 @@ class ContainerTransport(
 
   override val driver: UserId?,
 
+  /**
+   * Any notes related to the transport. Typically noted by a planner.
+   */
   val note: Note,
 
   override val transportHours: Duration?,
+
+  /**
+   * Any notes the driver has, after the transport completed.
+   */
+  val driverNote: Note?,
 
   val updatedAt: Instant?,
 
@@ -85,6 +93,7 @@ class ContainerTransport(
       driver: UserId?,
       note: Note,
       transportHours: Duration?,
+      driverNote: Note?,
       updatedAt: Instant?,
       sequenceNumber: Int,
     ): ContainerTransport {
@@ -104,6 +113,7 @@ class ContainerTransport(
         driver = driver,
         note = note,
         transportHours = transportHours,
+        driverNote = driverNote,
         updatedAt = updatedAt,
         sequenceNumber = sequenceNumber
       )

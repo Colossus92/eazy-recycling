@@ -70,6 +70,7 @@ class CreateContainerTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = null,
+      driverNote = null,
       updatedAt = Clock.System.now(),
       sequenceNumber = 9999 // Create as last in line
     )

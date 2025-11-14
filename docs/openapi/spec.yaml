@@ -2227,7 +2227,10 @@ components:
         hours:
           type: number
           format: double
+        driverNote:
+          type: string
       required:
+      - driverNote
       - hours
     AddressDto:
       type: object
@@ -2333,6 +2336,8 @@ components:
         transportHours:
           type: number
           format: double
+        driverNote:
+          type: string
         updatedAt:
           type: string
           format: date-time
@@ -3079,6 +3084,8 @@ components:
         transportHours:
           type: number
           format: double
+        driverNote:
+          type: string
         sequenceNumber:
           type: integer
           format: int32

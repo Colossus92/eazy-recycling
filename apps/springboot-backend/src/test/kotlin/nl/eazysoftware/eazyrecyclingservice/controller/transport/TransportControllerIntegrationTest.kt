@@ -497,7 +497,7 @@ class TransportControllerIntegrationTest(
     // Given
     val transport = createTestTransport("Transport to be finished")
     val savedTransport = transportRepository.save(transport)
-    val request = TransportController.TransportFinishedRequest(hours = 2.5)
+    val request = TransportController.TransportFinishedRequest(hours = 2.5, driverNote = "Driver note")
 
     // When & Then
     securedMockMvc.post(
@@ -517,7 +517,7 @@ class TransportControllerIntegrationTest(
   fun `should return not found when marking non-existent transport as finished`() {
     // Given
     val nonExistentId = UUID.randomUUID()
-    val request = TransportController.TransportFinishedRequest(hours = 2.0)
+    val request = TransportController.TransportFinishedRequest(hours = 2.0, "Driver note")
 
     // When & Then
     securedMockMvc.post(
@@ -532,7 +532,7 @@ class TransportControllerIntegrationTest(
     // Given
     val transport = createTestTransport("Another Driver's Transport")
     val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
-    val request = TransportController.TransportFinishedRequest(hours = 1.5)
+    val request = TransportController.TransportFinishedRequest(hours = 1.5, driverNote = "Driver note")
 
     // Different user ID than the driver
     val differentUserId = UUID.randomUUID().toString()
@@ -558,7 +558,7 @@ class TransportControllerIntegrationTest(
     // Given
     val transport = createTestTransport("Admin Access Transport")
     val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
-    val request = TransportController.TransportFinishedRequest(hours = 4.0)
+    val request = TransportController.TransportFinishedRequest(hours = 4.0, driverNote = "Driver note")
 
     // Different user ID than the driver
     val adminUserId = UUID.randomUUID().toString()
@@ -584,7 +584,7 @@ class TransportControllerIntegrationTest(
     // Given
     val transport = createTestTransport("Planner Access Transport")
     val savedTransport = transportRepository.save(transport.copy(driver = testDriver))
-    val request = TransportController.TransportFinishedRequest(hours = 2.75)
+    val request = TransportController.TransportFinishedRequest(hours = 2.75, driverNote = "Driver note")
 
     // Different user ID than the driver
     val plannerUserId = UUID.randomUUID().toString()

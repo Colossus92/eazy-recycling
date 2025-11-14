@@ -82,6 +82,7 @@ class UpdateContainerTransportService(
       driver = cmd.driver,
       note = cmd.note,
       transportHours = existingTransport.transportHours,
+      driverNote = existingTransport.driverNote,
       updatedAt = Clock.System.now(),
       sequenceNumber = existingTransport.sequenceNumber
     )

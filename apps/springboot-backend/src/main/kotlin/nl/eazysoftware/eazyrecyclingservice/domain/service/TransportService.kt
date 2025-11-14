@@ -25,10 +25,15 @@ class TransportService(
             ?: throw EntityNotFoundException("Transport with id $id not found")
     }
 
-    fun markTransportAsFinished(id: UUID, transportHours: Double): TransportDto {
+    fun markTransportAsFinished(id: UUID, transportHours: Double, driverNote: String): TransportDto {
         return transportRepository.findByIdOrNull(id)
           ?.let {
-            transportRepository.save(it.copy(transportHours = transportHours))
+            transportRepository.save(
+              it.copy(
+                transportHours = transportHours,
+                driverNote = driverNote,
+              )
+            )
           }
           ?: throw EntityNotFoundException("Transport met id $id niet gevonden")
     }
