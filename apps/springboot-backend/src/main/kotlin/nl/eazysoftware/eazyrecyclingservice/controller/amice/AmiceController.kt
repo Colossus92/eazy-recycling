@@ -12,9 +12,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarator
-import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -44,7 +44,7 @@ class AmiceController(
   }
 
   @GetMapping
-  fun getDeclarations(pageable: Pageable): Page<LmaDeclarationDto?> {
+  fun getDeclarations(pageable: Pageable): Page<LmaDeclaration> {
     return lmaDeclarations.findAll(pageable)
   }
 

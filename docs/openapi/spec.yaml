@@ -956,7 +956,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageLmaDeclarationDto"
+                $ref: "#/components/schemas/PageLmaDeclaration"
     post:
       tags:
       - amice-controller
@@ -2602,14 +2602,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -2678,6 +2678,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -2686,9 +2689,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -2719,11 +2719,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -3202,59 +3202,148 @@ components:
           type: array
           items:
             type: string
-    LmaDeclarationDto:
+    Address:
       type: object
       properties:
-        id:
+        streetName:
+          $ref: "#/components/schemas/StreetName"
+        buildingNumber:
           type: string
-        amiceUUID:
+        buildingNumberAddition:
+          type: string
+        postalCode:
+          $ref: "#/components/schemas/DutchPostalCode"
+        city:
+          $ref: "#/components/schemas/City"
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    City:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+      - value
+    Company:
+      allOf:
+      - $ref: "#/components/schemas/Location"
+      - type: object
+        properties:
+          companyId:
+            $ref: "#/components/schemas/CompanyId"
+          name:
+            type: string
+          address:
+            $ref: "#/components/schemas/Address"
+      required:
+      - address
+      - companyId
+      - name
+    CompanyId:
+      type: object
+      properties:
+        uuid:
           type: string
           format: uuid
-        wasteStreamNumber:
-          type: string
-        period:
-          type: string
-        transporters:
-          type: array
-          items:
-            type: string
-        totalWeight:
-          type: integer
-          format: int64
-        totalShipments:
-          type: integer
-          format: int64
-        createdAt:
-          type: string
-          format: date-time
-        errors:
-          type: array
-          items:
-            type: string
-        status:
-          type: string
-          enum:
-          - PENDING
-          - COMPLETED
-          - FAILED
       required:
-      - createdAt
-      - id
-      - period
-      - status
-      - totalShipments
-      - totalWeight
-      - transporters
-      - wasteStreamNumber
-    PageLmaDeclarationDto:
+      - uuid
+    DutchAddress:
+      allOf:
+      - $ref: "#/components/schemas/Location"
+      - type: object
+        properties:
+          address:
+            $ref: "#/components/schemas/Address"
+      required:
+      - address
+    DutchPostalCode:
       type: object
       properties:
-        totalElements:
+        input:
+          type: string
+        value:
+          type: string
+      required:
+      - input
+      - value
+    LmaDeclaration:
+      type: object
+      properties:
+        wasteStreamNumber:
+          $ref: "#/components/schemas/WasteStreamNumber"
+        pickupLocation:
+          oneOf:
+          - $ref: "#/components/schemas/Company"
+          - $ref: "#/components/schemas/DutchAddress"
+          - $ref: "#/components/schemas/NoLocation"
+          - $ref: "#/components/schemas/ProjectLocationSnapshot"
+          - $ref: "#/components/schemas/ProximityDescription"
+        wasteName:
+          type: string
+        totalWeight:
+          type: integer
+          format: int32
+        totalTransports:
+          type: integer
+          format: int32
+        period:
+          $ref: "#/components/schemas/YearMonth"
+        status:
+          type: string
+      required:
+      - period
+      - pickupLocation
+      - status
+      - totalTransports
+      - totalWeight
+      - wasteName
+      - wasteStreamNumber
+    Location: {}
+    LongProgression:
+      type: object
+      properties:
+        start:
           type: integer
           format: int64
+          writeOnly: true
+        endInclusive:
+          type: integer
+          format: int64
+          writeOnly: true
+        step:
+          type: integer
+          format: int64
+        first:
+          type: integer
+          format: int64
+        last:
+          type: integer
+          format: int64
+        isEmpty:
+          type: boolean
+      required:
+      - first
+      - isEmpty
+      - last
+      - step
+    NoLocation:
+      allOf:
+      - $ref: "#/components/schemas/Location"
+    PageLmaDeclaration:
+      type: object
+      properties:
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -3265,17 +3354,17 @@ components:
         content:
           type: array
           items:
-            $ref: "#/components/schemas/LmaDeclarationDto"
+            $ref: "#/components/schemas/LmaDeclaration"
         number:
           type: integer
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -3286,8 +3375,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -3296,6 +3383,49 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
+    ProjectLocationId:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+      required:
+      - uuid
+    ProjectLocationSnapshot:
+      allOf:
+      - $ref: "#/components/schemas/Location"
+      - type: object
+        properties:
+          projectLocationId:
+            $ref: "#/components/schemas/ProjectLocationId"
+          companyId:
+            $ref: "#/components/schemas/CompanyId"
+          address:
+            $ref: "#/components/schemas/Address"
+      required:
+      - address
+      - companyId
+      - projectLocationId
+    ProximityDescription:
+      allOf:
+      - $ref: "#/components/schemas/Location"
+      - type: object
+        properties:
+          postalCodeDigits:
+            type: string
+          city:
+            $ref: "#/components/schemas/City"
+          description:
+            type: string
+          country:
+            type: string
+      required:
+      - city
+      - country
+      - description
+      - postalCodeDigits
     SortObject:
       type: object
       properties:
@@ -3305,6 +3435,84 @@ components:
           type: boolean
         unsorted:
           type: boolean
+    StreetName:
+      type: object
+      properties:
+        value:
+          type: string
+      required:
+      - value
+    WasteStreamNumber:
+      type: object
+      properties:
+        number:
+          type: string
+      required:
+      - number
+    YearMonth:
+      type: object
+      properties:
+        value:
+          type: string
+          writeOnly: true
+        year:
+          type: integer
+          format: int32
+        month:
+          type: string
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+        days:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocalDate"
+          properties:
+            start:
+              $ref: "#/components/schemas/LocalDate"
+            end:
+              $ref: "#/components/schemas/LocalDate"
+            size:
+              type: integer
+              format: int32
+            longProgression$kotlinx_datetime:
+              $ref: "#/components/schemas/LongProgression"
+          required:
+          - end
+          - longProgression$kotlinx_datetime
+          - size
+          - start
+        value$kotlinx_datetime:
+          type: string
+        monthNumber$kotlinx_datetime:
+          type: integer
+          format: int32
+        firstDay:
+          $ref: "#/components/schemas/LocalDate"
+        lastDay:
+          $ref: "#/components/schemas/LocalDate"
+        numberOfDays:
+          type: integer
+          format: int32
+      required:
+      - days
+      - firstDay
+      - lastDay
+      - month
+      - monthNumber$kotlinx_datetime
+      - numberOfDays
+      - value$kotlinx_datetime
+      - year
   securitySchemes:
     bearerAuth:
       type: http

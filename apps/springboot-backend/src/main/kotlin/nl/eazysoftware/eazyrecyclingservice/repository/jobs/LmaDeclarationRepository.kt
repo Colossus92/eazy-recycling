@@ -1,23 +1,31 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
+import jakarta.persistence.ColumnResult
+import jakarta.persistence.ConstructorResult
+import jakarta.persistence.EntityManager
+import jakarta.persistence.SqlResultSetMapping
+import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import kotlin.time.Clock
 import kotlin.time.toJavaInstant
 
 interface LmaDeclarationJpaRepository : JpaRepository<LmaDeclarationDto, String>
-interface LmaDeclarationPageableRepository : PagingAndSortingRepository<LmaDeclarationDto, String>
 
 @Repository
 class LmaDeclarationRepository(
   private val jpaRepository: LmaDeclarationJpaRepository,
-  private val pageableRepository: LmaDeclarationPageableRepository,
+  private val entityManager: EntityManager,
+  private val pickupLocationMapper: PickupLocationMapper,
 ) : LmaDeclarations {
   override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
     LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
@@ -35,11 +43,107 @@ class LmaDeclarationRepository(
     return jpaRepository.saveAll(declarations)
   }
 
-  override fun findAll(pageable: Pageable): Page<LmaDeclarationDto?> {
-    return pageableRepository.findAll(pageable)
+  override fun findAll(pageable: Pageable): Page<LmaDeclaration> {
+    // Count query for pagination
+    val countQuery = entityManager.createNativeQuery(
+      "SELECT COUNT(*) FROM lma_declarations"
+    )
+    val total = (countQuery.singleResult as Number).toLong()
+
+    // Main query with joins to get waste stream name and pickup location
+    val query = """
+      SELECT
+        d.waste_stream_number,
+        d.period,
+        d.total_weight,
+        d.total_shipments,
+        d.status,
+        ws.name as waste_name,
+        ws.pickup_location_id
+      FROM lma_declarations d
+      LEFT JOIN waste_streams ws ON d.waste_stream_number = ws.number
+      ORDER BY d.created_at DESC
+      LIMIT :limit OFFSET :offset
+    """.trimIndent()
+
+    @Suppress("UNCHECKED_CAST")
+    val results = entityManager.createNativeQuery(
+      query,
+      LmaDeclarationQueryResult::class.java
+    )
+      .setParameter("limit", pageable.pageSize)
+      .setParameter("offset", pageable.offset)
+      .resultList as List<LmaDeclarationQueryResult>
+
+    val declarations = results.map { result ->
+      // Parse period from MMYYYY format to YearMonth
+      val yearMonth = parsePeriod(result.period)
+
+      // Fetch pickup location if available
+      val pickupLocation = if (result.pickupLocationId != null) {
+        val pickupLocationDto = entityManager.find(
+          nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto::class.java,
+          result.pickupLocationId
+        )
+        pickupLocationDto?.let { pickupLocationMapper.toDomain(it) }
+          ?: nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+      } else {
+        nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+      }
+
+      LmaDeclaration(
+        wasteStreamNumber = WasteStreamNumber(result.wasteStreamNumber),
+        pickupLocation = pickupLocation,
+        wasteName = result.wasteName ?: "Unknown",
+        totalWeight = result.totalWeight.toInt(),
+        totalTransports = result.totalShipments.toInt(),
+        period = yearMonth,
+        status = result.status
+      )
+    }
+
+    return PageImpl(declarations, pageable, total)
+  }
+
+  private fun parsePeriod(period: String): YearMonth {
+    // Period format is MMYYYY (e.g., "112025" for November 2025)
+    val month = period.take(2).toInt()
+    val year = period.substring(2).toInt()
+    return YearMonth(year, month)
   }
 }
 
+
+/**
+ * Result type for LMA declaration queries.
+ * Maps native SQL query results to typed properties.
+ */
+@SqlResultSetMapping(
+  name = "LmaDeclarationQueryResultMapping",
+  classes = [
+    ConstructorResult(
+      targetClass = LmaDeclarationQueryResult::class,
+      columns = [
+        ColumnResult(name = "waste_stream_number", type = String::class),
+        ColumnResult(name = "period", type = String::class),
+        ColumnResult(name = "total_weight", type = Long::class),
+        ColumnResult(name = "total_shipments", type = Long::class),
+        ColumnResult(name = "status", type = String::class),
+        ColumnResult(name = "waste_name", type = String::class),
+        ColumnResult(name = "pickup_location_id", type = String::class)
+      ]
+    )
+  ]
+)
+data class LmaDeclarationQueryResult(
+  val wasteStreamNumber: String,
+  val period: String,
+  val totalWeight: Long,
+  val totalShipments: Long,
+  val status: String,
+  val wasteName: String?,
+  val pickupLocationId: String?
+)
 
 object LmaDeclarationMapper {
 
