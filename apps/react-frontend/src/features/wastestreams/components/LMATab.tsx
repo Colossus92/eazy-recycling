@@ -22,7 +22,10 @@ type Column = {
 export const LMATab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { items, setQuery, isFetching, errorHandling } = useLmaDeclarations();
+  const { items, setQuery, isFetching, totalElements, errorHandling } = useLmaDeclarations({
+    page,
+    pageSize: rowsPerPage,
+  });
 
   const columns: Column[] = [
     {
@@ -118,26 +121,24 @@ export const LMATab = () => {
                 </tr>
               </thead>
               <tbody>
-                {items
-                  .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                  .map((item, index) => {
-                    return (
-                      <tr
-                        key={index}
-                        className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                      >
-                        {columns.map((col) => (
-                          <td
-                            className="p-4 truncate"
-                            key={String(col.key)}
-                            title={col.title(item)}
-                          >
-                            {col.accessor(item)}
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
+                {items.map((item, index) => {
+                  return (
+                    <tr
+                      key={index}
+                      className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
+                    >
+                      {columns.map((col) => (
+                        <td
+                          className="p-4 truncate"
+                          key={String(col.key)}
+                          title={col.title(item)}
+                        >
+                          {col.accessor(item)}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })}
               </tbody>
               <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
                 <tr className="text-body-2 bg-color-surface-primary">
@@ -147,7 +148,7 @@ export const LMATab = () => {
                       setPage={setPage}
                       rowsPerPage={rowsPerPage}
                       setRowsPerPage={setRowsPerPage}
-                      numberOfResults={items.length}
+                      numberOfResults={totalElements}
                     />
                   </td>
                 </tr>
