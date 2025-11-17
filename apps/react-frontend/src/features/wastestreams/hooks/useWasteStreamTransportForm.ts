@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view';
+import { WasteTransportRequest } from '@/api/client/models/waste-transport-request';
+import { transportService } from '@/api/services/transportService';
 
 export interface WasteStreamTransportFormValues {
   // Step 1: Select Waste Stream
@@ -35,6 +37,33 @@ export const fieldsToValidate: Array<Array<keyof WasteStreamTransportFormValues>
   [],
 ];
 
+/**
+ * Converts form values to WasteTransportRequest for API submission
+ */
+const formValuesToWasteTransportRequest = (
+  formValues: WasteStreamTransportFormValues
+): WasteTransportRequest => {
+  return {
+    carrierPartyId: '',
+    containerOperation: (formValues.containerOperation || 'PICKUP') as any,
+    pickupDateTime: formValues.pickupDate || '',
+    deliveryDateTime: formValues.deliveryDate,
+    truckId: formValues.truckId,
+    driverId: formValues.driverId,
+    containerId: formValues.containerId,
+    note: formValues.comments || '',
+    transportType: 'WASTE',
+    goods: [
+      {
+        wasteStreamNumber: formValues.wasteStreamNumber,
+        weight: parseFloat(formValues.weight || '0'),
+        unit: formValues.unit || 'kg',
+        quantity: parseInt(formValues.quantity || '1', 10),
+      },
+    ],
+  };
+};
+
 export function useWasteStreamTransportForm(
   transportId?: string,
   onSuccess?: () => void
@@ -59,21 +88,29 @@ export function useWasteStreamTransportForm(
     },
   });
 
-  // For now, just a placeholder mutation
   const mutation = useMutation({
     mutationFn: async (formData: WasteStreamTransportFormValues) => {
-      // This would be replaced with actual API call
-      console.log('Submitting waste stream transport:', formData);
-      return Promise.resolve(formData);
+      const request = formValuesToWasteTransportRequest(formData);
+      
+      if (transportId) {
+        const response = await transportService.updateWasteTransport(transportId, request);
+        return response.data;
+      } else {
+        const response = await transportService.createWasteTransport(request);
+        return response.data;
+      }
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['wasteStreamTransports'] });
+      await queryClient.invalidateQueries({ queryKey: ['transports'] });
       
       toastService.success(
         transportId 
           ? 'Afvalstroom transport bijgewerkt'
           : 'Afvalstroom transport aangemaakt'
       );
+      
+      // Reset and close form
+      resetForm();
       
       if (onSuccess) {
         onSuccess();
@@ -85,6 +122,7 @@ export function useWasteStreamTransportForm(
       toastService.error(
         `Er is een fout opgetreden bij het ${transportId ? 'bijwerken' : 'aanmaken'} van het transport`
       );
+      // Keep form open on error
     },
   });
 
