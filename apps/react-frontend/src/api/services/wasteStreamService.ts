@@ -6,7 +6,7 @@ const wasteStreamApi = new WasteStreamControllerApi(apiInstance.config)
 export type WasteStream = WasteStreamDto;
 
 export const wasteStreamService = {
-    getAll: () => wasteStreamApi.getWasteStreams().then((r) => r.data),
+    getAll: (consignor?: string) => wasteStreamApi.getWasteStreams(consignor).then((r) => r.data),
     getByNumber: (number: string) => wasteStreamApi.getWasteStreamByNumber(number).then((r) => r.data),
     delete: (id: string) => wasteStreamApi._delete(id),
     

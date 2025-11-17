@@ -20,6 +20,7 @@ interface WasteStreamSelectionTableProps {
   data?: WasteStreamData[];
   onSelect?: (wasteStream: WasteStreamData) => void;
   onBack?: () => void;
+  consignorId?: string;
 }
 
 
@@ -29,6 +30,7 @@ export const WasteStreamSelectionTable = ({
   data,
   onSelect,
   onBack,
+  consignorId,
 }: WasteStreamSelectionTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedWasteStream, setSelectedWasteStream] = useState<WasteStreamData | null>(null);
@@ -38,7 +40,7 @@ export const WasteStreamSelectionTable = ({
   useEffect(() => {
     if (isOpen && !data) {
       setIsLoading(true);
-      wasteStreamService.getAll()
+      wasteStreamService.getAll(consignorId)
         .then((streams) => {
           setWasteStreams(streams as WasteStreamData[]);
         })
@@ -52,7 +54,7 @@ export const WasteStreamSelectionTable = ({
     } else if (data) {
       setWasteStreams(data);
     }
-  }, [isOpen, data]);
+  }, [isOpen, data, consignorId]);
 
   if (!isOpen) return null;
 
@@ -77,7 +79,7 @@ export const WasteStreamSelectionTable = ({
 
   return (
     <FormDialog isOpen={isOpen} setIsOpen={setIsOpen} width="w-full max-w-4xl">
-      <div className="flex flex-col h-full max-h-[80vh] overflow-hidden rounded-radius-lg">
+      <div className="flex flex-col h-[80vh] overflow-hidden rounded-radius-lg">
         {/* Header */}
         <div className="bg-color-surface-primary border-b border-color-border-primary flex items-center gap-4 px-4 py-3 flex-shrink-0">
           <div className="flex-1">
