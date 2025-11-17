@@ -112,7 +112,7 @@ export const LMATab = () => {
                 <tr className="text-subtitle-1">
                   {columns.map((col) => (
                     <th
-                      className={'px-4 py-3 text-left'}
+                      className={'px-4 py-3 text-left truncate'}
                       key={String(col.key)}
                     >
                       {col.label}

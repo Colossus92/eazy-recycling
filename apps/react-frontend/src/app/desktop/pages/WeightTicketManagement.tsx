@@ -95,7 +95,7 @@ export const WeightTicketManagement = () => {
                   <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
                     <tr className="text-subtitle-1">
                       {columns.map((col) => (
-                        <th className={'px-4 py-3 text-left'} key={String(col.key)}>
+                        <th className={'px-4 py-3 text-left truncate'} key={String(col.key)}>
                           {col.label}
                         </th>
                       ))}
