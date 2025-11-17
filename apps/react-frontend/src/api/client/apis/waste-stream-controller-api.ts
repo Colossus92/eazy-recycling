@@ -192,10 +192,11 @@ export const WasteStreamControllerApiAxiosParamCreator = function (configuration
         /**
          * 
          * @param {string} [consignor] 
+         * @param {string} [status] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWasteStreams: async (consignor?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getWasteStreams: async (consignor?: string, status?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/waste-streams`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -214,6 +215,10 @@ export const WasteStreamControllerApiAxiosParamCreator = function (configuration
 
             if (consignor !== undefined) {
                 localVarQueryParameter['consignor'] = consignor;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
             }
 
 
@@ -374,11 +379,12 @@ export const WasteStreamControllerApiFp = function(configuration?: Configuration
         /**
          * 
          * @param {string} [consignor] 
+         * @param {string} [status] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getWasteStreams(consignor?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WasteStreamListView>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getWasteStreams(consignor, options);
+        async getWasteStreams(consignor?: string, status?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WasteStreamListView>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getWasteStreams(consignor, status, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['WasteStreamControllerApi.getWasteStreams']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -458,11 +464,12 @@ export const WasteStreamControllerApiFactory = function (configuration?: Configu
         /**
          * 
          * @param {string} [consignor] 
+         * @param {string} [status] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getWasteStreams(consignor?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<WasteStreamListView>> {
-            return localVarFp.getWasteStreams(consignor, options).then((request) => request(axios, basePath));
+        getWasteStreams(consignor?: string, status?: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<WasteStreamListView>> {
+            return localVarFp.getWasteStreams(consignor, status, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -541,12 +548,13 @@ export class WasteStreamControllerApi extends BaseAPI {
     /**
      * 
      * @param {string} [consignor] 
+     * @param {string} [status] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof WasteStreamControllerApi
      */
-    public getWasteStreams(consignor?: string, options?: RawAxiosRequestConfig) {
-        return WasteStreamControllerApiFp(this.configuration).getWasteStreams(consignor, options).then((request) => request(this.axios, this.basePath));
+    public getWasteStreams(consignor?: string, status?: string, options?: RawAxiosRequestConfig) {
+        return WasteStreamControllerApiFp(this.configuration).getWasteStreams(consignor, status, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
