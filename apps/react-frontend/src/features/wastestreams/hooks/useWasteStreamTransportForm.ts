@@ -1,9 +1,14 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view';
 import { WasteTransportRequest } from '@/api/client/models/waste-transport-request';
+import { TransportDetailView } from '@/api/client/models/transport-detail-view';
+import { WasteContainerViewLocation } from '@/api/client/models/waste-container-view-location';
 import { transportService } from '@/api/services/transportService';
+import { pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
+import { format } from 'date-fns';
 
 export interface WasteStreamTransportFormValues {
   // Step 1: Select Waste Stream
@@ -32,10 +37,50 @@ export const fieldsToValidate: Array<Array<keyof WasteStreamTransportFormValues>
   
   // Step 1: Transport Details
   ['pickupDate'],
-  
-  // Step 2: Additional Info (future)  
-  [],
+
 ];
+
+/**
+ * Converts WasteContainerViewLocation to a readable string using existing converters
+ */
+const locationToString = (location: WasteContainerViewLocation | undefined): string => {
+  if (!location) return '';
+  
+  // Use existing converter to convert to LocationFormValue
+  const formValue = pickupLocationViewToFormValue(location as any);
+  
+  // Convert LocationFormValue to readable string
+  switch (formValue.type) {
+    case 'dutch_address':
+      return [
+        formValue.streetName,
+        `${formValue.buildingNumber}${formValue.buildingNumberAddition ? ` ${formValue.buildingNumberAddition}` : ''}`,
+        formValue.city,
+      ]
+        .filter(Boolean)
+        .join(', ');
+    
+    case 'company':
+      return formValue.companyName || '';
+    
+    case 'project_location':
+      return [
+        formValue.companyName,
+        formValue.streetName,
+        `${formValue.buildingNumber}${formValue.buildingNumberAddition ? ` ${formValue.buildingNumberAddition}` : ''}`,
+        formValue.city,
+      ]
+        .filter(Boolean)
+        .join(', ');
+    
+    case 'proximity':
+      return `${formValue.description}, ${formValue.city}` || '';
+    
+    case 'none':
+    default:
+      return 'Geen';
+  }
+};
 
 /**
  * Converts form values to WasteTransportRequest for API submission
@@ -44,7 +89,7 @@ const formValuesToWasteTransportRequest = (
   formValues: WasteStreamTransportFormValues
 ): WasteTransportRequest => {
   return {
-    carrierPartyId: '',
+    carrierPartyId: formValues.consignorPartyId, // TODO replace with actual carrierParty
     containerOperation: (formValues.containerOperation || 'PICKUP') as any,
     pickupDateTime: formValues.pickupDate || '',
     deliveryDateTime: formValues.deliveryDate,
@@ -61,6 +106,52 @@ const formValuesToWasteTransportRequest = (
         quantity: parseInt(formValues.quantity || '1', 10),
       },
     ],
+  };
+};
+
+/**
+ * Converts TransportDetailView from API to form values
+ */
+const transportDetailToFormValues = (
+  transport: TransportDetailView
+): WasteStreamTransportFormValues => {
+  const goods = transport.goodsItem?.[0];
+  
+  // Construct WasteStreamListView from goods data
+  const wasteStreamData: WasteStreamListView | undefined = goods
+    ? {
+        wasteStreamNumber: goods.wasteStreamNumber,
+        wasteName: goods.name,
+        euralCode: goods.euralCode,
+        processingMethodCode: goods.processingMethodCode,
+        consignorPartyName: transport.consignorParty?.name || '',
+        consignorPartyId: transport.consignorParty?.id || '',
+        pickupLocation: locationToString(transport.pickupLocation),
+        deliveryLocation: locationToString(transport.deliveryLocation),
+        status: transport.status,
+        lastActivityAt: {} as any, // Not available in TransportDetailView
+        isEditable: false, // Not available in TransportDetailView
+      }
+    : undefined;
+  
+  return {
+    consignorPartyId: transport.consignorParty?.id || '',
+    wasteStreamNumber: goods?.wasteStreamNumber || '',
+    wasteStreamData,
+    quantity: goods?.quantity?.toString() || '',
+    weight: goods?.netNetWeight?.toString() || '',
+    unit: goods?.unit || 'kg',
+    truckId: transport.truck?.licensePlate || '',
+    driverId: transport.driver?.id || '',
+    pickupDate: transport.pickupDateTime
+      ? format(new Date(transport.pickupDateTime), "yyyy-MM-dd'T'HH:mm")
+      : '',
+    deliveryDate: transport.deliveryDateTime
+      ? format(new Date(transport.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
+      : '',
+    comments: transport.note || '',
+    containerId: transport.wasteContainer?.id || '',
+    containerOperation: transport.containerOperation || '',
   };
 };
 
@@ -88,6 +179,21 @@ export function useWasteStreamTransportForm(
     },
   });
 
+  // Fetch transport details when editing
+  const { data: transportData, isLoading } = useQuery({
+    queryKey: ['transport', transportId],
+    queryFn: () => transportService.getTransportById(transportId!),
+    enabled: !!transportId,
+  });
+
+  // Populate form when transport data is loaded
+  useEffect(() => {
+    if (transportData) {
+      const formValues = transportDetailToFormValues(transportData);
+      formContext.reset(formValues);
+    }
+  }, [transportData, formContext]);
+
   const mutation = useMutation({
     mutationFn: async (formData: WasteStreamTransportFormValues) => {
       const request = formValuesToWasteTransportRequest(formData);
@@ -101,6 +207,15 @@ export function useWasteStreamTransportForm(
       }
     },
     onSuccess: async () => {
+      // Invalidate planning query to reload CalendarGrid
+      await queryClient.invalidateQueries({ queryKey: ['planning'] });
+      
+      // Invalidate transport detail query to reload TransportDetailsDrawer if open
+      if (transportId) {
+        await queryClient.invalidateQueries({ queryKey: ['transport', transportId] });
+      }
+      
+      // Also invalidate transports list
       await queryClient.invalidateQueries({ queryKey: ['transports'] });
       
       toastService.success(
@@ -149,7 +264,7 @@ export function useWasteStreamTransportForm(
     fieldsToValidate,
     mutation,
     resetForm,
-    data: undefined, // TODO: Add query for existing transport data
-    isLoading: false, // TODO: Add loading state when fetching existing data
+    data: transportData,
+    isLoading,
   };
 }
