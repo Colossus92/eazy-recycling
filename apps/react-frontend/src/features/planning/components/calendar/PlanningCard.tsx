@@ -7,9 +7,9 @@ import { PlanningItem } from '@/features/planning/hooks/usePlanning';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import { PlanningCardPopover } from '@/features/planning/components/calendar/PlanningCardPopover.tsx';
 import { ContainerTransportForm } from '@/features/planning/forms/containertransportform/ContainerTransportForm.tsx';
-import { WasteTransportForm } from '@/features/planning/forms/wastetransportform/WasteTransportForm.tsx';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
+import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform';
 
 interface PlanningCardProps {
   transport: PlanningItem;
@@ -154,7 +154,7 @@ export const PlanningCard = ({
         />
       )}
       {isFormOpen && transport.transportType === 'WASTE' && (
-        <WasteTransportForm
+        <WasteStreamTransportForm
           isOpen={isFormOpen}
           setIsOpen={setIsFormOpen}
           transportId={transport.id}

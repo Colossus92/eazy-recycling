@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 import { WasteStreamFormValues } from '@/features/wastestreams/components/wastetransportform/hooks/useWasteStreamFormHook.ts';
-import { ConsignorClassificationSelect } from '@/features/planning/forms/wastetransportform/ConsignorClassificationSelect';
+import { ConsignorClassificationSelect } from '@/features/wastestreams/components/wastetransportform/components/ConsignorClassificationSelect';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { ProcessorPartySelectFormField } from '@/components/ui/form/ProcessorPartySelectFormField';
