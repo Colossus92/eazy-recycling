@@ -54,8 +54,8 @@ class WasteStreamController(
   }
 
   @GetMapping
-  fun getWasteStreams(): List<WasteStreamListView> {
-    return wasteStreamService.getWasteStreams()
+  fun getWasteStreams(@RequestParam(required = false) consignor: UUID?): List<WasteStreamListView> {
+    return wasteStreamService.getWasteStreams(consignor)
   }
 
   @GetMapping("/{wasteStreamNumber}")

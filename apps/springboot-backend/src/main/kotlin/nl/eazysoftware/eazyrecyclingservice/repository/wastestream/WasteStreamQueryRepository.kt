@@ -17,11 +17,31 @@ import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.nio.ByteBuffer
-import java.time.Instant
 import java.time.OffsetDateTime
 import java.util.*
 import kotlin.time.Clock
 import kotlin.time.toKotlinInstant
+import java.time.Instant as JavaInstant
+
+data class WasteStreamQueryResult(
+  val wasteStreamNumber: String,
+  val wasteName: String,
+  val euralCode: String,
+  val processingMethodCode: String,
+  val consignorPartyName: String,
+  val consignorPartyId: Any?,
+  val pickupLocationType: String?,
+  val pickupLocationStreetName: String?,
+  val pickupLocationBuildingNumber: String?,
+  val pickupLocationProximityDescription: String?,
+  val pickupLocationCity: String?,
+  val pickupLocationCompanyId: Any?,
+  val deliveryLocationStreetName: String?,
+  val deliveryLocationBuildingNumber: String?,
+  val deliveryLocationCity: String?,
+  val status: String,
+  val lastActivityAt: Any?
+)
 
 @Repository
 class WasteStreamQueryRepository(
@@ -31,60 +51,70 @@ class WasteStreamQueryRepository(
   private val pickupLocationMapper: PickupLocationMapper
 ) : GetAllWasteStreams, GetWasteStreamByNumber {
 
-  override fun execute(): List<WasteStreamListView> {
-    val query = """
+  override fun execute(consignor: UUID?): List<WasteStreamListView> {
+    val baseQuery = """
             SELECT
-                ws.number,
-                ws.name,
-                e.code,
-                pm.code,
-                c.name,
-                c.id,
-                pl.location_type,
-                pl.street_name,
-                pl.building_number,
-                pl.proximity_description,
-                pl.city,
-                pl.company_id,
-                dc.street_name,
-                dc.building_number,
-                dc.city,
+                ws.number as wasteStreamNumber,
+                ws.name as wasteName,
+                e.code as euralCode,
+                pm.code as processingMethodCode,
+                c.name as consignorPartyName,
+                c.id as consignorPartyId,
+                pl.location_type as pickupLocationType,
+                pl.street_name as pickupLocationStreetName,
+                pl.building_number as pickupLocationBuildingNumber,
+                pl.proximity_description as pickupLocationProximityDescription,
+                pl.city as pickupLocationCity,
+                pl.company_id as pickupLocationCompanyId,
+                dc.street_name as deliveryLocationStreetName,
+                dc.building_number as deliveryLocationBuildingNumber,
+                dc.city as deliveryLocationCity,
                 ws.status,
-                ws.last_activity_at
+                ws.last_activity_at as lastActivityAt
             FROM waste_streams ws
             JOIN eural e ON ws.eural_code = e.code
             JOIN processing_methods pm ON ws.processing_method_code = pm.code
             JOIN companies c ON ws.consignor_party_id = c.id
             LEFT JOIN pickup_locations pl ON ws.pickup_location_id = pl.id
             LEFT JOIN companies dc ON ws.processor_party_id = dc.processor_id
-            ORDER BY ws.number
         """.trimIndent()
 
-    val results = entityManager.createNativeQuery(query).resultList
+    val whereClause = if (consignor != null) {
+      " WHERE ws.consignor_party_id = :consignor"
+    } else {
+      ""
+    }
 
-    return results.map { row ->
-      val columns = row as Array<*>
-      val status = columns[15] as String
-      val lastActivityAtRaw = columns[16]
-      val lastActivityAt = when (lastActivityAtRaw) {
-        is OffsetDateTime -> lastActivityAtRaw.toInstant() // Support for H2 Database
-        is Instant -> lastActivityAtRaw
-        else -> throw IllegalStateException("Unexpected type for last_activity_at: ${lastActivityAtRaw?.javaClass}")
+    val query = "$baseQuery$whereClause ORDER BY ws.number"
+
+    val nativeQuery = entityManager.createNativeQuery(query, WasteStreamQueryResult::class.java)
+    if (consignor != null) {
+      nativeQuery.setParameter("consignor", consignor)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    val results = nativeQuery.resultList as List<WasteStreamQueryResult>
+
+    return results.map { result ->
+      val lastActivityAt = when (result.lastActivityAt) {
+        is OffsetDateTime -> result.lastActivityAt.toInstant() // Support for H2 Database
+        is JavaInstant -> result.lastActivityAt
+        else -> throw IllegalStateException("Unexpected type for last_activity_at: ${result.lastActivityAt?.javaClass}")
       }
       val effectiveStatus = EffectiveStatusPolicy.compute(
-        WasteStreamStatus.valueOf(status),
+        WasteStreamStatus.valueOf(result.status),
         lastActivityAt.toKotlinInstant(),
         Clock.System.now()
       ).toString()
       WasteStreamListView(
-        wasteStreamNumber = columns[0] as String,
-        wasteName = columns[1] as String,
-        euralCode = columns[2] as String,
-        processingMethodCode = columns[3] as String,
-        consignorPartyName = columns[4] as String,
-        consignorPartyId = toUuid(columns[5]),
-        pickupLocation = formatPickupLocation(columns),
-        deliveryLocation = "${columns[12]} ${columns[13]}, ${columns[14]}",
+        wasteStreamNumber = result.wasteStreamNumber,
+        wasteName = result.wasteName,
+        euralCode = result.euralCode,
+        processingMethodCode = result.processingMethodCode,
+        consignorPartyName = result.consignorPartyName,
+        consignorPartyId = toUuid(result.consignorPartyId),
+        pickupLocation = formatPickupLocation(result),
+        deliveryLocation = "${result.deliveryLocationStreetName} ${result.deliveryLocationBuildingNumber}, ${result.deliveryLocationCity}",
         lastActivityAt = lastActivityAt.toKotlinInstant().toDisplayTime(),
         status = effectiveStatus,
         isEditable = effectiveStatus == WasteStreamStatus.DRAFT.name,
@@ -92,17 +122,17 @@ class WasteStreamQueryRepository(
     }
   }
 
-  private fun formatPickupLocation(columns: Array<*>): String {
-    return when (val locationType: String = columns[6] as String) {
-      DUTCH_ADDRESS -> "${columns[7]} ${columns[8]}, ${columns[10]}"
-      PROXIMITY_DESC -> "${columns[9]}, ${columns[10]}"
+  private fun formatPickupLocation(result: WasteStreamQueryResult): String {
+    return when (val locationType: String? = result.pickupLocationType) {
+      DUTCH_ADDRESS -> "${result.pickupLocationStreetName} ${result.pickupLocationBuildingNumber}, ${result.pickupLocationCity}"
+      PROXIMITY_DESC -> "${result.pickupLocationProximityDescription}, ${result.pickupLocationCity}"
       COMPANY -> {
-        val companyId = toUuid(columns[11])
+        val companyId = toUuid(result.pickupLocationCompanyId)
         val company = companyRepository.findByIdOrNull(companyId)
           ?: throw IllegalArgumentException("Geen bedrijf gevonden met verwerkersnummer: $companyId")
         "${company.name}, ${company.address.city}"
       }
-      PROJECT_LOCATION -> "${columns[7]} ${columns[8]}, ${columns[10]}"
+      PROJECT_LOCATION -> "${result.pickupLocationStreetName} ${result.pickupLocationBuildingNumber}, ${result.pickupLocationCity}"
       NO_PICKUP -> "Geen herkomstlocatie"
       else -> throw IllegalStateException("Unexpected pickup location type: $locationType")
     }

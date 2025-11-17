@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailV
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class WasteStreamService(
@@ -14,8 +15,8 @@ class WasteStreamService(
     private val getWasteStreamByNumber: GetWasteStreamByNumber
 ) {
 
-    fun getWasteStreams(): List<WasteStreamListView> {
-        return getAllWasteStreams.execute()
+    fun getWasteStreams(consignor: UUID?): List<WasteStreamListView> {
+        return getAllWasteStreams.execute(consignor)
     }
 
     fun getWasteStreamByNumber(wasteStreamNumber: WasteStreamNumber): WasteStreamDetailView {
