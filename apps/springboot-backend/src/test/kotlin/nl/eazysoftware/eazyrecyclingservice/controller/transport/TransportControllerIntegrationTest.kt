@@ -22,7 +22,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJp
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
@@ -84,7 +84,7 @@ class TransportControllerIntegrationTest(
 
   private lateinit var testCompany: CompanyDto
   private lateinit var testLocation: PickupLocationDto.DutchAddressDto
-  private lateinit var testTruck: Truck
+  private lateinit var testTruck: TruckDto
   private lateinit var testDriver: ProfileDto
   private lateinit var testContainer: WasteContainerDto
   private lateinit var testBranch: CompanyProjectLocationDto
@@ -140,7 +140,7 @@ class TransportControllerIntegrationTest(
 
 
     // Create test truck
-    testTruck = Truck(
+    testTruck = TruckDto(
       licensePlate = "TEST-123",
       brand = "Mercedes",
       model = "Actros"

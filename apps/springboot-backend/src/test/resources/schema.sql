@@ -15,6 +15,12 @@ create table if not exists companies (
                            primary key (id)
 );
 
+CREATE TABLE IF NOT EXISTS company_roles (
+                           company_id UUID NOT NULL,
+                           roles TEXT NOT NULL,
+                           CONSTRAINT fk_company_roles_company_id FOREIGN KEY (company_id) REFERENCES companies(id)
+);
+
 create table if not exists company_project_locations (
                          id uuid not null,
                          company_id uuid not null,
@@ -78,6 +84,7 @@ create table if not exists trucks (
                         brand varchar(255),
                         license_plate varchar(255) not null,
                         model varchar(255),
+                        carrier_party_id uuid,
                         primary key (license_plate)
 );
 

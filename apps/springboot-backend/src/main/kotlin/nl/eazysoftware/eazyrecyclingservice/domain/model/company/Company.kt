@@ -10,5 +10,6 @@ data class Company(
   val vihbNumber: VihbNumber?,
   val processorId: ProcessorPartyId?,
   val address: Address,
+  val roles: List<CompanyRole> = emptyList(),
   val deletedAt: Instant? = null,
 )

@@ -15,7 +15,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMap
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
@@ -61,7 +61,7 @@ class WasteTransportMapper(
           it.id
         )
       },
-      truck = domain.truck?.let { entityManager.getReference(Truck::class.java, it.value) },
+      truck = domain.truck?.let { entityManager.getReference(TruckDto::class.java, it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
       goods = toDto(domain.goods),

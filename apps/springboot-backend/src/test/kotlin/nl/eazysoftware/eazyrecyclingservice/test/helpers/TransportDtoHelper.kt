@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import java.time.LocalDateTime
@@ -13,9 +13,9 @@ import java.util.*
 
 object TransportDtoHelper {
   fun transport(
-    truck: Truck?,
-    pickupDateTime: LocalDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
-    driver: ProfileDto? = driver1,
+      truck: TruckDto?,
+      pickupDateTime: LocalDateTime = LocalDateTime.of(2025, 5, 20, 10, 0),
+      driver: ProfileDto? = driver1,
   ): TransportDto =
     TransportDto(
       id = UUID.randomUUID(),

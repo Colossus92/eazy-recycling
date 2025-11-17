@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -12,7 +12,7 @@ class TruckService(
     val truckRepository: TruckRepository,
 ) {
 
-    fun createTruck(truck: Truck) {
+    fun createTruck(truck: TruckDto) {
         val truck = truck.copy(
             licensePlate = truck.licensePlate.uppercase(),
         )
@@ -23,11 +23,11 @@ class TruckService(
         truckRepository.save(truck)
     }
 
-    fun getAllTrucks(): List<Truck> {
+    fun getAllTrucks(): List<TruckDto> {
         return truckRepository.findAll()
     }
 
-    fun getTruckByLicensePlate(licensePlate: String): Truck {
+    fun getTruckByLicensePlate(licensePlate: String): TruckDto {
         return truckRepository
             .findByIdOrNull(licensePlate)
             ?: throw EntityNotFoundException("Vrachtwagen met kenteken $licensePlate niet gevonden")
@@ -37,7 +37,7 @@ class TruckService(
         truckRepository.deleteById(licensePlate)
     }
 
-    fun updateTruck(licensePlate: String, truck: Truck): Truck {
+    fun updateTruck(licensePlate: String, truck: TruckDto): TruckDto {
         if (!licensePlate.equals(truck.licensePlate, ignoreCase = true)) {
             throw IllegalArgumentException("Vrachtwagen komt niet overeen met kenteken $licensePlate")
         }

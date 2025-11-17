@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.truck
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +36,7 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
     @Autowired
     private lateinit var truckRepository: TruckRepository
 
-    private val testTruck = Truck(
+    private val testTruck = TruckDto(
         licensePlate = "TEST-123",
         brand = "Test Brand",
         model = "Test Model"
@@ -101,7 +101,7 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
             "GET" -> get(endpoint)
             "POST" -> post(endpoint)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(Truck(
+                .content(objectMapper.writeValueAsString(TruckDto(
                     licensePlate = "NEW-123",
                     brand = "New Brand",
                     model = "New Model"

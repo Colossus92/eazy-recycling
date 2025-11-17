@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.*
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.ZoneId
@@ -69,13 +69,13 @@ class PlanningService(
             }.toMutableList()
 
 
-    private fun getMissingTrucks(transports: List<TransportDto>, truckId: String?): List<Truck> {
+    private fun getMissingTrucks(transports: List<TransportDto>, truckId: String?): List<TruckDto> {
         // When filtered by truckId which already has transports, don't add missing trucks because this would erase the filter
         if (truckId != null && transports.any { it.truck?.licensePlate == truckId }) {
             return emptyList()
         }
 
-        val missingTrucks: List<Truck>
+        val missingTrucks: List<TruckDto>
 
         if (truckId != null) {
             missingTrucks = listOf(truckService.getTruckByLicensePlate(truckId))
@@ -99,15 +99,15 @@ class PlanningService(
     }
 
     fun reorderTransports(date: LocalDate, displayName: String, transportIds: List<UUID>): PlanningView {
-        val licensePlate = Truck.extractLicensePlateFromDisplayName(displayName)
+        val licensePlate = TruckDto.extractLicensePlateFromDisplayName(displayName)
         val transports = transportRepository.findAllById(transportIds)
 
         val transportsWithSequenceNumber = transportIds.mapIndexed { index, id ->
             val transport = transports.first { it.id == id }
-            var truck: Truck? = null
+            var truck: TruckDto? = null
 
             if (licensePlate != "Niet toegewezen") {
-                truck = entityManager.getReference(Truck::class.java, licensePlate)
+                truck = entityManager.getReference(TruckDto::class.java, licensePlate)
             }
 
             // Update the date while preserving the time of day

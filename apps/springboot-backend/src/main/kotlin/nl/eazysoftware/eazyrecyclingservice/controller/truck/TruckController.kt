@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.truck
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.service.TruckService
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -17,19 +17,19 @@ class TruckController(
     @PostMapping
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @ResponseStatus(HttpStatus.CREATED)
-    fun createTruck(@RequestBody truck: Truck) {
+    fun createTruck(@RequestBody truck: TruckDto) {
         truckService.createTruck(truck)
     }
 
     @GetMapping
     @PreAuthorize(HAS_ANY_ROLE)
-    fun getAllTrucks(): List<Truck> {
+    fun getAllTrucks(): List<TruckDto> {
         return truckService.getAllTrucks()
     }
 
     @GetMapping("/{licensePlate}")
     @PreAuthorize(HAS_ANY_ROLE)
-    fun getTruckByLicensePlate(@PathVariable licensePlate: String): Truck {
+    fun getTruckByLicensePlate(@PathVariable licensePlate: String): TruckDto {
         return truckService.getTruckByLicensePlate(licensePlate)
     }
 
@@ -43,7 +43,7 @@ class TruckController(
     @PutMapping("/{licensePlate}")
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @ResponseStatus(HttpStatus.OK)
-    fun updateTruck(@PathVariable licensePlate: String, @RequestBody truck: Truck): Truck {
+    fun updateTruck(@PathVariable licensePlate: String, @RequestBody truck: TruckDto): TruckDto {
         return truckService.updateTruck(licensePlate, truck)
     }
 }

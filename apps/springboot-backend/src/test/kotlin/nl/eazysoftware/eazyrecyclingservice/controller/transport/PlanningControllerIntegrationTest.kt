@@ -7,7 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -45,7 +45,7 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var testCompany: CompanyDto
     private lateinit var testPickupLocation: PickupLocationDto
     private lateinit var testDeliveryLocation: PickupLocationDto
-    private lateinit var testTruck: Truck
+    private lateinit var testTruck: TruckDto
     private lateinit var testDriver: ProfileDto
     private lateinit var otherDriver: ProfileDto
 
@@ -93,7 +93,7 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
         entityManager.persist(testDeliveryLocation)
 
         // Create test truck
-        testTruck = Truck(
+        testTruck = TruckDto(
             licensePlate = "TEST-123",
             brand = "Mercedes",
             model = "Actros"

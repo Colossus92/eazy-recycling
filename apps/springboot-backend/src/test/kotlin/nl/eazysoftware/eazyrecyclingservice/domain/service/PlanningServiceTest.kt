@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.test.helpers.TransportDtoHelper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -35,8 +35,8 @@ class PlanningServiceTest {
 
     private lateinit var planningService: PlanningService
 
-    private val truck1 = Truck(licensePlate = "ABC-123", brand = "Volvo", model = "FH16")
-    private val truck2 = Truck(licensePlate = "XYZ-789", brand = "Mercedes", model = "Actros")
+    private val truck1 = TruckDto(licensePlate = "ABC-123", brand = "Volvo", model = "FH16")
+    private val truck2 = TruckDto(licensePlate = "XYZ-789", brand = "Mercedes", model = "Actros")
 
     @BeforeEach
     fun setUp() {
@@ -290,7 +290,7 @@ class PlanningServiceTest {
         val transportIds = listOf(transport1.id, transport2.id, transport3.id)
 
         whenever(transportRepository.findAllById(transportIds)).thenReturn(transports)
-        whenever(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
+        whenever(entityManager.getReference(TruckDto::class.java, truck2.licensePlate)).thenReturn(truck2)
 
         // For the getPlanningByDate call at the end
         val mondayOfWeek = newDate.minusDays(newDate.dayOfWeek.value - 1L)
@@ -417,7 +417,7 @@ class PlanningServiceTest {
         val transportIds = listOf(transport1.id, transport2.id)
 
         whenever(transportRepository.findAllById(transportIds)).thenReturn(listOf(transport1, transport2))
-        whenever(entityManager.getReference(Truck::class.java, truck2.licensePlate)).thenReturn(truck2)
+        whenever(entityManager.getReference(TruckDto::class.java, truck2.licensePlate)).thenReturn(truck2)
 
         // For the getPlanningByDate call at the end
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
@@ -510,7 +510,7 @@ class PlanningServiceTest {
     fun `getPlanningByDate should add all missing trucks when truckId is null`() {
         // Given
         val pickupDate = LocalDate.now()
-        val existingTruck = Truck(
+        val existingTruck = TruckDto(
             licensePlate = "DEF-456",
             brand = "DAF",
             model = "XF"

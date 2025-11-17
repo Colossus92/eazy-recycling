@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PlanningService
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.BeforeEach
@@ -81,7 +81,7 @@ class PlanningControllerSecurityTest : BaseIntegrationTest() {
                   pickupDate = testDate.toString(),
                   deliveryDate = testDate.plusDays(1).toString(),
                   id = UUID.randomUUID().toString(),
-                  truck = Truck(licensePlate = "ABC123"),
+                  truck = TruckDto(licensePlate = "ABC123"),
                   originCity = "Test Origin City",
                   destinationCity = "Test Destination City",
                   driver = ProfileDto(

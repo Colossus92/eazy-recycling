@@ -3,7 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import org.hibernate.Hibernate
 import java.time.ZoneId
@@ -20,18 +20,18 @@ data class PlanningTransportsView(
 )
 
 data class PlanningTransportView(
-  val pickupDate: String,
-  val deliveryDate: String?,
-  val id: String,
-  val truck: Truck?,
-  val originCity: String?,
-  val destinationCity: String?,
-  val driver: ProfileDto?,
-  val status: TransportDto.Status,
-  val displayNumber: String?,
-  val containerId: String?,
-  val transportType: TransportType,
-  val sequenceNumber: Int,
+    val pickupDate: String,
+    val deliveryDate: String?,
+    val id: String,
+    val truck: TruckDto?,
+    val originCity: String?,
+    val destinationCity: String?,
+    val driver: ProfileDto?,
+    val status: TransportDto.Status,
+    val displayNumber: String?,
+    val containerId: String?,
+    val transportType: TransportType,
+    val sequenceNumber: Int,
 ) {
 
   constructor(transportDto: TransportDto) : this(

@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.truck
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.Truck
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +47,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should successfully create a truck when license plate does not exist`() {
         // Given
-        val truck = Truck(
+        val truck = TruckDto(
             licensePlate = "ABC-123",
             brand = "Volvo",
             model = "FH16"
@@ -69,14 +69,14 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should return conflict status when creating a truck with existing license plate`() {
         // Given
-        val existingTruck = Truck(
+        val existingTruck = TruckDto(
             licensePlate = "XYZ-789",
             brand = "Mercedes",
             model = "Actros"
         )
         truckRepository.save(existingTruck)
 
-        val duplicateTruck = Truck(
+        val duplicateTruck = TruckDto(
             licensePlate = "XYZ-789",
             brand = "Scania",
             model = "R450"
@@ -98,7 +98,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should handle truck creation with minimal required fields`() {
         // Given
-        val minimalTruck = Truck(
+        val minimalTruck = TruckDto(
             licensePlate = "MIN-123"
             // brand and model are nullable, so not setting them
         )
@@ -119,14 +119,14 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should handle case-insensitive license plate duplicates`() {
         // Given
-        val existingTruck = Truck(
+        val existingTruck = TruckDto(
             licensePlate = "CASE-123",
             brand = "DAF",
             model = "XF"
         )
         truckRepository.save(existingTruck)
 
-        val duplicateTruck = Truck(
+        val duplicateTruck = TruckDto(
             licensePlate = "case-123", // Same as above but lowercase
             brand = "MAN",
             model = "TGX"
@@ -142,12 +142,12 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should get all trucks`() {
         // Given
-        val truck1 = Truck(
+        val truck1 = TruckDto(
             licensePlate = "GET-ALL-1",
             brand = "Volvo",
             model = "FH16"
         )
-        val truck2 = Truck(
+        val truck2 = TruckDto(
             licensePlate = "GET-ALL-2",
             brand = "Mercedes",
             model = "Actros"
@@ -167,7 +167,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should get truck by license plate`() {
         // Given
-        val truck = Truck(
+        val truck = TruckDto(
             licensePlate = "GET-ONE",
             brand = "Scania",
             model = "R450"
@@ -193,7 +193,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should delete truck by license plate`() {
         // Given
-        val truck = Truck(
+        val truck = TruckDto(
             licensePlate = "DELETE-ME",
             brand = "MAN",
             model = "TGX"
@@ -211,14 +211,14 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should update truck`() {
         // Given
-        val originalTruck = Truck(
+        val originalTruck = TruckDto(
             licensePlate = "UPDATE-ME",
             brand = "Volvo",
             model = "FH16"
         )
         truckRepository.save(originalTruck)
 
-        val updatedTruck = Truck(
+        val updatedTruck = TruckDto(
             licensePlate = "UPDATE-ME", // Same license plate
             brand = "Volvo Updated",
             model = "FH16 Updated"
@@ -244,7 +244,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should return not found when updating non-existent truck`() {
         // Given
-        val truck = Truck(
+        val truck = TruckDto(
             licensePlate = "NON-EXISTENT",
             brand = "Brand",
             model = "Model"
@@ -261,14 +261,14 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should return bad request when updating truck with mismatched license plate`() {
         // Given
-        val originalTruck = Truck(
+        val originalTruck = TruckDto(
             licensePlate = "ORIGINAL",
             brand = "Original Brand",
             model = "Original Model"
         )
         truckRepository.save(originalTruck)
 
-        val truckWithDifferentLicensePlate = Truck(
+        val truckWithDifferentLicensePlate = TruckDto(
             licensePlate = "DIFFERENT", // Different from path variable
             brand = "New Brand",
             model = "New Model"
