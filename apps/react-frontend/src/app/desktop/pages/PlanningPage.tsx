@@ -12,14 +12,12 @@ import { PlanningFilterForm } from '@/features/planning/components/filter/Planni
 import { WasteTransportForm } from '@/features/planning/forms/wastetransportform/WasteTransportForm.tsx';
 import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform';
 
 export const PlanningPage = () => {
-  const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } =
-    usePlanningFilter();
-  const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] =
-    useState(false);
-  const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] =
-    useState(false);
+  const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
+  const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] = useState(false);
+  const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] = useState(false);
   return (
     <>
       <ContentContainer title={'Planning'}>
@@ -55,7 +53,7 @@ export const PlanningPage = () => {
         isOpen={isContainerTransportFormOpen}
         setIsOpen={setIsContainerTransportFormOpen}
       />
-      <WasteTransportForm
+      <WasteStreamTransportForm
         isOpen={isWasteTransportFormOpen}
         setIsOpen={setIsWasteTransportFormOpen}
       />
