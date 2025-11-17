@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button/Button.tsx';
 import X from '@/assets/icons/X.svg?react';
+import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
 import MagnifyingGlass from '@/assets/icons/MagnifyingGlass.svg?react';
 import Funnel from '@/assets/icons/Funnel.svg?react';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
@@ -11,8 +12,9 @@ import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view'
 import { ClipLoader } from 'react-spinners';
 import { Tooltip } from '@/components/ui/tooltip';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
+import { EmptyState } from '@/features/crud/EmptyState';
 
-export interface WasteStreamData extends WasteStreamListView {}
+export interface WasteStreamData extends WasteStreamListView { }
 
 interface WasteStreamSelectionTableProps {
   isOpen: boolean;
@@ -29,7 +31,6 @@ export const WasteStreamSelectionTable = ({
   setIsOpen,
   data,
   onSelect,
-  onBack,
   consignorId,
 }: WasteStreamSelectionTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,6 +78,11 @@ export const WasteStreamSelectionTable = ({
     setIsOpen(false);
   };
 
+  const close = () => {
+    setSearchTerm('');
+    setIsOpen(false);
+  }
+
   return (
     <FormDialog isOpen={isOpen} setIsOpen={setIsOpen} width="w-full max-w-4xl">
       <div className="flex flex-col h-[80vh] overflow-hidden rounded-radius-lg">
@@ -89,7 +95,7 @@ export const WasteStreamSelectionTable = ({
             variant="tertiary"
             icon={X}
             showText={false}
-            onClick={() => setIsOpen(false)}
+            onClick={close}
             className="p-1.5"
           />
         </div>
@@ -117,6 +123,15 @@ export const WasteStreamSelectionTable = ({
                 size={20}
                 color={'text-color-text-invert-primary'}
                 aria-label="Laad spinner"
+              />
+            </div>
+          ) : filteredData.length === 0 ? (
+            <div className="flex items-center justify-center h-full w-full p-4">
+              <EmptyState
+                icon={BxRecycle}
+                text="Maak een afvalstroomnummer aan via afvalstroombeheer"
+                onClick={() => { }}
+                showButton={false}
               />
             </div>
           ) : (
@@ -172,7 +187,7 @@ export const WasteStreamSelectionTable = ({
             icon={CaretLeft}
             label="Back"
             iconPosition="left"
-            onClick={onBack}
+            onClick={close}
           />
           <Button
             variant="primary"

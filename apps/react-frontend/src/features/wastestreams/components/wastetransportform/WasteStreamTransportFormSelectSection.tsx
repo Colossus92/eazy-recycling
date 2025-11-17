@@ -82,7 +82,6 @@ export const WasteStreamTransportFormSelectSection = () => {
       {/* Waste Stream Selection Table */}
       <WasteStreamSelectionTable
         isOpen={isWasteStreamTableOpen}
-        onBack={() => setIsWasteStreamTableOpen(false)}
         setIsOpen={setIsWasteStreamTableOpen}
         onSelect={handleWasteStreamSelect}
         consignorId={consignorPartyId}
