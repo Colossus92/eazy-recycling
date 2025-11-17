@@ -9,10 +9,9 @@ import { Calendar } from '@/features/planning/components/calendar/Calendar.tsx';
 import { ContainerTransportForm } from '@/features/planning/forms/containertransportform/ContainerTransportForm.tsx';
 import { Drawer } from '@/components/ui/drawer/Drawer.tsx';
 import { PlanningFilterForm } from '@/features/planning/components/filter/PlanningFilterForm';
-import { WasteTransportForm } from '@/features/planning/forms/wastetransportform/WasteTransportForm.tsx';
 import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform';
+import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
 
 export const PlanningPage = () => {
   const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
