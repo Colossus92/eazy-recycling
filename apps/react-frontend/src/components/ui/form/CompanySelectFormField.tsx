@@ -10,6 +10,7 @@ interface CompanySelectFormFieldProps<TFieldValues extends FieldValues> {
     placeholder: string;
     name: Path<TFieldValues>;
     rules: any;
+    disabled?: boolean;
 }
 
 
@@ -18,6 +19,7 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
     placeholder,
     name,
     rules,
+    disabled = false,
 }: CompanySelectFormFieldProps<TFieldValues>) => {
       const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
@@ -42,6 +44,7 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
                 errors: formContext.formState.errors,
                 control: formContext.control,
             }}
+            disabled={disabled}
         />
     );
 };

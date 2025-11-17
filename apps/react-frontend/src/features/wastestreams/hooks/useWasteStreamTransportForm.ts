@@ -8,18 +8,28 @@ export interface WasteStreamTransportFormValues {
   consignorPartyId: string;
   wasteStreamNumber: string;
   wasteStreamData?: WasteStreamListView;
+  quantity?: string;
+  weight?: string;
+  unit?: string;
   
-  // Future steps can be added here
   // Step 2: Transport Details
-  // Step 3: Additional Info
+  truckId?: string;
+  driverId?: string;
+  pickupDate?: string;
+  deliveryDate?: string;
+  comments?: string;
+  containerId?: string;
+  containerOperation?: string;
+  
+  // Step 3: Additional Info (future)
 }
 
 export const fieldsToValidate: Array<Array<keyof WasteStreamTransportFormValues>> = [
   // Step 0: Select Waste Stream
   ['consignorPartyId', 'wasteStreamNumber'],
   
-  // Step 1: Transport Details (future)
-  [],
+  // Step 1: Transport Details
+  ['pickupDate'],
   
   // Step 2: Additional Info (future)  
   [],
@@ -36,6 +46,16 @@ export function useWasteStreamTransportForm(
       consignorPartyId: '',
       wasteStreamNumber: '',
       wasteStreamData: undefined,
+      quantity: '',
+      weight: '',
+      unit: 'kg',
+      truckId: '',
+      driverId: '',
+      pickupDate: '',
+      deliveryDate: '',
+      containerId: '',
+      containerOperation: '',
+      comments: '',
     },
   });
 
@@ -73,6 +93,16 @@ export function useWasteStreamTransportForm(
       consignorPartyId: '',
       wasteStreamNumber: '',
       wasteStreamData: undefined,
+      quantity: '',
+      weight: '',
+      unit: 'kg',
+      truckId: '',
+      driverId: '',
+      pickupDate: '',
+      deliveryDate: '',
+      containerId: '',
+      containerOperation: '',
+      comments: '',
     });
   };
 

@@ -41,7 +41,7 @@ export const WasteStreamSelectionTable = ({
   useEffect(() => {
     if (isOpen && !data) {
       setIsLoading(true);
-      wasteStreamService.getAll(consignorId)
+      wasteStreamService.getAll(consignorId, 'ACTIVE')
         .then((streams) => {
           setWasteStreams(streams as WasteStreamData[]);
         })
@@ -185,14 +185,14 @@ export const WasteStreamSelectionTable = ({
           <Button
             variant="secondary"
             icon={CaretLeft}
-            label="Back"
+            label="Terug"
             iconPosition="left"
             onClick={close}
           />
           <Button
             variant="primary"
             icon={CaretRight}
-            label="Select Stream"
+            label="Selecteer afvalstroom"
             iconPosition="right"
             onClick={handleSelectStream}
             disabled={!selectedWasteStream}

@@ -73,7 +73,7 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
             className={clsx(
               'w-full text-body-1',
               disabled
-                ? 'text-color-text-disabled'
+                ? 'text-color-text-disabled cursor-not-allowed'
                 : 'text-color-text-secondary'
             )}
             styles={{

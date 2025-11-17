@@ -14,8 +14,8 @@ interface WeightTicketLinesTabProps {
   disabled?: boolean;
 }
 
-const UnitBadge = () => (
-  <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary">
+export const UnitBadge = () => (
+  <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary h-full">
     kg
   </div>
 );

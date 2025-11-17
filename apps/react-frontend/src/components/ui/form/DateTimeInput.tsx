@@ -33,7 +33,7 @@ export const DateTimeInput = <T extends FieldValues>({
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1">
-      <span className="text-subtitle-1">{title}</span>
+      <span className="text-caption-2">{title}</span>
       <div
         className={clsx(
           'relative flex items-center text-body-1 w-full',

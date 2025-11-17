@@ -8,6 +8,7 @@ import { Stepper } from '@/components/ui/form/multistep/Stepper.tsx';
 import { FormNavigation } from '@/features/planning/forms/FormNavigation.tsx';
 import { useWasteStreamTransportForm } from '@/features/wastestreams/hooks/useWasteStreamTransportForm';
 import { WasteStreamTransportFormSelectSection } from './WasteStreamTransportFormSelectSection';
+import { WasteStreamTransportFormDetailsSection } from './WasteStreamTransportFormDetailsSection';
 import { fallbackRender } from '@/utils/fallbackRender';
 
 interface WasteStreamTransportFormProps {
@@ -53,23 +54,20 @@ export const WasteStreamTransportForm = ({
     }
   };
 
-  // For now, only one step - can be expanded later
+  // Multi-step form
   const steps = [
     <WasteStreamTransportFormSelectSection />,
-    // Future steps:
-    // <WasteStreamTransportFormDetailsSection />,
-    // <WasteStreamTransportFormConfirmationSection />,
+    <WasteStreamTransportFormDetailsSection />,
   ];
 
   const stepDescriptions = [
     'Afvalstroom',
-    // 'Transport Details', 
-    // 'Confirmation',
+    'Transport Details',
   ];
 
   return (
     <ErrorBoundary fallbackRender={fallbackRender}>
-      <FormDialog isOpen={isOpen} setIsOpen={onCancel}>
+      <FormDialog isOpen={isOpen} setIsOpen={onCancel} width='w-[600px]'>
         <div className="w-full h-full">
           <FormProvider {...formContext}>
             <form
