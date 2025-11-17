@@ -6,6 +6,7 @@ import { useMobileHook } from '@/hooks/useMobileHook.ts';
 import { Sidebar } from '@/components/layouts/sidebar/Sidebar.tsx';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
 import WeightTicketManagement from './pages/WeightTicketManagement.tsx';
+import { ScreenSizeSafeguard } from '@/components/safeguards/ScreenSizeSafeguard.tsx';
 
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
@@ -34,35 +35,37 @@ const DesktopAccessCheck = ({ children }: { children: React.ReactNode }) => {
 export const App = () => {
   return (
     <Provider>
-      <DesktopAccessCheck>
-        <div className="flex items-start h-screen w-screen overflow-hidden pt-2 pb-2 pl-2 bg-color-surface-background">
-          <Sidebar />
-          <Routes>
-            <Route path="/" element={<PlanningPage />} />
-            <Route path="/crm" element={<CompanyManagement />} />
-            <Route path="/waste-streams" element={<WasteStreamManagement />} />
-            <Route path="/weight-tickets" element={<WeightTicketManagement />} />
-            <Route
-              path="/users"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <UserManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/masterdata"
-              element={
-                <ProtectedRoute requiredRole="admin">
-                  <MasterdataManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/profile" element={<ProfileManagement />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </DesktopAccessCheck>
+      <ScreenSizeSafeguard>
+        <DesktopAccessCheck>
+          <div className="flex items-start h-screen w-screen overflow-hidden pt-2 pb-2 pl-2 bg-color-surface-background">
+            <Sidebar />
+            <Routes>
+              <Route path="/" element={<PlanningPage />} />
+              <Route path="/crm" element={<CompanyManagement />} />
+              <Route path="/waste-streams" element={<WasteStreamManagement />} />
+              <Route path="/weight-tickets" element={<WeightTicketManagement />} />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <UserManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/masterdata"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <MasterdataManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/profile" element={<ProfileManagement />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </DesktopAccessCheck>
+      </ScreenSizeSafeguard>
     </Provider>
   );
 };
