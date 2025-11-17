@@ -220,4 +220,174 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isNoContent)
   }
 
+  @Test
+  fun `can filter waste streams by consignor`() {
+    // Given - create two companies
+    val company1 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "11111",
+      chamberOfCommerceId = "07082025",
+      vihbId = "856974VIXX",
+    ))
+    val company2 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "22222",
+      chamberOfCommerceId = "01022021",
+      vihbId = "856974VIXB"
+    ))
+
+    // Create waste streams with different consignors
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      consignorPartyId = company1.id
+    )
+    val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Plastic",
+      consignorPartyId = company2.id
+    )
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated)
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request2)
+    ).andExpect(status().isCreated)
+
+    // When & Then - filter by company1
+    securedMockMvc.get("/waste-streams?consignor=${company1.id}")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].consignorPartyId").value(company1.id.toString()))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+
+    // When & Then - filter by company2
+    securedMockMvc.get("/waste-streams?consignor=${company2.id}")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].consignorPartyId").value(company2.id.toString()))
+      .andExpect(jsonPath("$[0].wasteName").value("Plastic"))
+  }
+
+  @Test
+  fun `can filter waste streams by status`() {
+    // Given - create waste stream in DRAFT status
+    val draftRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(draftRequest)
+    ).andExpect(status().isCreated)
+
+    // When & Then - filter by DRAFT status
+    securedMockMvc.get("/waste-streams?status=DRAFT")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].status").value("DRAFT"))
+  }
+
+  @Test
+  fun `can filter waste streams by both consignor and status`() {
+    // Given - create two companies
+    val company1 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "11111",
+      chamberOfCommerceId = "07082025",
+      vihbId = "856974VIXX",
+    ))
+    val company2 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "22222",
+      chamberOfCommerceId = "01022021",
+      vihbId = "856974VIXB"
+    ))
+
+    // Create waste streams with different consignors
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      consignorPartyId = company1.id
+    )
+    val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Plastic",
+      consignorPartyId = company2.id
+    )
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated)
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request2)
+    ).andExpect(status().isCreated)
+
+    // When & Then - filter by company1 and DRAFT status
+    securedMockMvc.get("/waste-streams?consignor=${company1.id}&status=DRAFT")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].consignorPartyId").value(company1.id.toString()))
+      .andExpect(jsonPath("$[0].status").value("DRAFT"))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+
+    // When & Then - filter by company2 and DRAFT status
+    securedMockMvc.get("/waste-streams?consignor=${company2.id}&status=DRAFT")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].consignorPartyId").value(company2.id.toString()))
+      .andExpect(jsonPath("$[0].status").value("DRAFT"))
+      .andExpect(jsonPath("$[0].wasteName").value("Plastic"))
+  }
+
+  @Test
+  fun `returns empty list when filtering by non-existent consignor`() {
+    // Given - create a waste stream
+    val request = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request)
+    ).andExpect(status().isCreated)
+
+    // When & Then - filter by non-existent consignor
+    val nonExistentId = "00000000-0000-0000-0000-000000000000"
+    securedMockMvc.get("/waste-streams?consignor=$nonExistentId")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(0))
+  }
+
+  @Test
+  fun `returns empty list when filtering by status that does not match`() {
+    // Given - create a waste stream in DRAFT status
+    val request = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request)
+    ).andExpect(status().isCreated)
+
+    // When & Then - filter by ACTIVE status (waste stream is DRAFT)
+    securedMockMvc.get("/waste-streams?status=ACTIVE")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(0))
+  }
+
 }

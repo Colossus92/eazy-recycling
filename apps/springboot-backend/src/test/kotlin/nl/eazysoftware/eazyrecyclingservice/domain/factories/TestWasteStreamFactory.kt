@@ -24,12 +24,13 @@ object TestWasteStreamFactory {
     wasteCollectionType: String = WasteCollectionType.DEFAULT.name,
     pickupLocation: PickupLocationRequest = createTestPickupLocation(),
     processorPartyId: String = "12345",
-    consignorParty: ConsignorRequest.CompanyConsignor = ConsignorRequest.CompanyConsignor(companyId),
+    consignorPartyId: UUID? = null,
     pickupParty: UUID = companyId,
     dealerParty: UUID? = null,
     collectorParty: UUID? = null,
     brokerParty: UUID? = null
   ): WasteStreamRequest {
+    val consignorParty = ConsignorRequest.CompanyConsignor(consignorPartyId ?: companyId)
     return WasteStreamRequest(
       name = name,
       euralCode = euralCode,

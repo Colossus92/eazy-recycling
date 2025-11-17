@@ -15,8 +15,8 @@ class WasteStreamService(
     private val getWasteStreamByNumber: GetWasteStreamByNumber
 ) {
 
-    fun getWasteStreams(consignor: UUID?): List<WasteStreamListView> {
-        return getAllWasteStreams.execute(consignor)
+    fun getWasteStreams(consignor: UUID?, status: String?): List<WasteStreamListView> {
+        return getAllWasteStreams.execute(consignor, status)
     }
 
     fun getWasteStreamByNumber(wasteStreamNumber: WasteStreamNumber): WasteStreamDetailView {

@@ -51,7 +51,7 @@ class WasteStreamQueryRepository(
   private val pickupLocationMapper: PickupLocationMapper
 ) : GetAllWasteStreams, GetWasteStreamByNumber {
 
-  override fun execute(consignor: UUID?): List<WasteStreamListView> {
+  override fun execute(consignor: UUID?, status: String?): List<WasteStreamListView> {
     val baseQuery = """
             SELECT
                 ws.number as wasteStreamNumber,
@@ -79,8 +79,16 @@ class WasteStreamQueryRepository(
             LEFT JOIN companies dc ON ws.processor_party_id = dc.processor_id
         """.trimIndent()
 
-    val whereClause = if (consignor != null) {
-      " WHERE ws.consignor_party_id = :consignor"
+    val whereClauses = mutableListOf<String>()
+    if (consignor != null) {
+      whereClauses.add("ws.consignor_party_id = :consignor")
+    }
+    if (status != null) {
+      whereClauses.add("ws.status = :status")
+    }
+
+    val whereClause = if (whereClauses.isNotEmpty()) {
+      " WHERE " + whereClauses.joinToString(" AND ")
     } else {
       ""
     }
@@ -90,6 +98,9 @@ class WasteStreamQueryRepository(
     val nativeQuery = entityManager.createNativeQuery(query, WasteStreamQueryResult::class.java)
     if (consignor != null) {
       nativeQuery.setParameter("consignor", consignor)
+    }
+    if (status != null) {
+      nativeQuery.setParameter("status", status)
     }
 
     @Suppress("UNCHECKED_CAST")
