@@ -14,17 +14,7 @@ interface MobileTransportDetailsProps {
 }
 
 const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
-  const goodsItem = transport?.goodsItem?.[0];
-  const goodsItemText = goodsItem
-    ? goodsItem?.name +
-      ' - ' +
-      goodsItem?.netNetWeight +
-      ' ' +
-      goodsItem?.unit +
-      ' (Hoeveelheid: ' +
-      goodsItem?.quantity +
-      ')'
-    : 'Geen afval';
+  const goodsItems = transport?.goodsItem || [];
   const containerText = transport?.wasteContainer?.id
     ? transport.wasteContainer.id
     : 'Geen container toegewezen';
@@ -72,12 +62,22 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
           </div>
           <span className="text-subtitle-2">{containerText}</span>
         </div>
-        <div className="flex items-center self-stretch gap-2">
+        <div className="flex items-start self-stretch gap-2">
           <div className="flex items-center flex-1 gap-2">
             <PhRecycleLight className="size-5 text-color-text-secondary" />
             <span className="text-body-2 text-color-text-secondary">Afval</span>
           </div>
-          <span className="text-subtitle-2">{goodsItemText}</span>
+          <div className="flex flex-col items-end">
+            {goodsItems.map((item, index) => (
+              <span key={index} className="text-subtitle-2 text-right">
+                {item.name} - {item.netNetWeight} {item.unit} (Hoeveelheid:{' '}
+                {item.quantity})
+              </span>
+            ))}
+            {goodsItems.length === 0 && (
+              <span className="text-subtitle-2">Geen afval</span>
+            )}
+          </div>
         </div>
       </div>
       {transport.note && (

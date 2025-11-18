@@ -70,17 +70,7 @@ export const TransportDetailsDrawer = ({
     };
   }, [isDrawerOpen, onDelete]);
 
-  const goodsItem = data?.goodsItem?.[0];
-  const goodsItemText = goodsItem
-    ? goodsItem?.name +
-      ' - ' +
-      goodsItem?.netNetWeight +
-      ' ' +
-      goodsItem?.unit +
-      ' (Hoeveelheid: ' +
-      goodsItem?.quantity +
-      ')'
-    : 'Geen afval';
+  const goodsItems = data?.goodsItem || [];
   const containerText = data?.wasteContainer?.id
     ? data.wasteContainer.id
     : 'Geen container toegewezen';
@@ -219,7 +209,7 @@ export const TransportDetailsDrawer = ({
               </div>
               <span className={'text-body-2 truncate'}>{containerText}</span>
             </div>
-            <div className={'flex items-center gap-2 self-stretch'}>
+            <div className={'flex items-start gap-2 self-stretch'}>
               <div className="flex items-center flex-1 gap-2">
                 <PhRecycleLight
                   className={'w-5 h-5 text-color-text-secondary'}
@@ -228,19 +218,33 @@ export const TransportDetailsDrawer = ({
                   Afvalstof
                 </span>
               </div>
-              <span className={'text-body-2 truncate'}>{goodsItemText}</span>
+              <div className="flex flex-col items-end">
+                {goodsItems.map((item, index) => (
+                  <span key={index} className={'text-body-2 truncate text-right'}>
+                    {item.name} - {item.netNetWeight} {item.unit} (Hoeveelheid:{' '}
+                    {item.quantity})
+                  </span>
+                ))}
+                {goodsItems.length === 0 && (
+                  <span className={'text-body-2 truncate'}>Geen afval</span>
+                )}
+              </div>
             </div>
-            {goodsItem?.wasteStreamNumber && (
-              <div className={'flex items-center gap-2 self-stretch'}>
+            {goodsItems.length > 0 && (
+              <div className={'flex items-start gap-2 self-stretch'}>
                 <div className="flex items-center flex-1 gap-2">
                   <Hash className={'w-5 h-5 text-color-text-secondary'} />
                   <span className={'text-body-2 text-color-text-secondary'}>
                     Afvalstroomnummer
                   </span>
                 </div>
-                <span className={'text-body-2 truncate'}>
-                  {goodsItem.wasteStreamNumber}
-                </span>
+                <div className="flex flex-col items-end">
+                  {goodsItems.map((item, index) => (
+                    <span key={index} className={'text-body-2 text-right'}>
+                      {item.wasteStreamNumber || '-'}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
