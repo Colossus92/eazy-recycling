@@ -1047,6 +1047,27 @@ paths:
       responses:
         "204":
           description: No Content
+  /waste-streams/{wasteStreamNumber}/compatible:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: findCompatibleWasteStreams
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteStreamListView"
   /users/drivers:
     get:
       tags:
@@ -3341,12 +3362,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -3363,11 +3384,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -3378,8 +3399,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -3388,14 +3407,16 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
   securitySchemes:
     bearerAuth:

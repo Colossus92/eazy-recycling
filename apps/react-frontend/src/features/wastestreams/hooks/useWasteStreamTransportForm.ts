@@ -10,15 +10,18 @@ import { transportService } from '@/api/services/transportService';
 import { pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
 import { format } from 'date-fns';
 
+export interface WasteStreamLineFormValue {
+  wasteStreamNumber: string;
+  wasteStreamData?: WasteStreamListView;
+  quantity: string;
+  weight: string;
+}
+
 export interface WasteStreamTransportFormValues {
   // Step 1: Select Waste Stream
   consignorPartyId: string;
-  wasteStreamNumber: string;
-  wasteStreamData?: WasteStreamListView;
-  quantity?: string;
-  weight?: string;
-  unit?: string;
-  
+  wasteStreamLines: WasteStreamLineFormValue[];
+
   // Step 2: Transport Details
   truckId?: string;
   driverId?: string;
@@ -27,28 +30,31 @@ export interface WasteStreamTransportFormValues {
   comments?: string;
   containerId?: string;
   containerOperation?: string;
-  
+
   // Step 3: Additional Info (future)
 }
 
-export const fieldsToValidate: Array<Array<keyof WasteStreamTransportFormValues>> = [
+export const fieldsToValidate: Array<
+  Array<keyof WasteStreamTransportFormValues>
+> = [
   // Step 0: Select Waste Stream
-  ['consignorPartyId', 'wasteStreamNumber'],
-  
+  ['consignorPartyId', 'wasteStreamLines'],
+
   // Step 1: Transport Details
   ['pickupDate'],
-
 ];
 
 /**
  * Converts WasteContainerViewLocation to a readable string using existing converters
  */
-const locationToString = (location: WasteContainerViewLocation | undefined): string => {
+const locationToString = (
+  location: WasteContainerViewLocation | undefined
+): string => {
   if (!location) return '';
-  
+
   // Use existing converter to convert to LocationFormValue
   const formValue = pickupLocationViewToFormValue(location as any);
-  
+
   // Convert LocationFormValue to readable string
   switch (formValue.type) {
     case 'dutch_address':
@@ -59,10 +65,10 @@ const locationToString = (location: WasteContainerViewLocation | undefined): str
       ]
         .filter(Boolean)
         .join(', ');
-    
+
     case 'company':
       return formValue.companyName || '';
-    
+
     case 'project_location':
       return [
         formValue.companyName,
@@ -72,10 +78,10 @@ const locationToString = (location: WasteContainerViewLocation | undefined): str
       ]
         .filter(Boolean)
         .join(', ');
-    
+
     case 'proximity':
       return `${formValue.description}, ${formValue.city}` || '';
-    
+
     case 'none':
     default:
       return 'Geen';
@@ -98,14 +104,16 @@ const formValuesToWasteTransportRequest = (
     containerId: formValues.containerId,
     note: formValues.comments || '',
     transportType: 'WASTE',
-    goods: [
-      {
-        wasteStreamNumber: formValues.wasteStreamNumber,
-        weight: parseFloat(formValues.weight || '0'),
-        unit: formValues.unit || 'kg',
-        quantity: parseInt(formValues.quantity || '1', 10),
-      },
-    ],
+    goods: formValues.wasteStreamLines
+      .filter(
+        (line) => line.wasteStreamNumber && (line.weight || line.quantity)
+      )
+      .map((line) => ({
+        wasteStreamNumber: line.wasteStreamNumber,
+        weight: parseFloat(line.weight || '0'),
+        unit: 'kg',
+        quantity: parseInt(line.quantity || '1', 10),
+      })),
   };
 };
 
@@ -115,43 +123,45 @@ const formValuesToWasteTransportRequest = (
 const transportDetailToFormValues = (
   transport: TransportDetailView
 ): WasteStreamTransportFormValues => {
-  const goods = transport.goodsItem?.[0];
-  
-  // Construct WasteStreamListView from goods data
-  const wasteStreamData: WasteStreamListView | undefined = goods
-    ? {
-        wasteStreamNumber: goods.wasteStreamNumber,
-        wasteName: goods.name,
-        euralCode: goods.euralCode,
-        processingMethodCode: goods.processingMethodCode,
-        consignorPartyName: transport.consignorParty?.name || '',
-        consignorPartyId: transport.consignorParty?.id || '',
-        pickupLocation: locationToString(transport.pickupLocation),
-        deliveryLocation: locationToString(transport.deliveryLocation),
-        status: transport.status,
-        lastActivityAt: {} as any, // Not available in TransportDetailView
-        isEditable: false, // Not available in TransportDetailView
-      }
-    : undefined;
-  
+  const wasteStreamLines: WasteStreamLineFormValue[] = (
+    transport.goodsItem || []
+  ).map((goods) => {
+    const wasteStreamData: WasteStreamListView = {
+      wasteStreamNumber: goods.wasteStreamNumber,
+      wasteName: goods.name,
+      euralCode: goods.euralCode,
+      processingMethodCode: goods.processingMethodCode,
+      consignorPartyName: transport.consignorParty?.name || '',
+      consignorPartyId: transport.consignorParty?.id || '',
+      pickupLocation: locationToString(transport.pickupLocation),
+      deliveryLocation: locationToString(transport.deliveryLocation),
+      status: transport.status,
+      lastActivityAt: {} as any, // Not available in TransportDetailView
+      isEditable: false, // Not available in TransportDetailView
+    };
+
+    return {
+      wasteStreamNumber: goods.wasteStreamNumber || '',
+      wasteStreamData,
+      quantity: goods.quantity?.toString() || '1',
+      weight: goods.netNetWeight?.toString() || '',
+    };
+  });
+
   return {
     consignorPartyId: transport.consignorParty?.id || '',
-    wasteStreamNumber: goods?.wasteStreamNumber || '',
-    wasteStreamData,
-    quantity: goods?.quantity?.toString() || '',
-    weight: goods?.netNetWeight?.toString() || '',
-    unit: goods?.unit || 'kg',
-    truckId: transport.truck?.licensePlate || '',
-    driverId: transport.driver?.id || '',
+    wasteStreamLines,
+    truckId: transport.truck?.licensePlate || undefined,
+    driverId: transport.driver?.id || undefined,
     pickupDate: transport.pickupDateTime
       ? format(new Date(transport.pickupDateTime), "yyyy-MM-dd'T'HH:mm")
       : '',
     deliveryDate: transport.deliveryDateTime
       ? format(new Date(transport.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
       : '',
-    comments: transport.note || '',
-    containerId: transport.wasteContainer?.id || '',
-    containerOperation: transport.containerOperation || '',
+    comments: transport.note || undefined,
+    containerId: transport.wasteContainer?.id || undefined,
+    containerOperation: transport.containerOperation || undefined,
   };
 };
 
@@ -164,18 +174,14 @@ export function useWasteStreamTransportForm(
   const formContext = useForm<WasteStreamTransportFormValues>({
     defaultValues: {
       consignorPartyId: '',
-      wasteStreamNumber: '',
-      wasteStreamData: undefined,
-      quantity: '',
-      weight: '',
-      unit: 'kg',
-      truckId: '',
-      driverId: '',
+      wasteStreamLines: [],
+      truckId: undefined,
+      driverId: undefined,
       pickupDate: '',
       deliveryDate: '',
-      containerId: '',
-      containerOperation: '',
-      comments: '',
+      containerId: undefined,
+      containerOperation: undefined,
+      comments: undefined,
     },
   });
 
@@ -197,9 +203,12 @@ export function useWasteStreamTransportForm(
   const mutation = useMutation({
     mutationFn: async (formData: WasteStreamTransportFormValues) => {
       const request = formValuesToWasteTransportRequest(formData);
-      
+
       if (transportId) {
-        const response = await transportService.updateWasteTransport(transportId, request);
+        const response = await transportService.updateWasteTransport(
+          transportId,
+          request
+        );
         return response.data;
       } else {
         const response = await transportService.createWasteTransport(request);
@@ -209,31 +218,33 @@ export function useWasteStreamTransportForm(
     onSuccess: async () => {
       // Invalidate planning query to reload CalendarGrid
       await queryClient.invalidateQueries({ queryKey: ['planning'] });
-      
+
       // Invalidate transport detail query to reload TransportDetailsDrawer if open
       if (transportId) {
-        await queryClient.invalidateQueries({ queryKey: ['transport', transportId] });
+        await queryClient.invalidateQueries({
+          queryKey: ['transport', transportId],
+        });
       }
-      
+
       // Also invalidate transports list
       await queryClient.invalidateQueries({ queryKey: ['transports'] });
-      
+
       toastService.success(
-        transportId 
+        transportId
           ? 'Afvalstroom transport bijgewerkt'
           : 'Afvalstroom transport aangemaakt'
       );
-      
+
       // Reset and close form
       resetForm();
-      
+
       if (onSuccess) {
         onSuccess();
       }
     },
     onError: (error: unknown) => {
       console.error('Error saving waste stream transport:', error);
-      
+
       toastService.error(
         `Er is een fout opgetreden bij het ${transportId ? 'bijwerken' : 'aanmaken'} van het transport`
       );
@@ -244,18 +255,14 @@ export function useWasteStreamTransportForm(
   const resetForm = () => {
     formContext.reset({
       consignorPartyId: '',
-      wasteStreamNumber: '',
-      wasteStreamData: undefined,
-      quantity: '',
-      weight: '',
-      unit: 'kg',
-      truckId: '',
-      driverId: '',
+      wasteStreamLines: [],
+      truckId: undefined,
+      driverId: undefined,
       pickupDate: '',
       deliveryDate: '',
-      containerId: '',
-      containerOperation: '',
-      comments: '',
+      containerId: undefined,
+      containerOperation: undefined,
+      comments: undefined,
     });
   };
 

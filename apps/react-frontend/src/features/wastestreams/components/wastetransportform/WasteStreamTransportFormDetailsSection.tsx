@@ -14,24 +14,32 @@ import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 export const WasteStreamTransportFormDetailsSection = () => {
   const formContext = useFormContext<WasteStreamTransportFormValues>();
 
-  const wasteStreamData = formContext.watch('wasteStreamData');
-  const wasteStreamNumber = formContext.watch('wasteStreamNumber');
+  const wasteStreamLines = formContext.watch('wasteStreamLines');
+  const firstWasteStream = wasteStreamLines?.[0];
 
   return (
     <div className="flex flex-col items-start self-stretch gap-4">
       {/* Summary section with icon-based layout */}
       <div className="flex flex-col items-start self-stretch gap-2">
         {/* Afvalstroomnummer */}
-        <div className="flex items-center gap-2 self-stretch">
+        <div className="flex items-start gap-2 self-stretch">
           <div className="flex items-center flex-1 gap-2">
             <Hash className="w-5 h-5 text-color-text-secondary" />
             <span className="text-body-2 text-color-text-secondary">
               Afvalstroomnummer
             </span>
           </div>
-          <span className="text-body-2 truncate">
-            {wasteStreamNumber} - {wasteStreamData?.wasteName || ''}
-          </span>
+          <div className="flex flex-col">
+            {wasteStreamLines?.map((line, index) => (
+              <span
+                key={index}
+                className="text-body-2 text-color-text-primary text-right"
+              >
+                {line.wasteStreamNumber} -{' '}
+                {line.wasteStreamData?.wasteName || ''}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Opdrachtgever */}
@@ -43,7 +51,7 @@ export const WasteStreamTransportFormDetailsSection = () => {
             </span>
           </div>
           <span className="text-body-2 truncate">
-            {wasteStreamData?.consignorPartyName || ''}
+            {firstWasteStream?.wasteStreamData?.consignorPartyName || ''}
           </span>
         </div>
 
@@ -56,7 +64,7 @@ export const WasteStreamTransportFormDetailsSection = () => {
             </span>
           </div>
           <span className="text-body-2 truncate">
-            {wasteStreamData?.pickupLocation || ''}
+            {firstWasteStream?.wasteStreamData?.pickupLocation || ''}
           </span>
         </div>
 
@@ -69,7 +77,7 @@ export const WasteStreamTransportFormDetailsSection = () => {
             </span>
           </div>
           <span className="text-body-2 truncate">
-            {wasteStreamData?.deliveryLocation || ''}
+            {firstWasteStream?.wasteStreamData?.deliveryLocation || ''}
           </span>
         </div>
       </div>
@@ -115,7 +123,7 @@ export const WasteStreamTransportFormDetailsSection = () => {
                 }}
               />
             </div>
-            <div className='flex-1'>
+            <div className="flex-1">
               <ContainerOperationSelectFormField
                 formHook={{
                   register: formContext.register,

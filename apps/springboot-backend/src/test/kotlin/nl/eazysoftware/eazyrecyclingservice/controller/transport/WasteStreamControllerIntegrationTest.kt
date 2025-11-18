@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
@@ -388,6 +389,264 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isOk)
       .andExpect(jsonPath("$").isArray)
       .andExpect(jsonPath("$.length()").value(0))
+  }
+
+  @Test
+  fun `can get compatible waste streams with same pickup location, processor and consignor`() {
+    // Given - create a waste stream
+    val pickupLocation = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Main Street",
+      buildingNumber = "100",
+      buildingNumberAddition = null,
+      postalCode = "1234AB",
+      city = "Amsterdam",
+      country = "Nederland"
+    )
+
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      pickupLocation = pickupLocation,
+      processorPartyId = "12345",
+      consignorPartyId = testCompany.id
+    )
+
+    val result1 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated).andReturn()
+
+    val wasteStreamNumber1 = objectMapper.readTree(result1.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - get compatible waste streams (should return itself since it matches all criteria)
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber1/compatible")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+      .andExpect(jsonPath("$[0].wasteStreamNumber").value(wasteStreamNumber1))
+  }
+
+  @Test
+  fun `returns only waste streams with same pickup location when getting compatible waste streams`() {
+    // Given - create two waste streams with different pickup locations
+    val pickupLocation1 = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Main Street",
+      buildingNumber = "100",
+      buildingNumberAddition = null,
+      postalCode = "1234AB",
+      city = "Amsterdam",
+      country = "Nederland"
+    )
+    val pickupLocation2 = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Other Street",
+      buildingNumber = "200",
+      buildingNumberAddition = null,
+      postalCode = "5678CD",
+      city = "Rotterdam",
+      country = "Nederland"
+    )
+
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      pickupLocation = pickupLocation1,
+      processorPartyId = "12345",
+      consignorPartyId = testCompany.id
+    )
+    val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Plastic",
+      pickupLocation = pickupLocation2, // Different location
+      processorPartyId = "12345",
+      consignorPartyId = testCompany.id
+    )
+
+    val result1 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated).andReturn()
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request2)
+    ).andExpect(status().isCreated)
+
+    val wasteStreamNumber1 = objectMapper.readTree(result1.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - get compatible waste streams (should only return the first one)
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber1/compatible")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+  }
+
+  @Test
+  fun `returns only waste streams with same processor when getting compatible waste streams`() {
+    // Given - create two waste streams with different processor IDs
+    val pickupLocation = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Main Street",
+      buildingNumber = "100",
+      buildingNumberAddition = null,
+      postalCode = "1234AB",
+      city = "Amsterdam",
+      country = "Nederland"
+    )
+
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      pickupLocation = pickupLocation,
+      processorPartyId = "12345",
+      consignorPartyId = testCompany.id
+    )
+    val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Plastic",
+      pickupLocation = pickupLocation,
+      processorPartyId = "99999", // Different processor
+      consignorPartyId = testCompany.id
+    )
+
+    val result1 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated).andReturn()
+
+    val result2 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request2)
+    )
+
+    val wasteStreamNumber1 = objectMapper.readTree(result1.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - get compatible waste streams (should only return the first one due to different processor)
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber1/compatible")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+  }
+
+  @Test
+  fun `returns only waste streams with same consignor when getting compatible waste streams`() {
+    // Given - create two companies as consignors
+    val consignor1 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "11111",
+      chamberOfCommerceId = "11111111",
+      vihbId = "11111VIXXX"
+    ))
+    val consignor2 = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "22222",
+      chamberOfCommerceId = "22222222",
+      vihbId = "22222VIXXX"
+    ))
+
+    val pickupLocation = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Main Street",
+      buildingNumber = "100",
+      buildingNumberAddition = null,
+      postalCode = "1234AB",
+      city = "Amsterdam",
+      country = "Nederland"
+    )
+
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      pickupLocation = pickupLocation,
+      processorPartyId = "12345",
+      consignorPartyId = consignor1.id
+    )
+    val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Plastic",
+      pickupLocation = pickupLocation,
+      processorPartyId = "12345",
+      consignorPartyId = consignor2.id // Different consignor
+    )
+
+    val result1 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated).andReturn()
+
+    securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request2)
+    ).andExpect(status().isCreated)
+
+    val wasteStreamNumber1 = objectMapper.readTree(result1.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - get compatible waste streams (should only return the first one)
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber1/compatible")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+  }
+
+  @Test
+  fun `returns 404 when getting compatible waste streams for non-existent waste stream number`() {
+    // Given - a non-existent waste stream number
+    val nonExistentNumber = "999999999999"
+
+    // When & Then
+    securedMockMvc.get("/waste-streams/$nonExistentNumber/compatible")
+      .andExpect(status().isNotFound)
+  }
+
+  @Test
+  fun `returns 400 when getting compatible waste streams with invalid waste stream number format`() {
+    // Given - an invalid waste stream number (not 12 digits)
+    val invalidNumber = "12345"
+
+    // When & Then
+    securedMockMvc.get("/waste-streams/$invalidNumber/compatible")
+      .andExpect(status().isBadRequest)
+  }
+
+  @Test
+  fun `compatible waste streams include waste streams with different eural codes but same location and parties`() {
+    // Given - create a waste stream
+    val pickupLocation = PickupLocationRequest.DutchAddressRequest(
+      streetName = "Main Street",
+      buildingNumber = "100",
+      buildingNumberAddition = null,
+      postalCode = "1234AB",
+      city = "Amsterdam",
+      country = "Nederland"
+    )
+
+    val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass",
+      euralCode = "16 01 17",
+      pickupLocation = pickupLocation,
+      processorPartyId = "12345",
+      consignorPartyId = testCompany.id
+    )
+
+    val result1 = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(request1)
+    ).andExpect(status().isCreated).andReturn()
+
+    val wasteStreamNumber1 = objectMapper.readTree(result1.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - should return itself (eural code doesn't affect compatibility, only location and parties)
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber1/compatible")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].euralCode").value("16 01 17"))
+      .andExpect(jsonPath("$[0].wasteName").value("Glass"))
   }
 
 }

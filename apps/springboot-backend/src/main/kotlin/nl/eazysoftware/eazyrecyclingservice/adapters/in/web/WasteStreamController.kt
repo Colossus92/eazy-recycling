@@ -31,7 +31,8 @@ class WasteStreamController(
   private val updateWasteStream: UpdateWasteStream,
   private val deleteWasteStream: DeleteWasteStream,
   private val createActiveWasteStream: CreateAndActivateWasteStreamService,
-  private val updateAndActivateWasteStream: UpdateAndActivateWasteStream
+  private val updateAndActivateWasteStream: UpdateAndActivateWasteStream,
+  private val getCompatibleWasteStreams: nl.eazysoftware.eazyrecyclingservice.application.query.GetCompatibleWasteStreams
 ) {
 
   @PostMapping("/concept")
@@ -110,6 +111,16 @@ class WasteStreamController(
     wasteStreamNumber: String
   ) {
     deleteWasteStream.handle(DeleteWasteStreamCommand(WasteStreamNumber(wasteStreamNumber)))
+  }
+
+  @GetMapping("/{wasteStreamNumber}/compatible")
+  fun findCompatibleWasteStreams(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String
+  ): List<WasteStreamListView> {
+    return getCompatibleWasteStreams.execute(WasteStreamNumber(wasteStreamNumber))
   }
 }
 
