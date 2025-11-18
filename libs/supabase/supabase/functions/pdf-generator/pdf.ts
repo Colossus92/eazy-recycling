@@ -19,7 +19,11 @@ export async function drawBackgroundWaybill(
 }
 
 export function drawData(page: PDFPage, transportData: TransportData) {
-    drawConsignorClassification(page, transportData.goodsItem.consignor_classification);
+    // Use consignor classification from first goods item
+    const firstGoodsItem = transportData.goodsItems[0];
+    if (firstGoodsItem) {
+        drawConsignorClassification(page, firstGoodsItem.consignor_classification);
+    }
     drawConsignee(page, transportData);
     drawParty(110, 755, page, transportData.consignor);
     drawParty(110, 640, page, transportData.pickup_party);
@@ -29,7 +33,7 @@ export function drawData(page: PDFPage, transportData: TransportData) {
     transportData.transport.delivery_date_time && drawDate(page, transportData.transport.delivery_date_time, 400, 537);
     drawLicensePlate(page, transportData.transport.truck_id);
     drawDetails(page);
-    drawWaste(page, transportData.goodsItem);
+    drawWaste(page, transportData.goodsItems);
 }
 
 function drawConsignorClassification(page: PDFPage, consignorClassification: number) {
@@ -186,7 +190,7 @@ function drawDetails(page: PDFPage) {
     })
 }
 
-function drawWaste(page: PDFPage, goods: {
+function drawWaste(page: PDFPage, goodsItems: Array<{
     name: string;
     quantity: number;
     unit: string;
@@ -195,49 +199,58 @@ function drawWaste(page: PDFPage, goods: {
     eural_code: string;
     processing_method_code: string;
     consignor_classification: number;
-}) {
+}>) {
+    // Starting Y position for the first waste stream line
+    const startY = 410;
+    // Line height - space between each waste stream line
+    const lineHeight = 28;
 
-    goods.waste_stream_number && page.drawText(goods.waste_stream_number, {
-        x: 60,
-        y: 410,
-        size: 10,
-        color: rgb(0, 0, 0)
-    })
+    // Draw each goods item on a separate line
+    goodsItems.forEach((goods, index) => {
+        const yPosition = startY - (index * lineHeight);
 
-    page.drawText(goods.name, {
-        x: 150,
-        y: 410,
-        size: 10,
-        color: rgb(0, 0, 0)
-    })
+        goods.waste_stream_number && page.drawText(goods.waste_stream_number, {
+            x: 60,
+            y: yPosition,
+            size: 10,
+            color: rgb(0, 0, 0)
+        })
 
-    page.drawText(goods.quantity.toString(), {
-        x: 355,
-        y: 410,
-        size: 10,
-        color: rgb(0, 0, 0)
-    })
+        page.drawText(goods.name, {
+            x: 150,
+            y: yPosition,
+            size: 10,
+            color: rgb(0, 0, 0)
+        })
 
-    page.drawText(goods.eural_code, {
-        x: 405,
-        y: 410,
-        size: 8,
-        color: rgb(0, 0, 0)
-    })
+        page.drawText(goods.quantity.toString(), {
+            x: 355,
+            y: yPosition,
+            size: 10,
+            color: rgb(0, 0, 0)
+        })
 
-    page.drawText(goods.processing_method_code, {
-        x: 458,
-        y: 410,
-        size: 8,
-        color: rgb(0, 0, 0)
-    })
+        page.drawText(goods.eural_code, {
+            x: 405,
+            y: yPosition,
+            size: 8,
+            color: rgb(0, 0, 0)
+        })
 
-    page.drawText(goods.net_net_weight.toString(), {
-        x: 485,
-        y: 410,
-        size: 10,
-        color: rgb(0, 0, 0)
-    })
+        page.drawText(goods.processing_method_code, {
+            x: 458,
+            y: yPosition,
+            size: 8,
+            color: rgb(0, 0, 0)
+        })
+
+        page.drawText(goods.net_net_weight.toString(), {
+            x: 485,
+            y: yPosition,
+            size: 10,
+            color: rgb(0, 0, 0)
+        })
+    });
 }
 
 /**

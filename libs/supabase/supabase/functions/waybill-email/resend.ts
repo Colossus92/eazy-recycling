@@ -24,9 +24,17 @@ export async function sendEmail(email: string, base64Data: string) {
             ],
         }),
     });
-    const data = await res.json();
 
+    // Check if response is OK before parsing JSON
+    if (!res.ok) {
+        const errorText = await res.text();
+        console.error(`Resend API error (${res.status}):`, errorText);
+        throw new Error(`Failed to send email: ${res.status} - ${errorText.substring(0, 200)}`);
+    }
+
+    const data = await res.json();
     console.log("Resend response:", data);
+    return data;
 }
 
 const emailHtml = `

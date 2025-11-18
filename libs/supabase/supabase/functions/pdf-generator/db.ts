@@ -28,7 +28,7 @@ export interface TransportData {
     chamber_of_commerce_id: string;
     vihb_id?: string;
   };
-  goodsItem: {
+  goodsItems: Array<{
     name: string;
     quantity: number;
     unit: string;
@@ -37,7 +37,7 @@ export interface TransportData {
     eural_code: string;
     processing_method_code: string;
     consignor_classification: number;
-  };
+  }>;
   signatures: {
     consignor_email?: string;
     consignor_signed_at?: string;
@@ -163,7 +163,6 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.pickup_date_time,
         t.delivery_date_time,
         t.note,
-        t.goods_item_id,
         t.truck_id
       FROM
         transports t
@@ -188,12 +187,10 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       pickup_date_time: string;
       delivery_date_time?: string;
       note?: string;
-      goods_item_id: string;
       truck_id: string;
     }
 
     const transport = transportResult.rows[0] as TransportRow;
-    const goodsItemId = transport.goods_item_id;
 
     // Get consignor details
     const consignorResult = await connection.queryObject`
@@ -215,23 +212,26 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.id = ${transportId}
     `;
 
-    const goodsItemResult = await connection.queryObject`
+    // Get all goods items for this transport
+    const goodsItemsResult = await connection.queryObject`
       SELECT
-        gi.id,
+        tg.id,
         ws.eural_code,
         ws.name,
-        gi.quantity,
-        gi.unit,
-        gi.net_net_weight,
-        gi.waste_stream_number,
+        tg.quantity,
+        tg.unit,
+        tg.net_net_weight,
+        tg.waste_stream_number,
         ws.processing_method_code,
         ws.consignor_classification
       FROM
-        goods_items gi
+        transport_goods tg
       JOIN
-        waste_streams ws ON gi.waste_stream_number = ws.number
+        waste_streams ws ON tg.waste_stream_number = ws.number
       WHERE
-        gi.id = ${goodsItemId}
+        tg.transport_id = ${transportId}
+      ORDER BY
+        tg.id
     `;
 
     const deliveryCompanyResult = await connection.queryObject`
@@ -304,13 +304,14 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       FROM
         transports t
       JOIN
-        goods_items g ON t.goods_item_id = g.id
+        transport_goods tg ON t.id = tg.transport_id
       JOIN
-        waste_streams w ON g.waste_stream_number = w.number
+        waste_streams w ON tg.waste_stream_number = w.number
       JOIN
         companies c ON w.pickup_party_id = c.id
       WHERE
         t.id = ${transportId}
+      LIMIT 1
     `;
     const consigneeResult = await connection.queryObject`
       SELECT
@@ -325,14 +326,15 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         c.vihb_id
       FROM
         transports t
-          JOIN
-        goods_items g ON t.goods_item_id = g.id
-          JOIN
-        waste_streams w ON g.waste_stream_number = w.number
-          JOIN
+      JOIN
+        transport_goods tg ON t.id = tg.transport_id
+      JOIN
+        waste_streams w ON tg.waste_stream_number = w.number
+      JOIN
         companies c ON w.processor_party_id = c.processor_id
       WHERE
         t.id = ${transportId}
+      LIMIT 1
     `;
     const pickupLocationResult = await connection.queryObject`
       SELECT
@@ -377,7 +379,7 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         truck_id: transport.truck_id ? String(transport.truck_id) : undefined,
       },
       consignor: consignorResult.rows[0] as TransportData['consignor'],
-      goodsItem: goodsItemResult.rows[0] as TransportData['goodsItem'],
+      goodsItems: goodsItemsResult.rows as TransportData['goodsItems'],
       signatures: signaturesResult.rows[0] as TransportData['signatures'],
       delivery_company: deliveryCompanyResult.rows[0] as TransportData['delivery_company'],
       pickup_party: pickupPartyResult.rows[0] as TransportData['pickup_party'],
