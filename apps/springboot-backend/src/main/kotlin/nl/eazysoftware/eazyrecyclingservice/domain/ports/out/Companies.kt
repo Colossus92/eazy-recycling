@@ -2,10 +2,12 @@ package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 
 interface Companies {
   fun create(company: Company): Company
   fun findAll(): List<Company>
+  fun findByRole(role: CompanyRole): List<Company>
   fun findById(companyId: CompanyId): Company?
   fun update(company: Company): Company
   fun deleteById(companyId: CompanyId)

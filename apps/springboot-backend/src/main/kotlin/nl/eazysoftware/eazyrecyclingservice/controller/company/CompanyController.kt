@@ -16,10 +16,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.*
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -86,8 +83,11 @@ class CompanyController(
 
   @GetMapping
   @PreAuthorize(HAS_ANY_ROLE)
-  fun getCompanies(@RequestParam(required = false) includeBranches: Boolean = false): List<CompleteCompanyView> {
-    return getAllCompaniesQuery.handle(includeBranches)
+  fun getCompanies(
+    @RequestParam(required = false) includeBranches: Boolean = false,
+    @RequestParam(required = false) role: CompanyRole? = null
+  ): List<CompleteCompanyView> {
+    return getAllCompaniesQuery.handle(includeBranches, role)
   }
 
   @GetMapping("/{id}")

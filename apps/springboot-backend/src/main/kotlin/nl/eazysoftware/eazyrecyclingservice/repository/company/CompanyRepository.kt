@@ -2,10 +2,13 @@ package nl.eazysoftware.eazyrecyclingservice.repository.company
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
@@ -18,6 +21,9 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
   fun findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId: String): CompanyDto?
   fun findByVihbIdAndDeletedAtNotNull(vihbId: String): CompanyDto?
   fun findByProcessorIdAndDeletedAtNotNull(processorId: String): CompanyDto?
+  
+  @Query("SELECT c FROM CompanyDto c JOIN c.roles r WHERE r = :role AND c.deletedAt IS NULL")
+  fun findByRoleAndDeletedAtIsNull(@Param("role") role: CompanyRole): List<CompanyDto>
 }
 
 @Repository
@@ -34,6 +40,11 @@ class CompanyRepository(
 
   override fun findAll(): List<Company> {
     return jpaRepository.findAllByDeletedAtIsNull()
+      .map { companyMapper.toDomain(it) }
+  }
+
+  override fun findByRole(role: CompanyRole): List<Company> {
+    return jpaRepository.findByRoleAndDeletedAtIsNull(role)
       .map { companyMapper.toDomain(it) }
   }
 
