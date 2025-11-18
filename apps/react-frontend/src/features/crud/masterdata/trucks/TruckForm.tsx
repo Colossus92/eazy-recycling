@@ -8,7 +8,7 @@ import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { TextFormField } from '@/components/ui/form/TextFormField';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
-import { GetCompaniesRoleEnum, TruckRequest } from '@/api/client';
+import { TruckRequest } from '@/api/client';
 import { Truck } from '@/api/services/truckService';
 
 interface TruckFormProps {
@@ -131,7 +131,7 @@ export const TruckForm = ({
                 title="Transporteur"
                 placeholder="Selecteer transporteur"
                 rules={undefined}
-                role={GetCompaniesRoleEnum.Carrier}
+                role="CARRIER"
               />
             </div>
             <FormActionButtons onClick={cancel} item={initialData} />

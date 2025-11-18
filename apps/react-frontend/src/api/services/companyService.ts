@@ -6,7 +6,6 @@ import {
   CompanyRequest,
   CompleteCompanyView,
 } from '../client/models';
-import { GetCompaniesRoleEnum } from '../client/apis/company-controller-api';
 
 const companyApi = new CompanyControllerApi(apiInstance.config);
 export type Company = CompleteCompanyView;
@@ -27,7 +26,7 @@ const mapCompanyToCompanyRequest = (
 };
 
 export const companyService = {
-  getAll: (includeBranches: boolean = false, role?: GetCompaniesRoleEnum) =>
+  getAll: (includeBranches: boolean = false, role?: string) =>
     companyApi.getCompanies(includeBranches, role).then((r) => r.data),
   create: (c: Omit<Company, 'id'>, restoreCompanyId?: string) => {
     return companyApi
