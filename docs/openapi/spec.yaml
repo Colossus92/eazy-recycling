@@ -180,7 +180,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/Truck"
+                $ref: "#/components/schemas/TruckView"
     put:
       tags:
       - truck-controller
@@ -195,7 +195,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Truck"
+              $ref: "#/components/schemas/TruckRequest"
         required: true
       responses:
         "200":
@@ -203,7 +203,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/Truck"
+                $ref: "#/components/schemas/TruckResult"
     delete:
       tags:
       - truck-controller
@@ -701,7 +701,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Truck"
+                  $ref: "#/components/schemas/TruckView"
     post:
       tags:
       - truck-controller
@@ -710,11 +710,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Truck"
+              $ref: "#/components/schemas/TruckRequest"
         required: true
       responses:
         "201":
           description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TruckResult"
   /transport/{id}/waybill/signature:
     post:
       tags:
@@ -901,6 +905,14 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - CARRIER
+          - PROCESSOR
       responses:
         "200":
           description: OK
@@ -1585,24 +1597,27 @@ components:
       - firstName
       - lastName
       - roles
-    Truck:
+    TruckRequest:
       type: object
       properties:
         licensePlate:
           type: string
+          minLength: 1
         brand:
           type: string
-        model:
+        description:
           type: string
-        updatedAt:
-          type: string
-          format: date-time
-        displayName:
+        carrierPartyId:
           type: string
       required:
-      - displayName
       - licensePlate
-      - updatedAt
+    TruckResult:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+      required:
+      - licensePlate
     GoodsRequest:
       type: object
       properties:
@@ -1776,6 +1791,62 @@ components:
       - date
       - licensePlate
       - transportIds
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingNumber:
+          type: string
+        buildingNumberAddition:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    CompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - CARRIER
+            - PROCESSOR
+        deletedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - address
+      - id
+      - name
+      - roles
+      - updatedAt
     PlanningTransportView:
       type: object
       properties:
@@ -1786,7 +1857,7 @@ components:
         id:
           type: string
         truck:
-          $ref: "#/components/schemas/Truck"
+          $ref: "#/components/schemas/TruckDto"
         originCity:
           type: string
         destinationCity:
@@ -1863,6 +1934,26 @@ components:
       required:
       - id
       - roles
+    TruckDto:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        updatedAt:
+          type: string
+          format: date-time
+        displayName:
+          type: string
+      required:
+      - displayName
+      - licensePlate
+      - updatedAt
     UserRoleDto:
       type: object
       properties:
@@ -2244,54 +2335,6 @@ components:
       required:
       - driverNote
       - hours
-    AddressDto:
-      type: object
-      properties:
-        streetName:
-          type: string
-        buildingNumber:
-          type: string
-        buildingNumberAddition:
-          type: string
-        city:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
-      required:
-      - buildingNumber
-      - city
-      - country
-      - postalCode
-      - streetName
-    CompanyDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        chamberOfCommerceId:
-          type: string
-        vihbId:
-          type: string
-        processorId:
-          type: string
-        name:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        deletedAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-      - address
-      - id
-      - name
-      - updatedAt
     PickupLocationDto:
       type: object
       properties:
@@ -2336,7 +2379,7 @@ components:
         wasteContainer:
           $ref: "#/components/schemas/WasteContainerDto"
         truck:
-          $ref: "#/components/schemas/Truck"
+          $ref: "#/components/schemas/TruckDto"
         driver:
           $ref: "#/components/schemas/ProfileDto"
         note:
@@ -2643,14 +2686,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -2719,6 +2762,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -2727,9 +2773,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -2760,11 +2803,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -2995,6 +3038,24 @@ components:
       required:
       - id
       - roles
+    TruckView:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        carrierCompanyId:
+          type: string
+        carrierCompanyName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - licensePlate
     DriverView:
       type: object
       properties:
@@ -3131,19 +3192,6 @@ components:
       - sequenceNumber
       - status
       - transportType
-    TruckView:
-      type: object
-      properties:
-        licensePlate:
-          type: string
-        brand:
-          type: string
-        model:
-          type: string
-      required:
-      - brand
-      - licensePlate
-      - model
     DriverPlanningItem:
       type: object
       properties:
@@ -3275,12 +3323,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -3297,11 +3345,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
