@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
 import kotlin.time.Clock
@@ -49,7 +50,12 @@ class WasteTransportController(
   fun createWasteTransportFromWeightTicket(
     @Valid @RequestBody request: CreateWasteTransportFromWeightTicketRequest
   ): CreateWasteTransportResponse {
-    val result = createWasteTransportFromWeightTicket.execute(WeightTicketId(request.weightTicketId))
+    val command = CreateWasteTransportFromWeightTicketCommand(
+      weightTicketId = WeightTicketId(request.weightTicketId),
+      pickupDateTime = request.pickupDateTime,
+      deliveryDateTime = request.deliveryDateTime
+    )
+    val result = createWasteTransportFromWeightTicket.execute(command)
     return CreateWasteTransportResponse(transportId = result.transportId.uuid)
   }
 
@@ -112,7 +118,9 @@ data class UpdateWasteTransportResponse(
 )
 
 data class CreateWasteTransportFromWeightTicketRequest(
-  val weightTicketId: Long
+  val weightTicketId: Long,
+  val pickupDateTime: LocalDateTime,
+  val deliveryDateTime: LocalDateTime?,
 )
 
 /**

@@ -750,7 +750,7 @@ class TransportControllerIntegrationTest(
     // Given - create a completed weight ticket
     val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
       carrierParty = testCompany.id,
-      consignorCompanyId = testCompany.id!!,
+      consignorCompanyId = testCompany.id,
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = testWasteStream.number,
@@ -776,7 +776,13 @@ class TransportControllerIntegrationTest(
       .andExpect(status().isNoContent)
 
     // When - create waste transport from weight ticket
-    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = weightTicketId)
+    val pickupDateTime = LocalDateTime.now().plusDays(1)
+    val deliveryDateTime = LocalDateTime.now().plusDays(2)
+    val request = CreateWasteTransportFromWeightTicketRequest(
+      weightTicketId = weightTicketId,
+      pickupDateTime = pickupDateTime,
+      deliveryDateTime = deliveryDateTime
+    )
 
     val createResponse = securedMockMvc.post(
       "/transport/waste/from-weight-ticket",
@@ -807,7 +813,11 @@ class TransportControllerIntegrationTest(
   fun `should fail to create waste transport from non-existent weight ticket`() {
     // Given - non-existent weight ticket ID
     val nonExistentId = 999999L
-    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = nonExistentId)
+    val request = CreateWasteTransportFromWeightTicketRequest(
+      weightTicketId = nonExistentId,
+      pickupDateTime = LocalDateTime.now().plusDays(1),
+      deliveryDateTime = LocalDateTime.now().plusDays(2)
+    )
 
     // When & Then
     securedMockMvc.post(
@@ -822,7 +832,7 @@ class TransportControllerIntegrationTest(
     // Given - create a completed weight ticket without carrier
     val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
       carrierParty = null,
-      consignorCompanyId = testCompany.id!!,
+      consignorCompanyId = testCompany.id,
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = testWasteStream.number,
@@ -846,7 +856,11 @@ class TransportControllerIntegrationTest(
       .andExpect(status().isNoContent)
 
     // When & Then - try to create transport from weight ticket without carrier
-    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = weightTicketId)
+    val request = CreateWasteTransportFromWeightTicketRequest(
+      weightTicketId = weightTicketId,
+      pickupDateTime = LocalDateTime.now().plusDays(1),
+      deliveryDateTime = LocalDateTime.now().plusDays(2)
+    )
 
     securedMockMvc.post(
       "/transport/waste/from-weight-ticket",
