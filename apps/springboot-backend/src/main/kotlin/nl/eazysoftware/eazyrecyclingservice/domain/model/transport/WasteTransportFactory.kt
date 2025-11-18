@@ -5,6 +5,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteStreamCompatibilityService
 import org.springframework.stereotype.Component
 import kotlin.time.Duration
@@ -23,7 +25,8 @@ import kotlin.time.Instant
  */
 @Component
 class WasteTransportFactory(
-  private val compatibilityService: WasteStreamCompatibilityService
+  private val compatibilityService: WasteStreamCompatibilityService,
+  private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator
 ) {
 
   /**
@@ -34,22 +37,24 @@ class WasteTransportFactory(
    * @throws IllegalArgumentException if waste streams are not compatible
    */
   fun create(
-    displayNumber: TransportDisplayNumber,
     carrierParty: CompanyId,
     pickupDateTime: Instant,
-    deliveryDateTime: Instant,
+    deliveryDateTime: Instant?,
     wasteStreams: List<WasteStream>,
     goods: List<GoodsItem>,
     wasteContainer: WasteContainerId?,
     containerOperation: ContainerOperation?,
     truck: LicensePlate?,
     driver: UserId?,
-    note: Note,
+    note: Note?,
     transportHours: Duration?,
     driverNote: Note?,
     sequenceNumber: Int,
+    weightTicketId: WeightTicketId? = null,
   ): WasteTransport {
     validate(goods, wasteStreams)
+
+    val displayNumber = transportDisplayNumberGenerator.generateDisplayNumber()
 
     // All validations passed - create the aggregate
     return WasteTransport(
@@ -68,7 +73,8 @@ class WasteTransportFactory(
       transportHours = transportHours,
       driverNote = driverNote,
       updatedAt = Instant.DISTANT_PAST,
-      sequenceNumber = sequenceNumber
+      sequenceNumber = sequenceNumber,
+      weightTicketId = weightTicketId,
     )
   }
 
@@ -87,7 +93,8 @@ class WasteTransportFactory(
     containerOperation: ContainerOperation? = existing.containerOperation,
     truck: LicensePlate? = existing.truck,
     driver: UserId? = existing.driver,
-    note: Note = existing.note,
+    note: Note? = existing.note,
+    weightTicketId: WeightTicketId? = null,
   ): WasteTransport {
     validate(goods, wasteStreams)
 
@@ -107,7 +114,8 @@ class WasteTransportFactory(
       transportHours = existing.transportHours,
       driverNote = existing.driverNote,
       updatedAt = kotlin.time.Clock.System.now(),
-      sequenceNumber = existing.sequenceNumber
+      sequenceNumber = existing.sequenceNumber,
+      weightTicketId = weightTicketId,
     )
   }
 

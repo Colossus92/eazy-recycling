@@ -1,10 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport
 
 import jakarta.validation.Valid
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateWasteTransport
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateWasteTransportCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateWasteTransport
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateWasteTransportCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -16,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -32,6 +30,7 @@ import kotlin.time.toKotlinInstant
 @RequestMapping("/transport")
 class WasteTransportController(
   private val createWasteTransport: CreateWasteTransport,
+  private val createWasteTransportFromWeightTicket: CreateWasteTransportFromWeightTicket,
   private val updateWasteTransport: UpdateWasteTransport,
   private val wasteTransports: WasteTransports
 ) {
@@ -41,6 +40,16 @@ class WasteTransportController(
   @ResponseStatus(HttpStatus.CREATED)
   fun createWasteTransport(@Valid @RequestBody request: WasteTransportRequest): CreateWasteTransportResponse {
     val result = createWasteTransport.handle(request.toCreateCommand())
+    return CreateWasteTransportResponse(transportId = result.transportId.uuid)
+  }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/waste/from-weight-ticket")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createWasteTransportFromWeightTicket(
+    @Valid @RequestBody request: CreateWasteTransportFromWeightTicketRequest
+  ): CreateWasteTransportResponse {
+    val result = createWasteTransportFromWeightTicket.execute(WeightTicketId(request.weightTicketId))
     return CreateWasteTransportResponse(transportId = result.transportId.uuid)
   }
 
@@ -100,6 +109,10 @@ data class CreateWasteTransportResponse(
 data class UpdateWasteTransportResponse(
   val transportId: UUID,
   val status: String
+)
+
+data class CreateWasteTransportFromWeightTicketRequest(
+  val weightTicketId: Long
 )
 
 /**

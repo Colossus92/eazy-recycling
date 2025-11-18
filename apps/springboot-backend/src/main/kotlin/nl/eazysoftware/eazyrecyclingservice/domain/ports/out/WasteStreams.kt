@@ -26,4 +26,6 @@ interface WasteStreams {
    * @return The highest WasteStreamNumber for this processor, or null if none exist
    */
   fun findHighestNumberForProcessor(processorId: ProcessorPartyId): WasteStreamNumber?
+
+  fun findAllByNumber(wasteStreamNumbers: List<WasteStreamNumber>): List<WasteStream>
 }

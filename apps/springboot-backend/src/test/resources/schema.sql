@@ -76,6 +76,7 @@ create table if not exists transports (
                           sequence_number integer,
                           transport_hours NUMERIC(3,1),
                           driver_note text,
+                          weight_ticket_id bigint,
                           primary key (id)
 );
 

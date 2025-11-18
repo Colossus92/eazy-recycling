@@ -72,7 +72,8 @@ class UpdateWasteTransportService(
       transportHours = existingTransport.transportHours,
       driverNote = existingTransport.driverNote,
       updatedAt = Clock.System.now(),
-      sequenceNumber = existingTransport.sequenceNumber
+      sequenceNumber = existingTransport.sequenceNumber,
+      weightTicketId = existingTransport.weightTicketId,
     )
 
     val savedTransport = wasteTransports.save(updatedTransport)

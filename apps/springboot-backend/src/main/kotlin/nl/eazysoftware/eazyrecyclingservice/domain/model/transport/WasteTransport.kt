@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -41,7 +42,7 @@ class WasteTransport(
   /**
    * Any notes related to the transport. Typically noted by a planner.
    */
-  val note: Note,
+  val note: Note?,
 
   override val transportHours: Duration?,
 
@@ -56,6 +57,8 @@ class WasteTransport(
    * Used for ordering transports within the planning
    */
   val sequenceNumber: Int,
+
+  val weightTicketId: WeightTicketId? = null,
 
   ) : Transport {
 
@@ -93,6 +96,7 @@ class WasteTransport(
       transportHours: Duration?,
       updatedAt: Instant?,
       sequenceNumber: Int,
+      weightTicketId: WeightTicketId? = null,
     ): WasteTransport {
       return WasteTransport(
         transportId = TransportId.generate(),
@@ -110,7 +114,8 @@ class WasteTransport(
         transportHours = transportHours,
         driverNote = driverNote,
         updatedAt = updatedAt,
-        sequenceNumber = sequenceNumber
+        sequenceNumber = sequenceNumber,
+        weightTicketId = weightTicketId,
       )
     }
   }

@@ -48,7 +48,7 @@ class ContainerTransport(
   /**
    * Any notes related to the transport. Typically noted by a planner.
    */
-  val note: Note,
+  val note: Note?,
 
   override val transportHours: Duration?,
 

@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
@@ -36,6 +36,11 @@ class WasteStreamRepository(
     return jpaRepository.findByIdOrNull(wasteStreamNumber.number)
       ?.let { wasteStreamMapper.toDomain(it) }
   }
+
+  override fun findAllByNumber(wasteStreamNumbers: List<WasteStreamNumber>) =
+    wasteStreamNumbers.map { it.number }
+      .let { jpaRepository.findAllById(it) }
+      .map { wasteStreamMapper.toDomain(it) }
 
   override fun existsById(wasteStreamNumber: WasteStreamNumber) =
     jpaRepository.existsById(wasteStreamNumber.number)

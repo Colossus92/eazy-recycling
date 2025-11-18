@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -19,6 +20,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import org.springframework.stereotype.Component
 import java.time.ZoneId
 import kotlin.time.toJavaInstant
@@ -63,7 +65,7 @@ class WasteTransportMapper(
       },
       truck = domain.truck?.let { entityManager.getReference(TruckDto::class.java, it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
-      note = domain.note.description,
+      note = domain.note?.description,
       goods = toDto(domain.goods),
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
       updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
@@ -76,6 +78,7 @@ class WasteTransportMapper(
       driverNote = domain.driverNote?.description,
       pickupLocation = locationMapper.toDto(wasteStream.pickupLocation),
       deliveryLocation = locationMapper.toDto(deliveryLocation),
+      weightTicket = domain.weightTicketId?.let { entityManager.getReference(WeightTicketDto::class.java, it.number) },
     )
   }
 
@@ -95,11 +98,12 @@ class WasteTransportMapper(
       containerOperation = dto.containerOperation,
       truck = dto.truck?.let { LicensePlate(it.licensePlate) },
       driver = dto.driver?.let { UserId(it.id) },
-      note = Note(dto.note),
+      note = dto.note?.let { Note(it) },
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
       driverNote = dto.driverNote?.let { Note(it) },
       updatedAt = dto.updatedAt?.toCetKotlinInstant(),
       sequenceNumber = dto.sequenceNumber,
+      weightTicketId = dto.weightTicket?.let { WeightTicketId(it.id) },
     )
   }
 

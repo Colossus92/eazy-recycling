@@ -5,10 +5,12 @@ import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.CreateContainerTransportResponse
+import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportFromWeightTicketRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportResponse
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.GoodsRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
@@ -28,6 +30,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -75,6 +78,9 @@ class TransportControllerIntegrationTest(
 
   @Autowired
   private lateinit var wasteStreamJpaRepository: WasteStreamJpaRepository
+
+  @Autowired
+  private lateinit var weightTicketJpaRepository: WeightTicketJpaRepository
 
   @Autowired
   private lateinit var euralRepository: EuralRepository
@@ -737,6 +743,117 @@ class TransportControllerIntegrationTest(
     // Verify no transport was saved
     val savedTransports = transportRepository.findAll()
     assertThat(savedTransports).isEmpty()
+  }
+
+  @Test
+  fun `should create waste transport from completed weight ticket`() {
+    // Given - create a completed weight ticket
+    val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+      carrierParty = testCompany.id,
+      consignorCompanyId = testCompany.id!!,
+      lines = listOf(
+        TestWeightTicketFactory.createTestWeightTicketLine(
+          wasteStreamNumber = testWasteStream.number,
+          weightValue = "150.75"
+        )
+      ),
+      truckLicensePlate = testTruck.licensePlate,
+      note = "Test weight ticket for transport"
+    )
+
+    val createWeightTicketResult = securedMockMvc.post(
+      "/weight-tickets",
+      objectMapper.writeValueAsString(weightTicketRequest)
+    )
+      .andExpect(status().isCreated)
+      .andReturn()
+
+    val weightTicketId = objectMapper.readTree(createWeightTicketResult.response.contentAsString)
+      .get("id").asLong()
+
+    // Complete the weight ticket
+    securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+      .andExpect(status().isNoContent)
+
+    // When - create waste transport from weight ticket
+    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = weightTicketId)
+
+    val createResponse = securedMockMvc.post(
+      "/transport/waste/from-weight-ticket",
+      objectMapper.writeValueAsString(request)
+    )
+      .andExpect(status().isCreated)
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(jsonPath("$.transportId").exists())
+      .andReturn()
+
+    val createResult = objectMapper.readValue(
+      createResponse.response.contentAsString,
+      CreateWasteTransportResponse::class.java
+    )
+
+    // Then - verify transport was created with correct data
+    val savedTransport = transportRepository.findByIdOrNull(createResult.transportId)
+    assertThat(savedTransport).isNotNull
+    assertThat(savedTransport?.transportType).isEqualTo(TransportType.WASTE)
+    assertThat(savedTransport?.goods).hasSize(1)
+    assertThat(savedTransport?.goods?.first()?.wasteStreamNumber).isEqualTo(testWasteStream.number)
+    assertThat(savedTransport?.goods?.first()?.netNetWeight).isEqualTo(150.75)
+    assertThat(savedTransport?.truck?.licensePlate).isEqualTo(testTruck.licensePlate)
+    assertThat(savedTransport?.carrierParty?.id).isEqualTo(testCompany.id)
+  }
+
+  @Test
+  fun `should fail to create waste transport from non-existent weight ticket`() {
+    // Given - non-existent weight ticket ID
+    val nonExistentId = 999999L
+    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = nonExistentId)
+
+    // When & Then
+    securedMockMvc.post(
+      "/transport/waste/from-weight-ticket",
+      objectMapper.writeValueAsString(request)
+    )
+      .andExpect(status().isNotFound)
+  }
+
+  @Test
+  fun `should fail to create waste transport from weight ticket without carrier`() {
+    // Given - create a completed weight ticket without carrier
+    val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+      carrierParty = null,
+      consignorCompanyId = testCompany.id!!,
+      lines = listOf(
+        TestWeightTicketFactory.createTestWeightTicketLine(
+          wasteStreamNumber = testWasteStream.number,
+          weightValue = "100.00"
+        )
+      )
+    )
+
+    val createWeightTicketResult = securedMockMvc.post(
+      "/weight-tickets",
+      objectMapper.writeValueAsString(weightTicketRequest)
+    )
+      .andExpect(status().isCreated)
+      .andReturn()
+
+    val weightTicketId = objectMapper.readTree(createWeightTicketResult.response.contentAsString)
+      .get("id").asLong()
+
+    // Complete the weight ticket
+    securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+      .andExpect(status().isNoContent)
+
+    // When & Then - try to create transport from weight ticket without carrier
+    val request = CreateWasteTransportFromWeightTicketRequest(weightTicketId = weightTicketId)
+
+    securedMockMvc.post(
+      "/transport/waste/from-weight-ticket",
+      objectMapper.writeValueAsString(request)
+    )
+      .andExpect(status().isConflict)
+      .andExpect(jsonPath("$.message").value(containsString("vervoerder")))
   }
 
   private fun createTestTransport(note: String, goodsItem: TransportGoodsDto? = null): TransportDto {

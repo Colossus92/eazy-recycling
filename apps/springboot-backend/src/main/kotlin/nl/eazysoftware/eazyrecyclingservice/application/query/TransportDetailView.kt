@@ -24,7 +24,7 @@ data class TransportDetailView(
   val status: TransportStatus,
   val truck: TruckView?,
   val driver: DriverView?,
-  val note: String,
+  val note: String?,
   val transportHours: Double?,
   val driverNote: String?,
   val sequenceNumber: Int,

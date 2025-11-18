@@ -6,10 +6,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
-import nl.eazysoftware.eazyrecyclingservice.domain.service.TransportDisplayNumberGenerator
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.time.Instant
@@ -25,14 +25,15 @@ interface CreateWasteTransport {
 data class CreateWasteTransportCommand(
   val carrierParty: CompanyId,
   val pickupDateTime: Instant,
-  val deliveryDateTime: Instant,
+  val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val goods: List<GoodsItem>,
   val wasteContainer: WasteContainerId?,
   val containerOperation: ContainerOperation?,
   val truck: LicensePlate?,
   val driver: UserId?,
-  val note: Note,
+  val note: Note? = null,
+  val weightTicketId: WeightTicketId? = null,
 )
 
 data class CreateWasteTransportResult(
@@ -44,20 +45,17 @@ class CreateWasteTransportService(
   private val wasteTransports: WasteTransports,
   private val wasteTransportFactory: WasteTransportFactory,
   private val wasteStreams: WasteStreams,
-  private val transportDisplayNumberGenerator: TransportDisplayNumberGenerator,
   private val pdfGenerationClient: PdfGenerationClient,
 ) : CreateWasteTransport {
 
   @Transactional
   override fun handle(cmd: CreateWasteTransportCommand): CreateWasteTransportResult {
-    val displayNumber = transportDisplayNumberGenerator.generateDisplayNumber()
     val wasteStreams = cmd.goods.map {
       wasteStreams.findByNumber(it.wasteStreamNumber)
         ?: throw EntityNotFoundException("Afvalstroom met nummer ${it.wasteStreamNumber} niet gevonden")
     }
 
     val wasteTransport = wasteTransportFactory.create(
-      displayNumber = displayNumber,
       carrierParty = cmd.carrierParty,
       pickupDateTime = cmd.pickupDateTime,
       deliveryDateTime = cmd.deliveryDateTime,
@@ -70,6 +68,7 @@ class CreateWasteTransportService(
       note = cmd.note,
       transportHours = null,
       driverNote = null,
+      weightTicketId = cmd.weightTicketId,
       sequenceNumber = 9999 // Create as last in line
     )
 
