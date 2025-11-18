@@ -11,11 +11,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
-import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -28,7 +28,7 @@ class ContainerTransportMapper(
   private val companies: Companies,
   private val pickupLocationMapper: PickupLocationMapper,
   private val companyMapper: CompanyMapper,
-  private val truckRepository: TruckRepository,
+  private val truckJpaRepository: TruckJpaRepository,
   private val containerRepository: WasteContainerJpaRepository,
   private val entityManager: EntityManager,
 ) {
@@ -74,7 +74,7 @@ class ContainerTransportMapper(
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let { containerRepository.findByIdOrNull(it.id) },
-      truck = domain.truck?.let { truckRepository.findByIdOrNull(it.value) },
+      truck = domain.truck?.let { truckJpaRepository.findByIdOrNull(it.value) },
       driver = domain.driver?.let { entityManager.getReference(ProfileDto::class.java, it.uuid) },
       note = domain.note.description,
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),

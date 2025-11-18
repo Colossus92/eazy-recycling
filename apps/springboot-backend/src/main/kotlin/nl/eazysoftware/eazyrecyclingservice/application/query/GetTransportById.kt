@@ -16,7 +16,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WasteContainerService
 import nl.eazysoftware.eazyrecyclingservice.repository.ProfileRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,7 +34,7 @@ class GetTransportByIdService(
   private val wasteStreams: WasteStreams,
   private val companies: Companies,
   private val profileRepository: ProfileRepository,
-  private val truckRepository: TruckRepository,
+  private val truckJpaRepository: TruckJpaRepository,
   private val wasteContainerService: WasteContainerService,
   private val pickupLocationViewMapper: PickupLocationViewMapper,
   private val wasteContainerViewMapper: WasteContainerViewMapper,
@@ -76,7 +76,7 @@ class GetTransportByIdService(
   }
 
   private fun mapTruck(licensePlate: LicensePlate): TruckView {
-    val truck = truckRepository.findByIdOrNull(licensePlate.value)
+    val truck = truckJpaRepository.findByIdOrNull(licensePlate.value)
       ?: throw EntityNotFoundException("Truck met id $licensePlate niet gevonden")
 
     return TruckView(

@@ -2,9 +2,12 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Trucks
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.ZoneId
@@ -14,7 +17,8 @@ import java.util.*
 @Service
 class PlanningService(
     private val transportRepository: TransportRepository,
-    private val truckService: TruckService,
+    private val trucks: Trucks,
+    private val truckMapper: TruckMapper,
     private val entityManager: EntityManager,
 ) {
 
@@ -78,10 +82,14 @@ class PlanningService(
         val missingTrucks: List<TruckDto>
 
         if (truckId != null) {
-            missingTrucks = listOf(truckService.getTruckByLicensePlate(truckId))
+            val truck = trucks.findByLicensePlate(LicensePlate(truckId))
+                ?: throw IllegalArgumentException("Vrachtwagen met kenteken $truckId niet gevonden")
+            missingTrucks = listOf(truckMapper.toDto(truck))
         } else {
             val existingTrucks = transports.map { it.truck }.toSet()
-            missingTrucks = truckService.getAllTrucks().filterNot { it in existingTrucks }
+            missingTrucks = trucks.findAll()
+                .map { truckMapper.toDto(it) }
+                .filterNot { it in existingTrucks }
         }
 
         return missingTrucks

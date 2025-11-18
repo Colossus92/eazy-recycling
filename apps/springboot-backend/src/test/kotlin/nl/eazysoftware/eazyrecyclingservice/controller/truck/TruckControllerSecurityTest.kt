@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.controller.truck
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
-import nl.eazysoftware.eazyrecyclingservice.repository.TruckRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -34,7 +34,7 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
     private lateinit var objectMapper: ObjectMapper
 
     @Autowired
-    private lateinit var truckRepository: TruckRepository
+    private lateinit var truckJpaRepository: TruckJpaRepository
 
     private val testTruck = TruckDto(
         licensePlate = "TEST-123",
@@ -44,12 +44,12 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
 
     @BeforeEach
     fun setup() {
-        truckRepository.save(testTruck)
+        truckJpaRepository.save(testTruck)
     }
 
     @AfterEach
     fun cleanup() {
-        truckRepository.deleteAll()
+        truckJpaRepository.deleteAll()
     }
 
     companion object {

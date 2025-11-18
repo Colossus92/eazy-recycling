@@ -1,13 +1,14 @@
-import { FormDialog } from "@/components/ui/dialog/FormDialog";
-import { useErrorHandling } from "@/hooks/useErrorHandling";
-import { FormEvent } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-import { useForm } from "react-hook-form";
-import { fallbackRender } from "@/utils/fallbackRender";
-import { FormTopBar } from "@/components/ui/form/FormTopBar";
-import { TextFormField } from "@/components/ui/form/TextFormField";
-import { FormActionButtons } from "@/components/ui/form/FormActionButtons";
-import { Truck } from "@/api/client/models";
+import { FormDialog } from '@/components/ui/dialog/FormDialog';
+import { useErrorHandling } from '@/hooks/useErrorHandling';
+import { FormEvent } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { FormProvider, useForm } from 'react-hook-form';
+import { fallbackRender } from '@/utils/fallbackRender';
+import { FormTopBar } from '@/components/ui/form/FormTopBar';
+import { TextFormField } from '@/components/ui/form/TextFormField';
+import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
+import { Truck } from '@/api/client/models';
+import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 
 interface TruckFormProps {
     isOpen: boolean;
@@ -41,23 +42,18 @@ function toFormData(truck?: Truck) {
 
 export const TruckForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: TruckFormProps) => {
     const { handleError, ErrorDialogComponent } = useErrorHandling();
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm<TruckFormValues>({
+    const methods = useForm<TruckFormValues>({
         values: toFormData(initialData),
     });
 
     const cancel = () => {
-        reset({ licensePlate: '', model: '', brand: '', });
+        methods.reset({ licensePlate: '', model: '', brand: '', });
         onCancel();
     }
 
     const submitForm = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await handleSubmit(async (data) => {
+        await methods.handleSubmit(async (data) => {
             try {
                 await onSubmit(toTruck(data));
                 cancel();
@@ -70,48 +66,56 @@ export const TruckForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }
     return (
         <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
             <ErrorBoundary fallbackRender={fallbackRender}>
-                <form
-                    className="flex flex-col items-center self-stretch"
-                    onSubmit={(e) => submitForm(e)}
-                >
-                    <FormTopBar title={initialData ? "Vrachtwagen bewerken" : "Vrachtwagen toevoegen"} onClick={cancel} />
-                    <div className="flex flex-col items-center self-stretch p-4 gap-4">
-                        <TextFormField
-                            title={'Merk'}
-                            placeholder={'Vul merk in'}
-                            formHook={{
-                                register,
-                                name: 'brand',
-                                rules: { required: 'Merk is verplicht' },
-                                errors,
-                            }}
-                        />
-                        <div className="flex items-start self-stretch gap-4">
+                <FormProvider {...methods}>
+                    <form
+                        className="flex flex-col items-center self-stretch"
+                        onSubmit={(e) => submitForm(e)}
+                    >
+                        <FormTopBar title={initialData ? "Vrachtwagen bewerken" : "Vrachtwagen toevoegen"} onClick={cancel} />
+                        <div className="flex flex-col items-center self-stretch p-4 gap-4">
                             <TextFormField
-                                title={'Beschrijving'}
-                                placeholder={'Vul een beschrijving in'}
+                                title={'Merk'}
+                                placeholder={'Vul merk in'}
                                 formHook={{
-                                    register,
-                                    name: 'model',
-                                    rules: { required: 'Beschrijving is verplicht' },
-                                    errors,
+                                    register: methods.register,
+                                    name: 'brand',
+                                    rules: { required: 'Merk is verplicht' },
+                                    errors: methods.formState.errors,
                                 }}
                             />
-                            <TextFormField
-                                title={'Kenteken'}
-                                placeholder={'Vul kenteken in'}
-                                formHook={{
-                                    register,
-                                    name: 'licensePlate',
-                                    rules: { required: 'Kenteken is verplicht' },
-                                    errors,
-                                }}
-                                disabled={Boolean(initialData?.licensePlate)}
+                            <div className="flex items-start self-stretch gap-4">
+                                <TextFormField
+                                    title={'Beschrijving'}
+                                    placeholder={'Vul een beschrijving in'}
+                                    formHook={{
+                                        register: methods.register,
+                                        name: 'model',
+                                        rules: { required: 'Beschrijving is verplicht' },
+                                        errors: methods.formState.errors,
+                                    }}
+                                />
+                                <TextFormField
+                                    title={'Kenteken'}
+                                    placeholder={'Vul kenteken in'}
+                                    formHook={{
+                                        register: methods.register,
+                                        name: 'licensePlate',
+                                        rules: { required: 'Kenteken is verplicht' },
+                                        errors: methods.formState.errors,
+                                    }}
+                                    disabled={Boolean(initialData?.licensePlate)}
+                                />
+                            </div>
+                            <CompanySelectFormField
+                                name="carrierCompanyId"
+                                title="Transporteur"
+                                placeholder="Selecteer transporteur"
+                                rules={undefined}
                             />
                         </div>
-                    </div>
-                    <FormActionButtons onClick={cancel} item={undefined} />
-                </form>
+                        <FormActionButtons onClick={cancel} item={undefined} />
+                    </form>
+                </FormProvider>
                 <ErrorDialogComponent />
             </ErrorBoundary>
         </FormDialog>
