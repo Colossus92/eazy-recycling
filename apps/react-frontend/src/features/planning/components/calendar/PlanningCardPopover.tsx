@@ -136,7 +136,7 @@ export const PlanningCardPopover = ({
             {transport.truck
               ? transport.truck.brand +
                 ' ' +
-                transport.truck.model +
+                transport.truck.description +
                 ' (' +
                 transport.truck.licensePlate +
                 ')'

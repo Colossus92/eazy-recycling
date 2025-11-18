@@ -18,7 +18,8 @@ class GetAllTrucksQuery(
         TruckView(
           licensePlate = truck.licensePlate.value,
           brand = truck.brand,
-          model = truck.description,
+          description = truck.description,
+          displayName = truck.displayName,
           carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
           carrierCompanyName = null, // Will be populated by join if needed
           updatedAt = truck.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now()

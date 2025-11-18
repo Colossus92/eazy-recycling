@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { formatInstantInCET } from '@/utils/dateUtils';
-import { useState, lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
@@ -11,7 +11,10 @@ import { TransportStatusTag } from '@/features/planning/components/tag/Transport
 import { MobileTabBar } from '@/components/ui/mobile/MobileTabBar';
 import { Button } from '@/components/ui/button/Button';
 import { ReportFinishedComponent } from '@/features/mobile/planning/ReportFinishedComponent';
-import { resolveLocationAddress, transportService } from '@/api/services/transportService';
+import {
+  resolveLocationAddress,
+  transportService,
+} from '@/api/services/transportService';
 
 const MobileTransportDetailsTab = lazy(
   () => import('@/features/mobile/planning/MobileTransportDetails')
@@ -44,8 +47,10 @@ export const MobileTransportDetailsPage = () => {
     refetchOnWindowFocus: false,
   });
 
-  const pickupAddress = transport && resolveLocationAddress(transport.pickupLocation);
-  const deliveryAddress = transport && resolveLocationAddress(transport.deliveryLocation);
+  const pickupAddress =
+    transport && resolveLocationAddress(transport.pickupLocation);
+  const deliveryAddress =
+    transport && resolveLocationAddress(transport.deliveryLocation);
 
   return (
     <div className="flex flex-col w-full">
@@ -90,7 +95,7 @@ export const MobileTransportDetailsPage = () => {
                 <h4>{deliveryAddress?.city}</h4>
               </div>
               <span className="text-subtitle-2 text-color-text-secondary">
-                {transport.truck?.brand} {transport.truck?.model} (
+                {transport.truck?.brand} {transport.truck?.description} (
                 {transport.truck?.licensePlate})
               </span>
             </div>
@@ -103,7 +108,9 @@ export const MobileTransportDetailsPage = () => {
                   Status
                 </span>
               </div>
-              <TransportStatusTag status={transport.status}></TransportStatusTag>
+              <TransportStatusTag
+                status={transport.status}
+              ></TransportStatusTag>
             </div>
             <div className="flex items-center self-stretch gap-2">
               <div className="flex items-center flex-1 gap-2">

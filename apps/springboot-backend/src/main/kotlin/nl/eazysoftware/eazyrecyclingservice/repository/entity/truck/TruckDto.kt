@@ -15,7 +15,7 @@ data class TruckDto(
   val brand: String? = null,
 
   @Column
-  val model: String? = null,
+  val description: String? = null,
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
@@ -35,7 +35,7 @@ data class TruckDto(
   }
 
   fun getDisplayName(): String {
-    val text = "$model ($licensePlate)"
+    val text = "$description ($licensePlate)"
     return carrierParty
       ?.let { "${it.name} - $text"  }
       ?: text

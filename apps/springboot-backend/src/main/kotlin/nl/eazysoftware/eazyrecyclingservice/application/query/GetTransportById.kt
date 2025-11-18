@@ -82,7 +82,8 @@ class GetTransportByIdService(
     return TruckView(
       licensePlate = licensePlate.value,
       brand = truck.brand ?: "",
-      model = truck.model ?: "",
+      description = truck.description ?: "",
+      displayName = truck.getDisplayName()
     )
   }
 

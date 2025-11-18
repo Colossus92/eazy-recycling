@@ -28,10 +28,11 @@ class GetTruckByLicensePlateQuery(
     return TruckView(
       licensePlate = truck.licensePlate.value,
       brand = truck.brand,
-      model = truck.description,
+      description = truck.description,
       carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
       carrierCompanyName = companyName,
-      updatedAt = truck.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now()
+      updatedAt = truck.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now(),
+      displayName = truck.displayName,
     )
   }
 }

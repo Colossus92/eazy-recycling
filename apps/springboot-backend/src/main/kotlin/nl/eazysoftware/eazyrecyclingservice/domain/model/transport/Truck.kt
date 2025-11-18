@@ -8,7 +8,8 @@ data class Truck(
   val brand: String?,
   val description: String?,
   val carrierPartyId: CompanyId?,
-  val updatedAt: ZonedDateTime?
+  val updatedAt: ZonedDateTime?,
+  val displayName: String? = null,
 )
 
 data class LicensePlate(val value: String) {

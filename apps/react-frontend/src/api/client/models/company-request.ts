@@ -53,5 +53,19 @@ export interface CompanyRequest {
      * @memberof CompanyRequest
      */
     'address': AddressRequest;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CompanyRequest
+     */
+    'roles': Array<CompanyRequestRolesEnum>;
 }
+
+export const CompanyRequestRolesEnum = {
+    Carrier: 'CARRIER',
+    Processor: 'PROCESSOR'
+} as const;
+
+export type CompanyRequestRolesEnum = typeof CompanyRequestRolesEnum[keyof typeof CompanyRequestRolesEnum];
+
 

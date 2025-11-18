@@ -10,8 +10,7 @@ import {
   Option,
   SelectFormField,
 } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { Truck } from '@/api/client/models/truck.ts';
-import { truckService } from '@/api/services/truckService.ts';
+import { Truck, truckService } from '@/api/services/truckService.ts';
 
 interface TruckSelectFormFieldProps<TFieldValues extends FieldValues> {
   formHook: {
@@ -34,7 +33,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
 
   const truckOptions: Option[] = trucks.map((truck) => ({
     value: truck.licensePlate,
-    label: `${truck.brand} ${truck.model} ${truck.licensePlate}`,
+    label: `${truck.brand} ${truck.description} ${truck.licensePlate}`,
   }));
 
   return (
@@ -42,7 +41,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
       title={'Vrachtwagen (optioneel)'}
       placeholder={'Selecteer een vrachtwagen'}
       options={truckOptions}
-      testId='truck-select'
+      testId="truck-select"
       disabled={disabled}
       formHook={{
         register: formHook.register,

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WasteContainerForm } from '../WasteContainerForm';
 import { WasteContainerView } from '@/api/client';
 import { Company, companyService } from '@/api/services/companyService';
+import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
 
 // Mock ResizeObserver for test environment
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -35,6 +36,7 @@ const mockCompanies: Company[] = [
     vihbId: '123456VIHB',
     updatedAt: '2025-10-08T10:00:00Z',
     branches: [],
+    roles: [CompleteCompanyViewRolesEnum.Processor],
   },
   {
     id: 'company-2',
@@ -50,6 +52,7 @@ const mockCompanies: Company[] = [
     vihbId: '654321VIHB',
     updatedAt: '2025-10-08T10:00:00Z',
     branches: [],
+    roles: [CompleteCompanyViewRolesEnum.Carrier],
   },
 ];
 

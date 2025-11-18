@@ -1,7 +1,7 @@
 import { act, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Company } from '@/api/services/companyService';
 import { useCompanyCrud } from '../useCompanyCrud';
 
@@ -23,6 +23,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       vihbId: 'VIHB789',
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
+      roles: ['PROCESSOR'],
     },
     {
       id: 'comp-2',
@@ -39,6 +40,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       vihbId: 'VIHB987',
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
+      roles: ['CARRIER'],
     },
     {
       id: 'comp-3',
@@ -55,6 +57,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       vihbId: 'VIHB345',
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
+      roles: ['PROCESSOR', 'CARRIER'],
     },
   ];
 
@@ -225,6 +228,7 @@ describe('useCompanyCrud', () => {
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
       processorId: '12345',
+      roles: ['PROCESSOR'],
     } as Company;
 
     await act(async () => {

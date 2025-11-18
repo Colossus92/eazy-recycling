@@ -74,5 +74,19 @@ export interface CompleteCompanyView {
      * @memberof CompleteCompanyView
      */
     'branches': Array<CompanyBranchResponse>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CompleteCompanyView
+     */
+    'roles': Array<CompleteCompanyViewRolesEnum>;
 }
+
+export const CompleteCompanyViewRolesEnum = {
+    Carrier: 'CARRIER',
+    Processor: 'PROCESSOR'
+} as const;
+
+export type CompleteCompanyViewRolesEnum = typeof CompleteCompanyViewRolesEnum[keyof typeof CompleteCompanyViewRolesEnum];
+
 

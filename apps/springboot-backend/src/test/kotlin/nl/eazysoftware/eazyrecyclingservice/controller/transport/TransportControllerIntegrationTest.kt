@@ -143,7 +143,7 @@ class TransportControllerIntegrationTest(
     testTruck = TruckDto(
       licensePlate = "TEST-123",
       brand = "Mercedes",
-      model = "Actros"
+      description = "Actros"
     )
     entityManager.persist(testTruck)
 

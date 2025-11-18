@@ -96,8 +96,10 @@ models/transport-dto.ts
 models/transport-finished-request.ts
 models/transport-goods-dto.ts
 models/transport-reorder-request.ts
+models/truck-dto.ts
+models/truck-request.ts
+models/truck-result.ts
 models/truck-view.ts
-models/truck.ts
 models/update-container-transport-response.ts
 models/update-user-request.ts
 models/update-waste-transport-response.ts

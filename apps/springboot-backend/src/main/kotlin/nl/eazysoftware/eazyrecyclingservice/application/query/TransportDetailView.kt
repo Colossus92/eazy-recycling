@@ -41,7 +41,8 @@ data class TransportDetailView(
 data class TruckView(
   val licensePlate: String,
   val brand: String?,
-  val model: String?,
+  val description: String?,
+  val displayName: String?,
   val carrierCompanyId: String? = null,
   val carrierCompanyName: String? = null,
   val updatedAt: LocalDateTime? = null

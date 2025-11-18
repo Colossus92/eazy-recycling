@@ -83,7 +83,7 @@ create table if not exists trucks (
                         updated_at timestamp(6) not null,
                         brand varchar(255),
                         license_plate varchar(255) not null,
-                        model varchar(255),
+                        description varchar(255),
                         carrier_party_id uuid,
                         primary key (license_plate)
 );

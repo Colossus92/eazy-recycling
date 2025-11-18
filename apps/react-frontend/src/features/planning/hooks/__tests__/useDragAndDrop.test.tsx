@@ -1,7 +1,7 @@
 import { act, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DropResult } from '@hello-pangea/dnd';
 import { useDragAndDrop } from '../useDragAndDrop';
 import { Planning } from '../usePlanning';
@@ -36,12 +36,12 @@ const createMockPlanningResponse = (basePlanning: Planning): Planning => {
   return {
     ...basePlanning,
     dates: basePlanning.dates,
-    transports: basePlanning.transports.map(t => ({
+    transports: basePlanning.transports.map((t) => ({
       truck: t.truck,
       transports: Object.fromEntries(
         Object.entries(t.transports).map(([date, items]) => [
           date,
-          items.map(item => ({
+          items.map((item) => ({
             id: item.id,
             pickupDate: item.pickupDate,
             deliveryDate: item.deliveryDate,
@@ -50,24 +50,28 @@ const createMockPlanningResponse = (basePlanning: Planning): Planning => {
             destinationCity: item.destinationCity || '',
             driver: {
               firstName: item.driver?.firstName || '',
-              lastName: item.driver?.lastName || ''
+              lastName: item.driver?.lastName || '',
             },
             status: item.status,
-            truck: item.truck ? {
-              licensePlate: item.truck.licensePlate,
-              brand: item.truck.brand || '',
-              model: item.truck.model || '',
-              updatedAt: item.truck.updatedAt,
-              displayName: item.truck.displayName
-            } : undefined,
+            truck: item.truck
+              ? {
+                  licensePlate: item.truck.licensePlate,
+                  brand: item.truck.brand || '',
+                  model: item.truck.description || '',
+                  updatedAt: item.truck.updatedAt,
+                  displayName: item.truck.displayName,
+                }
+              : undefined,
             containerId: item.containerId,
-            transportType: typeof item.transportType === 'string' ? 
-              item.transportType : String(item.transportType),
-            sequenceNumber: item.sequenceNumber
-          }))
+            transportType:
+              typeof item.transportType === 'string'
+                ? item.transportType
+                : String(item.transportType),
+            sequenceNumber: item.sequenceNumber,
+          })),
         ])
-      )
-    }))
+      ),
+    })),
   };
 };
 
@@ -94,15 +98,15 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '01-VBT-8',
               brand: 'DAF',
-              model: 'XC200',
+              description: 'XC200',
               updatedAt: '2025-06-06',
-              displayName: '01-VBT-8'
+              displayName: '01-VBT-8',
             },
             originCity: 'Bunnik',
             destinationCity: 'Bergschenhoek',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts'
+              lastName: 'Posts',
             },
             status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0011',
@@ -124,13 +128,13 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
-              model: 'TGX',
+              description: 'TGX',
               updatedAt: '2025-06-04',
-              displayName: '11-DJ-12'
+              displayName: '11-DJ-12',
             },
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts'
+              lastName: 'Posts',
             },
             originCity: 'Bunnik',
             destinationCity: 'Bergschenhoek',
@@ -147,15 +151,15 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
-              model: 'TGX',
+              description: 'TGX',
               updatedAt: '2025-06-04',
-              displayName: '11-DJ-12'
+              displayName: '11-DJ-12',
             },
             originCity: 'Bergschenhoek',
             destinationCity: 'Bunnik',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts'
+              lastName: 'Posts',
             },
             status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0010',
@@ -172,15 +176,15 @@ const mockPlanning: Planning = {
             truck: {
               licensePlate: '11-DJ-12',
               brand: 'MAN',
-              model: 'TGX',
+              description: 'TGX',
               updatedAt: '2025-06-05',
-              displayName: '11-DJ-12'
+              displayName: '11-DJ-12',
             },
             originCity: 'Bergschenhoek',
             destinationCity: 'Bunnik',
             driver: {
               firstName: 'Pieter',
-              lastName: 'Posts'
+              lastName: 'Posts',
             },
             status: DriverPlanningItemStatusEnum.Finished,
             displayNumber: '25-0008',
@@ -222,7 +226,9 @@ describe('useDragAndDrop', () => {
 
   it('should handle drag and drop within the same date/truck', async () => {
     // Mock successful API response with a properly typed Planning object
-    vi.mocked(planningService.reorder).mockResolvedValue(createMockPlanningResponse(mockPlanning));
+    vi.mocked(planningService.reorder).mockResolvedValue(
+      createMockPlanningResponse(mockPlanning)
+    );
 
     const { result } = renderHook(
       () => useDragAndDrop({ initialPlanning: mockPlanning }),
@@ -260,7 +266,9 @@ describe('useDragAndDrop', () => {
 
   it('should handle drag and drop between different trucks on same date', async () => {
     // Mock successful API response with a properly typed Planning object
-    vi.mocked(planningService.reorder).mockResolvedValue(createMockPlanningResponse(mockPlanning));
+    vi.mocked(planningService.reorder).mockResolvedValue(
+      createMockPlanningResponse(mockPlanning)
+    );
 
     const { result } = renderHook(
       () => useDragAndDrop({ initialPlanning: mockPlanning }),
@@ -299,7 +307,9 @@ describe('useDragAndDrop', () => {
 
   it('should handle drag and drop between different dates', async () => {
     // Mock successful API response with a properly typed Planning object
-    vi.mocked(planningService.reorder).mockResolvedValue(createMockPlanningResponse(mockPlanning));
+    vi.mocked(planningService.reorder).mockResolvedValue(
+      createMockPlanningResponse(mockPlanning)
+    );
 
     const { result } = renderHook(
       () => useDragAndDrop({ initialPlanning: mockPlanning }),

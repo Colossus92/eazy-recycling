@@ -42,8 +42,8 @@ class PlanningServiceTest {
 
     private lateinit var planningService: PlanningService
 
-    private val truck1Dto = TruckDto(licensePlate = "ABC-123", brand = "Volvo", model = "FH16")
-    private val truck2Dto = TruckDto(licensePlate = "XYZ-789", brand = "Mercedes", model = "Actros")
+    private val truck1Dto = TruckDto(licensePlate = "ABC-123", brand = "Volvo", description = "FH16")
+    private val truck2Dto = TruckDto(licensePlate = "XYZ-789", brand = "Mercedes", description = "Actros")
     private val truck1Domain = Truck(LicensePlate("ABC-123"), "Volvo", "FH16", null, null)
     private val truck2Domain = Truck(LicensePlate("XYZ-789"), "Mercedes", "Actros", null, null)
 
@@ -530,7 +530,7 @@ class PlanningServiceTest {
         val existingTruck = TruckDto(
             licensePlate = "DEF-456",
             brand = "DAF",
-            model = "XF"
+            description = "XF"
         )
 
         val mondayOfWeek = pickupDate.minusDays(pickupDate.dayOfWeek.value - 1L)

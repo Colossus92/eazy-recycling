@@ -17,44 +17,32 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface TruckRequest
  */
-export interface LocalTime {
+export interface TruckRequest {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckRequest
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'licensePlate': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckRequest
      */
-    'value$kotlinx_datetime': string;
+    'brand'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof TruckRequest
      */
-    'nanosecond': number;
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckRequest
+     */
+    'carrierPartyId'?: string;
 }
 

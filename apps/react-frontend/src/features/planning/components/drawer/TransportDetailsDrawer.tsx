@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { formatInstantInCET } from '@/utils/dateUtils';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
-import { resolveLocationAddress, transportService } from '@/api/services/transportService';
+import {
+  resolveLocationAddress,
+  transportService,
+} from '@/api/services/transportService';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
@@ -94,7 +97,7 @@ export const TransportDetailsDrawer = ({
       {!isLoading && data && (
         <div
           className={'flex flex-col flex-1 self-stretch items-start p-4 gap-6'}
-          data-testid='transport-details-drawer-content'
+          data-testid="transport-details-drawer-content"
         >
           <div className={'flex flex-col items-start self-stretch gap-3'}>
             <div
@@ -108,7 +111,7 @@ export const TransportDetailsDrawer = ({
                 <h4>{resolveLocationAddress(data.deliveryLocation)?.city}</h4>
               </div>
               <span className="text-subtitle-2 text-color-text-secondary">
-                {data?.truck?.brand} {data?.truck?.model}{' '}
+                {data?.truck?.brand} {data?.truck?.description}{' '}
                 {data?.truck?.licensePlate}
               </span>
             </div>
@@ -148,7 +151,8 @@ export const TransportDetailsDrawer = ({
                 <span className={'text-body-2 truncate'}>
                   {formatInstantInCET(data.pickupDateTime, 'dd-MM-yyyy')}{' '}
                   {data.deliveryDateTime
-                    ? ' - ' + formatInstantInCET(data.deliveryDateTime, 'dd-MM-yyyy')
+                    ? ' - ' +
+                      formatInstantInCET(data.deliveryDateTime, 'dd-MM-yyyy')
                     : ''}
                 </span>
               </div>
@@ -167,9 +171,7 @@ export const TransportDetailsDrawer = ({
                   </span>
                 </div>
               )}
-              {data.driverNote && (
-                <DriverNote note={data.driverNote} />
-              )}
+              {data.driverNote && <DriverNote note={data.driverNote} />}
             </div>
           </div>
           <div className="flex flex-col items-start self-stretch gap-3">
@@ -245,9 +247,7 @@ export const TransportDetailsDrawer = ({
 
           <WaybillDownloadSection transportId={data.id} />
 
-          {data.note && (
-            <Note note={data.note} />
-          )}
+          {data.note && <Note note={data.note} />}
         </div>
       )}
     </Drawer>

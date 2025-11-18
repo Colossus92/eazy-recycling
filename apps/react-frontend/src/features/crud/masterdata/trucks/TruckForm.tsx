@@ -7,117 +7,138 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { TextFormField } from '@/components/ui/form/TextFormField';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
-import { Truck } from '@/api/client/models';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
+import { GetCompaniesRoleEnum, TruckRequest } from '@/api/client';
+import { Truck } from '@/api/services/truckService';
 
 interface TruckFormProps {
-    isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
-    onCancel: () => void;
-    onSubmit: (eural: Truck) => void;
-    initialData?: Truck;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  onCancel: () => void;
+  onSubmit: (eural: TruckRequest) => void;
+  initialData?: Truck;
 }
 
 export interface TruckFormValues {
-    brand: string;
-    model: string;
-    licensePlate: string;
+  brand: string;
+  description: string;
+  licensePlate: string;
+  carrierCompanyId?: string;
 }
 
-function toTruck(data: TruckFormValues) {
-    return {
-        brand: data.brand,
-        model: data.model,
-        licensePlate: data.licensePlate,
-    } as Truck;
+function toTruckRequest(data: TruckFormValues) {
+  return {
+    brand: data.brand,
+    description: data.description,
+    licensePlate: data.licensePlate,
+    carrierCompanyId: data.carrierCompanyId,
+  } as TruckRequest;
 }
 
 function toFormData(truck?: Truck) {
-    return {
-        brand: truck?.brand,
-        model: truck?.model,
-        licensePlate: truck?.licensePlate
-    } as TruckFormValues
+  return {
+    brand: truck?.brand,
+    description: truck?.description,
+    licensePlate: truck?.licensePlate,
+    carrierCompanyId: truck?.carrierCompanyId,
+  } as TruckFormValues;
 }
 
-export const TruckForm = ({ isOpen, setIsOpen, onCancel, onSubmit, initialData }: TruckFormProps) => {
-    const { handleError, ErrorDialogComponent } = useErrorHandling();
-    const methods = useForm<TruckFormValues>({
-        values: toFormData(initialData),
+export const TruckForm = ({
+  isOpen,
+  setIsOpen,
+  onCancel,
+  onSubmit,
+  initialData,
+}: TruckFormProps) => {
+  const { handleError, ErrorDialogComponent } = useErrorHandling();
+  const methods = useForm<TruckFormValues>({
+    values: toFormData(initialData),
+  });
+
+  const cancel = () => {
+    methods.reset({
+      licensePlate: '',
+      description: '',
+      brand: '',
+      carrierCompanyId: '',
     });
+    onCancel();
+  };
 
-    const cancel = () => {
-        methods.reset({ licensePlate: '', model: '', brand: '', });
-        onCancel();
-    }
+  const submitForm = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await methods.handleSubmit(async (data) => {
+      try {
+        await onSubmit(toTruckRequest(data));
+        cancel();
+      } catch (error) {
+        handleError(error);
+      }
+    })();
+  };
 
-    const submitForm = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        await methods.handleSubmit(async (data) => {
-            try {
-                await onSubmit(toTruck(data));
-                cancel();
-            } catch (error) {
-                handleError(error);
-            }
-        })();
-    };
-
-    return (
-        <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
-            <ErrorBoundary fallbackRender={fallbackRender}>
-                <FormProvider {...methods}>
-                    <form
-                        className="flex flex-col items-center self-stretch"
-                        onSubmit={(e) => submitForm(e)}
-                    >
-                        <FormTopBar title={initialData ? "Vrachtwagen bewerken" : "Vrachtwagen toevoegen"} onClick={cancel} />
-                        <div className="flex flex-col items-center self-stretch p-4 gap-4">
-                            <TextFormField
-                                title={'Merk'}
-                                placeholder={'Vul merk in'}
-                                formHook={{
-                                    register: methods.register,
-                                    name: 'brand',
-                                    rules: { required: 'Merk is verplicht' },
-                                    errors: methods.formState.errors,
-                                }}
-                            />
-                            <div className="flex items-start self-stretch gap-4">
-                                <TextFormField
-                                    title={'Beschrijving'}
-                                    placeholder={'Vul een beschrijving in'}
-                                    formHook={{
-                                        register: methods.register,
-                                        name: 'model',
-                                        rules: { required: 'Beschrijving is verplicht' },
-                                        errors: methods.formState.errors,
-                                    }}
-                                />
-                                <TextFormField
-                                    title={'Kenteken'}
-                                    placeholder={'Vul kenteken in'}
-                                    formHook={{
-                                        register: methods.register,
-                                        name: 'licensePlate',
-                                        rules: { required: 'Kenteken is verplicht' },
-                                        errors: methods.formState.errors,
-                                    }}
-                                    disabled={Boolean(initialData?.licensePlate)}
-                                />
-                            </div>
-                            <CompanySelectFormField
-                                name="carrierCompanyId"
-                                title="Transporteur"
-                                placeholder="Selecteer transporteur"
-                                rules={undefined}
-                            />
-                        </div>
-                        <FormActionButtons onClick={cancel} item={undefined} />
-                    </form>
-                </FormProvider>
-                <ErrorDialogComponent />
-            </ErrorBoundary>
-        </FormDialog>
-    )
-}
+  return (
+    <FormDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+      <ErrorBoundary fallbackRender={fallbackRender}>
+        <FormProvider {...methods}>
+          <form
+            className="flex flex-col items-center self-stretch"
+            onSubmit={(e) => submitForm(e)}
+          >
+            <FormTopBar
+              title={
+                initialData ? 'Vrachtwagen bewerken' : 'Vrachtwagen toevoegen'
+              }
+              onClick={cancel}
+            />
+            <div className="flex flex-col items-center self-stretch p-4 gap-4">
+              <TextFormField
+                title={'Merk'}
+                placeholder={'Vul merk in'}
+                formHook={{
+                  register: methods.register,
+                  name: 'brand',
+                  rules: { required: 'Merk is verplicht' },
+                  errors: methods.formState.errors,
+                }}
+              />
+              <div className="flex items-start self-stretch gap-4">
+                <TextFormField
+                  title={'Beschrijving'}
+                  placeholder={'Vul een beschrijving in'}
+                  formHook={{
+                    register: methods.register,
+                    name: 'description',
+                    rules: { required: 'Beschrijving is verplicht' },
+                    errors: methods.formState.errors,
+                  }}
+                />
+                <TextFormField
+                  title={'Kenteken'}
+                  placeholder={'Vul kenteken in'}
+                  formHook={{
+                    register: methods.register,
+                    name: 'licensePlate',
+                    rules: { required: 'Kenteken is verplicht' },
+                    errors: methods.formState.errors,
+                  }}
+                  disabled={Boolean(initialData?.licensePlate)}
+                />
+              </div>
+              <CompanySelectFormField
+                name="carrierCompanyId"
+                title="Transporteur"
+                placeholder="Selecteer transporteur"
+                rules={undefined}
+                role={GetCompaniesRoleEnum.Carrier}
+              />
+            </div>
+            <FormActionButtons onClick={cancel} item={initialData} />
+          </form>
+        </FormProvider>
+        <ErrorDialogComponent />
+      </ErrorBoundary>
+    </FormDialog>
+  );
+};

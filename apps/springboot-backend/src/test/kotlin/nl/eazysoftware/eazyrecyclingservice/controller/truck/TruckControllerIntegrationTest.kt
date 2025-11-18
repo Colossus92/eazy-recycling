@@ -63,7 +63,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val savedTruck = truckJpaRepository.findByIdOrNull("ABC-123")
     assertThat(savedTruck).isNotNull
     assertThat(savedTruck?.brand).isEqualTo("Volvo")
-    assertThat(savedTruck?.model).isEqualTo("FH16")
+    assertThat(savedTruck?.description).isEqualTo("FH16")
   }
 
   @Test
@@ -72,7 +72,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val existingTruck = TruckDto(
       licensePlate = "XYZ-789",
       brand = "Mercedes",
-      model = "Actros"
+      description = "Actros"
     )
     truckJpaRepository.save(existingTruck)
 
@@ -92,7 +92,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val savedTruck = truckJpaRepository.findByIdOrNull("XYZ-789")
     assertThat(savedTruck).isNotNull
     assertThat(savedTruck?.brand).isEqualTo("Mercedes")
-    assertThat(savedTruck?.model).isEqualTo("Actros")
+    assertThat(savedTruck?.description).isEqualTo("Actros")
   }
 
   @Test
@@ -114,7 +114,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val savedTruck = truckJpaRepository.findByIdOrNull("MIN-123")
     assertThat(savedTruck).isNotNull
     assertThat(savedTruck?.brand).isNull()
-    assertThat(savedTruck?.model).isNull()
+    assertThat(savedTruck?.description).isNull()
   }
 
   @Test
@@ -123,7 +123,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val existingTruck = TruckDto(
       licensePlate = "CASE-123",
       brand = "DAF",
-      model = "XF"
+      description = "XF"
     )
     truckJpaRepository.save(existingTruck)
 
@@ -146,12 +146,12 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val truck1 = TruckDto(
       licensePlate = "GET-ALL-1",
       brand = "Volvo",
-      model = "FH16"
+      description = "FH16"
     )
     val truck2 = TruckDto(
       licensePlate = "GET-ALL-2",
       brand = "Mercedes",
-      model = "Actros"
+      description = "Actros"
     )
     truckJpaRepository.saveAll(listOf(truck1, truck2))
 
@@ -171,7 +171,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val truck = TruckDto(
       licensePlate = "GET-ONE",
       brand = "Scania",
-      model = "R450"
+      description = "R450"
     )
     truckJpaRepository.save(truck)
 
@@ -181,7 +181,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$.licensePlate").value("GET-ONE"))
       .andExpect(jsonPath("$.brand").value("Scania"))
-      .andExpect(jsonPath("$.model").value("R450"))
+      .andExpect(jsonPath("$.description").value("R450"))
   }
 
   @Test
@@ -197,7 +197,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val truck = TruckDto(
       licensePlate = "DELETE-ME",
       brand = "MAN",
-      model = "TGX"
+      description = "TGX"
     )
     truckJpaRepository.save(truck)
 
@@ -215,7 +215,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val originalTruck = TruckDto(
       licensePlate = "UPDATE-ME",
       brand = "Volvo",
-      model = "FH16"
+      description = "FH16"
     )
     truckJpaRepository.save(originalTruck)
 
@@ -237,7 +237,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val savedTruck = truckJpaRepository.findByIdOrNull("UPDATE-ME")
     assertThat(savedTruck).isNotNull
     assertThat(savedTruck?.brand).isEqualTo("Volvo Updated")
-    assertThat(savedTruck?.model).isEqualTo("FH16 Updated")
+    assertThat(savedTruck?.description).isEqualTo("FH16 Updated")
   }
 
   @Test
@@ -263,7 +263,7 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val originalTruck = TruckDto(
       licensePlate = "ORIGINAL",
       brand = "Original Brand",
-      model = "Original Model"
+      description = "Original Model"
     )
     truckJpaRepository.save(originalTruck)
 
@@ -284,6 +284,6 @@ class TruckControllerIntegrationTest : BaseIntegrationTest() {
     val savedTruck = truckJpaRepository.findByIdOrNull("ORIGINAL")
     assertThat(savedTruck).isNotNull
     assertThat(savedTruck?.brand).isEqualTo("Original Brand")
-    assertThat(savedTruck?.model).isEqualTo("Original Model")
+    assertThat(savedTruck?.description).isEqualTo("Original Model")
   }
 }

@@ -12,6 +12,8 @@ import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { RestoreCompanyDialog } from './RestoreCompanyDialog';
 import { AxiosError } from 'axios';
+import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
+import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
 
 interface CompanyFormProps {
   onCancel: () => void;
@@ -37,6 +39,7 @@ export interface CompanyFormValues extends FieldValues {
   chamberOfCommerceId: string;
   vihbId: string;
   processorId?: string;
+  roles: CompleteCompanyViewRolesEnum[];
 }
 
 function toCompany(data: CompanyFormValues): Company {
@@ -55,6 +58,7 @@ function toCompany(data: CompanyFormValues): Company {
     vihbId: data.vihbId?.trim() || undefined,
     processorId: data.processorId?.trim() || undefined,
     updatedAt: new Date().toISOString(),
+    roles: data.roles,
     branches: [],
   };
 
@@ -67,14 +71,17 @@ export const CompanyForm = ({
   company,
 }: CompanyFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
-  const [softDeleteConflict, setSoftDeleteConflict] = useState<SoftDeleteConflict | null>(null);
-  const [pendingFormData, setPendingFormData] = useState<CompanyFormValues | null>(null);
+  const [softDeleteConflict, setSoftDeleteConflict] =
+    useState<SoftDeleteConflict | null>(null);
+  const [pendingFormData, setPendingFormData] =
+    useState<CompanyFormValues | null>(null);
 
   const {
     register,
     setValue,
     handleSubmit,
     watch,
+    control,
     formState: { errors },
   } = useForm<CompanyFormValues>({
     defaultValues: company
@@ -89,6 +96,7 @@ export const CompanyForm = ({
           chamberOfCommerceId: company.chamberOfCommerceId || '',
           vihbId: company.vihbId || '',
           processorId: company.processorId || '',
+          roles: company.roles || [],
         }
       : undefined,
   });
@@ -117,9 +125,12 @@ export const CompanyForm = ({
 
   const handleRestoreConfirm = async () => {
     if (!softDeleteConflict || !pendingFormData) return;
-    
+
     try {
-      await onSubmit(toCompany(pendingFormData), softDeleteConflict.deletedCompanyId);
+      await onSubmit(
+        toCompany(pendingFormData),
+        softDeleteConflict.deletedCompanyId
+      );
       setSoftDeleteConflict(null);
       setPendingFormData(null);
       onCancel();
@@ -164,94 +175,97 @@ export const CompanyForm = ({
             }}
             value={company?.name}
           />
-          <div className={'flex items-start gap-4 self-stretch'}>
-            <div className={'flex items-start flex-grow w-1/2'}>
-              <PostalCodeFormField
-                register={register}
-                setValue={setValue}
-                name="postalCode"
-                errors={errors}
-                value={company?.address.postalCode}
-              />
-            </div>
-            <div className={'flex items-start gap-4 w-1/2'}>
-              <NumberFormField
-                title={'Nummer'}
-                placeholder={''}
-                step={1}
-                formHook={{
-                  register,
-                  name: 'houseNumber',
-                  rules: {
-                    required: 'Huisnummer is verplicht',
-                    min: {
-                      value: 1,
-                      message: 'Ongeldig'
+          <div className="p-4 bg-color-surface-secondary rounded-md flex flex-col gap-4">
+            <span className="text-subtitle-1">Adres</span>
+            <div className={'flex items-start gap-4 self-stretch'}>
+              <div className={'flex items-start flex-grow w-1/2'}>
+                <PostalCodeFormField
+                  register={register}
+                  setValue={setValue}
+                  name="postalCode"
+                  errors={errors}
+                  value={company?.address.postalCode}
+                />
+              </div>
+              <div className={'flex items-start gap-4 w-1/2'}>
+                <NumberFormField
+                  title={'Nummer'}
+                  placeholder={''}
+                  step={1}
+                  formHook={{
+                    register,
+                    name: 'houseNumber',
+                    rules: {
+                      required: 'Huisnummer is verplicht',
+                      min: {
+                        value: 1,
+                        message: 'Ongeldig',
+                      },
+                      maxLength: {
+                        value: 10,
+                        message: 'Huisnummer mag maximaal 10 tekens bevatten',
+                      },
                     },
-                    maxLength: {
-                      value: 10,
-                      message: 'Huisnummer mag maximaal 10 tekens bevatten'
-                    }
-                  },
-                  errors,
-                }}
-                value={company?.address.houseNumber}
-              />
+                    errors,
+                  }}
+                  value={company?.address.houseNumber}
+                />
+                <TextFormField
+                  title={'Toevoeging'}
+                  placeholder={''}
+                  formHook={{
+                    register,
+                    name: 'houseNumberAddition',
+                    rules: {
+                      maxLength: {
+                        value: 6,
+                        message: 'Toevoeging mag maximaal 6 tekens bevatten',
+                      },
+                    },
+                    errors,
+                  }}
+                  value={company?.address.houseNumberAddition}
+                />
+              </div>
+            </div>
+            <div className={'flex items-start gap-4 self-stretch'}>
               <TextFormField
-                title={'Toevoeging'}
-                placeholder={''}
+                title={'Straat'}
+                placeholder={'Vul straatnaam in'}
                 formHook={{
                   register,
-                  name: 'houseNumberAddition',
+                  name: 'street',
                   rules: {
+                    required: 'Straat is verplicht',
                     maxLength: {
-                      value: 6,
-                      message: 'Toevoeging mag maximaal 6 tekens bevatten'
-                    }
+                      value: 43,
+                      message: 'Straatnaam mag maximaal 43 tekens bevatten',
+                    },
                   },
                   errors,
                 }}
-                value={company?.address.houseNumberAddition}
+                value={company?.address.street}
               />
             </div>
-          </div>
-          <div className={'flex items-start gap-4 self-stretch'}>
-            <TextFormField
-              title={'Straat'}
-              placeholder={'Vul straatnaam in'}
-              formHook={{
-                register,
-                name: 'street',
-                rules: {
-                  required: 'Straat is verplicht',
-                  maxLength: {
-                    value: 43,
-                    message: 'Straatnaam mag maximaal 43 tekens bevatten'
-                  }
-                },
-                errors,
-              }}
-              value={company?.address.street}
-            />
-          </div>
-          <div className={'flex items-start gap-4 self-stretch'}>
-            <TextFormField
-              title={'Plaats'}
-              placeholder={'Vul Plaats in'}
-              formHook={{
-                register,
-                name: 'city',
-                rules: {
-                  required: 'Plaats is verplicht',
-                  maxLength: {
-                    value: 24,
-                    message: 'Plaats mag maximaal 24 tekens bevatten'
-                  }
-                },
-                errors,
-              }}
-              value={company?.address.city}
-            />
+            <div className={'flex items-start gap-4 self-stretch'}>
+              <TextFormField
+                title={'Plaats'}
+                placeholder={'Vul Plaats in'}
+                formHook={{
+                  register,
+                  name: 'city',
+                  rules: {
+                    required: 'Plaats is verplicht',
+                    maxLength: {
+                      value: 24,
+                      message: 'Plaats mag maximaal 24 tekens bevatten',
+                    },
+                  },
+                  errors,
+                }}
+                value={company?.address.city}
+              />
+            </div>
           </div>
           <div className={'flex items-start gap-4 self-stretch'}>
             <TextFormField
@@ -317,6 +331,28 @@ export const CompanyForm = ({
               value={company?.processorId || undefined}
             />
           </div>
+          <SelectFormField
+            title={'Rol(len)'}
+            placeholder={'Selecteer rol(len)'}
+            options={[
+              {
+                value: 'PROCESSOR',
+                label: 'Verwerker',
+              },
+              {
+                value: 'CARRIER',
+                label: 'Transporteur',
+              },
+            ]}
+            formHook={{
+              register,
+              name: 'roles',
+              errors,
+              control,
+            }}
+            value={company?.roles}
+            isMulti={true}
+          />
         </div>
         <FormActionButtons onClick={onCancel} item={company} />
       </form>

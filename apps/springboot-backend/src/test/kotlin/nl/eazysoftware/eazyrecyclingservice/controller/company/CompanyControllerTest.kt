@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.ProjectLocationResult
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.CompanyResult
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
@@ -110,7 +111,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       postalCode = "1234 AB",
       city = "Amsterdam",
       country = "Nederland"
-    )
+    ),
+    roles = listOf(CompanyRole.PROCESSOR)
   )
 
   @Test

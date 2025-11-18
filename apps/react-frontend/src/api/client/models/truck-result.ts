@@ -17,26 +17,14 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface TruckResult
  */
-export interface SortObject {
+export interface TruckResult {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof TruckResult
      */
-    'empty'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'unsorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'sorted'?: boolean;
+    'licensePlate': string;
 }
 

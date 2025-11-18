@@ -1941,7 +1941,7 @@ components:
           type: string
         brand:
           type: string
-        model:
+        description:
           type: string
         carrierParty:
           $ref: "#/components/schemas/CompanyDto"
@@ -2189,9 +2189,17 @@ components:
           minLength: 1
         address:
           $ref: "#/components/schemas/AddressRequest"
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - CARRIER
+            - PROCESSOR
       required:
       - address
       - name
+      - roles
     CompanyResult:
       type: object
       properties:
@@ -3045,7 +3053,9 @@ components:
           type: string
         brand:
           type: string
-        model:
+        description:
+          type: string
+        displayName:
           type: string
         carrierCompanyId:
           type: string
@@ -3272,11 +3282,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/CompanyBranchResponse"
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - CARRIER
+            - PROCESSOR
       required:
       - address
       - branches
       - id
       - name
+      - roles
       - updatedAt
     Pageable:
       type: object
@@ -3323,12 +3341,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -3345,11 +3363,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -3360,6 +3378,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -3368,16 +3388,14 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
   securitySchemes:
     bearerAuth:

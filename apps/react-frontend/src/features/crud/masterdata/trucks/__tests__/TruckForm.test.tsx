@@ -1,8 +1,22 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TruckForm } from '../TruckForm';
-import { Truck } from '@/api/client';
+import { Truck } from '@/api/services/truckService';
+
+// Create a wrapper with QueryClientProvider for the component
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+);
 
 describe('TruckForm Tests', () => {
   const mockOnCancel = vi.fn();
@@ -22,7 +36,8 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       // Verify form is in add mode
@@ -30,11 +45,13 @@ describe('TruckForm Tests', () => {
 
       // Fill in the form
       const brandInput = screen.getByPlaceholderText('Vul merk in');
-      const modelInput = screen.getByPlaceholderText('Vul een beschrijving in');
+      const descriptionInput = screen.getByPlaceholderText(
+        'Vul een beschrijving in'
+      );
       const licensePlateInput = screen.getByPlaceholderText('Vul kenteken in');
 
       await userEvent.type(brandInput, 'Volvo');
-      await userEvent.type(modelInput, 'FH16');
+      await userEvent.type(descriptionInput, 'FH16');
       await userEvent.type(licensePlateInput, 'AB-123-CD');
 
       // Submit the form
@@ -46,7 +63,7 @@ describe('TruckForm Tests', () => {
         expect(mockOnSubmit).toHaveBeenCalledTimes(1);
         expect(mockOnSubmit).toHaveBeenCalledWith({
           brand: 'Volvo',
-          model: 'FH16',
+          description: 'FH16',
           licensePlate: 'AB-123-CD',
         });
       });
@@ -64,7 +81,8 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       // Submit the form without filling any fields
@@ -74,7 +92,9 @@ describe('TruckForm Tests', () => {
       // Check validation errors appear
       await waitFor(() => {
         expect(screen.getByText('Merk is verplicht')).toBeInTheDocument();
-        expect(screen.getByText('Beschrijving is verplicht')).toBeInTheDocument();
+        expect(
+          screen.getByText('Beschrijving is verplicht')
+        ).toBeInTheDocument();
         expect(screen.getByText('Kenteken is verplicht')).toBeInTheDocument();
       });
 
@@ -86,9 +106,9 @@ describe('TruckForm Tests', () => {
     it('calls onSubmit with correct data when updating an existing truck', async () => {
       const existingTruck: Truck = {
         brand: 'DAF',
-        model: 'XF',
+        description: 'XF',
         licensePlate: 'CD-789-EF',
-        updatedAt: "2025-10-08T09:58:14.123Z",
+        updatedAt: '2025-10-08T09:58:14.123Z',
         displayName: 'DAF XF CD-789-EF',
       };
 
@@ -99,7 +119,8 @@ describe('TruckForm Tests', () => {
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
           initialData={existingTruck}
-        />
+        />,
+        { wrapper }
       );
 
       // Verify form is in edit mode
@@ -112,12 +133,14 @@ describe('TruckForm Tests', () => {
 
       // Update the brand and model
       const brandInput = screen.getByPlaceholderText('Vul merk in');
-      const modelInput = screen.getByPlaceholderText('Vul een beschrijving in');
-      
+      const descriptionInput = screen.getByPlaceholderText(
+        'Vul een beschrijving in'
+      );
+
       await userEvent.clear(brandInput);
-      await userEvent.clear(modelInput);
+      await userEvent.clear(descriptionInput);
       await userEvent.type(brandInput, 'Scania');
-      await userEvent.type(modelInput, 'R500');
+      await userEvent.type(descriptionInput, 'R500');
 
       // Submit the form
       const submitButton = screen.getByTestId('submit-button');
@@ -127,7 +150,7 @@ describe('TruckForm Tests', () => {
       await waitFor(() => {
         expect(mockOnSubmit).toHaveBeenCalledWith({
           brand: 'Scania',
-          model: 'R500',
+          description: 'R500',
           licensePlate: 'CD-789-EF',
         });
       });
@@ -139,7 +162,9 @@ describe('TruckForm Tests', () => {
     });
 
     it('does not call onCancel when onSubmit throws an error', async () => {
-      const mockSubmitWithError = vi.fn().mockRejectedValue(new Error('API Error'));
+      const mockSubmitWithError = vi
+        .fn()
+        .mockRejectedValue(new Error('API Error'));
 
       render(
         <TruckForm
@@ -147,16 +172,19 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockSubmitWithError}
-        />
+        />,
+        { wrapper }
       );
 
       // Fill in the form
       const brandInput = screen.getByPlaceholderText('Vul merk in');
-      const modelInput = screen.getByPlaceholderText('Vul een beschrijving in');
+      const descriptionInput = screen.getByPlaceholderText(
+        'Vul een beschrijving in'
+      );
       const licensePlateInput = screen.getByPlaceholderText('Vul kenteken in');
 
       await userEvent.type(brandInput, 'MAN');
-      await userEvent.type(modelInput, 'TGX');
+      await userEvent.type(descriptionInput, 'TGX');
       await userEvent.type(licensePlateInput, 'GH-111-IJ');
 
       // Submit the form
@@ -181,7 +209,8 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       expect(screen.getByText('Vrachtwagen toevoegen')).toBeInTheDocument();
@@ -195,9 +224,9 @@ describe('TruckForm Tests', () => {
     it('renders correctly in edit mode', () => {
       const existingTruck: Truck = {
         brand: 'Iveco',
-        model: 'Stralis',
+        description: 'Stralis',
         licensePlate: 'KL-222-MN',
-        updatedAt: "2025-10-08T09:58:14.123Z",
+        updatedAt: '2025-10-08T09:58:14.123Z',
         displayName: 'Iveco Stralis KL-222-MN',
       };
 
@@ -208,13 +237,18 @@ describe('TruckForm Tests', () => {
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
           initialData={existingTruck}
-        />
+        />,
+        { wrapper }
       );
 
       expect(screen.getByText('Vrachtwagen bewerken')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Vul merk in')).toHaveValue('Iveco');
-      expect(screen.getByPlaceholderText('Vul een beschrijving in')).toHaveValue('Stralis');
-      expect(screen.getByPlaceholderText('Vul kenteken in')).toHaveValue('KL-222-MN');
+      expect(
+        screen.getByPlaceholderText('Vul een beschrijving in')
+      ).toHaveValue('Stralis');
+      expect(screen.getByPlaceholderText('Vul kenteken in')).toHaveValue(
+        'KL-222-MN'
+      );
     });
 
     it('calls onCancel when cancel button is clicked', async () => {
@@ -224,7 +258,8 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       const cancelButton = screen.getByTestId('cancel-button');
@@ -242,7 +277,8 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       const closeButton = screen.getByTestId('close-button');
@@ -260,21 +296,24 @@ describe('TruckForm Tests', () => {
           setIsOpen={vi.fn()}
           onCancel={mockOnCancel}
           onSubmit={mockOnSubmit}
-        />
+        />,
+        { wrapper }
       );
 
       // Fill in the form
       const brandInput = screen.getByPlaceholderText('Vul merk in');
-      const modelInput = screen.getByPlaceholderText('Vul een beschrijving in');
+      const descriptionInput = screen.getByPlaceholderText(
+        'Vul een beschrijving in'
+      );
       const licensePlateInput = screen.getByPlaceholderText('Vul kenteken in');
 
       await userEvent.type(brandInput, 'Renault');
-      await userEvent.type(modelInput, 'T-Series');
+      await userEvent.type(descriptionInput, 'T-Series');
       await userEvent.type(licensePlateInput, 'OP-333-QR');
 
       // Verify fields are filled
       expect(brandInput).toHaveValue('Renault');
-      expect(modelInput).toHaveValue('T-Series');
+      expect(descriptionInput).toHaveValue('T-Series');
       expect(licensePlateInput).toHaveValue('OP-333-QR');
 
       // Click cancel

@@ -39,7 +39,7 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
     private val testTruck = TruckDto(
         licensePlate = "TEST-123",
         brand = "Test Brand",
-        model = "Test Model"
+        description = "Test Model"
     )
 
     @BeforeEach
@@ -104,7 +104,7 @@ class TruckControllerSecurityTest : BaseIntegrationTest() {
                 .content(objectMapper.writeValueAsString(TruckDto(
                     licensePlate = "NEW-123",
                     brand = "New Brand",
-                    model = "New Model"
+                    description = "New Model"
                 )))
             "PUT" -> put(endpoint)
                 .contentType(MediaType.APPLICATION_JSON)

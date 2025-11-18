@@ -31,12 +31,36 @@ export interface TruckView {
      * @type {string}
      * @memberof TruckView
      */
-    'brand': string;
+    'brand'?: string;
     /**
      * 
      * @type {string}
      * @memberof TruckView
      */
-    'model': string;
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'carrierCompanyId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'carrierCompanyName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'updatedAt'?: string;
 }
 

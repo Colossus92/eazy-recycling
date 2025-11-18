@@ -18,7 +18,8 @@ class TruckMapper(
     return Truck(
       licensePlate = LicensePlate(dto.licensePlate),
       brand = dto.brand ?: "",
-      description = dto.model ?: "",
+      description = dto.description ?: "",
+      displayName = dto.getDisplayName(),
       carrierPartyId = dto.carrierParty?.id?.let { CompanyId(it) },
       updatedAt = dto.updatedAt.atZone(ZoneId.systemDefault())
     )
@@ -28,8 +29,8 @@ class TruckMapper(
     return TruckDto(
       licensePlate = domain.licensePlate.value.uppercase(),
       brand = domain.brand,
-      model = domain.description,
-      carrierParty = domain.carrierPartyId?.let { 
+      description = domain.description,
+      carrierParty = domain.carrierPartyId?.let {
         entityManager.getReference(CompanyDto::class.java, it.uuid)
       },
       updatedAt = domain.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now()

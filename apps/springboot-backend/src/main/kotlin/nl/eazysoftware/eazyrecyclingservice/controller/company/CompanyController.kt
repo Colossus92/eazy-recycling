@@ -58,7 +58,8 @@ class CompanyController(
           postalCode = DutchPostalCode(request.address.postalCode),
           city = City(request.address.city),
           country = request.address.country
-        )
+        ),
+        roles = request.roles,
       )
       return updateCompanyUseCase.handleRestore(companyId, updateCommand)
     }
@@ -76,7 +77,8 @@ class CompanyController(
         postalCode = DutchPostalCode(request.address.postalCode),
         city = City(request.address.city),
         country = request.address.country
-      )
+      ),
+      roles = request.roles,
     )
     return createCompanyUseCase.handle(command)
   }
@@ -119,7 +121,8 @@ class CompanyController(
         postalCode = DutchPostalCode(request.address.postalCode),
         city = City(request.address.city),
         country = request.address.country
-      )
+      ),
+      roles = request.roles,
     )
     return updateCompanyUseCase.handle(command)
   }
@@ -192,6 +195,8 @@ class CompanyController(
     val name: String,
     @field:Valid
     val address: AddressRequest,
+
+    val roles: List<CompanyRole>,
   )
 
   data class CompanyBranchResponse(

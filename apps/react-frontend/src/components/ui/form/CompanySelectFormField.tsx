@@ -1,29 +1,30 @@
-import { useFormContext } from "react-hook-form";
-import { SelectFormField } from "./selectfield/SelectFormField";
-import { useQuery } from "@tanstack/react-query";
-import { Company } from "@/api/services/companyService";
-import { companyService } from "@/api/services/companyService.ts";
-import { FieldValues, Path } from "react-hook-form";
+import { FieldValues, Path, useFormContext } from 'react-hook-form';
+import { SelectFormField } from './selectfield/SelectFormField';
+import { useQuery } from '@tanstack/react-query';
+import { Company } from '@/api/services/companyService';
+import { companyService } from '@/api/services/companyService.ts';
+import { GetCompaniesRoleEnum } from '@/api/client/apis/company-controller-api';
 
 interface CompanySelectFormFieldProps<TFieldValues extends FieldValues> {
-    title: string;
-    placeholder: string;
-    name: Path<TFieldValues>;
-    rules: any;
-    disabled?: boolean;
+  title: string;
+  placeholder: string;
+  name: Path<TFieldValues>;
+  rules: any;
+  disabled?: boolean;
+  role?: GetCompaniesRoleEnum;
 }
 
-
 export const CompanySelectFormField = <TFieldValues extends FieldValues>({
-    title,
-    placeholder,
-    name,
-    rules,
-    disabled = false,
+  title,
+  placeholder,
+  name,
+  rules,
+  disabled = false,
+  role = undefined,
 }: CompanySelectFormFieldProps<TFieldValues>) => {
-      const { data: companies = [] } = useQuery<Company[]>({
+  const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.getAll(),
+    queryFn: () => companyService.getAll(false, role),
   });
   const companyOptions = companies.map((company) => ({
     value: company.id || '',
@@ -31,20 +32,20 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
   }));
 
   const formContext = useFormContext<TFieldValues>();
-    return (
-        <SelectFormField
-            title={title}
-            placeholder={placeholder}
-            options={companyOptions}
-            testId="company-select"
-            formHook={{
-                register: formContext.register,
-                name,
-                rules,
-                errors: formContext.formState.errors,
-                control: formContext.control,
-            }}
-            disabled={disabled}
-        />
-    );
+  return (
+    <SelectFormField
+      title={title}
+      placeholder={placeholder}
+      options={companyOptions}
+      testId="company-select"
+      formHook={{
+        register: formContext.register,
+        name,
+        rules,
+        errors: formContext.formState.errors,
+        control: formContext.control,
+      }}
+      disabled={disabled}
+    />
+  );
 };

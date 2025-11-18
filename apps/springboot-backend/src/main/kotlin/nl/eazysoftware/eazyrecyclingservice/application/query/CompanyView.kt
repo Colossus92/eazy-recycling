@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import java.time.LocalDateTime
 import java.util.*
 
@@ -14,7 +15,7 @@ data class CompleteCompanyView(
   val processorId: String?,
   val updatedAt: LocalDateTime,
   val branches: List<CompanyController.CompanyBranchResponse> = emptyList(),
-
+  val roles: List<CompanyRole>,
   ) {
 
   companion object {
@@ -34,6 +35,7 @@ data class CompleteCompanyView(
         ),
         processorId = company.processorId?.number,
         updatedAt = LocalDateTime.now(),
+        roles = company.roles,
       )
     }
   }

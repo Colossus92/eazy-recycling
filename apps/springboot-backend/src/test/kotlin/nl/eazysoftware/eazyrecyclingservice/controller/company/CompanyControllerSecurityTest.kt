@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController.CompanyRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.request.AddressRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
@@ -31,120 +32,131 @@ import java.util.stream.Stream
 @ActiveProfiles("test")
 class CompanyControllerSecurityTest : BaseIntegrationTest() {
 
-    @Autowired
-    private lateinit var mockMvc: MockMvc
+  @Autowired
+  private lateinit var mockMvc: MockMvc
 
-    @Autowired
-    private lateinit var objectMapper: ObjectMapper
+  @Autowired
+  private lateinit var objectMapper: ObjectMapper
 
-    @Autowired
-    private lateinit var companyRepository: CompanyJpaRepository
+  @Autowired
+  private lateinit var companyRepository: CompanyJpaRepository
 
-    private lateinit var testCompanyId: UUID
-    private lateinit var testCompany: CompanyDto
+  private lateinit var testCompanyId: UUID
+  private lateinit var testCompany: CompanyDto
 
-    @BeforeEach
-    fun setup() {
-        testCompany = CompanyDto(
-            id = UUID.randomUUID(),
-            name = "Test Company",
-            chamberOfCommerceId = "12345678",
-            vihbId = "123456VIHB",
-            address = AddressDto(
+  @BeforeEach
+  fun setup() {
+    testCompany = CompanyDto(
+      id = UUID.randomUUID(),
+      name = "Test Company",
+      chamberOfCommerceId = "12345678",
+      vihbId = "123456VIHB",
+      address = AddressDto(
+        streetName = "Test Street",
+        buildingNumberAddition = "A",
+        buildingNumber = "123",
+        postalCode = "1234 AB",
+        city = "Test City",
+        country = "Test Country"
+      )
+    )
+    val savedCompany = companyRepository.save(testCompany)
+    testCompanyId = savedCompany.id
+  }
+
+  @AfterEach
+  fun cleanup() {
+    companyRepository.deleteAll()
+  }
+
+  companion object {
+    @JvmStatic
+    fun roleAccessScenarios(): Stream<Arguments> {
+      return Stream.of(
+        // GET all companies - any role can access
+        Arguments.of("/companies", "GET", Roles.ADMIN, 200),
+        Arguments.of("/companies", "GET", Roles.PLANNER, 200),
+        Arguments.of("/companies", "GET", Roles.CHAUFFEUR, 200),
+        Arguments.of("/companies", "GET", "unauthorized_role", 403),
+
+        // GET company by id - any role can access
+        Arguments.of("/companies/{id}", "GET", Roles.ADMIN, 200),
+        Arguments.of("/companies/{id}", "GET", Roles.PLANNER, 200),
+        Arguments.of("/companies/{id}", "GET", Roles.CHAUFFEUR, 200),
+        Arguments.of("/companies/{id}", "GET", "unauthorized_role", 403),
+
+        // POST (create) company - only admin and planner can access
+        Arguments.of("/companies", "POST", Roles.ADMIN, 201),
+        Arguments.of("/companies", "POST", Roles.PLANNER, 201),
+        Arguments.of("/companies", "POST", Roles.CHAUFFEUR, 403),
+        Arguments.of("/companies", "POST", "unauthorized_role", 403),
+
+        // PUT (update) company - only admin and planner can access
+        Arguments.of("/companies/{id}", "PUT", Roles.ADMIN, 200),
+        Arguments.of("/companies/{id}", "PUT", Roles.PLANNER, 200),
+        Arguments.of("/companies/{id}", "PUT", Roles.CHAUFFEUR, 403),
+        Arguments.of("/companies/{id}", "PUT", "unauthorized_role", 403),
+
+        // DELETE company - only admin and planner can access
+        Arguments.of("/companies/{id}", "DELETE", Roles.ADMIN, 204),
+        Arguments.of("/companies/{id}", "DELETE", Roles.PLANNER, 204),
+        Arguments.of("/companies/{id}", "DELETE", Roles.CHAUFFEUR, 403),
+        Arguments.of("/companies/{id}", "DELETE", "unauthorized_role", 403)
+      )
+    }
+  }
+
+  @ParameterizedTest(name = "{1} {0} with role {2} should return {3}")
+  @MethodSource("roleAccessScenarios")
+  fun `should verify role-based access control for company endpoints`(
+    endpoint: String,
+    method: String,
+    role: String,
+    expectedStatus: Int
+  ) {
+    // Replace {id} placeholder with actual ID
+    val resolvedEndpoint = endpoint.replace("{id}", testCompanyId.toString())
+
+    val request = when (method) {
+      "GET" -> get(resolvedEndpoint)
+      "POST" -> post(resolvedEndpoint)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(
+          objectMapper.writeValueAsString(
+            CompanyRequest(
+              chamberOfCommerceId = "87654321",
+              vihbId = "654321VIHB",
+              name = "New Test Company",
+              processorId = "12345",
+              address = AddressRequest(
                 streetName = "Test Street",
-                buildingNumberAddition = "A",
                 buildingNumber = "123",
                 postalCode = "1234 AB",
-                city = "Test City",
-                country = "Test Country"
+                city = "Test City"
+              ),
+              roles = listOf(CompanyRole.CARRIER),
             )
+          )
         )
-        val savedCompany = companyRepository.save(testCompany)
-        testCompanyId = savedCompany.id
-    }
 
-    @AfterEach
-    fun cleanup() {
-        companyRepository.deleteAll()
-    }
-
-    companion object {
-        @JvmStatic
-        fun roleAccessScenarios(): Stream<Arguments> {
-            return Stream.of(
-                // GET all companies - any role can access
-                Arguments.of("/companies", "GET", Roles.ADMIN, 200),
-                Arguments.of("/companies", "GET", Roles.PLANNER, 200),
-                Arguments.of("/companies", "GET", Roles.CHAUFFEUR, 200),
-                Arguments.of("/companies", "GET", "unauthorized_role", 403),
-
-                // GET company by id - any role can access
-                Arguments.of("/companies/{id}", "GET", Roles.ADMIN, 200),
-                Arguments.of("/companies/{id}", "GET", Roles.PLANNER, 200),
-                Arguments.of("/companies/{id}", "GET", Roles.CHAUFFEUR, 200),
-                Arguments.of("/companies/{id}", "GET", "unauthorized_role", 403),
-
-                // POST (create) company - only admin and planner can access
-                Arguments.of("/companies", "POST", Roles.ADMIN, 201),
-                Arguments.of("/companies", "POST", Roles.PLANNER, 201),
-                Arguments.of("/companies", "POST", Roles.CHAUFFEUR, 403),
-                Arguments.of("/companies", "POST", "unauthorized_role", 403),
-
-                // PUT (update) company - only admin and planner can access
-                Arguments.of("/companies/{id}", "PUT", Roles.ADMIN, 200),
-                Arguments.of("/companies/{id}", "PUT", Roles.PLANNER, 200),
-                Arguments.of("/companies/{id}", "PUT", Roles.CHAUFFEUR, 403),
-                Arguments.of("/companies/{id}", "PUT", "unauthorized_role", 403),
-
-                // DELETE company - only admin and planner can access
-                Arguments.of("/companies/{id}", "DELETE", Roles.ADMIN, 204),
-                Arguments.of("/companies/{id}", "DELETE", Roles.PLANNER, 204),
-                Arguments.of("/companies/{id}", "DELETE", Roles.CHAUFFEUR, 403),
-                Arguments.of("/companies/{id}", "DELETE", "unauthorized_role", 403)
+      "PUT" -> put(resolvedEndpoint)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(
+          objectMapper.writeValueAsString(
+            testCompany.copy(
+              name = "Updated Test Company"
             )
-        }
+          )
+        )
+
+      "DELETE" -> delete(resolvedEndpoint)
+      else -> throw IllegalArgumentException("Unsupported method: $method")
     }
 
-    @ParameterizedTest(name = "{1} {0} with role {2} should return {3}")
-    @MethodSource("roleAccessScenarios")
-    fun `should verify role-based access control for company endpoints`(
-        endpoint: String,
-        method: String,
-        role: String,
-        expectedStatus: Int
-    ) {
-        // Replace {id} placeholder with actual ID
-        val resolvedEndpoint = endpoint.replace("{id}", testCompanyId.toString())
-
-        val request = when (method) {
-            "GET" -> get(resolvedEndpoint)
-            "POST" -> post(resolvedEndpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(CompanyRequest(
-                    chamberOfCommerceId = "87654321",
-                    vihbId = "654321VIHB",
-                    name = "New Test Company",
-                    processorId = "12345",
-                    address = AddressRequest(
-                        streetName = "Test Street",
-                        buildingNumber = "123",
-                        postalCode = "1234 AB",
-                        city = "Test City"
-                    )
-                )))
-            "PUT" -> put(resolvedEndpoint)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testCompany.copy(
-                    name = "Updated Test Company"
-                )))
-            "DELETE" -> delete(resolvedEndpoint)
-            else -> throw IllegalArgumentException("Unsupported method: $method")
-        }
-
-        mockMvc.perform(
-            request.with(
-                jwt().authorities(SimpleGrantedAuthority(role))
-            )
-        ).andExpect(status().`is`(expectedStatus))
-    }
+    mockMvc.perform(
+      request.with(
+        jwt().authorities(SimpleGrantedAuthority(role))
+      )
+    ).andExpect(status().`is`(expectedStatus))
+  }
 }

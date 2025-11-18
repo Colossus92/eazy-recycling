@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CompanyForm } from '../CompanyForm';
 import { Company } from '@/api/services/companyService';
+import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
 
 // Mock the ErrorDialog component
 vi.mock('@/components/ui/dialog/ErrorDialog.tsx', () => ({
@@ -33,6 +34,7 @@ const mockCompanies: Company[] = [
     vihbId: '123456VIHB',
     updatedAt: new Date().toISOString(),
     branches: [],
+    roles: [CompleteCompanyViewRolesEnum.Processor],
   },
   {
     id: 'comp-2',
@@ -49,6 +51,7 @@ const mockCompanies: Company[] = [
     vihbId: '654321VIHB',
     updatedAt: new Date().toISOString(),
     branches: [],
+    roles: [CompleteCompanyViewRolesEnum.Carrier],
   },
 ];
 

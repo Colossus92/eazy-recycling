@@ -61,6 +61,12 @@ export interface CompanyDto {
     'address': AddressDto;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof CompanyDto
+     */
+    'roles': Array<CompanyDtoRolesEnum>;
+    /**
+     * 
      * @type {string}
      * @memberof CompanyDto
      */
@@ -72,4 +78,12 @@ export interface CompanyDto {
      */
     'updatedAt': string;
 }
+
+export const CompanyDtoRolesEnum = {
+    Carrier: 'CARRIER',
+    Processor: 'PROCESSOR'
+} as const;
+
+export type CompanyDtoRolesEnum = typeof CompanyDtoRolesEnum[keyof typeof CompanyDtoRolesEnum];
+
 

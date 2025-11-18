@@ -32,6 +32,7 @@ class CompanyMapper {
         city = City(dto.address.city),
         country = dto.address.country
       ),
+      roles = dto.roles,
       deletedAt = dto.deletedAt?.toKotlinInstant(),
     )
   }
@@ -51,6 +52,7 @@ class CompanyMapper {
         city = domain.address.city.value,
         country = domain.address.country
       ),
+      roles = domain.roles,
       deletedAt = domain.deletedAt?.toJavaInstant()
     )
   }

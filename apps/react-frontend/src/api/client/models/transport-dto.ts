@@ -27,7 +27,7 @@ import type { ProfileDto } from './profile-dto';
 import type { TransportGoodsDto } from './transport-goods-dto';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Truck } from './truck';
+import type { TruckDto } from './truck-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WasteContainerDto } from './waste-container-dto';
@@ -106,10 +106,10 @@ export interface TransportDto {
     'wasteContainer'?: WasteContainerDto;
     /**
      * 
-     * @type {Truck}
+     * @type {TruckDto}
      * @memberof TransportDto
      */
-    'truck'?: Truck;
+    'truck'?: TruckDto;
     /**
      * 
      * @type {ProfileDto}

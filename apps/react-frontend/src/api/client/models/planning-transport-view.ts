@@ -18,7 +18,7 @@
 import type { ProfileDto } from './profile-dto';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Truck } from './truck';
+import type { TruckDto } from './truck-dto';
 
 /**
  * 
@@ -46,10 +46,10 @@ export interface PlanningTransportView {
     'id': string;
     /**
      * 
-     * @type {Truck}
+     * @type {TruckDto}
      * @memberof PlanningTransportView
      */
-    'truck'?: Truck;
+    'truck'?: TruckDto;
     /**
      * 
      * @type {string}

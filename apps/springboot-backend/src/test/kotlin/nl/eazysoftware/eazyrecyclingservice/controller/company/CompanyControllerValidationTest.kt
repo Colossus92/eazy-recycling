@@ -39,7 +39,8 @@ class CompanyControllerValidationTest {
                 "1",
                 "1234 AB",
                 "Amsterdam"
-            )
+            ),
+          emptyList()
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -59,7 +60,8 @@ class CompanyControllerValidationTest {
                 "1",
                 "1234 AB",
                 "Amsterdam"
-            )
+            ),
+          emptyList()
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)
@@ -77,6 +79,7 @@ class CompanyControllerValidationTest {
           null,
             "Company",
             addressRequest,
+          emptyList()
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -91,6 +94,7 @@ class CompanyControllerValidationTest {
           null,
             "Company",
             addressRequest,
+          emptyList(),
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)
@@ -113,7 +117,8 @@ class CompanyControllerValidationTest {
                 "1",
                 validPostalCode,
                 "Amsterdam"
-            )
+            ),
+          emptyList()
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -133,7 +138,8 @@ class CompanyControllerValidationTest {
                 "1",
                 invalidPostalCode,
                 "Amsterdam"
-            )
+            ),
+          emptyList()
         )
         val violations = validator.validate(company)
 
@@ -152,6 +158,7 @@ class CompanyControllerValidationTest {
             validProcessorId,
             "Company",
             addressRequest,
+          emptyList(),
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -166,6 +173,7 @@ class CompanyControllerValidationTest {
             invalidProcessorId,
             "Company",
             addressRequest,
+          emptyList(),
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)

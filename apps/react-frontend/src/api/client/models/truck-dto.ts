@@ -13,48 +13,51 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CompanyDto } from './company-dto';
 
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface TruckDto
  */
-export interface LocalTime {
+export interface TruckDto {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckDto
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'licensePlate': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TruckDto
      */
-    'value$kotlinx_datetime': string;
+    'brand'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof TruckDto
      */
-    'nanosecond': number;
+    'description'?: string;
+    /**
+     * 
+     * @type {CompanyDto}
+     * @memberof TruckDto
+     */
+    'carrierParty'?: CompanyDto;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckDto
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckDto
+     */
+    'displayName': string;
 }
 

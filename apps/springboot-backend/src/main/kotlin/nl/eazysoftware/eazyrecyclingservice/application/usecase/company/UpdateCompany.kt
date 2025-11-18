@@ -43,7 +43,8 @@ class UpdateCompanyService(
       chamberOfCommerceId = cmd.chamberOfCommerceId,
       vihbNumber = cmd.vihbNumber,
       processorId = cmd.processorId,
-      address = cmd.address
+      address = cmd.address,
+      roles = cmd.roles,
     )
 
     companies.update(updatedCompany)
