@@ -48,56 +48,6 @@ export const WaybillDownloadSection = ({
     setTimeout(() => setIsDownloading(false), 1000);
   };
 
-  const renderDownloadContent = () => {
-    if (isLoading) {
-      return (
-        <span className={'text-body-2 text-color-text-secondary'}>
-          Laden...
-        </span>
-      );
-    }
-
-    if (error) {
-      return <span className={'text-body-2 text-red-600'}>{error}</span>;
-    }
-
-    if (!waybillInfo) {
-      return (
-        <span className={'text-body-2 text-color-text-secondary'}>
-          Geen document beschikbaar
-        </span>
-      );
-    }
-
-    return (
-      <button
-        onClick={handleDirectDownload}
-        disabled={isDownloading}
-        className="flex items-center self-stretch flex-1 gap-2 py-2 pl-2 pr-3 border border-solid border-color-border-primary rounded-radius-md bg-color-surface-primary hover:bg-color-surface-secondary disabled:cursor-not-allowed transition-colors"
-        data-testid="waybill-download-button"
-      >
-        <div className="flex size-10 justify-center items-center border border-solid border-color-border-primary rounded-radius-sm bg-color-surface-secondary">
-          <FilePdf className={'size-[25px] text-color-text-secondary'} />
-        </div>
-        <div className="flex flex-col items-start gap-1 flex-1">
-          <div className="flex items-center justify-between self-stretch">
-            <span className={'text-subtitle-2 text-color-text-primary'}>
-              Begeleidingsbrief
-            </span>
-            <span className={'text-body-2 text-color-text-secondary'}>
-              {waybillInfo.timestamp}
-            </span>
-          </div>
-          <div className="flex items-center justify-between self-stretch">
-            <span className={'text-body-2 text-color-text-secondary'}>
-              {isDownloading ? 'Downloaden...' : `${waybillInfo.fileSizeKb} KB`}
-            </span>
-          </div>
-        </div>
-      </button>
-    );
-  };
-
   return (
         isLoading ?
       <span className={'text-body-2 text-color-text-secondary'}>
