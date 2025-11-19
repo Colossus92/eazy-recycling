@@ -34,6 +34,8 @@ class WeightTicketController(
   private val copyWeightTicket: CopyWeightTicket,
   private val completeWeightTicket: CompleteWeightTicket,
 ) {
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
@@ -41,11 +43,13 @@ class WeightTicketController(
     return CreateWeightTicketResponse(id = result.id.number)
   }
 
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @GetMapping
   fun getWeightTickets(): List<WeightTicketListView> {
     return weightTicketService.getAllWeightTickets()
   }
 
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @GetMapping("/{weightTicketId}")
   fun getWeightTicketByNumber(
     @PathVariable
@@ -54,6 +58,7 @@ class WeightTicketController(
     return weightTicketService.getWeightTicketByNumber(WeightTicketId(weightTicketId))
   }
 
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @PutMapping("/{weightTicketId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun update(
@@ -134,6 +139,12 @@ class WeightTicketController(
       newWeightTicketId = newTicketId.number,
     )
   }
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @GetMapping("/pdf-url")
+  fun getWeightTicketPdfUrlByTransport(@RequestParam transportId: UUID): WeightTicketPdfUrlResponse? {
+    val pdfUrl = weightTicketService.getWeightTicketPdfUrlByTransport(transportId)
+    return pdfUrl?.let { WeightTicketPdfUrlResponse(pdfUrl = it.pdfUrl) }
+  }
 }
 
 data class SplitWeightTicketRequest(
@@ -154,6 +165,10 @@ data class SplitWeightTicketResponse(
 data class CopyWeightTicketResponse(
   val originalWeightTicketId: Long,
   val newWeightTicketId: Long,
+)
+
+data class WeightTicketPdfUrlResponse(
+  val pdfUrl: String
 )
 
 data class CancelWeightTicketRequest(
