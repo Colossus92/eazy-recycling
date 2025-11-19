@@ -14,6 +14,9 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
 import { useSearchParams } from 'react-router-dom';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
+import { transportService } from '@/api/services/transportService';
+import { toastService } from '@/components/ui/toast/toastService';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const PlanningPage = () => {
   const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
@@ -23,6 +26,7 @@ export const PlanningPage = () => {
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
   const [isTransportDetailsDrawerOpen, setIsTransportDetailsDrawerOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryClient = useQueryClient();
   
   // Handle URL params for opening transport details drawer from weight ticket
   useEffect(() => {
@@ -45,6 +49,29 @@ export const PlanningPage = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  const handleDeleteTransport = async () => {
+    if (!selectedTransportId) return;
+    
+    try {
+      await transportService.deleteTransport(selectedTransportId);
+      toastService.success('Transport verwijderd');
+      await queryClient.invalidateQueries({ queryKey: ['planning'] });
+      setIsTransportDetailsDrawerOpen(false);
+      setSelectedTransportId(undefined);
+    } catch (error) {
+      console.error('Error deleting transport:', error);
+      toastService.error('Fout bij het verwijderen van transport');
+    }
+  };
+
+  const handleEditTransport = () => {
+    if (!selectedTransportId) return;
+    
+    // Open the waste transport form for editing
+    setIsWasteTransportFormOpen(true);
+  };
+  
   return (
     <>
       <ContentContainer title={'Planning'}>
@@ -110,6 +137,8 @@ export const PlanningPage = () => {
             }
           }}
           transportId={selectedTransportId}
+          onDelete={handleDeleteTransport}
+          onEdit={handleEditTransport}
         />
       )}
     </>
