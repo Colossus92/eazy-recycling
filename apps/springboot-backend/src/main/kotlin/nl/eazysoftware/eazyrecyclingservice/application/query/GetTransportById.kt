@@ -160,6 +160,7 @@ class GetTransportByIdService(
       goodsItem = wasteTransport.goods.map { mapGoodsItem(it) },
       consigneeParty = mapCompany(wasteStream.deliveryLocation.processorPartyId),
       pickupParty = mapCompany(wasteStream.pickupParty),
+      weightTicketId = wasteTransport.weightTicketId?.number,
     )
   }
 
