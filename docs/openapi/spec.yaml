@@ -1024,6 +1024,25 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DeclareFirstReceivalsResponse"
+  /weight-tickets/pdf-url:
+    get:
+      tags:
+      - weight-ticket-controller
+      operationId: getWeightTicketPdfUrlByTransport
+      parameters:
+      - name: transportId
+        in: query
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WeightTicketPdfUrlResponse"
   /waste-streams:
     get:
       tags:
@@ -2571,6 +2590,8 @@ components:
           format: date-time
         cancellationReason:
           type: string
+        pdfUrl:
+          type: string
       required:
       - consignorParty
       - createdAt
@@ -3050,6 +3071,8 @@ components:
           $ref: "#/components/schemas/LocalDateTime"
         weightedAt:
           $ref: "#/components/schemas/LocalDateTime"
+        pdfUrl:
+          type: string
       required:
       - consignorParty
       - createdAt
@@ -3070,6 +3093,13 @@ components:
       - wasteStreamNumber
       - weightUnit
       - weightValue
+    WeightTicketPdfUrlResponse:
+      type: object
+      properties:
+        pdfUrl:
+          type: string
+      required:
+      - pdfUrl
     WasteStreamListView:
       type: object
       properties:
@@ -3543,12 +3573,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -3565,11 +3595,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -3595,9 +3625,9 @@ components:
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
   securitySchemes:
     bearerAuth:
