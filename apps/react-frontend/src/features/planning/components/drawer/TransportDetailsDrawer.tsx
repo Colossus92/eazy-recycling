@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { formatInstantInCET } from '@/utils/dateUtils';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
 import {
@@ -14,6 +15,7 @@ import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
 import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
 import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
 import PhRecycleLight from '@/assets/icons/PhRecycleLight.svg?react';
@@ -38,6 +40,8 @@ export const TransportDetailsDrawer = ({
   onEdit,
   onDelete,
 }: TransportDetailsDrawerProps) => {
+  const navigate = useNavigate();
+  
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],
     queryFn: async () => {
@@ -146,6 +150,24 @@ export const TransportDetailsDrawer = ({
                     : ''}
                 </span>
               </div>
+              {data.weightTicketId && (
+                <div 
+                  className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
+                  onClick={() => navigate(`/weight-tickets?weightTicketId=${data.weightTicketId}`)}
+                >
+                  <div className="flex items-center flex-1 gap-2">
+                    <Scale
+                      className={'w-5 h-5 text-color-text-secondary'}
+                    />
+                    <span className={'text-body-2 text-color-text-secondary'}>
+                      Weegbon
+                    </span>
+                  </div>
+                  <span className={'text-body-2 truncate text-color-brand-primary underline'}>
+                    {data.weightTicketId}
+                  </span>
+                </div>
+              )}
               {data.transportHours && (
                 <div className={'flex items-center gap-2 self-stretch'}>
                   <div className="flex items-center flex-1 gap-2">

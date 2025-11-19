@@ -22,7 +22,7 @@ import { useState, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { toastService } from '@/components/ui/toast/toastService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 
 type Column = {
@@ -40,6 +40,34 @@ export const WeightTicketManagement = () => {
   const { read, form, deletion, split, copy, createTransport, error } = useWeightTicketCrud();
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Handle URL params for opening weight ticket form from transport details
+  useEffect(() => {
+    const weightTicketId = searchParams.get('weightTicketId');
+    
+    if (weightTicketId) {
+      const weightTicketNumber = parseInt(weightTicketId, 10);
+      if (!isNaN(weightTicketNumber)) {
+        // Find the weight ticket in the list
+        const weightTicket = read.items.find(item => item.id === weightTicketNumber);
+        if (weightTicket) {
+          form.openForEdit(weightTicket);
+        } else {
+          // If not in list yet, create a minimal object to trigger the form
+          // The form will fetch the full details using the ID
+          form.openForEdit({ 
+            id: weightTicketNumber, 
+            consignorPartyName: '', 
+            status: 'DRAFT' 
+          } as WeightTicketListView);
+        }
+      }
+      
+      // Clear the URL params after opening
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, read.items, form]);
 
   // Handle opening the dual form after split or copy
   useEffect(() => {
