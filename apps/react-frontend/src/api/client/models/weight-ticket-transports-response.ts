@@ -13,30 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketTransport } from './weight-ticket-transport';
 
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface WeightTicketTransportsResponse
  */
-export interface SortObject {
+export interface WeightTicketTransportsResponse {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {Array<WeightTicketTransport>}
+     * @memberof WeightTicketTransportsResponse
      */
-    'empty'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'sorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'unsorted'?: boolean;
+    'transports': Array<WeightTicketTransport>;
 }
 

@@ -131,3 +131,5 @@ models/weight-ticket-list-view.ts
 models/weight-ticket-request-consignor-party.ts
 models/weight-ticket-request-pickup-location.ts
 models/weight-ticket-request.ts
+models/weight-ticket-transport.ts
+models/weight-ticket-transports-response.ts

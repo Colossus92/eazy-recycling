@@ -110,3 +110,5 @@ export * from './weight-ticket-list-view';
 export * from './weight-ticket-request';
 export * from './weight-ticket-request-consignor-party';
 export * from './weight-ticket-request-pickup-location';
+export * from './weight-ticket-transport';
+export * from './weight-ticket-transports-response';

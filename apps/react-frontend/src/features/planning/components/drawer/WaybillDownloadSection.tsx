@@ -1,18 +1,13 @@
-import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/api/supabaseClient';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
+import {
+  fetchWaybillInfo,
+  downloadWaybill,
+  WaybillInfo,
+} from '@/api/services/waybillService';
 
 interface WaybillDownloadSectionProps {
   transportId?: string;
-}
-
-interface WaybillInfo {
-  fileName: string;
-  filePath: string;
-  downloadUrl: string;
-  timestamp: string;
-  fileSizeKb: number;
 }
 
 export const WaybillDownloadSection = ({
@@ -24,78 +19,30 @@ export const WaybillDownloadSection = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchWaybillInfo = async () => {
+    const loadWaybillInfo = async () => {
       if (!transportId) return;
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const { data: files, error: listError } = await supabase.storage
-          .from('waybills')
-          .list(`waybills/${transportId}`, {
-            sortBy: { column: 'created_at', order: 'desc' },
-          });
-
-        if (listError) {
-          console.error('Error listing waybill files:', listError);
-          setError('Fout bij het ophalen van waybill bestanden');
-          return;
-        }
-
-        if (!files || files.length === 0) {
-          setWaybillInfo(null);
-          return;
-        }
-
-        const latestFile = files[0];
-        const filePath = `waybills/${transportId}/${latestFile.name}`;
-
-        const { data: signedUrlData, error: urlError } = await supabase.storage
-          .from('waybills')
-          .createSignedUrl(filePath, 3600); // 1 hour expiry
-
-        if (urlError) {
-          console.error('Error creating signed URL:', urlError);
-          setError('Fout bij het genereren van download link');
-          return;
-        }
-
-        setWaybillInfo({
-          timestamp: format(
-            new Date(latestFile.updated_at),
-            'dd-MM-yyyy hh:mm'
-          ),
-          fileSizeKb: latestFile.metadata?.size
-            ? Math.round(latestFile.metadata.size / 1024)
-            : 0,
-          fileName: latestFile.name,
-          filePath,
-          downloadUrl: signedUrlData.signedUrl,
-        });
-      } catch (error) {
-        console.error('Unexpected error fetching waybill info:', error);
-        setError('Onverwachte fout bij het ophalen van waybill informatie');
+        const info = await fetchWaybillInfo(transportId);
+        setWaybillInfo(info);
+      } catch (error: any) {
+        setError(error.message || 'Onverwachte fout bij het ophalen van waybill informatie');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchWaybillInfo();
+    loadWaybillInfo();
   }, [transportId]);
 
   const handleDirectDownload = () => {
-    if (!waybillInfo || isDownloading) return;
+    if (!waybillInfo || isDownloading || !transportId) return;
 
     setIsDownloading(true);
-
-    const link = document.createElement('a');
-    link.href = waybillInfo.downloadUrl;
-    link.download = `waybill-${transportId}-${waybillInfo.fileName}`;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadWaybill(waybillInfo, transportId);
 
     // Reset downloading state after a short delay
     setTimeout(() => setIsDownloading(false), 1000);
