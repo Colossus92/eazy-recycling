@@ -17,26 +17,26 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface CreateWasteTransportFromWeightTicketRequest
  */
-export interface SortObject {
+export interface CreateWasteTransportFromWeightTicketRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {number}
+     * @memberof CreateWasteTransportFromWeightTicketRequest
      */
-    'empty'?: boolean;
+    'weightTicketId': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof CreateWasteTransportFromWeightTicketRequest
      */
-    'unsorted'?: boolean;
+    'pickupDateTime': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof CreateWasteTransportFromWeightTicketRequest
      */
-    'sorted'?: boolean;
+    'deliveryDateTime'?: string;
 }
 

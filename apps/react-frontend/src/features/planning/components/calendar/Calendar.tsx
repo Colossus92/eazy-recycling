@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CalendarToolbar } from '@/features/planning/components/calendar/CalendarToolbar.tsx';
 import { CalendarGrid } from '@/features/planning/components/calendar/CalendarGrid.tsx';
 import { usePlanning } from '@/features/planning/hooks/usePlanning';
@@ -6,11 +6,19 @@ import { PlanningFilterParams } from '@/api/services/planningService.ts';
 
 interface CalendarProps {
   filters: PlanningFilterParams;
+  initialDate?: Date;
 }
 
-export const Calendar = ({ filters }: CalendarProps) => {
-  const [date, setDate] = useState(new Date());
+export const Calendar = ({ filters, initialDate }: CalendarProps) => {
+  const [date, setDate] = useState(initialDate || new Date());
   const { planning, isLoading, error } = usePlanning(date, filters);
+  
+  // Update date when initialDate changes
+  useEffect(() => {
+    if (initialDate) {
+      setDate(initialDate);
+    }
+  }, [initialDate]);
 
   if (error) {
     throw error;

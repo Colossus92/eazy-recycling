@@ -1,6 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
 import jakarta.persistence.EntityNotFoundException
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
@@ -12,7 +15,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 
 interface CreateWasteTransport {
   fun handle(cmd: CreateWasteTransportCommand): CreateWasteTransportResult
@@ -37,8 +42,11 @@ data class CreateWasteTransportCommand(
 )
 
 data class CreateWasteTransportResult(
-  val transportId: TransportId
-)
+  val transportId: TransportId,
+  val pickupDateTime: LocalDateTime,
+  val displayNumber: String,
+) {
+}
 
 @Service
 class CreateWasteTransportService(
@@ -76,7 +84,9 @@ class CreateWasteTransportService(
     pdfGenerationClient.triggerPdfGeneration(savedTransport.transportId.uuid, "empty")
 
     return CreateWasteTransportResult(
-      transportId = savedTransport.transportId
+      transportId = savedTransport.transportId,
+      displayNumber = savedTransport.displayNumber?.value ?: "Onbekend",
+      pickupDateTime = savedTransport.pickupDateTime.toLocalDateTime(TimeZone.of("Europe/Amsterdam")).toJavaLocalDateTime()
     )
   }
 }

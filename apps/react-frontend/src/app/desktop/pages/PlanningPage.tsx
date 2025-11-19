@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar.tsx';
@@ -12,11 +12,37 @@ import { PlanningFilterForm } from '@/features/planning/components/filter/Planni
 import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
+import { useSearchParams } from 'react-router-dom';
 
 export const PlanningPage = () => {
   const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
   const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] = useState(false);
   const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] = useState(false);
+  const [selectedTransportId, setSelectedTransportId] = useState<string | undefined>();
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Handle URL params for opening transport from weight ticket
+  useEffect(() => {
+    const transportId = searchParams.get('transportId');
+    const dateParam = searchParams.get('date');
+    
+    if (transportId) {
+      setSelectedTransportId(transportId);
+      setIsWasteTransportFormOpen(true);
+      
+      // Set calendar date if provided
+      if (dateParam) {
+        const parsedDate = new Date(dateParam);
+        if (!isNaN(parsedDate.getTime())) {
+          setCalendarDate(parsedDate);
+        }
+      }
+      
+      // Clear the URL params after opening
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
   return (
     <>
       <ContentContainer title={'Planning'}>
@@ -43,7 +69,7 @@ export const PlanningPage = () => {
           </ContentTitleBar>
           <div className="flex-1 flex flex-col items-start self-stretch h-full">
             <ErrorBoundary fallbackRender={fallbackRender}>
-              <Calendar filters={filters} />
+              <Calendar filters={filters} initialDate={calendarDate} />
             </ErrorBoundary>
           </div>
         </div>
@@ -54,7 +80,13 @@ export const PlanningPage = () => {
       />
       <WasteStreamTransportForm
         isOpen={isWasteTransportFormOpen}
-        setIsOpen={setIsWasteTransportFormOpen}
+        setIsOpen={(value) => {
+          setIsWasteTransportFormOpen(value);
+          if (!value) {
+            setSelectedTransportId(undefined);
+          }
+        }}
+        transportId={selectedTransportId}
       />
       <Drawer
         title={'Transport planning'}

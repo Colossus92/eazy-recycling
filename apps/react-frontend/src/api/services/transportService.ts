@@ -6,6 +6,7 @@ import {
   TransportFinishedRequest,
   WasteTransportControllerApi,
   WasteTransportRequest,
+  CreateWasteTransportFromWeightTicketRequest,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
 import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
@@ -264,4 +265,21 @@ export const transportDtoToWasteTransportFormValues = (
     processingMethodCode: goods?.processingMethodCode || '',
   };
   return formValues;
+};
+
+/**
+ * Creates a waste transport from a weight ticket
+ */
+export const createWasteTransportFromWeightTicket = async (
+  weightTicketId: number,
+  pickupDateTime: string,
+  deliveryDateTime?: string
+) => {
+  const request: CreateWasteTransportFromWeightTicketRequest = {
+    weightTicketId,
+    pickupDateTime,
+    deliveryDateTime,
+  };
+  const response = await wasteTransportApi.createWasteTransportFromWeightTicket(request);
+  return response.data;
 };

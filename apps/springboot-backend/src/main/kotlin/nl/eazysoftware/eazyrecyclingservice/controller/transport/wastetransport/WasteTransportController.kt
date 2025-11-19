@@ -49,14 +49,18 @@ class WasteTransportController(
   @ResponseStatus(HttpStatus.CREATED)
   fun createWasteTransportFromWeightTicket(
     @Valid @RequestBody request: CreateWasteTransportFromWeightTicketRequest
-  ): CreateWasteTransportResponse {
+  ): CreateFromWeightTicketResponse {
     val command = CreateWasteTransportFromWeightTicketCommand(
       weightTicketId = WeightTicketId(request.weightTicketId),
       pickupDateTime = request.pickupDateTime,
       deliveryDateTime = request.deliveryDateTime
     )
     val result = createWasteTransportFromWeightTicket.execute(command)
-    return CreateWasteTransportResponse(transportId = result.transportId.uuid)
+    return CreateFromWeightTicketResponse(
+      transportId = result.transportId.uuid,
+      displayNumber = result.displayNumber,
+      pickupDateTime = result.pickupDateTime,
+    )
   }
 
   @PreAuthorize(HAS_ANY_ROLE)
@@ -110,6 +114,12 @@ class WasteTransportController(
 
 data class CreateWasteTransportResponse(
   val transportId: UUID
+)
+
+data class CreateFromWeightTicketResponse(
+  val transportId: UUID,
+  val displayNumber: String,
+  val pickupDateTime: LocalDateTime,
 )
 
 data class UpdateWasteTransportResponse(

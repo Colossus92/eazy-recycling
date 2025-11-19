@@ -1,6 +1,7 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import CheckCircleOutline from '@/assets/icons/CheckCircleOutline.svg?react';
 import IcBaselineContentCopy from '@/assets/icons/IcBaselineContentCopy.svg?react';
+import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
 import { WeightTicketDetailView } from '@/api/client/models';
 
@@ -10,6 +11,7 @@ interface WeightTicketFormActionMenuProps {
     onSplit?: (id: number) => void;
     onCopy?: (id: number) => void;
     onComplete?: (id: number) => void;
+    onCreateTransport?: (id: number) => void;
 }
 
 export const WeightTicketFormActionMenu = ({
@@ -18,6 +20,7 @@ export const WeightTicketFormActionMenu = ({
     onSplit,
     onCopy,
     onComplete,
+    onCreateTransport,
 }: WeightTicketFormActionMenuProps) => {
     const actions = [];
     if (weightTicket.status === 'DRAFT' && onSplit) {
@@ -35,6 +38,15 @@ export const WeightTicketFormActionMenu = ({
                 label: 'Kopiëren',
                 icon: IcBaselineContentCopy,
                 onClick: () => onCopy(weightTicket.id),
+            }
+        );
+    }
+    if (onCreateTransport) {
+        actions.push(
+            {
+                label: 'Transport aanmaken',
+                icon: TruckTrailer,
+                onClick: () => onCreateTransport(weightTicket.id),
             }
         );
     }

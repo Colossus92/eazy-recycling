@@ -118,7 +118,7 @@ export interface TransportDetailView {
      * @type {string}
      * @memberof TransportDetailView
      */
-    'note': string;
+    'note'?: string;
     /**
      * 
      * @type {number}

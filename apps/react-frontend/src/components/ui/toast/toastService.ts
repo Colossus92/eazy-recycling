@@ -1,23 +1,24 @@
-import { toast } from 'react-toastify';
+import { toast, ToastContent } from 'react-toastify';
+import { ReactNode } from 'react';
 
 export const toastService = {
-  success: (message: string) => {
-    toast.success(message, {
+  success: (message: string | ReactNode) => {
+    toast.success(message as ToastContent, {
       className:
         'bg-color-status-success-light border-l-4 border-color-status-success-dark',
       progressClassName: 'bg-color-status-success-primary',
     });
   },
 
-  error: (message: string) => {
-    toast.error(message, {
+  error: (message: string | ReactNode) => {
+    toast.error(message as ToastContent, {
       className: 'bg-color-status-error-light text-color-text-secondary',
       progressClassName: 'bg-color-status-error-primary',
     });
   },
 
-  warn: (message: string) => {
-    toast.warn(message, {
+  warn: (message: string | ReactNode) => {
+    toast.warn(message as ToastContent, {
       className: 'bg-color-status-warning-light text-color-text-secondary',
       progressClassName: 'bg-color-status-warning-primary',
     });

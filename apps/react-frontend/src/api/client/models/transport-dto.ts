@@ -31,6 +31,9 @@ import type { TruckDto } from './truck-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WasteContainerDto } from './waste-container-dto';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketDto } from './weight-ticket-dto';
 
 /**
  * 
@@ -121,7 +124,7 @@ export interface TransportDto {
      * @type {string}
      * @memberof TransportDto
      */
-    'note': string;
+    'note'?: string;
     /**
      * 
      * @type {Array<TransportGoodsDto>}
@@ -152,6 +155,12 @@ export interface TransportDto {
      * @memberof TransportDto
      */
     'sequenceNumber': number;
+    /**
+     * 
+     * @type {WeightTicketDto}
+     * @memberof TransportDto
+     */
+    'weightTicket'?: WeightTicketDto;
     /**
      * 
      * @type {string}

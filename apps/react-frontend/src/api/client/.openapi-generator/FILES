@@ -41,6 +41,7 @@ models/create-container-transport-response.ts
 models/create-signature-request.ts
 models/create-user-request.ts
 models/create-waste-stream-response.ts
+models/create-waste-transport-from-weight-ticket-request.ts
 models/create-waste-transport-response.ts
 models/create-weight-ticket-response.ts
 models/declare-first-receivals-request.ts
@@ -121,6 +122,8 @@ models/waste-type-view.ts
 models/weight-request.ts
 models/weight-ticket-detail-view-consignor-party.ts
 models/weight-ticket-detail-view.ts
+models/weight-ticket-dto.ts
+models/weight-ticket-line-dto.ts
 models/weight-ticket-line-request.ts
 models/weight-ticket-line-view.ts
 models/weight-ticket-list-view.ts

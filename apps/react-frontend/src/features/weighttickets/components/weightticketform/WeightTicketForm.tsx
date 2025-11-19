@@ -20,6 +20,11 @@ import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { Tab } from '@/components/ui/tab/Tab';
 import { RadioFormField } from '@/components/ui/form/RadioFormField';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
+import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
+import { createWasteTransportFromWeightTicket, transportService } from '@/api/services/transportService';
+import { toastService } from '@/components/ui/toast/toastService';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -47,6 +52,9 @@ export const WeightTicketForm = ({
   const { data, isLoading, formContext, mutation, resetForm } =
     useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
+  const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | undefined>();
+  const navigate = useNavigate();
 
   const handleClose = (value: boolean) => {
     if (!value) {
@@ -58,6 +66,52 @@ export const WeightTicketForm = ({
   const handleCancel = () => {
     resetForm();
     setIsOpen(false);
+  };
+
+  const handleCreateTransport = (id: number) => {
+    setSelectedWeightTicketId(id);
+    setIsTransportFormOpen(true);
+  };
+
+  const handleTransportCreation = async (
+    weightTicketId: number,
+    pickupDateTime: string,
+    deliveryDateTime?: string
+  ) => {
+    try {
+      const response = await createWasteTransportFromWeightTicket(
+        weightTicketId,
+        pickupDateTime,
+        deliveryDateTime
+      );
+      
+      // Fetch transport details to get the pickup date
+      const transportDetails = await transportService.getTransportById(response.transportId);
+      
+      // Format the date for URL params
+      const pickupDate = new Date(transportDetails.pickupDateTime);
+      const dateParam = format(pickupDate, 'yyyy-MM-dd');
+      
+      // Create clickable toast with link to planning
+      const toastContent = (
+        <div className="flex flex-col gap-1">
+          <span>Transport aangemaakt: {response.transportId}</span>
+          <button
+            onClick={() => {
+              navigate(`/?transportId=${response.transportId}&date=${dateParam}`);
+            }}
+            className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
+          >
+            Bekijk in planning →
+          </button>
+        </div>
+      );
+      
+      toastService.success(toastContent);
+    } catch (error) {
+      toastService.error('Fout bij aanmaken transport');
+      throw error;
+    }
   };
 
   useEffect(() => {
@@ -157,6 +211,7 @@ export const WeightTicketForm = ({
                   onSplit={onSplit}
                   onCopy={onCopy}
                   onComplete={onComplete}
+                  onCreateTransport={handleCreateTransport}
                 />
               )
             }
@@ -329,6 +384,12 @@ export const WeightTicketForm = ({
       <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[720px]">
         {formContent}
       </FormDialog>
+      <TransportFromWeightTicketForm
+        isOpen={isTransportFormOpen}
+        setIsOpen={setIsTransportFormOpen}
+        weightTicketId={selectedWeightTicketId}
+        onCreateTransport={handleTransportCreation}
+      />
     </ErrorBoundary>
   );
 };
