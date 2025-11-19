@@ -216,6 +216,7 @@ create table if not exists weight_tickets (
                                  updated_at timestamp(6),
                                  weighted_at timestamp(6),
                                  cancellation_reason text,
+                                 pdf_url text,
                                  primary key (id)
 );
 
