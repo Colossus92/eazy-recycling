@@ -1,12 +1,15 @@
 import { toast, ToastContent } from 'react-toastify';
 import { ReactNode } from 'react';
 
+const position = 'top-center';
+
 export const toastService = {
   success: (message: string | ReactNode) => {
     toast.success(message as ToastContent, {
       className:
         'bg-color-status-success-light border-l-4 border-color-status-success-dark',
       progressClassName: 'bg-color-status-success-primary',
+      position,
     });
   },
 
@@ -14,6 +17,7 @@ export const toastService = {
     toast.error(message as ToastContent, {
       className: 'bg-color-status-error-light text-color-text-secondary',
       progressClassName: 'bg-color-status-error-primary',
+      position,
     });
   },
 
@@ -21,6 +25,7 @@ export const toastService = {
     toast.warn(message as ToastContent, {
       className: 'bg-color-status-warning-light text-color-text-secondary',
       progressClassName: 'bg-color-status-warning-primary',
+      position,
     });
   },
 };
