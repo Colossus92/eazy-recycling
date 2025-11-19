@@ -17,44 +17,26 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface CreateFromWeightTicketResponse
  */
-export interface LocalTime {
+export interface CreateFromWeightTicketResponse {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof CreateFromWeightTicketResponse
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
+    'transportId': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof CreateFromWeightTicketResponse
      */
-    'value$kotlinx_datetime': string;
+    'displayNumber': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateFromWeightTicketResponse
+     */
+    'pickupDateTime': string;
 }
 

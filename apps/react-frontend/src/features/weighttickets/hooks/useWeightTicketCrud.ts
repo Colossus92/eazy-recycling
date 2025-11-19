@@ -1,5 +1,6 @@
-import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse, CopyWeightTicketResponse } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse, CopyWeightTicketResponse, CreateFromWeightTicketResponse } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
+import { createWasteTransportFromWeightTicket } from '@/api/services/transportService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { WeightTicketFilterFormValues } from '../components/WeightTicketFilterForm';
@@ -27,6 +28,8 @@ export function useWeightTicketCrud() {
   const [splitResponse, setSplitResponse] = useState<SplitWeightTicketResponse | undefined>(undefined);
   const [itemToCopy, setItemToCopy] = useState<number | undefined>(undefined);
   const [copyResponse, setCopyResponse] = useState<CopyWeightTicketResponse | undefined>(undefined);
+  const [itemToCreateTransport, setItemToCreateTransport] = useState<number | undefined>(undefined);
+  const [createTransportResponse, setCreateTransportResponse] = useState<CreateFromWeightTicketResponse | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
     isDraft: false,
@@ -207,6 +210,35 @@ export function useWeightTicketCrud() {
     });
   };
 
+  const createTransport = async (
+    weightTicketId: number,
+    weightTicketData: WeightTicketRequest,
+    pickupDateTime: string,
+    deliveryDateTime?: string
+  ): Promise<void> => {
+    try {
+      if (itemToEdit?.status === 'DRAFT') {
+        // First update the weight ticket to ensure it reflects the current form state
+        await update(weightTicketId, weightTicketData);
+      }
+      
+      // Then create the transport
+      const createResponse = await createWasteTransportFromWeightTicket(
+        weightTicketId,
+        pickupDateTime,
+        deliveryDateTime
+      );
+    
+      // Store response for the component to handle toast
+      setCreateTransportResponse(createResponse);
+      setItemToCreateTransport(undefined);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het aanmaken van transport';
+      setErrorMessage(message);
+      throw error;
+    }
+  };
+
   return {
     read: {
       items: displayedWeightTickets,
@@ -276,6 +308,14 @@ export function useWeightTicketCrud() {
       confirm: copy,
       cancel: () => setItemToCopy(undefined),
       clearResponse: () => setCopyResponse(undefined),
+    },
+    createTransport: {
+      item: itemToCreateTransport,
+      response: createTransportResponse,
+      initiate: setItemToCreateTransport,
+      confirm: createTransport,
+      cancel: () => setItemToCreateTransport(undefined),
+      clearResponse: () => setCreateTransportResponse(undefined),
     },
     error: {
       message: errorMessage,

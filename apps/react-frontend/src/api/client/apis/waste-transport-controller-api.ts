@@ -24,6 +24,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { CreateFromWeightTicketResponse } from '../models';
+// @ts-ignore
 import type { CreateWasteTransportFromWeightTicketRequest } from '../models';
 // @ts-ignore
 import type { CreateWasteTransportResponse } from '../models';
@@ -178,7 +180,7 @@ export const WasteTransportControllerApiFp = function(configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest: CreateWasteTransportFromWeightTicketRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateWasteTransportResponse>> {
+        async createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest: CreateWasteTransportFromWeightTicketRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateFromWeightTicketResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['WasteTransportControllerApi.createWasteTransportFromWeightTicket']?.[index]?.url;
@@ -221,7 +223,7 @@ export const WasteTransportControllerApiFactory = function (configuration?: Conf
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest: CreateWasteTransportFromWeightTicketRequest, options?: any): AxiosPromise<CreateWasteTransportResponse> {
+        createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest: CreateWasteTransportFromWeightTicketRequest, options?: any): AxiosPromise<CreateFromWeightTicketResponse> {
             return localVarFp.createWasteTransportFromWeightTicket(createWasteTransportFromWeightTicketRequest, options).then((request) => request(axios, basePath));
         },
         /**

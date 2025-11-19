@@ -21,6 +21,9 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { useState, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
+import { toastService } from '@/components/ui/toast/toastService';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 type Column = {
   key: keyof WeightTicketListView;
@@ -34,7 +37,9 @@ export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDualFormOpen, setIsDualFormOpen] = useState(false);
-  const { read, form, deletion, split, copy, error } = useWeightTicketCrud();
+  const { read, form, deletion, split, copy, createTransport, error } = useWeightTicketCrud();
+
+  const navigate = useNavigate();
 
   // Handle opening the dual form after split or copy
   useEffect(() => {
@@ -44,6 +49,32 @@ export const WeightTicketManagement = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [split.response, copy.response]);
+
+  // Handle transport creation response and show toast
+  useEffect(() => {
+    if (createTransport.response) {
+      const pickupDate = new Date(createTransport.response.pickupDateTime);
+      const dateParam = format(pickupDate, 'yyyy-MM-dd');
+      
+      const toastContent = (
+        <div className="flex flex-col gap-1">
+          <span>Transport aangemaakt: {createTransport.response.displayNumber}</span>
+          <button
+            onClick={() => {
+              navigate(`/?transportId=${createTransport.response!.transportId}&date=${dateParam}`);
+            }}
+            className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
+          >
+            Bekijk in planning →
+          </button>
+        </div>
+      );
+      
+      toastService.success(toastContent);
+      createTransport.clearResponse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createTransport.response]);
 
   const columns: Column[] = [
     { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
@@ -170,6 +201,7 @@ export const WeightTicketManagement = () => {
           onComplete={form.complete}
           onSplit={split.initiate}
           onCopy={copy.confirm}
+          onCreateTransport={createTransport.confirm}
         />
       ) : split.response ? (
         <WeightTicketDualForm

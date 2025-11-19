@@ -18,6 +18,7 @@ export * from './consignor-view';
 export * from './container-transport-request';
 export * from './copy-weight-ticket-response';
 export * from './create-container-transport-response';
+export * from './create-from-weight-ticket-response';
 export * from './create-signature-request';
 export * from './create-user-request';
 export * from './create-waste-stream-response';

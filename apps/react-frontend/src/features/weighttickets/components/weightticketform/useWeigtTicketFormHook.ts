@@ -126,6 +126,7 @@ export function useWeightTicketForm(
     data,
     isLoading,
     resetForm,
+    formValuesToWeightTicketRequest,
   };
 }
 

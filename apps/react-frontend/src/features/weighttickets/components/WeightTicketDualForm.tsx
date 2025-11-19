@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { WeightTicketForm } from './weightticketform/WeightTicketForm';
 
 interface WeightTicketDualFormProps {
-    isOpen: boolean;
-    setIsOpen: (value: boolean) => void;
-    originalWeightTicketId: number;
-    newWeightTicketId: number;
-    onDelete: (id: number) => void;
-    onSplit: (id: number) => void;
-    onClose: () => void;
-    onComplete: () => void;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
+  originalWeightTicketId: number;
+  newWeightTicketId: number;
+  onDelete: (id: number) => void;
+  onSplit?: (id: number) => void;
+  onClose: () => void;
+  onComplete?: (id: number) => void;
 }
 
 export const WeightTicketDualForm = ({

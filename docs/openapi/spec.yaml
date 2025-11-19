@@ -804,7 +804,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/CreateWasteTransportResponse"
+                $ref: "#/components/schemas/CreateFromWeightTicketResponse"
   /transport/container:
     post:
       tags:
@@ -2598,6 +2598,21 @@ components:
       required:
       - pickupDateTime
       - weightTicketId
+    CreateFromWeightTicketResponse:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        pickupDateTime:
+          type: string
+          format: date-time
+      required:
+      - displayNumber
+      - pickupDateTime
+      - transportId
     CreateContainerTransportResponse:
       type: object
       properties:
@@ -2830,14 +2845,14 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -2906,9 +2921,6 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -2917,6 +2929,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -2947,11 +2962,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute

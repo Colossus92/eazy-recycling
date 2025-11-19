@@ -21,10 +21,7 @@ import { Tab } from '@/components/ui/tab/Tab';
 import { RadioFormField } from '@/components/ui/form/RadioFormField';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
-import { createWasteTransportFromWeightTicket, transportService } from '@/api/services/transportService';
-import { toastService } from '@/components/ui/toast/toastService';
-import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
+import { WeightTicketRequest } from '@/api/client';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -35,6 +32,7 @@ interface WeightTicketFormProps {
   onSplit?: (id: number) => void;
   onCopy?: (id: number) => void;
   onComplete?: (id: number) => void;
+  onCreateTransport?: (weightTicketId: number, weightTicketData: WeightTicketRequest, pickupDateTime: string, deliveryDateTime?: string) => Promise<void>;
   noDialog?: boolean;
 }
 
@@ -47,14 +45,14 @@ export const WeightTicketForm = ({
   onSplit,
   onCopy,
   onComplete,
+  onCreateTransport,
   noDialog = false,
 }: WeightTicketFormProps) => {
-  const { data, isLoading, formContext, mutation, resetForm } =
+  const { data, isLoading, formContext, mutation, resetForm, formValuesToWeightTicketRequest } =
     useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
   const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | undefined>();
-  const navigate = useNavigate();
 
   const handleClose = (value: boolean) => {
     if (!value) {
@@ -78,39 +76,18 @@ export const WeightTicketForm = ({
     pickupDateTime: string,
     deliveryDateTime?: string
   ) => {
-    try {
-      const response = await createWasteTransportFromWeightTicket(
-        weightTicketId,
-        pickupDateTime,
-        deliveryDateTime
-      );
+    if (onCreateTransport) {
+      // Trigger form validation
+      const isValid = await formContext.trigger();
+      if (!isValid) {
+        return;
+      }
       
-      // Fetch transport details to get the pickup date
-      const transportDetails = await transportService.getTransportById(response.transportId);
+      // Get current form values and convert to request format
+      const formValues = formContext.getValues();
+      const weightTicketRequest = formValuesToWeightTicketRequest(formValues);
       
-      // Format the date for URL params
-      const pickupDate = new Date(transportDetails.pickupDateTime);
-      const dateParam = format(pickupDate, 'yyyy-MM-dd');
-      
-      // Create clickable toast with link to planning
-      const toastContent = (
-        <div className="flex flex-col gap-1">
-          <span>Transport aangemaakt: {response.transportId}</span>
-          <button
-            onClick={() => {
-              navigate(`/?transportId=${response.transportId}&date=${dateParam}`);
-            }}
-            className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
-          >
-            Bekijk in planning →
-          </button>
-        </div>
-      );
-      
-      toastService.success(toastContent);
-    } catch (error) {
-      toastService.error('Fout bij aanmaken transport');
-      throw error;
+      await onCreateTransport(weightTicketId, weightTicketRequest, pickupDateTime, deliveryDateTime);
     }
   };
 
