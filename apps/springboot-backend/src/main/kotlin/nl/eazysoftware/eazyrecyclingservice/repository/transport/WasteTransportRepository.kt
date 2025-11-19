@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.transport
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.WasteTransport
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
@@ -36,5 +37,11 @@ class WasteTransportRepository(
 
   override fun delete(transportId: TransportId) {
     jpaRepository.deleteById(transportId.uuid)
+  }
+
+  override fun findByWeightTicketId(weightTicketId: WeightTicketId): List<WasteTransport> {
+    return jpaRepository.findByWeightTicketId(weightTicketId.number)
+      .filter { it.goods != null }
+      .map { wasteTransportMapper.toDomain(it) }
   }
 }

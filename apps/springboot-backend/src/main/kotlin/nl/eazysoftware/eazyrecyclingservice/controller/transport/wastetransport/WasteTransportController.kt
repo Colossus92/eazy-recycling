@@ -32,6 +32,7 @@ import kotlin.time.toKotlinInstant
 class WasteTransportController(
   private val createWasteTransport: CreateWasteTransport,
   private val createWasteTransportFromWeightTicket: CreateWasteTransportFromWeightTicket,
+  private val getWasteTransportsFromWeightTicket: nl.eazysoftware.eazyrecyclingservice.application.query.GetWasteTransportsFromWeightTicket,
   private val updateWasteTransport: UpdateWasteTransport,
   private val wasteTransports: WasteTransports
 ) {
@@ -42,6 +43,22 @@ class WasteTransportController(
   fun createWasteTransport(@Valid @RequestBody request: WasteTransportRequest): CreateWasteTransportResponse {
     val result = createWasteTransport.handle(request.toCreateCommand())
     return CreateWasteTransportResponse(transportId = result.transportId.uuid)
+  }
+
+  @PreAuthorize(HAS_ANY_ROLE)
+  @PutMapping("/waste/{id}")
+  fun updateWasteTransport(
+    @PathVariable id: UUID,
+    @Valid @RequestBody request: WasteTransportRequest
+  ): UpdateWasteTransportResponse {
+    // Check authorization before updating
+    checkAuthorization(id)
+
+    val result = updateWasteTransport.handle(request.toUpdateCommand(id))
+    return UpdateWasteTransportResponse(
+      transportId = result.transportId.uuid,
+      status = result.status
+    )
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -63,19 +80,35 @@ class WasteTransportController(
     )
   }
 
-  @PreAuthorize(HAS_ANY_ROLE)
-  @PutMapping("/waste/{id}")
-  fun updateWasteTransport(
-    @PathVariable id: UUID,
-    @Valid @RequestBody request: WasteTransportRequest
-  ): UpdateWasteTransportResponse {
-    // Check authorization before updating
-    checkAuthorization(id)
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @GetMapping("/waste/from-weight-ticket")
+  fun getWasteTransportsByWeightTicketId(
+    @RequestParam weightTicketId: Long
+  ): WeightTicketTransportsResponse {
+    val transports = getWasteTransportsFromWeightTicket.execute(weightTicketId)
+    return WeightTicketTransportsResponse(
+      transports = transports.map { view ->
+        WeightTicketTransportsResponse.WeightTicketTransport(
+          transportId = view.transportId,
+          displayNumber = view.displayNumber,
+          pickupDateTime = view.pickupDateTime,
+          status = view.status,
+          weightTicketId = view.weightTicketId
+        )
+      }
+    )
+  }
 
-    val result = updateWasteTransport.handle(request.toUpdateCommand(id))
-    return UpdateWasteTransportResponse(
-      transportId = result.transportId.uuid,
-      status = result.status
+  data class WeightTicketTransportsResponse(
+    val transports: List<WeightTicketTransport>
+  ) {
+
+    data class WeightTicketTransport(
+      val transportId: UUID,
+      val displayNumber: String,
+      val pickupDateTime: LocalDateTime,
+      val status: String,
+      val weightTicketId: Long
     )
   }
 

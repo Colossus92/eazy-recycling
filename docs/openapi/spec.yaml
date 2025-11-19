@@ -788,6 +788,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/CreateWasteTransportResponse"
   /transport/waste/from-weight-ticket:
+    get:
+      tags:
+      - waste-transport-controller
+      operationId: getWasteTransportsByWeightTicketId
+      parameters:
+      - name: weightTicketId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/WeightTicketTransportsResponse"
     post:
       tags:
       - waste-transport-controller
@@ -3352,6 +3370,37 @@ components:
       - sequenceNumber
       - status
       - transportType
+    WeightTicketTransport:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        pickupDateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+        weightTicketId:
+          type: integer
+          format: int64
+      required:
+      - displayNumber
+      - pickupDateTime
+      - status
+      - transportId
+      - weightTicketId
+    WeightTicketTransportsResponse:
+      type: object
+      properties:
+        transports:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTicketTransport"
+      required:
+      - transports
     DriverPlanningItem:
       type: object
       properties:
@@ -3491,12 +3540,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -3513,11 +3562,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -3543,9 +3592,9 @@ components:
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
   securitySchemes:
     bearerAuth:
