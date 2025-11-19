@@ -157,6 +157,12 @@ export interface TransportDetailView {
     'containerOperation'?: TransportDetailViewContainerOperationEnum;
     /**
      * 
+     * @type {number}
+     * @memberof TransportDetailView
+     */
+    'weightTicketId'?: number;
+    /**
+     * 
      * @type {Array<GoodsItemView>}
      * @memberof TransportDetailView
      */
