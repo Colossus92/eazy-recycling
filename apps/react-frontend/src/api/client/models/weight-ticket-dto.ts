@@ -143,6 +143,12 @@ export interface WeightTicketDto {
      * @memberof WeightTicketDto
      */
     'cancellationReason'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'pdfUrl'?: string;
 }
 
 export const WeightTicketDtoSecondWeighingUnitEnum = {

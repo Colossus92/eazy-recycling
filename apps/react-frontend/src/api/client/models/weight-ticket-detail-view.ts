@@ -149,5 +149,11 @@ export interface WeightTicketDetailView {
      * @memberof WeightTicketDetailView
      */
     'weightedAt'?: LocalDateTime;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'pdfUrl'?: string;
 }
 
