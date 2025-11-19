@@ -188,7 +188,7 @@ export const WeightTicketForm = ({
                   onSplit={onSplit}
                   onCopy={onCopy}
                   onComplete={onComplete}
-                  onCreateTransport={handleCreateTransport}
+                  onCreateTransport={onCreateTransport ? handleCreateTransport : undefined}
                 />
               )
             }
