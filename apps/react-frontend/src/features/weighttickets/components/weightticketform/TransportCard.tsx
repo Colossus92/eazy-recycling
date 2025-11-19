@@ -72,7 +72,7 @@ export const TransportCard = ({
                     #{displayNumber}
                 </span>
                 <span className="text-body-2 text-color-text-secondary">
-                    {formatInstantInCET(pickupDateTime, 'dd-MM-yyyy HH:mm')}
+                    Ophaalmoment: {formatInstantInCET(pickupDateTime, 'dd-MM-yyyy HH:mm')}
                 </span>
             </div>
             <div className="flex items-center gap-2">

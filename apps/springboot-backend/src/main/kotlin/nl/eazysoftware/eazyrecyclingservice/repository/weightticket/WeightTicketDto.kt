@@ -79,6 +79,9 @@ data class WeightTicketDto(
 
   @Column(name = "cancellation_reason", nullable = true)
   val cancellationReason: String?,
+
+  @Column(name = "pdf_url")
+  val pdfUrl: String? = null,
 )
 
 enum class WeightTicketStatusDto {

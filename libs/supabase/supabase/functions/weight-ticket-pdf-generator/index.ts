@@ -1,5 +1,6 @@
-import { fetchWeightTicketData } from './db.ts';
+import { fetchWeightTicketData, pool } from './db.ts';
 import { generateWeightTicketPdf } from './pdf.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 // Type definitions
 type ApiResponse = {
@@ -64,6 +65,7 @@ async function extractTicketId(req: Request): Promise<string> {
 
 // Main server handler
 Deno.serve(async (req) => {
+  let connection;
   try {
     // Extract ticket ID from request
     const ticketId = await extractTicketId(req);
@@ -91,8 +93,49 @@ Deno.serve(async (req) => {
     
     console.log(`[${ticketId}] PDF successfully generated`);
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Format filename with date: ddMMYYYY-weegbon-{weightticketid}.pdf
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear();
+    const filename = `${day}${month}${year}-weegbon-${ticketData.weightTicket.id}.pdf`;
+    
+    // Storage path: /{weightticketid}/filename.pdf
+    const storagePath = `${ticketData.weightTicket.id}/${filename}`;
+
+    console.log(`[${ticketId}] Uploading PDF to storage: ${storagePath}`);
+
+    // Upload PDF to Supabase storage
+    const { error: uploadError } = await supabase.storage
+      .from('weight-tickets')
+      .upload(storagePath, pdfBytes, {
+        contentType: 'application/pdf',
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error(`[${ticketId}] Storage upload error:`, uploadError);
+      throw new Error(`Failed to upload PDF: ${uploadError.message}`);
+    }
+
+    console.log(`[${ticketId}] PDF uploaded successfully, updating database...`);
+
+    // Update weight_tickets table with pdf_url
+    connection = await pool.connect();
+    await connection.queryObject`
+      UPDATE weight_tickets
+      SET pdf_url = ${storagePath}
+      WHERE id = ${ticketData.weightTicket.id}
+    `;
+
+    console.log(`[${ticketId}] Database updated with PDF URL`);
+
     // Return PDF as downloadable file
-    const filename = `weight-ticket-${ticketData.weightTicket.id}.pdf`;
     return createPdfResponse(pdfBytes, filename);
 
   } catch (err) {
@@ -105,5 +148,9 @@ Deno.serve(async (req) => {
       message: 'Internal server error',
       error: errorMessage
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 });

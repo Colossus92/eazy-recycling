@@ -73,6 +73,7 @@ class WeightTicketQueryRepository(
       createdAt = weightTicket.createdAt.toKotlinInstant().toDisplayTime(),
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),
       weightedAt = weightTicket.weightedAt?.toKotlinInstant()?.toDisplayTime(),
+      pdfUrl = weightTicket.pdfUrl,
     )
   }
 }

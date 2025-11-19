@@ -26,7 +26,10 @@ export interface WeightTicketData {
     cancellation_reason?: string;
     tarra_weight_value?: number;
     tarra_weight_unit?: string;
+    second_weighing_value?: number;
+    second_weighing_unit?: string;
     direction?: string;
+    pdf_url?: string;
   };
   lines: WeightTicketLine[];
   consignorParty?: {
@@ -120,9 +123,12 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
         cancellation_reason,
         tarra_weight_value,
         tarra_weight_unit,
+        second_weighing_value,
+        second_weighing_unit,
         pickup_location_id,
         delivery_location_id,
-        direction
+        direction,
+        pdf_url
       FROM
         weight_tickets
       WHERE
@@ -152,9 +158,12 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
       cancellation_reason?: string;
       tarra_weight_value?: number;
       tarra_weight_unit?: string;
+      second_weighing_value?: number;
+      second_weighing_unit?: string;
       pickup_location_id?: string;
       delivery_location_id?: string;
       direction?: string;
+      pdf_url?: string;
     }
 
     const ticket = ticketResult.rows[0] as WeightTicketRow;
@@ -271,7 +280,10 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
           cancellation_reason: ticket.cancellation_reason,
           tarra_weight_value: ticket.tarra_weight_value,
           tarra_weight_unit: ticket.tarra_weight_unit,
+          second_weighing_value: ticket.second_weighing_value,
+          second_weighing_unit: ticket.second_weighing_unit,
           direction: ticket.direction,
+          pdf_url: ticket.pdf_url,
         },
         lines,
         consignorParty,

@@ -23,6 +23,7 @@ data class WeightTicketDetailView(
   val createdAt: LocalDateTime,
   val updatedAt: LocalDateTime?,
   val weightedAt: LocalDateTime?,
+  val pdfUrl: String?,
 )
 
 data class WeightTicketLineView(
