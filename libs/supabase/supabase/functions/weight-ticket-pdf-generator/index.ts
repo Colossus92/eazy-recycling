@@ -1,6 +1,6 @@
 import { fetchWeightTicketData, pool } from './db.ts';
 import { generateWeightTicketPdf } from './pdf.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { generateFileName, uploadWeightTicketPdf } from './storage.ts';
 
 // Type definitions
 type ApiResponse = {
@@ -93,35 +93,11 @@ Deno.serve(async (req) => {
     
     console.log(`[${ticketId}] PDF successfully generated`);
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Format filename with date: ddMMYYYY-weegbon-{weightticketid}.pdf
-    const now = new Date();
-    const day = now.getDate().toString().padStart(2, '0');
-    const month = (now.getMonth() + 1).toString().padStart(2, '0');
-    const year = now.getFullYear();
-    const filename = `${day}${month}${year}-weegbon-${ticketData.weightTicket.id}.pdf`;
-    
-    // Storage path: /{weightticketid}/filename.pdf
-    const storagePath = `${ticketData.weightTicket.id}/${filename}`;
-
-    console.log(`[${ticketId}] Uploading PDF to storage: ${storagePath}`);
+    // Generate filename and storage path
+    const { filename, storagePath } = generateFileName(ticketData);
 
     // Upload PDF to Supabase storage
-    const { error: uploadError } = await supabase.storage
-      .from('weight-tickets')
-      .upload(storagePath, pdfBytes, {
-        contentType: 'application/pdf',
-        upsert: true
-      });
-
-    if (uploadError) {
-      console.error(`[${ticketId}] Storage upload error:`, uploadError);
-      throw new Error(`Failed to upload PDF: ${uploadError.message}`);
-    }
+    await uploadWeightTicketPdf(pdfBytes, storagePath);
 
     console.log(`[${ticketId}] PDF uploaded successfully, updating database...`);
 
