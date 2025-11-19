@@ -24,6 +24,8 @@ import { CompanyCard } from '@/components/ui/company/CompanyCard';
 import { toastService } from '@/components/ui/toast/toastService';
 import { Note } from '@/features/planning/components/note/Note';
 import { DriverNote } from '../note/DriverNote';
+import { WeightTicketDownloadSection } from './WeightTicketDownloadSection';
+import { DocumentsSection } from './DocumentsSection';
 
 interface TransportDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -270,10 +272,13 @@ export const TransportDetailsDrawer = ({
               </div>
             )}
           </div>
-
-          <WaybillDownloadSection transportId={data.id} />
-
           {data.note && <Note note={data.note} />}
+
+          <DocumentsSection>
+            <WaybillDownloadSection transportId={data.id} />
+            <WeightTicketDownloadSection weightTicketId={data.weightTicketId} />
+          </DocumentsSection>
+
         </div>
       )}
     </Drawer>

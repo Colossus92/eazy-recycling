@@ -15,4 +15,5 @@ export const weightTicketService = {
     complete: (weightTicketNumber: number) => weightTicketApi.complete(weightTicketNumber).then((r) => r.data),
     split: (weightTicketId: number, splitWeightTicketRequest: SplitWeightTicketRequest) => weightTicketApi.split(weightTicketId, splitWeightTicketRequest).then((r) => r.data),
     copy: (weightTicketId: number) => weightTicketApi.copy(weightTicketId).then((r) => r.data),
+    getWeightTicketPdfUrlByTransport: (transportId: string) => weightTicketApi.getWeightTicketPdfUrlByTransport(transportId).then((r) => r.data),
 };
