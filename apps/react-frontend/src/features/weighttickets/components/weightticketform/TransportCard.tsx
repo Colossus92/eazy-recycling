@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import { formatInstantInCET } from '@/utils/dateUtils';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import EyeSolid from '@/assets/icons/EyeSolid.svg?react';
 import { fetchWaybillInfo, downloadWaybill } from '@/api/services/waybillService';
 import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
+import { Button } from '@/components/ui/button/Button';
 
 interface TransportCardProps {
     transportId: string;
     displayNumber: string;
     pickupDateTime: string;
     status: string;
-    onViewDetails: (transportId: string) => void;
 }
 
 export const TransportCard = ({
@@ -18,8 +20,8 @@ export const TransportCard = ({
     displayNumber,
     pickupDateTime,
     status,
-    onViewDetails,
 }: TransportCardProps) => {
+    const navigate = useNavigate();
     const [waybillUrl, setWaybillUrl] = useState<string | null>(null);
     const [isLoadingWaybill, setIsLoadingWaybill] = useState(false);
 
@@ -54,6 +56,12 @@ export const TransportCard = ({
         }
     };
 
+    const handleViewDetails = () => {
+        const pickupDate = new Date(pickupDateTime);
+        const dateParam = format(pickupDate, 'yyyy-MM-dd');
+        navigate(`/?transportId=${transportId}&date=${dateParam}`);
+    };
+
     return (
         <div className="flex items-center gap-10 p-3 border border-solid border-color-border-primary rounded-radius-md bg-color-surface-primary w-full">
             <div className="flex flex-col justify-center items-start gap-1 flex-1">
@@ -68,21 +76,21 @@ export const TransportCard = ({
                 </span>
             </div>
             <div className="flex items-center gap-2">
-                    <button
-                        onClick={handleWaybillClick}
-                        disabled={isLoadingWaybill || !waybillUrl}
-                        className="flex size-10 justify-center items-center border border-solid border-color-border-primary rounded-radius-sm bg-color-surface-secondary hover:bg-color-surface-tertiary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        title="Download waybill"
-                    >
-                        <FilePdf className="size-5 text-color-text-secondary" />
-                    </button>
-                    <button
-                        onClick={() => onViewDetails(transportId)}
-                        className="flex size-10 justify-center items-center border border-solid border-color-border-primary rounded-radius-sm bg-color-surface-secondary hover:bg-color-surface-tertiary transition-colors"
-                        title="Bekijk details"
-                    >
-                        <EyeSolid className="size-5 text-color-text-secondary" />
-                    </button>
+                <Button
+                    variant="icon"
+                    icon={FilePdf}
+                    onClick={handleWaybillClick}
+                    disabled={isLoadingWaybill || !waybillUrl}
+                    title="Download waybill"
+                    showText={false}
+                />
+                <Button
+                    variant="icon"
+                    icon={EyeSolid}
+                    onClick={handleViewDetails}
+                    title="Bekijk in planning"
+                    showText={false}
+                />
             </div>
         </div>
     );

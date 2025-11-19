@@ -13,6 +13,7 @@ import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.t
 import { fallbackRender } from '@/utils/fallbackRender';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
 import { useSearchParams } from 'react-router-dom';
+import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 
 export const PlanningPage = () => {
   const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
@@ -20,16 +21,17 @@ export const PlanningPage = () => {
   const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] = useState(false);
   const [selectedTransportId, setSelectedTransportId] = useState<string | undefined>();
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
+  const [isTransportDetailsDrawerOpen, setIsTransportDetailsDrawerOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   
-  // Handle URL params for opening transport from weight ticket
+  // Handle URL params for opening transport details drawer from weight ticket
   useEffect(() => {
     const transportId = searchParams.get('transportId');
     const dateParam = searchParams.get('date');
     
     if (transportId) {
       setSelectedTransportId(transportId);
-      setIsWasteTransportFormOpen(true);
+      setIsTransportDetailsDrawerOpen(true);
       
       // Set calendar date if provided
       if (dateParam) {
@@ -98,6 +100,18 @@ export const PlanningPage = () => {
           closeDialog={() => setIsDrawerOpen(false)}
         />
       </Drawer>
+      {selectedTransportId && (
+        <TransportDetailsDrawer
+          isDrawerOpen={isTransportDetailsDrawerOpen}
+          setIsDrawerOpen={(value) => {
+            setIsTransportDetailsDrawerOpen(value);
+            if (!value) {
+              setSelectedTransportId(undefined);
+            }
+          }}
+          transportId={selectedTransportId}
+        />
+      )}
     </>
   );
 };

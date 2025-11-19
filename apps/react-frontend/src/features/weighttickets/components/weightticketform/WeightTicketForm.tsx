@@ -22,7 +22,6 @@ import { RadioFormField } from '@/components/ui/form/RadioFormField';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
 import { WeightTicketRequest } from '@/api/client';
-import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
 
 interface WeightTicketFormProps {
@@ -55,8 +54,6 @@ export const WeightTicketForm = ({
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
   const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | undefined>();
-  const [isTransportDrawerOpen, setIsTransportDrawerOpen] = useState(false);
-  const [selectedTransportId, setSelectedTransportId] = useState<string | undefined>();
 
   const handleClose = (value: boolean) => {
     if (!value) {
@@ -93,11 +90,6 @@ export const WeightTicketForm = ({
       
       await onCreateTransport(weightTicketId, weightTicketRequest, pickupDateTime, deliveryDateTime);
     }
-  };
-
-  const handleViewTransportDetails = (transportId: string) => {
-    setSelectedTransportId(transportId);
-    setIsTransportDrawerOpen(true);
   };
 
   useEffect(() => {
@@ -347,7 +339,6 @@ export const WeightTicketForm = ({
                       <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
                         <WeightTicketRelatedTab
                           weightTicketId={data.id}
-                          onViewTransportDetails={handleViewTransportDetails}
                         />
                       </TabPanel>
                     )}
@@ -385,13 +376,6 @@ export const WeightTicketForm = ({
         weightTicketId={selectedWeightTicketId}
         onCreateTransport={handleTransportCreation}
       />
-      {selectedTransportId && (
-        <TransportDetailsDrawer
-          isDrawerOpen={isTransportDrawerOpen}
-          setIsDrawerOpen={setIsTransportDrawerOpen}
-          transportId={selectedTransportId}
-        />
-      )}
     </ErrorBoundary>
   );
 };

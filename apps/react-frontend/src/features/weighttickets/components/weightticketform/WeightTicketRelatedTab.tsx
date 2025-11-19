@@ -8,12 +8,10 @@ import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
-  onViewTransportDetails: (transportId: string) => void;
 }
 
 export const WeightTicketRelatedTab = ({
   weightTicketId,
-  onViewTransportDetails,
 }: WeightTicketRelatedTabProps) => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['weight-ticket-transports', weightTicketId],
@@ -78,7 +76,6 @@ export const WeightTicketRelatedTab = ({
             displayNumber={transport.displayNumber}
             pickupDateTime={transport.pickupDateTime}
             status={transport.status}
-            onViewDetails={onViewTransportDetails}
           />
         ))}
       </div>
