@@ -9,9 +9,10 @@ interface DutchAddressInputProps {
      * Name of the parent location field (e.g., "pickupLocation")
      */
     name: Path<TFieldValues>;
+    disabled?: boolean;
 }
 
-export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
+export const DutchAddressInput = ({ name, disabled = false}: DutchAddressInputProps) => {
     const { register, setValue, formState: { errors } } = useFormContext<TFieldValues>();
     return (
         <div className="w-full flex flex-col gap-3">
@@ -47,6 +48,7 @@ export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
                             },
                             errors,
                         }}
+                        disabled={disabled}
                     />
 
                     <TextFormField
@@ -63,6 +65,7 @@ export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
                             },
                             errors,
                         }}
+                        disabled={disabled}
                     />
                 </div>
             </div>
@@ -83,6 +86,7 @@ export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
                             },
                             errors,
                         }}
+                        disabled={disabled}
                     />
             </div>
             <div className="flex items-start self-stretch gap-4">
@@ -102,6 +106,7 @@ export const DutchAddressInput = ({ name }: DutchAddressInputProps) => {
                         },
                         errors,
                     }}
+                    disabled={disabled}
                 />
             </div>
         </div>

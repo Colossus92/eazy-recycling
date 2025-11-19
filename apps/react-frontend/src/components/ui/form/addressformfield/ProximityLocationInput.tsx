@@ -5,9 +5,10 @@ import { TextFormField } from "../TextFormField";
 
 interface ProximityLocationInputProps<TFieldValues extends FieldValues> {
     name: Path<TFieldValues>;
+    disabled?: boolean;
 }
 
-export const ProximityLocationInput = <TFieldValues extends FieldValues>({ name }: ProximityLocationInputProps<TFieldValues>) => {
+export const ProximityLocationInput = <TFieldValues extends FieldValues>({ name, disabled = false }: ProximityLocationInputProps<TFieldValues>) => {
     const { register, formState: { errors } } = useFormContext<TFieldValues>();
     return (
         <div className="flex flex-col gap-4">
@@ -31,6 +32,7 @@ export const ProximityLocationInput = <TFieldValues extends FieldValues>({ name 
                 <TextFormField
                     title={'Plaats'}
                     placeholder={'Vul Plaats in'}
+                    disabled={disabled}
                     formHook={{
                         register,
                         name: `${String(name)}.city` as Path<TFieldValues>,
@@ -48,6 +50,7 @@ export const ProximityLocationInput = <TFieldValues extends FieldValues>({ name 
                     title={'Postcode (alleen cijfers)'}
                     placeholder={'Vier vcijfers'}
                     step={1}
+                    disabled={disabled}
                     formHook={{
                         register,
                         name: `${String(name)}.postalCodeDigits` as Path<TFieldValues>,

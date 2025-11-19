@@ -121,12 +121,14 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                         {currentType === 'dutch_address' && (
                             <DutchAddressInput
                                 name={name}
+                                disabled={disabled}
                             />
                         )}
 
                         {(currentType === 'company' || currentType === 'project_location') && (
                             <CompanyLocationInput
                                 name={name}
+                                disabled={disabled}
                             />
                         )}
 
@@ -134,6 +136,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                             <div className="w-full flex flex-col gap-3">
                                 <ProximityLocationInput
                                     name={name}
+                                    disabled={disabled}
                                 />
                             </div>
                         )}

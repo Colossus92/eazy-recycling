@@ -14,6 +14,7 @@ interface CompanyLocationInputProps {
      * Name of the parent location field (e.g., "pickupLocation")
      */
     name: Path<TFieldValues>;
+    disabled?: boolean;
 }
 
 interface Option {
@@ -21,7 +22,7 @@ interface Option {
     label: string;
 }
 
-export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
+export const CompanyLocationInput = ({ name, disabled = false }: CompanyLocationInputProps) => {
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies', true],
         queryFn: () => companyService.getAll(true),
@@ -180,11 +181,11 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
             borderRadius: '8px',
             borderWidth: '1px',
             borderStyle: 'solid',
-            borderColor: state.isFocused ? '#1E77F8' : '#E3E8F3',
+            borderColor: disabled ? '#E3E8F3' : (state.isFocused ? '#1E77F8' : '#E3E8F3'),
             backgroundColor: '#FFFFFF',
-            cursor: 'default',
+            cursor: disabled ? 'not-allowed' : 'default',
             boxShadow: 'none',
-            '&:hover': {
+            '&:hover': disabled ? {} : {
                 borderColor: '#1E77F8',
                 backgroundColor: '#F3F8FF',
             },
@@ -202,7 +203,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
     };
 
     const selectClassNames = {
-        placeholder: () => clsx('text-color-text-disabled', 'italic'),
+        placeholder: () => clsx(disabled ? 'text-color-text-disabled' : 'text-color-text-disabled', 'italic'),
         option: ({ isSelected, isFocused }: any) =>
             clsx(
                 'cursor-pointer',
@@ -212,7 +213,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                         ? 'bg-color-surface-secondary text-color-text-primary'
                         : 'bg-color-surface-primary text-color-text-primary'
             ),
-        singleValue: () => 'text-color-text-primary',
+        singleValue: () => disabled ? 'text-color-text-disabled' : 'text-color-text-primary',
         valueContainer: () => 'px-3 py-2',
     };
 
@@ -233,6 +234,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                                 options={companyOptions}
                                 placeholder="Selecteer een bedrijf"
                                 isClearable={true}
+                                isDisabled={disabled}
                                 classNamePrefix="react-select"
                                 noOptionsMessage={() => 'Geen opties beschikbaar'}
                                 id="company-location-select"
@@ -273,6 +275,7 @@ export const CompanyLocationInput = ({ name }: CompanyLocationInputProps) => {
                                 options={projectLocationOptions}
                                 placeholder="Selecteer een projectlocatie"
                                 isClearable={true}
+                                isDisabled={disabled}
                                 classNamePrefix="react-select"
                                 noOptionsMessage={() => 'Geen opties beschikbaar'}
                                 id="project-location-select"

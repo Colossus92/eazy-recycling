@@ -4,6 +4,7 @@ import clsx from "clsx";
 import CaretDown from '@/assets/icons/CaretDown.svg?react';
 import Check from '@/assets/icons/Check.svg?react';
 import Unchecked from '@/assets/icons/Unchecked.svg?react';
+import { formInputClasses } from '@/styles/formInputClasses.ts';
 
 interface ListboxFormFieldProps {
     title: string;
@@ -60,21 +61,37 @@ export const ListboxFormField = ({
         }
     };
 
+    const textColorClasses = disabled
+        ? formInputClasses.text.disabled
+        : formInputClasses.text.default;
+    const borderColorClasses = disabled
+        ? formInputClasses.border.disabled
+        : formInputClasses.border.default;
+    const backgroundClasses = disabled
+        ? formInputClasses.background.disabled
+        : formInputClasses.background.hover;
+
     return (
         <div className="flex flex-col items-start self-stretch gap-1" data-testid={testId}>
             <span className="text-caption-2">{title}</span>
             <Listbox value={selected} onChange={handleChange} disabled={disabled}>
                 <ListboxButton
                     className={clsx(
-                        'relative flex h-10 items-center self-stretch w-full rounded-md bg-color-surface-primary gap-2 py-2 px-3 text-left text-body-1 text-color-text-secondary',
-                        'border border-color-border-primary text-color-text-secondary',
-                        'hover:bg-color-brand-light hover:border-color-brand-dark hover:text-color-text-secondary',
+                        'relative flex h-10 items-center self-stretch gap-2 text-left text-body-1',
+                        formInputClasses.base,
+                        formInputClasses.padding.default,
+                        textColorClasses,
+                        borderColorClasses,
+                        backgroundClasses,
                         'focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25'
                     )}
                 >
-                    {selected ? <span>{selected.label}</span> : <span className="text-color-text-secondary">Selecteer een optie</span>}
+                    {selected ? <span>{selected.label}</span> : <span className={textColorClasses}>Selecteer een optie</span>}
                     <CaretDown
-                        className="group pointer-events-none absolute top-2.5 right-2.5 size-5 text-color-text-secondary"
+                        className={clsx(
+                            "group pointer-events-none absolute top-2.5 right-2.5 size-5",
+                            textColorClasses
+                        )}
                         aria-hidden="true"
                     />
                 </ListboxButton>

@@ -325,6 +325,7 @@ export const WeightTicketForm = ({
                         testId="pickup-location-select"
                         required={false}
                         isNoLocationAllowed={true}
+                        disabled={isDisabled}
                       />
                       <AddressFormField
                         name="deliveryLocation"
@@ -333,6 +334,7 @@ export const WeightTicketForm = ({
                         testId="delivery-location-select"
                         required={false}
                         isNoLocationAllowed={true}
+                        disabled={isDisabled}
                       />
                     </TabPanel>
                     {data && (
