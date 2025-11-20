@@ -1,7 +1,7 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
-import { TabPanel } from "@headlessui/react";
+import { TabPanel } from '@headlessui/react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { ActionMenu } from '../ActionMenu';
@@ -40,9 +40,14 @@ export const MasterDataTab = <T,>({ data, searchQuery, openAddForm, editAction, 
     const [page, setPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
+    const setQueryAndResetPage = (query: string) => {
+        searchQuery(query);
+        setPage(1);
+    }
+
     return (
         <TabPanel className={"flex-1 flex flex-col items-start self-stretch gap-4 overflow-hidden"}>
-            <ContentTitleBar setQuery={searchQuery}>
+            <ContentTitleBar setQuery={setQueryAndResetPage}>
                 <Button
                     variant={'primary'}
                     icon={Plus}
