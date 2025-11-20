@@ -88,6 +88,8 @@ export * from './user-response';
 export * from './user-role-dto';
 export * from './validation-error-response';
 export * from './validation-request-data-response';
+export * from './vat-rate-request';
+export * from './vat-rate-response';
 export * from './waste-container-dto';
 export * from './waste-container-request';
 export * from './waste-container-view';

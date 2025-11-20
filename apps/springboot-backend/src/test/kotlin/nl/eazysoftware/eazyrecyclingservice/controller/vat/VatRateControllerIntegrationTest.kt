@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.math.BigDecimal
 import java.time.Instant
+import java.time.LocalDateTime
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -53,7 +54,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val vatRateRequest = VatRateRequest(
       vatCode = "NL_HIGH",
       percentage = "21.00",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Dutch high VAT rate"
@@ -155,8 +156,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val updatedVatRateRequest = VatRateRequest(
       vatCode = "DE_HIGH",
       percentage = "20.00",
-      validFrom = "2024-01-01T00:00:00Z",
-      validTo = "2024-12-31T23:59:59Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
+      validTo = LocalDateTime.of(2024, 12, 31 , 23, 59, 59),
       countryCode = "DE",
       description = "German high VAT rate (updated)"
     )
@@ -185,7 +186,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val vatRateRequest = VatRateRequest(
       vatCode = "NON_EXISTENT",
       percentage = "21.00",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Non-existent VAT rate"
@@ -233,8 +234,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val vatRateRequest = VatRateRequest(
       vatCode = "FR_OLD",
       percentage = "19.60",
-      validFrom = "2014-01-01T00:00:00Z",
-      validTo = "2023-12-31T23:59:59Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
+      validTo = LocalDateTime.of(2023, 12, 31, 23, 59, 59),
       countryCode = "FR",
       description = "Old French VAT rate"
     )
@@ -281,7 +282,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val invalidVatRateRequest = VatRateRequest(
       vatCode = "INVALID",
       percentage = "not-a-number",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Invalid percentage"
@@ -301,7 +302,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val highRate = VatRateRequest(
       vatCode = "NL_HIGH_2024",
       percentage = "21.00",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Dutch high VAT rate 2024"
@@ -309,7 +310,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val lowRate = VatRateRequest(
       vatCode = "NL_LOW_2024",
       percentage = "9.00",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Dutch low VAT rate 2024"
@@ -338,7 +339,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
     val vatRateRequest = VatRateRequest(
       vatCode = "DECIMAL_TEST",
       percentage = "21.50",
-      validFrom = "2024-01-01T00:00:00Z",
+      validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
       description = "Decimal percentage test"

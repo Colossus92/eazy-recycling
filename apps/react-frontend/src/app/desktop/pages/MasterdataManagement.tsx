@@ -3,6 +3,7 @@ import { Tab } from '@/components/ui/tab/Tab';
 import { EuralCodesTab } from '@/features/crud/masterdata/euralcodes/EuralCodeTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
 import { TrucksTab } from '@/features/crud/masterdata/trucks/TrucksTab';
+import { VatRatesTab } from '@/features/crud/masterdata/vatrates/VatRateTab';
 import { WasteContainersTab } from '@/features/crud/masterdata/wastecontainers/WasteContainerTab';
 import { TabGroup, TabList, TabPanels } from '@headlessui/react';
 import React, { ReactNode, useState } from 'react';
@@ -30,6 +31,10 @@ export const MasterdataManagement = () => {
       component: () => (
         <ProcessingMethodsTab key={`processing-${selectedIndex}`} />
       ),
+    },
+    {
+      name: 'BTW',
+      component: () => <VatRatesTab key={`vatrate-${selectedIndex}`} />,
     },
   ];
 

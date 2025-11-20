@@ -10,6 +10,7 @@ apis/signature-controller-api.ts
 apis/transport-controller-api.ts
 apis/truck-controller-api.ts
 apis/user-controller-api.ts
+apis/vat-rate-controller-api.ts
 apis/waste-container-controller-api.ts
 apis/waste-stream-controller-api.ts
 apis/waste-transport-controller-api.ts
@@ -109,6 +110,8 @@ models/user-response.ts
 models/user-role-dto.ts
 models/validation-error-response.ts
 models/validation-request-data-response.ts
+models/vat-rate-request.ts
+models/vat-rate-response.ts
 models/waste-container-dto.ts
 models/waste-container-request.ts
 models/waste-container-view-location.ts

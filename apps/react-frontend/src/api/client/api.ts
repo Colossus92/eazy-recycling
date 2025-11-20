@@ -27,6 +27,7 @@ export * from './apis/signature-controller-api';
 export * from './apis/transport-controller-api';
 export * from './apis/truck-controller-api';
 export * from './apis/user-controller-api';
+export * from './apis/vat-rate-controller-api';
 export * from './apis/waste-container-controller-api';
 export * from './apis/waste-stream-controller-api';
 export * from './apis/waste-transport-controller-api';

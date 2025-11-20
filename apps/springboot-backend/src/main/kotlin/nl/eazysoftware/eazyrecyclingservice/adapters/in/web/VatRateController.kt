@@ -2,8 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
-import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
+import kotlin.time.toKotlinInstant
 
 @RestController
 @RequestMapping("/vat-rates")
@@ -76,10 +79,10 @@ data class VatRateRequest(
     @field:Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Percentage moet een geldig getal zijn")
     val percentage: String,
 
-    @field:NotBlank(message = "Geldig vanaf datum is verplicht")
-    val validFrom: String,
+    @field:NotNull(message = "Geldig vanaf is verplicht")
+    val validFrom: LocalDateTime,
 
-    val validTo: String?,
+    val validTo: LocalDateTime?,
 
     @field:NotBlank(message = "Landcode is verplicht")
     val countryCode: String,
@@ -91,8 +94,8 @@ data class VatRateRequest(
         return VatRate(
             vatCode = overrideVatCode ?: vatCode,
             percentage = percentage,
-            validFrom = Instant.parse(validFrom),
-            validTo = validTo?.let { Instant.parse(it) },
+            validFrom = validFrom.toCetInstant().toKotlinInstant(),
+            validTo = validTo?.toCetInstant()?.toKotlinInstant(),
             countryCode = countryCode,
             description = description
         )
