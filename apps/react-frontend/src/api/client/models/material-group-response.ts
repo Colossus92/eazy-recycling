@@ -43,7 +43,7 @@ export interface MaterialGroupResponse {
      * @type {string}
      * @memberof MaterialGroupResponse
      */
-    'description': string;
+    'description'?: string;
     /**
      * 
      * @type {string}

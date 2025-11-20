@@ -37,6 +37,6 @@ export interface MaterialGroupRequest {
      * @type {string}
      * @memberof MaterialGroupRequest
      */
-    'description': string;
+    'description'?: string;
 }
 

@@ -73,8 +73,7 @@ data class MaterialGroupRequest(
     @field:NotBlank(message = "Naam is verplicht")
     val name: String,
 
-    @field:NotBlank(message = "Omschrijving is verplicht")
-    val description: String
+    val description: String?,
 ) {
     fun toDomain(): MaterialGroup {
         return MaterialGroup(
@@ -92,7 +91,7 @@ data class MaterialGroupResponse(
     val id: Long,
     val code: String,
     val name: String,
-    val description: String,
+    val description: String?,
     val createdAt: String,
     val updatedAt: String?
 )

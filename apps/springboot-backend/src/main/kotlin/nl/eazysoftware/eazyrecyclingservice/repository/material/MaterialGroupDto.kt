@@ -16,8 +16,8 @@ data class MaterialGroupDto(
     @Column(name = "name", nullable = false)
     val name: String,
 
-    @Column(name = "description", nullable = false)
-    val description: String,
+    @Column(name = "description")
+    val description: String? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),

@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.SoftDele
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.IncompatibleWasteStreamsException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -94,6 +95,38 @@ class GlobalExceptionHandler {
       message = ex.message ?: "Deze actie brengt de data in een ongeldige staat en is niet toegestaan",
     )
 
+    logException(ex)
+
+    return ResponseEntity(errorResponse, HttpStatus.CONFLICT)
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException::class)
+  fun handleDataIntegrityViolationException(ex: DataIntegrityViolationException): ResponseEntity<ErrorResponse> {
+    // Check if this is a unique constraint violation by examining the message
+    val message = ex.message ?: ""
+    val rootCause = ex.rootCause?.message ?: ""
+    
+    val errorMessage = when {
+      message.contains("duplicate key", ignoreCase = true) || 
+      rootCause.contains("duplicate key", ignoreCase = true) -> {
+        // Extract constraint name if available for better error messages
+        val constraintMatch = Regex("constraint \"([^\"]+)\"").find(rootCause)
+        val constraintName = constraintMatch?.groupValues?.get(1)
+        
+        when {
+          constraintName?.contains("code") == true -> "Een item met deze code bestaat al"
+          constraintName?.contains("name") == true -> "Een item met deze naam bestaat al"
+          else -> "Dit item bestaat al in de database"
+        }
+      }
+      message.contains("foreign key", ignoreCase = true) || 
+      rootCause.contains("foreign key", ignoreCase = true) -> {
+        "Deze actie kan niet worden uitgevoerd omdat er gerelateerde gegevens bestaan"
+      }
+      else -> "Er is een probleem met de gegevensintegriteit"
+    }
+
+    val errorResponse = ErrorResponse(message = errorMessage)
     logException(ex)
 
     return ResponseEntity(errorResponse, HttpStatus.CONFLICT)
