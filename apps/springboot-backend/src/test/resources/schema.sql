@@ -299,3 +299,14 @@ create table if not exists materials (
                                           foreign key (material_group_id) references material_groups(id),
                                           foreign key (vat_code) references vat_rates(vat_code)
 );
+
+create table if not exists material_prices (
+                                               id bigint generated always as identity,
+                                               material_id bigint not null,
+                                               price numeric(19,4) not null,
+                                               currency text not null,
+                                               valid_from timestamp with time zone not null,
+                                               valid_to timestamp with time zone,
+                                               primary key (id),
+                                               foreign key (material_id) references materials(id)
+);
