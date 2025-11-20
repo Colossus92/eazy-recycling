@@ -76,9 +76,14 @@ export const LMATab = () => {
     },
   ];
 
+  const setQueryAndResetPage = (query: string) => {
+    setQuery(query);
+    setPage(1);
+  };
+
   return (
     <>
-      <ContentTitleBar setQuery={setQuery} >
+      <ContentTitleBar setQuery={setQueryAndResetPage} >
       </ContentTitleBar>
       <ErrorBoundary
         fallbackRender={fallbackRender}

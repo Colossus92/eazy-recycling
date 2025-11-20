@@ -111,11 +111,16 @@ export const WeightTicketManagement = () => {
     { key: 'status', label: 'Status', accessor: (item) => <WeightTicketStatusTag status={item.status as WeightTicketStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
   ];
 
+  const setQueryAndResetPage = (query: string) => {
+    read.setQuery(query);
+    setPage(1);
+  };
+
   return (
     <>
       <ContentContainer title={"Weegbonnen"}>
         <div className="flex-1 flex flex-col items-start self-stretch pt-4 gap-4 border border-solid rounded-radius-xl border-color-border-primary bg-color-surface-primary overflow-hidden">
-          <ContentTitleBar setQuery={read.setQuery} setIsFilterOpen={read.filter.setIsFilterOpen}>
+          <ContentTitleBar setQuery={setQueryAndResetPage} setIsFilterOpen={read.filter.setIsFilterOpen}>
             <Button
               variant={'primary'}
               icon={Plus}

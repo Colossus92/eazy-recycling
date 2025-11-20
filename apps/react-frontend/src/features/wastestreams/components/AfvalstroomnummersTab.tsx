@@ -33,7 +33,6 @@ export const AfvalstroomnummersTab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { read, form, deletion } = useWasteStreamCrud();
-
   const columns: Column[] = [
     {
       key: 'wasteStreamNumber',
@@ -83,10 +82,15 @@ export const AfvalstroomnummersTab = () => {
     },
   ];
 
+  const setQueryAndResetPage = (query: string) => {
+    read.setQuery(query);
+    setPage(1);
+  };
+
   return (
     <>
       <ContentTitleBar
-        setQuery={read.setQuery}
+        setQuery={setQueryAndResetPage}
         setIsFilterOpen={read.filter.setIsFilterOpen}
       >
         <Button

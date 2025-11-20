@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import { ActionMenu, AdditionalAction } from './ActionMenu.tsx';
 import { CrudDataProps } from './CrudPage.tsx';
 import { PaginationRow } from './pagination/PaginationRow.tsx';
@@ -36,6 +36,15 @@ export const ContentTable = <T, S = T>({
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const prevItemsLengthRef = useRef(data.items.length);
+
+  // Reset page to 1 when items change (e.g., after search)
+  useEffect(() => {
+    if (prevItemsLengthRef.current !== data.items.length) {
+      setPage(1);
+      prevItemsLengthRef.current = data.items.length;
+    }
+  }, [data.items.length]);
 
   return (
     <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary h-full overflow-y-auto">
