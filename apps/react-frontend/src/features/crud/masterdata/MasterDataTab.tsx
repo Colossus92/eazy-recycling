@@ -105,7 +105,7 @@ export const MasterDataTab = <T,>({ data, searchQuery, openAddForm, editAction, 
                             </tbody>
                             <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
                                 <tr className="text-body-2 bg-color-surface-primary">
-                                    <td colSpan={3} className="p-4">
+                                    <td colSpan={data.columns.length + 1} className="p-4">
                                         <PaginationRow
                                             page={page}
                                             setPage={setPage}
