@@ -1,7 +1,7 @@
 import { toast, ToastContent } from 'react-toastify';
 import { ReactNode } from 'react';
 
-const position = 'top-center';
+const position = 'bottom-right';
 
 export const toastService = {
   success: (message: string | ReactNode) => {
