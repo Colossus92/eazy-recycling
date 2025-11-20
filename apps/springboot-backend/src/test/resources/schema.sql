@@ -274,3 +274,28 @@ create table if not exists vat_rates (
                                          description text not null,
                                          primary key (vat_code)
 );
+
+create table if not exists material_groups (
+                                                id bigint generated always as identity,
+                                                code text not null,
+                                                name text not null,
+                                                description text not null,
+                                                created_at timestamp with time zone not null default now(),
+                                                updated_at timestamp with time zone,
+                                                primary key (id)
+);
+
+create table if not exists materials (
+                                          id bigint generated always as identity,
+                                          code text not null,
+                                          name text not null,
+                                          material_group_id bigint not null,
+                                          unit_of_measure text not null,
+                                          vat_code text not null,
+                                          created_at timestamp with time zone not null default now(),
+                                          status text not null,
+                                          updated_at timestamp with time zone,
+                                          primary key (id),
+                                          foreign key (material_group_id) references material_groups(id),
+                                          foreign key (vat_code) references vat_rates(vat_code)
+);
