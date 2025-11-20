@@ -4,6 +4,8 @@ apis/company-controller-api.ts
 apis/container-transport-controller-api.ts
 apis/driver-controller-api.ts
 apis/eural-controller-api.ts
+apis/material-controller-api.ts
+apis/material-group-controller-api.ts
 apis/planning-controller-api.ts
 apis/processing-method-controller-api.ts
 apis/signature-controller-api.ts
@@ -64,6 +66,10 @@ models/lma-declaration-view.ts
 models/local-date-time.ts
 models/local-date.ts
 models/local-time.ts
+models/material-group-request.ts
+models/material-group-response.ts
+models/material-request.ts
+models/material-response.ts
 models/no-pickup-location-request.ts
 models/no-pickup-view.ts
 models/page-lma-declaration-view.ts

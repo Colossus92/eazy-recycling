@@ -17,44 +17,44 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface MaterialRequest
  */
-export interface LocalTime {
+export interface MaterialRequest {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialRequest
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'code': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialRequest
      */
-    'value$kotlinx_datetime': string;
+    'name': string;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof MaterialRequest
      */
-    'nanosecond': number;
+    'materialGroupId': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialRequest
+     */
+    'unitOfMeasure': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialRequest
+     */
+    'vatCode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialRequest
+     */
+    'status': string;
 }
 

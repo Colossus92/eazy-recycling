@@ -17,44 +17,44 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface MaterialGroupResponse
  */
-export interface LocalTime {
+export interface MaterialGroupResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialGroupResponse
+     */
+    'id': number;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialGroupResponse
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'code': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialGroupResponse
      */
-    'value$kotlinx_datetime': string;
+    'name': string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof MaterialGroupResponse
      */
-    'nanosecond': number;
+    'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialGroupResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialGroupResponse
+     */
+    'updatedAt'?: string;
 }
 

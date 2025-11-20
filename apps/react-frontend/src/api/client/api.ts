@@ -21,6 +21,8 @@ export * from './apis/company-controller-api';
 export * from './apis/container-transport-controller-api';
 export * from './apis/driver-controller-api';
 export * from './apis/eural-controller-api';
+export * from './apis/material-controller-api';
+export * from './apis/material-group-controller-api';
 export * from './apis/planning-controller-api';
 export * from './apis/processing-method-controller-api';
 export * from './apis/signature-controller-api';
