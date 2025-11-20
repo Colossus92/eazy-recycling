@@ -5,6 +5,8 @@ alerts:
 domains:
   - domain: ers.eazysoftware.nl
     type: PRIMARY
+  - domain: app.eazyrecycling.nl
+    type: ALIAS
 envs:
   - key: VITE_SUPABASE_URL
     scope: RUN_AND_BUILD_TIME
