@@ -8,12 +8,12 @@ import org.springframework.ws.client.core.WebServiceTemplate
 import org.springframework.ws.soap.client.core.SoapActionCallback
 
 interface ToetsenAfvalstroomNummerClient {
-  
+
   fun validate(body: ToetsenAfvalstroomNummer): ToetsenAfvalstroomNummerResponse
 }
 
 class AmiceToetsenAfvalstroomNummerClient(
-  private val webServiceTemplate: WebServiceTemplate,
+  private val toetsenAfvalstroomNummerWebServiceTemplate: WebServiceTemplate,
 ) : ToetsenAfvalstroomNummerClient {
 
   @Value("\${amice.url:}")
@@ -26,7 +26,7 @@ class AmiceToetsenAfvalstroomNummerClient(
   override fun validate(body: ToetsenAfvalstroomNummer): ToetsenAfvalstroomNummerResponse {
     logger.info("Calling SOAP service to validate waste stream ${body.afvalstroomNummer}")
 
-    return webServiceTemplate.marshalSendAndReceive(
+    return toetsenAfvalstroomNummerWebServiceTemplate.marshalSendAndReceive(
       "$amiceBaseUrl/ToetsenAfvalstroomnummerService.asmx",
       body,
       SoapActionCallback(soapAction)

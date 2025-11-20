@@ -53,7 +53,7 @@ class WebServiceTemplateConfiguration(
   private lateinit var password: String
 
   /**
-   * JAXB Marshaller for converting SOAP messages to/from Java objects.
+   * JAXB Marshaller for converting SOAP messages to/from Java objects (Melding service).
    *
    * Note: The generated WSDL classes already have proper JAXB annotations.
    * We specify the ObjectFactory classes directly to avoid needing jaxb.index files.
@@ -62,6 +62,17 @@ class WebServiceTemplateConfiguration(
   fun amiceMarshaller(): Jaxb2Marshaller {
     val marshaller = Jaxb2Marshaller()
     marshaller.contextPath = "nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding"
+    return marshaller
+  }
+
+  /**
+   * JAXB Marshaller for ToetsenAfvalstroomnummer service.
+   * Uses a separate context path for the toetsen package.
+   */
+  @Bean
+  fun toetsenAfvalstroomNummerMarshaller(): Jaxb2Marshaller {
+    val marshaller = Jaxb2Marshaller()
+    marshaller.contextPath = "nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen"
     return marshaller
   }
 
@@ -131,7 +142,7 @@ class WebServiceTemplateConfiguration(
   }
 
   /**
-   * WebServiceTemplate configured with Apache HttpClient for client certificate authentication.
+   * WebServiceTemplate configured with Apache HttpClient for client certificate authentication (Melding service).
    *
    * This template uses:
    * - SSL Bundle for client certificate (from application.yaml)
@@ -155,7 +166,31 @@ class WebServiceTemplateConfiguration(
     // Configure SOAP Fault handling - throws SoapFaultClientException with fault details
     template.faultMessageResolver = SoapFaultMessageResolver()
 
-    logger.info("Created WebServiceTemplate with client certificate authentication and SOAP fault handling")
+    logger.info("Created Melding WebServiceTemplate with client certificate authentication and SOAP fault handling")
+    return template
+  }
+
+  /**
+   * WebServiceTemplate for ToetsenAfvalstroomnummer service.
+   * Uses the same HTTP configuration but with a different marshaller for the toetsen package.
+   */
+  @Bean
+  fun toetsenAfvalstroomNummerWebServiceTemplate(): WebServiceTemplate {
+    val marshaller = toetsenAfvalstroomNummerMarshaller()
+    val msgFactory = messageFactory()
+
+    val template = WebServiceTemplate(msgFactory)
+    template.marshaller = marshaller
+    template.unmarshaller = marshaller
+    template.setMessageSender(httpComponentsMessageSender())
+
+    // Add logging interceptor to see raw SOAP messages
+    template.interceptors = arrayOf(loggingInterceptor())
+
+    // Configure SOAP Fault handling - throws SoapFaultClientException with fault details
+    template.faultMessageResolver = SoapFaultMessageResolver()
+
+    logger.info("Created ToetsenAfvalstroomNummer WebServiceTemplate with client certificate authentication and SOAP fault handling")
     return template
   }
 
@@ -254,6 +289,6 @@ class WebServiceTemplateConfiguration(
 
   @Bean
   fun toetsenAfvalstroomNummerClient(): ToetsenAfvalstroomNummerClient {
-    return AmiceToetsenAfvalstroomNummerClient(amiceWebServiceTemplate())
+    return AmiceToetsenAfvalstroomNummerClient(toetsenAfvalstroomNummerWebServiceTemplate())
   }
 }
