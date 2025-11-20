@@ -1,7 +1,7 @@
 import { VatRateRequest, VatRateResponse } from '@/api/client';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -10,6 +10,13 @@ import { TextFormField } from '@/components/ui/form/TextFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
+
+// Convert ISO 8601 datetime (e.g., 2025-11-20T11:09:00Z) to datetime-local format (YYYY-MM-DDThh:mm)
+const formatDateTimeForInput = (dateTimeString: string | undefined): string => {
+  if (!dateTimeString) return '';
+  // Remove 'Z' and seconds, keep only YYYY-MM-DDThh:mm format
+  return dateTimeString.replace(/:\d{2}Z?$/, '').substring(0, 16);
+};
 
 interface VatRateFormProps {
   isOpen: boolean;
@@ -35,13 +42,28 @@ export const VatRateForm = ({
     reset,
     formState: { errors },
   } = useForm<VatRateFormValues>({
-    values: initialData
-      ? {
-          ...initialData,
-          percentage: parseFloat(initialData.percentage),
-        }
-      : undefined,
+    defaultValues: {
+      vatCode: '',
+      percentage: 0,
+      validFrom: '',
+      validTo: '',
+      countryCode: '',
+      description: '',
+    },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        vatCode: initialData.vatCode,
+        percentage: parseFloat(initialData.percentage),
+        validFrom: formatDateTimeForInput(initialData.validFrom),
+        validTo: formatDateTimeForInput(initialData.validTo),
+        countryCode: initialData.countryCode,
+        description: initialData.description,
+      });
+    }
+  }, [initialData, reset]);
 
   const cancel = () => {
     reset({

@@ -17,26 +17,26 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface MaterialPriceRequest
  */
-export interface SortObject {
+export interface MaterialPriceRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {number}
+     * @memberof MaterialPriceRequest
      */
-    'empty'?: boolean;
+    'materialId': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {number}
+     * @memberof MaterialPriceRequest
      */
-    'sorted'?: boolean;
+    'price': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof MaterialPriceRequest
      */
-    'unsorted'?: boolean;
+    'currency': string;
 }
 

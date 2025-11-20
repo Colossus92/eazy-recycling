@@ -7,7 +7,7 @@ import { MaterialGroupSelectFormField } from '@/components/ui/form/selectfield/M
 import { VatRateSelectFormField } from '@/components/ui/form/selectfield/VatRateSelectFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 
@@ -36,13 +36,26 @@ export const MaterialForm = ({
     control,
     formState: { errors },
   } = useForm<MaterialFormValues>({
-    values: initialData
-      ? {
-        ...initialData,
-        materialGroupId: initialData.materialGroupId.toString(),
-      }
-      : undefined,
+    defaultValues: {
+      code: '',
+      name: '',
+      materialGroupId: '',
+      unitOfMeasure: '',
+      vatCode: '',
+    },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      reset({
+        code: initialData.code,
+        name: initialData.name,
+        materialGroupId: initialData.materialGroupId.toString(),
+        unitOfMeasure: initialData.unitOfMeasure,
+        vatCode: initialData.vatCode,
+      });
+    }
+  }, [initialData, reset]);
 
   const cancel = () => {
     reset({

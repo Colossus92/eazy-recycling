@@ -36,7 +36,7 @@ export const MaterialGroupSelectFormField = ({
   const materialGroupOptions = useMemo(
     () =>
       materialGroups.map((group) => ({
-        value: group.code,
+        value: group.id.toString(),
         label: `${group.code} - ${group.name}`,
       })),
     [materialGroups]
