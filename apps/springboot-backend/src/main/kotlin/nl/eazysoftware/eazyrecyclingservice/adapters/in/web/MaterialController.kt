@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Materials
+import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialQueryResult
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -21,12 +22,12 @@ class MaterialController(
 
     @GetMapping
     fun getAllMaterials(): List<MaterialResponse> {
-        return materials.getAllMaterials().map { it.toResponse() }
+        return materials.getAllMaterialsWithGroupDetails().map { it.toResponse() }
     }
 
     @GetMapping("/{id}")
     fun getMaterialById(@PathVariable id: Long): MaterialResponse {
-        val material = materials.getMaterialById(id)
+        val material = materials.getMaterialWithGroupDetailsById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
         return material.toResponse()
     }
@@ -37,7 +38,10 @@ class MaterialController(
     fun createMaterial(@Valid @RequestBody request: MaterialRequest): MaterialResponse {
         val material = request.toDomain()
         val created = materials.createMaterial(material)
-        return created.toResponse()
+        // Fetch with group details for response
+        return materials.getMaterialWithGroupDetailsById(created.id!!)
+            ?.toResponse()
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve created material")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -51,8 +55,11 @@ class MaterialController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
 
         val material = request.toDomain()
-        val updated = materials.updateMaterial(id, material)
-        return updated.toResponse()
+        materials.updateMaterial(id, material)
+        // Fetch with group details for response
+        return materials.getMaterialWithGroupDetailsById(id)
+            ?.toResponse()
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve updated material")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -106,6 +113,8 @@ data class MaterialResponse(
     val code: String,
     val name: String,
     val materialGroupId: Long,
+    val materialGroupCode: String,
+    val materialGroupName: String,
     val unitOfMeasure: String,
     val vatCode: String,
     val status: String,
@@ -113,16 +122,18 @@ data class MaterialResponse(
     val updatedAt: String?
 )
 
-fun Material.toResponse(): MaterialResponse {
+fun MaterialQueryResult.toResponse(): MaterialResponse {
     return MaterialResponse(
-        id = id!!,
-        code = code,
-        name = name,
-        materialGroupId = materialGroupId,
-        unitOfMeasure = unitOfMeasure,
-        vatCode = vatCode,
-        status = status,
-        createdAt = createdAt.toString(),
-        updatedAt = updatedAt?.toString()
+        id = getId(),
+        code = getCode(),
+        name = getName(),
+        materialGroupId = getMaterialGroupId(),
+        materialGroupCode = getMaterialGroupCode(),
+        materialGroupName = getMaterialGroupName(),
+        unitOfMeasure = getUnitOfMeasure(),
+        vatCode = getVatCode(),
+        status = getStatus(),
+        createdAt = getCreatedAt().toString(),
+        updatedAt = getUpdatedAt()?.toString()
     )
 }

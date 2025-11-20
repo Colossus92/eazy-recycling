@@ -49,6 +49,18 @@ export interface MaterialResponse {
      * @type {string}
      * @memberof MaterialResponse
      */
+    'materialGroupCode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
+    'materialGroupName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
     'unitOfMeasure': string;
     /**
      * 

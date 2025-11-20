@@ -19,25 +19,31 @@ export const MaterialsTab = () => {
     {
       key: 'name',
       label: 'Naam',
-      width: '35',
+      width: '25',
       accessor: (item) => item.name,
     },
     {
-      key: 'materialGroupId',
-      label: 'Materiaalgroep ID',
-      width: '20',
-      accessor: (item) => item.materialGroupId.toString(),
+      key: 'materialGroupCode',
+      label: 'Materiaalgroepcode',
+      width: '15',
+      accessor: (item) => item.materialGroupCode,
+    },
+    {
+      key: 'materialGroupName',
+      label: 'Materiaalgroepnaam',
+      width: '15',
+      accessor: (item) => item.materialGroupName,
     },
     {
       key: 'unitOfMeasure',
       label: 'Eenheid',
-      width: '15',
+      width: '10',
       accessor: (item) => item.unitOfMeasure,
     },
     {
       key: 'vatCode',
       label: 'BTW Code',
-      width: '15',
+      width: '10',
       accessor: (item) => item.vatCode,
     },
   ];

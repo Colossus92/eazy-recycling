@@ -1,19 +1,15 @@
 import { MaterialRequest, MaterialResponse } from '@/api/client';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
-import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { FormEvent, useMemo } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { useForm } from 'react-hook-form';
-import { fallbackRender } from '@/utils/fallbackRender';
+import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { TextFormField } from '@/components/ui/form/TextFormField';
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
-import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
-import { useQuery } from '@tanstack/react-query';
-import { materialGroupService } from '@/api/services/materialGroupService';
-import { vatRateService } from '@/api/services/vatRateService';
-import { VatRateSelectFormField } from '@/components/ui/form/selectfield/VatRateSelectFormField';
 import { MaterialGroupSelectFormField } from '@/components/ui/form/selectfield/MaterialGroupSelectFormField';
+import { VatRateSelectFormField } from '@/components/ui/form/selectfield/VatRateSelectFormField';
+import { useErrorHandling } from '@/hooks/useErrorHandling';
+import { fallbackRender } from '@/utils/fallbackRender';
+import { FormEvent } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useForm } from 'react-hook-form';
 
 interface MaterialFormProps {
   isOpen: boolean;
@@ -42,9 +38,9 @@ export const MaterialForm = ({
   } = useForm<MaterialFormValues>({
     values: initialData
       ? {
-          ...initialData,
-          materialGroupId: initialData.materialGroupId.toString(),
-        }
+        ...initialData,
+        materialGroupId: initialData.materialGroupId.toString(),
+      }
       : undefined,
   });
 
@@ -126,27 +122,31 @@ export const MaterialForm = ({
                   control,
                 }}
               />
-              <TextFormField
-                title={'Eenheid'}
-                placeholder={'Bijv. kg'}
-                formHook={{
-                  register,
-                  name: 'unitOfMeasure',
-                  rules: { required: 'Eenheid is verplicht' },
-                  errors,
-                }}
-              />
             </div>
             <div className="flex items-start self-stretch gap-4">
-              <VatRateSelectFormField
-                formHook={{
-                  register,
-                  name: 'vatCode',
-                  rules: { required: 'BTW code is verplicht' },
-                  errors,
-                  control,
-                }}
-              />
+              <div className="w-1/4">
+                <TextFormField
+                  title={'Eenheid'}
+                  placeholder={'Bijv. kg'}
+                  formHook={{
+                    register,
+                    name: 'unitOfMeasure',
+                    rules: { required: 'Eenheid is verplicht' },
+                    errors,
+                  }}
+                />
+              </div>
+              <div className="w-3/4">
+                <VatRateSelectFormField
+                  formHook={{
+                    register,
+                    name: 'vatCode',
+                    rules: { required: 'BTW code is verplicht' },
+                    errors,
+                    control,
+                  }}
+                />
+              </div>
             </div>
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
