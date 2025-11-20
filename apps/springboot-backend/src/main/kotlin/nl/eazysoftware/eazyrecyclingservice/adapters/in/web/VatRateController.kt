@@ -1,0 +1,120 @@
+package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
+
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
+import kotlinx.datetime.Instant
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
+import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
+import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
+
+@RestController
+@RequestMapping("/vat-rates")
+@PreAuthorize(HAS_ANY_ROLE)
+class VatRateController(
+    private val vatRates: VatRates
+) {
+
+    @GetMapping
+    fun getAllVatRates(): List<VatRateResponse> {
+        return vatRates.getAllVatRates().map { it.toResponse() }
+    }
+
+    @GetMapping("/{vatCode}")
+    fun getVatRateByCode(@PathVariable vatCode: String): VatRateResponse {
+        val vatRate = vatRates.getVatRateByCode(vatCode)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+        return vatRate.toResponse()
+    }
+
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createVatRate(@Valid @RequestBody request: VatRateRequest): VatRateResponse {
+        val vatRate = request.toDomain()
+        val created = vatRates.createVatRate(vatRate)
+        return created.toResponse()
+    }
+
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PutMapping("/{vatCode}")
+    fun updateVatRate(
+        @PathVariable vatCode: String,
+        @Valid @RequestBody request: VatRateRequest
+    ): VatRateResponse {
+        // Check if VAT rate exists
+        vatRates.getVatRateByCode(vatCode)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+
+        val vatRate = request.toDomain(vatCode)
+        val updated = vatRates.updateVatRate(vatCode, vatRate)
+        return updated.toResponse()
+    }
+
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @DeleteMapping("/{vatCode}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteVatRate(@PathVariable vatCode: String) {
+        // Check if VAT rate exists
+        vatRates.getVatRateByCode(vatCode)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+
+        vatRates.deleteVatRate(vatCode)
+    }
+}
+
+data class VatRateRequest(
+    @field:NotBlank(message = "VAT code is verplicht")
+    val vatCode: String,
+
+    @field:NotBlank(message = "Percentage is verplicht")
+    @field:Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Percentage moet een geldig getal zijn")
+    val percentage: String,
+
+    @field:NotBlank(message = "Geldig vanaf datum is verplicht")
+    val validFrom: String,
+
+    val validTo: String?,
+
+    @field:NotBlank(message = "Landcode is verplicht")
+    val countryCode: String,
+
+    @field:NotBlank(message = "Omschrijving is verplicht")
+    val description: String
+) {
+    fun toDomain(overrideVatCode: String? = null): VatRate {
+        return VatRate(
+            vatCode = overrideVatCode ?: vatCode,
+            percentage = percentage,
+            validFrom = Instant.parse(validFrom),
+            validTo = validTo?.let { Instant.parse(it) },
+            countryCode = countryCode,
+            description = description
+        )
+    }
+}
+
+data class VatRateResponse(
+    val vatCode: String,
+    val percentage: String,
+    val validFrom: String,
+    val validTo: String?,
+    val countryCode: String,
+    val description: String
+)
+
+fun VatRate.toResponse(): VatRateResponse {
+    return VatRateResponse(
+        vatCode = vatCode,
+        percentage = percentage,
+        validFrom = validFrom.toString(),
+        validTo = validTo?.toString(),
+        countryCode = countryCode,
+        description = description
+    )
+}

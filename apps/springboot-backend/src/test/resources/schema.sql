@@ -264,3 +264,13 @@ create table monthly_waste_declaration_jobs (
 );
 
 create sequence if not exists receival_declaration_id_seq start with 1 increment by 1 maxvalue 999999999999;
+
+create table if not exists vat_rates (
+                                         vat_code text not null,
+                                         percentage numeric not null,
+                                         valid_from timestamp with time zone not null,
+                                         valid_to timestamp with time zone,
+                                         country_code text not null,
+                                         description text not null,
+                                         primary key (vat_code)
+);

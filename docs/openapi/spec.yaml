@@ -93,6 +93,60 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WasteStreamValidationResponse"
+  /vat-rates/{vatCode}:
+    get:
+      tags:
+      - vat-rate-controller
+      operationId: getVatRateByCode
+      parameters:
+      - name: vatCode
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VatRateResponse"
+    put:
+      tags:
+      - vat-rate-controller
+      operationId: updateVatRate
+      parameters:
+      - name: vatCode
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VatRateRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VatRateResponse"
+    delete:
+      tags:
+      - vat-rate-controller
+      operationId: deleteVatRate
+      parameters:
+      - name: vatCode
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: No Content
   /users/{id}:
     get:
       tags:
@@ -661,6 +715,37 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WasteStreamValidationResponse"
+  /vat-rates:
+    get:
+      tags:
+      - vat-rate-controller
+      operationId: getAllVatRates
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VatRateResponse"
+    post:
+      tags:
+      - vat-rate-controller
+      operationId: createVatRate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VatRateRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VatRateResponse"
   /users:
     get:
       tags:
@@ -1636,6 +1721,54 @@ components:
       required:
       - errors
       - isValid
+    VatRateRequest:
+      type: object
+      properties:
+        vatCode:
+          type: string
+          minLength: 1
+        percentage:
+          type: string
+          minLength: 1
+          pattern: "^\\d+(\\.\\d{1,2})?$"
+        validFrom:
+          type: string
+          minLength: 1
+        validTo:
+          type: string
+        countryCode:
+          type: string
+          minLength: 1
+        description:
+          type: string
+          minLength: 1
+      required:
+      - countryCode
+      - description
+      - percentage
+      - validFrom
+      - vatCode
+    VatRateResponse:
+      type: object
+      properties:
+        vatCode:
+          type: string
+        percentage:
+          type: string
+        validFrom:
+          type: string
+        validTo:
+          type: string
+        countryCode:
+          type: string
+        description:
+          type: string
+      required:
+      - countryCode
+      - description
+      - percentage
+      - validFrom
+      - vatCode
     UpdateUserRequest:
       type: object
       properties:
