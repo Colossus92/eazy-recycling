@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration
 data class ExactOnlineProperties(
     var clientId: String = "",
     var clientSecret: String ="",
-    var redirectUri: String = "https://app.eazyrecycling.nl",
+    var redirectUri: String = "https://app.eazyrecycling.nl/api/admin/exact/callback",
     var authorizationEndpoint: String = "https://start.exactonline.nl/api/oauth2/auth",
     var tokenEndpoint: String = "https://start.exactonline.nl/api/oauth2/token"
 ) {
