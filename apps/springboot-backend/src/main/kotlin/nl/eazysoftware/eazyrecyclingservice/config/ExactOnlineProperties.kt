@@ -11,10 +11,4 @@ data class ExactOnlineProperties(
     var redirectUri: String = "https://app.eazyrecycling.nl/api/admin/exact/callback",
     var authorizationEndpoint: String = "https://start.exactonline.nl/api/oauth2/auth",
     var tokenEndpoint: String = "https://start.exactonline.nl/api/oauth2/token"
-) {
-  init {
-      if (clientId.isEmpty() || clientSecret.isEmpty()) {
-          throw IllegalArgumentException("Exact Online client ID and secret must be provided")
-      }
-  }
-}
+)
