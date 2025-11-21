@@ -310,3 +310,14 @@ create table if not exists material_prices (
                                                primary key (id),
                                                foreign key (material_id) references materials(id)
 );
+
+create table if not exists exact_tokens (
+                                            id uuid not null,
+                                            access_token text not null,
+                                            refresh_token text not null,
+                                            token_type text not null,
+                                            expires_at timestamp with time zone not null,
+                                            created_at timestamp with time zone not null default now(),
+                                            updated_at timestamp with time zone not null default now(),
+                                            primary key (id)
+);
