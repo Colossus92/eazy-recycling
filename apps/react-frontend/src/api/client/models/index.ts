@@ -49,7 +49,6 @@ export * from './eural-code-view';
 export * from './filter-registration';
 export * from './goods-item-view';
 export * from './goods-request';
-export * from './http-status';
 export * from './http-status-code';
 export * from './instant';
 export * from './jsp-config-descriptor';
