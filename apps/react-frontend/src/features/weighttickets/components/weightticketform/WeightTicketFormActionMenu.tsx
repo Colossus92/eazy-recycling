@@ -32,7 +32,7 @@ export const WeightTicketFormActionMenu = ({
             }
         );
     }
-    if (weightTicket.status === 'DRAFT' && onCopy) {
+    if (onCopy) {
         actions.push(
             {
                 label: 'Kopiëren',
