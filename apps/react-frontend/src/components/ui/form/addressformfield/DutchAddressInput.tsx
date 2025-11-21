@@ -71,7 +71,7 @@ export const DutchAddressInput = ({ name, disabled = false}: DutchAddressInputPr
             </div>
 
             <div className="flex items-start self-stretch gap-4">
-                                    <TextFormField
+                    <TextFormField
                         title={'Straat'}
                         placeholder={'Vul straatnaam in'}
                         formHook={{

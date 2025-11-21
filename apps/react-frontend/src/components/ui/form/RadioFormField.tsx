@@ -1,6 +1,7 @@
 import { FieldErrors, FieldValues, Path, Control, RegisterOptions } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { RadioGroup, Label, Field, Radio } from '@headlessui/react';
+import { RequiredMarker } from './RequiredMarker.tsx';
 
 export interface RadioOption {
   value: string;
@@ -32,7 +33,10 @@ export const RadioFormField = <T extends FieldValues>({
 
   return (
     <div className="space-y-2 w-full">
-      {title && <label className="text-caption-2">{title}</label>}
+      {title && <label className="text-caption-2">
+        {title}
+        <RequiredMarker required={rules?.required} />
+      </label>}
       <Controller
         control={control}
         name={name}

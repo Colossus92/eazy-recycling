@@ -18,6 +18,7 @@ import {
 } from '@headlessui/react';
 import { useState } from 'react';
 import clsx from 'clsx';
+import { RequiredMarker } from './RequiredMarker.tsx';
 
 export interface ComboboxItem {
   id: string;
@@ -76,7 +77,10 @@ export const ComboboxFormField = <TFieldValues extends FieldValues>({
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
       <div className="flex items-center self-stretch justify-between">
-        <span className="text-caption-2">{title}</span>
+        <span className="text-caption-2">
+          {title}
+          <RequiredMarker required={rules?.required} />
+        </span>
       </div>
 
       <Controller

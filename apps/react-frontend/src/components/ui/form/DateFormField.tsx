@@ -3,6 +3,7 @@ import { FieldValues, FieldErrors, Path, RegisterOptions, UseFormRegister } from
 import { formInputClasses } from '@/styles/formInputClasses.ts';
 import { getFieldError } from '@/utils/formErrorUtils';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
+import { RequiredMarker } from './RequiredMarker.tsx';
 
 interface DateFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
@@ -41,7 +42,10 @@ export const DateFormField = <TFieldValues extends FieldValues>({
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
       <div className="flex items-center self-stretch justify-between">
-        <span className="text-subtitle-2 text-color-text-primary">{title}</span>
+        <span className="text-subtitle-2 text-color-text-primary">
+          {title}
+          <RequiredMarker required={rules?.required} />
+        </span>
       </div>
       <div className={clsx(
         'relative flex items-center w-full',

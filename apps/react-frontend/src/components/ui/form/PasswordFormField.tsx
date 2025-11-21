@@ -6,6 +6,7 @@ import {
   UseFormRegister,
 } from 'react-hook-form';
 import { PasswordInput } from './PasswordInput';
+import { RequiredMarker } from './RequiredMarker';
 
 export interface FormProps<TFieldValues extends FieldValues> {
   register: UseFormRegister<TFieldValues>;
@@ -33,7 +34,10 @@ export const PasswordFormField = <TFieldValues extends FieldValues>({
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1">
-      <span className="text-subtitle-1">{title}</span>
+      <span className="text-subtitle-1">
+        {title}
+        <RequiredMarker required={formHook?.rules?.required} />
+      </span>
       <PasswordInput
         placeholder={placeholder}
         formHook={{

@@ -8,6 +8,7 @@ import {
 import clsx from 'clsx';
 import { formInputClasses } from '@/styles/formInputClasses.ts';
 import { getFieldError } from '@/utils/formErrorUtils';
+import { RequiredMarker } from './RequiredMarker.tsx';
 
 interface TextAreaFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
@@ -50,7 +51,10 @@ export const TextAreaFormField = <TFieldValues extends FieldValues>({
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
       <div className="flex items-center self-stretch justify-between">
-        <span className="text-caption-2">{title}</span>
+        <span className="text-caption-2">
+          {title}
+          <RequiredMarker required={formHook?.rules?.required} />
+        </span>
       </div>
       <textarea
         className={clsx(

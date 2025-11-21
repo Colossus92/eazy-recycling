@@ -11,6 +11,7 @@ import {
 import Select from 'react-select';
 import { Controller } from 'react-hook-form';
 import clsx from 'clsx';
+import { RequiredMarker } from '../RequiredMarker';
 
 export interface Option {
   value: string;
@@ -50,7 +51,10 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
       <div className="flex items-center self-stretch justify-between">
-        <span className="text-caption-2">{title}</span>
+        <span className="text-caption-2">
+          {title}
+          <RequiredMarker required={rules?.required} />
+        </span>
       </div>
 
       <Controller

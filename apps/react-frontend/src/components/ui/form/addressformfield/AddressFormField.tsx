@@ -9,6 +9,7 @@ import { DutchAddressInput } from './DutchAddressInput';
 import { CompanyLocationInput } from './CompanyLocationInput';
 import { ProximityLocationInput } from './ProximityLocationInput';
 import Warning from '@/assets/icons/Warning.svg?react';
+import { RequiredMarker } from '../RequiredMarker';
 
 interface AddressFormFieldProps<TFieldValues extends FieldValues> {
     /**
@@ -105,7 +106,10 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                         className="flex flex-col items-start self-stretch gap-4 p-4 rounded-radius-md bg-color-surface-secondary"
                         data-testid={testId}
                     >
-                        <span className="text-subtitle-1">{label}</span>
+                        <span className="text-subtitle-1">
+                            {label}
+                            <RequiredMarker required={required} />
+                        </span>
 
                         {/* Location Type Selector */}
                         <div className="w-full">
@@ -115,6 +119,13 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                                 value={currentType === 'project_location' ? 'company' : currentType}
                                 onChange={(value) => handleTypeChange(value as LocationType)}
                                 disabled={disabled}
+                                formHook={{
+                                    control,
+                                    name: name as Path<TFieldValues>,
+                                    rules: {
+                                        required: required ? 'Type locatie is verplicht' : undefined,
+                                    },
+                                }}
                             />
                         </div>
 

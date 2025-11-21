@@ -7,6 +7,7 @@ import {
 } from 'react-hook-form';
 import { TextInput } from './TextInput.tsx';
 import { getFieldError } from '@/utils/formErrorUtils';
+import { RequiredMarker } from './RequiredMarker.tsx';
 
 interface TextFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
@@ -35,7 +36,10 @@ export const TextFormField = <TFieldValues extends FieldValues>({
   const fieldError = getFieldError(formHook?.errors, formHook?.name);
   return (
     <div className="flex flex-1 flex-col items-start self-stretch gap-1">
-      <span className="text-caption-2">{title}</span>
+      <span className="text-caption-2">
+        {title}
+        <RequiredMarker required={formHook?.rules?.required} />
+      </span>
       <TextInput
         placeholder={placeholder}
         formHook={{
