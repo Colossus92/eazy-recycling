@@ -29,6 +29,7 @@ class UpdateWeightTicketService(
       lines = cmd.lines,
       secondWeighing = cmd.secondWeighing,
       tarraWeight = cmd.tarraWeight,
+      weightedAt = cmd.weightedAt,
       carrierParty = cmd.carrierParty,
       consignorParty = cmd.consignorParty,
       direction = cmd.direction,

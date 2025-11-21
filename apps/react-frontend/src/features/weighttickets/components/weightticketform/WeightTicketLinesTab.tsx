@@ -156,20 +156,21 @@ export const WeightTicketLinesTab = ({
   const hasConsignorSelected = consignorPartyId && consignorPartyId.length > 0;
 
   return (
-    <>
-      <DateFormField 
-      title="Datum"
-      placeholder="Selecteer een datum"
-      formHook={{
-        register,
-        name: 'date',
-        rules: {
-          required: true,
-        },
-        errors,
-      }}
-      
-      />
+    <div className="flex flex-col items-start self-stretch gap-4">
+      <div className="w-1/44">
+        <DateFormField
+          title="Datum weging"
+          placeholder="Selecteer een datum"
+          formHook={{
+            register,
+            name: 'weightedAt',
+            rules: {
+              required: true,
+            },
+            errors,
+          }}
+        />
+      </div>
       <div className="flex flex-col items-start self-stretch gap-4 p-4 bg-color-surface-secondary rounded-radius-md">
         <div className="flex justify-between items-center self-stretch">
           <span className="text-subtitle-1">Wegingen</span>
@@ -425,6 +426,6 @@ export const WeightTicketLinesTab = ({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };

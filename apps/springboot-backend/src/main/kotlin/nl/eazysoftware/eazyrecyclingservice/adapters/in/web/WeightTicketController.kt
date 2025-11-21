@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
-import java.time.LocalDateTime
+import java.time.LocalDate
 import java.util.*
 
 @PreAuthorize(HAS_ANY_ROLE)
@@ -175,7 +175,7 @@ data class WeightTicketRequest(
   val tarraWeightUnit: WeightUnitRequest?,
   val secondWeighingValue: String?,
   val secondWeighingUnit: WeightUnitRequest?,
-  val weightedAt: LocalDateTime?,
+  val weightedAt: LocalDate?,
   val carrierParty: UUID?,
   val direction: WeightTicketDirection,
   val pickupLocation: PickupLocationRequest?,

@@ -70,6 +70,12 @@ export interface WeightTicketRequest {
      * @type {string}
      * @memberof WeightTicketRequest
      */
+    'weightedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketRequest
+     */
     'carrierParty'?: string;
     /**
      * 

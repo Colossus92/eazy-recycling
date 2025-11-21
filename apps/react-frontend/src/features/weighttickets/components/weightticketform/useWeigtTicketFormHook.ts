@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { toastService } from '@/components/ui/toast/toastService.ts';
@@ -34,6 +35,7 @@ export interface WeightTicketFormValues {
   tarraWeightUnit?: string;
   secondWeighingValue?: number;
   secondWeighingUnit?: string;
+  weightedAt?: string;
   direction: string;
   pickupLocation: LocationFormValue;
   deliveryLocation: LocationFormValue;
@@ -56,6 +58,7 @@ export function useWeightTicketForm(
       tarraWeightUnit: undefined,
       secondWeighingValue: undefined,
       secondWeighingUnit: undefined,
+      weightedAt: format(new Date(), 'yyyy-MM-dd'),
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -114,6 +117,7 @@ export function useWeightTicketForm(
       tarraWeightUnit: undefined,
       secondWeighingValue: NaN,
       secondWeighingUnit: undefined,
+      weightedAt: format(new Date(), 'yyyy-MM-dd'),
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -180,6 +184,9 @@ const weightTicketDetailsToFormValues = (
     tarraWeightValue: weightTicketDetails.tarraWeightValue,
     tarraWeightUnit: weightTicketDetails.tarraWeightUnit,
     direction: weightTicketDetails.direction || 'INBOUND',
+    weightedAt: weightTicketDetails.weightedAt
+      ? format(new Date(weightTicketDetails.weightedAt.toString()), 'yyyy-MM-dd')
+      : undefined,
     pickupLocation: pickupLocationViewToFormValue(
       weightTicketDetails.pickupLocation
     ),
@@ -225,6 +232,7 @@ const formValuesToWeightTicketRequest = (
     tarraWeightUnit: WeightTicketRequestTarraWeightUnitEnum.Kg,
     secondWeighingValue: normalizeNumberForBackend(formValues.secondWeighingValue) || undefined,
     secondWeighingUnit: WeightTicketRequestSecondWeighingUnitEnum.Kg,
+    weightedAt: formValues.weightedAt,
     direction:
       (formValues.direction as WeightTicketRequestDirectionEnum) ||
       WeightTicketRequestDirectionEnum.Inbound,

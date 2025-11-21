@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ValidationError
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
 import org.slf4j.LoggerFactory
@@ -30,6 +32,15 @@ class ValidateWasteStream(
    */
   fun handle(command: ValidateWasteStreamCommand): WasteStreamValidationResult {
     logger.info("Validating waste stream: ${command.wasteStream.wasteStreamNumber.number}")
+
+    if (command.wasteStream.deliveryLocation.processorPartyId != Tenant.processorPartyId) {
+      return WasteStreamValidationResult(
+        wasteStreamNumber = command.wasteStream.wasteStreamNumber.number,
+        isValid = true,
+        errors = emptyList(),
+        requestData = null
+      )
+    }
 
     return wasteStreamValidator.validate(command.wasteStream)
   }

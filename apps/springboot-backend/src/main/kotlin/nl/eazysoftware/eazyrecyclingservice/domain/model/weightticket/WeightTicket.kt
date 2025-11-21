@@ -78,6 +78,7 @@ class WeightTicket(
     deliveryLocation: Location? = this.deliveryLocation,
     secondWeighing: Weight? = this.secondWeighing,
     tarraWeight: Weight? = this.tarraWeight,
+    weightedAt: Instant? = this.weightedAt,
     truckLicensePlate: LicensePlate? = this.truckLicensePlate,
     reclamation: String? = this.reclamation,
     note: Note? = this.note,
@@ -88,6 +89,7 @@ class WeightTicket(
     this.lines = lines
     this.tarraWeight = tarraWeight
     this.secondWeighing = secondWeighing
+    this.weightedAt = weightedAt
     this.direction = direction
     this.pickupLocation = pickupLocation
     this.deliveryLocation = deliveryLocation
@@ -141,6 +143,7 @@ class WeightTicket(
       lines = WeightTicketLines(newLines),
       secondWeighing = null,
       tarraWeight = null,
+      weightedAt = this.weightedAt,
       carrierParty = this.carrierParty,
       direction = this.direction,
       pickupLocation = this.pickupLocation,
@@ -179,6 +182,7 @@ class WeightTicket(
       }),
       secondWeighing = this.secondWeighing,
       tarraWeight = this.tarraWeight,
+      weightedAt = this.weightedAt,
       carrierParty = this.carrierParty,
       direction = this.direction,
       pickupLocation = this.pickupLocation,
