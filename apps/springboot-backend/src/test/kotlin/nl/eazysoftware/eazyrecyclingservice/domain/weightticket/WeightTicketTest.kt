@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.*
 import kotlin.test.assertFailsWith
 import kotlin.time.Clock
@@ -187,6 +189,7 @@ class WeightTicketTest {
   fun `can complete weight ticket with draft status and lines`() {
     val weightTicket = weightTicket().apply {
       lines = SAMPLE_LINES
+      weightedAt = LocalDate.of(2025, 11, 21).toCetInstant()
     }
 
     assertDoesNotThrow {
@@ -201,13 +204,14 @@ class WeightTicketTest {
   fun `cannot complete weight ticket without lines`() {
     val weightTicket = weightTicket().apply {
       lines = EMPTY_LINES
+      weightedAt = LocalDate.of(2025, 11, 21).toCetInstant()
     }
 
     val exception = assertFailsWith<IllegalStateException> {
       weightTicket.complete()
     }
 
-    assertThat(exception).hasMessageContaining("Weegbon kan alleen worden voltooid als er minimaal één sorteerweging is")
+    assertThat(exception).hasMessageContaining("Weegbon kan alleen worden voltooid als er minimaal één sorteerregel is")
   }
 
   @ParameterizedTest
@@ -285,14 +289,15 @@ class WeightTicketTest {
   }
 
   @Test
-  fun `copied weight ticket has null weightedAt`() {
+  fun `copied weight ticket has same weightedAt`() {
+    val now = Clock.System.now()
     val originalTicket = weightTicket().apply {
-      weightedAt = Clock.System.now()
+      weightedAt = now
     }
 
     val copiedTicket = originalTicket.copy(WeightTicketId(999))
 
-    assertThat(copiedTicket.weightedAt).isNull()
+    assertThat(copiedTicket.weightedAt).isEqualTo(now)
   }
 
   @Test

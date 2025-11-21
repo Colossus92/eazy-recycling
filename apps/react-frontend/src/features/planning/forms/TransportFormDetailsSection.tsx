@@ -1,17 +1,10 @@
-import { useFormContext } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
-import {
-  Option,
-  SelectFormField,
-} from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { WasteContainerView } from '@/api/client';
-import { containerService } from '@/api/services/containerService';
+import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField.tsx';
+import { ContainerSelectFormField } from '@/components/ui/form/selectfield/ContainerSelectFormField';
 import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
-import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField.tsx';
-import { ContainerSelectFormField } from '@/components/ui/form/selectfield/ContainerSelectFormField';
+import { useFormContext } from 'react-hook-form';
 
 export const TransportFormDetailsSection = () => {
   const {
@@ -19,15 +12,7 @@ export const TransportFormDetailsSection = () => {
     control,
     formState: { errors },
   } = useFormContext<ContainerTransportFormValues | WasteTransportFormValues>();
-  const { data: wastecontainers = [] } = useQuery<WasteContainerView[]>({
-    queryKey: ['containers'],
-    queryFn: () => containerService.getAll(),
-  });
 
-  const containerOptions: Option[] = wastecontainers.map((container) => ({
-    value: container.id,
-    label: container.id,
-  }));
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>
       <TruckSelectFormField
@@ -57,7 +42,7 @@ export const TransportFormDetailsSection = () => {
       <TextAreaFormField
         title={'Opmerkingen'}
         placeholder={'Plaats opmerkingen'}
-        testId='transport-notes'
+        testId="transport-notes"
         formHook={{
           register,
           name: 'note',

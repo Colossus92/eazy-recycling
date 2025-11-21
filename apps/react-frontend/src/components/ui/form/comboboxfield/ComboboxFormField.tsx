@@ -18,7 +18,7 @@ import {
 } from '@headlessui/react';
 import { useState } from 'react';
 import clsx from 'clsx';
-import { RequiredMarker } from './RequiredMarker.tsx';
+import { RequiredMarker } from '../RequiredMarker.tsx';
 
 export interface ComboboxItem {
   id: string;
