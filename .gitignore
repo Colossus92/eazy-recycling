@@ -67,3 +67,4 @@ test-results/**
 .kotlin
 
 .env*
+!.env.example
