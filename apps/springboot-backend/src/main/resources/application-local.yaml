@@ -14,3 +14,11 @@ cors:
 springdoc:
   api-docs:
     enabled: true
+
+exact:
+  oauth:
+    client-id: test-client-id
+    client-secret: test-client-secret
+    redirect-uri: http://localhost:8080/api/admin/exact/callback
+    authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
+    token-endpoint: https://start.exactonline.nl/api/oauth2/token
