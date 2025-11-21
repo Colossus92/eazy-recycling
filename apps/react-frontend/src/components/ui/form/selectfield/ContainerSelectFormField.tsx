@@ -39,7 +39,7 @@ export const ContainerSelectFormField = <T extends FieldValues>({
 
   return (
     <SelectFormField
-      title={'Container (optioneel)'}
+      title={'Container'}
       placeholder={'Selecteer een container'}
       options={containerOptions}
       testId='container-select'

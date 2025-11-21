@@ -38,7 +38,7 @@ export const TruckSelectFormField = <T extends FieldValues>({
 
   return (
     <SelectFormField
-      title={'Vrachtwagen (optioneel)'}
+      title={'Vrachtwagen'}
       placeholder={'Selecteer een vrachtwagen'}
       options={truckOptions}
       testId="truck-select"

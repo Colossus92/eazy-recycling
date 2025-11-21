@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { FieldValues } from 'react-hook-form';
 import { FormProps } from '@/components/ui/form/TextFormField.tsx';
+import { RequiredMarker } from './RequiredMarker';
 
 interface DateTimeInputProps<T extends FieldValues> {
   title: string;
@@ -33,7 +34,10 @@ export const DateTimeInput = <T extends FieldValues>({
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1">
-      <span className="text-caption-2">{title}</span>
+      <span className="text-caption-2">
+        {title}
+        <RequiredMarker required={formHook?.rules?.required} />
+      </span>
       <div
         className={clsx(
           'relative flex items-center text-body-1 w-full',

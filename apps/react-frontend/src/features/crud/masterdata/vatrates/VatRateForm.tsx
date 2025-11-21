@@ -154,7 +154,7 @@ export const VatRateForm = ({
                 testId="valid-from-input"
               />
               <DateTimeInput
-                title={'Geldig tot (optioneel)'}
+                title={'Geldig tot'}
                 formHook={{
                   register,
                   name: 'validTo',

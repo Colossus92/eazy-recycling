@@ -83,7 +83,7 @@ export const TransportFromWeightTicketForm = ({
                                         }}
                                     />
                                     <DateTimeInput
-                                        title={'Aflevermoment (optioneel)'}
+                                        title={'Aflevermoment'}
                                         testId={'delivery-datetime-input'}
                                         formHook={{
                                             register: formContext.register,

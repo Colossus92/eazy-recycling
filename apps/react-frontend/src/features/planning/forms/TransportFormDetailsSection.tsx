@@ -11,6 +11,7 @@ import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSele
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField.tsx';
+import { ContainerSelectFormField } from '@/components/ui/form/selectfield/ContainerSelectFormField';
 
 export const TransportFormDetailsSection = () => {
   const {
@@ -45,11 +46,7 @@ export const TransportFormDetailsSection = () => {
           control: control,
         }}
       />
-      <SelectFormField
-        title={'Container (optioneel)'}
-        placeholder={'Selecteer een container'}
-        options={containerOptions}
-        testId='container-select'
+      <ContainerSelectFormField
         formHook={{
           register: register,
           name: 'containerId',
@@ -58,7 +55,7 @@ export const TransportFormDetailsSection = () => {
         }}
       />
       <TextAreaFormField
-        title={'Opmerkingen (optioneel)'}
+        title={'Opmerkingen'}
         placeholder={'Plaats opmerkingen'}
         testId='transport-notes'
         formHook={{

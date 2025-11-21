@@ -214,7 +214,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
 
       <div className="flex-grow-0 flex flex-col items-start self-stretch gap-4">
         <SelectFormField
-          title={'Kies bedrijf (optioneel)'}
+          title={'Kies bedrijf'}
           placeholder={'Selecteer een bedrijf of vul zelf een adres in'}
           options={companyOptions}
           testId={testId}
