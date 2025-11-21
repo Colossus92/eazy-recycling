@@ -39,7 +39,7 @@ out/
 ### Kotlin ###
 .kotlin
 
-.env*
+../../.env.example
 
 ### Certificates ###
 src/main/resources/certificates/

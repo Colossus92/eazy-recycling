@@ -99,6 +99,14 @@ services:
       - key: AMICE_CERTIFICATE_PATH
         scope: RUN_AND_BUILD_TIME
         value: file:/tmp/client.pfx
+      - key: EXACT_CLIENT_ID
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:aL2Wt+RGrKD0Fm1vkrokA0S4bjqiXUGX:DxlVyzFecliL1SIfsNrfKF2LC48CUdzxAOLiTrlJDu8fCPf0+FqubYntRcwo0SrUiUKMWw==]
+      - key: EXACT_CLIENT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:OBdQsK3yRTadcc57j2t+Gc4WRTO9Fzh2:fFzDoTjTthlxy7m7ra4GIn4ScKkN78Qb2RZARQ==]
     health_check:
       failure_threshold: 20
       period_seconds: 10

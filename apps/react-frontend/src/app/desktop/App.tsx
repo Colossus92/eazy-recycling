@@ -11,8 +11,11 @@ import { ScreenSizeSafeguard } from '@/components/safeguards/ScreenSizeSafeguard
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
 const CompanyManagement = lazy(() => import('./pages/CompanyManagement'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
-const MasterdataManagement = lazy(() => import('./pages/MasterdataManagement.tsx'));
+const MasterdataManagement = lazy(
+  () => import('./pages/MasterdataManagement.tsx')
+);
 const ProfileManagement = lazy(() => import('./pages/ProfileManagement'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 
 const DesktopAccessCheck = ({ children }: { children: React.ReactNode }) => {
   const { isMobileSession } = useMobileHook();
@@ -42,8 +45,14 @@ export const App = () => {
             <Routes>
               <Route path="/" element={<PlanningPage />} />
               <Route path="/crm" element={<CompanyManagement />} />
-              <Route path="/waste-streams" element={<WasteStreamManagement />} />
-              <Route path="/weight-tickets" element={<WeightTicketManagement />} />
+              <Route
+                path="/waste-streams"
+                element={<WasteStreamManagement />}
+              />
+              <Route
+                path="/weight-tickets"
+                element={<WeightTicketManagement />}
+              />
               <Route
                 path="/users"
                 element={
@@ -61,6 +70,14 @@ export const App = () => {
                 }
               />
               <Route path="/profile" element={<ProfileManagement />} />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </div>

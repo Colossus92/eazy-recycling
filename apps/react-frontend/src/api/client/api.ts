@@ -21,6 +21,7 @@ export * from './apis/company-controller-api';
 export * from './apis/container-transport-controller-api';
 export * from './apis/driver-controller-api';
 export * from './apis/eural-controller-api';
+export * from './apis/exact-online-controller-api';
 export * from './apis/material-controller-api';
 export * from './apis/material-group-controller-api';
 export * from './apis/material-price-controller-api';

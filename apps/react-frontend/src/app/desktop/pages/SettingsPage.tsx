@@ -1,0 +1,339 @@
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
+import { Button } from '@/components/ui/button/Button.tsx';
+import { ExactOnlineControllerApi } from '@/api/client/apis/exact-online-controller-api.ts';
+import { Configuration } from '@/api/client/configuration';
+import { supabase } from '@/api/supabaseClient';
+import type {
+  AuthorizationUrlResponse,
+  ConnectionStatusResponse,
+  RefreshTokenResponse,
+} from '@/api/client';
+import { toastService } from '@/components/ui/toast/toastService.ts';
+
+const getApiClient = async () => {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const accessToken = sessionData.session?.access_token || '';
+
+  const config = new Configuration({
+    basePath: import.meta.env.VITE_BACKEND_URL,
+    accessToken,
+  });
+
+  return new ExactOnlineControllerApi(config);
+};
+
+export const SettingsPage = () => {
+  const [authUrl, setAuthUrl] = useState<string | null>(null);
+  const [authState, setAuthState] = useState<string | null>(null);
+
+  // Query to get connection status
+  const {
+    data: connectionStatus,
+    isLoading: isLoadingStatus,
+    refetch: refetchStatus,
+  } = useQuery<ConnectionStatusResponse>({
+    queryKey: ['exactOnlineStatus'],
+    queryFn: async () => {
+      const api = await getApiClient();
+      const response = await api.getConnectionStatus();
+      return response.data;
+    },
+    refetchInterval: 5000, // Refresh every 5 seconds to detect auth completion
+  });
+
+  // Mutation to get authorization URL
+  const getAuthUrlMutation = useMutation({
+    mutationFn: async () => {
+      const api = await getApiClient();
+      const response = await api.getAuthorizationUrl();
+      return response.data;
+    },
+    onSuccess: (data: AuthorizationUrlResponse) => {
+      setAuthUrl(data.authorizationUrl);
+      setAuthState(data.state);
+      toastService.success('Authorization URL generated successfully');
+    },
+    onError: (error: Error) => {
+      toastService.error(`Failed to get authorization URL: ${error.message}`);
+    },
+  });
+
+  // Mutation to refresh token
+  const refreshTokenMutation = useMutation({
+    mutationFn: async () => {
+      const api = await getApiClient();
+      const response = await api.refreshToken();
+      return response.data;
+    },
+    onSuccess: (data: RefreshTokenResponse) => {
+      if (data.success) {
+        toastService.success(data.message || 'Token refreshed successfully');
+        refetchStatus();
+      } else {
+        toastService.error(data.message || 'Failed to refresh token');
+      }
+    },
+    onError: (error: Error) => {
+      toastService.error(`Failed to refresh token: ${error.message}`);
+    },
+  });
+
+  const handleGetAuthUrl = () => {
+    getAuthUrlMutation.mutate();
+  };
+
+  const handleOpenAuthUrl = () => {
+    if (authUrl) {
+      window.open(authUrl, '_blank');
+      toastService.success(
+        'Please complete the authorization in the new window. This page will automatically update when authentication is complete.'
+      );
+    }
+  };
+
+  const handleRefreshToken = () => {
+    refreshTokenMutation.mutate();
+  };
+
+  const handleTestConnection = () => {
+    refetchStatus();
+    toastService.success('Checking connection status...');
+  };
+
+  // Clear auth URL when connection becomes established
+  useEffect(() => {
+    if (connectionStatus?.connected) {
+      setAuthUrl(null);
+      setAuthState(null);
+    }
+  }, [connectionStatus?.connected]);
+
+  if (isLoadingStatus) {
+    return <ContentContainer title={'Instellingen'}>Laden...</ContentContainer>;
+  }
+
+  return (
+    <ContentContainer title={'Instellingen'}>
+      <div className="w-full max-w-4xl flex flex-col gap-6">
+        {/* Exact Online Integration Section */}
+        <div className="border border-solid border-color-border-primary rounded-2xl bg-color-surface-primary">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-solid border-color-border-primary">
+            <div className="flex flex-col gap-1">
+              <h4 className="text-color-text-primary">
+                Exact Online Integratie
+              </h4>
+              <span className="text-color-text-secondary">
+                Beheer de connectie met Exact Online voor automatische
+                synchronisatie
+              </span>
+            </div>
+          </div>
+
+          {/* Connection Status */}
+          <div className="px-6 py-4 border-b border-solid border-color-border-primary">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1">
+                <h5 className="text-color-text-primary">Verbindingsstatus</h5>
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      connectionStatus?.connected
+                        ? 'bg-color-status-success-dark'
+                        : 'bg-color-status-error-dark'
+                    }`}
+                  />
+                  <span className="text-color-text-secondary">
+                    {connectionStatus?.connected
+                      ? 'Verbonden'
+                      : 'Niet verbonden'}
+                  </span>
+                </div>
+                {connectionStatus?.message && (
+                  <p className="text-sm text-color-text-secondary mt-1">
+                    {connectionStatus.message}
+                  </p>
+                )}
+              </div>
+              <Button
+                variant="secondary"
+                label="Test Verbinding"
+                onClick={handleTestConnection}
+                disabled={isLoadingStatus}
+              />
+            </div>
+          </div>
+
+          {/* Authorization Section */}
+          {!connectionStatus?.connected && (
+            <div className="px-6 py-4 border-b border-solid border-color-border-primary">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <h5 className="text-color-text-primary">
+                    Autorisatie instellen
+                  </h5>
+                  <span className="text-sm text-color-text-secondary">
+                    Klik op de knop hieronder om de autorisatie URL te
+                    genereren. U wordt doorgestuurd naar Exact Online om de
+                    applicatie te autoriseren.
+                  </span>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="primary"
+                    label="Genereer Autorisatie URL"
+                    onClick={handleGetAuthUrl}
+                    disabled={getAuthUrlMutation.isPending || authUrl !== null}
+                  />
+                  {authUrl && (
+                    <Button
+                      variant="secondary"
+                      label="Open Autorisatie Pagina"
+                      onClick={handleOpenAuthUrl}
+                    />
+                  )}
+                </div>
+
+                {authUrl && (
+                  <div className="flex flex-col gap-2 p-4 bg-color-surface-tertiary rounded-radius-md">
+                    <span className="text-sm font-medium text-color-text-primary">
+                      Autorisatie URL:
+                    </span>
+                    <div className="flex gap-2 items-start">
+                      <code className="flex-1 text-xs text-color-text-secondary break-all bg-color-surface-secondary p-2 rounded">
+                        {authUrl}
+                      </code>
+                    </div>
+                    {authState && (
+                      <div className="mt-2">
+                        <span className="text-sm font-medium text-color-text-primary">
+                          State Token:
+                        </span>
+                        <code className="block text-xs text-color-text-secondary break-all bg-color-surface-secondary p-2 rounded mt-1">
+                          {authState}
+                        </code>
+                      </div>
+                    )}
+                    <p className="text-xs text-color-text-secondary mt-2">
+                      💡 Na het voltooien van de autorisatie wordt u teruggeleid
+                      naar de applicatie en wordt de verbinding automatisch tot
+                      stand gebracht.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Token Management Section */}
+          {connectionStatus?.connected && (
+            <div className="px-6 py-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <h5 className="text-color-text-primary">Token Beheer</h5>
+                  <span className="text-sm text-color-text-secondary">
+                    Vernieuw het toegangstoken wanneer deze is verlopen. Dit
+                    wordt normaal gesproken automatisch gedaan.
+                  </span>
+                </div>
+
+                <div>
+                  <Button
+                    variant="secondary"
+                    label="Vernieuw Token"
+                    onClick={handleRefreshToken}
+                    disabled={refreshTokenMutation.isPending}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* API Endpoints Documentation */}
+        <div className="border border-solid border-color-border-primary rounded-2xl bg-color-surface-primary">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-solid border-color-border-primary">
+            <div className="flex flex-col gap-1">
+              <h4 className="text-color-text-primary">
+                API Endpoints Documentatie
+              </h4>
+              <span className="text-color-text-secondary">
+                Beschikbare endpoints voor Exact Online integratie
+              </span>
+            </div>
+          </div>
+
+          <div className="px-6 py-4">
+            <div className="flex flex-col gap-4">
+              {/* Get Authorization URL */}
+              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
+                    GET
+                  </span>
+                  <code className="text-sm text-color-text-primary">
+                    /api/admin/exact/auth-url
+                  </code>
+                </div>
+                <p className="text-sm text-color-text-secondary">
+                  Genereer een OAuth2 autorisatie URL om te connecteren met
+                  Exact Online.
+                </p>
+              </div>
+
+              {/* Get Connection Status */}
+              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
+                    GET
+                  </span>
+                  <code className="text-sm text-color-text-primary">
+                    /api/admin/exact/status
+                  </code>
+                </div>
+                <p className="text-sm text-color-text-secondary">
+                  Controleer de huidige verbindingsstatus met Exact Online.
+                </p>
+              </div>
+
+              {/* Refresh Token */}
+              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-green-600 text-white rounded">
+                    POST
+                  </span>
+                  <code className="text-sm text-color-text-primary">
+                    /api/admin/exact/refresh
+                  </code>
+                </div>
+                <p className="text-sm text-color-text-secondary">
+                  Vernieuw het toegangstoken voor de Exact Online connectie.
+                </p>
+              </div>
+
+              {/* Handle Callback */}
+              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
+                    GET
+                  </span>
+                  <code className="text-sm text-color-text-primary">
+                    /api/admin/exact/callback
+                  </code>
+                </div>
+                <p className="text-sm text-color-text-secondary">
+                  OAuth2 callback endpoint (automatisch aangeroepen door Exact
+                  Online na autorisatie).
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ContentContainer>
+  );
+};
+
+export default SettingsPage;
