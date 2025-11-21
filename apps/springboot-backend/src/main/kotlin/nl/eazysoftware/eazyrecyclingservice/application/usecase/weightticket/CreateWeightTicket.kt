@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 
 interface CreateWeightTicket {
   fun handle(cmd: WeightTicketCommand): WeightTicketResult
@@ -23,17 +24,18 @@ interface CreateWeightTicket {
  * Contains GoodsCommand with only waste stream reference - full WasteStream will be fetched in the service.
  */
 data class WeightTicketCommand(
-  val lines: WeightTicketLines,
-  val secondWeighing: Weight?,
-  val tarraWeight: Weight?,
-  val consignorParty: Consignor,
-  val carrierParty: CompanyId?,
-  val direction: WeightTicketDirection,
-  val pickupLocation: PickupLocationCommand?,
-  val deliveryLocation: PickupLocationCommand?,
-  val truckLicensePlate: LicensePlate?,
-  val reclamation: String?,
-  val note: Note?,
+    val lines: WeightTicketLines,
+    val secondWeighing: Weight?,
+    val tarraWeight: Weight?,
+    val consignorParty: Consignor,
+    val carrierParty: CompanyId?,
+    val direction: WeightTicketDirection,
+    val pickupLocation: PickupLocationCommand?,
+    val deliveryLocation: PickupLocationCommand?,
+    val truckLicensePlate: LicensePlate?,
+    val reclamation: String?,
+    val note: Note?,
+    val weightedAt: Instant?,
 )
 
 data class WeightTicketResult(val id: WeightTicketId)

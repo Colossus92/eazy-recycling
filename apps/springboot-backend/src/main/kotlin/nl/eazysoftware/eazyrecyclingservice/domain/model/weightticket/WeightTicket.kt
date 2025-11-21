@@ -157,7 +157,10 @@ class WeightTicket(
       "Weegbon kan alleen worden voltooid als de status openstaand is"
     }
     check (!lines.isEmpty()) {
-      "Weegbon kan alleen worden voltooid als er minimaal één sorteerweging is"
+      "Weegbon kan alleen worden voltooid als er minimaal één sorteerregel is"
+    }
+    check(weightedAt != null) {
+      "Weegbon kan alleen worden voltooid als de weegdatum is ingevuld."
     }
     this.status = WeightTicketStatus.COMPLETED
     this.updatedAt = Clock.System.now()

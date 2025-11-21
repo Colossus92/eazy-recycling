@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
@@ -20,6 +21,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 
 @PreAuthorize(HAS_ANY_ROLE)
@@ -173,6 +175,7 @@ data class WeightTicketRequest(
   val tarraWeightUnit: WeightUnitRequest?,
   val secondWeighingValue: String?,
   val secondWeighingUnit: WeightUnitRequest?,
+  val weightedAt: LocalDateTime?,
   val carrierParty: UUID?,
   val direction: WeightTicketDirection,
   val pickupLocation: PickupLocationRequest?,
@@ -186,6 +189,7 @@ data class WeightTicketRequest(
       lines = lines.toDomain(),
       secondWeighing = secondWeighingValue?.let { toWeight(it, secondWeighingUnit) },
       tarraWeight = tarraWeightValue?.let { toWeight(it, tarraWeightUnit) },
+      weightedAt = weightedAt?.toCetInstant(),
       consignorParty = consignorParty.toDomain(),
       carrierParty = carrierParty?.let { CompanyId(it) },
       direction = direction,
