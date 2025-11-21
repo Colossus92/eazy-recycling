@@ -12,6 +12,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMe
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -39,6 +40,7 @@ class FirstReceivalWasteStreamQueryAdapter(
 
   private val logger = LoggerFactory.getLogger(FirstReceivalWasteStreamQueryAdapter::class.java)
 
+  @Transactional
   override fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<FirstReceivalDeclaration> {
     logger.info("Finding first receival declarations for yearMonth={}", yearMonth)
 

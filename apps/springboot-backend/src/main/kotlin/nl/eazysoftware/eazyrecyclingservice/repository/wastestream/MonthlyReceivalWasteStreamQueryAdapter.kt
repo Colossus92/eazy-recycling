@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyReceivalWast
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclarationIdGenerator
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -32,6 +33,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
 
   private val logger = LoggerFactory.getLogger(MonthlyReceivalWasteStreamQueryAdapter::class.java)
 
+  @Transactional
   override fun findMonthlyReceivalDeclarations(yearMonth: YearMonth): List<MonthlyReceivalDeclaration> {
     logger.info("Finding monthly receival declarations for yearMonth={}", yearMonth)
 
@@ -63,7 +65,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
       WHERE proc.processor_id = '08797'
         AND wt.id IS NOT NULL
         AND EXISTS (
-          SELECT 1 FROM lma_declarations d 
+          SELECT 1 FROM lma_declarations d
           WHERE d.waste_stream_number = ws.number
         )
       GROUP BY ws.number
