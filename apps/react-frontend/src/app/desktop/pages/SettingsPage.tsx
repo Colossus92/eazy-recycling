@@ -1,28 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import type {
+    AuthorizationUrlResponse,
+    ConnectionStatusResponse,
+    RefreshTokenResponse,
+} from '@/api/client';
+import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
-import { ExactOnlineControllerApi } from '@/api/client/apis/exact-online-controller-api.ts';
-import { Configuration } from '@/api/client/configuration';
-import { supabase } from '@/api/supabaseClient';
-import type {
-  AuthorizationUrlResponse,
-  ConnectionStatusResponse,
-  RefreshTokenResponse,
-} from '@/api/client';
 import { toastService } from '@/components/ui/toast/toastService.ts';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
-const getApiClient = async () => {
-  const { data: sessionData } = await supabase.auth.getSession();
-  const accessToken = sessionData.session?.access_token || '';
-
-  const config = new Configuration({
-    basePath: import.meta.env.VITE_BACKEND_URL,
-    accessToken,
-  });
-
-  return new ExactOnlineControllerApi(config);
-};
 
 export const SettingsPage = () => {
   const [authUrl, setAuthUrl] = useState<string | null>(null);
@@ -36,8 +23,7 @@ export const SettingsPage = () => {
   } = useQuery<ConnectionStatusResponse>({
     queryKey: ['exactOnlineStatus'],
     queryFn: async () => {
-      const api = await getApiClient();
-      const response = await api.getConnectionStatus();
+      const response = await exactOnlineService.getConnectionStatus();
       return response.data;
     },
     refetchInterval: 5000, // Refresh every 5 seconds to detect auth completion
@@ -46,8 +32,7 @@ export const SettingsPage = () => {
   // Mutation to get authorization URL
   const getAuthUrlMutation = useMutation({
     mutationFn: async () => {
-      const api = await getApiClient();
-      const response = await api.getAuthorizationUrl();
+      const response = await exactOnlineService.getAuthorizationUrl();
       return response.data;
     },
     onSuccess: (data: AuthorizationUrlResponse) => {
@@ -63,8 +48,7 @@ export const SettingsPage = () => {
   // Mutation to refresh token
   const refreshTokenMutation = useMutation({
     mutationFn: async () => {
-      const api = await getApiClient();
-      const response = await api.refreshToken();
+      const response = await exactOnlineService.refreshToken();
       return response.data;
     },
     onSuccess: (data: RefreshTokenResponse) => {
@@ -309,7 +293,7 @@ export const SettingsPage = () => {
                   </code>
                 </div>
                 <p className="text-sm text-color-text-secondary">
-                  Vernieuw het toegangstoken voor de Exact Online connectie.
+                  Vernieuw het toegangstoken voor des Exact Online connectie.
                 </p>
               </div>
 
