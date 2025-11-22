@@ -43,6 +43,7 @@ class SecurityConfig {
                 authorize
                     .requestMatchers("/v3/api-docs.yaml").permitAll()
                     .requestMatchers("/actuator/**").permitAll() // Allow health checks and error pages
+                    .requestMatchers("/api/admin/exact/callback").permitAll() // OAuth callback must be public
                     .anyRequest().authenticated() // All other requests just require authentication (any role)
             }
             .oauth2ResourceServer { oauth2 ->

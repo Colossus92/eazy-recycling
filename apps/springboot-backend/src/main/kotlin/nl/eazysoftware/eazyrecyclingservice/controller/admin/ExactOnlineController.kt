@@ -15,7 +15,6 @@ import org.springframework.web.servlet.view.RedirectView
  */
 @RestController
 @RequestMapping("/api/admin/exact")
-@PreAuthorize(HAS_ROLE_ADMIN)
 class ExactOnlineController(
     private val exactOAuthService: ExactOAuthService
 ) {
@@ -28,6 +27,7 @@ class ExactOnlineController(
      * Returns the Exact Online authorization URL that the frontend should redirect to.
      * The URL includes the OAuth2 parameters (client_id, redirect_uri, state, etc.)
      */
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @GetMapping("/auth-url")
     fun getAuthorizationUrl(): AuthorizationUrlResponse {
         logger.info("Generating Exact Online authorization URL")
@@ -46,12 +46,14 @@ class ExactOnlineController(
      * OAuth2 callback endpoint. Exact Online redirects here after user authorization.
      * Exchanges the authorization code for access and refresh tokens.
      *
+     * This endpoint is publicly accessible (configured in SecurityConfig) to allow
+     * Exact Online to redirect here without authentication.
+     *
      * Query parameters:
      * - code: Authorization code from Exact Online
      * - state: CSRF protection token
      */
     @GetMapping("/callback")
-    @PreAuthorize("permitAll()") // Allow unauthenticated access for OAuth callback
     fun handleCallback(
         @RequestParam code: String,
         @RequestParam state: String,
@@ -90,6 +92,7 @@ class ExactOnlineController(
      *
      * Check if we have valid Exact Online tokens
      */
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @GetMapping("/status")
     fun getConnectionStatus(): ConnectionStatusResponse {
         val hasValidTokens = exactOAuthService.hasValidTokens()
@@ -105,6 +108,7 @@ class ExactOnlineController(
      *
      * Manually refresh the access token (mainly for testing)
      */
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @PostMapping("/refresh")
     fun refreshToken(): ResponseEntity<RefreshTokenResponse> {
         return try {
