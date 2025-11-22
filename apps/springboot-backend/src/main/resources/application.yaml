@@ -47,6 +47,6 @@ exact:
   oauth:
     client-id: ${EXACT_CLIENT_ID:}
     client-secret: ${EXACT_CLIENT_SECRET:}
-    redirect-uri: ${EXACT_REDIRECT_URI}
+    redirect-uri: ${EXACT_REDIRECT_URI:http://localhost:8080/api/admin/exact/callback}
     authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
     token-endpoint: https://start.exactonline.nl/api/oauth2/token

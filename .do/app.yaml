@@ -107,6 +107,9 @@ services:
         scope: RUN_AND_BUILD_TIME
         type: SECRET
         value: EV[1:OBdQsK3yRTadcc57j2t+Gc4WRTO9Fzh2:fFzDoTjTthlxy7m7ra4GIn4ScKkN78Qb2RZARQ==]
+      - key: EXACT_REDIRECT_URI
+        scope: RUN_AND_BUILD_TIME
+        value: https://app.eazyrecycling.nl/api/admin/exact/callback
     health_check:
       failure_threshold: 20
       period_seconds: 10
