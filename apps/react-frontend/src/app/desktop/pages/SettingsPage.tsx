@@ -1,4 +1,8 @@
-import type { AuthorizationUrlResponse, ConnectionStatusResponse, RefreshTokenResponse, } from '@/api/client';
+import type {
+  AuthorizationUrlResponse,
+  ConnectionStatusResponse,
+  RefreshTokenResponse,
+} from '@/api/client';
 import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
@@ -137,11 +141,10 @@ export const SettingsPage = () => {
                 <h5 className="text-color-text-primary">Verbindingsstatus</h5>
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${
-                      connectionStatus?.connected
+                    className={`w-3 h-3 rounded-full ${connectionStatus?.connected
                         ? 'bg-color-status-success-dark'
                         : 'bg-color-status-error-dark'
-                    }`}
+                      }`}
                   />
                   <span className="text-color-text-secondary">
                     {connectionStatus?.connected
@@ -213,28 +216,26 @@ export const SettingsPage = () => {
           )}
 
           {/* Token Management Section */}
-          {connectionStatus?.connected && (
-            <div className="px-6 py-4">
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1">
-                  <h5 className="text-color-text-primary">Token Beheer</h5>
-                  <span className="text-sm text-color-text-secondary">
-                    Vernieuw het toegangstoken wanneer deze is verlopen. Dit
-                    wordt normaal gesproken automatisch gedaan.
-                  </span>
-                </div>
+          <div className="px-6 py-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <h5 className="text-color-text-primary">Token Beheer</h5>
+                <span className="text-sm text-color-text-secondary">
+                  Vernieuw het toegangstoken wanneer deze is verlopen. Dit
+                  wordt normaal gesproken automatisch gedaan.
+                </span>
+              </div>
 
-                <div>
-                  <Button
-                    variant="secondary"
-                    label="Vernieuw Token"
-                    onClick={handleRefreshToken}
-                    disabled={refreshTokenMutation.isPending}
-                  />
-                </div>
+              <div>
+                <Button
+                  variant="secondary"
+                  label="Vernieuw Token"
+                  onClick={handleRefreshToken}
+                  disabled={refreshTokenMutation.isPending}
+                />
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </ContentContainer>
