@@ -12,6 +12,8 @@ import org.springframework.security.oauth2.jwt.JwtValidators
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -40,7 +42,6 @@ class SecurityConfig {
             .authorizeHttpRequests { authorize ->
                 authorize
                     .requestMatchers("/api/admin/exact/callback**").permitAll()
-                    .requestMatchers("/api/admin/exact**").permitAll()
                     .requestMatchers("/v3/api-docs.yaml").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
                     .anyRequest().authenticated()
@@ -48,15 +49,43 @@ class SecurityConfig {
             .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
             .oauth2ResourceServer { oauth2 ->
-                oauth2.jwt { jwt ->
-                    jwt.decoder(jwtDecoder())
-                    jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                }
+                oauth2
+                    .bearerTokenResolver(bearerTokenResolver())
+                    .jwt { jwt ->
+                        jwt.decoder(jwtDecoder())
+                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                    }
             }
             .sessionManagement {
               it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .build()
+    }
+
+    @Bean
+    fun bearerTokenResolver(): BearerTokenResolver {
+        // Define public endpoints as regex patterns that should skip JWT authentication
+        // Convert Ant-style patterns to regex:
+        // ** = .* (match any characters)
+        // * = [^/]* (match any characters except /)
+        val publicEndpointPatterns = listOf(
+            "^/api/admin/exact/callback.*".toRegex(),  // /api/admin/exact/callback**
+            "^/v3/api-docs\\.yaml$".toRegex(),          // /v3/api-docs.yaml (exact match)
+            "^/actuator/.*".toRegex()                  // /actuator/**
+        )
+        
+        val defaultResolver = DefaultBearerTokenResolver()
+        
+        return BearerTokenResolver { request ->
+            val requestUri = request.requestURI
+            // If this is a public endpoint, return null to skip JWT authentication
+            if (publicEndpointPatterns.any { it.matches(requestUri) }) {
+                null
+            } else {
+                // For protected endpoints, use the default resolver
+                defaultResolver.resolve(request)
+            }
+        }
     }
 
     @Bean
