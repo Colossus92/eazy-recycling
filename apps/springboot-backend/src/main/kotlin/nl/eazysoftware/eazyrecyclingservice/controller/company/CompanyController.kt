@@ -196,7 +196,7 @@ class CompanyController(
     @field:Valid
     val address: AddressRequest,
 
-    val roles: List<CompanyRole>,
+    val roles: List<CompanyRole> = emptyList(),
   )
 
   data class CompanyBranchResponse(
