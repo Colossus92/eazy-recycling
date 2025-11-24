@@ -162,8 +162,8 @@ class ExactOAuthService(
         val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()
             ?: throw ExactOAuthException("No tokens available. Please authenticate first.")
 
-        // Check if token expires within the next 5 minutes
-        val expiryThreshold = Instant.now().plusSeconds(300)
+        // Check if token expires within the next 30 seconds
+        val expiryThreshold = Instant.now().plusSeconds(30)
 
         if (currentToken.expiresAt.isBefore(expiryThreshold)) {
             logger.info("Token is expiring soon, refreshing...")
@@ -198,7 +198,7 @@ class ExactOAuthService(
         )
 
         tokenRepository.save(tokenDto)
-        logger.debug("Saved tokens to database, expires at: $expiresAt")
+      logger.debug("Saved tokens to database, expires at: {}", expiresAt)
     }
 
     data class AuthorizationUrlResponse(

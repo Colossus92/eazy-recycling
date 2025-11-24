@@ -3,9 +3,15 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ExactOnlineSync
+import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto
+import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.exact.SyncStatus
+import org.slf4j.LoggerFactory
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.Instant
 import java.util.*
 
 interface CreateCompany {
@@ -15,7 +21,11 @@ interface CreateCompany {
 @Service
 class CreateCompanyService(
   private val companies: Companies,
+  private val exactOnlineSync: ExactOnlineSync,
+  private val companySyncRepository: CompanySyncRepository,
 ) : CreateCompany {
+
+  private val logger = LoggerFactory.getLogger(javaClass)
 
   @Transactional
   override fun handle(cmd: CreateCompanyCommand): CompanyResult {
@@ -77,6 +87,23 @@ class CreateCompanyService(
     )
 
     val savedCompany = companies.create(company)
+
+    // Sync to Exact Online - catch exceptions to prevent rollback of company creation
+    try {
+      exactOnlineSync.syncCompany(savedCompany)
+    } catch (e: Exception) {
+      logger.error("Failed to sync company ${savedCompany.companyId.uuid} to Exact Online", e)
+      
+      // Persist failed sync record
+      val syncDto = CompanySyncDto(
+        companyId = savedCompany.companyId.uuid,
+        externalId = null,
+        syncStatus = SyncStatus.FAILED,
+        syncedFromSourceAt = Instant.now(),
+        syncErrorMessage = "${e::class.simpleName}: ${e.message}",
+      )
+      companySyncRepository.save(syncDto)
+    }
 
     return CompanyResult(companyId = savedCompany.companyId.uuid)
   }

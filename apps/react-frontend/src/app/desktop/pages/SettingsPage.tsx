@@ -7,7 +7,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-
 export const SettingsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [authUrl, setAuthUrl] = useState<string | null>(null);
@@ -87,7 +86,9 @@ export const SettingsPage = () => {
     const exactErrorDescription = searchParams.get('exact_error_description');
 
     if (exactConnected === 'true') {
-      toastService.success('Exact Online verbinding succesvol tot stand gebracht!');
+      toastService.success(
+        'Exact Online verbinding succesvol tot stand gebracht!'
+      );
       refetchStatus(); // Refresh connection status
       // Clear URL parameters
       setSearchParams({});
@@ -197,11 +198,13 @@ export const SettingsPage = () => {
                 {authUrl && (
                   <div className="flex flex-col gap-2 p-4 bg-color-surface-tertiary rounded-radius-md">
                     <p className="text-sm text-color-text-secondary">
-                      ✅ Autorisatie URL succesvol gegenereerd. Klik op de knop hierboven om naar Exact Online te gaan.
+                      ✅ Autorisatie URL succesvol gegenereerd. Klik op de knop
+                      hierboven om naar Exact Online te gaan.
                     </p>
                     <p className="text-xs text-color-text-secondary mt-2">
-                      💡 Na het voltooien van de autorisatie bij Exact Online wordt u automatisch
-                      teruggeleid naar deze pagina en ontvangt u een bevestigingsmelding.
+                      💡 Na het voltooien van de autorisatie bij Exact Online
+                      wordt u automatisch teruggeleid naar deze pagina en
+                      ontvangt u een bevestigingsmelding.
                     </p>
                   </div>
                 )}

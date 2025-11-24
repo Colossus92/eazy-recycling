@@ -33,6 +33,10 @@ class CompanyMapper {
         country = dto.address.country
       ),
       roles = dto.roles,
+      phone = dto.phone,
+      email = dto.email,
+      isSupplier = dto.isSupplier,
+      isCustomer = dto.isCustomer,
       deletedAt = dto.deletedAt?.toKotlinInstant(),
     )
   }
@@ -53,6 +57,10 @@ class CompanyMapper {
         country = domain.address.country
       ),
       roles = domain.roles,
+      phone = domain.phone,
+      email = domain.email,
+      isSupplier = domain.isSupplier,
+      isCustomer = domain.isCustomer,
       deletedAt = domain.deletedAt?.toJavaInstant()
     )
   }

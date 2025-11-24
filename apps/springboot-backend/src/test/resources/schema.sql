@@ -11,6 +11,10 @@ create table if not exists companies (
                            street_name text,
                            processor_id text,
                            vihb_id text unique,
+                           phone text,
+                           email text,
+                           is_supplier boolean not null default true,
+                           is_customer boolean not null default true,
                            deleted_at timestamp with time zone,
                            primary key (id)
 );
@@ -320,4 +324,19 @@ create table if not exists exact_tokens (
                                             created_at timestamp with time zone not null default now(),
                                             updated_at timestamp with time zone not null default now(),
                                             primary key (id)
+);
+
+create table if not exists companies_sync (
+                                               id uuid not null,
+                                               company_id uuid not null,
+                                               external_id text,
+                                               last_timestamp bigint,
+                                               sync_status text not null,
+                                               synced_from_source_at timestamp with time zone,
+                                               sync_error_message text,
+                                               created_at timestamp with time zone not null,
+                                               updated_at timestamp with time zone,
+                                               deleted_in_source bool,
+                                               primary key (id),
+                                               foreign key (company_id) references companies(id)
 );

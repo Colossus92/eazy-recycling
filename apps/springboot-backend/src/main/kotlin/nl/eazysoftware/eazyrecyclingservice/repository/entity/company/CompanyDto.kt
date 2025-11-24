@@ -32,6 +32,18 @@ data class CompanyDto(
   @Enumerated(EnumType.STRING)
   val roles: List<CompanyRole> = emptyList(),
 
+  @Column(name = "phone", nullable = true)
+  val phone: String? = null,
+
+  @Column(name = "email", nullable = true)
+  val email: String? = null,
+
+  @Column(name = "is_supplier", nullable = false)
+  val isSupplier: Boolean = true,
+
+  @Column(name = "is_customer", nullable = false)
+  val isCustomer: Boolean = true,
+
   @Column(name = "deleted_at", nullable = true)
   val deletedAt: Instant? = null,
 

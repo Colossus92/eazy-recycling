@@ -11,5 +11,9 @@ data class Company(
   val processorId: ProcessorPartyId?,
   val address: Address,
   val roles: List<CompanyRole> = emptyList(),
+  val phone: String? = null,
+  val email: String? = null,
+  val isSupplier: Boolean = true,
+  val isCustomer: Boolean = true,
   val deletedAt: Instant? = null,
 )
