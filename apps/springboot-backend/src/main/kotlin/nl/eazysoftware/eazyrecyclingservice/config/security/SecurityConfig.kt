@@ -37,23 +37,24 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
-            .cors { it.configurationSource(corsConfigurationSource()) }
-            .csrf { it.disable() }
             .authorizeHttpRequests { authorize ->
                 authorize
+                    .requestMatchers("/api/admin/exact/callback**").permitAll()
+                    .requestMatchers("/api/admin/exact**").permitAll()
                     .requestMatchers("/v3/api-docs.yaml").permitAll()
-                    .requestMatchers("/actuator/**").permitAll() // Allow health checks and error pages
-                    .requestMatchers("/api/admin/exact/callback").permitAll() // OAuth callback must be public
-                    .anyRequest().authenticated() // All other requests just require authentication (any role)
+                    .requestMatchers("/actuator/**").permitAll()
+                    .anyRequest().authenticated()
             }
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .csrf { it.disable() }
             .oauth2ResourceServer { oauth2 ->
                 oauth2.jwt { jwt ->
                     jwt.decoder(jwtDecoder())
                     jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
                 }
             }
-            .sessionManagement { session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionManagement {
+              it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             }
             .build()
     }
