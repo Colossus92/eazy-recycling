@@ -50,7 +50,7 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
          * @throws {RequiredError}}
          */
         getAuthorizationUrl: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/exact/auth-url`;
+            const localVarPath = `/admin/exact/auth-url`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -81,7 +81,7 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
          * @throws {RequiredError}}
          */
         getConnectionStatus: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/exact/status`;
+            const localVarPath = `/admin/exact/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -120,7 +120,7 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
             assertParamExists('handleCallback', 'code', code)
             // verify required parameter 'state' is not null or undefined
             assertParamExists('handleCallback', 'state', state)
-            const localVarPath = `/api/admin/exact/callback`;
+            const localVarPath = `/admin/exact/callback`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -167,7 +167,7 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
          * @throws {RequiredError}}
          */
         refreshToken: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/admin/exact/refresh`;
+            const localVarPath = `/admin/exact/refresh`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

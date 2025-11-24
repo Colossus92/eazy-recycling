@@ -1355,18 +1355,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
-  /api/admin/exact/refresh:
-    post:
-      tags:
-      - exact-online-controller
-      operationId: refreshToken
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RefreshTokenResponse"
   /amice/declare-first-receivals:
     post:
       tags:
@@ -1385,6 +1373,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DeclareFirstReceivalsResponse"
+  /admin/exact/refresh:
+    post:
+      tags:
+      - exact-online-controller
+      operationId: refreshToken
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RefreshTokenResponse"
   /waste-streams:
     get:
       tags:
@@ -1638,7 +1638,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MaterialPriceResponse"
-  /api/admin/exact/status:
+  /amice:
+    get:
+      tags:
+      - amice-controller
+      operationId: getDeclarations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageLmaDeclarationView"
+  /admin/exact/status:
     get:
       tags:
       - exact-online-controller
@@ -1650,7 +1668,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ConnectionStatusResponse"
-  /api/admin/exact/callback:
+  /admin/exact/callback:
     get:
       tags:
       - exact-online-controller
@@ -1683,7 +1701,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RedirectView"
-  /api/admin/exact/auth-url:
+  /admin/exact/auth-url:
     get:
       tags:
       - exact-online-controller
@@ -1695,24 +1713,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthorizationUrlResponse"
-  /amice:
-    get:
-      tags:
-      - amice-controller
-      operationId: getDeclarations
-      parameters:
-      - name: pageable
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Pageable"
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageLmaDeclarationView"
 components:
   schemas:
     CompanyConsignor:
@@ -3283,16 +3283,6 @@ components:
       required:
       - companyId
       - projectLocationId
-    RefreshTokenResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-      required:
-      - message
-      - success
     ConsignorPartyRequest:
       type: object
       properties:
@@ -3421,6 +3411,16 @@ components:
       - declaredWasteStreamNumbers
       - message
       - success
+    RefreshTokenResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required:
+      - message
+      - success
     WeightTicketListView:
       type: object
       properties:
@@ -3505,14 +3505,14 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -3581,9 +3581,6 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3592,6 +3589,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -3622,11 +3622,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -4142,6 +4142,107 @@ components:
       - name
       - roles
       - updatedAt
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    LmaDeclarationView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        period:
+          type: string
+        totalWeight:
+          type: integer
+          format: int32
+        totalShipments:
+          type: integer
+          format: int32
+        status:
+          type: string
+        wasteName:
+          type: string
+        pickupLocation:
+          type: string
+      required:
+      - period
+      - pickupLocation
+      - status
+      - totalShipments
+      - totalWeight
+      - wasteName
+      - wasteStreamNumber
+    PageLmaDeclarationView:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/LmaDeclarationView"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
     ConnectionStatusResponse:
       type: object
       properties:
@@ -4160,13 +4261,13 @@ components:
           type: string
         displayName:
           type: string
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        applicationName:
-          type: string
         startupDate:
           type: integer
           format: int64
+        applicationName:
+          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4508,32 +4609,24 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        trimDirectiveWhitespaces:
+        elIgnored:
           type: string
-        errorOnUndeclaredNamespace:
+        isXml:
           type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        errorOnELNotFound:
-          type: string
-        pageEncoding:
-          type: string
-        scriptingInvalid:
-          type: string
-        includePreludes:
+        urlPatterns:
           type: array
           items:
             type: string
@@ -4541,15 +4634,23 @@ components:
           type: array
           items:
             type: string
-        defaultContentType:
-          type: string
-        urlPatterns:
+        includePreludes:
           type: array
           items:
             type: string
-        elIgnored:
+        scriptingInvalid:
           type: string
-        isXml:
+        pageEncoding:
+          type: string
+        errorOnELNotFound:
+          type: string
+        defaultContentType:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
           type: string
     RedirectView:
       type: object
@@ -4607,21 +4708,21 @@ components:
           type: array
           items:
             type: string
-        propagateQueryProperties:
-          type: boolean
         redirectView:
+          type: boolean
+        propagateQueryProperties:
           type: boolean
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
     ServletContext:
       type: object
       properties:
@@ -4668,10 +4769,36 @@ components:
         minorVersion:
           type: integer
           format: int32
-        servletRegistrations:
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
+        servletContextName:
+          type: string
+        filterRegistrations:
           type: object
           additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
+        initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        attributeNames: {}
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -4691,6 +4818,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -4701,36 +4832,6 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        attributeNames: {}
-        serverInfo:
-          type: string
-        contextPath:
-          type: string
     ServletRegistration:
       type: object
       properties:
@@ -4751,11 +4852,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        path:
-          type: string
         maxAge:
           type: integer
           format: int32
+        path:
+          type: string
         domain:
           type: string
         name:
@@ -4774,9 +4875,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object
@@ -4788,107 +4889,6 @@ components:
       required:
       - authorizationUrl
       - state
-    Pageable:
-      type: object
-      properties:
-        page:
-          type: integer
-          format: int32
-          minimum: 0
-        size:
-          type: integer
-          format: int32
-          minimum: 1
-        sort:
-          type: array
-          items:
-            type: string
-    LmaDeclarationView:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-        period:
-          type: string
-        totalWeight:
-          type: integer
-          format: int32
-        totalShipments:
-          type: integer
-          format: int32
-        status:
-          type: string
-        wasteName:
-          type: string
-        pickupLocation:
-          type: string
-      required:
-      - period
-      - pickupLocation
-      - status
-      - totalShipments
-      - totalWeight
-      - wasteName
-      - wasteStreamNumber
-    PageLmaDeclarationView:
-      type: object
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/LmaDeclarationView"
-        number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        numberOfElements:
-          type: integer
-          format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        empty:
-          type: boolean
-    PageableObject:
-      type: object
-      properties:
-        offset:
-          type: integer
-          format: int64
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
-        paged:
-          type: boolean
-        pageNumber:
-          type: integer
-          format: int32
-        pageSize:
-          type: integer
-          format: int32
-    SortObject:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        unsorted:
-          type: boolean
-        sorted:
-          type: boolean
   securitySchemes:
     bearerAuth:
       type: http
