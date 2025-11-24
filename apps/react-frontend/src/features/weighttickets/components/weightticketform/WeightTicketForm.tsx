@@ -1,6 +1,5 @@
 import { Company, companyService } from '@/api/services/companyService';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
-import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { SplitButton } from '@/components/ui/button/SplitButton';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
@@ -25,6 +24,7 @@ import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm'
 import { WeightTicketRequest } from '@/api/client';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
+import { Button } from '@/components/ui/button/Button';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -85,11 +85,11 @@ export const WeightTicketForm = ({
       if (!isValid) {
         return;
       }
-      
+
       // Get current form values and convert to request format
       const formValues = formContext.getValues();
       const weightTicketRequest = formValuesToWeightTicketRequest(formValues);
-      
+
       await onCreateTransport(weightTicketId, weightTicketRequest, pickupDateTime, deliveryDateTime);
     }
   };
@@ -160,6 +160,20 @@ export const WeightTicketForm = ({
     await createCompletedMutation.mutateAsync(filteredFormValues);
   });
 
+  const handleComplete = async () => {
+    // Validate form first
+    const isValid = await formContext.trigger();
+    if (!isValid) return;
+
+    if (data && onComplete) {
+      // For existing weight tickets, call onComplete
+      onComplete(data.id);
+    } else {
+      // For new weight tickets, save as completed
+      await onSubmitCompleted();
+    }
+  };
+
   const handleSubmit = isDisabled
     ? (e: React.FormEvent) => e.preventDefault()
     : onSubmit;
@@ -229,10 +243,10 @@ export const WeightTicketForm = ({
                   <WeightTicketStatusTag
                     status={
                       data.status as
-                        | 'DRAFT'
-                        | 'COMPLETED'
-                        | 'INVOICED'
-                        | 'CANCELLED'
+                      | 'DRAFT'
+                      | 'COMPLETED'
+                      | 'INVOICED'
+                      | 'CANCELLED'
                     }
                   />
                 )}
@@ -361,31 +375,23 @@ export const WeightTicketForm = ({
               </div>
             )}
           </div>
-          {data ? (
-            <FormActionButtons
+          <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
+            <Button
+              variant={'secondary'}
+              label={'Annuleren'}
               onClick={handleCancel}
-              item={data}
+              fullWidth={false}
+              data-testid={'cancel-button'}
+            />
+            <SplitButton
+              primaryLabel={data ? "Opslaan" : "Concept opslaan"}
+              secondaryLabel={data ? "Verwerken" : "Opslaan en verwerken"}
+              onPrimaryClick={onSubmit}
+              onSecondaryClick={handleComplete}
+              isSubmitting={mutation.isPending || createCompletedMutation.isPending}
               disabled={isDisabled}
             />
-          ) : (
-            <div className="flex items-center justify-end gap-3 px-4 py-3 border-t border-color-border-primary bg-color-surface-primary">
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="inline-flex items-center justify-center px-4 py-2 h-10 text-subtitle-2 text-color-brand-primary bg-color-surface-primary border border-color-border-primary rounded-radius-md hover:border-color-brand-primary hover:bg-color-brand-light disabled:text-color-text-disabled disabled:cursor-not-allowed"
-              >
-                Annuleren
-              </button>
-              <SplitButton
-                primaryLabel="Concept opslaan"
-                secondaryLabel="Opslaan en verwerken"
-                onPrimaryClick={onSubmit}
-                onSecondaryClick={onSubmitCompleted}
-                isSubmitting={mutation.isPending || createCompletedMutation.isPending}
-                disabled={isDisabled}
-              />
-            </div>
-          )}
+          </div>
         </form>
       </FormProvider>
     </div>
