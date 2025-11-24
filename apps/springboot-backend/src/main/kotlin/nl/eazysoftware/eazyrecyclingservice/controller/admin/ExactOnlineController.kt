@@ -15,7 +15,7 @@ import org.springframework.web.servlet.view.RedirectView
  * Handles authorization flow and token management for Exact Online API access.
  */
 @RestController
-@RequestMapping("/api/admin/exact")
+@RequestMapping("/admin/exact")
 class ExactOnlineController(
     private val exactOAuthService: ExactOAuthService,
     @Value("\${frontend.url}") private val frontendUrl: String
