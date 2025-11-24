@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button/Button.tsx';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 
 export const SettingsPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [authUrl, setAuthUrl] = useState<string | null>(null);
-  const [authState, setAuthState] = useState<string | null>(null);
 
   // Query to get connection status
   const {
@@ -37,7 +38,6 @@ export const SettingsPage = () => {
     },
     onSuccess: (data: AuthorizationUrlResponse) => {
       setAuthUrl(data.authorizationUrl);
-      setAuthState(data.state);
       toastService.success('Authorization URL generated successfully');
     },
     onError: (error: Error) => {
@@ -70,10 +70,8 @@ export const SettingsPage = () => {
 
   const handleOpenAuthUrl = () => {
     if (authUrl) {
-      window.open(authUrl, '_blank');
-      toastService.success(
-        'Please complete the authorization in the new window. This page will automatically update when authentication is complete.'
-      );
+      // Redirect in the same window so the OAuth callback can redirect back properly
+      window.location.href = authUrl;
     }
   };
 
@@ -86,11 +84,31 @@ export const SettingsPage = () => {
     toastService.success('Checking connection status...');
   };
 
+  // Handle OAuth callback results from query parameters
+  useEffect(() => {
+    const exactConnected = searchParams.get('exact_connected');
+    const exactError = searchParams.get('exact_error');
+    const exactErrorDescription = searchParams.get('exact_error_description');
+
+    if (exactConnected === 'true') {
+      toastService.success('Exact Online verbinding succesvol tot stand gebracht!');
+      refetchStatus(); // Refresh connection status
+      // Clear URL parameters
+      setSearchParams({});
+    } else if (exactError) {
+      const errorMessage = exactErrorDescription 
+        ? `Exact Online autorisatie mislukt: ${exactError} - ${exactErrorDescription}`
+        : `Exact Online autorisatie mislukt: ${exactError}`;
+      toastService.error(errorMessage);
+      // Clear URL parameters
+      setSearchParams({});
+    }
+  }, [searchParams, refetchStatus, setSearchParams]);
+
   // Clear auth URL when connection becomes established
   useEffect(() => {
     if (connectionStatus?.connected) {
       setAuthUrl(null);
-      setAuthState(null);
     }
   }, [connectionStatus?.connected]);
 
@@ -174,7 +192,7 @@ export const SettingsPage = () => {
                   {authUrl && (
                     <Button
                       variant="secondary"
-                      label="Open Autorisatie Pagina"
+                      label="Ga naar Exact Online Autorisatie"
                       onClick={handleOpenAuthUrl}
                     />
                   )}
@@ -182,28 +200,12 @@ export const SettingsPage = () => {
 
                 {authUrl && (
                   <div className="flex flex-col gap-2 p-4 bg-color-surface-tertiary rounded-radius-md">
-                    <span className="text-sm font-medium text-color-text-primary">
-                      Autorisatie URL:
-                    </span>
-                    <div className="flex gap-2 items-start">
-                      <code className="flex-1 text-xs text-color-text-secondary break-all bg-color-surface-secondary p-2 rounded">
-                        {authUrl}
-                      </code>
-                    </div>
-                    {authState && (
-                      <div className="mt-2">
-                        <span className="text-sm font-medium text-color-text-primary">
-                          State Token:
-                        </span>
-                        <code className="block text-xs text-color-text-secondary break-all bg-color-surface-secondary p-2 rounded mt-1">
-                          {authState}
-                        </code>
-                      </div>
-                    )}
+                    <p className="text-sm text-color-text-secondary">
+                      ✅ Autorisatie URL succesvol gegenereerd. Klik op de knop hierboven om naar Exact Online te gaan.
+                    </p>
                     <p className="text-xs text-color-text-secondary mt-2">
-                      💡 Na het voltooien van de autorisatie wordt u teruggeleid
-                      naar de applicatie en wordt de verbinding automatisch tot
-                      stand gebracht.
+                      💡 Na het voltooien van de autorisatie bij Exact Online wordt u automatisch 
+                      teruggeleid naar deze pagina en ontvangt u een bevestigingsmelding.
                     </p>
                   </div>
                 )}

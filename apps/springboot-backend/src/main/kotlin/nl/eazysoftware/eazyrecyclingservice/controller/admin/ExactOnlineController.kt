@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.admin
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -16,7 +17,8 @@ import org.springframework.web.servlet.view.RedirectView
 @RestController
 @RequestMapping("/api/admin/exact")
 class ExactOnlineController(
-    private val exactOAuthService: ExactOAuthService
+    private val exactOAuthService: ExactOAuthService,
+    @Value("\${frontend.url}") private val frontendUrl: String
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -64,13 +66,13 @@ class ExactOnlineController(
         // Handle OAuth errors
         if (error != null) {
             logger.error("OAuth error: $error - $error_description")
-            return RedirectView("/admin/integrations/exact?error=${error}&error_description=${error_description ?: ""}")
+            return RedirectView("$frontendUrl/settings?exact_error=${error}&exact_error_description=${error_description ?: ""}")
         }
 
         // Verify state to prevent CSRF attacks
         if (!exactOAuthService.verifyState(state)) {
             logger.error("Invalid or expired state parameter")
-            return RedirectView("/admin/integrations/exact?error=invalid_state")
+            return RedirectView("$frontendUrl/settings?exact_error=invalid_state")
         }
 
         try {
@@ -79,11 +81,11 @@ class ExactOnlineController(
             exactOAuthService.exchangeCodeForTokens(code)
 
             // Redirect back to frontend with success indicator
-            return RedirectView("/admin/integrations/exact?connected=1")
+            return RedirectView("$frontendUrl/settings?exact_connected=true")
 
         } catch (e: Exception) {
             logger.error("Failed to complete OAuth flow", e)
-            return RedirectView("/admin/integrations/exact?error=token_exchange_failed")
+            return RedirectView("$frontendUrl/settings?exact_error=token_exchange_failed")
         }
     }
 

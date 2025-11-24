@@ -33,6 +33,10 @@ spring:
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:https://*.eazysoftware.nl,https://*.eazyrecycling.nl}
 
+# Frontend URL for OAuth redirects
+frontend:
+  url: ${FRONTEND_URL:http://localhost:5173}
+
 springdoc:
   api-docs:
     enabled: false
@@ -50,3 +54,8 @@ exact:
     redirect-uri: ${EXACT_REDIRECT_URI:http://localhost:8080/api/admin/exact/callback}
     authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
+
+logging:
+  level:
+    root: info
+    nl.eazysoftware.eazyrecyclingservice: debug

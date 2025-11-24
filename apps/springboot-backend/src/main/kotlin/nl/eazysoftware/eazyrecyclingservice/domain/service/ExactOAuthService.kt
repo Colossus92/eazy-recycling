@@ -53,6 +53,7 @@ class ExactOAuthService(
      */
     fun verifyState(state: String): Boolean {
         val storedExpiry = stateStore[state] ?: return false
+        logger.info("State: $state, expiry: $storedExpiry")
 
         // Check if state is expired
         if (Instant.now().isAfter(storedExpiry)) {

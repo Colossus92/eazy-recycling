@@ -110,6 +110,9 @@ services:
       - key: EXACT_REDIRECT_URI
         scope: RUN_AND_BUILD_TIME
         value: https://app.eazyrecycling.nl/api/admin/exact/callback
+      - key: FRONTEND_URL
+        scope: RUN_AND_BUILD_TIME
+        value: https://app.eazyrecycling.nl
     health_check:
       failure_threshold: 20
       period_seconds: 10
