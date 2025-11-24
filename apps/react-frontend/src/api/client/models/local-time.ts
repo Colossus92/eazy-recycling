@@ -31,6 +31,18 @@ export interface LocalTime {
      * @type {number}
      * @memberof LocalTime
      */
+    'nanosecond': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LocalTime
+     */
+    'value$kotlinx_datetime': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LocalTime
+     */
     'hour': number;
     /**
      * 
@@ -44,17 +56,5 @@ export interface LocalTime {
      * @memberof LocalTime
      */
     'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value$kotlinx_datetime': string;
 }
 

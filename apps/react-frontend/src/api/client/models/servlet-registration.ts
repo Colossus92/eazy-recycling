@@ -34,6 +34,12 @@ export interface ServletRegistration {
     'mappings'?: Array<string>;
     /**
      * 
+     * @type {{ [key: string]: string; }}
+     * @memberof ServletRegistration
+     */
+    'initParameters'?: { [key: string]: string; };
+    /**
+     * 
      * @type {string}
      * @memberof ServletRegistration
      */
@@ -44,11 +50,5 @@ export interface ServletRegistration {
      * @memberof ServletRegistration
      */
     'className'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof ServletRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
 }
 

@@ -78,6 +78,7 @@ export function useWeightTicketForm(
     },
     enabled: !!weightTicketNumber,
   });
+  
   const mutation = useMutation({
     mutationFn: async (data: WeightTicketFormValues) => {
       const request = formValuesToWeightTicketRequest(data);
@@ -105,6 +106,29 @@ export function useWeightTicketForm(
     },
   });
 
+  const createCompletedMutation = useMutation({
+    mutationFn: async (data: WeightTicketFormValues) => {
+      const request = formValuesToWeightTicketRequest(data);
+      return weightTicketService.createCompleted(request);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
+
+      toastService.success('Weegbon aangemaakt en verwerkt');
+      resetForm();
+
+      if (onSuccess) {
+        onSuccess();
+      }
+    },
+    onError: (error) => {
+      console.error('Error submitting form:', error);
+      toastService.error(
+        'Er is een fout opgetreden bij het aanmaken van het weegbon'
+      );
+    },
+  });
+
   const resetForm = () => {
     formContext.reset({
       consignorPartyId: '',
@@ -127,6 +151,7 @@ export function useWeightTicketForm(
   return {
     formContext,
     mutation,
+    createCompletedMutation,
     data,
     isLoading,
     resetForm,

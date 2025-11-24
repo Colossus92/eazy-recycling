@@ -70,6 +70,30 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
+    'phone'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    'email'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CompanyDto
+     */
+    'isSupplier': boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CompanyDto
+     */
+    'isCustomer': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
     'deletedAt'?: string;
     /**
      * 

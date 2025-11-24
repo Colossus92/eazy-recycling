@@ -29,6 +29,7 @@ import java.util.*
 @RequestMapping("/weight-tickets")
 class WeightTicketController(
   private val create: CreateWeightTicket,
+  private val createCompleted: CreateCompletedWeightTicket,
   private val weightTicketService: WeightTicketService,
   private val updateWeightTicket: UpdateWeightTicket,
   private val cancelWeightTicket: CancelWeightTicket,
@@ -42,6 +43,14 @@ class WeightTicketController(
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
     val result = create.handle(body.toCommand())
+    return CreateWeightTicketResponse(id = result.id.number)
+  }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/completed")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createCompleted(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
+    val result = createCompleted.handle(body.toCommand())
     return CreateWeightTicketResponse(id = result.id.number)
   }
 

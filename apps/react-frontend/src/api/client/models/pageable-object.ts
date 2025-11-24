@@ -25,16 +25,10 @@ import type { SortObject } from './sort-object';
 export interface PageableObject {
     /**
      * 
-     * @type {number}
+     * @type {boolean}
      * @memberof PageableObject
      */
-    'offset'?: number;
-    /**
-     * 
-     * @type {SortObject}
-     * @memberof PageableObject
-     */
-    'sort'?: SortObject;
+    'unpaged'?: boolean;
     /**
      * 
      * @type {boolean}
@@ -55,9 +49,15 @@ export interface PageableObject {
     'pageSize'?: number;
     /**
      * 
-     * @type {boolean}
+     * @type {number}
      * @memberof PageableObject
      */
-    'unpaged'?: boolean;
+    'offset'?: number;
+    /**
+     * 
+     * @type {SortObject}
+     * @memberof PageableObject
+     */
+    'sort'?: SortObject;
 }
 

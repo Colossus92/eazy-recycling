@@ -2,6 +2,7 @@ import { Company, companyService } from '@/api/services/companyService';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
+import { SplitButton } from '@/components/ui/button/SplitButton';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
@@ -23,6 +24,7 @@ import { AddressFormField } from '@/components/ui/form/addressformfield/AddressF
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
 import { WeightTicketRequest } from '@/api/client';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
+import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -49,7 +51,7 @@ export const WeightTicketForm = ({
   onCreateTransport,
   noDialog = false,
 }: WeightTicketFormProps) => {
-  const { data, isLoading, formContext, mutation, resetForm, formValuesToWeightTicketRequest } =
+  const { data, isLoading, formContext, mutation, createCompletedMutation, resetForm, formValuesToWeightTicketRequest } =
     useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
@@ -118,9 +120,9 @@ export const WeightTicketForm = ({
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  const onSubmit = formContext.handleSubmit(async (formValues) => {
+  const validateAndFilterFormValues = (formValues: WeightTicketFormValues): WeightTicketFormValues | null => {
     // Calculate netto to validate it's not below 0
-    const weging1 = formValues.lines.reduce((sum, field) => {
+    const weging1 = formValues.lines.reduce((sum: number, field) => {
       const weight = parseNumber(field.weightValue as string);
       return sum + weight;
     }, 0);
@@ -134,18 +136,28 @@ export const WeightTicketForm = ({
         type: 'manual',
         message: 'Netto gewicht kan niet negatief zijn',
       });
-      return;
+      return null;
     }
 
     // Filter out empty lines (lines where wasteStreamNumber is empty)
-    const filteredFormValues = {
+    return {
       ...formValues,
       lines: formValues.lines.filter(
         (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
       ),
     };
+  };
 
+  const onSubmit = formContext.handleSubmit(async (formValues) => {
+    const filteredFormValues = validateAndFilterFormValues(formValues);
+    if (!filteredFormValues) return;
     await mutation.mutateAsync(filteredFormValues);
+  });
+
+  const onSubmitCompleted = formContext.handleSubmit(async (formValues) => {
+    const filteredFormValues = validateAndFilterFormValues(formValues);
+    if (!filteredFormValues) return;
+    await createCompletedMutation.mutateAsync(filteredFormValues);
   });
 
   const handleSubmit = isDisabled
@@ -349,11 +361,31 @@ export const WeightTicketForm = ({
               </div>
             )}
           </div>
-          <FormActionButtons
-            onClick={handleCancel}
-            item={data}
-            disabled={isDisabled}
-          />
+          {data ? (
+            <FormActionButtons
+              onClick={handleCancel}
+              item={data}
+              disabled={isDisabled}
+            />
+          ) : (
+            <div className="flex items-center justify-end gap-3 px-4 py-3 border-t border-color-border-primary bg-color-surface-primary">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="inline-flex items-center justify-center px-4 py-2 h-10 text-subtitle-2 text-color-brand-primary bg-color-surface-primary border border-color-border-primary rounded-radius-md hover:border-color-brand-primary hover:bg-color-brand-light disabled:text-color-text-disabled disabled:cursor-not-allowed"
+              >
+                Annuleren
+              </button>
+              <SplitButton
+                primaryLabel="Concept opslaan"
+                secondaryLabel="Opslaan en verwerken"
+                onPrimaryClick={onSubmit}
+                onSecondaryClick={onSubmitCompleted}
+                isSubmitting={mutation.isPending || createCompletedMutation.isPending}
+                disabled={isDisabled}
+              />
+            </div>
+          )}
         </form>
       </FormProvider>
     </div>
