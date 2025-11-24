@@ -23,7 +23,7 @@ import type { HttpStatusCode } from './http-status-code';
  * @enum {HttpStatusCode}
  */
 
-export const HttpStatus = {
+export const HttpStatusEnum = {
     _100Continue: '100 CONTINUE',
     _101SwitchingProtocols: '101 SWITCHING_PROTOCOLS',
     _102Processing: '102 PROCESSING',
@@ -95,12 +95,12 @@ export const HttpStatus = {
     _511NetworkAuthenticationRequired: '511 NETWORK_AUTHENTICATION_REQUIRED'
 } as const;
 
-export type HttpStatus = typeof HttpStatus[keyof typeof HttpStatus];
+export type HttpStatus = typeof HttpStatusEnum[keyof typeof HttpStatusEnum];
 
 /**
  * @type HttpStatus
  * @export
  */
-export type HttpStatus = HttpStatusCode;
+export type HttpStatusType = HttpStatusCode;
 
 
