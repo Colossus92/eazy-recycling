@@ -13,6 +13,9 @@
           "apiPackage": "apis",
           "modelPackage": "models",
           "withSeparateModelsAndApi": "true"
+        },
+        "schemaMappings": {
+          "HttpStatus": "HttpStatusEnum"
         }
       }
     }

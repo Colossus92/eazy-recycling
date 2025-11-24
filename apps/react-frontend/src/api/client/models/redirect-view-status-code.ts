@@ -18,7 +18,7 @@
 import type { DefaultHttpStatusCode } from './default-http-status-code';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { HttpStatus } from './http-status-enum.ts';
+import type { HttpStatus } from './http-status';
 
 /**
  * @type RedirectViewStatusCode
