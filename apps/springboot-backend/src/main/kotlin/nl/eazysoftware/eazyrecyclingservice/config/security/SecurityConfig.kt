@@ -41,7 +41,7 @@ class SecurityConfig {
         return http
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers("/api/admin/exact/callback**").permitAll()
+                    .requestMatchers("/admin/exact/callback**").permitAll()
                     .requestMatchers("/v3/api-docs.yaml").permitAll()
                     .requestMatchers("/actuator/**").permitAll()
                     .anyRequest().authenticated()
@@ -69,13 +69,13 @@ class SecurityConfig {
         // ** = .* (match any characters)
         // * = [^/]* (match any characters except /)
         val publicEndpointPatterns = listOf(
-            "^/api/admin/exact/callback.*".toRegex(),  // /api/admin/exact/callback**
-            "^/v3/api-docs\\.yaml$".toRegex(),          // /v3/api-docs.yaml (exact match)
-            "^/actuator/.*".toRegex()                  // /actuator/**
+            "^/admin/exact/callback.*".toRegex(),  // /admin/exact/callback** (after /api stripped by ingress)
+            "^/v3/api-docs\\.yaml$".toRegex(),      // /v3/api-docs.yaml (exact match)
+            "^/actuator/.*".toRegex()               // /actuator/**
         )
-        
+
         val defaultResolver = DefaultBearerTokenResolver()
-        
+
         return BearerTokenResolver { request ->
             val requestUri = request.requestURI
             // If this is a public endpoint, return null to skip JWT authentication
