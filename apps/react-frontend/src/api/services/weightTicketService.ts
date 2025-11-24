@@ -3,8 +3,10 @@ import { WeightTicketControllerApi } from "../client";
 import { WeightTicketRequest } from "../client/models/weight-ticket-request";
 import { CancelWeightTicketRequest } from "../client/models/cancel-weight-ticket-request";
 import { SplitWeightTicketRequest } from "../client/models/split-weight-ticket-request";
+import { WasteTransportControllerApi } from "../client/apis/waste-transport-controller-api";
 
 const weightTicketApi = new WeightTicketControllerApi(apiInstance.config)
+const wasteTransportApi = new WasteTransportControllerApi(apiInstance.config)
 
 export const weightTicketService = {
     getAll: () => weightTicketApi.getWeightTickets().then((r) => r.data),
@@ -16,4 +18,5 @@ export const weightTicketService = {
     complete: (weightTicketNumber: number) => weightTicketApi.complete(weightTicketNumber).then((r) => r.data),
     split: (weightTicketId: number, splitWeightTicketRequest: SplitWeightTicketRequest) => weightTicketApi.split(weightTicketId, splitWeightTicketRequest).then((r) => r.data),
     copy: (weightTicketId: number) => weightTicketApi.copy(weightTicketId).then((r) => r.data),
+    getWasteTransportsByWeightTicketId : (weightTicketId: number) => wasteTransportApi.getWasteTransportsByWeightTicketId(weightTicketId).then((r) => r.data),
 };

@@ -1,15 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { WasteTransportControllerApi } from '@/api/client/apis/waste-transport-controller-api';
-import { WeightTicketControllerApi } from '@/api/client/apis/weight-ticket-controller-api';
-import { Configuration } from '@/api/client/configuration';
+import { weightTicketService } from '@/api/services/weightTicketService';
 import { supabase } from '@/api/supabaseClient';
-import { TransportCard } from './TransportCard';
-import { ClipLoader } from 'react-spinners';
-import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
-import Scale from '@/assets/icons/Scale.svg?react';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
-import { useState } from 'react';
+import Scale from '@/assets/icons/Scale.svg?react';
+import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 import { Button } from '@/components/ui/button/Button';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { ClipLoader } from 'react-spinners';
+import { TransportCard } from './TransportCard';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
@@ -25,17 +23,8 @@ export const WeightTicketRelatedTab = ({
     queryFn: async () => {
       if (!weightTicketId) return null;
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token || '';
-      
-      const config = new Configuration({
-        basePath: import.meta.env.VITE_BACKEND_URL,
-        accessToken,
-      });
-
-      const api = new WasteTransportControllerApi(config);
-      const response = await api.getWasteTransportsByWeightTicketId(weightTicketId);
-      return response.data;
+      const response = await weightTicketService.getWasteTransportsByWeightTicketId(weightTicketId);
+      return response;
     },
     enabled: !!weightTicketId,
   });
@@ -45,17 +34,8 @@ export const WeightTicketRelatedTab = ({
     queryFn: async () => {
       if (!weightTicketId) return null;
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token || '';
-      
-      const config = new Configuration({
-        basePath: import.meta.env.VITE_BACKEND_URL,
-        accessToken,
-      });
-
-      const api = new WeightTicketControllerApi(config);
-      const response = await api.getWeightTicketByNumber(weightTicketId);
-      return response.data;
+      const response = await weightTicketService.getByNumber(weightTicketId);
+      return response;
     },
     enabled: !!weightTicketId,
   });
