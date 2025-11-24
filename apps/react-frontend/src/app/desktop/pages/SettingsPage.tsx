@@ -1,8 +1,4 @@
-import type {
-    AuthorizationUrlResponse,
-    ConnectionStatusResponse,
-    RefreshTokenResponse,
-} from '@/api/client';
+import type { AuthorizationUrlResponse, ConnectionStatusResponse, RefreshTokenResponse, } from '@/api/client';
 import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
@@ -96,7 +92,7 @@ export const SettingsPage = () => {
       // Clear URL parameters
       setSearchParams({});
     } else if (exactError) {
-      const errorMessage = exactErrorDescription 
+      const errorMessage = exactErrorDescription
         ? `Exact Online autorisatie mislukt: ${exactError} - ${exactErrorDescription}`
         : `Exact Online autorisatie mislukt: ${exactError}`;
       toastService.error(errorMessage);
@@ -204,7 +200,7 @@ export const SettingsPage = () => {
                       ✅ Autorisatie URL succesvol gegenereerd. Klik op de knop hierboven om naar Exact Online te gaan.
                     </p>
                     <p className="text-xs text-color-text-secondary mt-2">
-                      💡 Na het voltooien van de autorisatie bij Exact Online wordt u automatisch 
+                      💡 Na het voltooien van de autorisatie bij Exact Online wordt u automatisch
                       teruggeleid naar deze pagina en ontvangt u een bevestigingsmelding.
                     </p>
                   </div>
@@ -236,86 +232,6 @@ export const SettingsPage = () => {
               </div>
             </div>
           )}
-        </div>
-
-        {/* API Endpoints Documentation */}
-        <div className="border border-solid border-color-border-primary rounded-2xl bg-color-surface-primary">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-solid border-color-border-primary">
-            <div className="flex flex-col gap-1">
-              <h4 className="text-color-text-primary">
-                API Endpoints Documentatie
-              </h4>
-              <span className="text-color-text-secondary">
-                Beschikbare endpoints voor Exact Online integratie
-              </span>
-            </div>
-          </div>
-
-          <div className="px-6 py-4">
-            <div className="flex flex-col gap-4">
-              {/* Get Authorization URL */}
-              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
-                    GET
-                  </span>
-                  <code className="text-sm text-color-text-primary">
-                    /api/admin/exact/auth-url
-                  </code>
-                </div>
-                <p className="text-sm text-color-text-secondary">
-                  Genereer een OAuth2 autorisatie URL om te connecteren met
-                  Exact Online.
-                </p>
-              </div>
-
-              {/* Get Connection Status */}
-              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
-                    GET
-                  </span>
-                  <code className="text-sm text-color-text-primary">
-                    /api/admin/exact/status
-                  </code>
-                </div>
-                <p className="text-sm text-color-text-secondary">
-                  Controleer de huidige verbindingsstatus met Exact Online.
-                </p>
-              </div>
-
-              {/* Refresh Token */}
-              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-green-600 text-white rounded">
-                    POST
-                  </span>
-                  <code className="text-sm text-color-text-primary">
-                    /api/admin/exact/refresh
-                  </code>
-                </div>
-                <p className="text-sm text-color-text-secondary">
-                  Vernieuw het toegangstoken voor des Exact Online connectie.
-                </p>
-              </div>
-
-              {/* Handle Callback */}
-              <div className="p-4 bg-color-surface-tertiary rounded-radius-md">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="px-2 py-1 text-xs font-medium bg-color-brand-primary text-color-text-invert-primary rounded">
-                    GET
-                  </span>
-                  <code className="text-sm text-color-text-primary">
-                    /api/admin/exact/callback
-                  </code>
-                </div>
-                <p className="text-sm text-color-text-secondary">
-                  OAuth2 callback endpoint (automatisch aangeroepen door Exact
-                  Online na autorisatie).
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </ContentContainer>
