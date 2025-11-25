@@ -8,7 +8,7 @@ class WeightTicketLines(
   ) {
   fun isEmpty() = lines.isEmpty()
 
-  fun getLines() = lines.toList()
+  fun getLines() = lines
 }
 
 

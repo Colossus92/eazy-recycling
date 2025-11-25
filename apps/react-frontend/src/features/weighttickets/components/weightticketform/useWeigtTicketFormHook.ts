@@ -282,7 +282,7 @@ const formValuesToWeightTicketRequest = (
     lines: formValues.lines.map((line) => ({
       wasteStreamNumber: line.wasteStreamNumber,
       weight: {
-        value: normalizeNumberForBackend(line.weightValue) || '',
+        value: normalizeNumberForBackend(line.weightValue) || '0',
         unit: 'KG',
       },
     })),

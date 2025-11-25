@@ -276,12 +276,8 @@ export const WeightTicketLinesTab = ({
                             if (numValue === undefined && !wasteStreamNumber) {
                               return true;
                             }
-                            // If waste stream is filled but weight is not, show error
-                            if (numValue === undefined && wasteStreamNumber) {
-                              return 'Hoeveelheid is verplicht';
-                            }
                             // Validate positive value
-                            if (numValue !== undefined && numValue <= 0) {
+                            if (numValue !== undefined && numValue < 0) {
                               return 'Voer een positief getal in';
                             }
                             return true;
