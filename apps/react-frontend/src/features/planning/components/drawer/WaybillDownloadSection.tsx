@@ -57,7 +57,7 @@ export const WaybillDownloadSection = ({
         <span className={'text-body-2 text-red-600'}>{error}</span>
         : !waybillInfo ? (
           <span className={'text-body-2 text-color-text-secondary'}>
-            Geen document beschikbaar
+            Geen begeleidingsbrief beschikbaar
           </span>)
           : (
             <button

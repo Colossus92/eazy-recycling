@@ -20,7 +20,10 @@ export const WeightTicketDownloadSection = ({
 
   useEffect(() => {
     const loadWeightTicketPdfInfo = async () => {
-      if (!weightTicketId) return;
+      if (!weightTicketId) {
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(true);
       setError(null);
@@ -51,11 +54,13 @@ export const WeightTicketDownloadSection = ({
   return (
     isLoading ? (
       <span className={'text-body-2 text-color-text-secondary'}>
-        Laden...
+        Weegbon laden...
       </span>
     ) : error ? (
       <span className={'text-body-2 text-red-600'}>{error}</span>
-    ) : !weightTicketPdfInfo ? null : (
+    ) : !weightTicketPdfInfo ? <span className={'text-body-2 text-color-text-secondary '}>
+        Geen weegbon beschikbaar
+      </span> : (
       <button
         onClick={handleDirectDownload}
         disabled={isDownloading}
@@ -76,7 +81,7 @@ export const WeightTicketDownloadSection = ({
           </div>
           <div className="flex items-center justify-between self-stretch">
             <span className={'text-body-2 text-color-text-secondary'}>
-              {isDownloading ? 'Downloaden...' : `${weightTicketPdfInfo.fileSizeKb} KB`}
+              {isDownloading ? 'Weegbon downloaden...' : `${weightTicketPdfInfo.fileSizeKb} KB`}
             </span>
           </div>
         </div>
