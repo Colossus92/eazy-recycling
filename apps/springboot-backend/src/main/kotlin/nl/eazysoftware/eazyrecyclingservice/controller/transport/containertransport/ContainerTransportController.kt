@@ -113,9 +113,9 @@ fun ContainerTransportRequest.toCommand(): CreateContainerTransportCommand {
     deliveryLocation = this.deliveryLocation.toCommand(),
     deliveryDateTime = this.deliveryDateTime?.toCetInstant(),
     transportType = this.transportType,
-    wasteContainer = this.containerId?.let { WasteContainerId(it) },
+    wasteContainer = this.containerId?.takeIf { it.isNotBlank() }?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
-    truck = this.truckId?.let { LicensePlate(it) },
+    truck = this.truckId?.takeIf { it.isNotBlank() }?.let { LicensePlate(it) },
     driver = this.driverId?.let { UserId(it) },
     note = Note(this.note),
   )
@@ -134,9 +134,9 @@ fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContaine
     deliveryLocation = this.deliveryLocation.toCommand(),
     deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant(),
     transportType = this.transportType,
-    wasteContainer = this.containerId?.let { WasteContainerId(it) },
+    wasteContainer = this.containerId?.takeIf { it.isNotBlank() }?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
-    truck = this.truckId?.let { LicensePlate(it) },
+    truck = this.truckId?.takeIf { it.isNotBlank() }?.let { LicensePlate(it) },
     driver = this.driverId?.let { UserId(it) },
     note = Note(this.note),
   )

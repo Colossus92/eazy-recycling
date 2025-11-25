@@ -1,15 +1,17 @@
 import {
   ContainerTransportControllerApi,
+  CreateWasteTransportFromWeightTicketRequest,
   PickupLocationView,
   TransportControllerApi,
   TransportDetailView,
   TransportFinishedRequest,
   WasteTransportControllerApi,
   WasteTransportRequest,
-  CreateWasteTransportFromWeightTicketRequest,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
-import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
+import {
+  CreateContainerTransportRequestContainerOperationEnum
+} from '@/api/client/models/create-container-transport-request';
 import { CreateWasteTransportRequestContainerOperationEnum } from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
@@ -158,9 +160,9 @@ export const formValuesToCreateContainerTransportRequest = (
     deliveryLocation: locationFormValueToPickupLocationRequest(
       formValues.deliveryLocation
     ),
-    truckId: formValues.truckId,
-    driverId: formValues.driverId,
-    containerId: formValues.containerId,
+    truckId: formValues.truckId || undefined,
+    driverId: formValues.driverId || undefined,
+    containerId: formValues.containerId || undefined,
     note: formValues.note || '',
     transportType: 'CONTAINER',
   };
@@ -198,9 +200,9 @@ export const formValuesToCreateWasteTransportRequest = (
       formValues.containerOperation as CreateWasteTransportRequestContainerOperationEnum,
     pickupDateTime: formValues.pickupDateTime,
     deliveryDateTime: formValues.deliveryDateTime,
-    truckId: formValues.truckId,
-    driverId: formValues.driverId,
-    containerId: formValues.containerId,
+    truckId: formValues.truckId || undefined,
+    driverId: formValues.driverId || undefined,
+    containerId: formValues.containerId || undefined,
     note: formValues.note || '',
     transportType: 'WASTE',
     goods: [{
