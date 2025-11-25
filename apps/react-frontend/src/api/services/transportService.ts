@@ -10,15 +10,12 @@ import {
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
 import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
-import { CreateWasteTransportRequestContainerOperationEnum } from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
-import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
-import { format } from 'date-fns';
-import { apiInstance } from './apiInstance';
 import {
   locationFormValueToPickupLocationRequest,
   pickupLocationViewToFormValue,
 } from '@/types/forms/locationConverters';
+import { apiInstance } from './apiInstance';
 
 const transportApi = new TransportControllerApi(apiInstance.config);
 const containerTransportApi = new ContainerTransportControllerApi(
@@ -186,86 +183,6 @@ export const transportDetailViewToContainerTransportFormValues = (
     transportType: data.transportType,
   };
 
-  return formValues;
-};
-
-export const formValuesToCreateWasteTransportRequest = (
-  formValues: WasteTransportFormValues
-) => {
-  const request: WasteTransportRequest = {
-    carrierPartyId: formValues.carrierPartyId,
-    containerOperation:
-      formValues.containerOperation as CreateWasteTransportRequestContainerOperationEnum,
-    pickupDateTime: formValues.pickupDateTime,
-    deliveryDateTime: formValues.deliveryDateTime,
-    truckId: formValues.truckId || undefined,
-    driverId: formValues.driverId || undefined,
-    containerId: formValues.containerId || undefined,
-    note: formValues.note || '',
-    transportType: 'WASTE',
-    goods: [
-      {
-        wasteStreamNumber: formValues.wasteStreamNumber || '',
-        weight: formValues.weight,
-        unit: 'kg',
-        quantity: formValues.quantity,
-      },
-    ],
-  };
-  return request;
-};
-
-export const transportDtoToWasteTransportFormValues = (
-  transport: TransportDetailView
-) => {
-  // TODO allow for multiple goods
-  const goods = transport.goodsItem?.[0];
-  const pickupLocationAddress = resolveLocationAddress(
-    transport.pickupLocation
-  );
-  const deliveryLocationAddress = resolveLocationAddress(
-    transport.deliveryLocation
-  );
-
-  const formValues: WasteTransportFormValues = {
-    consignorPartyId: transport.consignorParty?.id || '',
-    carrierPartyId: transport.carrierParty?.id || '',
-    containerOperation: transport.containerOperation || '',
-    // pickupCompanyBranchId: data.pickupCompanyBranch?.id || '', //TODO
-    pickupStreet: pickupLocationAddress?.street || '',
-    pickupBuildingNumber: pickupLocationAddress?.houseNumber || '',
-    pickupPostalCode: pickupLocationAddress?.postalCode || '',
-    pickupCity: pickupLocationAddress?.city || '',
-    pickupDateTime: format(
-      new Date(transport.pickupDateTime),
-      "yyyy-MM-dd'T'HH:mm"
-    ),
-    deliveryCompanyId: deliveryLocationAddress?.companyId || '',
-    // deliveryCompanyBranchId: data.deliveryCompanyBranch?.id || '',
-    deliveryStreet: deliveryLocationAddress?.street || '',
-    deliveryBuildingNumber: deliveryLocationAddress?.houseNumber || '',
-    deliveryPostalCode: deliveryLocationAddress?.postalCode || '',
-    deliveryCity: deliveryLocationAddress?.city || '',
-    deliveryDateTime: transport.deliveryDateTime
-      ? format(new Date(transport.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
-      : undefined,
-    truckId: transport.truck?.licensePlate || '',
-    driverId: transport.driver?.id || '',
-    containerId: transport.wasteContainer?.id || '',
-    note: transport.note,
-    transportType: transport.transportType,
-
-    // Goods data
-    consigneePartyId: transport.consigneeParty?.id || '',
-    pickupPartyId: transport.pickupParty?.id || '',
-    wasteStreamNumber: goods?.wasteStreamNumber || '',
-    weight: goods?.netNetWeight || 0,
-    unit: goods?.unit || '',
-    quantity: goods?.quantity || 0,
-    goodsName: goods?.name || '',
-    euralCode: goods?.euralCode || '',
-    processingMethodCode: goods?.processingMethodCode || '',
-  };
   return formValues;
 };
 

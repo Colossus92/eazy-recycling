@@ -4,7 +4,7 @@ import { ContainerTransportFormValues } from '@/features/planning/hooks/useConta
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 
 export const ContainerTransportFormPickupSection = () => {
-  const formContext = useFormContext<ContainerTransportFormValues>();
+      const formContext = useFormContext<ContainerTransportFormValues>();
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>

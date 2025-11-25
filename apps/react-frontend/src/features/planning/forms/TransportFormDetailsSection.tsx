@@ -3,7 +3,6 @@ import { ContainerSelectFormField } from '@/components/ui/form/selectfield/Conta
 import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSelectFormField.tsx';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField.tsx';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
-import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm.ts';
 import { useFormContext } from 'react-hook-form';
 
 export const TransportFormDetailsSection = () => {
@@ -11,7 +10,7 @@ export const TransportFormDetailsSection = () => {
     register,
     control,
     formState: { errors },
-  } = useFormContext<ContainerTransportFormValues | WasteTransportFormValues>();
+  } = useFormContext<ContainerTransportFormValues>();
 
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>
