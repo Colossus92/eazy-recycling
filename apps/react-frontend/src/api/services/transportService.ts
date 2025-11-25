@@ -9,9 +9,7 @@ import {
   WasteTransportRequest,
 } from '@/api/client';
 import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
-import {
-  CreateContainerTransportRequestContainerOperationEnum
-} from '@/api/client/models/create-container-transport-request';
+import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
 import { CreateWasteTransportRequestContainerOperationEnum } from '@/api/client/models/create-waste-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { WasteTransportFormValues } from '@/features/planning/hooks/useWasteTransportForm';
