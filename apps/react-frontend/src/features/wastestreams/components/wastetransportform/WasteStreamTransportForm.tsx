@@ -1,5 +1,5 @@
 import { FormProvider } from 'react-hook-form';
-import { KeyboardEvent } from 'react';
+import { KeyboardEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useFormStepNavigation } from '@/features/planning/hooks/useFormStepNavigation';
 import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
@@ -40,6 +40,13 @@ export const WasteStreamTransportForm = ({
       },
       isSubmitting: mutation.isPending,
     });
+
+  // Reset step when form opens
+  useEffect(() => {
+    if (isOpen) {
+      reset();
+    }
+  }, [isOpen, reset]);
 
   const onCancel = () => {
     resetForm();

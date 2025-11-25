@@ -1,5 +1,5 @@
 import { FieldValues, UseFormReturn, Path } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 
 interface UseFormStepNavigationProps<T extends FieldValues> {
@@ -54,10 +54,10 @@ export function useFormStepNavigation<T extends FieldValues>({
 
   const back = () => setStep(Math.max(0, step - 1));
 
-  const reset = () => {
+  const reset = useCallback(() => {
     formContext.reset();
     setStep(0);
-  };
+  }, [formContext]);
 
   return {
     step,

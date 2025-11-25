@@ -10,7 +10,7 @@ import java.time.Instant
 /**
  * Scheduled job to automatically refresh Exact Online OAuth tokens before they expire.
  *
- * This job runs every 10 minutes and checks if tokens are expiring within the next 30 seconds.
+ * This job runs every 1 minute and checks if tokens are expiring within the next 30 seconds.
  * If so, it refreshes them proactively.
  */
 @Component
@@ -24,7 +24,7 @@ class ExactTokenRefreshScheduler(
     /**
      * Run every hour to check and refresh tokens if needed
      */
-    @Scheduled(fixedRate = 10000) // 10 minutes in milliseconds
+    @Scheduled(fixedRate = 100000) // 1 minutes in milliseconds
     fun refreshExpiringTokens() {
         try {
             val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()

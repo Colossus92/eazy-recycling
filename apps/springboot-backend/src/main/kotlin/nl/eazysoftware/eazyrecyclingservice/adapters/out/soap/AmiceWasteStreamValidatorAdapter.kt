@@ -134,8 +134,6 @@ class AmiceWasteStreamValidatorAdapter(
         request.locatieHerkomstPostcode = location.postalCode().value
         request.locatieHerkomstHuisnummer = location.buildingNumber()
         request.locatieHerkomstHuisnummerToevoeging = location.buildingNumberAddition()
-        request.locatieHerkomstWoonplaats = location.city()
-        request.locatieHerkomstStraatnaam = location.streetName()
         request.locatieHerkomstLand = location.country()
       }
       is Location.ProximityDescription -> {

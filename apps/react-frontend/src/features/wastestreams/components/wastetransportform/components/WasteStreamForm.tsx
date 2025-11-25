@@ -4,7 +4,7 @@ import { Stepper } from '@/components/ui/form/multistep/Stepper.tsx';
 import { FormNavigationWithDraft } from '@/features/planning/forms/FormNavigationWithDraft.tsx';
 import { useFormStepNavigation } from '@/features/planning/hooks/useFormStepNavigation';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { KeyboardEvent, useState } from 'react';
+import { KeyboardEvent, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { useWasteStreamForm } from '../hooks/useWasteStreamFormHook';
@@ -54,6 +54,13 @@ export const WasteStreamForm = ({
     },
     isSubmitting,
   });
+
+  // Reset step when form opens
+  useEffect(() => {
+    if (isOpen) {
+      resetStepper();
+    }
+  }, [isOpen, resetStepper]);
 
   const onCancel = () => {
     resetForm();
