@@ -1,16 +1,15 @@
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
-import { TextFormField } from '@/components/ui/form/TextFormField';
-import { useQuery } from '@tanstack/react-query';
+import { WasteStreamListView } from '@/api/client';
+import { wasteStreamService } from '@/api/services/wasteStreamService';
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
+import { DateFormField } from '@/components/ui/form/DateFormField';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
+import { NumberInput } from '@/components/ui/form/NumberInput';
+import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
-import { wasteStreamService } from '@/api/services/wasteStreamService';
-import { WasteStreamListView } from '@/api/client';
-import { NumberInput } from '@/components/ui/form/NumberInput';
-import { DateFormField } from '@/components/ui/form/DateFormField';
-import { NumberFormField } from '@/components/ui/form/NumberFormField';
 
 interface WeightTicketLinesTabProps {
   disabled?: boolean;
