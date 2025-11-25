@@ -205,12 +205,14 @@ export const formValuesToCreateWasteTransportRequest = (
     containerId: formValues.containerId || undefined,
     note: formValues.note || '',
     transportType: 'WASTE',
-    goods: [{
-      wasteStreamNumber: formValues.wasteStreamNumber || '',
-      weight: formValues.weight,
-      unit: 'kg',
-      quantity: formValues.quantity,
-    }],
+    goods: [
+      {
+        wasteStreamNumber: formValues.wasteStreamNumber || '',
+        weight: formValues.weight,
+        unit: 'kg',
+        quantity: formValues.quantity,
+      },
+    ],
   };
   return request;
 };
@@ -282,6 +284,7 @@ export const createWasteTransportFromWeightTicket = async (
     pickupDateTime,
     deliveryDateTime,
   };
-  const response = await wasteTransportApi.createWasteTransportFromWeightTicket(request);
+  const response =
+    await wasteTransportApi.createWasteTransportFromWeightTicket(request);
   return response.data;
 };
