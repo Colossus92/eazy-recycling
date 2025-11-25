@@ -14,7 +14,7 @@ export const FormDialog = ({ isOpen, setIsOpen, children, width = 'w-[488px]' }:
   useFormDialogEnterSubmit({ isOpen, containerRef });
 
   useEffect(() => {
-    if (!isOpen || !setIsOpen) return;
+    if (!isOpen || !setIsOpen) return; 
 
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {

@@ -52,7 +52,7 @@ export const WeightTicketForm = ({
   noDialog = false,
 }: WeightTicketFormProps) => {
   const { data, isLoading, formContext, mutation, createCompletedMutation, resetForm, formValuesToWeightTicketRequest } =
-    useWeightTicketForm(weightTicketNumber, () => setIsOpen(false));
+    useWeightTicketForm(weightTicketNumber);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
   const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | undefined>();
@@ -154,25 +154,19 @@ export const WeightTicketForm = ({
     await mutation.mutateAsync(filteredFormValues);
   });
 
-  const onSubmitCompleted = formContext.handleSubmit(async (formValues) => {
+  const handleComplete = formContext.handleSubmit(async (formValues) => {
     const filteredFormValues = validateAndFilterFormValues(formValues);
     if (!filteredFormValues) return;
-    await createCompletedMutation.mutateAsync(filteredFormValues);
-  });
-
-  const handleComplete = async () => {
-    // Validate form first
-    const isValid = await formContext.trigger();
-    if (!isValid) return;
 
     if (data && onComplete) {
-      // For existing weight tickets, call onComplete
+      // For existing weight tickets, save current state first, then complete
+      await mutation.mutateAsync(filteredFormValues);
       onComplete(data.id);
     } else {
       // For new weight tickets, save as completed
-      await onSubmitCompleted();
+      await createCompletedMutation.mutateAsync(filteredFormValues);
     }
-  };
+  });
 
   const handleSubmit = isDisabled
     ? (e: React.FormEvent) => e.preventDefault()

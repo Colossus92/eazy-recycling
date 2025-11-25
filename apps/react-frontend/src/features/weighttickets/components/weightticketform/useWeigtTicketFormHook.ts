@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { useState, useEffect } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import {
   CompanyView,
@@ -42,10 +43,19 @@ export interface WeightTicketFormValues {
 }
 
 export function useWeightTicketForm(
-  weightTicketNumber?: number,
-  onSuccess?: () => void
+  initialWeightTicketNumber?: number
 ) {
   const queryClient = useQueryClient();
+  
+  // Track the current weight ticket number internally
+  // This allows switching from create to edit mode after saving
+  const [currentWeightTicketNumber, setCurrentWeightTicketNumber] = useState<number | undefined>(initialWeightTicketNumber);
+  
+  // Sync with prop when it changes (e.g., when opening a different weight ticket)
+  useEffect(() => {
+    setCurrentWeightTicketNumber(initialWeightTicketNumber);
+  }, [initialWeightTicketNumber]);
+  
   const formContext = useForm<WeightTicketFormValues>({
     defaultValues: {
       consignorPartyId: '',
@@ -66,42 +76,54 @@ export function useWeightTicketForm(
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['weightTickets', weightTicketNumber],
+    queryKey: ['weightTickets', currentWeightTicketNumber],
     queryFn: async () => {
       const response = await weightTicketService.getByNumber(
-        weightTicketNumber!!
+        currentWeightTicketNumber!!
       );
       const formValues = weightTicketDetailsToFormValues(response);
       formContext.reset(formValues);
 
       return response;
     },
-    enabled: !!weightTicketNumber,
+    enabled: !!currentWeightTicketNumber,
   });
   
   const mutation = useMutation({
     mutationFn: async (data: WeightTicketFormValues) => {
       const request = formValuesToWeightTicketRequest(data);
-      if (!!data && weightTicketNumber) {
-        return weightTicketService.update(weightTicketNumber, request);
+      if (!!data && currentWeightTicketNumber) {
+        return weightTicketService.update(currentWeightTicketNumber, request);
       } else {
         return weightTicketService.create(request);
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
 
-      toastService.success(!data ? 'Weegbon aangemaakt' : 'Weegbon bijgewerkt');
-      resetForm();
-
-      if (onSuccess) {
-        onSuccess();
+      toastService.success(!currentWeightTicketNumber ? 'Weegbon aangemaakt' : 'Weegbon bijgewerkt');
+      
+      // Reload form with the latest data
+      if (currentWeightTicketNumber) {
+        // For updates, response is void - fetch the full details
+        const fullDetails = await weightTicketService.getByNumber(currentWeightTicketNumber);
+        const formValues = weightTicketDetailsToFormValues(fullDetails);
+        formContext.reset(formValues);
+      } else if ((response as any).id) {
+        // For creates, response is CreateWeightTicketResponse with just id
+        // Switch to edit mode by setting the new weight ticket number
+        const createdId = (response as any).id;
+        setCurrentWeightTicketNumber(createdId);
+        // Fetch the full details using the returned id
+        const fullDetails = await weightTicketService.getByNumber(createdId);
+        const formValues = weightTicketDetailsToFormValues(fullDetails);
+        formContext.reset(formValues);
       }
     },
     onError: (error) => {
       console.error('Error submitting form:', error);
       toastService.error(
-        `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het weegbon`
+        `Er is een fout opgetreden bij het ${currentWeightTicketNumber ? 'bijwerken' : 'aanmaken'} van het weegbon`
       );
     },
   });
@@ -111,14 +133,21 @@ export function useWeightTicketForm(
       const request = formValuesToWeightTicketRequest(data);
       return weightTicketService.createCompleted(request);
     },
-    onSuccess: async () => {
+    onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
 
       toastService.success('Weegbon aangemaakt en verwerkt');
-      resetForm();
-
-      if (onSuccess) {
-        onSuccess();
+      
+      // Reload form with the latest data
+      if ((response as any).id) {
+        // Response is CreateWeightTicketResponse with just id
+        // Switch to edit mode by setting the new weight ticket number
+        const createdId = (response as any).id;
+        setCurrentWeightTicketNumber(createdId);
+        // Fetch the full details using the returned id
+        const fullDetails = await weightTicketService.getByNumber(createdId);
+        const formValues = weightTicketDetailsToFormValues(fullDetails);
+        formContext.reset(formValues);
       }
     },
     onError: (error) => {
@@ -130,6 +159,8 @@ export function useWeightTicketForm(
   });
 
   const resetForm = () => {
+    // Reset to initial state (create mode if no initial number was provided)
+    setCurrentWeightTicketNumber(initialWeightTicketNumber);
     formContext.reset({
       consignorPartyId: '',
       carrierPartyId: '',
@@ -226,7 +257,9 @@ const weightTicketDetailsToFormValues = (
  */
 const normalizeNumberForBackend = (value: string | number | undefined): string | undefined => {
   if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'number' && isNaN(value)) return undefined;
   const stringValue = String(value);
+  if (stringValue === 'NaN') return undefined;
   // Replace comma with period for backend
   return stringValue.replace(',', '.');
 };

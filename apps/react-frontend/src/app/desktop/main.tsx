@@ -13,6 +13,6 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
-    <ToastContainer />
+    <ToastContainer style={{ zIndex: 9999 }} />
   </StrictMode>
 );
