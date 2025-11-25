@@ -22,7 +22,7 @@ export const Sidebar = () => {
   // Define all navigation items
   const allNavItems = [
     { icon: CalendarDots, label: 'Planning', to: '/' },
-    { icon: BuildingOffice, label: 'CRM', to: '/crm' },
+    { icon: BuildingOffice, label: 'Relaties', to: '/crm' },
     { icon: BxRecycle, label: 'Afvalstroombeheer', to: '/waste-streams' },
     { icon: Scale, label: 'Weegbonnen', to: '/weight-tickets' },
     {

@@ -18,7 +18,6 @@ export class SidebarComponent {
   private readonly planningNavItem: Locator;
   private readonly containersNavItem: Locator;
   private readonly crmNavItem: Locator;
-  private readonly trucksNavItem: Locator;
   private readonly wasteStreamsNavItem: Locator;
   private readonly usersNavItem: Locator; // Admin only
 
@@ -103,17 +102,8 @@ export class SidebarComponent {
    */
   async navigateToCRM(): Promise<void> {
     await this.crmNavItem.click();
-    await this.page.waitForURL('/crm');
+    await this.page.waitForURL('/relaties');
     await this.waitForNavItemActive(this.crmNavItem);
-  }
-
-  /**
-   * Navigate to Trucks page
-   */
-  async navigateToTrucks(): Promise<void> {
-    await this.trucksNavItem.click();
-    await this.page.waitForURL('/trucks');
-    await this.waitForNavItemActive(this.trucksNavItem);
   }
 
   /**

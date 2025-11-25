@@ -93,10 +93,6 @@ export class PlanningPage extends BasePage {
     await this.sidebar.navigateToCRM();
   }
 
-  async navigateToTrucks(): Promise<void> {
-    await this.sidebar.navigateToTrucks();
-  }
-
   async navigateToWasteStreams(): Promise<void> {
     await this.sidebar.navigateToWasteStreams();
   }

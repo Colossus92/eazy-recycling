@@ -46,10 +46,6 @@ test.describe('Dashboard with Sidebar Navigation', () => {
     await planningPage.navigateToCRM();
     expect(planningPage.page.url()).toContain('/crm');
 
-    // Navigate to Trucks
-    await planningPage.navigateToTrucks();
-    expect(planningPage.page.url()).toContain('/trucks');
-
     // Navigate to Waste Streams
     await planningPage.navigateToWasteStreams();
     expect(planningPage.page.url()).toContain('/waste-streams');
