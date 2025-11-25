@@ -51,16 +51,16 @@ export const NumberInput = <TFieldValues extends FieldValues>({
     const value = e.target.value;
     const parsed = parseNumber(value);
     if (!isNaN(parsed)) {
-      // Determine decimal places: if step is 'any' use 1, otherwise extract from step string
-      let decimalPlaces = 1;
-      if (step !== 'any' && typeof step === 'string') {
-        const stepStr = step;
-        const decimalIndex = stepStr.indexOf('.');
-        if (decimalIndex !== -1) {
-          decimalPlaces = stepStr.length - decimalIndex - 1;
+      // Determine decimal places based on step value
+      // step = 1 → 0 decimals, step = 0.1 → 1 decimal, step = 0.01 → 2 decimals
+      let decimalPlaces = 2; // default for 'any'
+      if (step !== 'any') {
+        const stepNum = typeof step === 'string' ? parseFloat(step) : step;
+        if (!isNaN(stepNum) && stepNum > 0) {
+          // Calculate decimal places from step: -log10(step) gives us the number of decimals
+          // For step=1: -log10(1) = 0, step=0.1: -log10(0.1) = 1, step=0.01: -log10(0.01) = 2
+          decimalPlaces = stepNum >= 1 ? 0 : Math.max(0, Math.round(-Math.log10(stepNum)));
         }
-      } else if (typeof step === 'number') {
-        decimalPlaces = step;
       }
       e.target.value = parsed.toFixed(decimalPlaces);
     }
