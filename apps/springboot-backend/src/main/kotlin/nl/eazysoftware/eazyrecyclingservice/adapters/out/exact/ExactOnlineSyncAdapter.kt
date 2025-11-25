@@ -71,6 +71,40 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
+   * Update an existing company in Exact Online
+   * Caller must handle exceptions to prevent rollback of company update.
+   */
+  override fun updateCompany(company: Company) {
+    // Skip sync if no valid tokens
+    if (!exactOAuthService.hasValidTokens()) {
+      logger.warn("Skipping Exact Online update for company ${company.companyId.uuid} - no valid tokens")
+      throw ExactSyncException("No valid tokens")
+    }
+
+    logger.info("Updating company ${company.companyId.uuid} in Exact Online")
+
+    // Update account in Exact Online
+    updateExactAccount(company)
+
+    // Update sync record with OK status
+    val existingSync = companySyncRepository.findByCompanyId(company.companyId.uuid)
+    if (existingSync != null) {
+      val updatedSync = existingSync.copy(
+        syncStatus = SyncStatus.OK,
+        syncedFromSourceAt = Instant.now(),
+        syncErrorMessage = null,
+        updatedAt = Instant.now()
+      )
+      companySyncRepository.save(updatedSync)
+    } else {
+      // No existing sync record - this shouldn't happen for updates, but handle gracefully
+      logger.warn("No existing sync record found for company ${company.companyId.uuid} during update")
+    }
+
+    logger.info("Successfully updated company ${company.companyId.uuid} in Exact Online")
+  }
+
+  /**
    * Create account in Exact Online
    */
   private fun createExactAccount(company: Company): ExactAccountCreateResponse {
@@ -109,6 +143,41 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
+   * Update account in Exact Online
+   */
+  private fun updateExactAccount(company: Company) {
+    val restTemplate = exactApiClient.getRestTemplate()
+    val url = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/crm/Accounts(guid'${company.companyId.uuid}')"
+    val customerStatus = if (company.isCustomer) "C" else "A"
+
+    val accountRequest = ExactAccountUpdateRequest(
+      Name = company.name,
+      AddressLine1 = "${company.address.streetName.value} ${company.address.buildingNumber}${company.address.buildingNumberAddition ?: ""}",
+      Postcode = company.address.postalCode.value,
+      City = company.address.city.value,
+      Country = "NL",
+      Status = customerStatus,
+      ChamberOfCommerce = company.chamberOfCommerceId,
+      Phone = company.phone,
+      Email = company.email,
+      IsSupplier = company.isSupplier,
+    )
+
+    val headers = HttpHeaders()
+    headers.contentType = MediaType.APPLICATION_JSON
+
+    // Log the request payload
+    val requestJson = objectMapper.writeValueAsString(accountRequest)
+    logger.info("Sending request to Exact Online: PUT $url")
+    logger.info("Request payload: $requestJson")
+
+    val request = HttpEntity(accountRequest, headers)
+    val response = restTemplate.exchange(url, HttpMethod.PUT, request, Void::class.java)
+
+    logger.info("Received response from Exact Online: ${response.statusCode}")
+  }
+
+  /**
    * Fetch full account details including Code field
    */
   private fun fetchAccountDetails(metadataUri: String): ExactAccountDetailsResponse {
@@ -131,6 +200,29 @@ class ExactOnlineSyncAdapter(
   data class ExactAccountRequest(
     @get:JsonProperty("ID")
     val ID: UUID,
+    @get:JsonProperty("Name")
+    val Name: String,
+    @get:JsonProperty("AddressLine1")
+    val AddressLine1: String,
+    @get:JsonProperty("Postcode")
+    val Postcode: String,
+    @get:JsonProperty("City")
+    val City: String,
+    @get:JsonProperty("Country")
+    val Country: String,
+    @get:JsonProperty("Status")
+    val Status: String,
+    @get:JsonProperty("ChamberOfCommerce")
+    val ChamberOfCommerce: String? = null,
+    @get:JsonProperty("Phone")
+    val Phone: String? = null,
+    @get:JsonProperty("Email")
+    val Email: String? = null,
+    @get:JsonProperty("IsSupplier")
+    val IsSupplier: Boolean,
+  )
+
+  data class ExactAccountUpdateRequest(
     @get:JsonProperty("Name")
     val Name: String,
     @get:JsonProperty("AddressLine1")
