@@ -33,25 +33,6 @@ export interface LocalDateTime {
      */
     'value'?: string;
     /**
-     * Use the \'month\' property instead
-     * @type {number}
-     * @memberof LocalDateTime
-     * @deprecated
-     */
-    'monthNumber': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalDateTime
-     */
-    'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalDateTime
-     */
-    'value$kotlinx_datetime': string;
-    /**
      * 
      * @type {LocalTime}
      * @memberof LocalDateTime
@@ -118,6 +99,25 @@ export interface LocalDateTime {
      * @memberof LocalDateTime
      */
     'day': number;
+    /**
+     * Use the \'month\' property instead
+     * @type {number}
+     * @memberof LocalDateTime
+     * @deprecated
+     */
+    'monthNumber': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof LocalDateTime
+     */
+    'nanosecond': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LocalDateTime
+     */
+    'value$kotlinx_datetime': string;
 }
 
 export const LocalDateTimeMonthEnum = {

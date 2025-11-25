@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface CompanySyncRepository : JpaRepository<CompanySyncDto, UUID> {
-    fun findByCompanyId(companyId: UUID): CompanySyncDto?
-    fun findByExternalId(externalId: String): CompanySyncDto?
+interface SyncCursorRepository : JpaRepository<SyncCursorDto, UUID> {
+    fun findByEntity(entity: String): SyncCursorDto?
 }

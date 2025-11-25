@@ -18,6 +18,7 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
   fun findAllByDeletedAtIsNull(): List<CompanyDto>
   fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
   fun findByProcessorIdAndDeletedAtIsNull(processorId: String): CompanyDto?
+  fun findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId: String): CompanyDto?
   fun findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId: String): CompanyDto?
   fun findByVihbIdAndDeletedAtNotNull(vihbId: String): CompanyDto?
   fun findByProcessorIdAndDeletedAtNotNull(processorId: String): CompanyDto?
@@ -68,9 +69,13 @@ class CompanyRepository(
       ?.let { jpaRepository.save(it.copy(deletedAt = Instant.now())) }
   }
 
+  override fun findByChamberOfCommerceId(chamberOfCommerceId: String): Company? {
+    return jpaRepository.findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId)
+      ?.let { companyMapper.toDomain(it) }
+  }
+
   override fun existsByChamberOfCommerceId(chamberOfCommerceId: String): Boolean {
-    return jpaRepository.findAllByDeletedAtIsNull()
-      .any { it.chamberOfCommerceId == chamberOfCommerceId }
+    return jpaRepository.findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId) != null
   }
 
   override fun existsByVihbNumber(vihbNumber: String): Boolean {

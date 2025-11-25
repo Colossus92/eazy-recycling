@@ -19,4 +19,21 @@ interface ExactOnlineSync {
      * without affecting the main company update flow.
      */
     fun updateCompany(company: Company)
+
+    /**
+     * Sync companies from Exact Online to our database.
+     * Uses the Exact Online Sync API with timestamp-based pagination.
+     * Returns the number of records synced.
+     */
+    fun syncFromExact(): SyncFromExactResult
 }
+
+/**
+ * Result of syncing from Exact Online
+ */
+data class SyncFromExactResult(
+    val recordsSynced: Int,
+    val recordsCreated: Int,
+    val recordsUpdated: Int,
+    val newTimestamp: Long
+)

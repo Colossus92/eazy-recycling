@@ -17,44 +17,38 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface SyncFromExactResponse
  */
-export interface LocalTime {
+export interface SyncFromExactResponse {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SyncFromExactResponse
+     */
+    'success': boolean;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof SyncFromExactResponse
      */
-    'value'?: string;
+    'message': string;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncFromExactResponse
      */
-    'hour': number;
+    'recordsSynced': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncFromExactResponse
      */
-    'minute': number;
+    'recordsCreated': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncFromExactResponse
      */
-    'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value$kotlinx_datetime': string;
+    'recordsUpdated': number;
 }
 

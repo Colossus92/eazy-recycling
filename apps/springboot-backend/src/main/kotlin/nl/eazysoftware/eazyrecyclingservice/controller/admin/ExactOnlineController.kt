@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.admin
 
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ExactOnlineSync
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.view.RedirectView
 @RequestMapping("/admin/exact")
 class ExactOnlineController(
     private val exactOAuthService: ExactOAuthService,
+    private val exactOnlineSync: ExactOnlineSync,
     @Value("\${frontend.url}") private val frontendUrl: String
 ) {
 
@@ -136,5 +138,45 @@ class ExactOnlineController(
     data class RefreshTokenResponse(
         val success: Boolean,
         val message: String
+    )
+
+    /**
+     * POST /api/admin/exact/sync
+     *
+     * Sync companies from Exact Online to our database.
+     * Uses the Exact Online Sync API with timestamp-based pagination.
+     */
+    @PreAuthorize(HAS_ROLE_ADMIN)
+    @PostMapping("/sync")
+    fun syncFromExact(): ResponseEntity<SyncFromExactResponse> {
+        return try {
+            logger.info("Starting sync from Exact Online")
+            val result = exactOnlineSync.syncFromExact()
+            ResponseEntity.ok(SyncFromExactResponse(
+                success = true,
+                message = "Sync completed successfully",
+                recordsSynced = result.recordsSynced,
+                recordsCreated = result.recordsCreated,
+                recordsUpdated = result.recordsUpdated
+            ))
+        } catch (e: Exception) {
+            logger.error("Failed to sync from Exact Online", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(SyncFromExactResponse(
+                    success = false,
+                    message = "Failed to sync: ${e.message}",
+                    recordsSynced = 0,
+                    recordsCreated = 0,
+                    recordsUpdated = 0
+                ))
+        }
+    }
+
+    data class SyncFromExactResponse(
+        val success: Boolean,
+        val message: String,
+        val recordsSynced: Int,
+        val recordsCreated: Int,
+        val recordsUpdated: Int
     )
 }

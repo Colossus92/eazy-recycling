@@ -11,6 +11,7 @@ interface Companies {
   fun findById(companyId: CompanyId): Company?
   fun update(company: Company): Company
   fun deleteById(companyId: CompanyId)
+  fun findByChamberOfCommerceId(chamberOfCommerceId: String): Company?
   fun existsByChamberOfCommerceId(chamberOfCommerceId: String): Boolean
   fun existsByVihbNumber(vihbNumber: String): Boolean
   fun findByProcessorId(processorId: String): Company?

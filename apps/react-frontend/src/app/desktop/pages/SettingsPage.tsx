@@ -3,7 +3,10 @@ import type {
   ConnectionStatusResponse,
   RefreshTokenResponse,
 } from '@/api/client';
-import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
+import {
+  exactOnlineService,
+  type SyncFromExactResponse,
+} from '@/api/services/exactOnlineService.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
 import { toastService } from '@/components/ui/toast/toastService.ts';
@@ -63,6 +66,26 @@ export const SettingsPage = () => {
     },
   });
 
+  // Mutation to sync from Exact Online
+  const syncFromExactMutation = useMutation({
+    mutationFn: async () => {
+      const response = await exactOnlineService.syncFromExact();
+      return response.data;
+    },
+    onSuccess: (data: SyncFromExactResponse) => {
+      if (data.success) {
+        toastService.success(
+          `Synchronisatie voltooid: ${data.recordsSynced} records (${data.recordsCreated} nieuw, ${data.recordsUpdated} bijgewerkt)`
+        );
+      } else {
+        toastService.error(data.message || 'Synchronisatie mislukt');
+      }
+    },
+    onError: (error: Error) => {
+      toastService.error(`Synchronisatie mislukt: ${error.message}`);
+    },
+  });
+
   const handleGetAuthUrl = () => {
     getAuthUrlMutation.mutate();
   };
@@ -81,6 +104,10 @@ export const SettingsPage = () => {
   const handleTestConnection = () => {
     refetchStatus();
     toastService.success('Checking connection status...');
+  };
+
+  const handleSyncFromExact = () => {
+    syncFromExactMutation.mutate();
   };
 
   // Handle OAuth callback results from query parameters
@@ -216,7 +243,7 @@ export const SettingsPage = () => {
           )}
 
           {/* Token Management Section */}
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 border-b border-solid border-color-border-primary">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
                 <h5 className="text-color-text-primary">Token Beheer</h5>
@@ -234,6 +261,45 @@ export const SettingsPage = () => {
                   disabled={refreshTokenMutation.isPending}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Data Synchronization Section */}
+          <div className="px-6 py-4">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <h5 className="text-color-text-primary">
+                  Data Synchronisatie
+                </h5>
+                <span className="text-sm text-color-text-secondary">
+                  Synchroniseer bedrijfsgegevens van Exact Online naar de
+                  lokale database. Bestaande gegevens worden overschreven met
+                  de waarden uit Exact Online.
+                </span>
+              </div>
+
+              <div>
+                <Button
+                  variant="primary"
+                  label={
+                    syncFromExactMutation.isPending
+                      ? 'Synchroniseren...'
+                      : 'Synchroniseer van Exact Online'
+                  }
+                  onClick={handleSyncFromExact}
+                  disabled={
+                    syncFromExactMutation.isPending ||
+                    !connectionStatus?.connected
+                  }
+                />
+              </div>
+
+              {!connectionStatus?.connected && (
+                <p className="text-sm text-color-text-secondary">
+                  ⚠️ Maak eerst verbinding met Exact Online om te kunnen
+                  synchroniseren.
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -27,19 +27,6 @@ export interface LocalDate {
      */
     'value'?: string;
     /**
-     * Use the \'month\' property instead
-     * @type {number}
-     * @memberof LocalDate
-     * @deprecated
-     */
-    'monthNumber': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalDate
-     */
-    'value$kotlinx_datetime': string;
-    /**
      * 
      * @type {number}
      * @memberof LocalDate
@@ -76,6 +63,19 @@ export interface LocalDate {
      * @memberof LocalDate
      */
     'day': number;
+    /**
+     * Use the \'month\' property instead
+     * @type {number}
+     * @memberof LocalDate
+     * @deprecated
+     */
+    'monthNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LocalDate
+     */
+    'value$kotlinx_datetime': string;
 }
 
 export const LocalDateMonthEnum = {

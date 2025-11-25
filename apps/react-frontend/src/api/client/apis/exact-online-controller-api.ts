@@ -31,6 +31,8 @@ import type { ConnectionStatusResponse } from '../models';
 import type { RedirectView } from '../models';
 // @ts-ignore
 import type { RefreshTokenResponse } from '../models';
+// @ts-ignore
+import type { SyncFromExactResponse } from '../models';
 /**
  * ExactOnlineControllerApi - axios parameter creator
  */
@@ -184,6 +186,37 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        syncFromExact: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/exact/sync`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -241,6 +274,17 @@ export const ExactOnlineControllerApiFp = function(configuration?: Configuration
             const operationBasePath = operationServerMap['ExactOnlineControllerApi.refreshToken']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async syncFromExact(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SyncFromExactResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.syncFromExact(options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['ExactOnlineControllerApi.syncFromExact']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
     };
 };
 
@@ -285,6 +329,14 @@ export const ExactOnlineControllerApiFactory = function (configuration?: Configu
          */
         refreshToken(options?: any): AxiosPromise<RefreshTokenResponse> {
             return localVarFp.refreshToken(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        syncFromExact(options?: any): AxiosPromise<SyncFromExactResponse> {
+            return localVarFp.syncFromExact(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -335,5 +387,15 @@ export class ExactOnlineControllerApi extends BaseAPI {
      */
     public refreshToken(options?: RawAxiosRequestConfig) {
         return ExactOnlineControllerApiFp(this.configuration).refreshToken(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ExactOnlineControllerApi
+     */
+    public syncFromExact(options?: RawAxiosRequestConfig) {
+        return ExactOnlineControllerApiFp(this.configuration).syncFromExact(options).then((request) => request(this.axios, this.basePath));
     }
 }
