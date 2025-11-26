@@ -412,7 +412,7 @@ class ExactOnlineSyncAdapter(
           conflictDetails = mapOf(
             "conflictType" to "KVK_COLLISION",
             "field" to "chamber_of_commerce_id",
-            "value" to (account.ChamberOfCommerce ?: ""),
+            "value" to account.ChamberOfCommerce,
             "existingExactGuid" to existingSync.exactGuid.toString(),
             "newExactGuid" to account.ID.toString(),
             "existingCompanyId" to companyByKvk.companyId.uuid.toString()
@@ -541,7 +541,12 @@ class ExactOnlineSyncAdapter(
     )
     companySyncRepository.save(updatedSync)
 
-    logger.debug("Updated company ${updatedCompany.name} (${existingCompany.companyId.uuid}) from Exact GUID ${account.ID}")
+    logger.debug(
+      "Updated company {} ({}) from Exact GUID {}",
+      updatedCompany.name,
+      existingCompany.companyId.uuid,
+      account.ID
+    )
     return ProcessResult.Updated
   }
 
@@ -588,7 +593,7 @@ class ExactOnlineSyncAdapter(
     )
     companySyncRepository.save(syncDto)
 
-    logger.debug("Created company ${company.name} (${newCompanyId.uuid}) from Exact GUID ${account.ID}")
+    logger.debug("Created company {} ({}) from Exact GUID {}", company.name, newCompanyId.uuid, account.ID)
     return ProcessResult.Created
   }
 
