@@ -47,6 +47,11 @@ data class CompanyDto(
   @Column(name = "deleted_at", nullable = true)
   val deletedAt: Instant? = null,
 
-  val updatedAt: Instant = Instant.now(),
+  /**
+   * User ID who deleted the company (metadata only, not used in queries).
+   */
+  @Column(name = "deleted_by", nullable = true)
+  val deletedBy: UUID? = null,
 
-  )
+  val updatedAt: Instant = Instant.now(),
+)

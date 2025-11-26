@@ -344,6 +344,197 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 
 ---
 
+## 7. Deletion Policy
+
+### Principle: Eazy Recycling Does NOT Delete in Exact Online
+
+**Rationale**:
+
+- Exact Online is the system of record for financial/accounting data
+- Deleting accounts in Exact can corrupt financial history (invoices, transactions)
+- Deletions should be intentional business decisions made by accounting staff
+- Reduces risk of accidental data loss from sync bugs or user errors
+
+### Handling Deletions from Exact Online
+
+Exact Online provides a **Deleted API** (`/api/v1/{division}/sync/Deleted`) that tracks deleted entities for 2 months. This must be used alongside the Sync API to maintain data consistency.
+
+#### Deleted API Details
+
+```text
+URI: /api/v1/{division}/sync/Deleted
+Method: GET
+Example: /api/v1/4002380/sync/Deleted?$filter=Timestamp gt 5&$select=Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID
+```
+
+**Key Properties**:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `Timestamp` | Edm.Int64 | Row version for incremental sync |
+| `DeletedBy` | Edm.Guid | UserID who deleted the record |
+| `DeletedDate` | Edm.DateTime | When the record was deleted |
+| `EntityKey` | Edm.Guid | The ID of the deleted entity |
+| `EntityType` | Edm.Int32 | Entity type (2 = Accounts) |
+| `ID` | Edm.Guid | Primary key of the deletion record |
+
+**Important Constraints**:
+
+- Deletion log is retained for **2 months only**
+- After 2 months, deletion records are automatically purged
+- If a division is moved to another database, all timestamps reset (requires full re-sync)
+
+### Deletion Sync Strategy
+
+#### Inbound Deletion Flow (Exact → Eazy)
+
+When a company is deleted in Exact Online:
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│           FETCH DELETED ACCOUNTS FROM EXACT                      │
+│           (Timestamp > last_deleted_timestamp)                   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │ For each deleted│
+                    │ account         │
+                    └────────┬────────┘
+                             │
+                             ▼
+              ┌──────────────────────────┐
+              │ Find by EntityKey        │
+              │ (exact_guid in sync)     │
+              └────────────┬─────────────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         │ FOUND           │ NOT FOUND       │
+         ▼                 ▼                 │
+   ┌───────────────┐ ┌───────────────┐       │
+   │ Soft-delete   │ │ Log warning   │       │
+   │ in Eazy       │ │ (already      │       │
+   │ Mark sync as  │ │ deleted or    │       │
+   │ DELETED       │ │ never synced) │       │
+   └───────────────┘ └───────────────┘       │
+```
+
+**Implementation**:
+
+1. Store separate `last_deleted_timestamp` cursor for the Deleted API
+2. Query Deleted API with `EntityType eq 2` (Accounts)
+3. For each deleted entity:
+   - Look up `exact_guid` in `companies_sync`
+   - If found: soft-delete the company, mark sync status as `DELETED`
+   - If not found: log and continue (entity may have never been synced)
+
+#### Outbound Deletion Flow (Eazy → Exact)
+
+Eazy Recycling does **not** propagate deletions to Exact Online.
+
+When a company is deleted in Eazy Recycling:
+
+1. **Soft-delete only** in Eazy Recycling database
+2. **Do NOT delete** in Exact Online
+3. Mark sync status as `DELETED_LOCALLY`
+4. Log the deletion for audit purposes
+
+```kotlin
+enum class SyncStatus {
+    OK,
+    FAILED,
+    CONFLICT,
+    PENDING_REVIEW,
+    DELETED,           // Deleted in Exact, soft-deleted locally
+    DELETED_LOCALLY    // Deleted locally, NOT propagated to Exact
+}
+```
+
+### Schema Changes for Deletion Support
+
+```sql
+-- Add deletion tracking to sync cursor
+ALTER TABLE companies_sync_cursor 
+    ADD COLUMN cursor_type VARCHAR(20) DEFAULT 'sync';
+-- cursor_type: 'sync' for regular sync, 'deleted' for deletion sync
+
+-- Add deletion metadata to companies_sync
+ALTER TABLE companies_sync 
+    ADD COLUMN deleted_in_exact_at TIMESTAMP,
+    ADD COLUMN deleted_in_exact_by UUID,
+    ADD COLUMN deleted_locally_at TIMESTAMP;
+
+-- Add deleted_by metadata to companies table (deleted_at already exists)
+-- Note: deleted_by is metadata only, not used in queries to determine deletion status
+ALTER TABLE companies 
+    ADD COLUMN deleted_by UUID;
+```
+
+### Sync Cursor Management
+
+The system must maintain **two separate cursors**:
+
+| Cursor Type | Entity | Purpose |
+|-------------|--------|---------|
+| `sync` | `accounts` | Track last sync timestamp for new/updated records |
+| `deleted` | `accounts` | Track last deletion timestamp |
+
+**First-time sync**: Start both cursors at timestamp `1` (as per Exact API documentation).
+
+**Cursor storage**:
+
+```kotlin
+data class SyncCursorDto(
+    val id: UUID?,
+    val entity: String,        // e.g., "accounts"
+    val cursorType: String,    // "sync" or "deleted"
+    val lastTimestamp: Long,
+    val updatedAt: Instant
+)
+```
+
+### 2-Month Retention Limitation
+
+Since Exact Online only retains deletion records for 2 months:
+
+1. **Sync frequency**: Run deletion sync **daily** via scheduled job to prevent falling behind
+2. **Gap detection**: If last deletion sync was > 2 weeks ago, log a warning
+3. **Recovery**: If gap exceeds 2 months, manual reconciliation may be required
+
+### Risks and Mitigations for Deletion
+
+#### Risk: Missing Deletions Due to 2-Month Limit
+
+**Risk**: If sync doesn't run for > 2 months, deletions are lost.
+
+**Mitigation**:
+
+- Scheduled job runs deletion sync **daily**
+- Alert if deletion sync hasn't run in > 2 weeks
+- Manual reconciliation if gap exceeds 2 months
+
+#### Risk: Orphaned Records in Eazy
+
+**Risk**: Company deleted in Exact but still active in Eazy.
+
+**Mitigation**:
+
+- Regular deletion sync catches most cases
+- Reconciliation job flags companies with `exact_guid` that no longer exist in Exact
+- Admin UI shows "orphaned" companies for review
+
+#### Risk: Accidental Local Deletion
+
+**Risk**: User deletes company in Eazy that should remain in Exact.
+
+**Mitigation**:
+
+- Soft-delete only (can be restored)
+- Audit log of all deletions
+- No propagation to Exact (intentional design)
+
+---
+
 ## Implementation Phases
 
 ### Phase 1: Schema Updates
@@ -352,6 +543,8 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 2. Add `conflict_details` JSONB column
 3. Add `requires_manual_review` flag
 4. Add unique indexes
+5. **Add `cursor_type` to sync cursor table**
+6. **Add deletion tracking columns**
 
 ### Phase 2: Decouple UUID
 
@@ -365,11 +558,19 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 2. Add `CONFLICT` and `PENDING_REVIEW` statuses
 3. Create admin endpoint to list conflicts
 
-### Phase 4: Conflict Resolution UI
+### Phase 4: Deletion Sync
+
+1. **Implement Deleted API client**
+2. **Add deletion cursor management**
+3. **Add `DELETED` and `DELETED_LOCALLY` sync statuses**
+4. **Create daily scheduled job for deletion sync**
+
+### Phase 5: Conflict Resolution UI
 
 1. Admin page showing sync conflicts
 2. Manual merge/link functionality
 3. Audit logging for resolutions
+4. **Show deleted/orphaned companies**
 
 ---
 
@@ -380,17 +581,23 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 - Decoupled identity allows future flexibility (merging, splitting companies)
 - Explicit conflict handling prevents silent data corruption
 - Audit trail enables debugging and compliance
+- **No accidental deletion of financial data in Exact**
+- **Soft-delete preserves data recovery options**
+- **Deletion sync keeps systems consistent**
 
 ### Negative
 
 - More complex sync logic
 - Requires manual intervention for conflicts
 - Additional storage for sync metadata
+- **2-month deletion retention requires regular sync cadence**
+- **Cannot delete companies in Exact from Eazy (by design)**
 
 ### Neutral
 
 - Migration needed for existing sync records
 - Admin training required for conflict resolution
+- Daily scheduled job required for deletion sync
 
 ---
 
@@ -398,4 +605,5 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 
 - [Exact Online REST API - CRM/Accounts](https://start.exactonline.nl/docs/HlpRestAPIResourcesDetails.aspx?name=CRMAccounts)
 - [Exact Online Sync API Documentation](https://support.exactonline.com/community/s/knowledge-base#All-All-DNO-Concept-api-apitypesc)
+- [Exact Online Deleted API](https://start.exactonline.nl/docs/HlpRestAPIResourcesDetails.aspx?name=SyncDeleted)
 - Current implementation: `ExactOnlineSyncAdapter.kt`

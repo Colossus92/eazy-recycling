@@ -192,6 +192,39 @@ class ExactOnlineController(
         ))
     }
 
+    /**
+     * POST /api/admin/exact/sync-deleted
+     *
+     * Sync deleted records from Exact Online.
+     * Uses the Exact Online Deleted API with timestamp-based pagination.
+     * Soft-deletes companies locally that were deleted in Exact.
+     */
+    @PreAuthorize(HAS_ROLE_ADMIN)
+    @PostMapping("/sync-deleted")
+    fun syncDeletedFromExact(): ResponseEntity<SyncDeletedResponse> {
+        return try {
+            logger.info("Starting deletion sync from Exact Online")
+            val result = exactOnlineSync.syncDeletedFromExact()
+            ResponseEntity.ok(SyncDeletedResponse(
+                success = true,
+                message = "Deletion sync completed successfully",
+                recordsProcessed = result.recordsProcessed,
+                recordsDeleted = result.recordsDeleted,
+                recordsNotFound = result.recordsNotFound
+            ))
+        } catch (e: Exception) {
+            logger.error("Failed to sync deleted records from Exact Online", e)
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(SyncDeletedResponse(
+                    success = false,
+                    message = "Failed to sync deleted records: ${e.message}",
+                    recordsProcessed = 0,
+                    recordsDeleted = 0,
+                    recordsNotFound = 0
+                ))
+        }
+    }
+
     data class SyncFromExactResponse(
         val success: Boolean,
         val message: String,
@@ -200,6 +233,14 @@ class ExactOnlineController(
         val recordsUpdated: Int,
         val recordsConflicted: Int,
         val recordsPendingReview: Int
+    )
+    
+    data class SyncDeletedResponse(
+        val success: Boolean,
+        val message: String,
+        val recordsProcessed: Int,
+        val recordsDeleted: Int,
+        val recordsNotFound: Int
     )
     
     data class SyncConflictsResponse(

@@ -16,6 +16,7 @@ create table if not exists companies (
                            is_supplier boolean not null default true,
                            is_customer boolean not null default true,
                            deleted_at timestamp with time zone,
+                           deleted_by uuid,
                            primary key (id)
 );
 
@@ -340,6 +341,19 @@ create table if not exists companies_sync (
                                                created_at timestamp with time zone not null,
                                                updated_at timestamp with time zone,
                                                deleted_in_source bool,
+                                               deleted_in_exact_at timestamp with time zone,
+                                               deleted_in_exact_by uuid,
+                                               deleted_locally_at timestamp with time zone,
                                                primary key (id),
                                                foreign key (company_id) references companies(id)
+);
+
+create table if not exists companies_sync_cursor (
+                                               id uuid not null,
+                                               entity text not null,
+                                               cursor_type text not null default 'sync',
+                                               last_timestamp bigint not null,
+                                               updated_at timestamp with time zone not null,
+                                               primary key (id),
+                                               unique (entity, cursor_type)
 );

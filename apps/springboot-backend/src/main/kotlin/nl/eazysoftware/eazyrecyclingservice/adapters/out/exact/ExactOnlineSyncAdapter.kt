@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ExactOnlineSync
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SyncDeletedResult
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SyncFromExactResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.*
@@ -236,7 +237,7 @@ class ExactOnlineSyncAdapter(
     logger.info("Starting sync from Exact Online")
 
     // Get the last timestamp from cursor, or start from 1 (first sync)
-    val cursor = syncCursorRepository.findByEntity(SYNC_ENTITY_ACCOUNTS)
+    val cursor = syncCursorRepository.findByEntityAndCursorType(SYNC_ENTITY_ACCOUNTS, SyncCursorDto.CURSOR_TYPE_SYNC)
     val lastTimestamp = cursor?.lastTimestamp ?: 0L
 
     var totalSynced = 0
@@ -289,6 +290,7 @@ class ExactOnlineSyncAdapter(
       updatedAt = Instant.now()
     ) ?: SyncCursorDto(
       entity = SYNC_ENTITY_ACCOUNTS,
+      cursorType = SyncCursorDto.CURSOR_TYPE_SYNC,
       lastTimestamp = currentTimestamp,
       updatedAt = Instant.now()
     )
@@ -318,6 +320,155 @@ class ExactOnlineSyncAdapter(
    */
   override fun getPendingReviews(): List<CompanySyncDto> {
     return companySyncRepository.findAllByRequiresManualReviewTrue()
+  }
+
+  /**
+   * Sync deleted records from Exact Online.
+   * Uses the Exact Online Deleted API with timestamp-based pagination.
+   * Soft-deletes companies locally that were deleted in Exact.
+   */
+  @Transactional
+  override fun syncDeletedFromExact(): SyncDeletedResult {
+    // Skip sync if no valid tokens
+    if (!exactOAuthService.hasValidTokens()) {
+      logger.warn("Skipping Exact Online deletion sync - no valid tokens")
+      throw ExactSyncException("No valid tokens")
+    }
+
+    logger.info("Starting deletion sync from Exact Online")
+
+    // Get the last timestamp from deleted cursor, or start from 1 (first sync)
+    val cursor = syncCursorRepository.findByEntityAndCursorType(SYNC_ENTITY_ACCOUNTS, SyncCursorDto.CURSOR_TYPE_DELETED)
+    val lastTimestamp = cursor?.lastTimestamp ?: 0L
+
+    var totalProcessed = 0
+    var totalDeleted = 0
+    var totalNotFound = 0
+    var currentTimestamp = lastTimestamp
+    var hasMoreRecords = true
+
+    // Paginate through all deleted records using timestamp
+    while (hasMoreRecords) {
+      val response = fetchDeletedFromExact(currentTimestamp)
+      val deletedRecords = response.d.results
+
+      if (deletedRecords.isEmpty()) {
+        hasMoreRecords = false
+        continue
+      }
+
+      logger.info("Fetched ${deletedRecords.size} deleted records from Exact Online (timestamp > $currentTimestamp)")
+
+      for (deleted in deletedRecords) {
+        // Only process Account deletions (EntityType = 2)
+        if (deleted.EntityType != ENTITY_TYPE_ACCOUNTS) {
+          continue
+        }
+
+        try {
+          val result = processDeletedAccount(deleted)
+          when (result) {
+            is DeleteResult.Deleted -> totalDeleted++
+            is DeleteResult.NotFound -> totalNotFound++
+          }
+          totalProcessed++
+        } catch (e: Exception) {
+          logger.error("Failed to process deleted account ${deleted.EntityKey}: ${e.message}", e)
+          // Continue with other records
+        }
+      }
+
+      // Update timestamp to the highest value in this batch
+      val maxTimestamp = deletedRecords.maxOfOrNull { it.Timestamp } ?: currentTimestamp
+      currentTimestamp = maxTimestamp
+
+      // If we got less than 1000 records, we've reached the end
+      hasMoreRecords = deletedRecords.size >= 1000
+    }
+
+    // Save the new cursor
+    val newCursor = cursor?.copy(
+      lastTimestamp = currentTimestamp,
+      updatedAt = Instant.now()
+    ) ?: SyncCursorDto(
+      entity = SYNC_ENTITY_ACCOUNTS,
+      cursorType = SyncCursorDto.CURSOR_TYPE_DELETED,
+      lastTimestamp = currentTimestamp,
+      updatedAt = Instant.now()
+    )
+    syncCursorRepository.save(newCursor)
+
+    logger.info("Deletion sync from Exact Online completed: $totalProcessed records processed ($totalDeleted deleted, $totalNotFound not found)")
+
+    return SyncDeletedResult(
+      recordsProcessed = totalProcessed,
+      recordsDeleted = totalDeleted,
+      recordsNotFound = totalNotFound,
+      newTimestamp = currentTimestamp
+    )
+  }
+
+  /**
+   * Result of processing a deleted record
+   */
+  private sealed class DeleteResult {
+    object Deleted : DeleteResult()
+    object NotFound : DeleteResult()
+  }
+
+  /**
+   * Process a single deleted account from Exact Online.
+   */
+  private fun processDeletedAccount(deleted: ExactDeletedRecord): DeleteResult {
+    // Find the sync record by exact_guid (EntityKey is the account's GUID)
+    val syncRecord = companySyncRepository.findByExactGuid(deleted.EntityKey)
+
+    if (syncRecord == null) {
+      logger.debug("No sync record found for deleted Exact account {} - may have never been synced", deleted.EntityKey)
+      return DeleteResult.NotFound
+    }
+
+    // Find the company
+    val company = companies.findById(CompanyId(syncRecord.companyId))
+    if (company == null) {
+      logger.warn("Company ${syncRecord.companyId} not found for deleted Exact account ${deleted.EntityKey}")
+      return DeleteResult.NotFound
+    }
+
+    // Soft-delete the company
+    companies.deleteById(company.companyId)
+
+    // Update sync record with deletion info
+    val updatedSync = syncRecord.copy(
+      syncStatus = SyncStatus.DELETED,
+      deletedInExactAt = deleted.DeletedDate?.let { Instant.parse(it) },
+      deletedInExactBy = deleted.DeletedBy,
+      updatedAt = Instant.now()
+    )
+    companySyncRepository.save(updatedSync)
+
+    logger.info("Soft-deleted company ${company.name} (${company.companyId.uuid}) - deleted in Exact by ${deleted.DeletedBy} on ${deleted.DeletedDate}")
+    return DeleteResult.Deleted
+  }
+
+  /**
+   * Fetch deleted records from Exact Online Deleted API
+   */
+  private fun fetchDeletedFromExact(timestamp: Long): ExactDeletedResponse {
+    val restTemplate = exactApiClient.getRestTemplate()
+    val url =
+      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted?\$filter=Timestamp gt $timestamp&\$select=Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID"
+
+    logger.debug("Fetching deleted records from Exact Online: $url")
+
+    val response = restTemplate.exchange(
+      url,
+      HttpMethod.GET,
+      null,
+      ExactDeletedResponse::class.java
+    )
+
+    return response.body ?: throw IllegalStateException("Empty response from Exact Online Deleted API")
   }
 
   /**
@@ -640,6 +791,7 @@ class ExactOnlineSyncAdapter(
 
   companion object {
     private const val SYNC_ENTITY_ACCOUNTS = "accounts"
+    private const val ENTITY_TYPE_ACCOUNTS = 2 // EntityType for Accounts in Exact Deleted API
   }
 
   // Data classes for Exact Online API
@@ -755,5 +907,32 @@ class ExactOnlineSyncAdapter(
     val Email: String?,
     @field:JsonProperty("IsSupplier")
     val IsSupplier: Boolean?,
+  )
+
+  // Data classes for Exact Online Deleted API
+
+  data class ExactDeletedResponse(
+    val d: ExactDeletedData
+  )
+
+  data class ExactDeletedData(
+    val results: List<ExactDeletedRecord>
+  )
+
+  data class ExactDeletedRecord(
+    @field:JsonProperty("Timestamp")
+    val Timestamp: Long,
+    @field:JsonProperty("DeletedBy")
+    val DeletedBy: UUID?,
+    @field:JsonProperty("DeletedDate")
+    val DeletedDate: String?, // ISO 8601 format
+    @field:JsonProperty("Division")
+    val Division: Int,
+    @field:JsonProperty("EntityKey")
+    val EntityKey: UUID,
+    @field:JsonProperty("EntityType")
+    val EntityType: Int,
+    @field:JsonProperty("ID")
+    val ID: UUID,
   )
 }

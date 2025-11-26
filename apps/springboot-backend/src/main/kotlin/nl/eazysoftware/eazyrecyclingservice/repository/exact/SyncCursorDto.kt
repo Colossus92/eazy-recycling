@@ -14,9 +14,20 @@ data class SyncCursorDto(
   @Column(name = "entity", nullable = false)
   val entity: String,
 
+  /**
+   * Type of cursor: 'sync' for regular sync, 'deleted' for deletion sync.
+   */
+  @Column(name = "cursor_type", nullable = false)
+  val cursorType: String = CURSOR_TYPE_SYNC,
+
   @Column(name = "last_timestamp", nullable = false)
   val lastTimestamp: Long,
 
   @Column(name = "updated_at", nullable = false)
   val updatedAt: Instant = Instant.now(),
-)
+) {
+  companion object {
+    const val CURSOR_TYPE_SYNC = "sync"
+    const val CURSOR_TYPE_DELETED = "deleted"
+  }
+}

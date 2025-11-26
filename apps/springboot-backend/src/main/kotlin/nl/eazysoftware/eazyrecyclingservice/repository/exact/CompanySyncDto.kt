@@ -62,6 +62,24 @@ data class CompanySyncDto(
 
   @Column(name = "updated_at", nullable = true)
   var updatedAt: Instant? = null,
+
+  /**
+   * Timestamp when the record was deleted in Exact Online.
+   */
+  @Column(name = "deleted_in_exact_at", nullable = true)
+  val deletedInExactAt: Instant? = null,
+
+  /**
+   * User ID who deleted the record in Exact Online.
+   */
+  @Column(name = "deleted_in_exact_by", nullable = true)
+  val deletedInExactBy: UUID? = null,
+
+  /**
+   * Timestamp when the record was deleted locally in Eazy Recycling.
+   */
+  @Column(name = "deleted_locally_at", nullable = true)
+  val deletedLocallyAt: Instant? = null,
 )
 
 /**
@@ -75,5 +93,9 @@ enum class SyncStatus {
   /** Sync blocked due to data conflict requiring manual resolution */
   CONFLICT,
   /** Record matched via fuzzy matching and needs manual confirmation */
-  PENDING_REVIEW
+  PENDING_REVIEW,
+  /** Record was deleted in Exact Online and soft-deleted locally */
+  DELETED,
+  /** Record was deleted locally but NOT propagated to Exact Online (by design) */
+  DELETED_LOCALLY
 }
