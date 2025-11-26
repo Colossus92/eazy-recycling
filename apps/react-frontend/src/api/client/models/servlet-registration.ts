@@ -22,16 +22,22 @@
 export interface ServletRegistration {
     /**
      * 
+     * @type {string}
+     * @memberof ServletRegistration
+     */
+    'runAsRole'?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof ServletRegistration
      */
     'mappings'?: Array<string>;
     /**
      * 
-     * @type {string}
+     * @type {{ [key: string]: string; }}
      * @memberof ServletRegistration
      */
-    'runAsRole'?: string;
+    'initParameters'?: { [key: string]: string; };
     /**
      * 
      * @type {string}
@@ -44,11 +50,5 @@ export interface ServletRegistration {
      * @memberof ServletRegistration
      */
     'className'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof ServletRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
 }
 

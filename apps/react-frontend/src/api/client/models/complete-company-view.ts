@@ -37,6 +37,12 @@ export interface CompleteCompanyView {
      * @type {string}
      * @memberof CompleteCompanyView
      */
+    'externalCode'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
     'chamberOfCommerceId'?: string;
     /**
      * 

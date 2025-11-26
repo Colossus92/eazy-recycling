@@ -32,6 +32,11 @@ export const CompanyManagement = () => {
 
   const columns: Column<Company>[] = [
     {
+      key: 'externalCode',
+      label: 'Code',
+      accessor: (item: Company) => item.externalCode ?? '-',
+    },
+    {
       key: 'name',
       label: 'Bedrijfsnaam',
       accessor: (item: Company): ReactNode => (
