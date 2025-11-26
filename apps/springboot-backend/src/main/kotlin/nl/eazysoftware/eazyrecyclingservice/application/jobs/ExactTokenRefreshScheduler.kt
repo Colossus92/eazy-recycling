@@ -50,4 +50,22 @@ class ExactTokenRefreshScheduler(
             // Don't throw the exception - we'll try again on the next scheduled run
         }
     }
+
+    /**
+     * Run at 00:00to clean up expired tokens and prevent table bloat
+     */
+    @Scheduled(cron = "0 0 0 * * *") // at 00:00
+    fun cleanupExpiredTokens() {
+        try {
+            val deletedCount = tokenRepository.deleteExpiredTokens(Instant.now())
+            if (deletedCount > 0) {
+                logger.info("Cleaned up $deletedCount expired Exact Online tokens")
+            } else {
+                logger.debug("No expired Exact Online tokens to clean up")
+            }
+        } catch (e: Exception) {
+            logger.error("Failed to clean up expired Exact Online tokens", e)
+            // Don't throw the exception - we'll try again on the next scheduled run
+        }
+    }
 }
