@@ -22,3 +22,4 @@ exact:
     redirect-uri: http://localhost:8080/api/admin/exact/callback
     authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
+    refresh-enabled: false

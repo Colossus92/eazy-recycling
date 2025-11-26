@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.jobs
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenRepository
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBooleanProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -14,6 +15,7 @@ import java.time.Instant
  * If so, it refreshes them proactively.
  */
 @Component
+@ConditionalOnBooleanProperty(name = ["exact.oauth.refresh-enabled"], havingValue = true)
 class ExactTokenRefreshScheduler(
     private val exactOAuthService: ExactOAuthService,
     private val tokenRepository: ExactTokenRepository
