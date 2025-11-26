@@ -26,6 +26,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
+import java.time.Instant
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -235,7 +236,7 @@ class ExactOnlineSyncAdapterTest {
         eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
       )
 
-      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountRequest
+      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountCreateRequest
       assertEquals("C", requestBody.Status)
     }
 
@@ -278,7 +279,7 @@ class ExactOnlineSyncAdapterTest {
         eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
       )
 
-      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountRequest
+      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountCreateRequest
       assertEquals("A", requestBody.Status)
     }
   }
@@ -303,45 +304,64 @@ class ExactOnlineSyncAdapterTest {
     }
 
     @Test
-    fun `updateCompany should not save sync record when no existing sync found`() {
+    fun `updateCompany should throw ExactSyncException when no existing sync found`() {
       // Given
       val company = createTestCompany()
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
-      whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
       whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(null)
 
-      val expectedUrl = "https://start.exactonline.nl/api/v1/4002380/crm/Accounts(guid'$companyId')"
-      whenever(restTemplate.exchange(
-        eq(expectedUrl),
-        eq(HttpMethod.PUT),
-        any(),
-        eq(Void::class.java)
-      )).thenReturn(ResponseEntity<Void>(HttpStatus.OK))
+      // When & Then
+      val exception = assertThrows<ExactSyncException> {
+        adapter.updateCompany(company)
+      }
+      assertEquals("No sync record found for company $companyId", exception.message)
 
-      // When
-      adapter.updateCompany(company)
-
-      // Then
-      verify(restTemplate).exchange(
-        eq(expectedUrl),
-        eq(HttpMethod.PUT),
-        any(),
-        eq(Void::class.java)
-      )
-      verify(companySyncRepository, never()).save(any())
+      verify(exactApiClient, never()).getRestTemplate()
     }
 
     @Test
-    fun `updateCompany should send PUT request to correct URL`() {
+    fun `updateCompany should throw ExactSyncException when sync record has no exactGuid`() {
       // Given
       val company = createTestCompany()
+      val existingSync = CompanySyncDto(
+        companyId = companyId,
+        externalId = exactCode,
+        exactGuid = null, // No exactGuid
+        syncStatus = SyncStatus.OK,
+        syncedFromSourceAt = Instant.now()
+      )
+
+      whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
+      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(existingSync)
+
+      // When & Then
+      val exception = assertThrows<ExactSyncException> {
+        adapter.updateCompany(company)
+      }
+      assertEquals("No Exact GUID found for company $companyId", exception.message)
+
+      verify(exactApiClient, never()).getRestTemplate()
+    }
+
+    @Test
+    fun `updateCompany should send PUT request to correct URL using exactGuid`() {
+      // Given
+      val company = createTestCompany()
+      val exactGuid = UUID.randomUUID()
+      val existingSync = CompanySyncDto(
+        companyId = companyId,
+        externalId = exactCode,
+        exactGuid = exactGuid,
+        syncStatus = SyncStatus.OK,
+        syncedFromSourceAt = Instant.now()
+      )
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
       whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
-      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(null)
+      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(existingSync)
 
-      val expectedUrl = "https://start.exactonline.nl/api/v1/4002380/crm/Accounts(guid'$companyId')"
+      val expectedUrl = "https://start.exactonline.nl/api/v1/4002380/crm/Accounts(guid'$exactGuid')"
       whenever(restTemplate.exchange(
         eq(expectedUrl),
         eq(HttpMethod.PUT),
@@ -368,10 +388,18 @@ class ExactOnlineSyncAdapterTest {
     fun `updateCompany should use correct customer status C when company is customer`() {
       // Given
       val company = createTestCompany(isCustomer = true)
+      val exactGuid = UUID.randomUUID()
+      val existingSync = CompanySyncDto(
+        companyId = companyId,
+        externalId = exactCode,
+        exactGuid = exactGuid,
+        syncStatus = SyncStatus.OK,
+        syncedFromSourceAt = Instant.now()
+      )
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
       whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
-      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(null)
+      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(existingSync)
 
       whenever(restTemplate.exchange(
         any<String>(),
@@ -400,10 +428,18 @@ class ExactOnlineSyncAdapterTest {
     fun `updateCompany should use correct customer status A when company is not customer`() {
       // Given
       val company = createTestCompany(isCustomer = false)
+      val exactGuid = UUID.randomUUID()
+      val existingSync = CompanySyncDto(
+        companyId = companyId,
+        externalId = exactCode,
+        exactGuid = exactGuid,
+        syncStatus = SyncStatus.OK,
+        syncedFromSourceAt = Instant.now()
+      )
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
       whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
-      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(null)
+      whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(existingSync)
 
       whenever(restTemplate.exchange(
         any<String>(),
@@ -471,7 +507,7 @@ class ExactOnlineSyncAdapterTest {
         eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
       )
 
-      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountRequest
+      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountCreateRequest
       assertEquals("Teststraat 123A", requestBody.AddressLine1)
     }
 
@@ -514,7 +550,7 @@ class ExactOnlineSyncAdapterTest {
         eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
       )
 
-      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountRequest
+      val requestBody = requestCaptor.firstValue.body as ExactOnlineSyncAdapter.ExactAccountCreateRequest
       assertEquals("Teststraat 123", requestBody.AddressLine1)
     }
   }

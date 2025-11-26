@@ -157,7 +157,9 @@ class ExactOnlineController(
                 message = "Sync completed successfully",
                 recordsSynced = result.recordsSynced,
                 recordsCreated = result.recordsCreated,
-                recordsUpdated = result.recordsUpdated
+                recordsUpdated = result.recordsUpdated,
+                recordsConflicted = result.recordsConflicted,
+                recordsPendingReview = result.recordsPendingReview
             ))
         } catch (e: Exception) {
             logger.error("Failed to sync from Exact Online", e)
@@ -167,9 +169,27 @@ class ExactOnlineController(
                     message = "Failed to sync: ${e.message}",
                     recordsSynced = 0,
                     recordsCreated = 0,
-                    recordsUpdated = 0
+                    recordsUpdated = 0,
+                    recordsConflicted = 0,
+                    recordsPendingReview = 0
                 ))
         }
+    }
+    
+    /**
+     * GET /api/admin/exact/conflicts
+     *
+     * Get all sync records that have conflicts requiring manual resolution.
+     */
+    @PreAuthorize(HAS_ROLE_ADMIN)
+    @GetMapping("/conflicts")
+    fun getConflicts(): ResponseEntity<SyncConflictsResponse> {
+        val conflicts = exactOnlineSync.getConflicts()
+        val pendingReviews = exactOnlineSync.getPendingReviews()
+        return ResponseEntity.ok(SyncConflictsResponse(
+            conflicts = conflicts.map { SyncConflictDto.fromEntity(it) },
+            pendingReviews = pendingReviews.map { SyncConflictDto.fromEntity(it) }
+        ))
     }
 
     data class SyncFromExactResponse(
@@ -177,6 +197,37 @@ class ExactOnlineController(
         val message: String,
         val recordsSynced: Int,
         val recordsCreated: Int,
-        val recordsUpdated: Int
+        val recordsUpdated: Int,
+        val recordsConflicted: Int,
+        val recordsPendingReview: Int
     )
+    
+    data class SyncConflictsResponse(
+        val conflicts: List<SyncConflictDto>,
+        val pendingReviews: List<SyncConflictDto>
+    )
+    
+    data class SyncConflictDto(
+        val id: String,
+        val companyId: String,
+        val externalId: String?,
+        val exactGuid: String?,
+        val syncStatus: String,
+        val conflictDetails: Map<String, Any>?,
+        val syncedFromSourceAt: String
+    ) {
+        companion object {
+            fun fromEntity(entity: nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto): SyncConflictDto {
+                return SyncConflictDto(
+                    id = entity.id?.toString() ?: "",
+                    companyId = entity.companyId.toString(),
+                    externalId = entity.externalId,
+                    exactGuid = entity.exactGuid?.toString(),
+                    syncStatus = entity.syncStatus.name,
+                    conflictDetails = entity.conflictDetails,
+                    syncedFromSourceAt = entity.syncedFromSourceAt.toString()
+                )
+            }
+        }
+    }
 }

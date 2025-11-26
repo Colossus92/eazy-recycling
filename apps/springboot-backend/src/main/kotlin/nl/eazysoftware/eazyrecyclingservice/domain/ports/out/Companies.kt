@@ -19,4 +19,10 @@ interface Companies {
   fun findDeletedByVihbNumber(vihbNumber: String): Company?
   fun findDeletedByProcessorId(processorId: String): Company?
   fun restore(companyId: CompanyId): Company
+  
+  /**
+   * Find company by exact address match (postal code, building number, building number addition).
+   * Used for matching companies from Exact Online when no other identifiers are available.
+   */
+  fun findByAddress(postalCode: String, buildingNumber: String, buildingNumberAddition: String?): Company?
 }

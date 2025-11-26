@@ -25,6 +25,20 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
   
   @Query("SELECT c FROM CompanyDto c JOIN c.roles r WHERE r = :role AND c.deletedAt IS NULL")
   fun findByRoleAndDeletedAtIsNull(@Param("role") role: CompanyRole): List<CompanyDto>
+  
+  @Query("""
+    SELECT c FROM CompanyDto c 
+    WHERE c.address.postalCode = :postalCode 
+    AND c.address.buildingNumber = :buildingNumber 
+    AND ((:buildingNumberAddition IS NULL AND c.address.buildingNumberAddition IS NULL) 
+         OR c.address.buildingNumberAddition = :buildingNumberAddition)
+    AND c.deletedAt IS NULL
+  """)
+  fun findByAddressAndDeletedAtIsNull(
+    @Param("postalCode") postalCode: String,
+    @Param("buildingNumber") buildingNumber: String,
+    @Param("buildingNumberAddition") buildingNumberAddition: String?
+  ): CompanyDto?
 }
 
 @Repository
@@ -106,5 +120,10 @@ class CompanyRepository(
     }
     val restoredDto = jpaRepository.save(dto.copy(deletedAt = null))
     return companyMapper.toDomain(restoredDto)
+  }
+
+  override fun findByAddress(postalCode: String, buildingNumber: String, buildingNumberAddition: String?): Company? {
+    return jpaRepository.findByAddressAndDeletedAtIsNull(postalCode, buildingNumber, buildingNumberAddition)
+      ?.let { companyMapper.toDomain(it) }
   }
 }

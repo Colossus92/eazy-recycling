@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
+import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto
 
 /**
  * Outgoing port for synchronizing companies with Exact Online
@@ -26,6 +27,16 @@ interface ExactOnlineSync {
      * Returns the number of records synced.
      */
     fun syncFromExact(): SyncFromExactResult
+    
+    /**
+     * Get all sync records that have conflicts requiring manual resolution.
+     */
+    fun getConflicts(): List<CompanySyncDto>
+    
+    /**
+     * Get all sync records that are pending manual review.
+     */
+    fun getPendingReviews(): List<CompanySyncDto>
 }
 
 /**
@@ -35,5 +46,7 @@ data class SyncFromExactResult(
     val recordsSynced: Int,
     val recordsCreated: Int,
     val recordsUpdated: Int,
+    val recordsConflicted: Int,
+    val recordsPendingReview: Int,
     val newTimestamp: Long
 )
