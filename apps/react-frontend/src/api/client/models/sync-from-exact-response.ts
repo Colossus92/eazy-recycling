@@ -50,5 +50,17 @@ export interface SyncFromExactResponse {
      * @memberof SyncFromExactResponse
      */
     'recordsUpdated': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncFromExactResponse
+     */
+    'recordsConflicted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncFromExactResponse
+     */
+    'recordsPendingReview': number;
 }
 

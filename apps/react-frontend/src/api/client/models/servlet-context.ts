@@ -55,34 +55,52 @@ export interface ServletContext {
     'minorVersion'?: number;
     /**
      * 
-     * @type {SessionCookieConfig}
+     * @type {Set<string>}
      * @memberof ServletContext
      */
-    'sessionCookieConfig'?: SessionCookieConfig;
+    'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
     /**
      * 
      * @type {string}
      * @memberof ServletContext
      */
-    'virtualServerName'?: string;
+    'requestCharacterEncoding'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'responseCharacterEncoding'?: string;
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof ServletContext
+     */
+    'defaultSessionTrackingModes'?: Set<ServletContextDefaultSessionTrackingModesEnum>;
     /**
      * 
      * @type {number}
      * @memberof ServletContext
      */
-    'sessionTimeout'?: number;
+    'effectiveMinorVersion'?: number;
     /**
      * 
-     * @type {any}
+     * @type {number}
      * @memberof ServletContext
      */
-    'initParameterNames'?: any;
+    'effectiveMajorVersion'?: number;
     /**
      * 
-     * @type {any}
+     * @type {{ [key: string]: ServletRegistration; }}
      * @memberof ServletContext
      */
-    'attributeNames'?: any;
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    /**
+     * 
+     * @type {Set<string>}
+     * @memberof ServletContext
+     */
+    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
     /**
      * 
      * @type {string}
@@ -103,10 +121,34 @@ export interface ServletContext {
     'jspConfigDescriptor'?: JspConfigDescriptor;
     /**
      * 
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
+    /**
+     * 
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
+    /**
+     * 
+     * @type {SessionCookieConfig}
+     * @memberof ServletContext
+     */
+    'sessionCookieConfig'?: SessionCookieConfig;
+    /**
+     * 
      * @type {string}
      * @memberof ServletContext
      */
-    'serverInfo'?: string;
+    'virtualServerName'?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
     /**
      * 
      * @type {string}
@@ -115,52 +157,10 @@ export interface ServletContext {
     'contextPath'?: string;
     /**
      * 
-     * @type {Set<string>}
-     * @memberof ServletContext
-     */
-    'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
-    /**
-     * 
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'effectiveMajorVersion'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'effectiveMinorVersion'?: number;
-    /**
-     * 
-     * @type {Set<string>}
-     * @memberof ServletContext
-     */
-    'defaultSessionTrackingModes'?: Set<ServletContextDefaultSessionTrackingModesEnum>;
-    /**
-     * 
      * @type {string}
      * @memberof ServletContext
      */
-    'requestCharacterEncoding'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'responseCharacterEncoding'?: string;
-    /**
-     * 
-     * @type {Set<string>}
-     * @memberof ServletContext
-     */
-    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
-    /**
-     * 
-     * @type {{ [key: string]: ServletRegistration; }}
-     * @memberof ServletContext
-     */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    'serverInfo'?: string;
 }
 
 export const ServletContextEffectiveSessionTrackingModesEnum = {

@@ -1698,6 +1698,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ConnectionStatusResponse"
+  /admin/exact/conflicts:
+    get:
+      tags:
+      - exact-online-controller
+      operationId: getConflicts
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SyncConflictsResponse"
   /admin/exact/callback:
     get:
       tags:
@@ -3467,9 +3479,17 @@ components:
         recordsUpdated:
           type: integer
           format: int32
+        recordsConflicted:
+          type: integer
+          format: int32
+        recordsPendingReview:
+          type: integer
+          format: int32
       required:
       - message
+      - recordsConflicted
       - recordsCreated
+      - recordsPendingReview
       - recordsSynced
       - recordsUpdated
       - success
@@ -3567,14 +3587,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -3643,6 +3663,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3651,9 +3674,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -3684,11 +3704,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -4315,6 +4335,43 @@ components:
       required:
       - connected
       - message
+    SyncConflictDto:
+      type: object
+      properties:
+        id:
+          type: string
+        companyId:
+          type: string
+        externalId:
+          type: string
+        exactGuid:
+          type: string
+        syncStatus:
+          type: string
+        conflictDetails:
+          type: object
+          additionalProperties: {}
+        syncedFromSourceAt:
+          type: string
+      required:
+      - companyId
+      - id
+      - syncStatus
+      - syncedFromSourceAt
+    SyncConflictsResponse:
+      type: object
+      properties:
+        conflicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncConflictDto"
+        pendingReviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncConflictDto"
+      required:
+      - conflicts
+      - pendingReviews
     ApplicationContext:
       type: object
       properties:
@@ -4323,13 +4380,13 @@ components:
           type: string
         displayName:
           type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         applicationName:
           type: string
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4658,15 +4715,15 @@ components:
       properties:
         error:
           type: boolean
-        is4xxClientError:
-          type: boolean
-        is5xxServerError:
-          type: boolean
         is1xxInformational:
           type: boolean
         is2xxSuccessful:
           type: boolean
         is3xxRedirection:
+          type: boolean
+        is4xxClientError:
+          type: boolean
+        is5xxServerError:
           type: boolean
     JspConfigDescriptor:
       type: object
@@ -4683,6 +4740,12 @@ components:
       type: object
       properties:
         buffer:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
           type: string
         defaultContentType:
           type: string
@@ -4707,12 +4770,6 @@ components:
         elIgnored:
           type: string
         isXml:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
           type: string
     RedirectView:
       type: object
@@ -4770,9 +4827,9 @@ components:
           type: array
           items:
             type: string
-        redirectView:
-          type: boolean
         propagateQueryProperties:
+          type: boolean
+        redirectView:
           type: boolean
         attributes:
           type: object
@@ -4831,43 +4888,7 @@ components:
         minorVersion:
           type: integer
           format: int32
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        sessionTimeout:
-          type: integer
-          format: int32
-        initParameterNames: {}
-        attributeNames: {}
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        serverInfo:
-          type: string
-        contextPath:
-          type: string
         effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        effectiveMajorVersion:
-          type: integer
-          format: int32
-        effectiveMinorVersion:
-          type: integer
-          format: int32
-        defaultSessionTrackingModes:
           type: array
           items:
             type: string
@@ -4880,6 +4901,25 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        defaultSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        effectiveMinorVersion:
+          type: integer
+          format: int32
+        effectiveMajorVersion:
+          type: integer
+          format: int32
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -4890,19 +4930,36 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        servletRegistrations:
+        servletContextName:
+          type: string
+        filterRegistrations:
           type: object
           additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
+        attributeNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        initParameterNames: {}
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
@@ -4914,11 +4971,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        path:
-          type: string
         maxAge:
           type: integer
           format: int32
+        path:
+          type: string
         domain:
           type: string
         name:

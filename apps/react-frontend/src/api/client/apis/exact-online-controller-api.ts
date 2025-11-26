@@ -32,6 +32,8 @@ import type { RedirectView } from '../models';
 // @ts-ignore
 import type { RefreshTokenResponse } from '../models';
 // @ts-ignore
+import type { SyncConflictsResponse } from '../models';
+// @ts-ignore
 import type { SyncFromExactResponse } from '../models';
 /**
  * ExactOnlineControllerApi - axios parameter creator
@@ -45,6 +47,37 @@ export const ExactOnlineControllerApiAxiosParamCreator = function (configuration
          */
         getAuthorizationUrl: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/admin/exact/auth-url`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        getConflicts: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/admin/exact/conflicts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -242,6 +275,17 @@ export const ExactOnlineControllerApiFp = function(configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        async getConflicts(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SyncConflictsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getConflicts(options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['ExactOnlineControllerApi.getConflicts']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         async getConnectionStatus(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConnectionStatusResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getConnectionStatus(options);
             const index = configuration?.serverIndex ?? 0;
@@ -307,6 +351,14 @@ export const ExactOnlineControllerApiFactory = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
+        getConflicts(options?: any): AxiosPromise<SyncConflictsResponse> {
+            return localVarFp.getConflicts(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
         getConnectionStatus(options?: any): AxiosPromise<ConnectionStatusResponse> {
             return localVarFp.getConnectionStatus(options).then((request) => request(axios, basePath));
         },
@@ -353,6 +405,16 @@ export class ExactOnlineControllerApi extends BaseAPI {
      */
     public getAuthorizationUrl(options?: RawAxiosRequestConfig) {
         return ExactOnlineControllerApiFp(this.configuration).getAuthorizationUrl(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ExactOnlineControllerApi
+     */
+    public getConflicts(options?: RawAxiosRequestConfig) {
+        return ExactOnlineControllerApiFp(this.configuration).getConflicts(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -25,13 +25,7 @@ export interface HttpStatusCode {
      * @type {boolean}
      * @memberof HttpStatusCode
      */
-    'is4xxClientError'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof HttpStatusCode
-     */
-    'is5xxServerError'?: boolean;
+    'error'?: boolean;
     /**
      * 
      * @type {boolean}
@@ -55,6 +49,12 @@ export interface HttpStatusCode {
      * @type {boolean}
      * @memberof HttpStatusCode
      */
-    'error'?: boolean;
+    'is4xxClientError'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof HttpStatusCode
+     */
+    'is5xxServerError'?: boolean;
 }
 

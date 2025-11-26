@@ -99,6 +99,8 @@ export * from './signature-status-view';
 export * from './sort-object';
 export * from './split-weight-ticket-request';
 export * from './split-weight-ticket-response';
+export * from './sync-conflict-dto';
+export * from './sync-conflicts-response';
 export * from './sync-from-exact-response';
 export * from './taglib-descriptor';
 export * from './transport-detail-view';
