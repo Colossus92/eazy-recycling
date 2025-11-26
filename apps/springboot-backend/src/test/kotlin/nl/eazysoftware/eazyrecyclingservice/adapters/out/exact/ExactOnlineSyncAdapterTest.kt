@@ -304,24 +304,58 @@ class ExactOnlineSyncAdapterTest {
     }
 
     @Test
-    fun `updateCompany should throw ExactSyncException when no existing sync found`() {
+    fun `updateCompany should create in Exact when no existing sync found`() {
       // Given
       val company = createTestCompany()
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
       whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(null)
+      whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
 
-      // When & Then
-      val exception = assertThrows<ExactSyncException> {
-        adapter.updateCompany(company)
-      }
-      assertEquals("No sync record found for company $companyId", exception.message)
+      val createResponse = ExactOnlineSyncAdapter.ExactAccountCreateResponse(
+        d = ExactOnlineSyncAdapter.ExactAccountData(
+          __metadata = ExactOnlineSyncAdapter.ExactMetadata(
+            uri = metadataUri,
+            type = "Exact.Web.Api.Models.CRM.Account"
+          )
+        )
+      )
+      whenever(restTemplate.postForEntity(
+        any<String>(),
+        any(),
+        eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
+      )).thenReturn(ResponseEntity.ok(createResponse))
 
-      verify(exactApiClient, never()).getRestTemplate()
+      val detailsResponse = ExactOnlineSyncAdapter.ExactAccountDetailsResponse(
+        d = ExactOnlineSyncAdapter.ExactAccountDetails(Code = exactCode, Name = company.name)
+      )
+      whenever(restTemplate.exchange(
+        eq(metadataUri),
+        eq(HttpMethod.GET),
+        isNull(),
+        eq(ExactOnlineSyncAdapter.ExactAccountDetailsResponse::class.java)
+      )).thenReturn(ResponseEntity.ok(detailsResponse))
+
+      // When
+      adapter.updateCompany(company)
+
+      // Then - should create via POST, not PUT
+      verify(restTemplate).postForEntity(
+        any<String>(),
+        any(),
+        eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
+      )
+      verify(restTemplate, never()).exchange(
+        any<String>(),
+        eq(HttpMethod.PUT),
+        any(),
+        eq(Void::class.java)
+      )
+      verify(companySyncRepository).save(any())
     }
 
     @Test
-    fun `updateCompany should throw ExactSyncException when sync record has no exactGuid`() {
+    fun `updateCompany should create in Exact when sync record has no exactGuid`() {
       // Given
       val company = createTestCompany()
       val existingSync = CompanySyncDto(
@@ -334,14 +368,48 @@ class ExactOnlineSyncAdapterTest {
 
       whenever(exactOAuthService.hasValidTokens()).thenReturn(true)
       whenever(companySyncRepository.findByCompanyId(companyId)).thenReturn(existingSync)
+      whenever(exactApiClient.getRestTemplate()).thenReturn(restTemplate)
 
-      // When & Then
-      val exception = assertThrows<ExactSyncException> {
-        adapter.updateCompany(company)
-      }
-      assertEquals("No Exact GUID found for company $companyId", exception.message)
+      val createResponse = ExactOnlineSyncAdapter.ExactAccountCreateResponse(
+        d = ExactOnlineSyncAdapter.ExactAccountData(
+          __metadata = ExactOnlineSyncAdapter.ExactMetadata(
+            uri = metadataUri,
+            type = "Exact.Web.Api.Models.CRM.Account"
+          )
+        )
+      )
+      whenever(restTemplate.postForEntity(
+        any<String>(),
+        any(),
+        eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
+      )).thenReturn(ResponseEntity.ok(createResponse))
 
-      verify(exactApiClient, never()).getRestTemplate()
+      val detailsResponse = ExactOnlineSyncAdapter.ExactAccountDetailsResponse(
+        d = ExactOnlineSyncAdapter.ExactAccountDetails(Code = exactCode, Name = company.name)
+      )
+      whenever(restTemplate.exchange(
+        eq(metadataUri),
+        eq(HttpMethod.GET),
+        isNull(),
+        eq(ExactOnlineSyncAdapter.ExactAccountDetailsResponse::class.java)
+      )).thenReturn(ResponseEntity.ok(detailsResponse))
+
+      // When
+      adapter.updateCompany(company)
+
+      // Then - should create via POST, not PUT
+      verify(restTemplate).postForEntity(
+        any<String>(),
+        any(),
+        eq(ExactOnlineSyncAdapter.ExactAccountCreateResponse::class.java)
+      )
+      verify(restTemplate, never()).exchange(
+        any<String>(),
+        eq(HttpMethod.PUT),
+        any(),
+        eq(Void::class.java)
+      )
+      verify(companySyncRepository).save(any())
     }
 
     @Test

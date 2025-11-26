@@ -1,17 +1,10 @@
-import type {
-  AuthorizationUrlResponse,
-  ConnectionStatusResponse,
-  RefreshTokenResponse,
-} from '@/api/client';
-import {
-  exactOnlineService,
-  type SyncFromExactResponse,
-} from '@/api/services/exactOnlineService.ts';
+import type { AuthorizationUrlResponse, ConnectionStatusResponse, RefreshTokenResponse, } from '@/api/client';
+import { exactOnlineService, } from '@/api/services/exactOnlineService.ts';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { Tab } from '@/components/ui/tab/Tab';
-import { TabGroup, TabList, TabPanels, TabPanel } from '@headlessui/react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { ExactSyncConflictsTab } from '@/features/exactsync/components/ExactSyncConflictsTab';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactNode, useEffect, useState } from 'react';
@@ -326,7 +319,7 @@ export const SettingsPage = () => {
           <TabPanels
             className="
               flex flex-col flex-1
-              bg-color-surface-primary 
+              bg-color-surface-primary
               border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary
               pt-4
               gap-4

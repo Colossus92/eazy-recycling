@@ -28,23 +28,28 @@ class GetAllCompaniesQuery(
     // Fetch all sync records to get external codes
     val syncRecordsByCompanyId = companySyncRepository.findAll()
       .associateBy { it.companyId }
-    
+
     val companyViews = allCompanies
-      .map { company -> 
-        val externalCode = syncRecordsByCompanyId[company.companyId.uuid]?.externalId
+      .map { company ->
+        val externalCode = syncRecordsByCompanyId[company.companyId.uuid]?.externalId?.trim()
         CompleteCompanyView.fromDomain(company, externalCode)
       }
+
+    val sortedViews = companyViews.sortedWith(compareBy(
+      { it.externalCode?.toIntOrNull() ?: Int.MAX_VALUE },
+      { it.name }
+    ))
 
     if (includeBranches) {
       val branches = projectLocations.findAll()
         .map { CompanyController.CompanyBranchResponse.from(it) }
 
-      return companyViews.map { company ->
+      return sortedViews.map { company ->
         val companyBranches = branches.filter { it.companyId == company.id }
         company.copy(branches = companyBranches)
       }
     }
 
-    return companyViews
+    return sortedViews
   }
 }

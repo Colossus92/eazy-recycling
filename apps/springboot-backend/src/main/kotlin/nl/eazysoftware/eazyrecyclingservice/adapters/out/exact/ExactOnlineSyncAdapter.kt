@@ -107,15 +107,12 @@ class ExactOnlineSyncAdapter(
 
     // Find existing sync record to get the Exact GUID
     val existingSync = companySyncRepository.findByCompanyId(company.companyId.uuid)
-    if (existingSync == null) {
-      logger.warn("No existing sync record found for company ${company.companyId.uuid} during update - cannot update in Exact")
-      throw ExactSyncException("No sync record found for company ${company.companyId.uuid}")
-    }
-
-    val exactGuid = existingSync.exactGuid
-    if (exactGuid == null) {
-      logger.warn("No Exact GUID found for company ${company.companyId.uuid} - cannot update in Exact")
-      throw ExactSyncException("No Exact GUID found for company ${company.companyId.uuid}")
+    val exactGuid = existingSync?.exactGuid
+    if (existingSync == null || exactGuid == null) {
+      // No sync record or no GUID - create in Exact
+      logger.info("No existing Exact link for company ${company.companyId.uuid} - creating in Exact Online")
+      syncCompany(company)
+      return
     }
 
     // Update account in Exact Online using the Exact GUID
@@ -338,7 +335,8 @@ class ExactOnlineSyncAdapter(
    */
   private fun fetchAccountsFromExact(timestamp: Long): ExactSyncAccountsResponse {
     val restTemplate = exactApiClient.getRestTemplate()
-    val url = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts?\$select=ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce&\$filter=Timestamp gt $timestamp"
+    val url =
+      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts?\$select=ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce&\$filter=Timestamp gt $timestamp"
 
     logger.debug("Fetching accounts from Exact Online: $url")
 
@@ -376,7 +374,14 @@ class ExactOnlineSyncAdapter(
     if (syncByGuid != null) {
       val existingCompany = companies.findById(CompanyId(syncByGuid.companyId))
       if (existingCompany != null) {
-        return updateExistingCompany(existingCompany, account, syncByGuid, streetName, buildingNumber, buildingNumberAddition)
+        return updateExistingCompany(
+          existingCompany,
+          account,
+          syncByGuid,
+          streetName,
+          buildingNumber,
+          buildingNumberAddition
+        )
       }
     }
 
@@ -389,7 +394,14 @@ class ExactOnlineSyncAdapter(
         val updatedSync = if (syncByCode.exactGuid == null) {
           syncByCode.copy(exactGuid = account.ID, updatedAt = Instant.now())
         } else syncByCode
-        return updateExistingCompany(existingCompany, account, updatedSync, streetName, buildingNumber, buildingNumberAddition)
+        return updateExistingCompany(
+          existingCompany,
+          account,
+          updatedSync,
+          streetName,
+          buildingNumber,
+          buildingNumberAddition
+        )
       }
     }
 
@@ -436,7 +448,14 @@ class ExactOnlineSyncAdapter(
         syncedFromSourceAt = Instant.now(),
         updatedAt = Instant.now()
       )
-      return updateExistingCompany(companyByKvk, account, updatedSync, streetName, buildingNumber, buildingNumberAddition)
+      return updateExistingCompany(
+        companyByKvk,
+        account,
+        updatedSync,
+        streetName,
+        buildingNumber,
+        buildingNumberAddition
+      )
     }
 
     // Step 4: Try to find by exact address match (postal_code + building_number + building_number_addition)
