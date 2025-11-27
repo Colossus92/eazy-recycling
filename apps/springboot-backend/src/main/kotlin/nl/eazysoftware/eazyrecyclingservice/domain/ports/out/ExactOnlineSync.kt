@@ -33,12 +33,6 @@ interface ExactOnlineSync {
      */
     fun getConflicts(): List<CompanySyncDto>
 
-    /**
-     * Sync deleted records from Exact Online.
-     * Uses the Exact Online Deleted API with timestamp-based pagination.
-     * Soft-deletes companies locally that were deleted in Exact.
-     */
-    fun syncDeletedFromExact(): SyncDeletedResult
 }
 
 /**
@@ -50,15 +44,10 @@ data class SyncFromExactResult(
     val recordsUpdated: Int,
     val recordsConflicted: Int,
     val recordsPendingReview: Int,
-    val newTimestamp: Long
+    val newTimestamp: Long,
+    // Deletion sync results
+    val deletedRecordsProcessed: Int,
+    val deletedRecordsDeleted: Int,
+    val deletedRecordsNotFound: Int
 )
 
-/**
- * Result of syncing deleted records from Exact Online
- */
-data class SyncDeletedResult(
-    val recordsProcessed: Int,
-    val recordsDeleted: Int,
-    val recordsNotFound: Int,
-    val newTimestamp: Long
-)

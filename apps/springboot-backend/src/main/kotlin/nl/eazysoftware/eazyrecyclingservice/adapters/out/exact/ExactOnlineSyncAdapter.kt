@@ -7,7 +7,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ExactOnlineSync
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SyncDeletedResult
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SyncFromExactResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.*
@@ -253,8 +252,7 @@ class ExactOnlineSyncAdapter(
         .filter { it.Status == "C" || it.IsSupplier == true } // Sync endpoint does not support filtering on fields
 
       if (accounts.isEmpty()) {
-        hasMoreRecords = false
-        continue
+        break  // Exit loop - no need to update timestamp when no records
       }
 
       logger.info("Fetched ${accounts.size} accounts from Exact Online (timestamp > $currentTimestamp)")
@@ -293,7 +291,12 @@ class ExactOnlineSyncAdapter(
       hasMoreRecords = accounts.size >= 1000
     }
 
-    // Save the new cursor
+    logger.info("Sync from Exact Online completed: $totalSynced records synced ($totalCreated created, $totalUpdated updated, $totalConflicted conflicts, $totalPendingReview pending review)")
+
+    // Also sync deleted records (before updating cursor to ensure atomicity)
+    val deletedResult = syncDeletedFromExact()
+
+    // Save the new cursor only after both syncs completed successfully
     val newCursor = cursor?.copy(
       lastTimestamp = currentTimestamp,
       updatedAt = Instant.now()
@@ -305,15 +308,16 @@ class ExactOnlineSyncAdapter(
     )
     syncCursorRepository.save(newCursor)
 
-    logger.info("Sync from Exact Online completed: $totalSynced records synced ($totalCreated created, $totalUpdated updated, $totalConflicted conflicts, $totalPendingReview pending review)")
-
     return SyncFromExactResult(
       recordsSynced = totalSynced,
       recordsCreated = totalCreated,
       recordsUpdated = totalUpdated,
       recordsConflicted = totalConflicted,
       recordsPendingReview = totalPendingReview,
-      newTimestamp = currentTimestamp
+      newTimestamp = currentTimestamp,
+      deletedRecordsProcessed = deletedResult.recordsProcessed,
+      deletedRecordsDeleted = deletedResult.recordsDeleted,
+      deletedRecordsNotFound = deletedResult.recordsNotFound
     )
   }
 
@@ -325,12 +329,26 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
+   * Parse Microsoft JSON date format: /Date(1234567890123)/
+   * Returns null if the format is invalid or the string is null.
+   */
+  private fun parseMicrosoftJsonDate(dateString: String?): Instant? {
+    if (dateString.isNullOrBlank()) return null
+
+    val regex = Regex("""^/Date\((\d+)\)/$""")
+    val match = regex.find(dateString)
+
+    return match?.groupValues?.get(1)?.toLongOrNull()?.let { millis ->
+      Instant.ofEpochMilli(millis)
+    }
+  }
+
+  /**
    * Sync deleted records from Exact Online.
    * Uses the Exact Online Deleted API with timestamp-based pagination.
    * Soft-deletes companies locally that were deleted in Exact.
    */
-  @Transactional
-  override fun syncDeletedFromExact(): SyncDeletedResult {
+  private fun syncDeletedFromExact(): SyncDeletedResult {
     // Skip sync if no valid tokens
     if (!exactOAuthService.hasValidTokens()) {
       logger.warn("Skipping Exact Online deletion sync - no valid tokens")
@@ -355,8 +373,7 @@ class ExactOnlineSyncAdapter(
       val deletedRecords = response.d.results
 
       if (deletedRecords.isEmpty()) {
-        hasMoreRecords = false
-        continue
+        break  // Exit loop - no need to update timestamp when no records
       }
 
       logger.info("Fetched ${deletedRecords.size} deleted records from Exact Online (timestamp > $currentTimestamp)")
@@ -376,7 +393,8 @@ class ExactOnlineSyncAdapter(
           totalProcessed++
         } catch (e: Exception) {
           logger.error("Failed to process deleted account ${deleted.EntityKey}: ${e.message}", e)
-          // Continue with other records
+          // Don't update cursor - throw exception to prevent partial sync
+          throw ExactSyncException("Failed to process deleted account ${deleted.EntityKey}", e)
         }
       }
 
@@ -405,10 +423,18 @@ class ExactOnlineSyncAdapter(
     return SyncDeletedResult(
       recordsProcessed = totalProcessed,
       recordsDeleted = totalDeleted,
-      recordsNotFound = totalNotFound,
-      newTimestamp = currentTimestamp
+      recordsNotFound = totalNotFound
     )
   }
+
+  /**
+   * Internal result of syncing deleted records
+   */
+  private data class SyncDeletedResult(
+    val recordsProcessed: Int,
+    val recordsDeleted: Int,
+    val recordsNotFound: Int
+  )
 
   /**
    * Result of processing a deleted record
@@ -448,7 +474,7 @@ class ExactOnlineSyncAdapter(
     // Update sync record with deletion info
     val updatedSync = syncRecord.copy(
       syncStatus = SyncStatus.DELETED,
-      deletedInExactAt = deleted.DeletedDate?.let { Instant.parse(it) },
+      deletedInExactAt = parseMicrosoftJsonDate(deleted.DeletedDate),
       deletedInExactBy = deleted.DeletedBy,
       updatedAt = Instant.now()
     )
@@ -464,7 +490,7 @@ class ExactOnlineSyncAdapter(
   private fun fetchDeletedFromExact(timestamp: Long): ExactDeletedResponse {
     val restTemplate = exactApiClient.getRestTemplate()
     val url =
-      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted?\$filter=Timestamp gt $timestamp&\$select=Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID"
+      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted?\$filter=Timestamp gt ${timestamp}L&\$select=Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID"
 
     logger.debug("Fetching deleted records from Exact Online: $url")
 
@@ -484,7 +510,7 @@ class ExactOnlineSyncAdapter(
   private fun fetchAccountsFromExact(timestamp: Long): ExactSyncAccountsResponse {
     val restTemplate = exactApiClient.getRestTemplate()
     val url =
-      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts?\$select=ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce&\$filter=Timestamp gt $timestamp"
+      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts?\$select=ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier&\$filter=Timestamp gt ${timestamp}L"
 
     logger.debug("Fetching accounts from Exact Online: $url")
 

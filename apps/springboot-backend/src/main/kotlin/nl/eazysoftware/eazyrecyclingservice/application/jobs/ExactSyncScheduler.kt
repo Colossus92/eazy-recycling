@@ -11,17 +11,19 @@ import java.time.Duration
 import java.time.Instant
 
 /**
- * Scheduled job that syncs deleted records from Exact Online daily.
+ * Scheduled job that syncs accounts from Exact Online daily.
  * 
  * This job runs daily at 3:00 AM to:
- * 1. Fetch deleted accounts from Exact Online's Deleted API
- * 2. Soft-delete corresponding companies in Eazy Recycling
+ * 1. Fetch new and updated accounts from Exact Online's Sync API
+ * 2. Create or update corresponding companies in Eazy Recycling
+ * 3. Fetch deleted accounts from Exact Online's Deleted API
+ * 4. Soft-delete corresponding companies in Eazy Recycling
  * 
  * Important: Exact Online only retains deletion records for 2 months.
  * Running this job daily ensures we don't miss any deletions.
  */
 @Component
-class ExactDeletionSyncScheduler(
+class ExactSyncScheduler(
     private val exactOnlineSync: ExactOnlineSync,
     private val syncCursorRepository: SyncCursorRepository,
 ) {
@@ -33,30 +35,34 @@ class ExactDeletionSyncScheduler(
     }
 
     /**
-     * Run daily at 3:00 AM to sync deleted records from Exact Online.
+     * Run daily at 3:00 AM to sync accounts from Exact Online.
      * 
      * Cron expression: "0 0 3 * * *" = At 03:00:00 every day
      */
     @Scheduled(cron = "0 0 3 * * *")
-    fun syncDeletedFromExact() {
-        logger.info("Starting scheduled deletion sync from Exact Online")
+    fun syncFromExact() {
+        logger.info("Starting scheduled sync from Exact Online")
 
         try {
             // Check if last sync was more than 2 weeks ago (warning threshold)
             checkSyncGap()
 
-            val result = exactOnlineSync.syncDeletedFromExact()
+            val result = exactOnlineSync.syncFromExact()
             
             logger.info(
-                "Scheduled deletion sync completed: {} records processed ({} deleted, {} not found)",
-                result.recordsProcessed,
-                result.recordsDeleted,
-                result.recordsNotFound
+                "Scheduled sync completed: {} records synced ({} created, {} updated, {} conflicts), {} deleted records processed ({} deleted, {} not found)",
+                result.recordsSynced,
+                result.recordsCreated,
+                result.recordsUpdated,
+                result.recordsConflicted,
+                result.deletedRecordsProcessed,
+                result.deletedRecordsDeleted,
+                result.deletedRecordsNotFound
             )
         } catch (e: ExactSyncException) {
-            logger.warn("Scheduled deletion sync skipped: ${e.message}")
+            logger.warn("Scheduled sync skipped: ${e.message}")
         } catch (e: Exception) {
-            logger.error("Scheduled deletion sync failed: ${e.message}", e)
+            logger.error("Scheduled sync failed: ${e.message}", e)
         }
     }
 
