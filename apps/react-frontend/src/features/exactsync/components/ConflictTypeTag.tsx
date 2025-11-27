@@ -1,7 +1,8 @@
-type ConflictType = 'KVK_COLLISION' | 'ADDRESS_COLLISION' | 'ADDRESS_MATCH';
+type ConflictType = 'KVK_COLLISION' | 'ADDRESS_COLLISION' | 'ADDRESS_MATCH' | 'DOMAIN_VALIDATION_ERROR';
 
 interface ConflictTypeTagProps {
   type: string;
+  description?: string;
 }
 
 const typeConfig: Record<
@@ -20,9 +21,13 @@ const typeConfig: Record<
     label: 'Mogelijke Match',
     description: 'Bedrijf gevonden op basis van adres - bevestiging vereist',
   },
+  DOMAIN_VALIDATION_ERROR: {
+    label: 'Foutieve gegevens',
+    description: 'Ontbrekende of foutieve data in exact - maak relatie compleet',
+  },
 };
 
-export const ConflictTypeTag = ({ type }: ConflictTypeTagProps) => {
+export const ConflictTypeTag = ({ type, description }: ConflictTypeTagProps) => {
   const config = typeConfig[type as ConflictType];
 
   if (!config) {
@@ -35,7 +40,7 @@ export const ConflictTypeTag = ({ type }: ConflictTypeTagProps) => {
         {config.label}
       </span>
       <span className="text-caption text-color-text-secondary">
-        {config.description}
+        {description || config.description}
       </span>
     </div>
   );

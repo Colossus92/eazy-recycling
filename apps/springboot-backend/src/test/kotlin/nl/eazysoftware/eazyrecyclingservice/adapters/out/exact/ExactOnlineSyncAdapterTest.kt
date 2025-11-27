@@ -61,13 +61,20 @@ class ExactOnlineSyncAdapterTest {
 
   @BeforeEach
   fun setUp() {
+    val conflictHandler = ExactConflictHandler(companySyncRepository)
     adapter = ExactOnlineSyncAdapter(
       exactApiClient = exactApiClient,
       companySyncRepository = companySyncRepository,
       syncCursorRepository = syncCursorRepository,
       companies = companies,
       exactOAuthService = exactOAuthService,
-      objectMapper = objectMapper
+      objectMapper = objectMapper,
+      accountProcessor = ExactAccountProcessor(
+        companySyncRepository = companySyncRepository,
+        companies = companies,
+        conflictHandler = conflictHandler
+      ),
+      conflictHandler = conflictHandler
     )
   }
 

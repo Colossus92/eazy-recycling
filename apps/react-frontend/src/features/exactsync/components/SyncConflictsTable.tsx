@@ -37,7 +37,10 @@ export const SyncConflictsTable = ({
       label: 'Probleem',
       accessor: (item) =>
         item.conflictDetails ? (
-          <ConflictTypeTag type={item.conflictDetails.conflictType} />
+          <ConflictTypeTag
+            type={item.conflictDetails.conflictType}
+            description={item.conflictDetails.errorMessage}
+          />
         ) : (
           <span className="text-color-text-secondary">-</span>
         ),

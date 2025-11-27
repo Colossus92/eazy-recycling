@@ -13,8 +13,12 @@ data class CompanySyncDto(
   @GeneratedValue(strategy = GenerationType.UUID)
   val id: UUID? = null,
 
-  @Column(name = "company_id", nullable = false)
-  val companyId: UUID,
+  /**
+   * The company ID in Eazy Recycling.
+   * Can be null for conflicts where no company could be created (e.g., domain invariant failures).
+   */
+  @Column(name = "company_id", nullable = true)
+  val companyId: UUID? = null,
 
   /**
    * The Exact Online Code (auto-generated sequential number).

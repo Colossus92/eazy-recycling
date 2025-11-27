@@ -25,4 +25,10 @@ interface Companies {
    * Used for matching companies from Exact Online when no other identifiers are available.
    */
   fun findByAddress(postalCode: String, buildingNumber: String, buildingNumberAddition: String?): Company?
+  
+  /**
+   * Flush pending changes to the database.
+   * Used to detect constraint violations immediately rather than at commit time.
+   */
+  fun flush()
 }

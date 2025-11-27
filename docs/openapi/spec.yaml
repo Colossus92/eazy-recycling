@@ -4345,6 +4345,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4353,8 +4355,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
@@ -4922,12 +4922,10 @@ components:
         minorVersion:
           type: integer
           format: int32
-        contextPath:
-          type: string
         serverInfo:
           type: string
-        attributeNames: {}
-        initParameterNames: {}
+        contextPath:
+          type: string
         sessionTimeout:
           type: integer
           format: int32
@@ -4935,6 +4933,8 @@ components:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        initParameterNames: {}
+        attributeNames: {}
         servletContextName:
           type: string
         filterRegistrations:
@@ -4943,16 +4943,10 @@ components:
             $ref: "#/components/schemas/FilterRegistration"
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -4972,10 +4966,16 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -4988,12 +4988,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         name:
           type: string
         className:
@@ -5005,12 +5005,12 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        domain:
-          type: string
         maxAge:
           type: integer
           format: int32
         path:
+          type: string
+        domain:
           type: string
         name:
           type: string

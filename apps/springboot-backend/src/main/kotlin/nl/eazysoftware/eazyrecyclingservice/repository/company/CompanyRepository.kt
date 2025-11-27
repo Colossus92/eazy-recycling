@@ -126,4 +126,8 @@ class CompanyRepository(
     return jpaRepository.findByAddressAndDeletedAtIsNull(postalCode, buildingNumber, buildingNumberAddition)
       ?.let { companyMapper.toDomain(it) }
   }
+  
+  override fun flush() {
+    jpaRepository.flush()
+  }
 }

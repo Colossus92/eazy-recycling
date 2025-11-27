@@ -3,10 +3,6 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.out.exact
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.config.exact.ExactApiClient
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
@@ -42,6 +38,8 @@ class ExactOnlineSyncAdapter(
   private val companies: Companies,
   private val exactOAuthService: ExactOAuthService,
   private val objectMapper: ObjectMapper,
+  private val accountProcessor: ExactAccountProcessor,
+  private val conflictHandler: ExactConflictHandler,
 ) : ExactOnlineSync {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -262,7 +260,11 @@ class ExactOnlineSyncAdapter(
 
       for (account in accounts) {
         try {
-          val result = processExactAccount(account)
+          // Parse address from AddressLine1 (format: "Street Number Addition")
+          val (streetName, buildingNumber, buildingNumberAddition) = parseAddressLine(account.AddressLine1)
+          
+          // Process in separate transaction to isolate constraint violations
+          val result = accountProcessor.processAccount(account, streetName, buildingNumber, buildingNumberAddition)
           when (result) {
             is ProcessResult.Created -> totalCreated++
             is ProcessResult.Updated -> totalUpdated++
@@ -270,9 +272,15 @@ class ExactOnlineSyncAdapter(
             is ProcessResult.PendingReview -> totalPendingReview++
           }
           totalSynced++
+        } catch (e: IllegalArgumentException) {
+          // Domain invariant failure (e.g., missing street name, invalid postal code)
+          logger.warn("Domain validation failed for account ${account.ID} (${account.Name}): ${e.message}")
+          conflictHandler.createValidationConflict(account, e.message ?: "Validatiefout", "DOMAIN_VALIDATION_ERROR")
+          totalConflicted++
+          totalSynced++
         } catch (e: Exception) {
+          // Other unexpected errors - log but continue with other accounts
           logger.error("Failed to process account ${account.ID}: ${e.message}", e)
-          // Continue with other accounts
         }
       }
 
@@ -421,10 +429,15 @@ class ExactOnlineSyncAdapter(
       return DeleteResult.NotFound
     }
 
-    // Find the company
-    val company = companies.findById(CompanyId(syncRecord.companyId))
+    // Find the company (companyId can be null for validation conflicts)
+    val companyId = syncRecord.companyId
+    if (companyId == null) {
+      logger.warn("Sync record for Exact account ${deleted.EntityKey} has no company - skipping deletion")
+      return DeleteResult.NotFound
+    }
+    val company = companies.findById(CompanyId(companyId))
     if (company == null) {
-      logger.warn("Company ${syncRecord.companyId} not found for deleted Exact account ${deleted.EntityKey}")
+      logger.warn("Company $companyId not found for deleted Exact account ${deleted.EntityKey}")
       return DeleteResult.NotFound
     }
 
@@ -465,16 +478,6 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
-   * Result of processing a single Exact account
-   */
-  private sealed class ProcessResult {
-    object Created : ProcessResult()
-    object Updated : ProcessResult()
-    object Conflict : ProcessResult()
-    object PendingReview : ProcessResult()
-  }
-
-  /**
    * Fetch accounts from Exact Online Sync API
    */
   private fun fetchAccountsFromExact(timestamp: Long): ExactSyncAccountsResponse {
@@ -492,279 +495,6 @@ class ExactOnlineSyncAdapter(
     )
 
     return response.body ?: throw IllegalStateException("Empty response from Exact Online Sync API")
-  }
-
-  /**
-   * Process a single account from Exact Online.
-   * Returns a ProcessResult indicating what happened.
-   *
-   * Matching strategy (in priority order):
-   * 1. exact_guid     → Direct link (highest confidence)
-   * 2. external_id    → Exact Code link
-   * 3. chamber_of_commerce_id → Business key match (KVK)
-   * 4. postal_code + building_number + building_number_addition → Address match (requires manual review)
-   * 5. No match       → Create new company
-   *
-   * Conflict detection:
-   * - If KVK match found but company is not linked to this Exact account → CONFLICT
-   * - If address match found → PENDING_REVIEW (fuzzy match needs confirmation)
-   */
-  private fun processExactAccount(account: ExactSyncAccount): ProcessResult {
-    // Parse address from AddressLine1 (format: "Street Number Addition")
-    val (streetName, buildingNumber, buildingNumberAddition) = parseAddressLine(account.AddressLine1)
-
-    // Step 1: Try to find by exact_guid (direct link - highest confidence)
-    val syncByGuid = companySyncRepository.findByExactGuid(account.ID)
-    if (syncByGuid != null) {
-      val existingCompany = companies.findById(CompanyId(syncByGuid.companyId))
-      if (existingCompany != null) {
-        return updateExistingCompany(
-          existingCompany,
-          account,
-          syncByGuid,
-          streetName,
-          buildingNumber,
-          buildingNumberAddition
-        )
-      }
-    }
-
-    // Step 2: Try to find by external_id (Exact Code)
-    val syncByCode = account.Code?.let { companySyncRepository.findByExternalId(it) }
-    if (syncByCode != null) {
-      val existingCompany = companies.findById(CompanyId(syncByCode.companyId))
-      if (existingCompany != null) {
-        // Update the sync record with the exact_guid if not already set
-        val updatedSync = if (syncByCode.exactGuid == null) {
-          syncByCode.copy(exactGuid = account.ID, updatedAt = Instant.now())
-        } else syncByCode
-        return updateExistingCompany(
-          existingCompany,
-          account,
-          updatedSync,
-          streetName,
-          buildingNumber,
-          buildingNumberAddition
-        )
-      }
-    }
-
-    // Step 3: Try to find by chamber of commerce ID (KVK)
-    val companyByKvk = account.ChamberOfCommerce?.let { companies.findByChamberOfCommerceId(it) }
-    if (companyByKvk != null) {
-      // Check if this company is already linked to a DIFFERENT Exact account
-      val existingSync = companySyncRepository.findByCompanyId(companyByKvk.companyId.uuid)
-      if (existingSync != null && existingSync.exactGuid != null && existingSync.exactGuid != account.ID) {
-        // CONFLICT: Company with this KVK is already linked to a different Exact account
-        logger.warn("CONFLICT: Company ${companyByKvk.name} (${companyByKvk.companyId.uuid}) with KVK ${account.ChamberOfCommerce} is already linked to Exact GUID ${existingSync.exactGuid}, but received update from Exact GUID ${account.ID}")
-
-        // Create a conflict sync record for the new Exact account
-        val conflictSync = CompanySyncDto(
-          companyId = companyByKvk.companyId.uuid,
-          externalId = account.Code,
-          exactGuid = account.ID,
-          syncStatus = SyncStatus.CONFLICT,
-          syncedFromSourceAt = Instant.now(),
-          conflictDetails = buildConflictDetails(
-            conflictType = "KVK_COLLISION",
-            account = account,
-            matchedCompany = companyByKvk,
-            extraDetails = mapOf(
-              "field" to "chamber_of_commerce_id",
-              "value" to account.ChamberOfCommerce,
-              "existingExactGuid" to existingSync.exactGuid.toString(),
-              "newExactGuid" to account.ID.toString(),
-              "existingCompanyId" to companyByKvk.companyId.uuid.toString()
-            )
-          ),
-        )
-        companySyncRepository.save(conflictSync)
-        return ProcessResult.Conflict
-      }
-
-      // No conflict - link and update
-      val syncRecord = existingSync ?: CompanySyncDto(
-        companyId = companyByKvk.companyId.uuid,
-        syncStatus = SyncStatus.OK,
-        syncedFromSourceAt = Instant.now()
-      )
-      val updatedSync = syncRecord.copy(
-        externalId = account.Code,
-        exactGuid = account.ID,
-        syncStatus = SyncStatus.OK,
-        syncedFromSourceAt = Instant.now(),
-        updatedAt = Instant.now()
-      )
-      return updateExistingCompany(
-        companyByKvk,
-        account,
-        updatedSync,
-        streetName,
-        buildingNumber,
-        buildingNumberAddition
-      )
-    }
-
-    // Step 4: Try to find by exact address match (postal_code + building_number + building_number_addition)
-    val postalCode = account.Postcode
-    if (!postalCode.isNullOrBlank() && buildingNumber.isNotBlank()) {
-      val companyByAddress = companies.findByAddress(postalCode, buildingNumber, buildingNumberAddition)
-      if (companyByAddress != null) {
-        // Check if this company is already linked to a DIFFERENT Exact account
-        val existingSync = companySyncRepository.findByCompanyId(companyByAddress.companyId.uuid)
-        if (existingSync != null && existingSync.exactGuid != null && existingSync.exactGuid != account.ID) {
-          // CONFLICT: Company at this address is already linked to a different Exact account
-          logger.warn("CONFLICT: Company ${companyByAddress.name} (${companyByAddress.companyId.uuid}) at address $postalCode $buildingNumber$buildingNumberAddition is already linked to Exact GUID ${existingSync.exactGuid}, but received update from Exact GUID ${account.ID}")
-
-          val conflictSync = CompanySyncDto(
-            companyId = companyByAddress.companyId.uuid,
-            externalId = account.Code,
-            exactGuid = account.ID,
-            syncStatus = SyncStatus.CONFLICT,
-            syncedFromSourceAt = Instant.now(),
-            conflictDetails = buildConflictDetails(
-              conflictType = "ADDRESS_COLLISION",
-              account = account,
-              matchedCompany = companyByAddress,
-              extraDetails = mapOf(
-                "postalCode" to postalCode,
-                "buildingNumber" to buildingNumber,
-                "buildingNumberAddition" to (buildingNumberAddition ?: ""),
-                "existingExactGuid" to existingSync.exactGuid.toString(),
-                "newExactGuid" to account.ID.toString(),
-                "existingCompanyId" to companyByAddress.companyId.uuid.toString()
-              )
-            ),
-          )
-          companySyncRepository.save(conflictSync)
-          return ProcessResult.Conflict
-        }
-
-        // Address match found but not linked yet - mark for manual review
-        logger.info("PENDING_REVIEW: Found potential address match for Exact account ${account.ID} (${account.Name}) with company ${companyByAddress.name} (${companyByAddress.companyId.uuid}) at $postalCode $buildingNumber$buildingNumberAddition")
-
-        val pendingSync = CompanySyncDto(
-          companyId = companyByAddress.companyId.uuid,
-          externalId = account.Code,
-          exactGuid = account.ID,
-          syncStatus = SyncStatus.PENDING_REVIEW,
-          syncedFromSourceAt = Instant.now(),
-          conflictDetails = buildConflictDetails(
-            conflictType = "ADDRESS_MATCH",
-            account = account,
-            matchedCompany = companyByAddress,
-            extraDetails = mapOf(
-              "matchType" to "ADDRESS_MATCH",
-              "postalCode" to postalCode,
-              "buildingNumber" to buildingNumber,
-              "buildingNumberAddition" to (buildingNumberAddition ?: "")
-            )
-          ),
-        )
-        companySyncRepository.save(pendingSync)
-        return ProcessResult.PendingReview
-      }
-    }
-
-    // Step 5: No match found - create new company
-    return createNewCompany(account, streetName, buildingNumber, buildingNumberAddition)
-  }
-
-  /**
-   * Update an existing company with data from Exact Online.
-   */
-  private fun updateExistingCompany(
-    existingCompany: Company,
-    account: ExactSyncAccount,
-    syncRecord: CompanySyncDto,
-    streetName: String,
-    buildingNumber: String,
-    buildingNumberAddition: String?
-  ): ProcessResult {
-    val updatedCompany = existingCompany.copy(
-      name = account.Name,
-      chamberOfCommerceId = account.ChamberOfCommerce,
-      address = Address(
-        streetName = StreetName(streetName),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        postalCode = DutchPostalCode(account.Postcode ?: "0000AA"),
-        city = City(account.City ?: ""),
-        country = account.Country ?: "NL"
-      ),
-      phone = account.Phone,
-      email = account.Email,
-      isSupplier = account.IsSupplier ?: false,
-      isCustomer = account.Status == "C"
-    )
-    companies.update(updatedCompany)
-
-    // Update sync record
-    val updatedSync = syncRecord.copy(
-      externalId = account.Code,
-      exactGuid = account.ID,
-      syncStatus = SyncStatus.OK,
-      syncedFromSourceAt = Instant.now(),
-      syncErrorMessage = null,
-      conflictDetails = null,
-      updatedAt = Instant.now()
-    )
-    companySyncRepository.save(updatedSync)
-
-    logger.debug(
-      "Updated company {} ({}) from Exact GUID {}",
-      updatedCompany.name,
-      existingCompany.companyId.uuid,
-      account.ID
-    )
-    return ProcessResult.Updated
-  }
-
-  /**
-   * Create a new company from Exact Online data.
-   */
-  private fun createNewCompany(
-    account: ExactSyncAccount,
-    streetName: String,
-    buildingNumber: String,
-    buildingNumberAddition: String?
-  ): ProcessResult {
-    val newCompanyId = CompanyId(UUID.randomUUID())
-    val company = Company(
-      companyId = newCompanyId,
-      name = account.Name,
-      chamberOfCommerceId = account.ChamberOfCommerce,
-      vihbNumber = null, // Not available from Exact
-      processorId = null, // Not available from Exact
-      address = Address(
-        streetName = StreetName(streetName),
-        buildingNumber = buildingNumber,
-        buildingNumberAddition = buildingNumberAddition,
-        postalCode = DutchPostalCode(account.Postcode ?: "0000AA"),
-        city = City(account.City ?: ""),
-        country = account.Country ?: "NL"
-      ),
-      roles = emptyList(), // Roles are managed locally
-      phone = account.Phone,
-      email = account.Email,
-      isSupplier = account.IsSupplier ?: false,
-      isCustomer = account.Status == "C"
-    )
-
-    companies.create(company)
-
-    // Create sync record linking our company ID to the Exact GUID and Code
-    val syncDto = CompanySyncDto(
-      companyId = newCompanyId.uuid,
-      externalId = account.Code,
-      exactGuid = account.ID,
-      syncStatus = SyncStatus.OK,
-      syncedFromSourceAt = Instant.now()
-    )
-    companySyncRepository.save(syncDto)
-
-    logger.debug("Created company {} ({}) from Exact GUID {}", company.name, newCompanyId.uuid, account.ID)
-    return ProcessResult.Created
   }
 
   /**
@@ -869,51 +599,6 @@ class ExactOnlineSyncAdapter(
     val Name: String,
     // Add other fields as needed
   )
-
-  /**
-   * Build conflict details map with standard fields for display in the frontend.
-   * Includes exactName, exactAddress, matchedCompanyName, matchedCompanyAddress when available.
-   */
-  private fun buildConflictDetails(
-    conflictType: String,
-    account: ExactSyncAccount,
-    matchedCompany: Company,
-    extraDetails: Map<String, Any?> = emptyMap()
-  ): Map<String, Any> {
-    val details = mutableMapOf<String, Any>(
-      "conflictType" to conflictType,
-      "exactName" to account.Name
-    )
-
-    // Build Exact address from available fields
-    val exactAddressParts = listOfNotNull(
-      account.AddressLine1?.takeIf { it.isNotBlank() },
-      account.Postcode?.takeIf { it.isNotBlank() },
-      account.City?.takeIf { it.isNotBlank() }
-    )
-    if (exactAddressParts.isNotEmpty()) {
-      details["exactAddress"] = exactAddressParts.joinToString(", ")
-    }
-
-    // Add matched company info
-    details["matchedCompanyName"] = matchedCompany.name
-
-    // Build matched company address
-    try {
-      details["matchedCompanyAddress"] = matchedCompany.address.toAddressLine()
-    } catch (_: Exception) {
-      // Address might be incomplete, skip if we can't format it
-    }
-
-    // Add extra details, filtering out null values
-    extraDetails.forEach { (key, value) ->
-      if (value != null) {
-        details[key] = value
-      }
-    }
-
-    return details
-  }
 
   // Data classes for Exact Online Sync API
 
