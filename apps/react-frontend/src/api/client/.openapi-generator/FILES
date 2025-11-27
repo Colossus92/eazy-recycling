@@ -127,6 +127,7 @@ models/split-weight-ticket-request.ts
 models/split-weight-ticket-response.ts
 models/sync-conflict-dto.ts
 models/sync-conflicts-response.ts
+models/sync-deleted-response.ts
 models/sync-from-exact-response.ts
 models/taglib-descriptor.ts
 models/transport-detail-view.ts

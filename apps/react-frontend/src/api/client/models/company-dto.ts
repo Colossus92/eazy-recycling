@@ -100,6 +100,12 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
+    'deletedBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
     'updatedAt': string;
 }
 

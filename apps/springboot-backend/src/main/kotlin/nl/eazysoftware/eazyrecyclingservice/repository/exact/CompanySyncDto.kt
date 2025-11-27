@@ -51,12 +51,6 @@ data class CompanySyncDto(
   @JdbcTypeCode(SqlTypes.JSON)
   val conflictDetails: Map<String, Any>? = null,
 
-  /**
-   * Flag indicating this record requires manual review before sync can proceed.
-   */
-  @Column(name = "requires_manual_review", nullable = false)
-  val requiresManualReview: Boolean = false,
-
   @Column(name = "created_at", nullable = false)
   val createdAt: Instant = Instant.now(),
 

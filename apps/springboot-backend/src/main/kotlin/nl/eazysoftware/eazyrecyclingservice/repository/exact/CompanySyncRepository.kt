@@ -6,9 +6,8 @@ import java.util.*
 
 @Repository
 interface CompanySyncRepository : JpaRepository<CompanySyncDto, UUID> {
-    fun findByCompanyId(companyId: UUID): CompanySyncDto?
-    fun findByExternalId(externalId: String): CompanySyncDto?
-    fun findByExactGuid(exactGuid: UUID): CompanySyncDto?
-    fun findAllBySyncStatus(syncStatus: SyncStatus): List<CompanySyncDto>
-    fun findAllByRequiresManualReviewTrue(): List<CompanySyncDto>
+  fun findByCompanyId(companyId: UUID): CompanySyncDto?
+  fun findByExternalId(externalId: String): CompanySyncDto?
+  fun findByExactGuid(exactGuid: UUID): CompanySyncDto?
+  fun findAllBySyncStatus(syncStatus: SyncStatus): List<CompanySyncDto>
 }

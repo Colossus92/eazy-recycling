@@ -101,6 +101,7 @@ export * from './split-weight-ticket-request';
 export * from './split-weight-ticket-response';
 export * from './sync-conflict-dto';
 export * from './sync-conflicts-response';
+export * from './sync-deleted-response';
 export * from './sync-from-exact-response';
 export * from './taglib-descriptor';
 export * from './transport-detail-view';

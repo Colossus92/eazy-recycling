@@ -316,13 +316,6 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
-   * Get all sync records that are pending manual review.
-   */
-  override fun getPendingReviews(): List<CompanySyncDto> {
-    return companySyncRepository.findAllByRequiresManualReviewTrue()
-  }
-
-  /**
    * Sync deleted records from Exact Online.
    * Uses the Exact Online Deleted API with timestamp-based pagination.
    * Soft-deletes companies locally that were deleted in Exact.
@@ -572,15 +565,18 @@ class ExactOnlineSyncAdapter(
           exactGuid = account.ID,
           syncStatus = SyncStatus.CONFLICT,
           syncedFromSourceAt = Instant.now(),
-          conflictDetails = mapOf(
-            "conflictType" to "KVK_COLLISION",
-            "field" to "chamber_of_commerce_id",
-            "value" to account.ChamberOfCommerce,
-            "existingExactGuid" to existingSync.exactGuid.toString(),
-            "newExactGuid" to account.ID.toString(),
-            "existingCompanyId" to companyByKvk.companyId.uuid.toString()
+          conflictDetails = buildConflictDetails(
+            conflictType = "KVK_COLLISION",
+            account = account,
+            matchedCompany = companyByKvk,
+            extraDetails = mapOf(
+              "field" to "chamber_of_commerce_id",
+              "value" to account.ChamberOfCommerce,
+              "existingExactGuid" to existingSync.exactGuid.toString(),
+              "newExactGuid" to account.ID.toString(),
+              "existingCompanyId" to companyByKvk.companyId.uuid.toString()
+            )
           ),
-          requiresManualReview = true
         )
         companySyncRepository.save(conflictSync)
         return ProcessResult.Conflict
@@ -626,16 +622,19 @@ class ExactOnlineSyncAdapter(
             exactGuid = account.ID,
             syncStatus = SyncStatus.CONFLICT,
             syncedFromSourceAt = Instant.now(),
-            conflictDetails = mapOf(
-              "conflictType" to "ADDRESS_COLLISION",
-              "postalCode" to postalCode,
-              "buildingNumber" to buildingNumber,
-              "buildingNumberAddition" to (buildingNumberAddition ?: ""),
-              "existingExactGuid" to existingSync.exactGuid.toString(),
-              "newExactGuid" to account.ID.toString(),
-              "existingCompanyId" to companyByAddress.companyId.uuid.toString()
+            conflictDetails = buildConflictDetails(
+              conflictType = "ADDRESS_COLLISION",
+              account = account,
+              matchedCompany = companyByAddress,
+              extraDetails = mapOf(
+                "postalCode" to postalCode,
+                "buildingNumber" to buildingNumber,
+                "buildingNumberAddition" to (buildingNumberAddition ?: ""),
+                "existingExactGuid" to existingSync.exactGuid.toString(),
+                "newExactGuid" to account.ID.toString(),
+                "existingCompanyId" to companyByAddress.companyId.uuid.toString()
+              )
             ),
-            requiresManualReview = true
           )
           companySyncRepository.save(conflictSync)
           return ProcessResult.Conflict
@@ -650,15 +649,17 @@ class ExactOnlineSyncAdapter(
           exactGuid = account.ID,
           syncStatus = SyncStatus.PENDING_REVIEW,
           syncedFromSourceAt = Instant.now(),
-          conflictDetails = mapOf(
-            "matchType" to "ADDRESS_MATCH",
-            "postalCode" to postalCode,
-            "buildingNumber" to buildingNumber,
-            "buildingNumberAddition" to (buildingNumberAddition ?: ""),
-            "exactAccountName" to account.Name,
-            "localCompanyName" to companyByAddress.name
+          conflictDetails = buildConflictDetails(
+            conflictType = "ADDRESS_MATCH",
+            account = account,
+            matchedCompany = companyByAddress,
+            extraDetails = mapOf(
+              "matchType" to "ADDRESS_MATCH",
+              "postalCode" to postalCode,
+              "buildingNumber" to buildingNumber,
+              "buildingNumberAddition" to (buildingNumberAddition ?: "")
+            )
           ),
-          requiresManualReview = true
         )
         companySyncRepository.save(pendingSync)
         return ProcessResult.PendingReview
@@ -706,7 +707,6 @@ class ExactOnlineSyncAdapter(
       syncedFromSourceAt = Instant.now(),
       syncErrorMessage = null,
       conflictDetails = null,
-      requiresManualReview = false,
       updatedAt = Instant.now()
     )
     companySyncRepository.save(updatedSync)
@@ -869,6 +869,51 @@ class ExactOnlineSyncAdapter(
     val Name: String,
     // Add other fields as needed
   )
+
+  /**
+   * Build conflict details map with standard fields for display in the frontend.
+   * Includes exactName, exactAddress, matchedCompanyName, matchedCompanyAddress when available.
+   */
+  private fun buildConflictDetails(
+    conflictType: String,
+    account: ExactSyncAccount,
+    matchedCompany: Company,
+    extraDetails: Map<String, Any?> = emptyMap()
+  ): Map<String, Any> {
+    val details = mutableMapOf<String, Any>(
+      "conflictType" to conflictType,
+      "exactName" to account.Name
+    )
+
+    // Build Exact address from available fields
+    val exactAddressParts = listOfNotNull(
+      account.AddressLine1?.takeIf { it.isNotBlank() },
+      account.Postcode?.takeIf { it.isNotBlank() },
+      account.City?.takeIf { it.isNotBlank() }
+    )
+    if (exactAddressParts.isNotEmpty()) {
+      details["exactAddress"] = exactAddressParts.joinToString(", ")
+    }
+
+    // Add matched company info
+    details["matchedCompanyName"] = matchedCompany.name
+
+    // Build matched company address
+    try {
+      details["matchedCompanyAddress"] = matchedCompany.address.toAddressLine()
+    } catch (_: Exception) {
+      // Address might be incomplete, skip if we can't format it
+    }
+
+    // Add extra details, filtering out null values
+    extraDetails.forEach { (key, value) ->
+      if (value != null) {
+        details[key] = value
+      }
+    }
+
+    return details
+  }
 
   // Data classes for Exact Online Sync API
 

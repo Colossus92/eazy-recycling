@@ -1,13 +1,12 @@
 import { SyncConflictDto } from '@/api/client';
-import { SyncStatusTag } from './SyncStatusTag';
-import { ConflictTypeTag } from './ConflictTypeTag';
+import CheckCircle from '@/assets/icons/CheckCircle.svg?react';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { useState } from 'react';
-import CheckCircle from '@/assets/icons/CheckCircle.svg?react';
+import { ConflictTypeTag } from './ConflictTypeTag';
+import { SyncStatusTag } from './SyncStatusTag';
 
 interface SyncConflictsTableProps {
   conflicts: SyncConflictDto[];
-  pendingReviews: SyncConflictDto[];
   isLoading: boolean;
 }
 
@@ -21,14 +20,10 @@ type Column = {
 
 export const SyncConflictsTable = ({
   conflicts,
-  pendingReviews,
   isLoading,
 }: SyncConflictsTableProps) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  // Combine conflicts and pending reviews
-  const allItems = [...conflicts, ...pendingReviews];
 
   const columns: Column[] = [
     {
@@ -57,7 +52,10 @@ export const SyncConflictsTable = ({
             {item.conflictDetails?.exactName || 'Onbekend'}
           </span>
           <span className="text-caption text-color-text-secondary">
-            {item.conflictDetails?.exactAddress || item.externalId || '-'}
+            Code: {item.externalId || '-'}
+          </span>
+          <span className="text-caption text-color-text-secondary">
+            Adres: {item.conflictDetails?.exactAddress || '-'}
           </span>
           {item.exactGuid && (
             <span className="text-caption text-color-text-tertiary truncate">
@@ -77,7 +75,7 @@ export const SyncConflictsTable = ({
             {item.conflictDetails?.matchedCompanyName || '-'}
           </span>
           <span className="text-caption text-color-text-secondary">
-            {item.conflictDetails?.matchedCompanyAddress || '-'}
+            Adres: {item.conflictDetails?.matchedCompanyAddress || '-'}
           </span>
           {item.companyId && (
             <span className="text-caption text-color-text-tertiary truncate">
@@ -118,9 +116,9 @@ export const SyncConflictsTable = ({
     );
   }
 
-  if (allItems.length === 0) {
+  if (conflicts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-12">
+      <div className="flex flex-col items-center justify-center gap-4 py-12 w-full">
         <div className="w-16 h-16 rounded-full bg-color-success-light flex items-center justify-center">
           <CheckCircle className="w-8 h-8 text-color-success" />
         </div>
@@ -147,17 +145,14 @@ export const SyncConflictsTable = ({
         <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
           <tr className="text-subtitle-1">
             {columns.map((col) => (
-              <th
-                className="px-4 py-3 text-left truncate"
-                key={col.key}
-              >
+              <th className="px-4 py-3 text-left truncate" key={col.key}>
                 {col.label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {allItems
+          {conflicts
             .slice((page - 1) * rowsPerPage, page * rowsPerPage)
             .map((item) => (
               <tr
@@ -165,11 +160,7 @@ export const SyncConflictsTable = ({
                 className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
               >
                 {columns.map((col) => (
-                  <td
-                    className="p-4"
-                    key={col.key}
-                    title={col.title?.(item)}
-                  >
+                  <td className="p-4" key={col.key} title={col.title?.(item)}>
                     {col.accessor(item)}
                   </td>
                 ))}
@@ -184,7 +175,7 @@ export const SyncConflictsTable = ({
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}
                 setRowsPerPage={setRowsPerPage}
-                numberOfResults={allItems.length}
+                numberOfResults={conflicts.length}
               />
             </td>
           </tr>

@@ -29,11 +29,5 @@ export interface SyncConflictsResponse {
      * @memberof SyncConflictsResponse
      */
     'conflicts': Array<SyncConflictDto>;
-    /**
-     * 
-     * @type {Array<SyncConflictDto>}
-     * @memberof SyncConflictsResponse
-     */
-    'pendingReviews': Array<SyncConflictDto>;
 }
 

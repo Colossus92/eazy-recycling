@@ -17,26 +17,38 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface SyncDeletedResponse
  */
-export interface SortObject {
+export interface SyncDeletedResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof SortObject
+     * @memberof SyncDeletedResponse
      */
-    'empty'?: boolean;
+    'success': boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof SyncDeletedResponse
      */
-    'unsorted'?: boolean;
+    'message': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {number}
+     * @memberof SyncDeletedResponse
      */
-    'sorted'?: boolean;
+    'recordsProcessed': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncDeletedResponse
+     */
+    'recordsDeleted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncDeletedResponse
+     */
+    'recordsNotFound': number;
 }
 

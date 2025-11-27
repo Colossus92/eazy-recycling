@@ -175,7 +175,7 @@ class ExactOnlineController(
                 ))
         }
     }
-    
+
     /**
      * GET /api/admin/exact/conflicts
      *
@@ -185,10 +185,8 @@ class ExactOnlineController(
     @GetMapping("/conflicts")
     fun getConflicts(): ResponseEntity<SyncConflictsResponse> {
         val conflicts = exactOnlineSync.getConflicts()
-        val pendingReviews = exactOnlineSync.getPendingReviews()
         return ResponseEntity.ok(SyncConflictsResponse(
             conflicts = conflicts.map { SyncConflictDto.fromEntity(it) },
-            pendingReviews = pendingReviews.map { SyncConflictDto.fromEntity(it) }
         ))
     }
 
@@ -234,7 +232,7 @@ class ExactOnlineController(
         val recordsConflicted: Int,
         val recordsPendingReview: Int
     )
-    
+
     data class SyncDeletedResponse(
         val success: Boolean,
         val message: String,
@@ -242,12 +240,11 @@ class ExactOnlineController(
         val recordsDeleted: Int,
         val recordsNotFound: Int
     )
-    
+
     data class SyncConflictsResponse(
         val conflicts: List<SyncConflictDto>,
-        val pendingReviews: List<SyncConflictDto>
     )
-    
+
     data class SyncConflictDto(
         val id: String,
         val companyId: String,

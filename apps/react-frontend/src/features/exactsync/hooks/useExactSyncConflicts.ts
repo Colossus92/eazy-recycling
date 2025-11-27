@@ -5,9 +5,7 @@ export const useExactSyncConflicts = () => {
   const {
     data,
     isLoading,
-    isFetching,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['exactSyncConflicts'],
     queryFn: async () => {
@@ -18,10 +16,7 @@ export const useExactSyncConflicts = () => {
 
   return {
     conflicts: data?.conflicts ?? [],
-    pendingReviews: data?.pendingReviews ?? [],
     isLoading,
-    isFetching,
     error,
-    refetch,
   };
 };

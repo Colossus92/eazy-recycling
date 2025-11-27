@@ -337,7 +337,6 @@ create table if not exists companies_sync (
                                                synced_from_source_at timestamp with time zone,
                                                sync_error_message text,
                                                conflict_details jsonb,
-                                               requires_manual_review boolean not null,
                                                created_at timestamp with time zone not null,
                                                updated_at timestamp with time zone,
                                                deleted_in_source bool,

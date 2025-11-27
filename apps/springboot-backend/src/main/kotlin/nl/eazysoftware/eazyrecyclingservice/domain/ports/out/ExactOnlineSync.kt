@@ -27,17 +27,12 @@ interface ExactOnlineSync {
      * Returns the number of records synced.
      */
     fun syncFromExact(): SyncFromExactResult
-    
+
     /**
      * Get all sync records that have conflicts requiring manual resolution.
      */
     fun getConflicts(): List<CompanySyncDto>
-    
-    /**
-     * Get all sync records that are pending manual review.
-     */
-    fun getPendingReviews(): List<CompanySyncDto>
-    
+
     /**
      * Sync deleted records from Exact Online.
      * Uses the Exact Online Deleted API with timestamp-based pagination.
