@@ -81,6 +81,7 @@ export const CompanyForm = ({
     useState<SoftDeleteConflict | null>(null);
   const [pendingFormData, setPendingFormData] =
     useState<CompanyFormValues | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -111,6 +112,8 @@ export const CompanyForm = ({
 
   const submitAndClose = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     await handleSubmit(async (data) => {
       try {
         await onSubmit(toCompany(data));
@@ -123,10 +126,12 @@ export const CompanyForm = ({
             // This is a soft-delete conflict
             setSoftDeleteConflict(conflictData);
             setPendingFormData(data);
+            setIsSubmitting(false);
             return; // Don't show error dialog, show restore dialog instead
           }
         }
         handleError(error);
+        setIsSubmitting(false);
       }
     })();
   };
@@ -379,7 +384,7 @@ export const CompanyForm = ({
             isMulti={true}
           />
         </div>
-        <FormActionButtons onClick={onCancel} item={company} />
+        <FormActionButtons onClick={onCancel} item={company} disabled={isSubmitting} />
       </form>
       <RestoreCompanyDialog
         isOpen={softDeleteConflict !== null}

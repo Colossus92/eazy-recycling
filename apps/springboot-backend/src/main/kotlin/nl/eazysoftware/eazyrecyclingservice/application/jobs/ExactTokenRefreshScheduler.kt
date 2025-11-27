@@ -17,7 +17,7 @@ import java.time.Instant
  * avoiding unnecessary database polling.
  */
 @Component
-@ConditionalOnBooleanProperty(name = ["exact.oauth.refresh-enabled"], havingValue = true)
+@ConditionalOnBooleanProperty(name = ["exact.oauth.refresh-enabled"], havingValue = true, matchIfMissing = true)
 class ExactTokenRefreshScheduler(
     private val exactOAuthService: ExactOAuthService,
     private val tokenRepository: ExactTokenRepository,

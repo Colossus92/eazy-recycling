@@ -70,28 +70,7 @@ class ExactAccountProcessor(
       }
     }
 
-    // Step 2: Try to find by external_id (Exact Code)
-    val syncByCode = account.Code?.let { companySyncRepository.findByExternalId(it) }
-    val syncByCodeCompanyId = syncByCode?.companyId
-    if (syncByCode != null && syncByCodeCompanyId != null) {
-      val existingCompany = companies.findById(CompanyId(syncByCodeCompanyId))
-      if (existingCompany != null) {
-        // Update the sync record with the exact_guid if not already set
-        val updatedSync = if (syncByCode.exactGuid == null) {
-          syncByCode.copy(exactGuid = account.ID, updatedAt = Instant.now())
-        } else syncByCode
-        return updateExistingCompany(
-          existingCompany,
-          account,
-          updatedSync,
-          streetName,
-          buildingNumber,
-          buildingNumberAddition
-        )
-      }
-    }
-
-    // Step 3: Try to find by KVK number (Chamber of Commerce ID)
+    // Step 2: Try to find by KVK number (Chamber of Commerce ID)
     val kvkNumber = account.ChamberOfCommerce
     if (!kvkNumber.isNullOrBlank()) {
       val companyByKvk = companies.findByChamberOfCommerceId(kvkNumber)
@@ -140,7 +119,7 @@ class ExactAccountProcessor(
       }
     }
 
-    // Step 4: No match found - create new company
+    // Step 3: No match found - create new company
     return createNewCompany(account, streetName, buildingNumber, buildingNumberAddition)
   }
 
