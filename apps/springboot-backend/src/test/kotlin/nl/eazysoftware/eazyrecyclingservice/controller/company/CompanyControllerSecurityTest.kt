@@ -126,8 +126,8 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
             CompanyRequest(
               chamberOfCommerceId = "87654321",
               vihbId = "654321VIHB",
-              name = "New Test Company",
               processorId = "12345",
+              name = "New Test Company",
               address = AddressRequest(
                 streetName = "Test Street",
                 buildingNumber = "123",
@@ -135,6 +135,8 @@ class CompanyControllerSecurityTest : BaseIntegrationTest() {
                 city = "Test City"
               ),
               roles = listOf(CompanyRole.CARRIER),
+              phone = "0612345678",
+              email = "test@example.com"
             )
           )
         )

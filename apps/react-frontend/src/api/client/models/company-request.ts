@@ -59,6 +59,18 @@ export interface CompanyRequest {
      * @memberof CompanyRequest
      */
     'roles': Array<CompanyRequestRolesEnum>;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyRequest
+     */
+    'phone'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyRequest
+     */
+    'email'?: string;
 }
 
 export const CompanyRequestRolesEnum = {

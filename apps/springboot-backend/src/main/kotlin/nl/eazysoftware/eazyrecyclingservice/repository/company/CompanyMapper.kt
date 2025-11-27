@@ -6,6 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Email
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.PhoneNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
@@ -33,8 +35,8 @@ class CompanyMapper {
         country = dto.address.country
       ),
       roles = dto.roles,
-      phone = dto.phone,
-      email = dto.email,
+      phone = dto.phone?.let { PhoneNumber(it) },
+      email = dto.email?.let { Email(it) },
       isSupplier = dto.isSupplier,
       isCustomer = dto.isCustomer,
       deletedAt = dto.deletedAt?.toKotlinInstant(),
@@ -57,8 +59,8 @@ class CompanyMapper {
         country = domain.address.country
       ),
       roles = domain.roles,
-      phone = domain.phone,
-      email = domain.email,
+      phone = domain.phone?.value,
+      email = domain.email?.value,
       isSupplier = domain.isSupplier,
       isCustomer = domain.isCustomer,
       deletedAt = domain.deletedAt?.toJavaInstant()

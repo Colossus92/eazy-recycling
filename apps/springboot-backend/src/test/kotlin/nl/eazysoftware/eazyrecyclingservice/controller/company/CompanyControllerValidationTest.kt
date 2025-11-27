@@ -29,18 +29,17 @@ class CompanyControllerValidationTest {
     @MethodSource("validChamberOfCommerceIds")
     fun `valid champer of commerce id should not have any violations`(validChamberOfCommerceId: String?) {
         val company = CompanyController.CompanyRequest(
-            validChamberOfCommerceId,
-            "123456VIHB",
-            null,
-            "Company",
-            AddressRequest(
-                "Main St",
-                "",
-                "1",
-                "1234 AB",
-                "Amsterdam"
-            ),
-          emptyList()
+          validChamberOfCommerceId,
+          "123456VIHB",
+          null,
+          "Company",
+          AddressRequest(
+              "Main St",
+              "",
+              "1",
+              "1234 AB",
+              "Amsterdam"
+          ),
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -50,18 +49,17 @@ class CompanyControllerValidationTest {
     @MethodSource("invalidChamberOfCommerceIds")
     fun `invalid chamber of commerce id should have a violation`(invalidChamberOfCommerceId: String) {
         val company = CompanyController.CompanyRequest(
-            invalidChamberOfCommerceId,
-            "123456VIHB",
+          invalidChamberOfCommerceId,
+          "123456VIHB",
           null,
-            "Company",
-            AddressRequest(
-                "Main St",
-                "",
-                "1",
-                "1234 AB",
-                "Amsterdam"
-            ),
-          emptyList()
+          "Company",
+          AddressRequest(
+              "Main St",
+              "",
+              "1",
+              "1234 AB",
+              "Amsterdam"
+          ),
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)
@@ -74,12 +72,11 @@ class CompanyControllerValidationTest {
     @MethodSource("validVihbIds")
     fun `valid vihb id should not have any violations`(validVihbId: String?) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            validVihbId,
+          "12345678",
+          validVihbId,
           null,
-            "Company",
-            addressRequest,
-          emptyList()
+          "Company",
+          addressRequest,
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -89,12 +86,11 @@ class CompanyControllerValidationTest {
     @MethodSource("invalidVihbIds")
     fun `invalid vihb id should have a violation`(invalidVihbId: String) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            invalidVihbId,
+          "12345678",
+          invalidVihbId,
           null,
-            "Company",
-            addressRequest,
-          emptyList(),
+          "Company",
+          addressRequest,
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)
@@ -107,18 +103,17 @@ class CompanyControllerValidationTest {
     @MethodSource("validPostalCodes")
     fun `valid postal code should not have any violations`(validPostalCode: String) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            "123456VIHB",
+          "12345678",
+          "123456VIHB",
           null,
-            "Company",
-            AddressRequest(
-                "Main St",
-                "",
-                "1",
-                validPostalCode,
-                "Amsterdam"
-            ),
-          emptyList()
+          "Company",
+          AddressRequest(
+              "Main St",
+              "",
+              "1",
+              validPostalCode,
+              "Amsterdam"
+          ),
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -128,18 +123,17 @@ class CompanyControllerValidationTest {
     @MethodSource("invalidPostalCodes")
     fun `invalid postal code should have a violation`(invalidPostalCode: String) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            "123456VIHB",
-            null,
-            "Company",
-            AddressRequest(
-                "Main St",
-                "",
-                "1",
-                invalidPostalCode,
-                "Amsterdam"
-            ),
-          emptyList()
+          "12345678",
+          "123456VIHB",
+          null,
+          "Company",
+          AddressRequest(
+              "Main St",
+              "",
+              "1",
+              invalidPostalCode,
+              "Amsterdam"
+          ),
         )
         val violations = validator.validate(company)
 
@@ -153,12 +147,11 @@ class CompanyControllerValidationTest {
     @MethodSource("validProcessorIds")
     fun `valid processor id should not have any violations`(validProcessorId: String?) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            "123456VIHB",
-            validProcessorId,
-            "Company",
-            addressRequest,
-          emptyList(),
+          "12345678",
+          "123456VIHB",
+          validProcessorId,
+          "Company",
+          addressRequest,
         )
         val violations = validator.validate(company)
         assertThat(violations).isEmpty()
@@ -168,12 +161,11 @@ class CompanyControllerValidationTest {
     @MethodSource("invalidProcessorIds")
     fun `invalid processor id should have a violation`(invalidProcessorId: String) {
         val company = CompanyController.CompanyRequest(
-            "12345678",
-            "123456VIHB",
-            invalidProcessorId,
-            "Company",
-            addressRequest,
-          emptyList(),
+          "12345678",
+          "123456VIHB",
+          invalidProcessorId,
+          "Company",
+          addressRequest,
         )
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)

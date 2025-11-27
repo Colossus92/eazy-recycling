@@ -17,6 +17,8 @@ data class CompleteCompanyView(
   val updatedAt: LocalDateTime,
   val branches: List<CompanyController.CompanyBranchResponse> = emptyList(),
   val roles: List<CompanyRole>,
+  val phone: String?,
+  val email: String?,
   ) {
 
   companion object {
@@ -38,6 +40,8 @@ data class CompleteCompanyView(
         processorId = company.processorId?.number,
         updatedAt = LocalDateTime.now(),
         roles = company.roles,
+        phone = company.phone?.value,
+        email = company.email?.value,
       )
     }
   }

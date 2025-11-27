@@ -100,19 +100,19 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     vihbId: String? = "123456VIHB",
     name: String = "Test BV"
   ) = CompanyController.CompanyRequest(
-    chamberOfCommerceId = chamberOfCommerceId,
-    vihbId = vihbId,
-    name = name,
-    processorId = "12345",
-    address = AddressRequest(
-      streetName = "Main St",
-      buildingNumberAddition = "HQ",
-      buildingNumber = "1",
-      postalCode = "1234 AB",
-      city = "Amsterdam",
-      country = "Nederland"
-    ),
-    roles = listOf(CompanyRole.PROCESSOR)
+      chamberOfCommerceId = chamberOfCommerceId,
+      vihbId = vihbId,
+      processorId = "12345",
+      name = name,
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.PROCESSOR),
   )
 
   @Test

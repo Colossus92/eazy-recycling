@@ -6,6 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Email
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.PhoneNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncRepository
@@ -138,61 +140,7 @@ class ExactAccountProcessor(
       }
     }
 
-    // Step 4: Try to find by address (fuzzy match - lowest confidence)
-    val postalCode = account.Postcode
-    if (!postalCode.isNullOrBlank() && buildingNumber.isNotBlank()) {
-      val companyByAddress = companies.findByAddress(postalCode, buildingNumber, buildingNumberAddition)
-      if (companyByAddress != null) {
-        // Check if this company is already linked to a different Exact account
-        val existingSync = companySyncRepository.findByCompanyId(companyByAddress.companyId.uuid)
-        if (existingSync != null && existingSync.exactGuid != null && existingSync.exactGuid != account.ID) {
-          // Address collision - same address but different Exact accounts
-          conflictHandler.saveOrUpdateConflict(
-            account = account,
-            companyId = companyByAddress.companyId.uuid,
-            conflictDetails = conflictHandler.buildConflictDetails(
-              conflictType = "ADDRESS_COLLISION",
-              account = account,
-              matchedCompany = companyByAddress,
-              extraDetails = mapOf(
-                "existingExactGuid" to existingSync.exactGuid.toString(),
-                "matchedAddress" to "$postalCode $buildingNumber${buildingNumberAddition ?: ""}"
-              )
-            )
-          )
-          logger.warn(
-            "Address collision detected: Company {} already linked to Exact GUID {}, but received from GUID {}",
-            companyByAddress.name,
-            existingSync.exactGuid,
-            account.ID
-          )
-          return ProcessResult.Conflict
-        }
-
-        // Address match found - create as PENDING_REVIEW for manual confirmation
-        conflictHandler.saveOrUpdateConflict(
-          account = account,
-          companyId = companyByAddress.companyId.uuid,
-          conflictDetails = conflictHandler.buildConflictDetails(
-            conflictType = "ADDRESS_MATCH",
-            account = account,
-            matchedCompany = companyByAddress,
-            extraDetails = mapOf(
-              "matchedAddress" to "$postalCode $buildingNumber${buildingNumberAddition ?: ""}"
-            )
-          ),
-          syncStatus = SyncStatus.PENDING_REVIEW
-        )
-        logger.info(
-          "Address match found for Exact account {} - linked to company {} pending review",
-          account.Name,
-          companyByAddress.name
-        )
-        return ProcessResult.PendingReview
-      }
-    }
-
-    // Step 5: No match found - create new company
+    // Step 4: No match found - create new company
     return createNewCompany(account, streetName, buildingNumber, buildingNumberAddition)
   }
 
@@ -218,8 +166,8 @@ class ExactAccountProcessor(
         city = City(account.City ?: ""),
         country = account.Country ?: "NL"
       ),
-      phone = account.Phone,
-      email = account.Email,
+      phone = account.Phone?.let { PhoneNumber(it) },
+      email = account.Email?.let { Email(it) },
       isSupplier = account.IsSupplier ?: false,
       isCustomer = account.Status == "C"
     )
@@ -304,8 +252,8 @@ class ExactAccountProcessor(
         country = account.Country ?: "NL"
       ),
       roles = emptyList(), // Roles are managed locally
-      phone = account.Phone,
-      email = account.Email,
+      phone = account.Phone?.let { PhoneNumber(it) },
+      email = account.Email?.let { Email(it) },
       isSupplier = account.IsSupplier ?: false,
       isCustomer = account.Status == "C"
     )
@@ -329,9 +277,8 @@ class ExactAccountProcessor(
     // Check if there's an existing sync record (e.g., from a previous conflict) and update it
     val existingSync = companySyncRepository.findByExactGuid(account.ID)
       ?: account.Code?.let { companySyncRepository.findByExternalId(it) }
-    
-    val syncDto = if (existingSync != null) {
-      existingSync.copy(
+
+    val syncDto = existingSync?.copy(
         companyId = newCompanyId.uuid,
         externalId = account.Code,
         exactGuid = account.ID,
@@ -340,16 +287,14 @@ class ExactAccountProcessor(
         syncErrorMessage = null,
         conflictDetails = null,
         updatedAt = Instant.now()
-      )
-    } else {
-      CompanySyncDto(
-        companyId = newCompanyId.uuid,
-        externalId = account.Code,
-        exactGuid = account.ID,
-        syncStatus = SyncStatus.OK,
-        syncedFromSourceAt = Instant.now()
-      )
-    }
+    )
+        ?: CompanySyncDto(
+          companyId = newCompanyId.uuid,
+          externalId = account.Code,
+          exactGuid = account.ID,
+          syncStatus = SyncStatus.OK,
+          syncedFromSourceAt = Instant.now()
+        )
     companySyncRepository.save(syncDto)
 
     logger.debug("Created company {} ({}) from Exact GUID {}", company.name, newCompanyId.uuid, account.ID)

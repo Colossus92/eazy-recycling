@@ -22,16 +22,16 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {number}
-     * @memberof SessionCookieConfig
-     */
-    'maxAge'?: number;
-    /**
-     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
     'path'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SessionCookieConfig
+     */
+    'maxAge'?: number;
     /**
      * 
      * @type {string}

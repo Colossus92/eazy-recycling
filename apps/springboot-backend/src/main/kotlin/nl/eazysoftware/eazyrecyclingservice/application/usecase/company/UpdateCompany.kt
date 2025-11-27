@@ -54,6 +54,8 @@ class UpdateCompanyService(
       vihbNumber = cmd.vihbNumber,
       processorId = cmd.processorId,
       address = cmd.address,
+      phone = cmd.phone,
+      email = cmd.email,
       roles = cmd.roles,
     )
 

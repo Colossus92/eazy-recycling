@@ -83,6 +83,8 @@ class CreateCompanyService(
       vihbNumber = cmd.vihbNumber,
       processorId = cmd.processorId,
       address = cmd.address,
+      phone = cmd.phone,
+      email = cmd.email,
       roles = cmd.roles,
     )
 
@@ -93,7 +95,7 @@ class CreateCompanyService(
       exactOnlineSync.syncCompany(savedCompany)
     } catch (e: Exception) {
       logger.error("Failed to sync company ${savedCompany.companyId.uuid} to Exact Online", e)
-      
+
       // Persist failed sync record
       val syncDto = CompanySyncDto(
         companyId = savedCompany.companyId.uuid,

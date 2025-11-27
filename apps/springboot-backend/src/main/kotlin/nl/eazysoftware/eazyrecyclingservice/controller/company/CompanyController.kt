@@ -59,6 +59,8 @@ class CompanyController(
           city = City(request.address.city),
           country = request.address.country
         ),
+        phone = request.phone?.let { PhoneNumber(it) },
+        email = request.email?.let { Email(it) },
         roles = request.roles,
       )
       return updateCompanyUseCase.handleRestore(companyId, updateCommand)
@@ -79,6 +81,8 @@ class CompanyController(
         country = request.address.country
       ),
       roles = request.roles,
+      phone = request.phone?.let { PhoneNumber(it) },
+      email = request.email?.let { Email(it) },
     )
     return createCompanyUseCase.handle(command)
   }
@@ -122,6 +126,8 @@ class CompanyController(
         city = City(request.address.city),
         country = request.address.country
       ),
+      phone = request.phone?.let { PhoneNumber(it) },
+      email = request.email?.let { Email(it) },
       roles = request.roles,
     )
     return updateCompanyUseCase.handle(command)
@@ -197,6 +203,8 @@ class CompanyController(
     val address: AddressRequest,
 
     val roles: List<CompanyRole> = emptyList(),
+    val phone: String? = null,
+    val email: String? = null,
   )
 
   data class CompanyBranchResponse(

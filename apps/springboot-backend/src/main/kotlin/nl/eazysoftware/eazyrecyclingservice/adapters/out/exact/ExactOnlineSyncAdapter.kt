@@ -146,8 +146,8 @@ class ExactOnlineSyncAdapter(
       Country = "NL",
       Status = customerStatus,
       ChamberOfCommerce = company.chamberOfCommerceId,
-      Phone = company.phone,
-      Email = company.email,
+      Phone = company.phone?.value,
+      Email = company.email?.value,
       IsSupplier = company.isSupplier,
     )
 
@@ -183,8 +183,8 @@ class ExactOnlineSyncAdapter(
       Country = "NL",
       Status = customerStatus,
       ChamberOfCommerce = company.chamberOfCommerceId,
-      Phone = company.phone,
-      Email = company.email,
+      Phone = company.phone?.value,
+      Email = company.email?.value,
       IsSupplier = company.isSupplier,
     )
 
@@ -262,7 +262,7 @@ class ExactOnlineSyncAdapter(
         try {
           // Parse address from AddressLine1 (format: "Street Number Addition")
           val (streetName, buildingNumber, buildingNumberAddition) = parseAddressLine(account.AddressLine1)
-          
+
           // Process in separate transaction to isolate constraint violations
           val result = accountProcessor.processAccount(account, streetName, buildingNumber, buildingNumberAddition)
           when (result) {

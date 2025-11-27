@@ -2950,6 +2950,10 @@ components:
             enum:
             - CARRIER
             - PROCESSOR
+        phone:
+          type: string
+        email:
+          type: string
       required:
       - address
       - name
@@ -4256,6 +4260,10 @@ components:
             enum:
             - CARRIER
             - PROCESSOR
+        phone:
+          type: string
+        email:
+          type: string
       required:
       - address
       - branches
@@ -4345,8 +4353,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4355,14 +4361,16 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     ConnectionStatusResponse:
       type: object
@@ -4779,29 +4787,29 @@ components:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         defaultContentType:
           type: string
-        errorOnELNotFound:
+        trimDirectiveWhitespaces:
           type: string
-        pageEncoding:
+        errorOnUndeclaredNamespace:
           type: string
-        scriptingInvalid:
-          type: string
-        includePreludes:
-          type: array
-          items:
-            type: string
         includeCodas:
           type: array
           items:
             type: string
-        trimDirectiveWhitespaces:
+        includePreludes:
+          type: array
+          items:
+            type: string
+        scriptingInvalid:
           type: string
-        errorOnUndeclaredNamespace:
+        pageEncoding:
+          type: string
+        errorOnELNotFound:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
           type: string
         deferredSyntaxAllowedAsLiteral:
           type: string
@@ -4922,10 +4930,18 @@ components:
         minorVersion:
           type: integer
           format: int32
-        serverInfo:
-          type: string
         contextPath:
           type: string
+        serverInfo:
+          type: string
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
         sessionTimeout:
           type: integer
           format: int32
@@ -4935,14 +4951,6 @@ components:
           type: string
         initParameterNames: {}
         attributeNames: {}
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
         servletRegistrations:
           type: object
           additionalProperties:
@@ -4988,12 +4996,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
@@ -5005,11 +5013,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
-        path:
-          type: string
         domain:
           type: string
         name:
@@ -5028,9 +5036,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

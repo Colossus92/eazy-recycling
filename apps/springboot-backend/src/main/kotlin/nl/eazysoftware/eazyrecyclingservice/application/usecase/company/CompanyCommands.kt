@@ -3,6 +3,8 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Email
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.PhoneNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
 import java.util.*
@@ -13,6 +15,8 @@ data class CreateCompanyCommand(
   val vihbNumber: VihbNumber?,
   val processorId: ProcessorPartyId?,
   val address: Address,
+  val phone: PhoneNumber?,
+  val email: Email?,
   val roles: List<CompanyRole>,
 )
 
@@ -23,6 +27,8 @@ data class UpdateCompanyCommand(
   val vihbNumber: VihbNumber?,
   val processorId: ProcessorPartyId?,
   val address: Address,
+  val phone: PhoneNumber?,
+  val email: Email?,
   val roles: List<CompanyRole>,
 )
 

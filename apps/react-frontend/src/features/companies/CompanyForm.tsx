@@ -10,6 +10,8 @@ import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
+import { PhoneNumberFormField } from '@/components/ui/form/PhoneNumberFormField';
+import { EmailFormField } from '@/components/ui/form/EmailFormField';
 import { RestoreCompanyDialog } from './RestoreCompanyDialog';
 import { AxiosError } from 'axios';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
@@ -39,6 +41,8 @@ export interface CompanyFormValues extends FieldValues {
   chamberOfCommerceId: string;
   vihbId: string;
   processorId?: string;
+  phone?: string;
+  email?: string;
   roles: CompleteCompanyViewRolesEnum[];
 }
 
@@ -57,6 +61,8 @@ function toCompany(data: CompanyFormValues): Company {
     name: data.name,
     vihbId: data.vihbId?.trim() || undefined,
     processorId: data.processorId?.trim() || undefined,
+    phone: data.phone?.trim() || undefined,
+    email: data.email?.trim() || undefined,
     updatedAt: new Date().toISOString(),
     roles: data.roles,
     branches: [],
@@ -86,18 +92,20 @@ export const CompanyForm = ({
   } = useForm<CompanyFormValues>({
     defaultValues: company
       ? {
-          id: company.id,
-          name: company.name,
-          street: company.address.street,
-          houseNumber: company.address.houseNumber,
-          houseNumberAddition: company.address.houseNumberAddition,
-          postalCode: company.address.postalCode,
-          city: company.address.city,
-          chamberOfCommerceId: company.chamberOfCommerceId || '',
-          vihbId: company.vihbId || '',
-          processorId: company.processorId || '',
-          roles: company.roles || [],
-        }
+        id: company.id,
+        name: company.name,
+        street: company.address.street,
+        houseNumber: company.address.houseNumber,
+        houseNumberAddition: company.address.houseNumberAddition,
+        postalCode: company.address.postalCode,
+        city: company.address.city,
+        chamberOfCommerceId: company.chamberOfCommerceId || '',
+        vihbId: company.vihbId || '',
+        processorId: company.processorId || '',
+        phone: company.phone || '',
+        email: company.email || '',
+        roles: company.roles || [],
+      }
       : undefined,
   });
 
@@ -149,14 +157,14 @@ export const CompanyForm = ({
   return (
     <ErrorBoundary fallbackRender={fallbackRender}>
       <form
-        className="flex flex-col items-center self-stretch"
+        className="flex flex-col items-center self-stretch h-[90vh]"
         onSubmit={(e) => submitAndClose(e)}
       >
         <FormTopBar
           title={company ? 'Bedrijf aanpassen' : 'Een bedrijf toevoegen'}
           onClick={onCancel}
         />
-        <div className="flex flex-col items-center self-stretch p-4 gap-4">
+        <div className="flex flex-col items-center self-stretch flex-1 p-4 gap-4 min-h-0 overflow-y-auto">
           <JdenticonAvatar value={watch('name')} />
           <TextFormField
             title={'Bedrijfsnaam'}
@@ -267,6 +275,23 @@ export const CompanyForm = ({
               />
             </div>
           </div>
+          <div className="flex flex-col items-start self-stretch p-4 bg-color-surface-secondary rounded-md gap-4">
+            <span className="text-subtitle-1">Contact</span>
+            <EmailFormField
+              register={register}
+              errors={errors}
+              name="email"
+              value={company?.email}
+            />
+            <PhoneNumberFormField
+              formHook={{
+                register,
+                name: 'phone',
+                errors,
+              }}
+              value={company?.phone}
+            />
+          </div>
           <div className={'flex items-start gap-4 self-stretch'}>
             <TextFormField
               title={'KvK nummer'}
@@ -356,7 +381,6 @@ export const CompanyForm = ({
         </div>
         <FormActionButtons onClick={onCancel} item={company} />
       </form>
-
       <RestoreCompanyDialog
         isOpen={softDeleteConflict !== null}
         onClose={handleRestoreCancel}

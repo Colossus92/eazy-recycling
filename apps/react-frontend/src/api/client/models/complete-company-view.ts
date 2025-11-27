@@ -86,6 +86,18 @@ export interface CompleteCompanyView {
      * @memberof CompleteCompanyView
      */
     'roles': Array<CompleteCompanyViewRolesEnum>;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'phone'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'email'?: string;
 }
 
 export const CompleteCompanyViewRolesEnum = {

@@ -8,6 +8,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Email
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.PhoneNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto
@@ -650,8 +652,8 @@ class ExactOnlineSyncAdapterTest {
       city = City("Amsterdam")
     ),
     roles = emptyList(),
-    phone = "+31612345678",
-    email = "test@company.nl",
+    phone = PhoneNumber("+31612345678"),
+    email = Email("test@company.nl"),
     isSupplier = isSupplier,
     isCustomer = isCustomer
   )
