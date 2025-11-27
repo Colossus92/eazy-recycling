@@ -215,7 +215,34 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
     ON companies_sync (external_id) WHERE external_id IS NOT NULL;
 ```
 
-### 6. Sync Flow Diagrams
+### 6. Data Filtering Strategy
+
+#### Inbound Sync Filter: Customers and Suppliers Only
+
+When syncing accounts from Exact Online, we only import and persist accounts that meet one of the following criteria:
+
+- **Status = 'C'** (Customer status in Exact Online)
+- **IsSupplier = true** (Supplier flag in Exact Online)
+
+**Rationale**:
+
+- Eazy Recycling only needs to track companies that are customers or suppliers
+- Other account types (prospects, leads, inactive accounts) are not relevant to our business processes
+- Reduces database size and improves sync performance
+- Prevents cluttering the company list with irrelevant entities
+
+**Implementation**:
+
+The Exact Online Sync API does not support filtering on the `Status` or `IsSupplier` fields directly in the `$filter` parameter. Therefore, filtering is applied **after** fetching the data:
+
+```kotlin
+val accounts = response.d.results
+    .filter { it.Status == "C" || it.IsSupplier == true }
+```
+
+**Note**: The `$filter` parameter in the Sync API URL only supports filtering on the `Timestamp` field for incremental sync. All other filtering must be done client-side after receiving the response.
+
+### 7. Sync Flow Diagrams
 
 #### Outbound Sync (Eazy → Exact)
 
@@ -344,7 +371,7 @@ CREATE UNIQUE INDEX companies_sync_external_id_key
 
 ---
 
-## 7. Deletion Policy
+## 8. Deletion Policy
 
 ### Principle: Eazy Recycling Does NOT Delete in Exact Online
 

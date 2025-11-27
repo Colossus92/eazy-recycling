@@ -250,6 +250,7 @@ class ExactOnlineSyncAdapter(
     while (hasMoreRecords) {
       val response = fetchAccountsFromExact(currentTimestamp)
       val accounts = response.d.results
+        .filter { it.Status == "C" || it.IsSupplier == true } // Sync endpoint does not support filtering on fields
 
       if (accounts.isEmpty()) {
         hasMoreRecords = false
