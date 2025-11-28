@@ -21,6 +21,7 @@ class CompanyViewMapper {
       postalCode = company.address.postalCode.value,
       city = company.address.city.value,
       country = company.address.country
-    )
+    ),
+    email = company.email?.value,
   )
 }

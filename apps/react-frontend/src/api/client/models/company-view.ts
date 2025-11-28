@@ -59,5 +59,11 @@ export interface CompanyView {
      * @memberof CompanyView
      */
     'address': AddressView;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyView
+     */
+    'email'?: string;
 }
 

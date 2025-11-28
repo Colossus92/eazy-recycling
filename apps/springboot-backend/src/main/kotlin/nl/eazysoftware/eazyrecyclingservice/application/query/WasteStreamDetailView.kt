@@ -62,7 +62,8 @@ data class CompanyView(
   val chamberOfCommerceId: String?,
   val vihbId: String?,
   val processorId: String?,
-  val address: AddressView
+  val address: AddressView,
+  val email: String?,
 )
 
 data class AddressView(

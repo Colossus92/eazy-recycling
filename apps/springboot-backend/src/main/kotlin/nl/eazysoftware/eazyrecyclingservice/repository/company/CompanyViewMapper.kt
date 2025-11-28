@@ -20,7 +20,8 @@ object CompanyViewMapper {
         postalCode = dto.address.postalCode,
         city = dto.address.city,
         country = dto.address.country
-      )
+      ),
+      email = dto.email
     )
   }
 }

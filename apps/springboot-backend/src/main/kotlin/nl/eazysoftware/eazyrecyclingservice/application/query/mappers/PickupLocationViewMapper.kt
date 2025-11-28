@@ -52,7 +52,8 @@ class PickupLocationViewMapper(
                   postalCode = location.address.postalCode.value,
                   city = location.address.city.value,
                   country = location.address.country
-              )
+              ),
+              email = company.email?.value
           )
         )
       }

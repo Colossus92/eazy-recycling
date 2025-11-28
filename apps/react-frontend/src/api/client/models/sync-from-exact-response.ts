@@ -62,5 +62,23 @@ export interface SyncFromExactResponse {
      * @memberof SyncFromExactResponse
      */
     'recordsPendingReview': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncFromExactResponse
+     */
+    'deletedRecordsProcessed': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncFromExactResponse
+     */
+    'deletedRecordsDeleted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SyncFromExactResponse
+     */
+    'deletedRecordsNotFound': number;
 }
 

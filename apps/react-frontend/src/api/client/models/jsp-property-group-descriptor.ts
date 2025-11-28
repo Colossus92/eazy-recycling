@@ -28,18 +28,6 @@ export interface JspPropertyGroupDescriptor {
     'buffer'?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'urlPatterns'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'defaultContentType'?: string;
-    /**
-     * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
@@ -52,22 +40,16 @@ export interface JspPropertyGroupDescriptor {
     'errorOnUndeclaredNamespace'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'includeCodas'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includePreludes'?: Array<string>;
+    'deferredSyntaxAllowedAsLiteral'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'scriptingInvalid'?: string;
+    'errorOnELNotFound'?: string;
     /**
      * 
      * @type {string}
@@ -79,7 +61,31 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'errorOnELNotFound'?: string;
+    'scriptingInvalid'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includePreludes'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includeCodas'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'defaultContentType'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'urlPatterns'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -92,11 +98,5 @@ export interface JspPropertyGroupDescriptor {
      * @memberof JspPropertyGroupDescriptor
      */
     'isXml'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'deferredSyntaxAllowedAsLiteral'?: string;
 }
 

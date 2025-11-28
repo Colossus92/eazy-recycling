@@ -120,6 +120,7 @@ export const MobileSignaturePage = () => {
               <TextFormField
                 title="Emailadres"
                 placeholder="Emailadres"
+                value={party.email}
                 formHook={{
                   register,
                   name: 'email',

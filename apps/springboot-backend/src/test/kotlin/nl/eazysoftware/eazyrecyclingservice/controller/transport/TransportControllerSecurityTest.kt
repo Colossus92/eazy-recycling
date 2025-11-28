@@ -382,7 +382,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         postalCode = "1234 AB",
         city = "Test City",
         country = "Netherlands"
-      )
+      ),
+      email = "test@eazysoftware.nl"
     )
 
     val mockLocation = PickupLocationView.DutchAddressView(
