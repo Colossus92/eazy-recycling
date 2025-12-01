@@ -149,11 +149,7 @@ export const AfvalstroomnummersTab = () => {
                       <tr
                         key={index}
                         className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                        onDoubleClick={() =>
-                          item.isEditable
-                            ? form.openForEdit(item)
-                            : Promise.resolve()
-                        }
+                        onDoubleClick={() => form.openForEdit(item)}
                       >
                         {columns.map((col) => (
                           <td
@@ -168,11 +164,7 @@ export const AfvalstroomnummersTab = () => {
                           {item.status !== 'INACTIVE' &&
                             item.status !== 'EXPIRED' && (
                               <ActionMenu<WasteStreamListView>
-                                onEdit={
-                                  item.isEditable
-                                    ? form.openForEdit
-                                    : undefined
-                                }
+                                onEdit={form.openForEdit}
                                 onDelete={(wasteStream) =>
                                   deletion.initiate(wasteStream)
                                 }

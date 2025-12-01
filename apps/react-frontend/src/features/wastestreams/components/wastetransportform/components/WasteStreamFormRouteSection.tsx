@@ -5,7 +5,13 @@ import { AddressFormField } from '@/components/ui/form/addressformfield/AddressF
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { ProcessorPartySelectFormField } from '@/components/ui/form/ProcessorPartySelectFormField';
 
-export const WasteStreamFormRouteSection = () => {
+interface WasteStreamFormRouteSectionProps {
+  disabled?: boolean;
+}
+
+export const WasteStreamFormRouteSection = ({
+  disabled = false,
+}: WasteStreamFormRouteSectionProps) => {
   const formContext = useFormContext<WasteStreamFormValues>();
 
   return (
@@ -15,6 +21,7 @@ export const WasteStreamFormRouteSection = () => {
         placeholder={'Selecteer een afzender'}
         name="consignorPartyId"
         rules={{ required: 'Afzender is verplicht' }}
+        disabled={disabled}
       />
       <ConsignorClassificationSelect
         formHook={{
@@ -23,16 +30,19 @@ export const WasteStreamFormRouteSection = () => {
           errors: formContext.formState.errors,
           control: formContext.control,
         }}
+        disabled={disabled}
       />
       <AddressFormField
         control={formContext.control}
         name="pickupLocation"
         label="Locatie van herkomst"
         entity="afvalstroomnummer"
+        disabled={disabled}
       />
       <ProcessorPartySelectFormField
         name="processorPartyId"
         rules={{ required: 'Verwerker is verplicht' }}
+        disabled={disabled}
       />
     </div>
   );

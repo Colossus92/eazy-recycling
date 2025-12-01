@@ -8,11 +8,13 @@ import { Path } from "react-hook-form";
 interface ProcessorPartySelectFormFieldProps<TFieldValues extends FieldValues> {
     name: Path<TFieldValues>;
     rules: any;
+    disabled?: boolean;
 }
 
 export const ProcessorPartySelectFormField = <TFieldValues extends FieldValues>({
     name,
     rules,
+    disabled = false,
 }: ProcessorPartySelectFormFieldProps<TFieldValues>) => {
     const formContext = useFormContext<TFieldValues>();
     const { data: companies = [] } = useQuery<Company[]>({
@@ -30,6 +32,7 @@ export const ProcessorPartySelectFormField = <TFieldValues extends FieldValues>(
             placeholder={'Selecteer een verwerker'}
             options={processorPartyOptions}
             testId="processor-party-select"
+            disabled={disabled}
             formHook={{
                 register: formContext.register,
                 name: name,

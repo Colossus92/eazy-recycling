@@ -12,6 +12,7 @@ interface FormNavigationWithDraftProps {
   onSaveDraft?: () => Promise<void>;
   onSaveAndValidate?: () => Promise<void>;
   isSubmitting?: boolean;
+  isReadOnly?: boolean;
 }
 
 export const FormNavigationWithDraft = ({
@@ -23,6 +24,7 @@ export const FormNavigationWithDraft = ({
   onSaveDraft,
   onSaveAndValidate,
   isSubmitting = false,
+  isReadOnly = false,
 }: FormNavigationWithDraftProps) => {
   return (
     <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary relative z-0">
@@ -46,17 +48,28 @@ export const FormNavigationWithDraft = ({
         )}
       </div>
       {step === totalSteps ? (
-        <div className={'flex-1'}>
-          <SplitButton
-            primaryLabel={isSubmitting ? 'Valideren...' : 'Opslaan en valideren'}
-            secondaryLabel={isSubmitting ? 'Opslaan...' : 'Opslaan als concept'}
-            onPrimaryClick={() => onSaveAndValidate?.()}
-            onSecondaryClick={() => onSaveDraft?.()}
-            disabled={isSubmitting}
-            isSubmitting={isSubmitting}
-            fullWidth={true}
-          />
-        </div>
+        isReadOnly ? (
+          <div className={'flex-1'}>
+            <Button
+              variant={'primary'}
+              label={'Sluiten'}
+              onClick={onCancel}
+              fullWidth={true}
+            />
+          </div>
+        ) : (
+          <div className={'flex-1'}>
+            <SplitButton
+              primaryLabel={isSubmitting ? 'Valideren...' : 'Opslaan en valideren'}
+              secondaryLabel={isSubmitting ? 'Opslaan...' : 'Opslaan als concept'}
+              onPrimaryClick={() => onSaveAndValidate?.()}
+              onSecondaryClick={() => onSaveDraft?.()}
+              disabled={isSubmitting}
+              isSubmitting={isSubmitting}
+              fullWidth={true}
+            />
+          </div>
+        )
       ) : (
         <div className={'flex-1'}>
           <Button

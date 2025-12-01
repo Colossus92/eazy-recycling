@@ -102,9 +102,12 @@ export const WasteStreamForm = ({
     }
   };
 
+  // Form is read-only when viewing a non-DRAFT waste stream
+  const isReadOnly = Boolean(data && data.status !== 'DRAFT');
+
   const steps = [
-    <WasteStreamFormRouteSection />,
-    <WasteStreamFormGoodsSection />,
+    <WasteStreamFormRouteSection disabled={isReadOnly} />,
+    <WasteStreamFormGoodsSection disabled={isReadOnly} />,
   ];
 
   return (
@@ -162,6 +165,7 @@ export const WasteStreamForm = ({
                 onSaveDraft={handleSaveDraft}
                 onSaveAndValidate={handleSaveAndValidate}
                 isSubmitting={isSubmitting}
+                isReadOnly={isReadOnly}
               />
             </form>
           </FormProvider>

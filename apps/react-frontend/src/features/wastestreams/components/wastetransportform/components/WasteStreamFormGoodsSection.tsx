@@ -9,7 +9,13 @@ import { euralService } from '@/api/services/euralService';
 import { Eural } from '@/api/client';
 import { WasteStreamFormValues } from '@/features/wastestreams/components/wastetransportform/hooks/useWasteStreamFormHook';
 
-export const WasteStreamFormGoodsSection = () => {
+interface WasteStreamFormGoodsSectionProps {
+  disabled?: boolean;
+}
+
+export const WasteStreamFormGoodsSection = ({
+  disabled = false,
+}: WasteStreamFormGoodsSectionProps) => {
   const formContext = useFormContext<WasteStreamFormValues>();
 
   const { data: companies = [] } = useQuery<Company[]>({
@@ -44,6 +50,7 @@ export const WasteStreamFormGoodsSection = () => {
         placeholder={'Selecteer een ontdoener'}
         options={companyOptions}
         testId='pickup-party-select'
+        disabled={disabled}
         formHook={{
           register: formContext.register,
           name: 'pickupPartyId',
@@ -58,6 +65,7 @@ export const WasteStreamFormGoodsSection = () => {
           <TextFormField
             title={'Gebruikelijke benaming'}
             placeholder={'Gebruikelijke benaming afvalstof'}
+            disabled={disabled}
             formHook={{
               register: formContext.register,
               name: 'goodsName',
@@ -73,6 +81,7 @@ export const WasteStreamFormGoodsSection = () => {
             placeholder={'Selecteer een euralcode'}
             options={euralOptions}
             testId='eural-code-select'
+            disabled={disabled}
             formHook={{
               register: formContext.register,
               name: 'euralCode',
@@ -88,6 +97,7 @@ export const WasteStreamFormGoodsSection = () => {
             placeholder={'Selecteer een verwerkingsmethode'}
             options={processingMethodOptions}
             testId='processing-method-select'
+            disabled={disabled}
             formHook={{
               register: formContext.register,
               name: 'processingMethodCode',
