@@ -71,7 +71,6 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
             code = "TEST_GROUP",
             name = "Test Material Group",
             description = "For testing material prices",
-            createdAt = Instant.now()
         )
         val savedGroup = materialGroupJpaRepository.save(materialGroup)
 
@@ -83,7 +82,6 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
             unitOfMeasure = "KG",
             vatRate = vatRate,
             status = "ACTIVE",
-            createdAt = Instant.now()
         )
         val savedMaterial = materialJpaRepository.save(material)
         testMaterialId = savedMaterial.id

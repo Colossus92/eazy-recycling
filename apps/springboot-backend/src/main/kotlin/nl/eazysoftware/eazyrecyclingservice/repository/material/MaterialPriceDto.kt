@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -26,4 +27,4 @@ data class MaterialPriceDto(
 
     @Column(name = "valid_to")
     val validTo: Instant? = null
-)
+) : AuditableEntity()

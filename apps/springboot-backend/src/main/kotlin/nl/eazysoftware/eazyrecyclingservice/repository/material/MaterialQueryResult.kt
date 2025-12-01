@@ -16,6 +16,8 @@ interface MaterialQueryResult {
     fun getUnitOfMeasure(): String
     fun getVatCode(): String
     fun getStatus(): String
-    fun getCreatedAt(): Instant
+    fun getCreatedAt(): Instant?
+    fun getCreatedBy(): String?
     fun getUpdatedAt(): Instant?
+    fun getUpdatedBy(): String?
 }

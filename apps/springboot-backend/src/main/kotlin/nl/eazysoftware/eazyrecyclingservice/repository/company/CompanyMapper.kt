@@ -4,12 +4,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.City
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Email
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.PhoneNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.VihbNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.*
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import org.springframework.stereotype.Component
@@ -40,6 +35,10 @@ class CompanyMapper {
       isSupplier = dto.isSupplier,
       isCustomer = dto.isCustomer,
       deletedAt = dto.deletedAt?.toKotlinInstant(),
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
     )
   }
 

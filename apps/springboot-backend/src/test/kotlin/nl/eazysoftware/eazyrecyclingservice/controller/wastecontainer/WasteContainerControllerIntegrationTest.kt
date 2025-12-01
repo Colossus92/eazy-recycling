@@ -300,4 +300,42 @@ class WasteContainerControllerIntegrationTest : BaseIntegrationTest() {
         )
             .andExpect(status().isNotFound)
     }
+
+    @Test
+    fun `should persist and return audit fields when creating and retrieving container`() {
+        // Given
+        val containerRequest = WasteContainerRequest(
+            id = "AUDIT-TEST-001",
+            location = PickupLocationRequest.DutchAddressRequest(
+                streetName = "Audit Street",
+                buildingNumber = "1",
+                city = "Audit City",
+                postalCode = "1234AB",
+                country = "Nederland"
+            ),
+            notes = "Container for audit test"
+        )
+
+        // When - Create container
+        securedMockMvc.post(
+            "/containers",
+            objectMapper.writeValueAsString(containerRequest)
+        ).andExpect(status().isCreated)
+
+        // Then - Verify audit fields are persisted in database
+        val savedContainer = wasteContainerRepository.findByIdOrNull("AUDIT-TEST-001")
+        assertThat(savedContainer).isNotNull
+        assertThat(savedContainer?.createdAt).isNotNull
+        assertThat(savedContainer?.createdBy).isEqualTo("Test User")
+        assertThat(savedContainer?.updatedAt).isNotNull
+        assertThat(savedContainer?.updatedBy).isEqualTo("Test User")
+
+        // And - Verify audit fields are returned in API response
+        securedMockMvc.get("/containers/AUDIT-TEST-001")
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.createdAt").isNotEmpty)
+            .andExpect(jsonPath("$.createdByName").value("Test User"))
+            .andExpect(jsonPath("$.updatedAt").isNotEmpty)
+            .andExpect(jsonPath("$.updatedByName").value("Test User"))
+    }
 }

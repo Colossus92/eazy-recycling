@@ -118,8 +118,10 @@ data class MaterialResponse(
     val unitOfMeasure: String,
     val vatCode: String,
     val status: String,
-    val createdAt: String,
-    val updatedAt: String?
+    val createdAt: String?,
+    val createdByName: String?,
+    val updatedAt: String?,
+    val updatedByName: String?,
 )
 
 fun MaterialQueryResult.toResponse(): MaterialResponse {
@@ -133,7 +135,9 @@ fun MaterialQueryResult.toResponse(): MaterialResponse {
         unitOfMeasure = getUnitOfMeasure(),
         vatCode = getVatCode(),
         status = getStatus(),
-        createdAt = getCreatedAt().toString(),
-        updatedAt = getUpdatedAt()?.toString()
+        createdAt = getCreatedAt()?.toString(),
+        createdByName = getCreatedBy(),
+        updatedAt = getUpdatedAt()?.toString(),
+        updatedByName = getUpdatedBy(),
     )
 }

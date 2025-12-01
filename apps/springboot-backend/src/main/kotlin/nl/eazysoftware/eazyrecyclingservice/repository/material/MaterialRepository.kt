@@ -22,7 +22,9 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
                 m.vat_code as vatCode,
                 m.status as status,
                 m.created_at as createdAt,
-                m.updated_at as updatedAt
+                m.created_by as createdBy,
+                m.last_modified_at as updatedAt,
+                m.last_modified_by as updatedBy
             FROM materials m
             INNER JOIN material_groups mg ON m.material_group_id = mg.id
         """,
@@ -43,7 +45,9 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
                 m.vat_code as vatCode,
                 m.status as status,
                 m.created_at as createdAt,
-                m.updated_at as updatedAt
+                m.created_by as createdBy,
+                m.last_modified_at as updatedAt,
+                m.last_modified_by as updatedBy
             FROM materials m
             INNER JOIN material_groups mg ON m.material_group_id = mg.id
             WHERE m.id = :id
@@ -82,7 +86,7 @@ class MaterialRepository(
     }
 
     override fun updateMaterial(id: Long, material: Material): Material {
-        val dto = mapper.toDto(material.copy(id = id, updatedAt = kotlin.time.Clock.System.now()))
+        val dto = mapper.toDto(material.copy(id = id))
         val saved = jpaRepository.save(dto)
         return mapper.toDomain(saved)
     }

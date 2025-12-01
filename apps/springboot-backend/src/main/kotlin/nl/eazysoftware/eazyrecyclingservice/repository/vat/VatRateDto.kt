@@ -4,6 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import java.math.BigDecimal
 import java.time.Instant
 
@@ -28,4 +29,4 @@ data class VatRateDto(
 
     @Column(name = "description", nullable = false)
     val description: String
-)
+) : AuditableEntity()

@@ -10,6 +10,8 @@ data class Material(
   val unitOfMeasure: String,
   val vatCode: String,
   val status: String,
-  val createdAt: Instant?,
-  val updatedAt: Instant?
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedBy: String? = null,
 )

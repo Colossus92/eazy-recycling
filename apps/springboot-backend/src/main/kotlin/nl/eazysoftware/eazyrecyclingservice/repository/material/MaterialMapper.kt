@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import org.springframework.stereotype.Component
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -21,8 +20,7 @@ class MaterialMapper(
             unitOfMeasure = domain.unitOfMeasure,
             vatRate = entityManager.getReference(VatRateDto::class.java, domain.vatCode),
             status = domain.status,
-            createdAt = domain.createdAt?.toJavaInstant() ?: java.time.Instant.now(),
-            updatedAt = domain.updatedAt?.toJavaInstant()
+            // Audit fields are managed by Spring Data JPA
         )
     }
 
@@ -35,8 +33,10 @@ class MaterialMapper(
             unitOfMeasure = dto.unitOfMeasure,
             vatCode = dto.vatRate.vatCode,
             status = dto.status,
-            createdAt = dto.createdAt.toKotlinInstant(),
-            updatedAt = dto.updatedAt?.toKotlinInstant()
+            createdAt = dto.createdAt?.toKotlinInstant(),
+            createdBy = dto.createdBy,
+            updatedAt = dto.updatedAt?.toKotlinInstant(),
+            updatedBy = dto.updatedBy,
         )
     }
 }

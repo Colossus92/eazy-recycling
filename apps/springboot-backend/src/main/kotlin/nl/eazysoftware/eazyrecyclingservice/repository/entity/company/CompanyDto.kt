@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.entity.company
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import java.time.Instant
 import java.util.*
@@ -52,6 +53,4 @@ data class CompanyDto(
    */
   @Column(name = "deleted_by", nullable = true)
   val deletedBy: UUID? = null,
-
-  val updatedAt: Instant = Instant.now(),
-)
+) : AuditableEntity()

@@ -79,7 +79,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       code = "TEST_GROUP",
       name = "Test Material Group",
       description = "For testing materials",
-      createdAt = Instant.now()
     )
     val savedGroup = materialGroupJpaRepository.save(materialGroup)
     testMaterialGroupId = savedGroup.id
@@ -140,7 +139,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       unitOfMeasure = "KG",
       vatRate = vatRate,
       status = "ACTIVE",
-      createdAt = Instant.now()
     )
     val material2 = MaterialDto(
       code = "MAT003",
@@ -149,7 +147,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       unitOfMeasure = "KG",
       vatRate = vatRate,
       status = "ACTIVE",
-      createdAt = Instant.now()
     )
     materialJpaRepository.saveAll(listOf(material1, material2))
 
@@ -176,7 +173,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       unitOfMeasure = "KG",
       vatRate = vatRate,
       status = "ACTIVE",
-      createdAt = Instant.now()
     )
     val saved = materialJpaRepository.save(material)
 
@@ -209,7 +205,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       unitOfMeasure = "KG",
       vatRate = vatRate,
       status = "ACTIVE",
-      createdAt = Instant.now()
     )
     val saved = materialJpaRepository.save(originalMaterial)
 
@@ -278,7 +273,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       unitOfMeasure = "KG",
       vatRate = vatRate,
       status = "ACTIVE",
-      createdAt = Instant.now()
     )
     val saved = materialJpaRepository.save(material)
 
@@ -424,5 +418,35 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     assertThat(savedMaterials).hasSize(5)
     assertThat(savedMaterials.map { it.unitOfMeasure })
       .containsExactlyInAnyOrder("KG", "L", "M", "TON", "PIECE")
+  }
+
+  @Test
+  fun `should persist and return audit fields when creating material`() {
+    // Given
+    val request = MaterialRequest(
+      code = "MAT_AUDIT",
+      name = "Audit Test Material",
+      materialGroupId = testMaterialGroupId!!,
+      unitOfMeasure = "KG",
+      vatCode = testVatCode1,
+      status = "ACTIVE"
+    )
+
+    // When - Create material
+    securedMockMvc.post(
+      "/materials",
+      objectMapper.writeValueAsString(request)
+    ).andExpect(status().isCreated)
+      .andExpect(jsonPath("$.createdAt").isNotEmpty)
+      .andExpect(jsonPath("$.createdByName").value("Test User"))
+      .andExpect(jsonPath("$.updatedAt").isNotEmpty)
+      .andExpect(jsonPath("$.updatedByName").value("Test User"))
+
+    // Then - Verify audit fields are persisted in database
+    val savedMaterial = materialJpaRepository.findAll().first { it.code == "MAT_AUDIT" }
+    assertThat(savedMaterial.createdAt).isNotNull
+    assertThat(savedMaterial.createdBy).isEqualTo("Test User")
+    assertThat(savedMaterial.updatedAt).isNotNull
+    assertThat(savedMaterial.updatedBy).isEqualTo("Test User")
   }
 }

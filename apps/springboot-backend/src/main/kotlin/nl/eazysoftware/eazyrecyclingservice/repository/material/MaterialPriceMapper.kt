@@ -18,7 +18,11 @@ class MaterialPriceMapper(
             price = dto.price,
             currency = dto.currency,
             validFrom = dto.validFrom.toKotlinInstant(),
-            validTo = dto.validTo?.toKotlinInstant()
+            validTo = dto.validTo?.toKotlinInstant(),
+            createdAt = dto.createdAt?.toKotlinInstant(),
+            createdBy = dto.createdBy,
+            updatedAt = dto.updatedAt?.toKotlinInstant(),
+            updatedBy = dto.updatedBy,
         )
     }
 
@@ -31,7 +35,7 @@ class MaterialPriceMapper(
             price = domain.price,
             currency = domain.currency,
             validFrom = domain.validFrom.toJavaInstant(),
-            validTo = domain.validTo?.toJavaInstant()
+            validTo = domain.validTo?.toJavaInstant(),
         )
     }
 }

@@ -1,5 +1,4 @@
 create table if not exists companies (
-                           updated_at timestamp(6),
                            id uuid not null,
                            building_number_addition text,
                            building_number text,
@@ -17,6 +16,10 @@ create table if not exists companies (
                            is_customer boolean not null default true,
                            deleted_at timestamp with time zone,
                            deleted_by uuid,
+                           created_at timestamp with time zone not null default now(),
+                           created_by text,
+                           last_modified_at timestamp with time zone not null default now(),
+                           last_modified_by text,
                            primary key (id)
 );
 
@@ -101,6 +104,10 @@ create table if not exists waste_containers (
                            id text,
                            notes text,
                            location_id text,
+                           created_at timestamp with time zone not null default now(),
+                           created_by text,
+                           last_modified_at timestamp with time zone not null default now(),
+                           last_modified_by text,
                            primary key (id)
 );
 
@@ -152,12 +159,20 @@ create table if not exists signatures (
 
 create table if not exists eural (
                                   code text not null,
-                                  description text not null
+                                  description text not null,
+                                  created_at timestamp with time zone not null default now(),
+                                  created_by text,
+                                  last_modified_at timestamp with time zone not null default now(),
+                                  last_modified_by text
 );
 
 create table if not exists processing_methods (
                                   code text not null,
-                                  description text not null
+                                  description text not null,
+                                  created_at timestamp with time zone not null default now(),
+                                  created_by text,
+                                  last_modified_at timestamp with time zone not null default now(),
+                                  last_modified_by text
 );
 
 create table if not exists waste_streams (
@@ -280,6 +295,10 @@ create table if not exists vat_rates (
                                          valid_to timestamp with time zone,
                                          country_code text not null,
                                          description text not null,
+                                         created_at timestamp with time zone not null default now(),
+                                         created_by text,
+                                         last_modified_at timestamp with time zone not null default now(),
+                                         last_modified_by text,
                                          primary key (vat_code)
 );
 
@@ -287,9 +306,11 @@ create table if not exists material_groups (
                                                 id bigint generated always as identity,
                                                 code text not null,
                                                 name text not null,
-                                                description text not null,
+                                                description text,
                                                 created_at timestamp with time zone not null default now(),
-                                                updated_at timestamp with time zone,
+                                                created_by text,
+                                                last_modified_at timestamp with time zone not null default now(),
+                                                last_modified_by text,
                                                 primary key (id)
 );
 
@@ -300,9 +321,11 @@ create table if not exists materials (
                                           material_group_id bigint not null,
                                           unit_of_measure text not null,
                                           vat_code text not null,
-                                          created_at timestamp with time zone not null default now(),
                                           status text not null,
-                                          updated_at timestamp with time zone,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
                                           primary key (id),
                                           foreign key (material_group_id) references material_groups(id),
                                           foreign key (vat_code) references vat_rates(vat_code)
@@ -315,6 +338,10 @@ create table if not exists material_prices (
                                                currency text not null,
                                                valid_from timestamp with time zone not null,
                                                valid_to timestamp with time zone,
+                                               created_at timestamp with time zone not null default now(),
+                                               created_by text,
+                                               last_modified_at timestamp with time zone not null default now(),
+                                               last_modified_by text,
                                                primary key (id),
                                                foreign key (material_id) references materials(id)
 );

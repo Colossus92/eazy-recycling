@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 
 @Entity
@@ -14,4 +15,4 @@ data class WasteContainerDto(
     var location: PickupLocationDto? = null,
 
     val notes: String?,
-)
+) : AuditableEntity()

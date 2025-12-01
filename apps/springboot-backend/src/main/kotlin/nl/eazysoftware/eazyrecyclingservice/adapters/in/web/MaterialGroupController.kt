@@ -92,8 +92,10 @@ data class MaterialGroupResponse(
     val code: String,
     val name: String,
     val description: String?,
-    val createdAt: String,
-    val updatedAt: String?
+    val createdAt: String?,
+    val createdByName: String?,
+    val updatedAt: String?,
+    val updatedByName: String?,
 )
 
 fun MaterialGroup.toResponse(): MaterialGroupResponse {
@@ -102,7 +104,9 @@ fun MaterialGroup.toResponse(): MaterialGroupResponse {
         code = code,
         name = name,
         description = description,
-        createdAt = createdAt.toString(),
-        updatedAt = updatedAt?.toString()
+        createdAt = createdAt?.toString(),
+        createdByName = createdBy,
+        updatedAt = updatedAt?.toString(),
+        updatedByName = updatedBy,
     )
 }

@@ -4,6 +4,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import org.springframework.stereotype.Component
+import kotlin.time.toKotlinInstant
 
 @Component
 class WasteContainerMapper(
@@ -14,7 +15,11 @@ class WasteContainerMapper(
     return WasteContainer(
       wasteContainerId = WasteContainerId(dto.id),
       location = dto.location?.let { locationMapper.toDomain(it) },
-      notes = dto.notes
+      notes = dto.notes,
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
     )
   }
 
@@ -22,7 +27,7 @@ class WasteContainerMapper(
     return WasteContainerDto(
       id = domain.wasteContainerId.id,
       notes = domain.notes,
-      location = domain.location?.let { locationMapper.toDto(it) }
+      location = domain.location?.let { locationMapper.toDto(it) },
     )
   }
 

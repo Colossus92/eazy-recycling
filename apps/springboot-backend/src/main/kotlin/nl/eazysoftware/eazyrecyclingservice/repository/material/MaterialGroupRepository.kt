@@ -29,8 +29,11 @@ class MaterialGroupRepository(
     }
 
     override fun updateMaterialGroup(id: Long, materialGroup: MaterialGroup): MaterialGroup {
-        val dto = mapper.toDto(materialGroup.copy(id = id, updatedAt = kotlin.time.Clock.System.now()))
-        val saved = jpaRepository.save(dto)
+        val existing = jpaRepository.findById(id).orElseThrow()
+        existing.code = materialGroup.code
+        existing.name = materialGroup.name
+        existing.description = materialGroup.description
+        val saved = jpaRepository.save(existing)
         return mapper.toDomain(saved)
     }
 

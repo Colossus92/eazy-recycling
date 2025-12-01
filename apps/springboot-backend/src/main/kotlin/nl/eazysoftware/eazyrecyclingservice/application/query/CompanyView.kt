@@ -3,8 +3,9 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.*
+import kotlin.time.toJavaInstant
 
 data class CompleteCompanyView(
   val id: UUID,
@@ -14,11 +15,14 @@ data class CompleteCompanyView(
   val name: String,
   val address: AddressView,
   val processorId: String?,
-  val updatedAt: LocalDateTime,
   val branches: List<CompanyController.CompanyBranchResponse> = emptyList(),
   val roles: List<CompanyRole>,
   val phone: String?,
   val email: String?,
+  val createdAt: Instant? = null,
+  val createdByName: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedByName: String? = null,
   ) {
 
   companion object {
@@ -38,10 +42,13 @@ data class CompleteCompanyView(
           country = company.address.country
         ),
         processorId = company.processorId?.number,
-        updatedAt = LocalDateTime.now(),
         roles = company.roles,
         phone = company.phone?.value,
         email = company.email?.value,
+        createdAt = company.createdAt?.toJavaInstant(),
+        createdByName = company.createdBy,
+        updatedAt = company.updatedAt?.toJavaInstant(),
+        updatedByName = company.updatedBy,
       )
     }
   }

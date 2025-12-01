@@ -15,7 +15,7 @@ class VatRateMapper {
             validFrom = domain.validFrom.toJavaInstant(),
             validTo = domain.validTo?.toJavaInstant(),
             countryCode = domain.countryCode,
-            description = domain.description
+            description = domain.description,
         )
     }
 
@@ -26,7 +26,11 @@ class VatRateMapper {
             validFrom = dto.validFrom.toKotlinInstant(),
             validTo = dto.validTo?.toKotlinInstant(),
             countryCode = dto.countryCode,
-            description = dto.description
+            description = dto.description,
+            createdAt = dto.createdAt?.toKotlinInstant(),
+            createdBy = dto.createdBy,
+            updatedAt = dto.updatedAt?.toKotlinInstant(),
+            updatedBy = dto.updatedBy,
         )
     }
 }

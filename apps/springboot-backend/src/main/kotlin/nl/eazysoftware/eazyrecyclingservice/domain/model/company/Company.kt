@@ -16,4 +16,8 @@ data class Company(
   val isSupplier: Boolean = true,
   val isCustomer: Boolean = true,
   val deletedAt: Instant? = null,
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedBy: String? = null,
 )

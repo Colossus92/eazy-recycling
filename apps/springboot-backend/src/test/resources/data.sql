@@ -64,5 +64,5 @@ VALUES ('A.01', 'Bewaren'),
        ('G.01', 'Direct storten'),
        ('G.02', 'Immobiliseren');
 
-INSERT INTO companies ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "updated_at", "building_number_addition", "building_number", "country", "processor_id")
-VALUES ('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '85217463', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', '2025-09-19 11:22:15.258406+00', null, '8', 'Nederland', '11987');
+INSERT INTO companies ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "building_number_addition", "building_number", "country", "processor_id")
+VALUES ('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '85217463', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', null, '8', 'Nederland', '11987');

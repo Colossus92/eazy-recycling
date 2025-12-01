@@ -14,6 +14,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
  */
 class SecuredMockMvc(private val mockMvc: MockMvc) {
 
+    companion object {
+        private val TEST_USER_METADATA = mapOf(
+            "first_name" to "Test",
+            "last_name" to "User"
+        )
+    }
+
     /**
      * Performs a GET request with admin role authentication.
      *
@@ -23,7 +30,9 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
     fun get(url: String): ResultActions {
         return mockMvc.perform(
             MockMvcRequestBuilders.get(url)
-                .with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
+                .with(jwt()
+                    .jwt { it.claim("user_metadata", TEST_USER_METADATA) }
+                    .authorities(SimpleGrantedAuthority(Roles.ADMIN)))
         )
     }
 
@@ -39,7 +48,9 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
             MockMvcRequestBuilders.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)
-                .with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
+                .with(jwt()
+                    .jwt { it.claim("user_metadata", TEST_USER_METADATA) }
+                    .authorities(SimpleGrantedAuthority(Roles.ADMIN)))
         )
     }
 
@@ -76,7 +87,9 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
             MockMvcRequestBuilders.put(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)
-                .with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
+                .with(jwt()
+                    .jwt { it.claim("user_metadata", TEST_USER_METADATA) }
+                    .authorities(SimpleGrantedAuthority(Roles.ADMIN)))
         )
     }
 
@@ -89,7 +102,9 @@ class SecuredMockMvc(private val mockMvc: MockMvc) {
     fun delete(url: String): ResultActions {
         return mockMvc.perform(
             MockMvcRequestBuilders.delete(url)
-                .with(jwt().authorities(SimpleGrantedAuthority(Roles.ADMIN)))
+                .with(jwt()
+                    .jwt { it.claim("user_metadata", TEST_USER_METADATA) }
+                    .authorities(SimpleGrantedAuthority(Roles.ADMIN)))
         )
     }
 }

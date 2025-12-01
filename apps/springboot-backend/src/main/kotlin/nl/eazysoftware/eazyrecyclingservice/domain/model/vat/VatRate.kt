@@ -9,5 +9,9 @@ data class VatRate(
   val validFrom: Instant,
   val validTo: Instant?,
   val countryCode: String,
-  val description: String
+  val description: String,
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedBy: String? = null,
 )

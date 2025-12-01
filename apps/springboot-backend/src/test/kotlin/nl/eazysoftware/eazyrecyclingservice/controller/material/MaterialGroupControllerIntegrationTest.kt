@@ -18,7 +18,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.time.Instant
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -81,13 +80,11 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
       code = "METALS",
       name = "Metals",
       description = "All metal materials",
-      createdAt = Instant.now()
     )
     val group2 = MaterialGroupDto(
       code = "WOOD",
       name = "Wood",
       description = "All wood materials",
-      createdAt = Instant.now()
     )
     materialGroupJpaRepository.saveAll(listOf(group1, group2))
 
@@ -108,7 +105,6 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
       code = "GLASS",
       name = "Glass",
       description = "All glass materials",
-      createdAt = Instant.now()
     )
     val saved = materialGroupJpaRepository.save(group)
 
@@ -136,7 +132,6 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
       code = "PAPER",
       name = "Paper",
       description = "Paper materials",
-      createdAt = Instant.now()
     )
     val saved = materialGroupJpaRepository.save(originalGroup)
 
@@ -191,7 +186,6 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
       code = "DELETE_ME",
       name = "Delete Me",
       description = "This will be deleted",
-      createdAt = Instant.now()
     )
     val saved = materialGroupJpaRepository.save(group)
 

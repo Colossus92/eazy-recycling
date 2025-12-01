@@ -9,5 +9,9 @@ data class MaterialPrice(
     val price: BigDecimal,
     val currency: String,
     val validFrom: Instant,
-    val validTo: Instant?
+    val validTo: Instant?,
+    val createdAt: Instant? = null,
+    val createdBy: String? = null,
+    val updatedAt: Instant? = null,
+    val updatedBy: String? = null,
 )
