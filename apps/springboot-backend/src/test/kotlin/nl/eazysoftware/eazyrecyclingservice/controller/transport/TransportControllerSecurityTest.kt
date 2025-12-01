@@ -413,6 +413,9 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       driverNote = null,
       sequenceNumber = 1,
       updatedAt = Clock.System.now().toJavaInstant(),
+      updatedByName = "Test User",
+      createdAt = Clock.System.now().toJavaInstant(),
+      createdByName = "Test User",
       wasteContainer = null,
       containerOperation = ContainerOperation.DELIVERY
     )
