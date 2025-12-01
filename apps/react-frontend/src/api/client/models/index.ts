@@ -50,7 +50,6 @@ export * from './filter-registration';
 export * from './goods-item-view';
 export * from './goods-request';
 export * from './http-status-code';
-export * from './instant';
 export * from './jsp-config-descriptor';
 export * from './jsp-property-group-descriptor';
 export * from './lma-declaration-view';

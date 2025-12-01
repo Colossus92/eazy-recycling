@@ -51,6 +51,7 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.stream.Stream
 import kotlin.time.Clock
+import kotlin.time.toJavaInstant
 
 class TransportControllerSecurityTest : BaseIntegrationTest() {
 
@@ -412,7 +413,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       transportHours = null,
       driverNote = null,
       sequenceNumber = 1,
-      updatedAt = Clock.System.now(),
+      updatedAt = Clock.System.now().toJavaInstant(),
       wasteContainer = null,
       containerOperation = ContainerOperation.DELIVERY
     )

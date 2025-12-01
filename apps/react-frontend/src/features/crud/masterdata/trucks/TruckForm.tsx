@@ -10,6 +10,7 @@ import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { TruckRequest } from '@/api/client';
 import { Truck } from '@/api/services/truckService';
+import { AuditMetaDataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface TruckFormProps {
   isOpen: boolean;
@@ -132,6 +133,12 @@ export const TruckForm = ({
                 placeholder="Selecteer transporteur"
                 rules={undefined}
                 role="CARRIER"
+              />
+              <AuditMetaDataFooter
+                createdAt={initialData?.createdAt}
+                createdByName={initialData?.createdByName}
+                updatedAt={initialData?.updatedAt}
+                updatedByName={initialData?.updatedByName}
               />
             </div>
             <FormActionButtons onClick={cancel} item={initialData} />

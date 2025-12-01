@@ -3,9 +3,8 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 import nl.eazysoftware.eazyrecyclingservice.controller.wastecontainer.WasteContainerView
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportStatus
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.*
-import kotlin.time.Instant
 
 /**
  * View model for container transport details.
@@ -46,7 +45,10 @@ data class TruckView(
   val displayName: String?,
   val carrierCompanyId: String? = null,
   val carrierCompanyName: String? = null,
-  val updatedAt: LocalDateTime? = null
+  val createdAt: Instant? = null,
+  val createdByName: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedByName: String? = null
 )
 
 data class DriverView(

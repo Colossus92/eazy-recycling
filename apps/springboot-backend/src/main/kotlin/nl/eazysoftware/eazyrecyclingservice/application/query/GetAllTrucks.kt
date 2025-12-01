@@ -13,17 +13,19 @@ class GetAllTrucksQuery(
 ) : GetAllTrucks {
 
   override fun handle(): List<TruckView> {
-    return trucks.findAll()
-      .map { truck ->
-        TruckView(
-          licensePlate = truck.licensePlate.value,
-          brand = truck.brand,
-          description = truck.description,
-          displayName = truck.displayName,
-          carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
-          carrierCompanyName = null, // Will be populated by join if needed
-          updatedAt = truck.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now()
-        )
-      }
+    return trucks.findAll().map { truck ->
+      TruckView(
+        licensePlate = truck.licensePlate.value,
+        brand = truck.brand,
+        description = truck.description,
+        displayName = truck.displayName,
+        carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
+        carrierCompanyName = null, // Will be populated by join if needed
+        createdAt = truck.createdAt,
+        createdByName = truck.createdBy,
+        updatedAt = truck.updatedAt,
+        updatedByName = truck.updatedBy
+      )
+    }
   }
 }

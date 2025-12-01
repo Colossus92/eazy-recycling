@@ -31,8 +31,11 @@ class GetTruckByLicensePlateQuery(
       description = truck.description,
       carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
       carrierCompanyName = companyName,
-      updatedAt = truck.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now(),
       displayName = truck.displayName,
+      createdAt = truck.createdAt,
+      createdByName = truck.createdBy,
+      updatedAt = truck.updatedAt,
+      updatedByName = truck.updatedBy
     )
   }
 }

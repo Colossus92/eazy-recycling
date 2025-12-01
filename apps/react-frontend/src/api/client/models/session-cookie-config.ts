@@ -31,13 +31,13 @@ export interface SessionCookieConfig {
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'path'?: string;
+    'domain'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'path'?: string;
     /**
      * 
      * @type {string}
@@ -62,12 +62,12 @@ export interface SessionCookieConfig {
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'httpOnly'?: boolean;
+    'secure'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'secure'?: boolean;
+    'httpOnly'?: boolean;
 }
 

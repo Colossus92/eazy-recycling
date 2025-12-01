@@ -52,7 +52,25 @@ export interface TruckDto {
      * @type {string}
      * @memberof TruckDto
      */
-    'updatedAt': string;
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckDto
+     */
+    'updatedBy'?: string;
     /**
      * 
      * @type {string}

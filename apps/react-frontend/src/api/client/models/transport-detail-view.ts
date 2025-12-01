@@ -24,9 +24,6 @@ import type { DriverView } from './driver-view';
 import type { GoodsItemView } from './goods-item-view';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Instant } from './instant';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { TruckView } from './truck-view';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -139,10 +136,10 @@ export interface TransportDetailView {
     'sequenceNumber': number;
     /**
      * 
-     * @type {Instant}
+     * @type {string}
      * @memberof TransportDetailView
      */
-    'updatedAt'?: Instant;
+    'updatedAt'?: string;
     /**
      * 
      * @type {WasteContainerView}

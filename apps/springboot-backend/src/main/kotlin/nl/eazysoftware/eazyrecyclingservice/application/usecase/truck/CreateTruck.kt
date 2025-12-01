@@ -27,7 +27,10 @@ class CreateTruckService(
       brand = cmd.brand,
       description = cmd.description,
       carrierPartyId = cmd.carrierPartyId,
-      updatedAt = null
+      createdAt = null,
+      createdBy = null,
+      updatedAt = null,
+      updatedBy = null
     )
 
     val savedTruck = trucks.save(truck)

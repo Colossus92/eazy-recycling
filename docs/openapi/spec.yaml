@@ -2548,15 +2548,21 @@ components:
           type: string
         carrierParty:
           $ref: "#/components/schemas/CompanyDto"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
         updatedAt:
           type: string
           format: date-time
+        updatedBy:
+          type: string
         displayName:
           type: string
       required:
       - displayName
       - licensePlate
-      - updatedAt
     UserRoleDto:
       type: object
       properties:
@@ -3977,9 +3983,16 @@ components:
           type: string
         carrierCompanyName:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
         updatedAt:
           type: string
           format: date-time
+        updatedByName:
+          type: string
       required:
       - licensePlate
     DriverView:
@@ -4024,18 +4037,6 @@ components:
       - quantity
       - unit
       - wasteStreamNumber
-    Instant:
-      type: object
-      properties:
-        epochSeconds:
-          type: integer
-          format: int64
-        nanosecondsOfSecond:
-          type: integer
-          format: int32
-      required:
-      - epochSeconds
-      - nanosecondsOfSecond
     TransportDetailView:
       type: object
       properties:
@@ -4089,7 +4090,8 @@ components:
           type: integer
           format: int32
         updatedAt:
-          $ref: "#/components/schemas/Instant"
+          type: string
+          format: date-time
         wasteContainer:
           $ref: "#/components/schemas/WasteContainerView"
         containerOperation:
@@ -4333,6 +4335,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4341,16 +4345,14 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     ConnectionStatusResponse:
       type: object
@@ -4763,11 +4765,11 @@ components:
       properties:
         buffer:
           type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
           type: string
         errorOnELNotFound:
           type: string
@@ -4785,14 +4787,14 @@ components:
             type: string
         defaultContentType:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
         elIgnored:
           type: string
         isXml:
           type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
     RedirectView:
       type: object
       properties:
@@ -4858,12 +4860,12 @@ components:
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
     ServletContext:
       type: object
       properties:
@@ -4910,7 +4912,7 @@ components:
         minorVersion:
           type: integer
           format: int32
-        sessionTrackingModes:
+        effectiveSessionTrackingModes:
           type: array
           items:
             type: string
@@ -4919,7 +4921,6 @@ components:
             - URL
             - SSL
           uniqueItems: true
-          writeOnly: true
         servletRegistrations:
           type: object
           additionalProperties:
@@ -4943,7 +4944,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        effectiveSessionTrackingModes:
+        sessionTrackingModes:
           type: array
           items:
             type: string
@@ -4952,6 +4953,7 @@ components:
             - URL
             - SSL
           uniqueItems: true
+          writeOnly: true
         servletContextName:
           type: string
         filterRegistrations:
@@ -4963,25 +4965,25 @@ components:
         sessionTimeout:
           type: integer
           format: int32
-        initParameterNames: {}
+        attributeNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        attributeNames: {}
-        serverInfo:
-          type: string
+        initParameterNames: {}
         contextPath:
+          type: string
+        serverInfo:
           type: string
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
@@ -4996,9 +4998,9 @@ components:
         maxAge:
           type: integer
           format: int32
-        path:
-          type: string
         domain:
+          type: string
+        path:
           type: string
         name:
           type: string
@@ -5009,9 +5011,9 @@ components:
         comment:
           type: string
           deprecated: true
-        httpOnly:
-          type: boolean
         secure:
+          type: boolean
+        httpOnly:
           type: boolean
     TaglibDescriptor:
       type: object

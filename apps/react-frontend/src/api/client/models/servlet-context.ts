@@ -60,7 +60,7 @@ export interface ServletContext {
      * @type {Set<string>}
      * @memberof ServletContext
      */
-    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
+    'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
     /**
      *
      * @type {{ [key: string]: ServletRegistration; }}
@@ -102,7 +102,7 @@ export interface ServletContext {
      * @type {Set<string>}
      * @memberof ServletContext
      */
-    'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
+    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
     /**
      *
      * @type {string}
@@ -132,7 +132,7 @@ export interface ServletContext {
      * @type {any}
      * @memberof ServletContext
      */
-    'initParameterNames'?: any;
+    'attributeNames'?: any;
     /**
      *
      * @type {SessionCookieConfig}
@@ -150,35 +150,21 @@ export interface ServletContext {
      * @type {any}
      * @memberof ServletContext
      */
-    'attributeNames'?: any;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'serverInfo'?: string;
+    'initParameterNames'?: any;
     /**
      *
      * @type {string}
      * @memberof ServletContext
      */
     'contextPath'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'serverInfo'?: string;
 }
 
-export const ServletContextSessionTrackingModesEnum = {
-    Cookie: 'COOKIE',
-    Url: 'URL',
-    Ssl: 'SSL'
-} as const;
-
-export type ServletContextSessionTrackingModesEnum = typeof ServletContextSessionTrackingModesEnum[keyof typeof ServletContextSessionTrackingModesEnum];
-export const ServletContextDefaultSessionTrackingModesEnum = {
-    Cookie: 'COOKIE',
-    Url: 'URL',
-    Ssl: 'SSL'
-} as const;
-
-export type ServletContextDefaultSessionTrackingModesEnum = typeof ServletContextDefaultSessionTrackingModesEnum[keyof typeof ServletContextDefaultSessionTrackingModesEnum];
 export const ServletContextEffectiveSessionTrackingModesEnum = {
     Cookie: 'COOKIE',
     Url: 'URL',
@@ -186,5 +172,19 @@ export const ServletContextEffectiveSessionTrackingModesEnum = {
 } as const;
 
 export type ServletContextEffectiveSessionTrackingModesEnum = typeof ServletContextEffectiveSessionTrackingModesEnum[keyof typeof ServletContextEffectiveSessionTrackingModesEnum];
+export const ServletContextDefaultSessionTrackingModesEnum = {
+    Cookie: 'COOKIE',
+    Url: 'URL',
+    Ssl: 'SSL'
+} as const;
+
+export type ServletContextDefaultSessionTrackingModesEnum = typeof ServletContextDefaultSessionTrackingModesEnum[keyof typeof ServletContextDefaultSessionTrackingModesEnum];
+export const ServletContextSessionTrackingModesEnum = {
+    Cookie: 'COOKIE',
+    Url: 'URL',
+    Ssl: 'SSL'
+} as const;
+
+export type ServletContextSessionTrackingModesEnum = typeof ServletContextSessionTrackingModesEnum[keyof typeof ServletContextSessionTrackingModesEnum];
 
 

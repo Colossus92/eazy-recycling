@@ -61,6 +61,24 @@ export interface TruckView {
      * @type {string}
      * @memberof TruckView
      */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TruckView
+     */
+    'updatedByName'?: string;
 }
 

@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.entity.truck
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "trucks")
@@ -20,19 +20,7 @@ data class TruckDto(
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
   val carrierParty: CompanyDto? = null,
-
-  @Column(name = "updated_at", nullable = false)
-  var updatedAt: LocalDateTime = LocalDateTime.now()
-) {
-  @PrePersist
-  fun prePersist() {
-    updatedAt = LocalDateTime.now()
-  }
-
-  @PreUpdate
-  fun preUpdate() {
-    updatedAt = LocalDateTime.now()
-  }
+) : AuditableEntity() {
 
   fun getDisplayName(): String {
     val text = "$description ($licensePlate)"

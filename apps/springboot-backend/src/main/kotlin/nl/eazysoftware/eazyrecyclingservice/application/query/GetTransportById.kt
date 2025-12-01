@@ -21,6 +21,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
+import kotlin.time.toJavaInstant
 
 interface GetTransportById {
   fun execute(transportId: UUID): TransportDetailView
@@ -122,7 +123,7 @@ class GetTransportByIdService(
     transportHours = containerTransport.transportHours?.inWholeSeconds?.toDouble()?.div(3600),
     driverNote = containerTransport.driverNote?.description,
     sequenceNumber = containerTransport.sequenceNumber,
-    updatedAt = containerTransport.updatedAt,
+    updatedAt = containerTransport.updatedAt?.toJavaInstant(),
     wasteContainer = containerTransport.wasteContainer?.let { mapWasteContainer(it.id) },
     containerOperation = containerTransport.containerOperation,
   )
@@ -154,7 +155,7 @@ class GetTransportByIdService(
       transportHours = wasteTransport.transportHours?.inWholeSeconds?.toDouble()?.div(3600),
       driverNote = wasteTransport.driverNote?.description,
       sequenceNumber = wasteTransport.sequenceNumber,
-      updatedAt = wasteTransport.updatedAt,
+      updatedAt = wasteTransport.updatedAt?.toJavaInstant(),
       wasteContainer = wasteTransport.wasteContainer?.let { mapWasteContainer(it.id) },
       containerOperation = wasteTransport.containerOperation,
       goodsItem = wasteTransport.goods.map { mapGoodsItem(it) },

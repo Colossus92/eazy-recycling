@@ -7,7 +7,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.Truck
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import org.springframework.stereotype.Component
-import java.time.ZoneId
 
 @Component
 class TruckMapper(
@@ -21,7 +20,10 @@ class TruckMapper(
       description = dto.description ?: "",
       displayName = dto.getDisplayName(),
       carrierPartyId = dto.carrierParty?.id?.let { CompanyId(it) },
-      updatedAt = dto.updatedAt.atZone(ZoneId.systemDefault())
+      createdAt = dto.createdAt,
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt,
+      updatedBy = dto.updatedBy
     )
   }
 
@@ -32,8 +34,8 @@ class TruckMapper(
       description = domain.description,
       carrierParty = domain.carrierPartyId?.let {
         entityManager.getReference(CompanyDto::class.java, it.uuid)
-      },
-      updatedAt = domain.updatedAt?.toLocalDateTime() ?: java.time.LocalDateTime.now()
+      }
+      // Audit fields are managed by Spring Data JPA
     )
   }
 }
