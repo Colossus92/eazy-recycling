@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.math.BigDecimal
@@ -68,12 +69,6 @@ data class WeightTicketDto(
   @Column(name = "status", nullable = false)
   val status: WeightTicketStatusDto = WeightTicketStatusDto.DRAFT,
 
-  @Column(name = "created_at", nullable = false)
-  val createdAt: Instant,
-
-  @Column(name = "updated_at")
-  val updatedAt: Instant?,
-
   @Column(name = "weighted_at")
   val weightedAt: Instant?,
 
@@ -82,7 +77,7 @@ data class WeightTicketDto(
 
   @Column(name = "pdf_url")
   val pdfUrl: String? = null,
-)
+) : AuditableEntity()
 
 enum class WeightTicketStatusDto {
   DRAFT,

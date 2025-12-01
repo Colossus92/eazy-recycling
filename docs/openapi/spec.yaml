@@ -3329,12 +3329,6 @@ components:
           - COMPLETED
           - INVOICED
           - CANCELLED
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
         weightedAt:
           type: string
           format: date-time
@@ -3342,9 +3336,18 @@ components:
           type: string
         pdfUrl:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
       required:
       - consignorParty
-      - createdAt
       - direction
       - id
       - lines
@@ -3869,15 +3872,18 @@ components:
           type: string
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
+        createdByName:
+          type: string
         updatedAt:
           $ref: "#/components/schemas/LocalDateTime"
+        updatedByName:
+          type: string
         weightedAt:
           $ref: "#/components/schemas/LocalDateTime"
         pdfUrl:
           type: string
       required:
       - consignorParty
-      - createdAt
       - direction
       - id
       - lines
@@ -4376,12 +4382,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -4398,11 +4404,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -4413,6 +4419,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4421,8 +4429,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
@@ -4482,11 +4488,11 @@ components:
           type: string
         displayName:
           type: string
+        applicationName:
+          type: string
         startupDate:
           type: integer
           format: int64
-        applicationName:
-          type: string
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
@@ -4830,27 +4836,19 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
         defaultContentType:
           type: string
         errorOnELNotFound:
@@ -4867,11 +4865,19 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
+        elIgnored:
           type: string
+        isXml:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
           type: string
     RedirectView:
       type: object
@@ -4990,28 +4996,32 @@ components:
         minorVersion:
           type: integer
           format: int32
-        contextPath:
-          type: string
-        serverInfo:
-          type: string
         attributeNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
+        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        initParameterNames: {}
         servletContextName:
           type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        effectiveSessionTrackingModes:
+        sessionTimeout:
+          type: integer
+          format: int32
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        sessionTrackingModes:
           type: array
           items:
             type: string
@@ -5020,6 +5030,7 @@ components:
             - URL
             - SSL
           uniqueItems: true
+          writeOnly: true
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5039,11 +5050,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        sessionTrackingModes:
+        effectiveSessionTrackingModes:
           type: array
           items:
             type: string
@@ -5052,7 +5059,6 @@ components:
             - URL
             - SSL
           uniqueItems: true
-          writeOnly: true
     ServletRegistration:
       type: object
       properties:
@@ -5096,9 +5102,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

@@ -518,8 +518,6 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       reclamation = null,
       note = null,
       status = WeightTicketStatusDto.valueOf(status),
-      createdAt = Instant.now(),
-      updatedAt = Instant.now(),
       weightedAt = weightedAtInstant,
       cancellationReason = null
     )

@@ -70,8 +70,10 @@ class WeightTicketQueryRepository(
       reclamation = weightTicket.reclamation,
       note = weightTicket.note,
       cancellationReason = weightTicket.cancellationReason,
-      createdAt = weightTicket.createdAt.toKotlinInstant().toDisplayTime(),
+      createdAt = weightTicket.createdAt?.toKotlinInstant()?.toDisplayTime(),
+      createdByName = weightTicket.createdBy,
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),
+      updatedByName = weightTicket.updatedBy,
       weightedAt = weightTicket.weightedAt?.toKotlinInstant()?.toDisplayTime(),
       pdfUrl = weightTicket.pdfUrl,
     )

@@ -20,8 +20,10 @@ data class WeightTicketDetailView(
   val reclamation: String?,
   val note: String?,
   val cancellationReason: String?,
-  val createdAt: LocalDateTime,
+  val createdAt: LocalDateTime?,
+  val createdByName: String?,
   val updatedAt: LocalDateTime?,
+  val updatedByName: String?,
   val weightedAt: LocalDateTime?,
   val pdfUrl: String?,
 )

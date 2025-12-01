@@ -124,18 +124,6 @@ export interface WeightTicketDto {
      * @type {string}
      * @memberof WeightTicketDto
      */
-    'createdAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WeightTicketDto
-     */
-    'updatedAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WeightTicketDto
-     */
     'weightedAt'?: string;
     /**
      * 
@@ -149,6 +137,30 @@ export interface WeightTicketDto {
      * @memberof WeightTicketDto
      */
     'pdfUrl'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'updatedBy'?: string;
 }
 
 export const WeightTicketDtoSecondWeighingUnitEnum = {

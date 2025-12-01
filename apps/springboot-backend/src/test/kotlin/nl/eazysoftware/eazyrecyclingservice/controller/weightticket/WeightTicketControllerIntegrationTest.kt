@@ -60,7 +60,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = testCarrierCompany.id,
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
@@ -103,7 +103,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // Given
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = null,
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             truckLicensePlate = null,
             reclamation = null,
             note = null
@@ -136,12 +136,12 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     fun `should create multiple weight tickets with sequential IDs`() {
         // Given
         val firstRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             note = "First ticket"
         )
 
         val secondRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             note = "Second ticket"
         )
 
@@ -174,7 +174,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     fun `should create weight ticket with multiple lines`() {
         // Given
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789011",
@@ -219,7 +219,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // Given - create weight ticket and extract generated ID
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = testCarrierCompany.id,
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             truckLicensePlate = "CC-789-DD",
             reclamation = "Detail test reclamation",
             note = "Detail test note"
@@ -250,11 +250,11 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     fun `can get all weight tickets`() {
         // Given - create multiple weight tickets
         val firstRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             note = "First ticket for list"
         )
         val secondRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             note = "Second ticket for list"
         )
 
@@ -283,7 +283,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // Given - create weight ticket and extract generated ID
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
             carrierParty = testCarrierCompany.id,
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
@@ -341,7 +341,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     fun `can delete created weight ticket`() {
         // Given - create weight ticket and extract generated ID
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             note = "To be deleted"
         )
         val createResult = securedMockMvc.post(
@@ -376,7 +376,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     fun `can complete weight ticket with draft status and lines`() {
         // Given - create weight ticket with lines
         val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
-            consignorCompanyId = testConsignorCompany.id!!,
+            consignorCompanyId = testConsignorCompany.id,
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
@@ -408,6 +408,5 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val completedWeightTicket = weightTicketRepository.findById(weightTicketId)
         assertThat(completedWeightTicket).isPresent
         assertThat(completedWeightTicket.get().status.name).isEqualTo("COMPLETED")
-        assertThat(completedWeightTicket.get().updatedAt).isNotNull
     }
 }

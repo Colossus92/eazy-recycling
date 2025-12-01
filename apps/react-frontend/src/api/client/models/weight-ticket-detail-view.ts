@@ -136,13 +136,25 @@ export interface WeightTicketDetailView {
      * @type {LocalDateTime}
      * @memberof WeightTicketDetailView
      */
-    'createdAt': LocalDateTime;
+    'createdAt'?: LocalDateTime;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'createdByName'?: string;
     /**
      * 
      * @type {LocalDateTime}
      * @memberof WeightTicketDetailView
      */
     'updatedAt'?: LocalDateTime;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'updatedByName'?: string;
     /**
      * 
      * @type {LocalDateTime}

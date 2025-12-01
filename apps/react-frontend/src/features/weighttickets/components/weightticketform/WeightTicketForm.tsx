@@ -12,7 +12,10 @@ import { useQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
-import { useWeightTicketForm } from './useWeigtTicketFormHook';
+import {
+  useWeightTicketForm,
+  WeightTicketFormValues,
+} from './useWeigtTicketFormHook';
 import { WeightTicketLinesTab } from './WeightTicketLinesTab';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { useEffect, useState } from 'react';
@@ -23,8 +26,8 @@ import { AddressFormField } from '@/components/ui/form/addressformfield/AddressF
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
 import { WeightTicketRequest } from '@/api/client';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
-import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 import { Button } from '@/components/ui/button/Button';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -35,7 +38,12 @@ interface WeightTicketFormProps {
   onSplit?: (id: number) => void;
   onCopy?: (id: number) => void;
   onComplete?: (id: number) => void;
-  onCreateTransport?: (weightTicketId: number, weightTicketData: WeightTicketRequest, pickupDateTime: string, deliveryDateTime?: string) => Promise<void>;
+  onCreateTransport?: (
+    weightTicketId: number,
+    weightTicketData: WeightTicketRequest,
+    pickupDateTime: string,
+    deliveryDateTime?: string
+  ) => Promise<void>;
   noDialog?: boolean;
 }
 
@@ -51,11 +59,20 @@ export const WeightTicketForm = ({
   onCreateTransport,
   noDialog = false,
 }: WeightTicketFormProps) => {
-  const { data, isLoading, formContext, mutation, createCompletedMutation, resetForm, formValuesToWeightTicketRequest } =
-    useWeightTicketForm(weightTicketNumber);
+  const {
+    data,
+    isLoading,
+    formContext,
+    mutation,
+    createCompletedMutation,
+    resetForm,
+    formValuesToWeightTicketRequest,
+  } = useWeightTicketForm(weightTicketNumber);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
-  const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | undefined>();
+  const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<
+    number | undefined
+  >();
 
   const handleClose = (value: boolean) => {
     if (!value) {
@@ -90,7 +107,12 @@ export const WeightTicketForm = ({
       const formValues = formContext.getValues();
       const weightTicketRequest = formValuesToWeightTicketRequest(formValues);
 
-      await onCreateTransport(weightTicketId, weightTicketRequest, pickupDateTime, deliveryDateTime);
+      await onCreateTransport(
+        weightTicketId,
+        weightTicketRequest,
+        pickupDateTime,
+        deliveryDateTime
+      );
     }
   };
 
@@ -120,13 +142,17 @@ export const WeightTicketForm = ({
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  const validateAndFilterFormValues = (formValues: WeightTicketFormValues): WeightTicketFormValues | null => {
+  const validateAndFilterFormValues = (
+    formValues: WeightTicketFormValues
+  ): WeightTicketFormValues | null => {
     // Calculate netto to validate it's not below 0
     const weging1 = formValues.lines.reduce((sum: number, field) => {
       const weight = parseNumber(field.weightValue as string);
       return sum + weight;
     }, 0);
-    const weging2 = parseNumber(formValues.secondWeighingValue as unknown as string);
+    const weging2 = parseNumber(
+      formValues.secondWeighingValue as unknown as string
+    );
     const bruto = weging1 - weging2;
     const tarra = parseNumber(formValues.tarraWeightValue as unknown as string);
     const netto = bruto - tarra;
@@ -209,7 +235,9 @@ export const WeightTicketForm = ({
                   onSplit={onSplit}
                   onCopy={onCopy}
                   onComplete={onComplete}
-                  onCreateTransport={onCreateTransport ? handleCreateTransport : undefined}
+                  onCreateTransport={
+                    onCreateTransport ? handleCreateTransport : undefined
+                  }
                 />
               )
             }
@@ -237,10 +265,10 @@ export const WeightTicketForm = ({
                   <WeightTicketStatusTag
                     status={
                       data.status as
-                      | 'DRAFT'
-                      | 'COMPLETED'
-                      | 'INVOICED'
-                      | 'CANCELLED'
+                        | 'DRAFT'
+                        | 'COMPLETED'
+                        | 'INVOICED'
+                        | 'CANCELLED'
                     }
                   />
                 )}
@@ -359,15 +387,19 @@ export const WeightTicketForm = ({
                     </TabPanel>
                     {data && (
                       <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
-                        <WeightTicketRelatedTab
-                          weightTicketId={data.id}
-                        />
+                        <WeightTicketRelatedTab weightTicketId={data.id} />
                       </TabPanel>
                     )}
                   </TabPanels>
                 </TabGroup>
               </div>
             )}
+            <AuditMetadataFooter
+              createdAt={data?.createdAt?.toString()}
+              createdByName={data?.createdByName}
+              updatedAt={data?.updatedAt?.toString()}
+              updatedByName={data?.updatedByName}
+            />
           </div>
           <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
             <Button
@@ -378,11 +410,13 @@ export const WeightTicketForm = ({
               data-testid={'cancel-button'}
             />
             <SplitButton
-              primaryLabel={data ? "Opslaan" : "Concept opslaan"}
-              secondaryLabel={data ? "Verwerken" : "Opslaan en verwerken"}
+              primaryLabel={data ? 'Opslaan' : 'Concept opslaan'}
+              secondaryLabel={data ? 'Verwerken' : 'Opslaan en verwerken'}
               onPrimaryClick={onSubmit}
               onSecondaryClick={handleComplete}
-              isSubmitting={mutation.isPending || createCompletedMutation.isPending}
+              isSubmitting={
+                mutation.isPending || createCompletedMutation.isPending
+              }
               disabled={isDisabled}
             />
           </div>

@@ -32,8 +32,10 @@ class WeightTicketMapper(
       reclamation = dto.reclamation,
       note = dto.note?.let { Note(it) },
       status = toDomainStatus(dto.status),
-      createdAt = dto.createdAt.toKotlinInstant(),
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
       updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
       weightedAt = dto.weightedAt?.toKotlinInstant(),
       cancellationReason = dto.cancellationReason?.let { CancellationReason(it) },
       lines = dto.lines
@@ -71,8 +73,7 @@ class WeightTicketMapper(
       Consignor.Person -> throw IllegalArgumentException("Particuliere opdrachtgever wordt nog niet ondersteund.")
     }
 
-    // Step 1: Create the parent DTO without goods
-    val weightTicketDto = WeightTicketDto(
+    return WeightTicketDto(
       id = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
       lines = toDto(domain.lines),
@@ -88,13 +89,9 @@ class WeightTicketMapper(
       direction = domain.direction,
       pickupLocation = domain.pickupLocation?.let { pickupLocationMapper.toDto(it) },
       deliveryLocation = domain.deliveryLocation?.let { pickupLocationMapper.toDto(it) },
-      createdAt = domain.createdAt.toJavaInstant(),
-      updatedAt = domain.updatedAt?.toJavaInstant(),
       weightedAt = domain.weightedAt?.toJavaInstant(),
       cancellationReason = domain.cancellationReason?.value,
     )
-
-    return weightTicketDto
   }
 
   private fun toDto(domain: Weight.WeightUnit?): WeightUnitDto? {

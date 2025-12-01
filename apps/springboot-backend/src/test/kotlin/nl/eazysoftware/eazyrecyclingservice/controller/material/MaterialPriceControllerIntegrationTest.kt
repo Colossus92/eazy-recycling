@@ -270,7 +270,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
         // Verify new price entry was created
         val allPrices = materialPriceJpaRepository.findAll()
         assertThat(allPrices).hasSize(2)
-        
+
         val newPrice = allPrices.find { it.id != savedId }
         assertThat(newPrice).isNotNull
         assertThat(newPrice?.price).isEqualByComparingTo(BigDecimal("120.00"))

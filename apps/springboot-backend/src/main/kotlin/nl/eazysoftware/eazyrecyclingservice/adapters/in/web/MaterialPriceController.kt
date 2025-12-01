@@ -121,7 +121,7 @@ fun MaterialPrice.toResponse(): MaterialPriceResponse {
         price = price,
         currency = currency,
         validFrom = validFrom.toString()  ,
-        validTo = validTo.toString(),
+        validTo = validTo?.toString(),
         createdAt = createdAt?.toJavaInstant(),
         createdByName = createdBy,
         updatedAt = updatedAt?.toJavaInstant(),

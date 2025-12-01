@@ -28,7 +28,9 @@ class WeightTicket(
   var reclamation: String?,
   var note: Note?,
   var cancellationReason: CancellationReason? = null,
-  val createdAt: Instant = Clock.System.now(),
+  val createdAt: Instant? = Clock.System.now(),
+  val createdBy: String? = null,
+  var updatedBy: String? = null,
   var updatedAt: Instant? = null,
   var weightedAt: Instant? = null,
 ) {
