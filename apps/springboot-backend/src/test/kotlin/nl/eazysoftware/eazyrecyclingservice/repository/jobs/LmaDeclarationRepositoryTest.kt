@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import kotlinx.datetime.YearMonth
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
@@ -22,7 +24,9 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
+import java.sql.Timestamp
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @SpringBootTest
@@ -142,6 +146,168 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
     val declarations = result.content.sortedBy { it.wasteStreamNumber.number }
     assertThat(declarations[0].period).isEqualTo(YearMonth(2025, 1))
     assertThat(declarations[1].period).isEqualTo(YearMonth(2024, 12))
+  }
+
+  @Test
+  fun `saveAllPendingFirstReceivals should save declarations and update waste stream timestamps`() {
+    // Given - create waste stream with old timestamp
+    val wasteStreamNumber = "087970000001"
+    createWasteStream(wasteStreamNumber, "Test Waste Stream")
+
+    // Set last_modified_at to an old timestamp
+    val oldTimestamp = Instant.now().minus(10, ChronoUnit.DAYS)
+    jdbcTemplate.update(
+      "UPDATE waste_streams SET last_modified_at = ? WHERE number = ?",
+      Timestamp.from(oldTimestamp), wasteStreamNumber
+    )
+
+    val firstReceival = EersteOntvangstMeldingDetails().apply {
+      meldingsNummerMelder = "DECL-001"
+      afvalstroomNummer = wasteStreamNumber
+      periodeMelding = "112025"
+      vervoerders = "Transporter A, Transporter B"
+      totaalGewicht = 5000
+      aantalVrachten = 10
+    }
+
+    // When
+    lmaDeclarations.saveAllPendingFirstReceivals(listOf(firstReceival))
+
+    // Then - verify declaration was saved
+    val savedDeclarations = lmaDeclarations.findAll(PageRequest.of(0, 10))
+    assertThat(savedDeclarations.content).hasSize(1)
+    assertThat(savedDeclarations.content.first().wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
+    assertThat(savedDeclarations.content.first().status).isEqualTo("PENDING")
+
+    // Verify waste stream timestamp was updated
+    val updatedTimestamp = jdbcTemplate.queryForObject(
+      "SELECT last_modified_at FROM waste_streams WHERE number = ?",
+      Timestamp::class.java,
+      wasteStreamNumber
+    )?.toInstant()
+    assertThat(updatedTimestamp).isAfter(oldTimestamp)
+  }
+
+  @Test
+  fun `saveAllPendingMonthlyReceivals should save declarations and update waste stream timestamps`() {
+    // Given - create waste stream with old timestamp
+    val wasteStreamNumber = "087970000002"
+    createWasteStream(wasteStreamNumber, "Monthly Waste Stream")
+
+    // Set last_modified_at to an old timestamp
+    val oldTimestamp = Instant.now().minus(10, ChronoUnit.DAYS)
+    jdbcTemplate.update(
+      "UPDATE waste_streams SET last_modified_at = ? WHERE number = ?",
+      Timestamp.from(oldTimestamp), wasteStreamNumber
+    )
+
+    val monthlyReceival = MaandelijkseOntvangstMeldingDetails().apply {
+      meldingsNummerMelder = "DECL-002"
+      afvalstroomNummer = wasteStreamNumber
+      periodeMelding = "102025"
+      vervoerders = "Transporter C"
+      totaalGewicht = 3000
+      aantalVrachten = 5
+    }
+
+    // When
+    lmaDeclarations.saveAllPendingMonthlyReceivals(listOf(monthlyReceival))
+
+    // Then - verify declaration was saved
+    val savedDeclarations = lmaDeclarations.findAll(PageRequest.of(0, 10))
+    assertThat(savedDeclarations.content).hasSize(1)
+    assertThat(savedDeclarations.content.first().wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
+    assertThat(savedDeclarations.content.first().status).isEqualTo("PENDING")
+
+    // Verify waste stream timestamp was updated
+    val updatedTimestamp = jdbcTemplate.queryForObject(
+      "SELECT last_modified_at FROM waste_streams WHERE number = ?",
+      Timestamp::class.java,
+      wasteStreamNumber
+    )?.toInstant()
+    assertThat(updatedTimestamp).isAfter(oldTimestamp)
+  }
+
+  @Test
+  fun `saveAllPendingFirstReceivals should update multiple waste streams`() {
+    // Given - create multiple waste streams
+    val wasteStreamNumber1 = "087970000003"
+    val wasteStreamNumber2 = "087970000004"
+    createWasteStream(wasteStreamNumber1, "Waste Stream 1")
+    createWasteStream(wasteStreamNumber2, "Waste Stream 2")
+
+    val oldTimestamp = Instant.now().minus(10, ChronoUnit.DAYS)
+    jdbcTemplate.update(
+      "UPDATE waste_streams SET last_modified_at = ? WHERE number = ?",
+      Timestamp.from(oldTimestamp), wasteStreamNumber1
+    )
+    jdbcTemplate.update(
+      "UPDATE waste_streams SET last_modified_at = ? WHERE number = ?",
+      Timestamp.from(oldTimestamp), wasteStreamNumber2
+    )
+
+    val firstReceivals = listOf(
+      EersteOntvangstMeldingDetails().apply {
+        meldingsNummerMelder = "DECL-003"
+        afvalstroomNummer = wasteStreamNumber1
+        periodeMelding = "112025"
+        vervoerders = "Transporter A"
+        totaalGewicht = 1000
+        aantalVrachten = 2
+      },
+      EersteOntvangstMeldingDetails().apply {
+        meldingsNummerMelder = "DECL-004"
+        afvalstroomNummer = wasteStreamNumber2
+        periodeMelding = "112025"
+        vervoerders = "Transporter B"
+        totaalGewicht = 2000
+        aantalVrachten = 4
+      }
+    )
+
+    // When
+    lmaDeclarations.saveAllPendingFirstReceivals(firstReceivals)
+
+    // Then - verify both declarations were saved
+    val savedDeclarations = lmaDeclarations.findAll(PageRequest.of(0, 10))
+    assertThat(savedDeclarations.content).hasSize(2)
+
+    // Verify both waste stream timestamps were updated
+    val updatedTimestamp1 = jdbcTemplate.queryForObject(
+      "SELECT last_modified_at FROM waste_streams WHERE number = ?",
+      Timestamp::class.java,
+      wasteStreamNumber1
+    )?.toInstant()
+    val updatedTimestamp2 = jdbcTemplate.queryForObject(
+      "SELECT last_modified_at FROM waste_streams WHERE number = ?",
+      Timestamp::class.java,
+      wasteStreamNumber2
+    )?.toInstant()
+    assertThat(updatedTimestamp1).isAfter(oldTimestamp)
+    assertThat(updatedTimestamp2).isAfter(oldTimestamp)
+  }
+
+  @Test
+  fun `saveAllPendingFirstReceivals should handle non-existent waste streams gracefully`() {
+    // Given - declaration for non-existent waste stream
+    val nonExistentWasteStreamNumber = "999999999999"
+
+    val firstReceival = EersteOntvangstMeldingDetails().apply {
+      meldingsNummerMelder = "DECL-005"
+      afvalstroomNummer = nonExistentWasteStreamNumber
+      periodeMelding = "112025"
+      vervoerders = "Transporter X"
+      totaalGewicht = 500
+      aantalVrachten = 1
+    }
+
+    // When - should not throw exception
+    lmaDeclarations.saveAllPendingFirstReceivals(listOf(firstReceival))
+
+    // Then - declaration should still be saved
+    val savedDeclarations = lmaDeclarations.findAll(PageRequest.of(0, 10))
+    assertThat(savedDeclarations.content).hasSize(1)
+    assertThat(savedDeclarations.content.first().wasteStreamNumber.number).isEqualTo(nonExistentWasteStreamNumber)
   }
 
   // Helper methods

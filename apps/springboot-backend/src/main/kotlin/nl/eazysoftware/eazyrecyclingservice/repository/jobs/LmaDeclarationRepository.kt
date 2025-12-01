@@ -28,11 +28,30 @@ class LmaDeclarationRepository(
   private val pickupLocationMapper: PickupLocationMapper,
 ) : LmaDeclarations {
   override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
-    LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
+    val declarations = LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING)
+    jpaRepository.saveAll(declarations)
+    touchWasteStreams(declarations.map { it.wasteStreamNumber })
   }
 
   override fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>) {
-    LmaDeclarationMapper.mapMonthlyReceivals(monthlyReceivals, LmaDeclarationDto.Status.PENDING).apply { jpaRepository.saveAll(this) }
+    val declarations = LmaDeclarationMapper.mapMonthlyReceivals(monthlyReceivals, LmaDeclarationDto.Status.PENDING)
+    jpaRepository.saveAll(declarations)
+    touchWasteStreams(declarations.map { it.wasteStreamNumber })
+  }
+
+  /**
+   * Updates the last_modified_at timestamp for waste streams to track activity.
+   * This is required for [nl.eazysoftware.eazyrecyclingservice.domain.model.waste.EffectiveStatusPolicy]
+   * to correctly determine if a waste stream is expired.
+   */
+  private fun touchWasteStreams(wasteStreamNumbers: List<String>) {
+    if (wasteStreamNumbers.isEmpty()) return
+    entityManager.createNativeQuery(
+      "UPDATE waste_streams SET last_modified_at = :now WHERE number IN :numbers"
+    )
+      .setParameter("now", Clock.System.now().toJavaInstant())
+      .setParameter("numbers", wasteStreamNumbers)
+      .executeUpdate()
   }
 
   override fun findByIds(ids: List<String>): List<LmaDeclarationDto> {
