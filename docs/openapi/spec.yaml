@@ -1474,6 +1474,27 @@ paths:
       responses:
         "204":
           description: No Content
+  /waste-streams/{wasteStreamNumber}/weight-tickets:
+    get:
+      tags:
+      - waste-stream-controller
+      operationId: getWeightTicketsByWasteStream
+      parameters:
+      - name: wasteStreamNumber
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: "^[0-9]{12}$"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeightTicketsByWasteStreamView"
   /waste-streams/{wasteStreamNumber}/compatible:
     get:
       tags:
@@ -3696,14 +3717,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -3772,6 +3793,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3780,9 +3804,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -3813,11 +3834,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -4040,6 +4061,21 @@ components:
       - euralCode
       - name
       - processingMethod
+    WeightTicketsByWasteStreamView:
+      type: object
+      properties:
+        weightTicketNumber:
+          type: integer
+          format: int64
+        weightedAt:
+          $ref: "#/components/schemas/LocalDateTime"
+        amount:
+          type: number
+        createdBy:
+          type: string
+      required:
+      - amount
+      - weightTicketNumber
     UserResponse:
       type: object
       properties:
@@ -4440,6 +4476,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4448,8 +4486,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
@@ -4509,13 +4545,13 @@ components:
           type: string
         displayName:
           type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
         applicationName:
           type: string
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4870,6 +4906,12 @@ components:
       properties:
         buffer:
           type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         urlPatterns:
           type: array
           items:
@@ -4894,12 +4936,6 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
-          type: string
     RedirectView:
       type: object
       properties:
@@ -4956,9 +4992,9 @@ components:
           type: array
           items:
             type: string
-        redirectView:
-          type: boolean
         propagateQueryProperties:
+          type: boolean
+        redirectView:
           type: boolean
         attributes:
           type: object
@@ -5017,50 +5053,6 @@ components:
         minorVersion:
           type: integer
           format: int32
-        serverInfo:
-          type: string
-        contextPath:
-          type: string
-        sessionTimeout:
-          type: integer
-          format: int32
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        attributeNames: {}
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5080,15 +5072,59 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
+        attributeNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTimeout:
+          type: integer
+          format: int32
+        initParameterNames: {}
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
@@ -5100,13 +5136,13 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
-        path:
-          type: string
-        domain:
-          type: string
         name:
           type: string
         attributes:

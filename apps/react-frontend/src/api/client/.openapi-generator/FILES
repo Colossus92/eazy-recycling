@@ -170,3 +170,4 @@ models/weight-ticket-request-pickup-location.ts
 models/weight-ticket-request.ts
 models/weight-ticket-transport.ts
 models/weight-ticket-transports-response.ts
+models/weight-tickets-by-waste-stream-view.ts

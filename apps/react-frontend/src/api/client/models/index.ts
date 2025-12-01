@@ -144,3 +144,4 @@ export * from './weight-ticket-request-consignor-party';
 export * from './weight-ticket-request-pickup-location';
 export * from './weight-ticket-transport';
 export * from './weight-ticket-transports-response';
+export * from './weight-tickets-by-waste-stream-view';

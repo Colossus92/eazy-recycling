@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -33,11 +35,15 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var companyRepository: CompanyJpaRepository
 
+  @Autowired
+  private lateinit var weightTicketRepository: WeightTicketJpaRepository
+
   private lateinit var testCompany: CompanyDto
 
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
+    weightTicketRepository.deleteAll()
     wasteStreamRepository.deleteAll()
 
     // Create test company for each test (will be rolled back after each test due to @Transactional)
@@ -647,6 +653,120 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.length()").value(1))
       .andExpect(jsonPath("$[0].euralCode").value("16 01 17"))
       .andExpect(jsonPath("$[0].wasteName").value("Glass"))
+  }
+
+  @Test
+  fun `can get weight tickets by waste stream number`() {
+    // Given - create a waste stream
+    val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+    val createWasteStreamResult = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(wasteStreamRequest)
+    ).andExpect(status().isCreated).andReturn()
+
+    val wasteStreamNumber = objectMapper.readTree(createWasteStreamResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // Create a weight ticket with a line for this waste stream
+    val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+      consignorCompanyId = testCompany.id,
+      lines = listOf(
+        TestWeightTicketFactory.createTestWeightTicketLine(
+          wasteStreamNumber = wasteStreamNumber,
+          weightValue = "150.75"
+        )
+      )
+    )
+
+    securedMockMvc.post(
+      "/weight-tickets",
+      objectMapper.writeValueAsString(weightTicketRequest)
+    ).andExpect(status().isCreated)
+
+    // When & Then - get weight tickets for this waste stream
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber/weight-tickets")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].weightTicketNumber").exists())
+      .andExpect(jsonPath("$[0].amount").value(150.75))
+  }
+
+  @Test
+  fun `returns empty list when no weight tickets exist for waste stream`() {
+    // Given - create a waste stream without any weight tickets
+    val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+    val createWasteStreamResult = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(wasteStreamRequest)
+    ).andExpect(status().isCreated).andReturn()
+
+    val wasteStreamNumber = objectMapper.readTree(createWasteStreamResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // When & Then - get weight tickets for this waste stream
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber/weight-tickets")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(0))
+  }
+
+  @Test
+  fun `returns multiple weight tickets for same waste stream`() {
+    // Given - create a waste stream
+    val wasteStreamRequest = TestWasteStreamFactory.createTestWasteStreamRequest(
+      companyId = testCompany.id,
+      name = "Glass"
+    )
+    val createWasteStreamResult = securedMockMvc.post(
+      "/waste-streams/concept",
+      objectMapper.writeValueAsString(wasteStreamRequest)
+    ).andExpect(status().isCreated).andReturn()
+
+    val wasteStreamNumber = objectMapper.readTree(createWasteStreamResult.response.contentAsString)
+      .get("wasteStreamNumber").asText()
+
+    // Create multiple weight tickets with lines for this waste stream
+    val weightTicketRequest1 = TestWeightTicketFactory.createTestWeightTicketRequest(
+      consignorCompanyId = testCompany.id,
+      lines = listOf(
+        TestWeightTicketFactory.createTestWeightTicketLine(
+          wasteStreamNumber = wasteStreamNumber,
+          weightValue = "100.00"
+        )
+      )
+    )
+    val weightTicketRequest2 = TestWeightTicketFactory.createTestWeightTicketRequest(
+      consignorCompanyId = testCompany.id,
+      lines = listOf(
+        TestWeightTicketFactory.createTestWeightTicketLine(
+          wasteStreamNumber = wasteStreamNumber,
+          weightValue = "200.00"
+        )
+      )
+    )
+
+    securedMockMvc.post(
+      "/weight-tickets",
+      objectMapper.writeValueAsString(weightTicketRequest1)
+    ).andExpect(status().isCreated)
+
+    securedMockMvc.post(
+      "/weight-tickets",
+      objectMapper.writeValueAsString(weightTicketRequest2)
+    ).andExpect(status().isCreated)
+
+    // When & Then - get weight tickets for this waste stream
+    securedMockMvc.get("/waste-streams/$wasteStreamNumber/weight-tickets")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$").isArray)
+      .andExpect(jsonPath("$.length()").value(2))
   }
 
 }

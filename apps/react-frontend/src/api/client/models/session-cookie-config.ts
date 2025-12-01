@@ -22,10 +22,10 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof SessionCookieConfig
      */
-    'maxAge'?: number;
+    'domain'?: string;
     /**
      * 
      * @type {string}
@@ -34,10 +34,10 @@ export interface SessionCookieConfig {
     'path'?: string;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'maxAge'?: number;
     /**
      * 
      * @type {string}

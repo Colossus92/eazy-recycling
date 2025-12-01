@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketsByWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WasteStreamListView
+import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketsByWasteStreamView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
@@ -32,7 +34,8 @@ class WasteStreamController(
   private val deleteWasteStream: DeleteWasteStream,
   private val createActiveWasteStream: CreateAndActivateWasteStreamService,
   private val updateAndActivateWasteStream: UpdateAndActivateWasteStream,
-  private val getCompatibleWasteStreams: nl.eazysoftware.eazyrecyclingservice.application.query.GetCompatibleWasteStreams
+  private val getCompatibleWasteStreams: nl.eazysoftware.eazyrecyclingservice.application.query.GetCompatibleWasteStreams,
+  private val getWeightTicketsByWasteStream: GetWeightTicketsByWasteStream
 ) {
 
   @PostMapping("/concept")
@@ -121,6 +124,16 @@ class WasteStreamController(
     wasteStreamNumber: String
   ): List<WasteStreamListView> {
     return getCompatibleWasteStreams.execute(WasteStreamNumber(wasteStreamNumber))
+  }
+
+  @GetMapping("/{wasteStreamNumber}/weight-tickets")
+  fun getWeightTicketsByWasteStream(
+    @PathVariable
+    @Length(min = 12, max = 12, message = "Afvalstroomnummer moet exact 12 tekens lang zijn")
+    @Pattern(regexp = "^[0-9]{12}$", message = "Afvalstroomnummer moet 12 cijfers bevatten")
+    wasteStreamNumber: String
+  ): List<WeightTicketsByWasteStreamView> {
+    return getWeightTicketsByWasteStream.execute(WasteStreamNumber(wasteStreamNumber))
   }
 }
 
