@@ -67,6 +67,7 @@ export const WeightTicketForm = ({
     createCompletedMutation,
     resetForm,
     formValuesToWeightTicketRequest,
+    currentWeightTicketNumber,
   } = useWeightTicketForm(weightTicketNumber);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isTransportFormOpen, setIsTransportFormOpen] = useState(false);
@@ -184,13 +185,15 @@ export const WeightTicketForm = ({
     const filteredFormValues = validateAndFilterFormValues(formValues);
     if (!filteredFormValues) return;
 
-    if (data && onComplete) {
-      // For existing weight tickets, save current state first, then complete
-      await mutation.mutateAsync(filteredFormValues);
-      onComplete(data.id);
-    } else {
-      // For new weight tickets, save as completed
-      await createCompletedMutation.mutateAsync(filteredFormValues);
+    // Save first (creates or updates)
+    const response = await mutation.mutateAsync(filteredFormValues);
+    
+    // Determine the weight ticket ID to complete
+    // Priority: currentWeightTicketNumber (set after first save), then data.id, then response.id (for new tickets)
+    const weightTicketId = currentWeightTicketNumber ?? data?.id ?? (response as any)?.id;
+    
+    if (weightTicketId && onComplete) {
+      onComplete(weightTicketId);
     }
   });
 

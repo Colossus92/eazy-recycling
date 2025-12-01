@@ -273,9 +273,10 @@ export function useWeightTicketCrud() {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
-      complete: () => {
-        if (itemToEdit) {
-          complete(itemToEdit.id);
+      complete: (id?: number) => {
+        const weightTicketId = id ?? itemToEdit?.id;
+        if (weightTicketId) {
+          complete(weightTicketId);
         }
         close();
       },
