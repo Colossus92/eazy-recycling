@@ -190,7 +190,10 @@ create table if not exists waste_streams (
                                   broker_party_id uuid,
                                   processor_party_id text,
                                   status text,
-                                  last_activity_at timestamp with time zone not null default now(),
+                                  created_at timestamp with time zone not null default now(),
+                                  created_by text,
+                                  last_modified_at timestamp with time zone not null default now(),
+                                  last_modified_by text,
                                   primary key (number)
 );
 

@@ -213,7 +213,7 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       brokerParty = null,
       processorParty = companyRepository.getReferenceById(processorCompanyId),
       status = "ACTIVE",
-      lastActivityAt = Instant.now(),
+      updatedAt = Instant.now(),
       consignorClassification = 1
     )
     wasteStreamRepository.save(wasteStream)

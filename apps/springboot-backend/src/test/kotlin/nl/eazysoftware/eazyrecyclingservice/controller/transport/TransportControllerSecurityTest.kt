@@ -252,7 +252,6 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       dealerParty = null,
       collectorParty = null,
       brokerParty = null,
-      lastActivityAt = Instant.now(),
       status = WasteStreamStatus.ACTIVE.name,
     )
 

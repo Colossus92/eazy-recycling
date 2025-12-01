@@ -21,7 +21,7 @@ export interface WeightTicketData {
     note?: string;
     status: string;
     created_at: string;
-    updated_at: string;
+    last_modified_at: string;
     weighted_at?: string;
     cancellation_reason?: string;
     tarra_weight_value?: number;
@@ -118,7 +118,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
         note,
         status,
         created_at,
-        updated_at,
+        last_modified_at,
         weighted_at,
         cancellation_reason,
         tarra_weight_value,
@@ -153,7 +153,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
       note?: string;
       status: string;
       created_at: string;
-      updated_at: string;
+      last_modified_at: string;
       weighted_at?: string;
       cancellation_reason?: string;
       tarra_weight_value?: number;
@@ -275,7 +275,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
           note: ticket.note,
           status: ticket.status,
           created_at: ticket.created_at,
-          updated_at: ticket.updated_at,
+          last_modified_at: ticket.last_modified_at,
           weighted_at: ticket.weighted_at,
           cancellation_reason: ticket.cancellation_reason,
           tarra_weight_value: ticket.tarra_weight_value,

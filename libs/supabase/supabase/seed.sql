@@ -69,10 +69,10 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '',
         '');
 
-INSERT INTO "public"."trucks" ("license_plate", "brand", "model", "updated_at") VALUES
+INSERT INTO "public"."trucks" ("license_plate", "brand", "model", "last_modified_at") VALUES
 	('86-BVB-6', 'Scania', 'Haakarm', '2025-09-19 10:56:08.866574+00');
 
-INSERT INTO "public"."companies" ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "updated_at", "building_name", "building_number", "country") VALUES
+INSERT INTO "public"."companies" ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "last_modified_at", "building_name", "building_number", "country") VALUES
 	('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '12345678', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', '2025-09-19 11:22:15.258406+00', NULL, '8', 'Nederland'),
 	('b6d76e22-998b-4842-826d-8d42853e87a5', 'King Customer', '87654321', 'Coolsingel', '3011 AD', ' Rotterdam', NULL, '2025-09-19 11:23:33.417513+00', NULL, '40', 'Nederland');
 
@@ -141,11 +141,11 @@ VALUES ('A.01', 'Bewaren'),
        ('G.01', 'Direct storten'),
        ('G.02', 'Immobiliseren');
 
-INSERT INTO "public"."waste_containers" ("id", "type", "created_at", "updated_at", "location_company_id", "street_name", "postal_code", "city", "building_number", "building_name", "country", "notes") VALUES
+INSERT INTO "public"."waste_containers" ("id", "type", "created_at", "last_modified_at", "location_company_id", "street_name", "postal_code", "city", "building_number", "building_name", "country", "notes") VALUES
 	('40M001', NULL, '2025-09-22 08:04:13.247323+00', '2025-09-22 08:04:13.247323+00', NULL, '', '', '', '', NULL, 'Nederland', '');
 
 
-INSERT INTO "public"."material_groups" ("id", "code", "name", "description", "created_at", "updated_at")
+INSERT INTO "public"."material_groups" ("id", "code", "name", "description", "created_at", "last_modified_at")
 VALUES ('6', '001', 'Koper', '', '2025-11-20 12:57:25.073089+00', null),
        ('5', '002', 'Kabel', '', '2025-11-20 12:57:20.412787+00', null),
        ('7', '003', 'Messing', '', '2025-11-20 12:57:32.778148+00', null),
@@ -167,7 +167,7 @@ VALUES ('6', '001', 'Koper', '', '2025-11-20 12:57:25.073089+00', null),
        ('22', 'W5', 'WEEEA5', null, '2025-11-26 13:42:57+00', null),
        ('23', 'W6', 'WEEEA6', null, '2025-11-26 13:43:12+00', null);
 
-INSERT INTO materials (id, code, name, material_group_id, unit_of_measure, vat_code, purchase_account_number, sales_account_number, status, created_at, updated_at)
+INSERT INTO materials (id, code, name, material_group_id, unit_of_measure, vat_code, purchase_account_number, sales_account_number, status, created_at, last_modified_at)
 VALUES (1, '1', 'Ijzer', 21, 'kg', 'HOOG', '6115', '8030', 'ACTIVE', NOW(), NOW()),
        (2, '2', 'Fietsen', 21, 'kg', 'HOOG', '6115', '8030', 'ACTIVE', NOW(), NOW()),
        (3, '3', 'Ijzer 3B', 21, 'kg', 'HOOG', '6115', '8030', 'ACTIVE', NOW(), NOW()),

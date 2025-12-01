@@ -19,8 +19,8 @@ enum class EffectiveStatus {
 }
 
 object EffectiveStatusPolicy {
-  fun compute(base: WasteStreamStatus, lastActivityAt: Instant, now: Instant): EffectiveStatus =
-    if (now >= lastActivityAt.plus(5, DateTimeUnit.YEAR, TimeConfiguration.DOMAIN_TIMEZONE)) EffectiveStatus.EXPIRED
+  fun compute(base: WasteStreamStatus, lastActivityAt: Instant?, now: Instant): EffectiveStatus =
+    if (lastActivityAt != null && now >= lastActivityAt.plus(5, DateTimeUnit.YEAR, TimeConfiguration.DOMAIN_TIMEZONE)) EffectiveStatus.EXPIRED
     else when (base) {
       WasteStreamStatus.DRAFT -> EffectiveStatus.DRAFT
       WasteStreamStatus.ACTIVE -> EffectiveStatus.ACTIVE

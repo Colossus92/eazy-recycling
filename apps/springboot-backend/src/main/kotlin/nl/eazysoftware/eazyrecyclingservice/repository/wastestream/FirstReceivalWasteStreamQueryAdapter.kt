@@ -72,7 +72,7 @@ class FirstReceivalWasteStreamQueryAdapter(
         ws.broker_party_id,
         ws.processor_party_id,
         ws.status,
-        ws.last_activity_at,
+        ws.last_modified_at,
         ws.consignor_classification,
         COALESCE(SUM(wtl.weight_value), 0) as total_weight,
         COUNT(DISTINCT wt.id) as total_shipments,
@@ -93,7 +93,7 @@ class FirstReceivalWasteStreamQueryAdapter(
                ws.waste_collection_type, ws.pickup_location_id, ws.consignor_party_id,
                ws.pickup_party_id, ws.dealer_party_id, ws.collector_party_id,
                ws.broker_party_id, ws.processor_party_id, ws.status,
-               ws.last_activity_at, ws.consignor_classification
+               ws.last_modified_at, ws.consignor_classification
       HAVING COUNT(DISTINCT wt.id) > 0
     """.trimIndent()
 
@@ -152,14 +152,13 @@ class FirstReceivalWasteStreamQueryAdapter(
         processorParty = companyRepository.findByProcessorIdAndDeletedAtIsNull(result.processorPartyId)
           ?: throw IllegalArgumentException("Processor company not found for processor_id: ${result.processorPartyId}"),
         status = result.status,
-        lastActivityAt = result.lastActivityAt,
         consignorClassification = result.consignorClassification
       )
 
       val wasteStream = wasteStreamMapper.toDomain(wasteStreamDto)
       val totalWeight = result.totalWeight.toInt()
       val totalShipments = result.totalShipments.toShort()
-      val transporters = result.transporters?.toList() ?: emptyList()
+      val transporters = result.transporters ?: emptyList()
 
       receivalDeclarationFactory.create(
         wasteStream = wasteStream,
@@ -190,62 +189,9 @@ data class FirstReceivalWasteStreamQueryResult(
   val brokerPartyId: UUID?,
   val processorPartyId: String,
   val status: String,
-  val lastActivityAt: Instant,
+  val updatedAt: Instant,
   val consignorClassification: Int,
   val totalWeight: BigDecimal,
   val totalShipments: Long,
-  val transporters: Array<String>?
-) {
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-
-    other as FirstReceivalWasteStreamQueryResult
-
-    if (number != other.number) return false
-    if (name != other.name) return false
-    if (euralCode != other.euralCode) return false
-    if (processingMethodCode != other.processingMethodCode) return false
-    if (wasteCollectionType != other.wasteCollectionType) return false
-    if (pickupLocationId != other.pickupLocationId) return false
-    if (consignorPartyId != other.consignorPartyId) return false
-    if (pickupPartyId != other.pickupPartyId) return false
-    if (dealerPartyId != other.dealerPartyId) return false
-    if (collectorPartyId != other.collectorPartyId) return false
-    if (brokerPartyId != other.brokerPartyId) return false
-    if (processorPartyId != other.processorPartyId) return false
-    if (status != other.status) return false
-    if (lastActivityAt != other.lastActivityAt) return false
-    if (consignorClassification != other.consignorClassification) return false
-    if (totalWeight != other.totalWeight) return false
-    if (totalShipments != other.totalShipments) return false
-    if (transporters != null) {
-      if (other.transporters == null) return false
-      if (!transporters.contentEquals(other.transporters)) return false
-    } else if (other.transporters != null) return false
-
-    return true
-  }
-
-  override fun hashCode(): Int {
-    var result = number.hashCode()
-    result = 31 * result + name.hashCode()
-    result = 31 * result + euralCode.hashCode()
-    result = 31 * result + processingMethodCode.hashCode()
-    result = 31 * result + wasteCollectionType.hashCode()
-    result = 31 * result + (pickupLocationId?.hashCode() ?: 0)
-    result = 31 * result + consignorPartyId.hashCode()
-    result = 31 * result + pickupPartyId.hashCode()
-    result = 31 * result + (dealerPartyId?.hashCode() ?: 0)
-    result = 31 * result + (collectorPartyId?.hashCode() ?: 0)
-    result = 31 * result + (brokerPartyId?.hashCode() ?: 0)
-    result = 31 * result + processorPartyId.hashCode()
-    result = 31 * result + status.hashCode()
-    result = 31 * result + lastActivityAt.hashCode()
-    result = 31 * result + consignorClassification
-    result = 31 * result + totalWeight.hashCode()
-    result = 31 * result + totalShipments.hashCode()
-    result = 31 * result + (transporters?.contentHashCode() ?: 0)
-    return result
-  }
-}
+  val transporters: List<String>?
+)

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import {
   CompanyView,
@@ -57,17 +58,6 @@ export function useWasteStreamForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
-  const { data, isLoading } = useQuery({
-    queryKey: ['wasteStream', wasteStreamNumber],
-    queryFn: async () => {
-      const response = await wasteStreamService.getByNumber(wasteStreamNumber!);
-      const formValues = wasteStreamDetailsToFormValues(response);
-      formContext.reset(formValues);
-
-      return response;
-    },
-    enabled: !!wasteStreamNumber,
-  });
   const formContext = useForm<WasteStreamFormValues>({
     defaultValues: {
       consignorPartyId: '',
@@ -80,6 +70,20 @@ export function useWasteStreamForm(
       euralCode: '',
     },
   });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['wasteStream', wasteStreamNumber],
+    queryFn: () => wasteStreamService.getByNumber(wasteStreamNumber!),
+    enabled: !!wasteStreamNumber,
+  });
+
+  // Populate form when data is loaded
+  useEffect(() => {
+    if (data) {
+      const formValues = wasteStreamDetailsToFormValues(data);
+      formContext.reset(formValues);
+    }
+  }, [data, formContext]);
 
   // Draft mutation - saves without validation
   const draftMutation = useMutation({
@@ -95,7 +99,7 @@ export function useWasteStreamForm(
       await queryClient.invalidateQueries({ queryKey: ['wasteStreams'] });
 
       toastService.success(
-        !data
+        !wasteStreamNumber
           ? 'Afvalstroomnummer concept aangemaakt'
           : 'Afvalstroomnummer concept bijgewerkt'
       );
@@ -108,7 +112,7 @@ export function useWasteStreamForm(
     onError: (error: unknown) => {
       console.error('Error saving draft:', error);
 
-      let errorMessage = `Er is een fout opgetreden bij het ${data ? 'bijwerken' : 'aanmaken'} van het concept`;
+      let errorMessage = `Er is een fout opgetreden bij het ${wasteStreamNumber ? 'bijwerken' : 'aanmaken'} van het concept`;
 
       if (error instanceof AxiosError && error.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -133,7 +137,7 @@ export function useWasteStreamForm(
 
       if (validationResponse?.isValid) {
         toastService.success(
-          !data
+          !wasteStreamNumber
             ? 'Afvalstroomnummer aangemaakt en gevalideerd'
             : 'Afvalstroomnummer bijgewerkt en gevalideerd'
         );

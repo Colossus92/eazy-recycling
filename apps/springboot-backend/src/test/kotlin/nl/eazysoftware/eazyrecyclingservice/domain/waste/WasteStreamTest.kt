@@ -507,7 +507,7 @@ class WasteStreamTest {
     consignorParty = Consignor.Company(companyId()),
     pickupParty = companyId(),
     status = status,
-    lastActivityAt = lastActivityAt,
+    updatedAt = lastActivityAt,
     consignorClassification = ConsignorClassification.PICKUP_PARTY,
   )
 

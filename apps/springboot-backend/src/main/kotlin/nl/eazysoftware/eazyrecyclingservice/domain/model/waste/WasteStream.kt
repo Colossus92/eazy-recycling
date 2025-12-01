@@ -38,7 +38,10 @@ class WasteStream(
    */
   var brokerParty: CompanyId? = null,
 
-  var lastActivityAt: Instant = Clock.System.now(),
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  var updatedAt: Instant? = Clock.System.now(),
+  val updatedBy: String? = null,
 
   var status: WasteStreamStatus = WasteStreamStatus.DRAFT,
 ) {
@@ -96,7 +99,7 @@ class WasteStream(
   }
 
   fun getEffectiveStatus(): EffectiveStatus {
-    return EffectiveStatusPolicy.compute(status, lastActivityAt, Clock.System.now())
+    return EffectiveStatusPolicy.compute(status, updatedAt, Clock.System.now())
   }
 
   /**
@@ -141,7 +144,7 @@ class WasteStream(
     this.dealerParty = dealerParty
     this.collectorParty = collectorParty
     this.brokerParty = brokerParty
-    this.lastActivityAt = Clock.System.now()
+    this.updatedAt = Clock.System.now()
   }
 
   /**

@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import kotlinx.datetime.LocalDateTime
+import java.time.Instant
 import java.util.*
 
 data class WasteStreamDetailView(
@@ -18,7 +19,10 @@ data class WasteStreamDetailView(
   val collectorParty: CompanyView?,
   val brokerParty: CompanyView?,
   val status: String,
-  val lastActivityAt: LocalDateTime,
+  val createdAt: Instant?,
+  val createdBy: String?,
+  val updatedAt: Instant?,
+  val updatedBy: String?
 )
 
 data class WasteTypeView(

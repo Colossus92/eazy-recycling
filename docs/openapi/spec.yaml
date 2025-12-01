@@ -3689,14 +3689,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -3765,6 +3765,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3773,9 +3776,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -3806,11 +3806,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -4001,14 +4001,21 @@ components:
           $ref: "#/components/schemas/CompanyView"
         status:
           type: string
-        lastActivityAt:
-          $ref: "#/components/schemas/LocalDateTime"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
       required:
       - collectionType
       - consignorClassification
       - consignorParty
       - deliveryLocation
-      - lastActivityAt
       - pickupParty
       - status
       - wasteStreamNumber
@@ -4488,13 +4495,13 @@ components:
           type: string
         displayName:
           type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         applicationName:
           type: string
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4849,7 +4856,11 @@ components:
       properties:
         buffer:
           type: string
-        defaultContentType:
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
           type: string
         errorOnELNotFound:
           type: string
@@ -4865,6 +4876,8 @@ components:
           type: array
           items:
             type: string
+        defaultContentType:
+          type: string
         elIgnored:
           type: string
         isXml:
@@ -4873,12 +4886,6 @@ components:
           type: array
           items:
             type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
     RedirectView:
       type: object
       properties:
@@ -4935,21 +4942,21 @@ components:
           type: array
           items:
             type: string
-        redirectView:
-          type: boolean
         propagateQueryProperties:
+          type: boolean
+        redirectView:
           type: boolean
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesCSV:
-          type: string
-          writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
     ServletContext:
       type: object
       properties:
@@ -4996,41 +5003,10 @@ components:
         minorVersion:
           type: integer
           format: int32
-        attributeNames: {}
-        initParameterNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        contextPath:
-          type: string
-        serverInfo:
-          type: string
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5050,6 +5026,16 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -5059,6 +5045,27 @@ components:
             - URL
             - SSL
           uniqueItems: true
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
+        initParameterNames: {}
+        attributeNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
     ServletRegistration:
       type: object
       properties:

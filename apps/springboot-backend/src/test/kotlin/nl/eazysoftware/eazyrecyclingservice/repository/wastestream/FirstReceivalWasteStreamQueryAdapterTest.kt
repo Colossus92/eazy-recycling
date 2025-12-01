@@ -378,7 +378,7 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       brokerParty = null,
       processorParty = processorParty,
       status = status,
-      lastActivityAt = Instant.now(),
+      updatedAt = Instant.now(),
       consignorClassification = 1
     )
     wasteStreamRepository.save(wasteStream)

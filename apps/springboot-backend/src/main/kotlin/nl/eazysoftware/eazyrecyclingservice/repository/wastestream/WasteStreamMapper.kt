@@ -52,7 +52,10 @@ class WasteStreamMapper(
       dealerParty = dto.dealerParty?.let { CompanyId(it.id) },
       collectorParty = dto.collectorParty?.let { CompanyId(it.id) },
       brokerParty = dto.brokerParty?.let { CompanyId(it.id) },
-      lastActivityAt = dto.lastActivityAt.toKotlinInstant(),
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
       status = WasteStreamStatus.valueOf(dto.status)
     )
   }
@@ -80,7 +83,6 @@ class WasteStreamMapper(
       dealerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       collectorParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       brokerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
-      lastActivityAt = domain.lastActivityAt.toJavaInstant(),
       status = domain.status.name
     )
   }

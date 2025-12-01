@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
@@ -69,10 +70,6 @@ data class WasteStreamDto(
   @JoinColumn(name = "broker_party_id", referencedColumnName = "id")
   val brokerParty: CompanyDto?,
 
-  @Column(name = "last_activity_at", nullable = false)
-  val lastActivityAt: Instant,
-
   @Column(name = "status", nullable = false)
   val status: String
-
-  )
+) : AuditableEntity()

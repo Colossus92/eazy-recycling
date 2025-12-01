@@ -12,6 +12,7 @@ import { WasteStreamFormRouteSection } from './WasteStreamFormRouteSection';
 import { WasteStreamFormGoodsSection } from './WasteStreamFormGoodsSection';
 import { Note } from '@/features/planning/components/note/Note';
 import { ValidationError } from '@/api/client/models/validation-error';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface WasteStreamFormProps {
   isOpen: boolean;
@@ -155,6 +156,12 @@ export const WasteStreamForm = ({
                 ) : (
                   steps[step]
                 )}
+                <AuditMetadataFooter
+                  createdAt={data?.createdAt}
+                  createdByName={data?.createdBy}
+                  updatedAt={data?.updatedAt}
+                  updatedByName={data?.updatedBy}
+                />
               </div>
               <FormNavigationWithDraft
                 step={step}

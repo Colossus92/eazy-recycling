@@ -52,7 +52,7 @@ class GetCompatibleWasteStreamsAdapter(
                 dc.building_number as deliveryLocationBuildingNumber,
                 dc.city as deliveryLocationCity,
                 ws.status,
-                ws.last_activity_at as lastActivityAt
+                ws.last_modified_at as lastActivityAt
             FROM waste_streams ws
             JOIN eural e ON ws.eural_code = e.code
             JOIN processing_methods pm ON ws.processing_method_code = pm.code
@@ -77,7 +77,7 @@ class GetCompatibleWasteStreamsAdapter(
       val lastActivityAt = when (result.lastActivityAt) {
         is OffsetDateTime -> result.lastActivityAt.toInstant() // Support for H2 Database
         is JavaInstant -> result.lastActivityAt
-        else -> throw IllegalStateException("Unexpected type for last_activity_at: ${result.lastActivityAt?.javaClass}")
+        else -> throw IllegalStateException("Unexpected type for last_modified_at: ${result.lastActivityAt?.javaClass}")
       }
       val effectiveStatus = EffectiveStatusPolicy.compute(
         WasteStreamStatus.valueOf(result.status),

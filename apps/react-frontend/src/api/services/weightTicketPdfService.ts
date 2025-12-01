@@ -47,7 +47,7 @@ export const fetchWeightTicketPdfInfo = async (
     }
 
     return {
-      timestamp: format(new Date(latestFile.updated_at), 'dd-MM-yyyy hh:mm'),
+      timestamp: format(new Date(latestFile.last_modified_at), 'dd-MM-yyyy hh:mm'),
       fileSizeKb: latestFile.metadata?.size
         ? Math.round(latestFile.metadata.size / 1024)
         : 0,
