@@ -6,6 +6,8 @@ import kotlin.time.Instant
 data class MaterialPrice(
     val id: Long?,
     val materialId: Long,
+    val materialCode: String,
+    val materialName: String,
     val price: BigDecimal,
     val currency: String,
     val validFrom: Instant,

@@ -104,6 +104,8 @@ data class MaterialPriceRequest(
 data class MaterialPriceResponse(
     val id: Long,
     val materialId: Long,
+    val materialCode: String,
+    val materialName: String,
     val price: BigDecimal,
     val currency: String,
     val validFrom: String,
@@ -118,6 +120,8 @@ fun MaterialPrice.toResponse(): MaterialPriceResponse {
     return MaterialPriceResponse(
         id = id!!,
         materialId = materialId,
+        materialCode = materialCode,
+        materialName = materialName,
         price = price,
         currency = currency,
         validFrom = validFrom.toString()  ,

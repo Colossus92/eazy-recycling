@@ -14,6 +14,16 @@ interface MaterialPriceJpaRepository : JpaRepository<MaterialPriceDto, Long> {
     @Query(
         """
         SELECT mp FROM MaterialPriceDto mp
+        JOIN FETCH mp.material
+        WHERE mp.id = :id
+        """
+    )
+    fun findByIdWithMaterial(id: Long): MaterialPriceDto?
+
+    @Query(
+        """
+        SELECT mp FROM MaterialPriceDto mp
+        JOIN FETCH mp.material
         WHERE mp.validTo IS NULL OR mp.validTo > :now
         """
     )
@@ -22,6 +32,7 @@ interface MaterialPriceJpaRepository : JpaRepository<MaterialPriceDto, Long> {
     @Query(
         """
         SELECT mp FROM MaterialPriceDto mp
+        JOIN FETCH mp.material
         WHERE mp.material.id = :materialId
         AND (mp.validTo IS NULL OR mp.validTo > :now)
         """
@@ -41,7 +52,7 @@ class MaterialPriceRepository(
     }
 
     override fun getPriceById(id: Long): MaterialPrice? {
-        return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
+        return jpaRepository.findByIdWithMaterial(id)?.let { mapper.toDomain(it) }
     }
 
     override fun getActivePricesByMaterialId(materialId: Long): List<MaterialPrice> {

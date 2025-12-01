@@ -15,6 +15,8 @@ class MaterialPriceMapper(
         return MaterialPrice(
             id = dto.id,
             materialId = dto.material.id!!,
+            materialCode = dto.material.code,
+            materialName = dto.material.name,
             price = dto.price,
             currency = dto.currency,
             validFrom = dto.validFrom.toKotlinInstant(),

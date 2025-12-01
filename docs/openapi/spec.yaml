@@ -2716,6 +2716,10 @@ components:
         materialId:
           type: integer
           format: int64
+        materialCode:
+          type: string
+        materialName:
+          type: string
         price:
           type: number
         currency:
@@ -2737,7 +2741,9 @@ components:
       required:
       - currency
       - id
+      - materialCode
       - materialId
+      - materialName
       - price
       - validFrom
     MaterialGroupRequest:
@@ -4068,7 +4074,7 @@ components:
           type: integer
           format: int64
         weightedAt:
-          type: string
+          $ref: "#/components/schemas/LocalDateTime"
         amount:
           type: number
         createdBy:
@@ -4439,12 +4445,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -4461,11 +4467,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -4476,6 +4482,8 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4484,8 +4492,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
     SortObject:
       type: object
       properties:
@@ -4547,20 +4553,20 @@ components:
           type: string
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
+        applicationName:
+          type: string
         startupDate:
           type: integer
           format: int64
-        applicationName:
-          type: string
         environment:
           $ref: "#/components/schemas/Environment"
+        beanDefinitionCount:
+          type: integer
+          format: int32
         beanDefinitionNames:
           type: array
           items:
             type: string
-        beanDefinitionCount:
-          type: integer
-          format: int32
         parentBeanFactory:
           $ref: "#/components/schemas/BeanFactory"
         classLoader:
@@ -4880,6 +4886,8 @@ components:
       properties:
         error:
           type: boolean
+        is3xxRedirection:
+          type: boolean
         is4xxClientError:
           type: boolean
         is5xxServerError:
@@ -4888,19 +4896,17 @@ components:
           type: boolean
         is2xxSuccessful:
           type: boolean
-        is3xxRedirection:
-          type: boolean
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -4911,14 +4917,6 @@ components:
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
-          type: string
-        isXml:
           type: string
         defaultContentType:
           type: string
@@ -4933,6 +4931,14 @@ components:
           items:
             type: string
         includeCodas:
+          type: array
+          items:
+            type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
+        urlPatterns:
           type: array
           items:
             type: string
@@ -5001,12 +5007,12 @@ components:
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
     ServletContext:
       type: object
       properties:
@@ -5095,18 +5101,14 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        serverInfo:
-          type: string
-        contextPath:
-          type: string
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
         sessionTimeout:
           type: integer
           format: int32
         initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
         attributeNames: {}
         servletContextName:
           type: string
@@ -5116,6 +5118,10 @@ components:
             $ref: "#/components/schemas/FilterRegistration"
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
     ServletRegistration:
       type: object
       properties:
@@ -5136,11 +5142,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
-        path:
-          type: string
         domain:
           type: string
         name:
@@ -5159,9 +5165,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

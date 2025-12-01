@@ -34,6 +34,18 @@ export interface MaterialPriceResponse {
     'materialId': number;
     /**
      * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'materialCode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'materialName': string;
+    /**
+     * 
      * @type {number}
      * @memberof MaterialPriceResponse
      */

@@ -105,16 +105,16 @@ export interface ServletContext {
     'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
     /**
      *
-     * @type {string}
+     * @type {number}
      * @memberof ServletContext
      */
-    'serverInfo'?: string;
+    'sessionTimeout'?: number;
     /**
      *
-     * @type {string}
+     * @type {any}
      * @memberof ServletContext
      */
-    'contextPath'?: string;
+    'initParameterNames'?: any;
     /**
      *
      * @type {SessionCookieConfig}
@@ -127,18 +127,6 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'virtualServerName'?: string;
-    /**
-     *
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'sessionTimeout'?: number;
-    /**
-     *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
     /**
      *
      * @type {any}
@@ -163,6 +151,18 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'jspConfigDescriptor'?: JspConfigDescriptor;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'serverInfo'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'contextPath'?: string;
 }
 
 export const ServletContextEffectiveSessionTrackingModesEnum = {

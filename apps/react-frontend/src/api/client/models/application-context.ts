@@ -52,16 +52,16 @@ export interface ApplicationContext {
     'autowireCapableBeanFactory'?: any;
     /**
      * 
-     * @type {number}
-     * @memberof ApplicationContext
-     */
-    'startupDate'?: number;
-    /**
-     * 
      * @type {string}
      * @memberof ApplicationContext
      */
     'applicationName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ApplicationContext
+     */
+    'startupDate'?: number;
     /**
      * 
      * @type {Environment}
@@ -70,16 +70,16 @@ export interface ApplicationContext {
     'environment'?: Environment;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof ApplicationContext
-     */
-    'beanDefinitionNames'?: Array<string>;
-    /**
-     * 
      * @type {number}
      * @memberof ApplicationContext
      */
     'beanDefinitionCount'?: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ApplicationContext
+     */
+    'beanDefinitionNames'?: Array<string>;
     /**
      * 
      * @type {any}

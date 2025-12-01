@@ -11,10 +11,16 @@ export const MaterialPricesTab = () => {
 
   const columns: Column<MaterialPriceResponse>[] = [
     {
-      key: 'materialId',
-      label: 'Materiaal ID',
+      key: 'materialCode',
+      label: 'Code',
       width: '20',
-      accessor: (item) => item.materialId.toString(),
+      accessor: (item) => item.materialCode,
+    },
+    {
+      key: 'materialName',
+      label: 'Naam',
+      width: '20',
+      accessor: (item) => item.materialName,
     },
     {
       key: 'price',
@@ -25,19 +31,19 @@ export const MaterialPricesTab = () => {
     {
       key: 'currency',
       label: 'Valuta',
-      width: '15',
+      width: '10',
       accessor: (item) => item.currency,
     },
     {
       key: 'validFrom',
       label: 'Geldig vanaf',
-      width: '20',
+      width: '15',
       accessor: (item) => item.validFrom,
     },
     {
       key: 'validTo',
       label: 'Geldig tot',
-      width: '25',
+      width: '15',
       accessor: (item) => item.validTo || '-',
     },
   ];
