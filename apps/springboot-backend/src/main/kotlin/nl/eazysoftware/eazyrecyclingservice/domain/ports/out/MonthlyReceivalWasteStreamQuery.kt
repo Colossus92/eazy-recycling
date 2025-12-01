@@ -10,7 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
  * - It has active transports (weight tickets) in the given month
  * - It has already been declared before (has existing declarations)
  * - The waste stream is in ACTIVE status
- * - Only for processor_id '08797'
+ * - Only for processor_id of current tenant
  */
 interface MonthlyReceivalWasteStreamQuery {
 

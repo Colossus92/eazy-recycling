@@ -4,6 +4,8 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
@@ -25,7 +27,7 @@ import java.util.*
  *
  * Queries waste streams based on:
  * - Weight tickets received in the given month (via weight_ticket_lines and weight_tickets)
- * - Only waste streams with processor_id '08797' (current tenant)
+ * - Only waste streams with processor_id of current tenant
  * - Declaration history to identify first-time declarations (no existing lma_declarations)
  * - Aggregation of weight from weight_ticket_lines and shipment counts from weight_tickets
  * - Transporter information from carrier companies
@@ -81,10 +83,10 @@ class FirstReceivalWasteStreamQueryAdapter(
       LEFT JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
         AND wt.weighted_at >= :startOfMonth
         AND wt.weighted_at < :endOfMonth
-        AND wt.status IN ('COMPLETED', 'INVOICED')
+        AND wt.status IN ('${WeightTicketStatus.COMPLETED.name}', '${WeightTicketStatus.INVOICED.name}')
       LEFT JOIN companies c ON c.id = wt.carrier_party_id
       LEFT JOIN lma_declarations d ON d.waste_stream_number = ws.number
-      WHERE proc.processor_id = '08797'
+      WHERE proc.processor_id = '${Tenant.processorPartyId.number}'
         AND d.id IS NULL
         AND wt.id IS NOT NULL
       GROUP BY ws.number, ws.name, ws.eural_code, ws.processing_method_code,
