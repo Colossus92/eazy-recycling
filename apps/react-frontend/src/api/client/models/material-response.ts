@@ -79,12 +79,24 @@ export interface MaterialResponse {
      * @type {string}
      * @memberof MaterialResponse
      */
-    'createdAt': string;
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
+    'createdByName'?: string;
     /**
      * 
      * @type {string}
      * @memberof MaterialResponse
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
+    'updatedByName'?: string;
 }
 

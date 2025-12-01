@@ -2163,6 +2163,16 @@ components:
           type: string
         description:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedByName:
+          type: string
       required:
       - countryCode
       - description
@@ -2361,6 +2371,16 @@ components:
           type: string
         description:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
       required:
       - code
       - description
@@ -2439,9 +2459,16 @@ components:
         deletedBy:
           type: string
           format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
         updatedAt:
           type: string
           format: date-time
+        updatedBy:
+          type: string
       required:
       - address
       - id
@@ -2449,7 +2476,6 @@ components:
       - isSupplier
       - name
       - roles
-      - updatedAt
     PlanningTransportView:
       type: object
       properties:
@@ -2629,11 +2655,14 @@ components:
           type: string
         createdAt:
           type: string
+        createdByName:
+          type: string
         updatedAt:
+          type: string
+        updatedByName:
           type: string
       required:
       - code
-      - createdAt
       - id
       - materialGroupCode
       - materialGroupId
@@ -2674,6 +2703,16 @@ components:
           type: string
         validTo:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedByName:
+          type: string
       required:
       - currency
       - id
@@ -2708,11 +2747,14 @@ components:
           type: string
         createdAt:
           type: string
+        createdByName:
+          type: string
         updatedAt:
+          type: string
+        updatedByName:
           type: string
       required:
       - code
-      - createdAt
       - id
       - name
     Eural:
@@ -2721,6 +2763,16 @@ components:
         code:
           type: string
         description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
           type: string
       required:
       - code
@@ -2887,6 +2939,16 @@ components:
           - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
         notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedByName:
           type: string
       required:
       - id
@@ -3206,6 +3268,16 @@ components:
         location:
           $ref: "#/components/schemas/PickupLocationDto"
         notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
           type: string
       required:
       - id
@@ -3614,14 +3686,14 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -3690,9 +3762,6 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3701,6 +3770,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -3731,11 +3803,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -4228,9 +4300,6 @@ components:
           $ref: "#/components/schemas/AddressView"
         processorId:
           type: string
-        updatedAt:
-          type: string
-          format: date-time
         branches:
           type: array
           items:
@@ -4246,13 +4315,22 @@ components:
           type: string
         email:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedByName:
+          type: string
       required:
       - address
       - branches
       - id
       - name
       - roles
-      - updatedAt
     Pageable:
       type: object
       properties:
@@ -4298,12 +4376,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -4320,11 +4398,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -4335,8 +4413,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4345,6 +4421,8 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     SortObject:
       type: object
       properties:
@@ -4404,13 +4482,13 @@ components:
           type: string
         displayName:
           type: string
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        applicationName:
-          type: string
         startupDate:
           type: integer
           format: int64
+        applicationName:
+          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4752,24 +4830,28 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        deferredSyntaxAllowedAsLiteral:
+        elIgnored:
           type: string
-        trimDirectiveWhitespaces:
+        isXml:
           type: string
-        errorOnUndeclaredNamespace:
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
@@ -4785,16 +4867,12 @@ components:
           type: array
           items:
             type: string
-        defaultContentType:
+        deferredSyntaxAllowedAsLiteral:
           type: string
-        elIgnored:
+        trimDirectiveWhitespaces:
           type: string
-        isXml:
+        errorOnUndeclaredNamespace:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
     RedirectView:
       type: object
       properties:
@@ -4851,9 +4929,9 @@ components:
           type: array
           items:
             type: string
-        propagateQueryProperties:
-          type: boolean
         redirectView:
+          type: boolean
+        propagateQueryProperties:
           type: boolean
         attributes:
           type: object
@@ -4912,6 +4990,27 @@ components:
         minorVersion:
           type: integer
           format: int32
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
+        attributeNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        initParameterNames: {}
+        servletContextName:
+          type: string
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -4921,10 +5020,6 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -4944,6 +5039,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -4954,27 +5053,6 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        attributeNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        contextPath:
-          type: string
-        serverInfo:
-          type: string
     ServletRegistration:
       type: object
       properties:
@@ -4995,12 +5073,12 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
         domain:
-          type: string
-        path:
           type: string
         name:
           type: string
@@ -5018,9 +5096,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

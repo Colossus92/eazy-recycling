@@ -41,5 +41,29 @@ export interface WasteContainerDto {
      * @memberof WasteContainerDto
      */
     'notes'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerDto
+     */
+    'updatedBy'?: string;
 }
 

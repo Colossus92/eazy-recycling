@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional
 import kotlin.time.Clock
 
 interface CreateMaterialPrice {
-    fun handle(cmd: MaterialPriceCommand): MaterialPriceResult
+    fun handle(cmd: MaterialPriceCommand): MaterialPrice
 }
 
 @Service
@@ -16,7 +16,7 @@ class CreateMaterialPriceService(
 ) : CreateMaterialPrice {
 
     @Transactional
-    override fun handle(cmd: MaterialPriceCommand): MaterialPriceResult {
+    override fun handle(cmd: MaterialPriceCommand): MaterialPrice {
         val now = Clock.System.now()
 
         val price = MaterialPrice(
@@ -28,15 +28,6 @@ class CreateMaterialPriceService(
             validTo = null
         )
 
-        val savedPrice = materialPrices.createPrice(price)
-
-        return MaterialPriceResult(
-            id = savedPrice.id!!,
-            materialId = savedPrice.materialId,
-            price = savedPrice.price,
-            currency = savedPrice.currency,
-            validFrom = savedPrice.validFrom.toString(),
-            validTo = savedPrice.validTo?.toString()
-        )
+        return materialPrices.createPrice(price)
     }
 }

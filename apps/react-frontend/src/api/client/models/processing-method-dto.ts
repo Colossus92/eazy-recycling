@@ -32,5 +32,29 @@ export interface ProcessingMethodDto {
      * @memberof ProcessingMethodDto
      */
     'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProcessingMethodDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProcessingMethodDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProcessingMethodDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProcessingMethodDto
+     */
+    'updatedBy'?: string;
 }
 

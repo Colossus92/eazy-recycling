@@ -4,14 +4,20 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetMaterialPrices
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.material.*
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.material.CreateMaterialPrice
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.material.DeleteMaterialPrice
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.material.MaterialPriceCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.material.UpdateMaterialPrice
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
+import nl.eazysoftware.eazyrecyclingservice.domain.model.material.MaterialPrice
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.time.Instant
+import kotlin.time.toJavaInstant
 
 @RestController
 @RequestMapping("/material-prices")
@@ -101,16 +107,24 @@ data class MaterialPriceResponse(
     val price: BigDecimal,
     val currency: String,
     val validFrom: String,
-    val validTo: String?
+    val validTo: String?,
+    val createdAt: Instant? = null,
+    val createdByName: String? = null,
+    val updatedAt: Instant? = null,
+    val updatedByName: String? = null,
 )
 
-fun MaterialPriceResult.toResponse(): MaterialPriceResponse {
+fun MaterialPrice.toResponse(): MaterialPriceResponse {
     return MaterialPriceResponse(
-        id = id,
+        id = id!!,
         materialId = materialId,
         price = price,
         currency = currency,
-        validFrom = validFrom,
-        validTo = validTo
+        validFrom = validFrom.toString()  ,
+        validTo = validTo.toString(),
+        createdAt = createdAt?.toJavaInstant(),
+        createdByName = createdBy,
+        updatedAt = updatedAt?.toJavaInstant(),
+        updatedByName = updatedBy,
     )
 }

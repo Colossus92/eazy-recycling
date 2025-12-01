@@ -8,6 +8,7 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { TextFormField } from '@/components/ui/form/TextFormField';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface MaterialGroupFormProps {
   isOpen: boolean;
@@ -107,6 +108,12 @@ export const MaterialGroupForm = ({
                 }}
               />
             </div>
+            <AuditMetadataFooter
+              createdAt={initialData?.createdAt}
+              createdByName={initialData?.createdByName}
+              updatedAt={initialData?.updatedAt}
+              updatedByName={initialData?.updatedByName}
+            />
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
         </form>

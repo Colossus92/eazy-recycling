@@ -32,5 +32,29 @@ export interface Eural {
      * @memberof Eural
      */
     'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Eural
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Eural
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Eural
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Eural
+     */
+    'updatedBy'?: string;
 }
 

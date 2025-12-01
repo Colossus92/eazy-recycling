@@ -13,7 +13,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.time.Instant
 import java.time.LocalDateTime
+import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @RestController
@@ -108,7 +110,11 @@ data class VatRateResponse(
     val validFrom: String,
     val validTo: String?,
     val countryCode: String,
-    val description: String
+    val description: String,
+    val createdAt: Instant? = null,
+    val createdByName: String? = null,
+    val updatedAt: Instant? = null,
+    val updatedByName: String? = null,
 )
 
 fun VatRate.toResponse(): VatRateResponse {
@@ -118,6 +124,10 @@ fun VatRate.toResponse(): VatRateResponse {
         validFrom = validFrom.toString(),
         validTo = validTo?.toString(),
         countryCode = countryCode,
-        description = description
+        description = description,
+        createdAt = createdAt?.toJavaInstant(),
+        createdByName = createdBy,
+        updatedAt = updatedAt?.toJavaInstant(),
+        updatedByName = updatedBy,
     )
 }

@@ -56,5 +56,29 @@ export interface VatRateResponse {
      * @memberof VatRateResponse
      */
     'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
+    'updatedByName'?: string;
 }
 

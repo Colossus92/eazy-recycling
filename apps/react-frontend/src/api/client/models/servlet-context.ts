@@ -57,16 +57,70 @@ export interface ServletContext {
     'minorVersion'?: number;
     /**
      *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'contextPath'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'serverInfo'?: string;
+    /**
+     *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
+    /**
+     *
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
+    /**
+     *
+     * @type {{ [key: string]: FilterRegistration; }}
+     * @memberof ServletContext
+     */
+    'filterRegistrations'?: { [key: string]: FilterRegistration; };
+    /**
+     *
+     * @type {SessionCookieConfig}
+     * @memberof ServletContext
+     */
+    'sessionCookieConfig'?: SessionCookieConfig;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'virtualServerName'?: string;
+    /**
+     *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'servletContextName'?: string;
+    /**
+     *
+     * @type {JspConfigDescriptor}
+     * @memberof ServletContext
+     */
+    'jspConfigDescriptor'?: JspConfigDescriptor;
+    /**
+     *
      * @type {Set<string>}
      * @memberof ServletContext
      */
     'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
-    /**
-     *
-     * @type {{ [key: string]: ServletRegistration; }}
-     * @memberof ServletContext
-     */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
     /**
      *
      * @type {number}
@@ -99,70 +153,16 @@ export interface ServletContext {
     'responseCharacterEncoding'?: string;
     /**
      *
+     * @type {{ [key: string]: ServletRegistration; }}
+     * @memberof ServletContext
+     */
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    /**
+     *
      * @type {Set<string>}
      * @memberof ServletContext
      */
     'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'servletContextName'?: string;
-    /**
-     *
-     * @type {{ [key: string]: FilterRegistration; }}
-     * @memberof ServletContext
-     */
-    'filterRegistrations'?: { [key: string]: FilterRegistration; };
-    /**
-     *
-     * @type {JspConfigDescriptor}
-     * @memberof ServletContext
-     */
-    'jspConfigDescriptor'?: JspConfigDescriptor;
-    /**
-     *
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'sessionTimeout'?: number;
-    /**
-     *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'attributeNames'?: any;
-    /**
-     *
-     * @type {SessionCookieConfig}
-     * @memberof ServletContext
-     */
-    'sessionCookieConfig'?: SessionCookieConfig;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'virtualServerName'?: string;
-    /**
-     *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'contextPath'?: string;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'serverInfo'?: string;
 }
 
 export const ServletContextEffectiveSessionTrackingModesEnum = {

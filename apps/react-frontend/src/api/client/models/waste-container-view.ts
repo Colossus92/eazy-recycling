@@ -41,5 +41,29 @@ export interface WasteContainerView {
      * @memberof WasteContainerView
      */
     'notes'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerView
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerView
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerView
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof WasteContainerView
+     */
+    'updatedByName'?: string;
 }
 

@@ -49,12 +49,24 @@ export interface MaterialGroupResponse {
      * @type {string}
      * @memberof MaterialGroupResponse
      */
-    'createdAt': string;
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialGroupResponse
+     */
+    'createdByName'?: string;
     /**
      * 
      * @type {string}
      * @memberof MaterialGroupResponse
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialGroupResponse
+     */
+    'updatedByName'?: string;
 }
 

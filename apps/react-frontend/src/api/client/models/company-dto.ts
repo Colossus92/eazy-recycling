@@ -106,7 +106,25 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
-    'updatedAt': string;
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    'updatedBy'?: string;
 }
 
 export const CompanyDtoRolesEnum = {

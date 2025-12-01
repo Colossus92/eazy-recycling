@@ -56,5 +56,29 @@ export interface MaterialPriceResponse {
      * @memberof MaterialPriceResponse
      */
     'validTo'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'updatedByName'?: string;
 }
 

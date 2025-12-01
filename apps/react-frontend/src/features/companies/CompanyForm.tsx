@@ -16,6 +16,7 @@ import { RestoreCompanyDialog } from './RestoreCompanyDialog';
 import { AxiosError } from 'axios';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface CompanyFormProps {
   onCancel: () => void;
@@ -93,20 +94,20 @@ export const CompanyForm = ({
   } = useForm<CompanyFormValues>({
     defaultValues: company
       ? {
-        id: company.id,
-        name: company.name,
-        street: company.address.street,
-        houseNumber: company.address.houseNumber,
-        houseNumberAddition: company.address.houseNumberAddition,
-        postalCode: company.address.postalCode,
-        city: company.address.city,
-        chamberOfCommerceId: company.chamberOfCommerceId || '',
-        vihbId: company.vihbId || '',
-        processorId: company.processorId || '',
-        phone: company.phone || '',
-        email: company.email || '',
-        roles: company.roles || [],
-      }
+          id: company.id,
+          name: company.name,
+          street: company.address.street,
+          houseNumber: company.address.houseNumber,
+          houseNumberAddition: company.address.houseNumberAddition,
+          postalCode: company.address.postalCode,
+          city: company.address.city,
+          chamberOfCommerceId: company.chamberOfCommerceId || '',
+          vihbId: company.vihbId || '',
+          processorId: company.processorId || '',
+          phone: company.phone || '',
+          email: company.email || '',
+          roles: company.roles || [],
+        }
       : undefined,
   });
 
@@ -383,8 +384,18 @@ export const CompanyForm = ({
             value={company?.roles}
             isMulti={true}
           />
+          <AuditMetadataFooter
+            createdAt={company?.createdAt}
+            createdByName={company?.createdByName}
+            updatedAt={company?.updatedAt}
+            updatedByName={company?.updatedByName}
+          />
         </div>
-        <FormActionButtons onClick={onCancel} item={company} disabled={isSubmitting} />
+        <FormActionButtons
+          onClick={onCancel}
+          item={company}
+          disabled={isSubmitting}
+        />
       </form>
       <RestoreCompanyDialog
         isOpen={softDeleteConflict !== null}

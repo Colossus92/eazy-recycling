@@ -10,6 +10,7 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface MaterialFormProps {
   isOpen: boolean;
@@ -18,7 +19,10 @@ interface MaterialFormProps {
   initialData?: MaterialResponse;
 }
 
-type MaterialFormValues = Omit<MaterialRequest, 'status' | 'materialGroupId'> & {
+type MaterialFormValues = Omit<
+  MaterialRequest,
+  'status' | 'materialGroupId'
+> & {
   materialGroupId: number | string;
 };
 
@@ -161,6 +165,12 @@ export const MaterialForm = ({
                 />
               </div>
             </div>
+            <AuditMetadataFooter
+              createdAt={initialData?.createdAt}
+              createdByName={initialData?.createdByName}
+              updatedAt={initialData?.updatedAt}
+              updatedByName={initialData?.updatedByName}
+            />
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
         </form>

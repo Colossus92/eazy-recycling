@@ -1,12 +1,10 @@
-import { MasterDataTab } from "../MasterDataTab"
-import { DataTableProps } from "../MasterDataTab";
-import { Column } from "../MasterDataTab";
-import { DeleteDialog } from "@/components/ui/dialog/DeleteDialog";
-import { EmptyState } from "../../EmptyState";
+import { Column, DataTableProps, MasterDataTab } from '../MasterDataTab';
+import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
+import { EmptyState } from '../../EmptyState';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
-import { useWasteContainerCrud } from "./useWasteContainerCrud";
-import { WasteContainerForm } from "./WasteContainerForm";
-import { WasteContainerView } from "@/api/client";
+import { useWasteContainerCrud } from './useWasteContainerCrud';
+import { WasteContainerForm } from './WasteContainerForm';
+import { WasteContainerView } from '@/api/client';
 
 function getWasteContainerLocation(container: WasteContainerView): string {
   if (!container.location) {
@@ -14,7 +12,6 @@ function getWasteContainerLocation(container: WasteContainerView): string {
   }
 
   const location = container.location as any;
-  console.log(JSON.stringify(location));
   switch (location.type) {
     case 'dutch_address':
       return `${location.streetName} ${location.buildingNumber}${location.buildingNumberAddition ? ' ' + location.buildingNumberAddition : ''}, ${location.postalCode} ${location.city}`;

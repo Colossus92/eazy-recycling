@@ -10,6 +10,7 @@ import { TextFormField } from '@/components/ui/form/TextFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 // Convert ISO 8601 datetime (e.g., 2025-11-20T11:09:00Z) to datetime-local format (YYYY-MM-DDThh:mm)
 const formatDateTimeForInput = (dateTimeString: string | undefined): string => {
@@ -175,6 +176,12 @@ export const VatRateForm = ({
                 }}
               />
             </div>
+            <AuditMetadataFooter
+              createdAt={initialData?.createdAt}
+              createdByName={initialData?.createdByName}
+              updatedAt={initialData?.updatedAt}
+              updatedByName={initialData?.updatedByName}
+            />
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
         </form>

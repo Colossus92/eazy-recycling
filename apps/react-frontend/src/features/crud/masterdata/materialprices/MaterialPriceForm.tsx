@@ -10,6 +10,7 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface MaterialPriceFormProps {
   isOpen: boolean;
@@ -18,7 +19,10 @@ interface MaterialPriceFormProps {
   initialData?: MaterialPriceResponse;
 }
 
-type MaterialPriceFormValues = Omit<MaterialPriceRequest, 'materialId' | 'price'> & {
+type MaterialPriceFormValues = Omit<
+  MaterialPriceRequest,
+  'materialId' | 'price'
+> & {
   materialId: number | string;
   price: number;
 };
@@ -51,6 +55,12 @@ export const MaterialPriceForm = ({
         price: initialData.price,
         currency: initialData.currency,
       });
+    } else {
+      reset({
+        materialId: '',
+        price: 0,
+        currency: 'EUR',
+      });
     }
   }, [initialData, reset]);
 
@@ -58,7 +68,7 @@ export const MaterialPriceForm = ({
     reset({
       materialId: '',
       price: 0,
-      currency: '',
+      currency: 'EUR',
     });
     onCancel();
   };
@@ -124,7 +134,6 @@ export const MaterialPriceForm = ({
               <TextFormField
                 title={'Valuta'}
                 placeholder={'Bijv. EUR'}
-                value={initialData?.currency || 'EUR'}
                 disabled={true}
                 formHook={{
                   register,
@@ -134,6 +143,12 @@ export const MaterialPriceForm = ({
                 }}
               />
             </div>
+            <AuditMetadataFooter
+              createdAt={initialData?.createdAt}
+              createdByName={initialData?.createdByName}
+              updatedAt={initialData?.updatedAt}
+              updatedByName={initialData?.updatedByName}
+            />
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
         </form>

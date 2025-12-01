@@ -70,12 +70,6 @@ export interface CompleteCompanyView {
     'processorId'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof CompleteCompanyView
-     */
-    'updatedAt': string;
-    /**
-     * 
      * @type {Array<CompanyBranchResponse>}
      * @memberof CompleteCompanyView
      */
@@ -98,6 +92,30 @@ export interface CompleteCompanyView {
      * @memberof CompleteCompanyView
      */
     'email'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'updatedByName'?: string;
 }
 
 export const CompleteCompanyViewRolesEnum = {
