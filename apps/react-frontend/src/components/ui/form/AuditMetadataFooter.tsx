@@ -17,7 +17,7 @@ function formatDateTime(isoString?: string): string {
     });
 }
 
-export const AuditMetaDataFooter = ({
+export const AuditMetadataFooter = ({
     createdAt,
     createdByName,
     updatedAt,

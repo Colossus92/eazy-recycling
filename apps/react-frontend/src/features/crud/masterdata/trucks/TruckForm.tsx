@@ -10,7 +10,7 @@ import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { TruckRequest } from '@/api/client';
 import { Truck } from '@/api/services/truckService';
-import { AuditMetaDataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface TruckFormProps {
   isOpen: boolean;
@@ -134,7 +134,7 @@ export const TruckForm = ({
                 rules={undefined}
                 role="CARRIER"
               />
-              <AuditMetaDataFooter
+              <AuditMetadataFooter
                 createdAt={initialData?.createdAt}
                 createdByName={initialData?.createdByName}
                 updatedAt={initialData?.updatedAt}
