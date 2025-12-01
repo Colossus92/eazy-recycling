@@ -13,9 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { LocalDateTime } from './local-date-time';
 
 /**
  * 
@@ -31,10 +28,10 @@ export interface WeightTicketsByWasteStreamView {
     'weightTicketNumber': number;
     /**
      * 
-     * @type {LocalDateTime}
+     * @type {string}
      * @memberof WeightTicketsByWasteStreamView
      */
-    'weightedAt'?: LocalDateTime;
+    'weightedAt'?: string;
     /**
      * 
      * @type {number}

@@ -7,7 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
-import java.time.OffsetDateTime
+import java.time.Instant
 import kotlin.time.toKotlinInstant
 
 /**
@@ -32,18 +32,25 @@ class WeightTicketsByWasteStreamQueryAdapter(
             ORDER BY wt.weighted_at DESC NULLS LAST, wt.id DESC
         """.trimIndent()
 
-        val results = entityManager.createNativeQuery(query)
+        @Suppress("UNCHECKED_CAST")
+        val results = entityManager.createNativeQuery(query, WeightTicketsByWasteStreamResult::class.java)
             .setParameter("wasteStreamNumber", wasteStreamNumber.number)
-            .resultList
+            .resultList as List<WeightTicketsByWasteStreamResult>
 
         return results.map { row ->
-            val columns = row as Array<*>
             WeightTicketsByWasteStreamView(
-                weightTicketNumber = columns[0] as Long,
-                weightedAt = (columns[1] as? OffsetDateTime)?.toInstant()?.toKotlinInstant()?.toDisplayTime(),
-                amount = columns[2] as BigDecimal,
-                createdBy = columns[3] as? String
+                weightTicketNumber = row.weightTicketNumber,
+                weightedAt = row.weightedAt?.toKotlinInstant()?.toDisplayTime(),
+                amount = row.amount,
+                createdBy = row.createdBy
             )
         }
     }
+
+  data class WeightTicketsByWasteStreamResult(
+    val weightTicketNumber: Long,
+    val weightedAt: Instant?,
+    val amount: BigDecimal,
+    val createdBy: String?
+  )
 }

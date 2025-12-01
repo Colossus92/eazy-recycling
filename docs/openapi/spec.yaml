@@ -4068,7 +4068,7 @@ components:
           type: integer
           format: int64
         weightedAt:
-          $ref: "#/components/schemas/LocalDateTime"
+          type: string
         amount:
           type: number
         createdBy:
@@ -4476,8 +4476,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4486,14 +4484,16 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
     ConnectionStatusResponse:
       type: object
@@ -4554,13 +4554,13 @@ components:
           type: string
         environment:
           $ref: "#/components/schemas/Environment"
-        beanDefinitionCount:
-          type: integer
-          format: int32
         beanDefinitionNames:
           type: array
           items:
             type: string
+        beanDefinitionCount:
+          type: integer
+          format: int32
         parentBeanFactory:
           $ref: "#/components/schemas/BeanFactory"
         classLoader:
@@ -4906,11 +4906,11 @@ components:
       properties:
         buffer:
           type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
           type: string
         urlPatterns:
           type: array
@@ -5053,6 +5053,15 @@ components:
         minorVersion:
           type: integer
           format: int32
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5072,6 +5081,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -5082,24 +5095,10 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        contextPath:
-          type: string
         serverInfo:
           type: string
-        attributeNames: {}
+        contextPath:
+          type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
@@ -5108,6 +5107,7 @@ components:
           type: integer
           format: int32
         initParameterNames: {}
+        attributeNames: {}
         servletContextName:
           type: string
         filterRegistrations:
@@ -5119,12 +5119,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         name:
           type: string
         className:
@@ -5136,13 +5136,13 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        domain:
-          type: string
-        path:
-          type: string
         maxAge:
           type: integer
           format: int32
+        path:
+          type: string
+        domain:
+          type: string
         name:
           type: string
         attributes:
@@ -5152,9 +5152,9 @@ components:
         comment:
           type: string
           deprecated: true
-        secure:
-          type: boolean
         httpOnly:
+          type: boolean
+        secure:
           type: boolean
     TaglibDescriptor:
       type: object

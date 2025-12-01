@@ -70,16 +70,16 @@ export interface ApplicationContext {
     'environment'?: Environment;
     /**
      * 
-     * @type {number}
-     * @memberof ApplicationContext
-     */
-    'beanDefinitionCount'?: number;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof ApplicationContext
      */
     'beanDefinitionNames'?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ApplicationContext
+     */
+    'beanDefinitionCount'?: number;
     /**
      * 
      * @type {any}

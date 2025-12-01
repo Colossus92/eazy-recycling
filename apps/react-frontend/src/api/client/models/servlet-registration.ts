@@ -22,16 +22,16 @@
 export interface ServletRegistration {
     /**
      * 
-     * @type {Array<string>}
-     * @memberof ServletRegistration
-     */
-    'mappings'?: Array<string>;
-    /**
-     * 
      * @type {string}
      * @memberof ServletRegistration
      */
     'runAsRole'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ServletRegistration
+     */
+    'mappings'?: Array<string>;
     /**
      * 
      * @type {string}

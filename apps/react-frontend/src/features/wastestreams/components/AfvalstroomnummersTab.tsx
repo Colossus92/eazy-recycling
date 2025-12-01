@@ -12,7 +12,7 @@ import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { useWasteStreamCrud } from '@/features/wastestreams/hooks/useWasteStreamCrud';
 import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import {
@@ -20,6 +20,7 @@ import {
   WasteStreamStatusTagProps,
 } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { WasteStreamFilterForm } from '@/features/wastestreams/components/WasteStreamFilterForm';
+import { WasteStreamDetailsDrawer } from '@/features/wastestreams/components/drawer/WasteStreamDetailsDrawer';
 
 type Column = {
   key: keyof WasteStreamListView;
@@ -32,7 +33,45 @@ type Column = {
 export const AfvalstroomnummersTab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedWasteStream, setSelectedWasteStream] =
+    useState<WasteStreamListView | null>(null);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useWasteStreamCrud();
+
+  /**
+   * Handle single click to open drawer, double click to open edit form.
+   * Uses a timeout to distinguish between single and double clicks.
+   */
+  const handleRowClick = (item: WasteStreamListView) => {
+    if (clickTimeoutRef.current) {
+      // Double click detected - clear timeout and open edit form
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      form.openForEdit(item);
+    } else {
+      // Single click - set timeout to open drawer
+      clickTimeoutRef.current = setTimeout(() => {
+        clickTimeoutRef.current = null;
+        setSelectedWasteStream(item);
+        setIsDrawerOpen(true);
+      }, 200); // 200ms delay to detect double click
+    }
+  };
+
+  const handleDrawerEdit = () => {
+    if (selectedWasteStream) {
+      setIsDrawerOpen(false);
+      form.openForEdit(selectedWasteStream);
+    }
+  };
+
+  const handleDrawerDelete = () => {
+    if (selectedWasteStream) {
+      setIsDrawerOpen(false);
+      deletion.initiate(selectedWasteStream);
+    }
+  };
   const columns: Column[] = [
     {
       key: 'wasteStreamNumber',
@@ -148,8 +187,8 @@ export const AfvalstroomnummersTab = () => {
                     return (
                       <tr
                         key={index}
-                        className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                        onDoubleClick={() => form.openForEdit(item)}
+                        className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary cursor-pointer"
+                        onClick={() => handleRowClick(item)}
                       >
                         {columns.map((col) => (
                           <td
@@ -221,6 +260,25 @@ export const AfvalstroomnummersTab = () => {
           currentValues={read.filter.currentFormValues}
         />
       </Drawer>
+      {selectedWasteStream && (
+        <WasteStreamDetailsDrawer
+          isDrawerOpen={isDrawerOpen}
+          setIsDrawerOpen={setIsDrawerOpen}
+          wasteStreamNumber={selectedWasteStream.wasteStreamNumber || ''}
+          onEdit={
+            selectedWasteStream.status !== 'INACTIVE' &&
+            selectedWasteStream.status !== 'EXPIRED'
+              ? handleDrawerEdit
+              : undefined
+          }
+          onDelete={
+            selectedWasteStream.status !== 'INACTIVE' &&
+            selectedWasteStream.status !== 'EXPIRED'
+              ? handleDrawerDelete
+              : undefined
+          }
+        />
+      )}
     </>
   );
 };

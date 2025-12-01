@@ -37,4 +37,10 @@ export const wasteStreamService = {
     wasteStreamApi
       .updateAndValidate(wasteStreamNumber, wasteStreamRequest)
       .then((r) => r.data),
+
+  // Weight tickets by waste stream
+  getWeightTicketsByWasteStream: (wasteStreamNumber: string) =>
+    wasteStreamApi
+      .getWeightTicketsByWasteStream(wasteStreamNumber)
+      .then((r) => r.data),
 };

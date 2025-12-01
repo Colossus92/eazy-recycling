@@ -22,10 +22,10 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'maxAge'?: number;
     /**
      * 
      * @type {string}
@@ -34,10 +34,10 @@ export interface SessionCookieConfig {
     'path'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof SessionCookieConfig
      */
-    'maxAge'?: number;
+    'domain'?: string;
     /**
      * 
      * @type {string}
@@ -62,12 +62,12 @@ export interface SessionCookieConfig {
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'secure'?: boolean;
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'httpOnly'?: boolean;
+    'secure'?: boolean;
 }
 
