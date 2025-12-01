@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.entity.transport
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
+import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
@@ -88,15 +89,12 @@ data class TransportDto(
   val driverNote: String? = null,
 
   @Column(nullable = false)
-  var updatedAt: LocalDateTime? = LocalDateTime.now(),
-
-  @Column(nullable = false)
   var sequenceNumber: Int,
 
   @ManyToOne
   @JoinColumn(name = "weight_ticket_id", referencedColumnName = "id", nullable = true)
   val weightTicket: WeightTicketDto? = null
-) {
+) : AuditableEntity() {
 
 
   enum class Status {
@@ -104,16 +102,6 @@ data class TransportDto(
     PLANNED,
     FINISHED,
     INVOICED,
-  }
-
-  @PrePersist
-  fun prePersist() {
-    updatedAt = LocalDateTime.now()
-  }
-
-  @PreUpdate
-  fun preUpdate() {
-    updatedAt = LocalDateTime.now()
   }
 
   fun getStatus(): Status {

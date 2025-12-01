@@ -3217,14 +3217,21 @@ components:
           format: double
         driverNote:
           type: string
-        updatedAt:
-          type: string
-          format: date-time
         sequenceNumber:
           type: integer
           format: int32
         weightTicket:
           $ref: "#/components/schemas/WeightTicketDto"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
         status:
           type: string
           enum:
@@ -3689,14 +3696,14 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -3765,9 +3772,6 @@ components:
         day:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -3776,6 +3780,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -3806,11 +3813,11 @@ components:
         second:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -4174,9 +4181,16 @@ components:
         sequenceNumber:
           type: integer
           format: int32
+        createdAt:
+          type: string
+          format: date-time
+        createdByName:
+          type: string
         updatedAt:
           type: string
           format: date-time
+        updatedByName:
+          type: string
         wasteContainer:
           $ref: "#/components/schemas/WasteContainerView"
         containerOperation:
@@ -4389,12 +4403,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
         first:
           type: boolean
         last:
@@ -4411,11 +4425,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -4426,8 +4440,6 @@ components:
           format: int64
         sort:
           $ref: "#/components/schemas/SortObject"
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -4436,14 +4448,16 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
     SortObject:
       type: object
       properties:
         empty:
           type: boolean
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
     ConnectionStatusResponse:
       type: object
@@ -4495,13 +4509,13 @@ components:
           type: string
         displayName:
           type: string
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        applicationName:
-          type: string
         startupDate:
           type: integer
           format: int64
+        applicationName:
+          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4843,24 +4857,28 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        trimDirectiveWhitespaces:
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        elIgnored:
           type: string
-        errorOnUndeclaredNamespace:
+        isXml:
           type: string
-        deferredSyntaxAllowedAsLiteral:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
@@ -4876,16 +4894,12 @@ components:
           type: array
           items:
             type: string
-        defaultContentType:
+        deferredSyntaxAllowedAsLiteral:
           type: string
-        elIgnored:
+        trimDirectiveWhitespaces:
           type: string
-        isXml:
+        errorOnUndeclaredNamespace:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
     RedirectView:
       type: object
       properties:
@@ -4942,9 +4956,9 @@ components:
           type: array
           items:
             type: string
-        propagateQueryProperties:
-          type: boolean
         redirectView:
+          type: boolean
+        propagateQueryProperties:
           type: boolean
         attributes:
           type: object
@@ -5003,6 +5017,46 @@ components:
         minorVersion:
           type: integer
           format: int32
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
+        sessionTimeout:
+          type: integer
+          format: int32
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        initParameterNames: {}
+        attributeNames: {}
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         servletRegistrations:
           type: object
           additionalProperties:
@@ -5026,55 +5080,15 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        initParameterNames: {}
-        attributeNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        contextPath:
-          type: string
-        serverInfo:
-          type: string
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         name:
           type: string
         className:
@@ -5086,11 +5100,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        path:
-          type: string
         maxAge:
           type: integer
           format: int32
+        path:
+          type: string
         domain:
           type: string
         name:
@@ -5109,9 +5123,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

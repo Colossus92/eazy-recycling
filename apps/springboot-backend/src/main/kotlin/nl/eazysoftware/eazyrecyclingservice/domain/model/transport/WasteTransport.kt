@@ -51,7 +51,6 @@ class WasteTransport(
    */
   val driverNote: Note?,
 
-  val updatedAt: Instant?,
 
   /**
    * Used for ordering transports within the planning
@@ -59,6 +58,11 @@ class WasteTransport(
   val sequenceNumber: Int,
 
   val weightTicketId: WeightTicketId? = null,
+
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedBy: String? = null,
 
   ) : Transport {
 

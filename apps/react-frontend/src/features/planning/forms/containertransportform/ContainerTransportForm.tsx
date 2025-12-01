@@ -12,6 +12,7 @@ import { TransportFormDetailsSection } from '@/features/planning/forms/Transport
 import { ContainerTransportMainSection } from '@/features/planning/forms/containertransportform/ContainerTransportMainSection.tsx';
 import { useContainerTransportForm } from '@/features/planning/hooks/useContainerTransportForm';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface ContainerTransportFormProps {
   isOpen: boolean;
@@ -104,6 +105,12 @@ export const ContainerTransportForm = ({
                 ) : (
                   steps[step]
                 )}
+                <AuditMetadataFooter
+                  createdAt={data?.createdAt}
+                  createdByName={data?.createdByName}
+                  updatedAt={data?.updatedAt}
+                  updatedByName={data?.updatedByName}
+                />
               </div>
               <FormNavigation
                 step={step}

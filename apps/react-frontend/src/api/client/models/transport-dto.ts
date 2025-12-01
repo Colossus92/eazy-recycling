@@ -145,12 +145,6 @@ export interface TransportDto {
     'driverNote'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof TransportDto
-     */
-    'updatedAt'?: string;
-    /**
-     * 
      * @type {number}
      * @memberof TransportDto
      */
@@ -161,6 +155,30 @@ export interface TransportDto {
      * @memberof TransportDto
      */
     'weightTicket'?: WeightTicketDto;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDto
+     */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDto
+     */
+    'createdBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDto
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDto
+     */
+    'updatedBy'?: string;
     /**
      * 
      * @type {string}

@@ -68,7 +68,6 @@ class WasteTransportMapper(
       note = domain.note?.description,
       goods = toDto(domain.goods),
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
-      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber,
       carrierParty = domain.carrierParty.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       consignorParty = when (val consignor = wasteStream.consignorParty) {
@@ -101,7 +100,10 @@ class WasteTransportMapper(
       note = dto.note?.let { Note(it) },
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
       driverNote = dto.driverNote?.let { Note(it) },
-      updatedAt = dto.updatedAt?.toCetKotlinInstant(),
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
       sequenceNumber = dto.sequenceNumber,
       weightTicketId = dto.weightTicket?.let { WeightTicketId(it.id) },
     )

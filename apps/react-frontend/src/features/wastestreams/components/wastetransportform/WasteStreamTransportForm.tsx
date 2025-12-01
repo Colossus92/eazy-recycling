@@ -10,6 +10,7 @@ import { useWasteStreamTransportForm } from '@/features/wastestreams/hooks/useWa
 import { WasteStreamTransportFormSelectSection } from './WasteStreamTransportFormSelectSection';
 import { WasteStreamTransportFormDetailsSection } from './WasteStreamTransportFormDetailsSection';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface WasteStreamTransportFormProps {
   isOpen: boolean;
@@ -107,6 +108,12 @@ export const WasteStreamTransportForm = ({
                     {steps[step]}
                   </div>
                 )}
+                <AuditMetadataFooter
+                  createdAt={data?.createdAt}
+                  createdByName={data?.createdByName}
+                  updatedAt={data?.updatedAt}
+                  updatedByName={data?.updatedByName}
+                />
               </div>
 
               <FormNavigation

@@ -139,7 +139,25 @@ export interface TransportDetailView {
      * @type {string}
      * @memberof TransportDetailView
      */
+    'createdAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
+    'createdByName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
+    'updatedByName'?: string;
     /**
      * 
      * @type {WasteContainerView}

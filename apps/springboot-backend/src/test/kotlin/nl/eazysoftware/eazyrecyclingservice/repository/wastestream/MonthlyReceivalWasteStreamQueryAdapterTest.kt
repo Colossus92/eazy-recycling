@@ -478,7 +478,6 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       brokerParty = null,
       processorParty = processorParty,
       status = status,
-      updatedAt = Instant.now(),
       consignorClassification = 1
     )
     wasteStreamRepository.save(wasteStream)

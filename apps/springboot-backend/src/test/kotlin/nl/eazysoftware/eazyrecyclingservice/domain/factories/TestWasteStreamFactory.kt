@@ -75,7 +75,6 @@ object TestWasteStreamFactory {
       dealerParty = dealerParty,
       collectorParty = collectorParty,
       brokerParty = brokerParty,
-      updatedAt = Instant.now(),
       status = WasteStreamStatus.DRAFT.name
     )
   }

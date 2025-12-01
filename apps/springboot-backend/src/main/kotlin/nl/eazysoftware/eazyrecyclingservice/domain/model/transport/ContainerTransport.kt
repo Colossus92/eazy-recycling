@@ -57,13 +57,16 @@ class ContainerTransport(
    */
   val driverNote: Note?,
 
-  val updatedAt: Instant?,
 
   /**
    * Used for ordering transports within the planning
    */
   val sequenceNumber: Int,
 
+  val createdAt: Instant? = null,
+  val createdBy: String? = null,
+  val updatedAt: Instant? = null,
+  val updatedBy: String? = null,
   ) : Transport {
 
   /**

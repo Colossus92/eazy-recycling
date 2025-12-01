@@ -68,7 +68,6 @@ create table if not exists locations (
 create table if not exists transports (
                           delivery_date_time timestamp(6) without time zone,
                           pickup_date_time timestamp(6) without time zone,
-                          updated_at timestamp(6) without time zone NOT NULL,
                           carrier_party_id uuid,
                           consignor_party_id uuid,
                           driver_id uuid,
@@ -85,6 +84,10 @@ create table if not exists transports (
                           transport_hours NUMERIC(3,1),
                           driver_note text,
                           weight_ticket_id bigint,
+                          created_at timestamp with time zone not null default now(),
+                          created_by text,
+                          last_modified_at timestamp with time zone not null default now(),
+                          last_modified_by text,
                           primary key (id)
 );
 

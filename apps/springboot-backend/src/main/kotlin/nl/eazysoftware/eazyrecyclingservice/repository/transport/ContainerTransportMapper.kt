@@ -51,7 +51,10 @@ class ContainerTransportMapper(
       note = dto.note?.let { Note(it) },
       transportHours = dto.transportHours?.let { kotlin.time.Duration.parse("${it}h") },
       driverNote = dto.driverNote?.let { Note(it) },
-      updatedAt = dto.updatedAt?.toCetKotlinInstant(),
+      createdAt = dto.createdAt?.toKotlinInstant(),
+      createdBy = dto.createdBy,
+      updatedAt = dto.updatedAt?.toKotlinInstant(),
+      updatedBy = dto.updatedBy,
       sequenceNumber = dto.sequenceNumber
     )
   }
@@ -79,7 +82,6 @@ class ContainerTransportMapper(
       note = domain.note?.description,
       transportHours = domain.transportHours?.inWholeHours?.toDouble(),
       driverNote = domain.driverNote?.description,
-      updatedAt = domain.updatedAt?.toJavaInstant()?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDateTime(),
       sequenceNumber = domain.sequenceNumber
     )
   }

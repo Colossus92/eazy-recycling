@@ -158,7 +158,7 @@ class FirstReceivalWasteStreamQueryAdapter(
       val wasteStream = wasteStreamMapper.toDomain(wasteStreamDto)
       val totalWeight = result.totalWeight.toInt()
       val totalShipments = result.totalShipments.toShort()
-      val transporters = result.transporters ?: emptyList()
+      val transporters = result.transporters?.toList() ?: emptyList()
 
       receivalDeclarationFactory.create(
         wasteStream = wasteStream,
@@ -193,5 +193,5 @@ data class FirstReceivalWasteStreamQueryResult(
   val consignorClassification: Int,
   val totalWeight: BigDecimal,
   val totalShipments: Long,
-  val transporters: List<String>?
+  val transporters: Array<String>?
 )
