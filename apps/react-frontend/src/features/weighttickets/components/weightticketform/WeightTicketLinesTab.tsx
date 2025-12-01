@@ -161,6 +161,7 @@ export const WeightTicketLinesTab = ({
         <DateFormField
           title="Datum weging"
           placeholder="Selecteer een datum"
+          disabled={disabled}
           formHook={{
             register,
             name: 'weightedAt',
