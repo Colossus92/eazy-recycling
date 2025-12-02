@@ -2,6 +2,27 @@
 trigger: always_on
 ---
 
-In the backend (the springboot-backend folder, with Spring and Kotlin code). Apply Domain-Driven-Design and hexagonal architecture best practices.
+---
+description: Standards for Spring Boot, Kotlin, and DDD implementation
+globs: "**/*.kt"
+---
+# Backend Architecture Standards
 
-Till date there are some simple entities (like processing-method, eural code, truck, wastecontainers) which do not necessarily need to be in this architecture style, because of their simplicity. But do apply patterns for the core aggregates, ContainerTransport, WasteTransport, WasteStream, Company.
+## Core Architecture
+- **Pattern**: DDD with Hexagonal Architecture (Ports & Adapters).
+- **Structure**:
+  - `domain`: Pure Kotlin. Contains Aggregates, Entities, Value Objects. No frameworks.
+  - `application`: Use Cases / Services orchestrating domain logic.
+  - `infrastructure`: Adapters (Rest Controllers, JPA Repositories).
+  - `ports`: Interfaces defined in `domain` or `application`, implemented in `infrastructure`.
+
+## Implementation Rules
+- **Entities**: Mutable, have identity.
+- **Value Objects**: Immutable data classes.
+- **Repositories**: 
+  - Define interface in `domain/ports`.
+  - Implement JpaRepository in `infrastructure`.
+  - Use DTOs for DB persistence; map to/from Domain Entities.
+- **Testing**: 
+  - Domain logic: JUnit 5 (Unit tests).
+  - Infrastructure/Flows: Spring Integration Tests (`@SpringBootTest`).
