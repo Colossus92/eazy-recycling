@@ -74,17 +74,24 @@ class GetAllCompaniesQuery(
       companyViews
     }
 
+    // Sort by external code (ascending, nulls last) then by name (ascending)
+    val sortedViews = filteredViews.sortedWith(
+      compareBy<CompleteCompanyView> { it.externalCode.isNullOrBlank() }
+        .thenBy { it.externalCode?.lowercase() }
+        .thenBy { it.name.lowercase() }
+    )
+
     // Add branches if requested
     val viewsWithBranches = if (includeBranches) {
       val branches = projectLocations.findAll()
         .map { CompanyController.CompanyBranchResponse.from(it) }
 
-      filteredViews.map { company ->
+      sortedViews.map { company ->
         val companyBranches = branches.filter { it.companyId == company.id }
         company.copy(branches = companyBranches)
       }
     } else {
-      filteredViews
+      sortedViews
     }
 
     // Create page with potentially filtered results
