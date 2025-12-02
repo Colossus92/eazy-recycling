@@ -3,9 +3,33 @@ package nl.eazysoftware.eazyrecyclingservice.application.query
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
+import org.springframework.data.domain.Page
 import java.time.Instant
 import java.util.*
 import kotlin.time.toJavaInstant
+
+/**
+ * Paginated response for company list endpoint.
+ */
+data class PagedCompanyResponse(
+  val content: List<CompleteCompanyView>,
+  val page: Int,
+  val size: Int,
+  val totalElements: Long,
+  val totalPages: Int,
+) {
+  companion object {
+    fun from(page: Page<CompleteCompanyView>): PagedCompanyResponse {
+      return PagedCompanyResponse(
+        content = page.content,
+        page = page.number,
+        size = page.size,
+        totalElements = page.totalElements,
+        totalPages = page.totalPages,
+      )
+    }
+  }
+}
 
 data class CompleteCompanyView(
   val id: UUID,

@@ -18,8 +18,8 @@ export const ProcessorPartySelectFormField = <TFieldValues extends FieldValues>(
 }: ProcessorPartySelectFormFieldProps<TFieldValues>) => {
     const formContext = useFormContext<TFieldValues>();
     const { data: companies = [] } = useQuery<Company[]>({
-        queryKey: ['companies'],
-        queryFn: () => companyService.getAll(),
+        queryKey: ['companies', 'list'],
+        queryFn: () => companyService.getAllAsList(),
     });
     const processorPartyOptions = companies.filter((company) => company.processorId).map((company) => ({
         value: company.processorId!!,

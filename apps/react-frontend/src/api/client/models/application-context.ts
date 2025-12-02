@@ -52,16 +52,16 @@ export interface ApplicationContext {
     'autowireCapableBeanFactory'?: any;
     /**
      * 
-     * @type {string}
-     * @memberof ApplicationContext
-     */
-    'applicationName'?: string;
-    /**
-     * 
      * @type {number}
      * @memberof ApplicationContext
      */
     'startupDate'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApplicationContext
+     */
+    'applicationName'?: string;
     /**
      * 
      * @type {Environment}

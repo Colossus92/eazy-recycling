@@ -67,6 +67,7 @@ export * from './no-pickup-view';
 export * from './page-lma-declaration-view';
 export * from './pageable';
 export * from './pageable-object';
+export * from './paged-company-response';
 export * from './person-consignor';
 export * from './person-consignor-view';
 export * from './pickup-company-request';

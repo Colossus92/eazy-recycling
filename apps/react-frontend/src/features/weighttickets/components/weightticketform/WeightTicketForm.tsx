@@ -125,7 +125,7 @@ export const WeightTicketForm = ({
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.getAll(),
+    queryFn: () => companyService.getAllAsList(),
   });
   const companyOptions = companies.map((company) => ({
     value: company.id || '',

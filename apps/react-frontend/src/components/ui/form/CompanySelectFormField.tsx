@@ -22,8 +22,8 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
   role = undefined,
 }: CompanySelectFormFieldProps<TFieldValues>) => {
   const { data: companies = [] } = useQuery<Company[]>({
-    queryKey: ['companies'],
-    queryFn: () => companyService.getAll(false, role),
+    queryKey: ['companies', 'list', role],
+    queryFn: () => companyService.getAllAsList(false, role),
   });
   const companyOptions = companies.map((company) => ({
     value: company.id || '',

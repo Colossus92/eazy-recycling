@@ -33,18 +33,28 @@ export const ContentTable = <T, S = T>({
   additionalActions,
   expandableConfig,
 }: ContentTableProps<T, S>) => {
-  const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  // Local pagination state (used when server-side pagination is not provided)
+  const [localPage, setLocalPage] = useState(1);
+  const [localRowsPerPage, setLocalRowsPerPage] = useState(10);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const prevItemsLengthRef = useRef(data.items.length);
 
-  // Reset page to 1 when items change (e.g., after search)
+  // Use server-side pagination if provided, otherwise use local state
+  const isServerPaginated = !!data.pagination;
+  const page = isServerPaginated ? data.pagination!.page : localPage;
+  const setPage = isServerPaginated ? data.pagination!.setPage : setLocalPage;
+  const rowsPerPage = isServerPaginated ? data.pagination!.rowsPerPage : localRowsPerPage;
+  const setRowsPerPage = isServerPaginated ? data.pagination!.setRowsPerPage : setLocalRowsPerPage;
+  const totalElements = isServerPaginated ? data.pagination!.totalElements : data.items.length;
+  const totalPages = isServerPaginated ? data.pagination!.totalPages : undefined;
+
+  // Reset page to 1 when items change (only for client-side pagination)
   useEffect(() => {
-    if (prevItemsLengthRef.current !== data.items.length) {
-      setPage(1);
+    if (!isServerPaginated && prevItemsLengthRef.current !== data.items.length) {
+      setLocalPage(1);
       prevItemsLengthRef.current = data.items.length;
     }
-  }, [data.items.length]);
+  }, [data.items.length, isServerPaginated]);
 
   return (
     <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary h-full overflow-y-auto">
@@ -66,9 +76,10 @@ export const ContentTable = <T, S = T>({
           </tr>
         </thead>
         <tbody>
-          {data.items
-            .slice((page - 1) * rowsPerPage, page * rowsPerPage)
-            .map((item, index) => {
+          {(isServerPaginated 
+            ? data.items // Server already returns paginated data
+            : data.items.slice((page - 1) * rowsPerPage, page * rowsPerPage)
+          ).map((item, index) => {
               const actualIndex = (page - 1) * rowsPerPage + index;
               const isExpanded = expandedRows.has(actualIndex);
               const hasSubItems = expandableConfig?.hasSubItems(item) || false;
@@ -150,7 +161,8 @@ export const ContentTable = <T, S = T>({
                 setPage={setPage}
                 rowsPerPage={rowsPerPage}
                 setRowsPerPage={setRowsPerPage}
-                numberOfResults={data.items.length}
+                numberOfResults={totalElements}
+                totalPages={totalPages}
               />
             </td>
           </tr>

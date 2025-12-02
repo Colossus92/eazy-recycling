@@ -36,6 +36,17 @@ export interface CrudDataProps<T> {
   items: T[];
   columns: Column<T>[];
   setQuery: (value: string) => void;
+  /**
+   * Server-side pagination config. If provided, pagination is controlled externally.
+   */
+  pagination?: {
+    page: number;
+    setPage: (page: number) => void;
+    rowsPerPage: number;
+    setRowsPerPage: (rowsPerPage: number) => void;
+    totalElements: number;
+    totalPages: number;
+  };
 }
 
 export interface CrudDialogProps<T> {

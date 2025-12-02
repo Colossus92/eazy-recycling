@@ -31,12 +31,6 @@ export interface HttpStatusCode {
      * @type {boolean}
      * @memberof HttpStatusCode
      */
-    'is3xxRedirection'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof HttpStatusCode
-     */
     'is4xxClientError'?: boolean;
     /**
      * 
@@ -56,5 +50,11 @@ export interface HttpStatusCode {
      * @memberof HttpStatusCode
      */
     'is2xxSuccessful'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof HttpStatusCode
+     */
+    'is3xxRedirection'?: boolean;
 }
 

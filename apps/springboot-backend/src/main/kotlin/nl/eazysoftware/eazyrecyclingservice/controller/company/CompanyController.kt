@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
 import nl.eazysoftware.eazyrecyclingservice.application.query.CompleteCompanyView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
+import nl.eazysoftware.eazyrecyclingservice.application.query.PagedCompanyResponse
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
@@ -91,9 +92,12 @@ class CompanyController(
   @PreAuthorize(HAS_ANY_ROLE)
   fun getCompanies(
     @RequestParam(required = false) includeBranches: Boolean = false,
-    @RequestParam(required = false) role: CompanyRole? = null
-  ): List<CompleteCompanyView> {
-    return getAllCompaniesQuery.handle(includeBranches, role)
+    @RequestParam(required = false) role: CompanyRole? = null,
+    @RequestParam(required = false) query: String? = null,
+    @RequestParam(required = false, defaultValue = "0") page: Int = 0,
+    @RequestParam(required = false, defaultValue = "10") size: Int = 10,
+  ): PagedCompanyResponse {
+    return getAllCompaniesQuery.searchPaginated(query, role, page, size, includeBranches)
   }
 
   @GetMapping("/{id}")

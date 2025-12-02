@@ -35,7 +35,7 @@ export const CompanyAddressInput = <T extends FieldValues>({
 }: CompanyAddressInputProps<T>) => {
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies', includeBranches],
-    queryFn: () => companyService.getAll(includeBranches),
+    queryFn: () => companyService.getAllAsList(includeBranches),
     refetchOnMount: false,
   });
   const {

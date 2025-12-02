@@ -12,7 +12,7 @@ export const ContainerTransportMainSection = () => {
   } = useFormContext<ContainerTransportFormValues>();
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.getAll(),
+    queryFn: () => companyService.getAllAsList(),
   });
 
   const companyOptions = companies.map((company) => ({

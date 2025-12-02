@@ -15,49 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { CompleteCompanyView } from './complete-company-view';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface PagedCompanyResponse
  */
-export interface PageableObject {
+export interface PagedCompanyResponse {
+    /**
+     * 
+     * @type {Array<CompleteCompanyView>}
+     * @memberof PagedCompanyResponse
+     */
+    'content': Array<CompleteCompanyView>;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof PagedCompanyResponse
      */
-    'offset'?: number;
-    /**
-     * 
-     * @type {SortObject}
-     * @memberof PageableObject
-     */
-    'sort'?: SortObject;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
+    'page': number;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof PagedCompanyResponse
      */
-    'pageNumber'?: number;
+    'size': number;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof PagedCompanyResponse
      */
-    'pageSize'?: number;
+    'totalElements': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {number}
+     * @memberof PagedCompanyResponse
      */
-    'unpaged'?: boolean;
+    'totalPages': number;
 }
 

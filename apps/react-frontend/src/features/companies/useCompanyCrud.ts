@@ -1,39 +1,51 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { companyService, Company } from '@/api/services/companyService.ts';
+import { companyService, Company, PagedCompanyResponse } from '@/api/services/companyService.ts';
 
 export const useCompanyCrud = () => {
   const queryClient = useQueryClient();
+  const [query, setQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(0); // 0-indexed for API
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+
   const {
-    data: companies = [],
+    data: pagedResponse,
     error,
     isLoading,
-  } = useQuery<Company[]>({
-    queryKey: ['companies'],
-    queryFn: () => companyService.getAll(true),
+  } = useQuery<PagedCompanyResponse>({
+    queryKey: ['companies', { query, page, size: rowsPerPage }],
+    queryFn: () => companyService.getAll({ 
+      includeBranches: true, 
+      query: query || undefined,
+      page,
+      size: rowsPerPage,
+    }),
   });
-  const [query, setQuery] = useState<string>('');
-  const displayedCompanies = useMemo<Company[]>(
-    () =>
-      companies.filter((company: Company) => {
-        return (
-          company.name?.toLowerCase().includes(query.toLowerCase()) ||
-          company.address?.street
-            ?.toLowerCase()
-            .includes(query.toLowerCase()) ||
-          company.address?.city?.toLowerCase().includes(query.toLowerCase()) ||
-          company.chamberOfCommerceId
-            ?.toLowerCase()
-            .includes(query.toLowerCase()) ||
-          company.vihbId?.toLowerCase().includes(query.toLowerCase())||
-          company.processorId?.toLowerCase().includes(query.toLowerCase())
-        );
-      }),
-    [companies, query]
-  );
+
+  const displayedCompanies = pagedResponse?.content ?? [];
+  const totalElements = pagedResponse?.totalElements ?? 0;
+  const totalPages = pagedResponse?.totalPages ?? 0;
+
   const [isAdding, setIsAdding] = useState(false);
   const [editing, setEditing] = useState<Company | undefined>(undefined);
   const [deleting, setDeleting] = useState<Company | undefined>(undefined);
+
+  // Reset to first page when query changes
+  const handleSetQuery = (newQuery: string) => {
+    setQuery(newQuery);
+    setPage(0);
+  };
+
+  // Handle page change (convert from 1-indexed UI to 0-indexed API)
+  const handleSetPage = (uiPage: number) => {
+    setPage(uiPage - 1);
+  };
+
+  // Handle rows per page change
+  const handleSetRowsPerPage = (newRowsPerPage: number) => {
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+  };
 
   const createMutation = useMutation({
     mutationFn: ({ item, restoreCompanyId }: { item: Omit<Company, 'id'>; restoreCompanyId?: string }) => 
@@ -52,7 +64,7 @@ export const useCompanyCrud = () => {
         .invalidateQueries({ queryKey: ['companies'] })
         .then(() => setEditing(undefined));
     },
-  });``
+  });
 
   const removeMutation = useMutation({
     mutationFn: (item: Company) => companyService.delete(item.id),
@@ -92,7 +104,7 @@ export const useCompanyCrud = () => {
 
   return {
     displayedCompanies,
-    setQuery,
+    setQuery: handleSetQuery,
     isAdding,
     setIsAdding,
     setEditing,
@@ -104,5 +116,12 @@ export const useCompanyCrud = () => {
     remove,
     error,
     isLoading,
+    // Pagination
+    page: page + 1, // Convert to 1-indexed for UI
+    setPage: handleSetPage,
+    rowsPerPage,
+    setRowsPerPage: handleSetRowsPerPage,
+    totalElements,
+    totalPages,
   };
 };

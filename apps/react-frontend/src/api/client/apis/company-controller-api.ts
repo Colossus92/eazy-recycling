@@ -32,6 +32,8 @@ import type { CompanyResult } from '../models';
 // @ts-ignore
 import type { CompleteCompanyView } from '../models';
 // @ts-ignore
+import type { PagedCompanyResponse } from '../models';
+// @ts-ignore
 import type { ProjectLocationResult } from '../models';
 /**
  * CompanyControllerApi - axios parameter creator
@@ -234,10 +236,13 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
          * 
          * @param {boolean} [includeBranches] 
          * @param {GetCompaniesRoleEnum} [role] 
+         * @param {string} [query] 
+         * @param {number} [page] 
+         * @param {number} [size] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getCompanies: async (includeBranches?: boolean, role?: GetCompaniesRoleEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCompanies: async (includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/companies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -260,6 +265,18 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
 
             if (role !== undefined) {
                 localVarQueryParameter['role'] = role;
+            }
+
+            if (query !== undefined) {
+                localVarQueryParameter['query'] = query;
+            }
+
+            if (page !== undefined) {
+                localVarQueryParameter['page'] = page;
+            }
+
+            if (size !== undefined) {
+                localVarQueryParameter['size'] = size;
             }
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -433,11 +450,14 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
          * 
          * @param {boolean} [includeBranches] 
          * @param {GetCompaniesRoleEnum} [role] 
+         * @param {string} [query] 
+         * @param {number} [page] 
+         * @param {number} [size] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CompleteCompanyView>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCompanies(includeBranches, role, options);
+        async getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PagedCompanyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCompanies(includeBranches, role, query, page, size, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['CompanyControllerApi.getCompanies']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -530,11 +550,14 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
          * 
          * @param {boolean} [includeBranches] 
          * @param {'CARRIER' | 'PROCESSOR'} [role] 
+         * @param {string} [query] 
+         * @param {number} [page] 
+         * @param {number} [size] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, options?: any): AxiosPromise<Array<CompleteCompanyView>> {
-            return localVarFp.getCompanies(includeBranches, role, options).then((request) => request(axios, basePath));
+        getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, options?: any): AxiosPromise<PagedCompanyResponse> {
+            return localVarFp.getCompanies(includeBranches, role, query, page, size, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -626,12 +649,15 @@ export class CompanyControllerApi extends BaseAPI {
      * 
      * @param {boolean} [includeBranches] 
      * @param {'CARRIER' | 'PROCESSOR'} [role] 
+     * @param {string} [query] 
+     * @param {number} [page] 
+     * @param {number} [size] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CompanyControllerApi
      */
-    public getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, options?: RawAxiosRequestConfig) {
-        return CompanyControllerApiFp(this.configuration).getCompanies(includeBranches, role, options).then((request) => request(this.axios, this.basePath));
+    public getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, options?: RawAxiosRequestConfig) {
+        return CompanyControllerApiFp(this.configuration).getCompanies(includeBranches, role, query, page, size, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

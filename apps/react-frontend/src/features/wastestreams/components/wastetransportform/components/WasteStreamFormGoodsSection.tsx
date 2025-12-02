@@ -20,7 +20,7 @@ export const WasteStreamFormGoodsSection = ({
 
   const { data: companies = [] } = useQuery<Company[]>({
     queryKey: ['companies'],
-    queryFn: () => companyService.getAll(),
+    queryFn: () => companyService.getAllAsList(),
   });
   const { data: eurals = [] } = useQuery<Eural[]>({
     queryKey: ['eurals'],

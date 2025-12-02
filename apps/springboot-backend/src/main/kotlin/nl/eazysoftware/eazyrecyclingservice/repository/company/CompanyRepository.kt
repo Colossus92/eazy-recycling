@@ -5,7 +5,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.data.repository.query.Param
@@ -13,7 +17,7 @@ import org.springframework.stereotype.Repository
 import java.time.Instant
 import java.util.*
 
-interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
+interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID>, JpaSpecificationExecutor<CompanyDto> {
 
   fun findAllByDeletedAtIsNull(): List<CompanyDto>
   fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
@@ -22,15 +26,15 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID> {
   fun findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId: String): CompanyDto?
   fun findByVihbIdAndDeletedAtNotNull(vihbId: String): CompanyDto?
   fun findByProcessorIdAndDeletedAtNotNull(processorId: String): CompanyDto?
-  
+
   @Query("SELECT c FROM CompanyDto c JOIN c.roles r WHERE r = :role AND c.deletedAt IS NULL")
   fun findByRoleAndDeletedAtIsNull(@Param("role") role: CompanyRole): List<CompanyDto>
-  
+
   @Query("""
-    SELECT c FROM CompanyDto c 
-    WHERE c.address.postalCode = :postalCode 
-    AND c.address.buildingNumber = :buildingNumber 
-    AND ((:buildingNumberAddition IS NULL AND c.address.buildingNumberAddition IS NULL) 
+    SELECT c FROM CompanyDto c
+    WHERE c.address.postalCode = :postalCode
+    AND c.address.buildingNumber = :buildingNumber
+    AND ((:buildingNumberAddition IS NULL AND c.address.buildingNumberAddition IS NULL)
          OR c.address.buildingNumberAddition = :buildingNumberAddition)
     AND c.deletedAt IS NULL
   """)
@@ -51,11 +55,6 @@ class CompanyRepository(
     val dto = companyMapper.toDto(company)
     val savedDto = jpaRepository.save(dto)
     return companyMapper.toDomain(savedDto)
-  }
-
-  override fun findAll(): List<Company> {
-    return jpaRepository.findAllByDeletedAtIsNull()
-      .map { companyMapper.toDomain(it) }
   }
 
   override fun findByRole(role: CompanyRole): List<Company> {
@@ -126,8 +125,41 @@ class CompanyRepository(
     return jpaRepository.findByAddressAndDeletedAtIsNull(postalCode, buildingNumber, buildingNumberAddition)
       ?.let { companyMapper.toDomain(it) }
   }
-  
+
   override fun flush() {
     jpaRepository.flush()
+  }
+
+  override fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable): Page<Company> {
+    val spec = buildSearchSpecification(query, role)
+    return jpaRepository.findAll(spec, pageable)
+      .map { companyMapper.toDomain(it) }
+  }
+
+  private fun buildSearchSpecification(query: String?, role: CompanyRole?): Specification<CompanyDto> {
+    return Specification { root, criteriaQuery, criteriaBuilder ->
+      val predicates = mutableListOf(
+        criteriaBuilder.isNull(root.get<Instant?>("deletedAt"))
+      )
+
+      // Role filter
+      if (role != null) {
+        predicates.add(criteriaBuilder.isMember(role, root.get("roles")))
+      }
+
+      // Search query filter - searches across code (externalCode is handled in query layer), name, city, chamberOfCommerceId, vihbId
+      if (!query.isNullOrBlank()) {
+        val searchPattern = "%${query.lowercase()}%"
+        val searchPredicates = listOf(
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), searchPattern),
+          criteriaBuilder.like(criteriaBuilder.lower(root.get<String?>("chamberOfCommerceId")), searchPattern),
+          criteriaBuilder.like(criteriaBuilder.lower(root.get<String?>("vihbId")), searchPattern),
+          criteriaBuilder.like(criteriaBuilder.lower(root.get<Any>("address").get("city")), searchPattern),
+        )
+        predicates.add(criteriaBuilder.or(*searchPredicates.toTypedArray()))
+      }
+
+      criteriaBuilder.and(*predicates.toTypedArray())
+    }
   }
 }

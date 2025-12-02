@@ -10,6 +10,11 @@ interface PaginationRowProps {
   rowsPerPage: number;
   setRowsPerPage: (rowsPerPage: number) => void;
   numberOfResults: number;
+  /**
+   * Total number of pages (for server-side pagination).
+   * If not provided, calculated from numberOfResults / rowsPerPage.
+   */
+  totalPages?: number;
 }
 
 export const PaginationRow = ({
@@ -18,8 +23,10 @@ export const PaginationRow = ({
   rowsPerPage,
   setRowsPerPage,
   numberOfResults,
+  totalPages: totalPagesProp,
 }: PaginationRowProps) => {
-  const numberOfPages = Math.ceil(numberOfResults / rowsPerPage);
+  // Use provided totalPages for server-side pagination, otherwise calculate
+  const numberOfPages = totalPagesProp ?? Math.ceil(numberOfResults / rowsPerPage);
   const getPageNumbers = () => {
     const maxVisiblePages = 5;
     const pageNumbers = [];

@@ -5,11 +5,13 @@ import {
   CompanyBranchResponse,
   CompanyRequest,
   CompleteCompanyView,
+  PagedCompanyResponse,
 } from '../client/models';
 
 const companyApi = new CompanyControllerApi(apiInstance.config);
 export type Company = CompleteCompanyView;
 export type CompanyBranch = CompanyBranchResponse;
+export type { PagedCompanyResponse };
 
 const mapCompanyToCompanyRequest = (
   company: Omit<Company, 'id'>
@@ -25,9 +27,34 @@ const mapCompanyToCompanyRequest = (
   };
 };
 
+export interface GetCompaniesParams {
+  includeBranches?: boolean;
+  role?: string;
+  query?: string;
+  page?: number;
+  size?: number;
+}
+
 export const companyService = {
-  getAll: (includeBranches: boolean = false, role?: string) =>
-    companyApi.getCompanies(includeBranches, role).then((r) => r.data),
+  /**
+   * Get paginated companies with optional search and filtering.
+   * Use this for the main company list with pagination.
+   */
+  getAll: (params: GetCompaniesParams = {}): Promise<PagedCompanyResponse> => {
+    const { includeBranches = false, role, query, page = 0, size = 10 } = params;
+    return companyApi.getCompanies(includeBranches, role, query, page, size).then((r) => r.data);
+  },
+  
+  /**
+   * Get all companies as a simple list (no pagination).
+   * Use this for dropdowns and selects where you need all companies.
+   * Fetches a large page size to get all companies in one request.
+   */
+  getAllAsList: (includeBranches: boolean = false, role?: string): Promise<Company[]> => {
+    // Fetch a large page to get all companies
+    return companyApi.getCompanies(includeBranches, role, undefined, 0, 1000)
+      .then((r) => r.data.content);
+  },
   create: (c: Omit<Company, 'id'>, restoreCompanyId?: string) => {
     return companyApi
       .createCompany(mapCompanyToCompanyRequest(c), restoreCompanyId)

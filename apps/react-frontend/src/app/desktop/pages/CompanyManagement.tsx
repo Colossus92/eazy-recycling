@@ -27,6 +27,13 @@ export const CompanyManagement = () => {
     remove,
     error,
     isLoading,
+    // Pagination
+    page,
+    setPage,
+    rowsPerPage,
+    setRowsPerPage,
+    totalElements,
+    totalPages,
   } = useCompanyCrud();
   const { handlers, renderDialogs } = useBranchManagement();
 
@@ -124,6 +131,14 @@ export const CompanyManagement = () => {
           items: displayedCompanies,
           columns,
           setQuery,
+          pagination: {
+            page,
+            setPage,
+            rowsPerPage,
+            setRowsPerPage,
+            totalElements,
+            totalPages,
+          },
         }}
         dialogs={{
           add: {

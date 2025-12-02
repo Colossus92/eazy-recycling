@@ -148,7 +148,8 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     securedMockMvc.get("/companies")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$.content.length()").value(2))
+      .andExpect(jsonPath("$.totalElements").value(2))
   }
 
   @Test
@@ -157,9 +158,9 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     securedMockMvc.get("/companies")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[0].id").value(testCompany.id.toString()))
-      .andExpect(jsonPath("$[0].name").value(testCompany.name))
-      .andExpect(jsonPath("$[0].branches").isEmpty())
+      .andExpect(jsonPath("$.content[0].id").value(testCompany.id.toString()))
+      .andExpect(jsonPath("$.content[0].name").value(testCompany.name))
+      .andExpect(jsonPath("$.content[0].branches").isEmpty())
   }
 
   @Test
@@ -168,9 +169,9 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     securedMockMvc.get("/companies?includeBranches=false")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[0].id").value(testCompany.id.toString()))
-      .andExpect(jsonPath("$[0].name").value(testCompany.name))
-      .andExpect(jsonPath("$[0].branches").isEmpty())
+      .andExpect(jsonPath("$.content[0].id").value(testCompany.id.toString()))
+      .andExpect(jsonPath("$.content[0].name").value(testCompany.name))
+      .andExpect(jsonPath("$.content[0].branches").isEmpty())
   }
 
   @Test
@@ -179,13 +180,13 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[0].id").value(testCompany.id.toString()))
-      .andExpect(jsonPath("$[0].name").value(testCompany.name))
-      .andExpect(jsonPath("$[0].branches.length()").value(2))
-      .andExpect(jsonPath("$[0].branches[0].id").exists())
-      .andExpect(jsonPath("$[0].branches[0].address.postalCode").value(testBranches[0].postalCode))
-      .andExpect(jsonPath("$[0].branches[1].id").exists())
-      .andExpect(jsonPath("$[0].branches[1].address.postalCode").value(testBranches[1].postalCode))
+      .andExpect(jsonPath("$.content[0].id").value(testCompany.id.toString()))
+      .andExpect(jsonPath("$.content[0].name").value(testCompany.name))
+      .andExpect(jsonPath("$.content[0].branches.length()").value(2))
+      .andExpect(jsonPath("$.content[0].branches[0].id").exists())
+      .andExpect(jsonPath("$.content[0].branches[0].address.postalCode").value(testBranches[0].postalCode))
+      .andExpect(jsonPath("$.content[0].branches[1].id").exists())
+      .andExpect(jsonPath("$.content[0].branches[1].address.postalCode").value(testBranches[1].postalCode))
   }
 
   @Test
@@ -227,15 +228,15 @@ class CompanyControllerIntegrationTest @Autowired constructor(
 
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.length()").value(2))
+      .andExpect(jsonPath("$.content.length()").value(2))
 
       // First company should have 2 branches
-      .andExpect(jsonPath("$[?(@.id == '${testCompany.id}')].branches.length()").value(2))
+      .andExpect(jsonPath("$.content[?(@.id == '${testCompany.id}')].branches.length()").value(2))
 
       // Second company should have 1 branch
-      .andExpect(jsonPath("$[?(@.id == '${secondCompany.id}')].branches.length()").value(1))
+      .andExpect(jsonPath("$.content[?(@.id == '${secondCompany.id}')].branches.length()").value(1))
       .andExpect(
-        jsonPath("$[?(@.id == '${secondCompany.id}')].branches[0].address.postalCode").value(
+        jsonPath("$.content[?(@.id == '${secondCompany.id}')].branches[0].address.postalCode").value(
           secondCompanyBranch.postalCode
         )
       )
@@ -537,10 +538,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated by fetching companies with branches
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("200"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("2000BB"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("200"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("2000BB"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
 
   @Test
@@ -706,10 +707,10 @@ class CompanyControllerIntegrationTest @Autowired constructor(
     // Verify the branch was updated correctly
     securedMockMvc.get("/companies?includeBranches=true")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumberAddition").value(null))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("600"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("6000FF"))
-      .andExpect(jsonPath("$[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.street").value("Updated Street"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.houseNumberAddition").value(null))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.houseNumber").value("600"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("6000FF"))
+      .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
 }

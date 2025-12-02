@@ -93,6 +93,7 @@ models/no-pickup-view.ts
 models/page-lma-declaration-view.ts
 models/pageable-object.ts
 models/pageable.ts
+models/paged-company-response.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
 models/pickup-company-request.ts

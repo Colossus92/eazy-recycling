@@ -25,7 +25,7 @@ interface Option {
 export const CompanyLocationInput = ({ name, disabled = false }: CompanyLocationInputProps) => {
     const { data: companies = [] } = useQuery<Company[]>({
         queryKey: ['companies', true],
-        queryFn: () => companyService.getAll(true),
+        queryFn: () => companyService.getAllAsList(true),
         refetchOnMount: false,
     });
 
