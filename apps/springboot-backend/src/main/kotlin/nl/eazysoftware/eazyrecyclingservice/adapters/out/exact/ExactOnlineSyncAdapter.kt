@@ -17,6 +17,9 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.*
 
@@ -220,7 +223,7 @@ class ExactOnlineSyncAdapter(
 
   /**
    * Sync companies from Exact Online to our database using the Sync API.
-   * Uses timestamp-based pagination to get only new and changed records.
+   * Uses timestamp-based filtering for incremental sync and __next property for pagination.
    */
   @Transactional
   override fun syncFromExact(): SyncFromExactResult {
@@ -232,7 +235,7 @@ class ExactOnlineSyncAdapter(
 
     logger.info("Starting sync from Exact Online")
 
-    // Get the last timestamp from cursor, or start from 1 (first sync)
+    // Get the last timestamp from cursor, or start from 0 (first sync)
     val cursor = syncCursorRepository.findByEntityAndCursorType(SYNC_ENTITY_ACCOUNTS, SyncCursorDto.CURSOR_TYPE_SYNC)
     val lastTimestamp = cursor?.lastTimestamp ?: 0L
 
@@ -241,20 +244,18 @@ class ExactOnlineSyncAdapter(
     var totalUpdated = 0
     var totalConflicted = 0
     var totalPendingReview = 0
-    var currentTimestamp = lastTimestamp
-    var hasMoreRecords = true
+    var maxTimestampSeen = lastTimestamp
 
-    // Paginate through all records using timestamp
-    while (hasMoreRecords) {
-      val response = fetchAccountsFromExact(currentTimestamp)
-      val accounts = response.d.results
-        .filter { it.Status == "C" || it.IsSupplier == true } // Sync endpoint does not support filtering on fields
+    // Initial request with timestamp filter
+    var nextUrl: String? = buildAccountsSyncUrl(lastTimestamp)
 
-      if (accounts.isEmpty()) {
-        break  // Exit loop - no need to update timestamp when no records
-      }
+    // Paginate through all records using __next property
+    while (nextUrl != null) {
+      val response = fetchAccountsFromUrl(nextUrl)
+      val allAccounts = response.d.results
+      val accounts = allAccounts.filter { it.Status == "C" || it.IsSupplier == true } // Sync endpoint does not support filtering on fields
 
-      logger.info("Fetched ${accounts.size} accounts from Exact Online (timestamp > $currentTimestamp)")
+      logger.info("Fetched ${allAccounts.size} accounts from Exact Online (${accounts.size} after filtering)")
 
       for (account in accounts) {
         try {
@@ -282,12 +283,17 @@ class ExactOnlineSyncAdapter(
         }
       }
 
-      // Update timestamp to the highest value in this batch
-      val maxTimestamp = accounts.maxOfOrNull { it.Timestamp } ?: currentTimestamp
-      currentTimestamp = maxTimestamp
+      // Track the highest timestamp seen across all batches
+      val batchMaxTimestamp = allAccounts.maxOfOrNull { it.Timestamp } ?: 0L
+      if (batchMaxTimestamp > maxTimestampSeen) {
+        maxTimestampSeen = batchMaxTimestamp
+      }
 
-      // If we got less than 1000 records, we've reached the end
-      hasMoreRecords = accounts.size >= 1000
+      // Use __next for pagination - Exact Online handles the skiptoken
+      nextUrl = response.d.next
+      if (nextUrl != null) {
+        logger.debug("Following __next link for more records")
+      }
     }
 
     logger.info("Sync from Exact Online completed: $totalSynced records synced ($totalCreated created, $totalUpdated updated, $totalConflicted conflicts, $totalPendingReview pending review)")
@@ -296,16 +302,19 @@ class ExactOnlineSyncAdapter(
     val deletedResult = syncDeletedFromExact()
 
     // Save the new cursor only after both syncs completed successfully
+    // Always save the cursor, even if no records were synced (to persist the timestamp)
     val newCursor = cursor?.copy(
-      lastTimestamp = currentTimestamp,
+      lastTimestamp = maxTimestampSeen,
       updatedAt = Instant.now()
     ) ?: SyncCursorDto(
       entity = SYNC_ENTITY_ACCOUNTS,
       cursorType = SyncCursorDto.CURSOR_TYPE_SYNC,
-      lastTimestamp = currentTimestamp,
+      lastTimestamp = maxTimestampSeen,
       updatedAt = Instant.now()
     )
     syncCursorRepository.save(newCursor)
+
+    logger.info("Updated sync cursor to timestamp $maxTimestampSeen")
 
     return SyncFromExactResult(
       recordsSynced = totalSynced,
@@ -313,7 +322,7 @@ class ExactOnlineSyncAdapter(
       recordsUpdated = totalUpdated,
       recordsConflicted = totalConflicted,
       recordsPendingReview = totalPendingReview,
-      newTimestamp = currentTimestamp,
+      newTimestamp = maxTimestampSeen,
       deletedRecordsProcessed = deletedResult.recordsProcessed,
       deletedRecordsDeleted = deletedResult.recordsDeleted,
       deletedRecordsNotFound = deletedResult.recordsNotFound
@@ -344,7 +353,7 @@ class ExactOnlineSyncAdapter(
 
   /**
    * Sync deleted records from Exact Online.
-   * Uses the Exact Online Deleted API with timestamp-based pagination.
+   * Uses the Exact Online Deleted API with __next property for pagination.
    * Soft-deletes companies locally that were deleted in Exact.
    */
   private fun syncDeletedFromExact(): SyncDeletedResult {
@@ -356,26 +365,24 @@ class ExactOnlineSyncAdapter(
 
     logger.info("Starting deletion sync from Exact Online")
 
-    // Get the last timestamp from deleted cursor, or start from 1 (first sync)
+    // Get the last timestamp from deleted cursor, or start from 0 (first sync)
     val cursor = syncCursorRepository.findByEntityAndCursorType(SYNC_ENTITY_ACCOUNTS, SyncCursorDto.CURSOR_TYPE_DELETED)
     val lastTimestamp = cursor?.lastTimestamp ?: 0L
 
     var totalProcessed = 0
     var totalDeleted = 0
     var totalNotFound = 0
-    var currentTimestamp = lastTimestamp
-    var hasMoreRecords = true
+    var maxTimestampSeen = lastTimestamp
 
-    // Paginate through all deleted records using timestamp
-    while (hasMoreRecords) {
-      val response = fetchDeletedFromExact(currentTimestamp)
+    // Initial request with timestamp filter
+    var nextUrl: String? = buildDeletedSyncUrl(lastTimestamp)
+
+    // Paginate through all deleted records using __next property
+    while (nextUrl != null) {
+      val response = fetchDeletedFromUrl(nextUrl)
       val deletedRecords = response.d.results
 
-      if (deletedRecords.isEmpty()) {
-        break  // Exit loop - no need to update timestamp when no records
-      }
-
-      logger.info("Fetched ${deletedRecords.size} deleted records from Exact Online (timestamp > $currentTimestamp)")
+      logger.info("Fetched ${deletedRecords.size} deleted records from Exact Online")
 
       for (deleted in deletedRecords) {
         // Only process Account deletions (EntityType = 2)
@@ -397,27 +404,33 @@ class ExactOnlineSyncAdapter(
         }
       }
 
-      // Update timestamp to the highest value in this batch
-      val maxTimestamp = deletedRecords.maxOfOrNull { it.Timestamp } ?: currentTimestamp
-      currentTimestamp = maxTimestamp
+      // Track the highest timestamp seen across all batches
+      val batchMaxTimestamp = deletedRecords.maxOfOrNull { it.Timestamp } ?: 0L
+      if (batchMaxTimestamp > maxTimestampSeen) {
+        maxTimestampSeen = batchMaxTimestamp
+      }
 
-      // If we got less than 1000 records, we've reached the end
-      hasMoreRecords = deletedRecords.size >= 1000
+      // Use __next for pagination - Exact Online handles the skiptoken
+      nextUrl = response.d.next
+      if (nextUrl != null) {
+        logger.debug("Following __next link for more deleted records")
+      }
     }
 
     // Save the new cursor
     val newCursor = cursor?.copy(
-      lastTimestamp = currentTimestamp,
+      lastTimestamp = maxTimestampSeen,
       updatedAt = Instant.now()
     ) ?: SyncCursorDto(
       entity = SYNC_ENTITY_ACCOUNTS,
       cursorType = SyncCursorDto.CURSOR_TYPE_DELETED,
-      lastTimestamp = currentTimestamp,
+      lastTimestamp = maxTimestampSeen,
       updatedAt = Instant.now()
     )
     syncCursorRepository.save(newCursor)
 
     logger.info("Deletion sync from Exact Online completed: $totalProcessed records processed ($totalDeleted deleted, $totalNotFound not found)")
+    logger.info("Updated deleted sync cursor to timestamp $maxTimestampSeen")
 
     return SyncDeletedResult(
       recordsProcessed = totalProcessed,
@@ -484,43 +497,72 @@ class ExactOnlineSyncAdapter(
   }
 
   /**
-   * Fetch deleted records from Exact Online Deleted API
+   * Build the initial URL for fetching accounts from Exact Online Sync API.
+   * Query parameters are properly encoded for use with URI.create().
    */
-  private fun fetchDeletedFromExact(timestamp: Long): ExactDeletedResponse {
-    val restTemplate = exactApiClient.getRestTemplate()
-    val url =
-      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted?\$filter=Timestamp gt ${timestamp}L&\$select=Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID"
-
-    logger.debug("Fetching deleted records from Exact Online: $url")
-
-    val response = restTemplate.exchange(
-      url,
-      HttpMethod.GET,
-      null,
-      ExactDeletedResponse::class.java
-    )
-
-    return response.body ?: throw IllegalStateException("Empty response from Exact Online Deleted API")
+  private fun buildAccountsSyncUrl(timestamp: Long): String {
+    val baseUrl = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts"
+    val select = encodeQueryParam("ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier,Timestamp")
+    val filter = encodeQueryParam("Timestamp gt ${timestamp}L")
+    return "$baseUrl?\$select=$select&\$filter=$filter"
   }
 
   /**
-   * Fetch accounts from Exact Online Sync API
+   * Build the initial URL for fetching deleted records from Exact Online Deleted API.
+   * Query parameters are properly encoded for use with URI.create().
    */
-  private fun fetchAccountsFromExact(timestamp: Long): ExactSyncAccountsResponse {
+  private fun buildDeletedSyncUrl(timestamp: Long): String {
+    val baseUrl = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted"
+    val select = encodeQueryParam("Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID")
+    val filter = encodeQueryParam("Timestamp gt ${timestamp}L")
+    return "$baseUrl?\$filter=$filter&\$select=$select"
+  }
+
+  /**
+   * URL-encode a query parameter value.
+   */
+  private fun encodeQueryParam(value: String): String {
+    return URLEncoder.encode(value, StandardCharsets.UTF_8)
+  }
+
+  /**
+   * Fetch accounts from Exact Online using the provided URL (initial or __next).
+   * Uses URI to prevent double-encoding of the __next URL which is already encoded.
+   */
+  private fun fetchAccountsFromUrl(url: String): ExactSyncAccountsResponse {
     val restTemplate = exactApiClient.getRestTemplate()
-    val url =
-      "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts?\$select=ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier&\$filter=Timestamp gt ${timestamp}L"
 
     logger.debug("Fetching accounts from Exact Online: $url")
 
+    // Use URI.create() to prevent RestTemplate from re-encoding an already-encoded URL
     val response = restTemplate.exchange(
-      url,
+      URI.create(url),
       HttpMethod.GET,
       null,
       ExactSyncAccountsResponse::class.java
     )
 
     return response.body ?: throw IllegalStateException("Empty response from Exact Online Sync API")
+  }
+
+  /**
+   * Fetch deleted records from Exact Online using the provided URL (initial or __next).
+   * Uses URI to prevent double-encoding of the __next URL which is already encoded.
+   */
+  private fun fetchDeletedFromUrl(url: String): ExactDeletedResponse {
+    val restTemplate = exactApiClient.getRestTemplate()
+
+    logger.debug("Fetching deleted records from Exact Online: $url")
+
+    // Use URI.create() to prevent RestTemplate from re-encoding an already-encoded URL
+    val response = restTemplate.exchange(
+      URI.create(url),
+      HttpMethod.GET,
+      null,
+      ExactDeletedResponse::class.java
+    )
+
+    return response.body ?: throw IllegalStateException("Empty response from Exact Online Deleted API")
   }
 
   /**
@@ -633,7 +675,9 @@ class ExactOnlineSyncAdapter(
   )
 
   data class ExactSyncAccountsData(
-    val results: List<ExactSyncAccount>
+    val results: List<ExactSyncAccount>,
+    @field:JsonProperty("__next")
+    val next: String? = null
   )
 
   data class ExactSyncAccount(
@@ -672,7 +716,9 @@ class ExactOnlineSyncAdapter(
   )
 
   data class ExactDeletedData(
-    val results: List<ExactDeletedRecord>
+    val results: List<ExactDeletedRecord>,
+    @field:JsonProperty("__next")
+    val next: String? = null
   )
 
   data class ExactDeletedRecord(
