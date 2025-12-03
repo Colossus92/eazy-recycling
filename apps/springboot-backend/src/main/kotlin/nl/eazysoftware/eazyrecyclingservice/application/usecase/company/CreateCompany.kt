@@ -99,7 +99,6 @@ class CreateCompanyService(
       // Persist failed sync record
       val syncDto = CompanySyncDto(
         companyId = savedCompany.companyId.uuid,
-        externalId = null,
         syncStatus = SyncStatus.FAILED,
         syncedFromSourceAt = Instant.now(),
         syncErrorMessage = "${e::class.simpleName}: ${e.message}",

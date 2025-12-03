@@ -107,7 +107,6 @@ class ExactAccountProcessor(
           account,
           existingSync ?: CompanySyncDto(
             companyId = companyByKvk.companyId.uuid,
-            externalId = account.Code,
             exactGuid = account.ID,
             syncStatus = SyncStatus.OK,
             syncedFromSourceAt = Instant.now()
@@ -135,6 +134,7 @@ class ExactAccountProcessor(
     buildingNumberAddition: String?
   ): ProcessResult {
     val updatedCompany = existingCompany.copy(
+      code = account.Code?.trim(),
       name = account.Name,
       chamberOfCommerceId = account.ChamberOfCommerce,
       address = Address(
@@ -166,7 +166,6 @@ class ExactAccountProcessor(
       )
 
       val conflictSync = syncRecord.copy(
-        externalId = account.Code,
         exactGuid = account.ID,
         syncStatus = SyncStatus.CONFLICT,
         syncedFromSourceAt = Instant.now(),
@@ -187,7 +186,6 @@ class ExactAccountProcessor(
 
     // Update sync record
     val updatedSync = syncRecord.copy(
-      externalId = account.Code,
       exactGuid = account.ID,
       syncStatus = SyncStatus.OK,
       syncedFromSourceAt = Instant.now(),
@@ -218,6 +216,7 @@ class ExactAccountProcessor(
     val newCompanyId = CompanyId(UUID.randomUUID())
     val company = Company(
       companyId = newCompanyId,
+      code = account.Code?.trim(),
       name = account.Name,
       chamberOfCommerceId = account.ChamberOfCommerce,
       vihbNumber = null, // Not available from Exact
@@ -252,14 +251,12 @@ class ExactAccountProcessor(
       return conflictHandler.createValidationConflict(account, constraintMessage, "CREATE_CONSTRAINT_VIOLATION")
     }
 
-    // Create or update sync record linking our company ID to the Exact GUID and Code
+    // Create or update sync record linking our company ID to the Exact GUID
     // Check if there's an existing sync record (e.g., from a previous conflict) and update it
     val existingSync = companySyncRepository.findByExactGuid(account.ID)
-      ?: account.Code?.let { companySyncRepository.findByExternalId(it) }
 
     val syncDto = existingSync?.copy(
         companyId = newCompanyId.uuid,
-        externalId = account.Code,
         exactGuid = account.ID,
         syncStatus = SyncStatus.OK,
         syncedFromSourceAt = Instant.now(),
@@ -269,7 +266,6 @@ class ExactAccountProcessor(
     )
         ?: CompanySyncDto(
           companyId = newCompanyId.uuid,
-          externalId = account.Code,
           exactGuid = account.ID,
           syncStatus = SyncStatus.OK,
           syncedFromSourceAt = Instant.now()

@@ -1,5 +1,6 @@
 create table if not exists companies (
                            id uuid not null,
+                           code text,
                            building_number_addition text,
                            building_number text,
                            chamber_of_commerce_id text unique,
@@ -368,7 +369,6 @@ create table if not exists exact_tokens (
 create table if not exists companies_sync (
                                                id uuid not null,
                                                company_id uuid not null,
-                                               external_id text,
                                                exact_guid uuid,
                                                last_timestamp bigint,
                                                sync_status text not null,

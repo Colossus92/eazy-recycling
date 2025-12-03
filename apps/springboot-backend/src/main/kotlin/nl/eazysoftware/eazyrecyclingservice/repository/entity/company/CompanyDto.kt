@@ -13,6 +13,9 @@ data class CompanyDto(
   @Id
   val id: UUID,
 
+  @Column(name = "code", nullable = true)
+  val code: String? = null,
+
   @Column(unique = true, nullable = true)
   val chamberOfCommerceId: String? = null,
 

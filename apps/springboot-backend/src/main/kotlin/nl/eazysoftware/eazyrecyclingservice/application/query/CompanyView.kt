@@ -33,7 +33,7 @@ data class PagedCompanyResponse(
 
 data class CompleteCompanyView(
   val id: UUID,
-  val externalCode: String?,
+  val code: String?,
   val chamberOfCommerceId: String?,
   val vihbId: String?,
   val name: String,
@@ -50,10 +50,10 @@ data class CompleteCompanyView(
   ) {
 
   companion object {
-    fun fromDomain(company: Company, externalCode: String? = null): CompleteCompanyView {
+    fun fromDomain(company: Company): CompleteCompanyView {
       return CompleteCompanyView(
         id = company.companyId.uuid,
-        externalCode = externalCode,
+        code = company.code,
         chamberOfCommerceId = company.chamberOfCommerceId,
         vihbId = company.vihbNumber?.value,
         name = company.name,

@@ -5,6 +5,7 @@ import kotlin.time.Instant
 
 data class Company(
   val companyId: CompanyId,
+  val code: String? = null,
   val name: String,
   val chamberOfCommerceId: String?,
   val vihbNumber: VihbNumber?,

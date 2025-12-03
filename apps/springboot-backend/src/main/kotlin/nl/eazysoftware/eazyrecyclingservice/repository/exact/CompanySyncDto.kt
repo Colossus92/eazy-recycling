@@ -21,13 +21,6 @@ data class CompanySyncDto(
   val companyId: UUID? = null,
 
   /**
-   * The Exact Online Code (auto-generated sequential number).
-   * Used as secondary identifier for matching.
-   */
-  @Column(name = "external_id", nullable = true)
-  val externalId: String? = null,
-
-  /**
    * The Exact Online GUID (primary key in Exact).
    * This is the authoritative link between systems.
    */

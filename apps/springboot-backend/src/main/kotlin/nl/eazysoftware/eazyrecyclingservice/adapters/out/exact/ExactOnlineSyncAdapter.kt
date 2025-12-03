@@ -70,7 +70,6 @@ class ExactOnlineSyncAdapter(
     // Save sync record with OK status, storing both Exact GUID and Code
     val syncDto = CompanySyncDto(
       companyId = company.companyId.uuid,
-      externalId = accountDetails.d.Code,
       exactGuid = exactGuid,
       syncStatus = SyncStatus.OK,
       syncedFromSourceAt = Instant.now()

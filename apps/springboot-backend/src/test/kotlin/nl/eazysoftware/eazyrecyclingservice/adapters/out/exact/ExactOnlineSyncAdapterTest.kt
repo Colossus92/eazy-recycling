@@ -142,7 +142,6 @@ class ExactOnlineSyncAdapterTest {
 
       val savedSync = syncCaptor.firstValue
       assertEquals(companyId, savedSync.companyId)
-      assertEquals(exactCode, savedSync.externalId)
       assertEquals(SyncStatus.OK, savedSync.syncStatus)
       assertNull(savedSync.syncErrorMessage)
     }
@@ -369,7 +368,6 @@ class ExactOnlineSyncAdapterTest {
       val company = createTestCompany()
       val existingSync = CompanySyncDto(
         companyId = companyId,
-        externalId = exactCode,
         exactGuid = null, // No exactGuid
         syncStatus = SyncStatus.OK,
         syncedFromSourceAt = Instant.now()
@@ -428,7 +426,6 @@ class ExactOnlineSyncAdapterTest {
       val exactGuid = UUID.randomUUID()
       val existingSync = CompanySyncDto(
         companyId = companyId,
-        externalId = exactCode,
         exactGuid = exactGuid,
         syncStatus = SyncStatus.OK,
         syncedFromSourceAt = Instant.now()
@@ -468,7 +465,6 @@ class ExactOnlineSyncAdapterTest {
       val exactGuid = UUID.randomUUID()
       val existingSync = CompanySyncDto(
         companyId = companyId,
-        externalId = exactCode,
         exactGuid = exactGuid,
         syncStatus = SyncStatus.OK,
         syncedFromSourceAt = Instant.now()
@@ -508,7 +504,6 @@ class ExactOnlineSyncAdapterTest {
       val exactGuid = UUID.randomUUID()
       val existingSync = CompanySyncDto(
         companyId = companyId,
-        externalId = exactCode,
         exactGuid = exactGuid,
         syncStatus = SyncStatus.OK,
         syncedFromSourceAt = Instant.now()

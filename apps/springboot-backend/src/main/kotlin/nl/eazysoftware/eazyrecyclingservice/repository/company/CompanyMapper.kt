@@ -17,6 +17,7 @@ class CompanyMapper {
   fun toDomain(dto: CompanyDto): Company {
     return Company(
       companyId = CompanyId(dto.id),
+      code = dto.code,
       name = dto.name,
       chamberOfCommerceId = dto.chamberOfCommerceId,
       vihbNumber = dto.vihbId?.let { VihbNumber(it) },
@@ -45,6 +46,7 @@ class CompanyMapper {
   fun toDto(domain: Company): CompanyDto {
     return CompanyDto(
       id = domain.companyId.uuid,
+      code = domain.code,
       name = domain.name,
       chamberOfCommerceId = domain.chamberOfCommerceId,
       vihbId = domain.vihbNumber?.value,

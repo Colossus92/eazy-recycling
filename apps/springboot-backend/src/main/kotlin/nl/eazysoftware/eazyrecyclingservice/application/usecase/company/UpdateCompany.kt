@@ -81,7 +81,6 @@ class UpdateCompanyService(
         // No existing sync record - create one with failed status
         val syncDto = CompanySyncDto(
           companyId = updatedCompany.companyId.uuid,
-          externalId = null,
           syncStatus = SyncStatus.FAILED,
           syncedFromSourceAt = Instant.now(),
           syncErrorMessage = "${e::class.simpleName}: ${e.message}",

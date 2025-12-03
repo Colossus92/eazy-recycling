@@ -19,7 +19,7 @@ import java.util.*
 
 interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID>, JpaSpecificationExecutor<CompanyDto> {
 
-  fun findAllByDeletedAtIsNull(): List<CompanyDto>
+  fun findByVihbIdAndDeletedAtIsNotNull(id: String): CompanyDto?
   fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
   fun findByProcessorIdAndDeletedAtIsNull(processorId: String): CompanyDto?
   fun findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId: String): CompanyDto?
@@ -92,8 +92,7 @@ class CompanyRepository(
   }
 
   override fun existsByVihbNumber(vihbNumber: String): Boolean {
-    return jpaRepository.findAllByDeletedAtIsNull()
-      .any { it.vihbId == vihbNumber }
+    return jpaRepository.findByVihbIdAndDeletedAtIsNotNull(vihbNumber) != null
   }
 
   override fun findDeletedByChamberOfCommerceId(chamberOfCommerceId: String): Company? {
@@ -147,17 +146,33 @@ class CompanyRepository(
         predicates.add(criteriaBuilder.isMember(role, root.get("roles")))
       }
 
-      // Search query filter - searches across code (externalCode is handled in query layer), name, city, chamberOfCommerceId, vihbId
+      // Search query filter - searches across code, name, city, chamberOfCommerceId, vihbId
       if (!query.isNullOrBlank()) {
         val searchPattern = "%${query.lowercase()}%"
         val searchPredicates = listOf(
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("code")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), searchPattern),
-          criteriaBuilder.like(criteriaBuilder.lower(root.get<String?>("chamberOfCommerceId")), searchPattern),
-          criteriaBuilder.like(criteriaBuilder.lower(root.get<String?>("vihbId")), searchPattern),
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("chamberOfCommerceId")), searchPattern),
+          criteriaBuilder.like(criteriaBuilder.lower(root.get("vihbId")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get<Any>("address").get("city")), searchPattern),
         )
         predicates.add(criteriaBuilder.or(*searchPredicates.toTypedArray()))
       }
+
+      // Order by code (numeric sort with nulls last), then by name ascending
+      // LPAD pads with zeros for proper numeric sorting (code is trimmed at source)
+      val codeField = root.get<String?>("code")
+      
+      // COALESCE handles nulls by replacing them with a high value string
+      val paddedCode = criteriaBuilder.coalesce(
+        criteriaBuilder.function("LPAD", String::class.java, codeField, criteriaBuilder.literal(10), criteriaBuilder.literal("0")),
+        "9999999999" // High value for nulls to sort them last
+      )
+      
+      criteriaQuery?.orderBy(
+        criteriaBuilder.asc(paddedCode),
+        criteriaBuilder.asc(root.get<String>("name"))
+      )
 
       criteriaBuilder.and(*predicates.toTypedArray())
     }
