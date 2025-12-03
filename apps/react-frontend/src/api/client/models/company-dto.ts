@@ -34,6 +34,12 @@ export interface CompanyDto {
      * @type {string}
      * @memberof CompanyDto
      */
+    'code'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
     'chamberOfCommerceId'?: string;
     /**
      * 

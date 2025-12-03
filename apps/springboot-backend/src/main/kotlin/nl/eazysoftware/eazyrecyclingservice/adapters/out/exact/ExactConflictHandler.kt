@@ -23,7 +23,7 @@ class ExactConflictHandler(
   /**
    * Create or update a conflict record for an Exact account that cannot be imported.
    * Uses REQUIRES_NEW to ensure the conflict is saved even if the parent transaction rolls back.
-   * First checks if there's an existing sync record with the same exactGuid or externalId
+   * First checks if there's an existing sync record with the same exactGuid
    * and updates it instead of creating a new one.
    * Returns ProcessResult.Conflict.
    */
@@ -51,7 +51,7 @@ class ExactConflictHandler(
 
   /**
    * Save or update a conflict/pending review record.
-   * First checks if there's an existing sync record with the same exactGuid or externalId
+   * First checks if there's an existing sync record with the same exactGuid
    * and updates it instead of creating a new one.
    */
   fun saveOrUpdateConflict(
@@ -60,15 +60,13 @@ class ExactConflictHandler(
     conflictDetails: Map<String, Any>,
     syncStatus: SyncStatus = SyncStatus.CONFLICT
   ) {
-    // Try to find existing sync record by exactGuid or externalId
+    // Try to find existing sync record by exactGuid
     val existingSync = companySyncRepository.findByExactGuid(account.ID)
-      ?: account.Code?.let { companySyncRepository.findByExternalId(it) }
 
     val syncRecord = if (existingSync != null) {
       // Update existing record
       existingSync.copy(
         companyId = companyId ?: existingSync.companyId,
-        externalId = account.Code,
         exactGuid = account.ID,
         syncStatus = syncStatus,
         syncedFromSourceAt = Instant.now(),
@@ -79,7 +77,6 @@ class ExactConflictHandler(
       // Create new record
       CompanySyncDto(
         companyId = companyId,
-        externalId = account.Code,
         exactGuid = account.ID,
         syncStatus = syncStatus,
         syncedFromSourceAt = Instant.now(),
@@ -105,15 +102,10 @@ class ExactConflictHandler(
       "exactName" to account.Name
     )
 
+    if (account.Code != null) details["code"] = account.Code
+
     // Build Exact address from available fields
-    val exactAddressParts = listOfNotNull(
-      account.AddressLine1?.takeIf { it.isNotBlank() },
-      account.Postcode?.takeIf { it.isNotBlank() },
-      account.City?.takeIf { it.isNotBlank() }
-    )
-    if (exactAddressParts.isNotEmpty()) {
-      details["exactAddress"] = exactAddressParts.joinToString(", ")
-    }
+    buildExactAddress(account, details)
 
     // Add matched company info
     details["matchedCompanyName"] = matchedCompany.name
@@ -155,14 +147,7 @@ class ExactConflictHandler(
     )
 
     // Build Exact address from available fields
-    val exactAddressParts = listOfNotNull(
-      account.AddressLine1?.takeIf { it.isNotBlank() },
-      account.Postcode?.takeIf { it.isNotBlank() },
-      account.City?.takeIf { it.isNotBlank() }
-    )
-    if (exactAddressParts.isNotEmpty()) {
-      details["exactAddress"] = exactAddressParts.joinToString(", ")
-    }
+    buildExactAddress(account, details)
 
     // Add any extra details
     extraDetails.forEach { (key, value) ->
@@ -172,5 +157,19 @@ class ExactConflictHandler(
     }
 
     return details
+  }
+
+  private fun buildExactAddress(
+      account: ExactOnlineSyncAdapter.ExactSyncAccount,
+      details: MutableMap<String, Any>
+  ) {
+    val exactAddressParts = listOfNotNull(
+      account.AddressLine1?.takeIf { it.isNotBlank() },
+      account.Postcode?.takeIf { it.isNotBlank() },
+      account.City?.takeIf { it.isNotBlank() }
+      )
+    if (exactAddressParts.isNotEmpty()) {
+      details["exactAddress"] = exactAddressParts.joinToString(", ")
+      }
   }
 }

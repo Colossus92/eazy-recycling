@@ -41,18 +41,38 @@ export const companyService = {
    * Use this for the main company list with pagination.
    */
   getAll: (params: GetCompaniesParams = {}): Promise<PagedCompanyResponse> => {
-    const { includeBranches = false, role, query, page = 0, size = 10 } = params;
-    return companyApi.getCompanies(includeBranches, role, query, page, size).then((r) => r.data);
+    const {
+      includeBranches = false,
+      role,
+      query,
+      page = 0,
+      size = 10,
+    } = params;
+    return companyApi
+      .getCompanies(includeBranches, role, query, page, size)
+      .then((r) => r.data);
   },
-  
+
+  /**
+   * Get a single company by ID.
+   */
+  getById: (id: string): Promise<Company> => {
+    return companyApi.getById(id).then((r) => r.data);
+  },
+
   /**
    * Get all companies as a simple list (no pagination).
    * Use this for dropdowns and selects where you need all companies.
    * Fetches a large page size to get all companies in one request.
    */
-  getAllAsList: (includeBranches: boolean = false, role?: string): Promise<Company[]> => {
+  getAllAsList: (
+    includeBranches: boolean = false,
+    role?: string,
+    query?: string
+  ): Promise<Company[]> => {
     // Fetch a large page to get all companies
-    return companyApi.getCompanies(includeBranches, role, undefined, 0, 1000)
+    return companyApi
+      .getCompanies(includeBranches, role, query, 0, 1000)
       .then((r) => r.data.content);
   },
   create: (c: Omit<Company, 'id'>, restoreCompanyId?: string) => {

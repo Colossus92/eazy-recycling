@@ -39,9 +39,9 @@ export const CompanyManagement = () => {
 
   const columns: Column<Company>[] = [
     {
-      key: 'externalCode',
+      key: 'code',
       label: 'Code',
-      accessor: (item: Company) => item.externalCode ?? '-',
+      accessor: (item: Company) => item.code ?? '-',
     },
     {
       key: 'name',
@@ -170,7 +170,10 @@ export const CompanyManagement = () => {
         expandableConfig={expandableConfig}
         renderForm={(close, onSubmit, itemToEdit) => {
           // Wrapper to handle the restoreCompanyId parameter
-          const handleSubmit = async (data: Company, restoreCompanyId?: string) => {
+          const handleSubmit = async (
+            data: Company,
+            restoreCompanyId?: string
+          ) => {
             if (itemToEdit) {
               // For updates, use the regular update function
               await onSubmit(data);

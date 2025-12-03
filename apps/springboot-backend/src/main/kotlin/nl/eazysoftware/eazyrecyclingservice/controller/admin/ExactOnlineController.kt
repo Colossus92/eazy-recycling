@@ -227,7 +227,7 @@ class ExactOnlineController(
                 return SyncConflictDto(
                     id = entity.id?.toString() ?: "",
                     companyId = entity.companyId.toString(),
-                    externalId = entity.externalId,
+                    externalId = entity.conflictDetails?.get("code") as? String,
                     exactGuid = entity.exactGuid?.toString(),
                     syncStatus = entity.syncStatus.name,
                     conflictDetails = entity.conflictDetails,

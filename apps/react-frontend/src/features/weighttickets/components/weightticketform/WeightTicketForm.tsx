@@ -1,33 +1,28 @@
-import { Company, companyService } from '@/api/services/companyService';
-import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
-import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
+import { WeightTicketRequest } from '@/api/client';
+import { Button } from '@/components/ui/button/Button';
 import { SplitButton } from '@/components/ui/button/SplitButton';
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
+import { FormDialog } from '@/components/ui/dialog/FormDialog.tsx';
+import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
+import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
+import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
+import { RadioFormField } from '@/components/ui/form/RadioFormField';
 import { TruckSelectFormField } from '@/components/ui/form/selectfield/TruckSelectFormField';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
 import { TextFormField } from '@/components/ui/form/TextFormField';
+import { Tab } from '@/components/ui/tab/Tab';
 import { Note } from '@/features/planning/components/note/Note';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useQuery } from '@tanstack/react-query';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
-import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
-import {
-  useWeightTicketForm,
-  WeightTicketFormValues,
-} from './useWeigtTicketFormHook';
-import { WeightTicketLinesTab } from './WeightTicketLinesTab';
-import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
-import { useEffect, useState } from 'react';
-import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { Tab } from '@/components/ui/tab/Tab';
-import { RadioFormField } from '@/components/ui/form/RadioFormField';
-import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
-import { WeightTicketRequest } from '@/api/client';
+import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
+import { useWeightTicketForm, WeightTicketFormValues, } from './useWeigtTicketFormHook';
+import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
+import { WeightTicketLinesTab } from './WeightTicketLinesTab';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
-import { Button } from '@/components/ui/button/Button';
-import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface WeightTicketFormProps {
   isOpen: boolean;
@@ -123,15 +118,6 @@ export const WeightTicketForm = ({
     );
   }, [data?.status, status]);
 
-  const { data: companies = [] } = useQuery<Company[]>({
-    queryKey: ['companies'],
-    queryFn: () => companyService.getAllAsList(),
-  });
-  const companyOptions = companies.map((company) => ({
-    value: company.id || '',
-    label: company.name,
-  }));
-
   /**
    * Helper function to parse number strings that may use comma or period as decimal separator
    */
@@ -187,11 +173,11 @@ export const WeightTicketForm = ({
 
     // Save first (creates or updates)
     const response = await mutation.mutateAsync(filteredFormValues);
-    
+
     // Determine the weight ticket ID to complete
     // Priority: currentWeightTicketNumber (set after first save), then data.id, then response.id (for new tickets)
     const weightTicketId = currentWeightTicketNumber ?? data?.id ?? (response as any)?.id;
-    
+
     if (weightTicketId && onComplete) {
       onComplete(weightTicketId);
     }
@@ -302,34 +288,21 @@ export const WeightTicketForm = ({
                         }}
                       />
                       <div className="w-1/2">
-                        <SelectFormField
+                        <CompanySelectFormField
                           title={'Opdrachtgever'}
                           placeholder={'Selecteer een opdrachtgever'}
-                          options={companyOptions}
-                          testId="consignor-party-select"
+                          name={'consignorPartyId'}
+                          rules={{ required: 'Opdrachtgever is verplicht' }}
                           disabled={isDisabled}
-                          formHook={{
-                            register: formContext.register,
-                            name: 'consignorPartyId',
-                            rules: { required: 'Opdrachtgever is verplicht' },
-                            errors: formContext.formState.errors,
-                            control: formContext.control,
-                          }}
                         />
                       </div>
                       <div className="w-1/2">
-                        <SelectFormField
+                        <CompanySelectFormField
                           title={'Vervoerder'}
                           placeholder={'Selecteer een vervoerder'}
-                          options={companyOptions}
-                          testId="carrier-party-select"
+                          name={'carrierPartyId'}
+                          rules={{ required: 'Vervoerder is verplicht' }}
                           disabled={isDisabled}
-                          formHook={{
-                            register: formContext.register,
-                            name: 'carrierPartyId',
-                            errors: formContext.formState.errors,
-                            control: formContext.control,
-                          }}
                         />
                       </div>
                       <div className="w-1/2">

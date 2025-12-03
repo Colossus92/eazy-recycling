@@ -1,50 +1,22 @@
-import { useFormContext } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField.tsx';
-import { companyService, Company } from '@/api/services/companyService.ts';
+import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
+import { useFormContext } from 'react-hook-form';
 
 export const ContainerTransportMainSection = () => {
-  const {
-    register,
-    control,
-    formState: { errors },
-  } = useFormContext<ContainerTransportFormValues>();
-  const { data: companies = [] } = useQuery<Company[]>({
-    queryKey: ['companies'],
-    queryFn: () => companyService.getAllAsList(),
-  });
-
-  const companyOptions = companies.map((company) => ({
-    value: company.id || '',
-    label: company.name,
-  }));
-
+  const { register } = useFormContext<ContainerTransportFormValues>();
   return (
     <div className={'flex flex-col items-start self-stretch gap-4'}>
-      <SelectFormField
+      <CompanySelectFormField
         title={'Opdrachtgever'}
         placeholder={'Selecteer een opdrachtgever'}
-        options={companyOptions}
-        formHook={{
-          register: register,
-          name: 'consignorPartyId',
-          rules: { required: 'Opdrachtgever is verplicht' },
-          errors: errors,
-          control: control,
-        }}
+        name={'consignorPartyId'}
+        rules={{ required: 'Opdrachtgever is verplicht' }}
       />
-      <SelectFormField
+      <CompanySelectFormField
         title={'Vervoerder'}
         placeholder={'Selecteer een vervoerder'}
-        options={companyOptions}
-        formHook={{
-          register: register,
-          name: 'carrierPartyId',
-          rules: { required: 'Vervoerder is verplicht' },
-          errors: errors,
-          control: control,
-        }}
+        name={'carrierPartyId'}
+        rules={{ required: 'Vervoerder is verplicht' }}
       />
       <input
         type="hidden"

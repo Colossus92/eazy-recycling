@@ -46,12 +46,6 @@ export interface ApplicationContext {
     'displayName'?: string;
     /**
      * 
-     * @type {any}
-     * @memberof ApplicationContext
-     */
-    'autowireCapableBeanFactory'?: any;
-    /**
-     * 
      * @type {number}
      * @memberof ApplicationContext
      */
@@ -62,6 +56,12 @@ export interface ApplicationContext {
      * @memberof ApplicationContext
      */
     'applicationName'?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof ApplicationContext
+     */
+    'autowireCapableBeanFactory'?: any;
     /**
      * 
      * @type {Environment}

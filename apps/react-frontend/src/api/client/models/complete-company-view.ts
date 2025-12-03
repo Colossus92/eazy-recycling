@@ -37,7 +37,7 @@ export interface CompleteCompanyView {
      * @type {string}
      * @memberof CompleteCompanyView
      */
-    'externalCode'?: string;
+    'code'?: string;
     /**
      * 
      * @type {string}

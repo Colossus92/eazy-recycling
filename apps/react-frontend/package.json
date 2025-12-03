@@ -34,6 +34,7 @@
     "react-hook-form": "^7.56.0",
     "react-router-dom": "^7.5.0",
     "react-select": "^5.10.1",
+    "react-select-async-paginate": "^0.7.11",
     "react-signature-canvas": "^1.1.0-alpha.2",
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5"
