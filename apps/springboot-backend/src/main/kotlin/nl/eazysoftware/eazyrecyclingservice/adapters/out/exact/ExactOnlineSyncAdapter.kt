@@ -260,7 +260,7 @@ class ExactOnlineSyncAdapter(
       for (account in accounts) {
         try {
           // Parse address from AddressLine1 (format: "Street Number Addition")
-          val (streetName, buildingNumber, buildingNumberAddition) = parseAddressLine(account.AddressLine1)
+          val (streetName, buildingNumber, buildingNumberAddition) = AddressLineParser.parse(account.AddressLine1)
 
           // Process in separate transaction to isolate constraint violations
           val result = accountProcessor.processAccount(account, streetName, buildingNumber, buildingNumberAddition)
@@ -563,28 +563,6 @@ class ExactOnlineSyncAdapter(
     )
 
     return response.body ?: throw IllegalStateException("Empty response from Exact Online Deleted API")
-  }
-
-  /**
-   * Parse address line into street name, building number, and addition.
-   * Format: "Street Name 123A" -> ("Street Name", "123", "A")
-   */
-  private fun parseAddressLine(addressLine: String?): Triple<String, String, String?> {
-    if (addressLine.isNullOrBlank()) {
-      return Triple("", "", null)
-    }
-
-    // Regex to match: street name, building number, optional addition
-    val regex = Regex("""^(.+?)\s+(\d+)([A-Za-z]*)$""")
-    val match = regex.find(addressLine.trim())
-
-    return if (match != null) {
-      val (street, number, addition) = match.destructured
-      Triple(street, number, addition.ifBlank { null })
-    } else {
-      // If no match, treat the whole thing as street name
-      Triple(addressLine, "", null)
-    }
   }
 
   companion object {

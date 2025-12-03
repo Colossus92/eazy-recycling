@@ -345,20 +345,8 @@ class WasteStreamTest {
 
   @Nested
   inner class DutchAddress {
-    @Test
-    fun `a dutch address can't have a blank house number`() {
-      val exception = assertFailsWith<IllegalArgumentException> {
-        Location.DutchAddress(
-          address = Address(
-            streetName = StreetName("Stadstraat"),
-            postalCode = DutchPostalCode("1234 AB"),
-            buildingNumber = "",
-            city = City("Test city"),
-          ),
-        )
-      }
-      assertThat(exception.message).isEqualTo("Huisnummer moet een waarde hebben.")
-    }
+    // Note: blank house number validation removed per ADR-0017 to allow Exact Online sync with incomplete data.
+    // Validation is enforced at controller level for user-created data and by LMA validation for declarations.
 
     @Test
     fun `a dutch address must have Nederland as country`() {
@@ -442,17 +430,8 @@ class WasteStreamTest {
       assertThat(exception.message).isEqualTo("Voor een nabijheidsbeschrijving moet de postcode alleen vier cijfers bevatten, maar was: 1234a")
     }
 
-    @Test
-    fun `a proximity description can't have a blank city`() {
-      val exception = assertFailsWith<IllegalArgumentException> {
-        Location.ProximityDescription(
-          "1234",
-          City(""),
-          "Nabijheidsbeschrijving"
-        )
-      }
-      assertThat(exception.message).isEqualTo("De stad is verplicht")
-    }
+    // Note: blank city validation removed per ADR-0017 to allow Exact Online sync with incomplete data.
+    // Validation is enforced at controller level for user-created data and by LMA validation for declarations.
 
     @Test
     fun `a proximity description can't have a blank proximity description`() {

@@ -8,26 +8,15 @@ data class Address(
   val city: City,
   val country: String = "Nederland",
 ) {
-  init {
-    require(!buildingNumber.isBlank()){
-      "Huisnummer moet een waarde hebben."
-    }
-  }
+  // Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
+  // Validation is enforced at controller level for user-created data and by LMA validation for declarations.
 
   fun toAddressLine() = "${streetName.value} $buildingNumber${buildingNumberAddition ?: ""}, ${city.value}"
 }
 
 
-data class StreetName(val value: String) {
-  init {
-    require(value.isNotBlank()) { "De straatnaam is verplicht" }
-    require(value.length <= 43) { "De straatnaam mag maximaal 43 tekens bevatten, maar was: $value" }
-  }
-}
+data class StreetName(val value: String)
+// Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
 
-data class City(val value: String) {
-  init {
-    require(value.isNotBlank()) { "De stad is verplicht" }
-    require(value.length <= 24) { "De stad mag maximaal 24 tekens bevatten, maar was: $value" }
-  }
-}
+data class City(val value: String)
+// Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
