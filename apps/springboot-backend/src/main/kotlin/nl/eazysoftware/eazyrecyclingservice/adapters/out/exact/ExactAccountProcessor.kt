@@ -70,55 +70,9 @@ class ExactAccountProcessor(
       }
     }
 
-    // Step 2: Try to find by KVK number (Chamber of Commerce ID)
-    val kvkNumber = account.ChamberOfCommerce
-    if (!kvkNumber.isNullOrBlank()) {
-      val companyByKvk = companies.findByChamberOfCommerceId(kvkNumber)
-      if (companyByKvk != null) {
-        // Check if this company is already linked to a different Exact account
-        val existingSync = companySyncRepository.findByCompanyId(companyByKvk.companyId.uuid)
-        if (existingSync != null && existingSync.exactGuid != null && existingSync.exactGuid != account.ID) {
-          // KVK collision - same KVK number but different Exact accounts
-          conflictHandler.saveOrUpdateConflict(
-            account = account,
-            companyId = companyByKvk.companyId.uuid,
-            conflictDetails = conflictHandler.buildConflictDetails(
-              conflictType = "KVK_COLLISION",
-              account = account,
-              matchedCompany = companyByKvk,
-              extraDetails = mapOf(
-                "existingExactGuid" to existingSync.exactGuid.toString(),
-                "chamberOfCommerce" to kvkNumber
-              )
-            )
-          )
-          logger.warn(
-            "KVK collision detected: Company {} already linked to Exact GUID {}, but received from GUID {}",
-            companyByKvk.name,
-            existingSync.exactGuid,
-            account.ID
-          )
-          return ProcessResult.Conflict
-        }
-
-        // Company found by KVK, link and update
-        return updateExistingCompany(
-          companyByKvk,
-          account,
-          existingSync ?: CompanySyncDto(
-            companyId = companyByKvk.companyId.uuid,
-            exactGuid = account.ID,
-            syncStatus = SyncStatus.OK,
-            syncedFromSourceAt = Instant.now()
-          ),
-          streetName,
-          buildingNumber,
-          buildingNumberAddition
-        )
-      }
-    }
-
-    // Step 3: No match found - create new company
+    // Step 2: No exact_guid match found - create new company
+    // Note: We no longer match by KVK number since Exact Online allows duplicate KVK numbers.
+    // Each Exact account creates its own company record, linked by exact_guid. See ADR-0018.
     return createNewCompany(account, streetName, buildingNumber, buildingNumberAddition)
   }
 

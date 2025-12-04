@@ -34,13 +34,7 @@ class UpdateCompanyService(
     val existingCompany = companies.findById(cmd.companyId)
       ?: throw EntityNotFoundException("Bedrijf met id ${cmd.companyId.uuid} niet gevonden")
 
-    // Validate uniqueness constraints for fields that changed
-    cmd.chamberOfCommerceId?.let { kvk ->
-      if (kvk != existingCompany.chamberOfCommerceId && companies.existsByChamberOfCommerceId(kvk)) {
-        throw DuplicateKeyException("KVK nummer $kvk is al in gebruik.")
-      }
-    }
-
+    // Validate uniqueness constraints for fields that changed (VIHB only - KVK duplicates are allowed, see ADR-0018)
     cmd.vihbNumber?.let { vihb ->
       if (vihb != existingCompany.vihbNumber && companies.existsByVihbNumber(vihb.value)) {
         throw DuplicateKeyException("VIHB nummer ${vihb.value} is al in gebruik.")

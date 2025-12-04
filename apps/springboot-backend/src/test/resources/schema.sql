@@ -3,7 +3,7 @@ create table if not exists companies (
                            code text,
                            building_number_addition text,
                            building_number text,
-                           chamber_of_commerce_id text unique,
+                           chamber_of_commerce_id text,
                            city text,
                            country text,
                            name text,
