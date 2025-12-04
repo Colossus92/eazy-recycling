@@ -5,6 +5,7 @@ apis/container-transport-controller-api.ts
 apis/driver-controller-api.ts
 apis/eural-controller-api.ts
 apis/exact-online-controller-api.ts
+apis/lma-import-controller-api.ts
 apis/material-controller-api.ts
 apis/material-group-controller-api.ts
 apis/material-price-controller-api.ts
@@ -79,6 +80,9 @@ models/index.ts
 models/jsp-config-descriptor.ts
 models/jsp-property-group-descriptor.ts
 models/lma-declaration-view.ts
+models/lma-import-error-dto.ts
+models/lma-import-errors-response.ts
+models/lma-import-response.ts
 models/local-date-time.ts
 models/local-date.ts
 models/local-time.ts

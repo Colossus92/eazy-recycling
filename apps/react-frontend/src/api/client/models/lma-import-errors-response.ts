@@ -13,30 +13,21 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { LmaImportErrorDto } from './lma-import-error-dto';
 
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface LmaImportErrorsResponse
  */
-export interface SortObject {
+export interface LmaImportErrorsResponse {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {Array<LmaImportErrorDto>}
+     * @memberof LmaImportErrorsResponse
      */
-    'unsorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'sorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'empty'?: boolean;
+    'errors': Array<LmaImportErrorDto>;
 }
 

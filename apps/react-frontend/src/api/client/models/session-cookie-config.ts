@@ -22,6 +22,12 @@
 export interface SessionCookieConfig {
     /**
      * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'secure'?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof SessionCookieConfig
      */
@@ -31,13 +37,19 @@ export interface SessionCookieConfig {
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'path'?: string;
+    'domain'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'path'?: string;
     /**
      * 
      * @type {string}
@@ -57,17 +69,5 @@ export interface SessionCookieConfig {
      * @deprecated
      */
     'comment'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'httpOnly'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'secure'?: boolean;
 }
 

@@ -1759,36 +1759,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/LmaImportErrorsResponse"
-  /admin/lma/import/errors/{batchId}:
-    get:
-      tags:
-      - lma-import-controller
-      operationId: getErrorsByBatch
-      parameters:
-      - name: batchId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/LmaImportErrorsResponse"
     delete:
       tags:
       - lma-import-controller
-      operationId: deleteErrorsByBatch
-      parameters:
-      - name: batchId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
+      operationId: deleteAllErrors
       responses:
         "200":
           description: OK
@@ -4586,12 +4560,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         numberOfElements:
           type: integer
           format: int32
@@ -5095,34 +5069,34 @@ components:
       properties:
         defaultContentType:
           type: string
-        scriptingInvalid:
-          type: string
-        includeCodas:
-          type: array
-          items:
-            type: string
         urlPatterns:
           type: array
           items:
             type: string
-        pageEncoding:
-          type: string
-        isXml:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
         elIgnored:
           type: string
         errorOnELNotFound:
           type: string
-        deferredSyntaxAllowedAsLiteral:
+        pageEncoding:
           type: string
-        errorOnUndeclaredNamespace:
+        scriptingInvalid:
+          type: string
+        isXml:
           type: string
         includePreludes:
           type: array
           items:
             type: string
+        includeCodas:
+          type: array
+          items:
+            type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
         buffer:
           type: string
     RedirectView:
@@ -5188,33 +5162,50 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
-        attributesCSV:
-          type: string
-          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
+          writeOnly: true
+        attributesCSV:
+          type: string
           writeOnly: true
     ServletContext:
       type: object
       properties:
         contextPath:
           type: string
+        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        initParameterNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -5240,27 +5231,10 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         attributeNames: {}
         classLoader:
           type: object
@@ -5308,12 +5282,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -5325,11 +5299,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        secure:
+          type: boolean
         maxAge:
           type: integer
           format: int32
-        secure:
-          type: boolean
         domain:
           type: string
         httpOnly:
@@ -5348,9 +5322,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

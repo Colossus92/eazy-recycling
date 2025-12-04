@@ -9,6 +9,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaImportErrors
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,7 +27,9 @@ class ImportLmaWasteStreamsService(
   private val csvParser: LmaCsvParser,
   private val wasteStreams: WasteStreams,
   private val companies: Companies,
-  private val lmaImportErrors: LmaImportErrors
+  private val lmaImportErrors: LmaImportErrors,
+  private val euralRepository: EuralRepository,
+  private val processingMethodRepository: ProcessingMethodRepository
 ) : ImportLmaWasteStreams {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -118,7 +124,7 @@ class ImportLmaWasteStreamsService(
     val processorPartyId = record.verwerkersnummer
       ?: return createError(record, importBatchId, LmaImportErrorCode.MISSING_REQUIRED_FIELD, "Verwerkersnummer is verplicht")
 
-    val processorCompany = companies.findByProcessorId(processorPartyId)
+    companies.findByProcessorId(processorPartyId)
       ?: return createError(record, importBatchId, LmaImportErrorCode.PROCESSOR_NOT_FOUND,
         "Geen verwerker gevonden met nummer: $processorPartyId")
 
@@ -140,6 +146,9 @@ class ImportLmaWasteStreamsService(
         "Ongeldige euralcode: ${record.euralcode}")
     }
 
+    // Ensure eural code exists in database, create if missing
+    ensureEuralCodeExists(euralCode, record.euralcodeOmschrijving)
+
     // Parse and validate processing method
     val processingMethodCode = try {
       formatProcessingMethod(record.verwerkingsmethodeCode
@@ -148,6 +157,9 @@ class ImportLmaWasteStreamsService(
       return createError(record, importBatchId, LmaImportErrorCode.INVALID_PROCESSING_METHOD,
         "Ongeldige verwerkingsmethode: ${record.verwerkingsmethodeCode}")
     }
+
+    // Ensure processing method exists in database, create if missing
+    ensureProcessingMethodExists(processingMethodCode, record.verwerkingsmethodeOmschrijving)
 
     // Determine collection type
     val collectionType = determineCollectionType(record)
@@ -281,5 +293,33 @@ class ImportLmaWasteStreamsService(
     if (postalCode.isNullOrBlank()) return ""
     val digits = postalCode.replace(" ", "").take(4)
     return if (digits.all { it.isDigit() }) digits else ""
+  }
+
+  /**
+   * Ensures the Eural code exists in the database. Creates it if missing.
+   */
+  private fun ensureEuralCodeExists(code: String, description: String?) {
+    if (!euralRepository.existsById(code)) {
+      val eural = Eural(
+        code = code,
+        description = description ?: "Geïmporteerd via LMA - $code"
+      )
+      euralRepository.save(eural)
+      logger.info("Created missing Eural code: $code")
+    }
+  }
+
+  /**
+   * Ensures the processing method exists in the database. Creates it if missing.
+   */
+  private fun ensureProcessingMethodExists(code: String, description: String?) {
+    if (!processingMethodRepository.existsById(code)) {
+      val processingMethod = ProcessingMethodDto(
+        code = code,
+        description = description ?: "Geïmporteerd via LMA - $code"
+      )
+      processingMethodRepository.save(processingMethod)
+      logger.info("Created missing processing method: $code")
+    }
   }
 }

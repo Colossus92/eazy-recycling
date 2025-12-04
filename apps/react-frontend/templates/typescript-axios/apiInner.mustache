@@ -175,11 +175,7 @@ export const {{classname}}AxiosParamCreator = function (configuration?: Configur
             localVarHeaderParameter['Content-Type'] = 'application/x-www-form-urlencoded';
     {{/multipartFormData}}
     {{#multipartFormData}}
-    {{#consumes}}
-    {{#-first}}
-            localVarHeaderParameter['Content-Type'] = '{{mediaType}}';
-    {{/-first}}
-    {{/consumes}}
+            // Don't set Content-Type for multipart/form-data - let axios set it with the boundary
     {{/multipartFormData}}
 
     {{/hasFormParams}}
@@ -198,7 +194,7 @@ export const {{classname}}AxiosParamCreator = function (configuration?: Configur
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
     {{#vendorExtensions}}
     {{#hasFormParams}}
-            localVarRequestOptions.data = localVarFormParams{{#multipartFormData}}.getBuffer(){{/multipartFormData}};
+            localVarRequestOptions.data = localVarFormParams;
     {{/hasFormParams}}
     {{/vendorExtensions}}
     {{#bodyParam}}

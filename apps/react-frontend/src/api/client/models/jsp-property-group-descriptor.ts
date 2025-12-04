@@ -25,7 +25,7 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'buffer'?: string;
+    'defaultContentType'?: string;
     /**
      * 
      * @type {Array<string>}
@@ -37,19 +37,7 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'defaultContentType'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'trimDirectiveWhitespaces'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'errorOnUndeclaredNamespace'?: string;
+    'elIgnored'?: string;
     /**
      * 
      * @type {string}
@@ -70,6 +58,12 @@ export interface JspPropertyGroupDescriptor {
     'scriptingInvalid'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
@@ -85,18 +79,24 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'isXml'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'elIgnored'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
     'deferredSyntaxAllowedAsLiteral'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'trimDirectiveWhitespaces'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'errorOnUndeclaredNamespace'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'buffer'?: string;
 }
 

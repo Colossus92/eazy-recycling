@@ -87,30 +87,15 @@ class LmaImportController(
   }
 
   /**
-   * GET /api/admin/lma/import/errors/{batchId}
+   * DELETE /api/admin/lma/import/errors
    *
-   * Get all errors for a specific import batch.
+   * Delete all import errors.
    */
   @PreAuthorize(HAS_ROLE_ADMIN)
-  @GetMapping("/import/errors/{batchId}")
-  fun getErrorsByBatch(@PathVariable batchId: UUID): ResponseEntity<LmaImportErrorsResponse> {
-    val errors = lmaImportErrors.findByImportBatchId(batchId)
-    return ResponseEntity.ok(
-      LmaImportErrorsResponse(
-        errors = errors.map { LmaImportErrorDto.fromDomain(it) }
-      )
-    )
-  }
-
-  /**
-   * DELETE /api/admin/lma/import/errors/{batchId}
-   *
-   * Delete all errors for a specific import batch.
-   */
-  @PreAuthorize(HAS_ROLE_ADMIN)
-  @DeleteMapping("/import/errors/{batchId}")
-  fun deleteErrorsByBatch(@PathVariable batchId: UUID): ResponseEntity<Void> {
-    lmaImportErrors.deleteByImportBatchId(batchId)
+  @DeleteMapping("/import/errors")
+  fun deleteAllErrors(): ResponseEntity<Void> {
+    lmaImportErrors.deleteAll()
+    logger.info("Deleted all LMA import errors")
     return ResponseEntity.noContent().build()
   }
 

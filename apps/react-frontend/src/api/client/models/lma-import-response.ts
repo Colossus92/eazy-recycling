@@ -13,51 +13,54 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface LmaImportResponse
  */
-export interface PageableObject {
+export interface LmaImportResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof PageableObject
+     * @memberof LmaImportResponse
      */
-    'unpaged'?: boolean;
+    'success': boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof LmaImportResponse
      */
-    'paged'?: boolean;
+    'message': string;
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof LmaImportResponse
      */
-    'pageNumber'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageSize'?: number;
+    'importBatchId'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof LmaImportResponse
      */
-    'offset'?: number;
+    'totalRows': number;
     /**
      * 
-     * @type {SortObject}
-     * @memberof PageableObject
+     * @type {number}
+     * @memberof LmaImportResponse
      */
-    'sort'?: SortObject;
+    'successfulImports': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof LmaImportResponse
+     */
+    'skippedRows': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof LmaImportResponse
+     */
+    'errorCount': number;
 }
 

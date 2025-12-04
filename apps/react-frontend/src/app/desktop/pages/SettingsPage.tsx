@@ -3,18 +3,15 @@ import type {
   ConnectionStatusResponse,
   RefreshTokenResponse,
 } from '@/api/client';
-import {
-  exactOnlineService,
-} from '@/api/services/exactOnlineService.ts';
-import {
-  SyncFromExactResponse,
-} from '@/api/client/models/sync-from-exact-response';
+import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
+import { SyncFromExactResponse } from '@/api/client/models/sync-from-exact-response';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { Button } from '@/components/ui/button/Button.tsx';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { Tab } from '@/components/ui/tab/Tab';
-import { TabGroup, TabList, TabPanels, TabPanel } from '@headlessui/react';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { ExactSyncConflictsTab } from '@/features/exactsync/components/ExactSyncConflictsTab';
+import { LmaImportTab } from '@/features/lmaimport';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactNode, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -150,7 +147,13 @@ export const SettingsPage = () => {
     { name: 'Verbinding', component: () => <ExactConnectionTab /> },
     {
       name: 'Sync Conflicten',
-      component: () => <ExactSyncConflictsTab key={`conflicts-${selectedIndex}`} />,
+      component: () => (
+        <ExactSyncConflictsTab key={`conflicts-${selectedIndex}`} />
+      ),
+    },
+    {
+      name: 'LMA Import',
+      component: () => <LmaImportTab key={`lma-import-${selectedIndex}`} />,
     },
   ];
 
@@ -206,10 +209,12 @@ export const SettingsPage = () => {
           <div className="px-6 py-4 border-b border-solid border-color-border-primary">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1">
-                <h5 className="text-color-text-primary">Autorisatie instellen</h5>
+                <h5 className="text-color-text-primary">
+                  Autorisatie instellen
+                </h5>
                 <span className="text-sm text-color-text-secondary">
-                  Klik op de knop hieronder om de autorisatie URL te genereren. U
-                  wordt doorgestuurd naar Exact Online om de applicatie te
+                  Klik op de knop hieronder om de autorisatie URL te genereren.
+                  U wordt doorgestuurd naar Exact Online om de applicatie te
                   autoriseren.
                 </span>
               </div>
@@ -237,9 +242,9 @@ export const SettingsPage = () => {
                     hierboven om naar Exact Online te gaan.
                   </p>
                   <p className="text-xs text-color-text-secondary mt-2">
-                    💡 Na het voltooien van de autorisatie bij Exact Online wordt
-                    u automatisch teruggeleid naar deze pagina en ontvangt u een
-                    bevestigingsmelding.
+                    💡 Na het voltooien van de autorisatie bij Exact Online
+                    wordt u automatisch teruggeleid naar deze pagina en ontvangt
+                    u een bevestigingsmelding.
                   </p>
                 </div>
               )}
@@ -291,7 +296,8 @@ export const SettingsPage = () => {
                 }
                 onClick={handleSyncFromExact}
                 disabled={
-                  syncFromExactMutation.isPending || !connectionStatus?.connected
+                  syncFromExactMutation.isPending ||
+                  !connectionStatus?.connected
                 }
               />
             </div>
@@ -328,7 +334,7 @@ export const SettingsPage = () => {
           <TabPanels
             className="
               flex flex-col flex-1
-              bg-color-surface-primary 
+              bg-color-surface-primary
               border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary
               pt-4
               gap-4
