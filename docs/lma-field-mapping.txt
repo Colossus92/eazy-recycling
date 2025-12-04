@@ -1,0 +1,30 @@
+Afvalstroomnummer -> wasteStreamNumber.number
+Verwerkersnummer Locatie van Bestemming (LvB) -> WasteDeliveryLocation.processorPartyId
+LvB KvK nummer -> skip, resolved by WasteDeliveryLocation.processorPartyId
+LvB Bedrijfsnaam -> skip, resolved by WasteDeliveryLocation.processorPartyId
+LvB Adres -> skip, resolved by WasteDeliveryLocation.processorPartyId
+LvB Postcode/Plaats -> skip, resolved by WasteDeliveryLocation.processorPartyId
+Handelsregisternummer Ontdoener -> find Party by chamber of commerce id, use uuid to fill pickupParty.uuid
+Naam Ontdoener -> skip resolved by "Handelsregisternummer Ontdoener"
+Land Ontdoener -> skip resolved by "Handelsregisternummer Ontdoener"
+For LocatieHerkomst (pickupLocation) counts,
+    if there's a Nabijheidsbeschrijving, fill the field with a ProximityDescription
+        Postcode -> postCodeDigits
+        Plaats -> city
+        Nabijheidsbeschrijving -> description
+        Land -> country
+    else it will be DutchAddress
+        Straatnaaam -> address.streetName
+        Huisnummer -> address.buildingNumber
+        HuisnummerToevoeging -> address.buildingNumberAddition
+        Postcode -> address.postalCode
+        Plaats -> address.city
+Euralcode -> wasteType.euralCode.code, we save the euralcode with spaces after every second number, for instance 160117 becomes 16 01 17. Possibly an asterix is added at the end of the euralcode this should not be preceeded by a space.
+Euralcode Omschrijving  -> skip resolved by "Euralcode"
+Gebruikelijke Naam Afvalstof -> wasteType.name
+VerwerkingsMethode Code -> wasteType.processionMethod.code, we save the procession method with a . after the letter. So A01 becomes A.01
+VerwerkingsMethode Omschrijving -> skip resolved by "VerwerkingsMethode Code"
+For the two below counts, if neither is true then WasteCollectionType.DEFAULT
+    Routeinzameling -> if true then WasteCollectionType.ROUTE
+    Inzamelaarsregeling -> if thrue then WasteCollectionType.COLLECTORS_SCHEME
+Particuliere Ontdoener -> skip J for now, only process N. We don't support this yet.

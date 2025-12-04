@@ -394,3 +394,17 @@ create table if not exists companies_sync_cursor (
                                                primary key (id),
                                                unique (entity, cursor_type)
 );
+
+create table if not exists lma_import_errors (
+                                               id uuid not null,
+                                               import_batch_id uuid not null,
+                                               row_number int not null,
+                                               waste_stream_number text,
+                                               error_code text not null,
+                                               error_message text not null,
+                                               raw_data jsonb,
+                                               created_at timestamp with time zone not null default now(),
+                                               resolved_at timestamp with time zone,
+                                               resolved_by text,
+                                               primary key (id)
+);

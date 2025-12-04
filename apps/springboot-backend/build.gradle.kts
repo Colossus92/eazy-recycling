@@ -86,6 +86,9 @@ dependencies {
   // Environment variables
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
+  // CSV parsing for LMA import
+  implementation("org.apache.commons:commons-csv:1.12.0")
+
   // Mapstruct
   implementation("org.mapstruct:mapstruct:1.6.3")
   kapt("org.mapstruct:mapstruct-processor:1.6.3")
