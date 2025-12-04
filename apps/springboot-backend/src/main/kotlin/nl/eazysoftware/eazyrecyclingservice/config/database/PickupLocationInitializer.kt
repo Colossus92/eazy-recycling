@@ -23,7 +23,7 @@ class PickupLocationInitializer(
   fun initializePickupLocations() {
     // Check if NO_PICKUP location already exists
     val existingNoPickup = entityManager.find(PickupLocationDto.NoPickupLocationDto::class.java, NO_PICKUP)
-    
+
     if (existingNoPickup == null) {
       // Create and persist the singleton NO_PICKUP location
       val noPickupLocation = PickupLocationDto.NoPickupLocationDto()

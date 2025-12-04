@@ -140,6 +140,9 @@ openApi {
   outputDir.set(file("../../docs/openapi"))
   outputFileName.set("spec.yaml")
   customBootRun {
+    // Use our custom bootRunOpenApi task
+    mainClass.set("nl.eazysoftware.eazyrecyclingservice.OpenApiApplicationKt")
+    classpath.setFrom(sourceSets["test"].runtimeClasspath, sourceSets["main"].runtimeClasspath)
     args.set(listOf("--spring.profiles.active=openapi"))
   }
 }
@@ -167,6 +170,28 @@ tasks.withType<Jar> {
 // Configure bootRun to use local profile by default
 tasks.named<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
   args("--spring.profiles.active=local")
+}
+
+// Create a custom task to run the OpenAPI application with testcontainers (for manual use)
+tasks.register<JavaExec>("bootRunOpenApi") {
+  group = "application"
+  description = "Runs the Spring Boot application with OpenAPI profile and testcontainers"
+  classpath = sourceSets["test"].runtimeClasspath + sourceSets["main"].runtimeClasspath
+  mainClass.set("nl.eazysoftware.eazyrecyclingservice.OpenApiApplicationKt")
+  args("--spring.profiles.active=openapi")
+  
+  // Ensure classes are compiled before running
+  dependsOn("testClasses")
+}
+
+// Ensure test classes and resources are processed before forkedSpringBootRun
+tasks.named("forkedSpringBootRun") {
+  dependsOn("testClasses", "processTestResources")
+}
+
+// Ensure test classes are compiled before generateOpenApiDocs runs
+tasks.named("generateOpenApiDocs") {
+  dependsOn("testClasses")
 }
 
 // Configure WSDL2Java for SOAP client generation
