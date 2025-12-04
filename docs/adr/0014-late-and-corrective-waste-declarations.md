@@ -155,20 +155,47 @@ Extend `MonthlyWasteDeclarationJob.JobType`:
 | LATE_MONTHLY_RECEIVALS | Daily | All previous months |
 | CORRECTIVE_DECLARATIONS | Daily | All declared tickets |
 
+**Important**: Late declaration jobs only process weight tickets from months that have passed their declaration deadline (the 20th). This prevents declaring weight tickets that are still within their normal declaration window.
+
+**Example timeline:**
+
+- On December 4th:
+  - November weight tickets are NOT processed (they will be declared on December 20th)
+  - October and earlier weight tickets ARE processed (October's deadline was November 20th)
+- On December 21st:
+  - November weight tickets ARE now processed (deadline passed on December 20th)
+  - December weight tickets are NOT processed (they will be declared on January 20th)
+
 #### 4. Query Logic
 
 **Late Declarations Query:**
 
+The query must only include weight tickets from months that have passed their declaration deadline (the 20th of the following month). This is calculated as follows:
+
+- If current day is before the 20th: cutoff = start of (current month - 1)
+- If current day is on or after the 20th: cutoff = start of current month
+
 ```sql
 -- Find weight ticket lines not yet declared
+-- Only includes tickets from months past their declaration deadline
 SELECT wtl.*, wt.weighted_at
 FROM weight_ticket_lines wtl
 JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
 LEFT JOIN weight_ticket_declaration_snapshots snap 
   ON snap.weight_ticket_line_id = wtl.id
 WHERE wt.status IN ('COMPLETED', 'INVOICED')
-  AND wt.weighted_at < :startOfCurrentMonth  -- Only previous months
+  AND wt.weighted_at < :declarationCutoffDate  -- Only months past their deadline
   AND snap.id IS NULL  -- Not yet declared
+
+-- :declarationCutoffDate calculation (pseudo-code):
+-- if (currentDayOfMonth < 20) {
+--   declarationCutoffDate = startOfMonth(currentMonth - 1)
+-- } else {
+--   declarationCutoffDate = startOfMonth(currentMonth)
+-- }
+--
+-- Example: On December 4th, cutoff = November 1st (so October and earlier are included)
+-- Example: On December 21st, cutoff = December 1st (so November and earlier are included)
 ```
 
 **Corrective Declarations Query:**
@@ -192,7 +219,21 @@ WHERE wt.status IN ('COMPLETED', 'INVOICED')
   )
 ```
 
-#### 5. Declaration Flow
+#### 5. Declaration Status
+
+Extend the `LmaDeclaration.Status` enum to include a new status for manual approval:
+
+| Status | Description |
+|--------|-------------|
+| PENDING | Declaration created, awaiting processing |
+| SENT | Declaration submitted to LMA |
+| ACCEPTED | Declaration accepted by LMA |
+| REJECTED | Declaration rejected by LMA |
+| **CORRECTIVE** | Corrective declaration awaiting manual approval |
+
+The `CORRECTIVE` status is used as a safety mechanism to prevent the system from automatically sending large numbers of corrective declarations without human oversight.
+
+#### 6. Declaration Flow
 
 1. **Initial Declaration** (First/Monthly Receivals):
    - Query undeclared weight ticket lines for the period
@@ -200,13 +241,40 @@ WHERE wt.status IN ('COMPLETED', 'INVOICED')
    - Submit to LMA
    - Create snapshot records for each declared line
 
-2. **Corrective Declaration**:
+2. **Corrective Declaration** (with manual approval):
    - Query lines where current weight differs from latest snapshot
    - Calculate delta (positive or negative)
-   - Submit correction to LMA with delta values
+   - Create declaration record with status `CORRECTIVE`
+   - **Wait for manual approval** via UI
+   - Upon approval: Submit correction to LMA with delta values
    - Create new snapshot record with current values
 
-#### 6. Edge Cases
+#### 7. Manual Approval Workflow
+
+To prevent the system from automatically sending large numbers of corrective declarations (especially during initial rollout), corrective declarations require manual approval:
+
+1. **Detection**: Daily job detects weight tickets needing correction
+2. **Creation**: Corrective declarations are created with status `CORRECTIVE`
+3. **Review**: User reviews pending corrective declarations in the LMA tab
+4. **Approval**: User clicks "Approve" button to send the declaration to LMA
+5. **Submission**: Upon approval, status changes to `SENT` and declaration is submitted
+
+**UI Changes (LMATab.tsx):**
+
+Add an "Actions" column to the LMA declarations table:
+
+| Column | Content |
+|--------|---------|
+| Actions | "Goedkeuren" button (only visible for `CORRECTIVE` status) |
+
+Button behavior:
+
+- Visible only when `status === 'CORRECTIVE'`
+- On click: Calls API to approve and submit the declaration
+- Shows loading state during submission
+- Refreshes table after successful submission
+
+#### 8. Edge Cases
 
 - **Cancelled weight tickets**: If a declared ticket is cancelled, treat as correction with negative weight equal to declared amount
 - **Line removal**: If a line is deleted after declaration, detect via missing line with existing snapshot
