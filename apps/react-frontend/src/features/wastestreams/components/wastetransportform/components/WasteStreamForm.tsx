@@ -144,7 +144,17 @@ export const WasteStreamForm = ({
                     {validationErrors.map((error, index) => (
                       <Note
                         key={index}
-                        note={`${error.code}: ${error.description}`}
+                        note={
+                          <>
+                            <strong>{error.code}</strong>:{' '}
+                            {error.description.split('\n').map((line, i, arr) => (
+                              <span key={i}>
+                                {line}
+                                {i < arr.length - 1 && <br />}
+                              </span>
+                            ))}
+                          </>
+                        }
                       />
                     ))}
                   </div>

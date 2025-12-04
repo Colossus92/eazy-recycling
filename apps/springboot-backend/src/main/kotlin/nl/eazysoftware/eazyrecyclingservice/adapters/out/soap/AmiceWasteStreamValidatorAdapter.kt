@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.out.soap
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.toetsen.*
 import nl.eazysoftware.eazyrecyclingservice.config.soap.ToetsenAfvalstroomNummerClient
-import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.isNetherlands
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
@@ -113,7 +113,8 @@ class AmiceWasteStreamValidatorAdapter(
         val company = companies.findById(consignor.id)
         if (company != null) {
           ontdoener.handelsregisternummer = company.chamberOfCommerceId
-          if (company.address.country != "Nederland") {
+          val country = company.address.country.trim()
+          if (!country.isNetherlands()) {
             ontdoener.naam = company.name
           }
           ontdoener.land = company.address.country
@@ -170,7 +171,8 @@ class AmiceWasteStreamValidatorAdapter(
 
     if (company != null) {
       bedrijf.handelsregisternummer = company.chamberOfCommerceId
-      if (company.address.country != "Nederland") {
+      val country = company.address.country.trim()
+      if (!country.isNetherlands()) {
         bedrijf.naam = company.name
       }
       bedrijf.land = company.address.country

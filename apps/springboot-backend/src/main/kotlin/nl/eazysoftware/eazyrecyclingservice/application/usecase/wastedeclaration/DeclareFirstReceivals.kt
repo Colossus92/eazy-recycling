@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.Ontdoener
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.isNetherlands
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
@@ -127,7 +128,8 @@ class DeclareFirstReceivalsService(
         val company = companies.findById(consignor.id)
         if (company != null) {
           ontdoener.handelsregisternummer = company.chamberOfCommerceId
-          if (company.address.country != "Nederland") {
+          val country = company.address.country.trim()
+          if (!country.isNetherlands()) {
             ontdoener.naam = company.name
           }
           ontdoener.land = company.address.country
@@ -186,7 +188,8 @@ class DeclareFirstReceivalsService(
 
     if (company != null) {
       bedrijf.handelsregisternummer = company.chamberOfCommerceId
-      if (company.address.country != "Nederland") {
+      val country = company.address.country.trim()
+      if (!country.isNetherlands()) {
         bedrijf.naam = company.name
       }
       bedrijf.land = company.address.country
