@@ -62,5 +62,11 @@ export interface LmaDeclarationView {
      * @memberof LmaDeclarationView
      */
     'pickupLocation': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof LmaDeclarationView
+     */
+    'errors'?: Array<string>;
 }
 

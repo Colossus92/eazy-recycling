@@ -78,7 +78,8 @@ class LmaDeclarationRepository(
         d.total_shipments,
         d.status,
         ws.name as waste_name,
-        ws.pickup_location_id
+        ws.pickup_location_id,
+        d.errors
       FROM lma_declarations d
       LEFT JOIN waste_streams ws ON d.waste_stream_number = ws.number
       ORDER BY d.created_at DESC
@@ -117,7 +118,8 @@ class LmaDeclarationRepository(
         totalWeight = result.totalWeight.toInt(),
         totalTransports = result.totalShipments.toInt(),
         period = yearMonth,
-        status = result.status
+        status = result.status,
+        errors = result.errors,
       )
     }
 
@@ -149,7 +151,8 @@ class LmaDeclarationRepository(
         ColumnResult(name = "total_shipments", type = Long::class),
         ColumnResult(name = "status", type = String::class),
         ColumnResult(name = "waste_name", type = String::class),
-        ColumnResult(name = "pickup_location_id", type = String::class)
+        ColumnResult(name = "pickup_location_id", type = String::class),
+        ColumnResult(name = "errors", type = Array<String>::class)
       ]
     )
   ]
@@ -161,7 +164,8 @@ data class LmaDeclarationQueryResult(
   val totalShipments: Long,
   val status: String,
   val wasteName: String?,
-  val pickupLocationId: String?
+  val pickupLocationId: String?,
+  val errors: Array<String>?
 )
 
 object LmaDeclarationMapper {

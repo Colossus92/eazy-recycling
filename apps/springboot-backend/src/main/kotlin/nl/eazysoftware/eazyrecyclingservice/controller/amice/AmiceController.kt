@@ -50,6 +50,7 @@ class AmiceController(
     val status: String,
     val wasteName: String,
     val pickupLocation: String,
+    val errors: List<String>?,
   ) {
     companion object {
       fun fromDomain(lmaDeclaration: LmaDeclaration): LmaDeclarationView {
@@ -61,6 +62,7 @@ class AmiceController(
           status = lmaDeclaration.status,
           wasteName = lmaDeclaration.wasteName,
           pickupLocation = lmaDeclaration.pickupLocation.toAddressLine(),
+          errors = lmaDeclaration.errors?.toList(),
         )
       }
     }

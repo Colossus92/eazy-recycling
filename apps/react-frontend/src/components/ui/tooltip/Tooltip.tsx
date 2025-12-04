@@ -115,8 +115,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
             left: tooltipPosition.left,
           }}
         >
-          <div className="bg-color-surface-primary border border-color-border-primary rounded-radius-sm px-2 py-1 shadow-lg max-w-xs">
-            <p className="text-caption-subtitle text-color-text-primary whitespace-nowrap">
+          <div className="bg-color-surface-primary border border-color-border-primary rounded-radius-sm px-2 py-1 shadow-lg max-w-sm">
+            <p className="text-caption-subtitle text-color-text-primary whitespace-pre-wrap break-words">
               {content}
             </p>
           </div>

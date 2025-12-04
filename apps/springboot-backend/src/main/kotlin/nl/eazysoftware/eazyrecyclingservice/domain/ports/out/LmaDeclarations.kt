@@ -26,4 +26,5 @@ data class LmaDeclaration(
   val totalTransports: Int,
   val period: YearMonth,
   val status: String,
+  val errors: Array<String>?,
 )

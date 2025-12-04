@@ -10,6 +10,8 @@ import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
 import { useLmaDeclarations } from '@/features/wastestreams/hooks/useLmaDeclarations';
 import { LmaDeclarationView } from '@/api/client';
 import { LMADeclarationStatusTag, LMADeclarationStatusTagProps } from './LMADeclarationStatusTag';
+import { Tooltip } from '@/components/ui/tooltip/Tooltip';
+import Warning from '@/assets/icons/Warning.svg?react';
 
 type Column = {
   key: keyof LmaDeclarationView;
@@ -33,35 +35,35 @@ export const LMATab = () => {
       label: 'Nummer',
       accessor: (item) => item.wasteStreamNumber,
       title: (item) => item.wasteStreamNumber,
-      width: '15%',
+      width: '12%',
     },
     {
       key: 'pickupLocation',
       label: 'Herkomstlocatie',
       accessor: (item) => item.pickupLocation,
       title: (item) => item.pickupLocation,
-      width: '25%',
+      width: '20%',
     },
     {
       key: 'wasteName',
       label: 'Gebruikelijke benaming',
       accessor: (item) => item.wasteName,
       title: (item) => item.wasteName,
-      width: '20%',
+      width: '15%',
     },
     {
       key: 'totalWeight',
       label: 'Totaal gewicht (kg)',
       accessor: (item) => item.totalWeight.toFixed(2),
       title: (item) => item.totalWeight.toString(),
-      width: '15%',
+      width: '12%',
     },
     {
       key: 'period',
       label: 'Periode',
       accessor: (item) => item.period,
       title: (item) => item.period,
-      width: '15%',
+      width: '10%',
     },
     {
       key: 'status',
@@ -73,6 +75,30 @@ export const LMATab = () => {
       ),
       title: (item) => item.status,
       width: '10%',
+    },
+    {
+      key: 'errors',
+      label: 'Fouten',
+      accessor: (item) => {
+        const errors = item.errors;
+        if (!errors || errors.length === 0) {
+          return <span className="text-color-text-tertiary">-</span>;
+        }
+        const tooltipContent = errors.join('\n');
+        const displayText = errors.length === 1 
+          ? errors[0] 
+          : `${errors.length} fouten`;
+        return (
+          <Tooltip content={tooltipContent} position="left">
+            <div className="flex items-center gap-1 text-color-error cursor-help">
+              <Warning className="w-4 h-4 flex-shrink text-color-status-error-dark" />
+              <span className="truncate">{displayText}</span>
+            </div>
+          </Tooltip>
+        );
+      },
+      title: (item) => item.errors?.join('\n'),
+      width: '21%',
     },
   ];
 

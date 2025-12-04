@@ -4549,6 +4549,10 @@ components:
           type: string
         pickupLocation:
           type: string
+        errors:
+          type: array
+          items:
+            type: string
       required:
       - period
       - pickupLocation
@@ -5073,10 +5077,6 @@ components:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
-        errorOnELNotFound:
-          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
@@ -5091,9 +5091,13 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
         trimDirectiveWhitespaces:
+          type: string
+        elIgnored:
+          type: string
+        errorOnELNotFound:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
           type: string
         errorOnUndeclaredNamespace:
           type: string
@@ -5162,24 +5166,25 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
-          writeOnly: true
-        attributesCSV:
-          type: string
           writeOnly: true
     ServletContext:
       type: object
       properties:
         contextPath:
           type: string
-        initParameterNames: {}
+        attributeNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        initParameterNames: {}
         sessionTimeout:
           type: integer
           format: int32
@@ -5235,7 +5240,6 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        attributeNames: {}
         classLoader:
           type: object
           properties:
