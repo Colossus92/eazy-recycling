@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareMonthlyReceivals
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DetectLateDeclarations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
@@ -15,7 +16,8 @@ import org.springframework.stereotype.Component
  *
  * Runs every 10 minutes to check for pending jobs and processes them according to their type:
  * - FIRST_RECEIVALS: Triggers the FirstReceivalDeclarator
- * - MONTHLY_RECEIVALS: To be implemented
+ * - MONTHLY_RECEIVALS: Triggers the MonthlyReceivalDeclarator
+ * - LATE_WEIGHT_TICKETS: Processes late weight tickets for declarations
  */
 @Component
 class WasteDeclarationJobProcessScheduler(
@@ -23,7 +25,8 @@ class WasteDeclarationJobProcessScheduler(
   private val firstReceivalWasteStreamQuery: FirstReceivalWasteStreamQuery,
   private val declareFirstReceivals: DeclareFirstReceivals,
   private val monthlyReceivalWasteStreamQuery: MonthlyReceivalWasteStreamQuery,
-  private val declareMonthlyReceivals: DeclareMonthlyReceivals
+  private val declareMonthlyReceivals: DeclareMonthlyReceivals,
+  private val detectLateDeclarations: DetectLateDeclarations,
 ) {
 
   private val logger = LoggerFactory.getLogger(WasteDeclarationJobProcessScheduler::class.java)
@@ -58,6 +61,7 @@ class WasteDeclarationJobProcessScheduler(
       when (job.jobType) {
         MonthlyWasteDeclarationJob.JobType.FIRST_RECEIVALS -> processFirstReceivalsJob(job)
         MonthlyWasteDeclarationJob.JobType.MONTHLY_RECEIVALS -> processMonthlyReceivalsJob(job)
+        MonthlyWasteDeclarationJob.JobType.LATE_WEIGHT_TICKETS -> processLateWeightTicketsJob(job)
       }
     } catch (e: Exception) {
       logger.error("Failed to process job: id={}, type={}", job.id, job.jobType, e)
@@ -110,4 +114,16 @@ class WasteDeclarationJobProcessScheduler(
 
     logger.info("Successfully completed MONTHLY_RECEIVALS job for yearMonth={}", job.yearMonth)
   }
+
+  private fun processLateWeightTicketsJob(job: MonthlyWasteDeclarationJob) {
+    logger.info("Processing LATE_WEIGHT_TICKETS job")
+
+    detectLateDeclarations.detectAndCreateForLateWeightTickets()
+
+    // Mark job as completed
+    monthlyWasteDeclarationJobs.save(job.markCompleted())
+
+    logger.info("Successfully completed LATE_WEIGHT_TICKETS job")
+  }
+
 }

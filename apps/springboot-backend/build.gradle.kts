@@ -87,7 +87,7 @@ dependencies {
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 
   // CSV parsing for LMA import
-  implementation("org.apache.commons:commons-csv:1.12.0")
+  implementation("org.apache.commons:commons-csv:1.14.1")
 
   // Mapstruct
   implementation("org.mapstruct:mapstruct:1.6.3")
@@ -182,7 +182,7 @@ tasks.register<JavaExec>("bootRunOpenApi") {
   classpath = sourceSets["test"].runtimeClasspath + sourceSets["main"].runtimeClasspath
   mainClass.set("nl.eazysoftware.eazyrecyclingservice.OpenApiApplicationKt")
   args("--spring.profiles.active=openapi")
-  
+
   // Ensure classes are compiled before running
   dependsOn("testClasses")
 }

@@ -58,8 +58,26 @@ class LmaDeclarationRepository(
     return jpaRepository.findAllById(ids)
   }
 
+  override fun findById(id: String): LmaDeclarationDto? {
+    return jpaRepository.findById(id).orElse(null)
+  }
+
   override fun saveAll(declarations: List<LmaDeclarationDto>): List<LmaDeclarationDto> {
     return jpaRepository.saveAll(declarations)
+  }
+
+  override fun saveCorrectiveDeclaration(declaration: LmaDeclarationDto): LmaDeclarationDto {
+    val saved = jpaRepository.save(declaration)
+    touchWasteStreams(listOf(saved.wasteStreamNumber))
+    return saved
+  }
+
+  override fun hasExistingDeclaration(wasteStreamNumber: String): Boolean {
+    val query = entityManager.createNativeQuery(
+      "SELECT COUNT(*) FROM lma_declarations WHERE waste_stream_number = :wasteStreamNumber"
+    )
+      .setParameter("wasteStreamNumber", wasteStreamNumber)
+    return (query.singleResult as Number).toLong() > 0
   }
 
   override fun findAll(pageable: Pageable): Page<LmaDeclaration> {
@@ -72,6 +90,7 @@ class LmaDeclarationRepository(
     // Main query with joins to get waste stream name and pickup location
     val query = """
       SELECT
+        d.id,
         d.waste_stream_number,
         d.period,
         d.total_weight,
@@ -79,7 +98,8 @@ class LmaDeclarationRepository(
         d.status,
         ws.name as waste_name,
         ws.pickup_location_id,
-        d.errors
+        d.errors,
+        d.transporters
       FROM lma_declarations d
       LEFT JOIN waste_streams ws ON d.waste_stream_number = ws.number
       ORDER BY d.created_at DESC
@@ -112,6 +132,7 @@ class LmaDeclarationRepository(
       }
 
       LmaDeclaration(
+        id = result.id,
         wasteStreamNumber = WasteStreamNumber(result.wasteStreamNumber),
         pickupLocation = pickupLocation,
         wasteName = result.wasteName ?: "Unknown",
@@ -120,6 +141,7 @@ class LmaDeclarationRepository(
         period = yearMonth,
         status = result.status,
         errors = result.errors,
+        transporters = result.transporters?.toList() ?: emptyList(),
       )
     }
 
@@ -145,6 +167,7 @@ class LmaDeclarationRepository(
     ConstructorResult(
       targetClass = LmaDeclarationQueryResult::class,
       columns = [
+        ColumnResult(name = "id", type = String::class),
         ColumnResult(name = "waste_stream_number", type = String::class),
         ColumnResult(name = "period", type = String::class),
         ColumnResult(name = "total_weight", type = Long::class),
@@ -152,12 +175,14 @@ class LmaDeclarationRepository(
         ColumnResult(name = "status", type = String::class),
         ColumnResult(name = "waste_name", type = String::class),
         ColumnResult(name = "pickup_location_id", type = String::class),
-        ColumnResult(name = "errors", type = Array<String>::class)
+        ColumnResult(name = "errors", type = Array<String>::class),
+        ColumnResult(name = "transporters", type = Array<String>::class)
       ]
     )
   ]
 )
 data class LmaDeclarationQueryResult(
+  val id: String,
   val wasteStreamNumber: String,
   val period: String,
   val totalWeight: Long,
@@ -165,7 +190,8 @@ data class LmaDeclarationQueryResult(
   val status: String,
   val wasteName: String?,
   val pickupLocationId: String?,
-  val errors: Array<String>?
+  val errors: Array<String>?,
+  val transporters: Array<String>?,
 )
 
 object LmaDeclarationMapper {

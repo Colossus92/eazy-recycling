@@ -73,6 +73,7 @@ data class MonthlyWasteDeclarationJob(
 
   enum class JobType {
     FIRST_RECEIVALS,
-    MONTHLY_RECEIVALS
+    MONTHLY_RECEIVALS,
+    LATE_WEIGHT_TICKETS,
   }
 }

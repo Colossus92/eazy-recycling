@@ -273,7 +273,7 @@ create table lma_declaration_sessions (
 );
 
 create table lma_declarations (
-                                           "id" text not null,
+                                           "id" text not null unique,
                                            "amice_uuid" uuid,
                                            "waste_stream_number" text not null,
                                            "period" text not null,
@@ -408,3 +408,23 @@ create table if not exists lma_import_errors (
                                                resolved_by text,
                                                primary key (id)
 );
+
+create sequence if not exists weight_ticket_declaration_snapshots_id_seq start with 1 increment by 1;
+
+create table if not exists weight_ticket_declaration_snapshots (
+                                               id bigint not null default nextval('weight_ticket_declaration_snapshots_id_seq'),
+                                               weight_ticket_id bigint not null,
+                                               weight_ticket_line_index int not null,
+                                               waste_stream_number text not null,
+                                               declared_weight_value numeric not null,
+                                               declaration_id text not null,
+                                               declared_at timestamp with time zone not null default now(),
+                                               declaration_period text not null,
+                                               primary key (id),
+                                               constraint fk_declaration_snapshots_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id),
+                                               constraint fk_declaration_snapshots_declaration foreign key (declaration_id) references lma_declarations(id)
+);
+
+create index if not exists idx_declaration_snapshots_weight_ticket on weight_ticket_declaration_snapshots(weight_ticket_id);
+create index if not exists idx_declaration_snapshots_waste_stream on weight_ticket_declaration_snapshots(waste_stream_number);
+create index if not exists idx_declaration_snapshots_period on weight_ticket_declaration_snapshots(declaration_period);

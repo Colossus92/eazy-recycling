@@ -44,5 +44,7 @@ data class LmaDeclarationDto(
     PENDING,
     COMPLETED,
     FAILED,
+    /** Corrective declaration awaiting manual approval before submission to LMA */
+    WAITING_APPROVAL,
   }
 }

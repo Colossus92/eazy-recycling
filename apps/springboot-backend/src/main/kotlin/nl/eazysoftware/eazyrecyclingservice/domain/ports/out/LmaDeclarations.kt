@@ -12,13 +12,17 @@ import org.springframework.data.domain.Pageable
 interface LmaDeclarations {
   fun saveAll(declarations: List<LmaDeclarationDto>): List<LmaDeclarationDto>
   fun findByIds(ids: List<String>): List<LmaDeclarationDto>
+  fun findById(id: String): LmaDeclarationDto?
   fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>)
   fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>)
+  fun saveCorrectiveDeclaration(declaration: LmaDeclarationDto): LmaDeclarationDto
   fun findAll(pageable: Pageable): Page<LmaDeclaration>
+  fun hasExistingDeclaration(wasteStreamNumber: String): Boolean
 }
 
 
 data class LmaDeclaration(
+  val id: String,
   val wasteStreamNumber: WasteStreamNumber,
   val pickupLocation: Location,
   val wasteName: String,
@@ -27,4 +31,5 @@ data class LmaDeclaration(
   val period: YearMonth,
   val status: String,
   val errors: Array<String>?,
+  val transporters: List<String>,
 )

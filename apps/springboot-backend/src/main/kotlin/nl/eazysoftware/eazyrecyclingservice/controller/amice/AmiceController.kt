@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty
 import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.ApproveCorrectiveDeclaration
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
@@ -34,6 +35,7 @@ class AmiceController(
   private val declareFirstReceivals: DeclareFirstReceivals,
   private val firstReceivalDeclarationFactory: ReceivalDeclarationFactory,
   private val lmaDeclarations: LmaDeclarations,
+  private val approveCorrectiveDeclaration: ApproveCorrectiveDeclaration,
 ) {
 
   @GetMapping
@@ -43,6 +45,7 @@ class AmiceController(
   }
 
   data class LmaDeclarationView(
+    val id: String,
     val wasteStreamNumber: String,
     val period: String,
     val totalWeight: Int,
@@ -51,10 +54,12 @@ class AmiceController(
     val wasteName: String,
     val pickupLocation: String,
     val errors: List<String>?,
+    val transporters: List<String>,
   ) {
     companion object {
       fun fromDomain(lmaDeclaration: LmaDeclaration): LmaDeclarationView {
         return LmaDeclarationView(
+          id = lmaDeclaration.id,
           wasteStreamNumber = lmaDeclaration.wasteStreamNumber.number,
           period = "${lmaDeclaration.period.month.number.toString().padStart(2, '0')}-${lmaDeclaration.period.year}",
           totalWeight = lmaDeclaration.totalWeight,
@@ -63,6 +68,7 @@ class AmiceController(
           wasteName = lmaDeclaration.wasteName,
           pickupLocation = lmaDeclaration.pickupLocation.toAddressLine(),
           errors = lmaDeclaration.errors?.toList(),
+          transporters = lmaDeclaration.transporters,
         )
       }
     }
@@ -242,5 +248,31 @@ class AmiceController(
     val success: Boolean,
     val message: String,
     val declaredWasteStreamNumbers: List<String>
+  )
+
+  /**
+   * Approves and submits a corrective declaration to LMA.
+   * 
+   * Corrective declarations are created with status CORRECTIVE and require manual approval
+   * before being submitted. This endpoint handles the approval process.
+   */
+  @PostMapping("/declarations/{declarationId}/approve")
+  @ResponseStatus(HttpStatus.OK)
+  fun approveDeclaration(
+    @PathVariable declarationId: String
+  ): ApproveDeclarationResponse {
+    val result = approveCorrectiveDeclaration.approve(declarationId)
+    
+    return ApproveDeclarationResponse(
+      success = result.success,
+      message = result.message,
+      declarationId = result.declarationId,
+    )
+  }
+
+  data class ApproveDeclarationResponse(
+    val success: Boolean,
+    val message: String,
+    val declarationId: String,
   )
 }
