@@ -76,8 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
   useEffect(() => {
+    // Check if URL contains recovery token (before Supabase processes it)
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      setIsPasswordRecovery(true);
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.access_token) {
@@ -94,7 +101,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      // Detect password recovery event
+      if (event === 'PASSWORD_RECOVERY') {
+        setIsPasswordRecovery(true);
+      }
+
       setSession(session);
       if (session?.access_token) {
         const claims = session.access_token.split('.')[1];
@@ -140,6 +152,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         value={{ session, signOut, userRoles, user, hasRole, userId }}
       >
         <UnauthenticatedRoutes />
+      </AuthContext.Provider>
+    );
+  }
+
+  // If user is in password recovery flow, show the change password page
+  // even though they are authenticated (via the recovery token)
+  if (isPasswordRecovery) {
+    return (
+      <AuthContext.Provider
+        value={{ session, signOut, userRoles, user, hasRole, userId }}
+      >
+        <ChangePasswordPage />
       </AuthContext.Provider>
     );
   }

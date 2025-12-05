@@ -1,4 +1,4 @@
-import { Description, Dialog, DialogPanel } from '@headlessui/react';
+import { Dialog, DialogPanel } from '@headlessui/react';
 import { Button } from '../button/Button';
 import X from '@/assets/icons/X.svg?react';
 import ErrorTriangle from '@/assets/icons/ErrorTriangle.svg?react';

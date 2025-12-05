@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/button/Button';
@@ -22,7 +21,6 @@ export const ChangePasswordPage = () => {
   } = useForm<ChangePasswordFormInputs>();
   const [formError, setFormError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const navigate = useNavigate();
 
   const password = watch('password');
 
@@ -56,9 +54,10 @@ export const ChangePasswordPage = () => {
         console.error('Password update error:', error);
       } else {
         toastService.success('Wachtwoord succesvol gewijzigd!');
-        // Sign out and redirect to login
+        // Sign out and redirect to login with full page reload
+        // to clear the password recovery state
         await supabase.auth.signOut();
-        navigate('/login');
+        window.location.href = '/login';
       }
     } catch (error) {
       console.error('Password update error:', error);
@@ -99,7 +98,7 @@ export const ChangePasswordPage = () => {
           <Button
             label="Terug naar inloggen"
             fullWidth={true}
-            onClick={() => navigate('/login')}
+            onClick={() => (window.location.href = '/login')}
           />
         </div>
       </div>
