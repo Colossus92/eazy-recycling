@@ -12,9 +12,10 @@ import { LmaDeclarationView } from '@/api/client';
 import { LMADeclarationStatusTag, LMADeclarationStatusTagProps } from './LMADeclarationStatusTag';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import Warning from '@/assets/icons/Warning.svg?react';
+import { Button } from '@/components/ui/button/Button';
 
 type Column = {
-  key: keyof LmaDeclarationView;
+  key: keyof LmaDeclarationView | 'actions';
   label: string;
   accessor: (value: LmaDeclarationView) => React.ReactNode;
   title: (value: LmaDeclarationView) => string | undefined;
@@ -24,7 +25,7 @@ type Column = {
 export const LMATab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { items, setQuery, isFetching, totalElements, errorHandling } = useLmaDeclarations({
+  const { items, setQuery, isFetching, totalElements, errorHandling, approveDeclaration, isApproving } = useLmaDeclarations({
     page,
     pageSize: rowsPerPage,
   });
@@ -35,35 +36,35 @@ export const LMATab = () => {
       label: 'Nummer',
       accessor: (item) => item.wasteStreamNumber,
       title: (item) => item.wasteStreamNumber,
-      width: '12%',
+      width: '11%',
     },
     {
       key: 'pickupLocation',
       label: 'Herkomstlocatie',
       accessor: (item) => item.pickupLocation,
       title: (item) => item.pickupLocation,
-      width: '20%',
+      width: '17%',
     },
     {
       key: 'wasteName',
       label: 'Gebruikelijke benaming',
       accessor: (item) => item.wasteName,
       title: (item) => item.wasteName,
-      width: '15%',
+      width: '14%',
     },
     {
       key: 'totalWeight',
       label: 'Totaal gewicht (kg)',
       accessor: (item) => item.totalWeight.toFixed(2),
       title: (item) => item.totalWeight.toString(),
-      width: '12%',
+      width: '10%',
     },
     {
       key: 'period',
       label: 'Periode',
       accessor: (item) => item.period,
       title: (item) => item.period,
-      width: '10%',
+      width: '8%',
     },
     {
       key: 'status',
@@ -74,7 +75,7 @@ export const LMATab = () => {
         />
       ),
       title: (item) => item.status,
-      width: '10%',
+      width: '12%',
     },
     {
       key: 'errors',
@@ -98,7 +99,31 @@ export const LMATab = () => {
         );
       },
       title: (item) => item.errors?.join('\n'),
-      width: '21%',
+      width: '14%',
+    },
+    {
+      key: 'actions',
+      label: 'Acties',
+      accessor: (item) => {
+        if (item.status !== 'WAITING_APPROVAL') {
+          return <span className="text-color-text-tertiary">-</span>;
+        }
+        return (
+          <Button
+            variant="secondary"
+            size="small"
+            label={isApproving ? 'Bezig...' : 'Goedkeuren'}
+            onClick={(e) => {
+              e.stopPropagation();
+              approveDeclaration(item.id);
+            }}
+            disabled={isApproving}
+          />
+            
+        );
+      },
+      title: () => undefined,
+      width: '14%',
     },
   ];
 

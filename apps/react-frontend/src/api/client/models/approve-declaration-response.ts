@@ -17,26 +17,26 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface ApproveDeclarationResponse
  */
-export interface SortObject {
+export interface ApproveDeclarationResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof SortObject
+     * @memberof ApproveDeclarationResponse
      */
-    'sorted'?: boolean;
+    'success': boolean;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof ApproveDeclarationResponse
      */
-    'unsorted'?: boolean;
+    'message': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof ApproveDeclarationResponse
      */
-    'empty'?: boolean;
+    'declarationId': string;
 }
 

@@ -1,14 +1,15 @@
-# Late and Corrective Waste Declarations
+# Late Waste Declarations
 
 ## Context and Problem Statement
 
 The current monthly waste declaration system triggers jobs on the 20th of each month to declare all completed/invoiced weight tickets from the previous month. However, this approach has limitations:
 
 1. **Late completions**: Weight tickets may be completed after the 20th, missing the declaration window for their month
-2. **Corrections after declaration**: Weight tickets may be modified (e.g., material weights adjusted) after they have already been declared, requiring corrective declarations
-3. **Multi-month backlog**: Late weight tickets could span multiple previous months, not just the immediately preceding one
+2. **Multi-month backlog**: Late weight tickets could span multiple previous months, not just the immediately preceding one
 
-The LMA (Landelijk Meldpunt Afvalstoffen) system accepts both initial declarations and corrections. Corrections can be positive (additional weight) or negative (weight reduction). The challenge is tracking which weight tickets have been declared and detecting changes that require corrective declarations.
+The LMA (Landelijk Meldpunt Afvalstoffen) system accepts both initial declarations and corrections. The challenge is tracking which weight tickets have been declared and detecting late weight tickets that need to be declared.
+
+> **Note**: Corrective declarations (for weight tickets modified after declaration) are not currently supported. This feature may be added in the future based on user demand.
 
 ### Current Architecture
 
@@ -141,9 +142,7 @@ CREATE INDEX idx_declaration_snapshots_period ON weight_ticket_declaration_snaps
 
 Extend `MonthlyWasteDeclarationJob.JobType`:
 
-- `LATE_FIRST_RECEIVALS`: For undeclared weight tickets from any previous month (waste streams without prior declarations)
-- `LATE_MONTHLY_RECEIVALS`: For undeclared weight tickets from any previous month (waste streams with prior declarations)
-- `CORRECTIVE_DECLARATIONS`: For weight tickets that changed after declaration
+- `LATE_WEIGHT_TICKETS`: For undeclared weight tickets from any previous month (handles both first receivals and monthly receivals)
 
 #### 3. Job Scheduling
 
@@ -151,9 +150,7 @@ Extend `MonthlyWasteDeclarationJob.JobType`:
 |----------|----------|-------|
 | FIRST_RECEIVALS | 20th of month | Previous month only |
 | MONTHLY_RECEIVALS | 20th of month | Previous month only |
-| LATE_FIRST_RECEIVALS | Daily | All previous months |
-| LATE_MONTHLY_RECEIVALS | Daily | All previous months |
-| CORRECTIVE_DECLARATIONS | Daily | All declared tickets |
+| LATE_WEIGHT_TICKETS | Daily at 23:00 | All previous months past deadline |
 
 **Important**: Late declaration jobs only process weight tickets from months that have passed their declaration deadline (the 20th). This prevents declaring weight tickets that are still within their normal declaration window.
 
@@ -198,27 +195,6 @@ WHERE wt.status IN ('COMPLETED', 'INVOICED')
 -- Example: On December 21st, cutoff = December 1st (so November and earlier are included)
 ```
 
-**Corrective Declarations Query:**
-
-```sql
--- Find weight ticket lines that changed after declaration
-SELECT 
-  wtl.*,
-  snap.declared_weight_value,
-  (wtl.weight_value - snap.declared_weight_value) as weight_delta
-FROM weight_ticket_lines wtl
-JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
-JOIN weight_ticket_declaration_snapshots snap 
-  ON snap.weight_ticket_line_id = wtl.id
-WHERE wt.status IN ('COMPLETED', 'INVOICED')
-  AND wtl.weight_value != snap.declared_weight_value
-  AND snap.declared_at = (
-    SELECT MAX(s2.declared_at) 
-    FROM weight_ticket_declaration_snapshots s2 
-    WHERE s2.weight_ticket_line_id = wtl.id
-  )
-```
-
 #### 5. Declaration Status
 
 Extend the `LmaDeclaration.Status` enum to include a new status for manual approval:
@@ -226,12 +202,11 @@ Extend the `LmaDeclaration.Status` enum to include a new status for manual appro
 | Status | Description |
 |--------|-------------|
 | PENDING | Declaration created, awaiting processing |
-| SENT | Declaration submitted to LMA |
-| ACCEPTED | Declaration accepted by LMA |
-| REJECTED | Declaration rejected by LMA |
-| **CORRECTIVE** | Corrective declaration awaiting manual approval |
+| COMPLETED | Declaration successfully submitted to LMA |
+| FAILED | Declaration submission failed |
+| **WAITING_APPROVAL** | Late declaration awaiting manual approval |
 
-The `CORRECTIVE` status is used as a safety mechanism to prevent the system from automatically sending large numbers of corrective declarations without human oversight.
+The `WAITING_APPROVAL` status is used as a safety mechanism to prevent the system from automatically sending late declarations without human oversight.
 
 #### 6. Declaration Flow
 
@@ -241,23 +216,23 @@ The `CORRECTIVE` status is used as a safety mechanism to prevent the system from
    - Submit to LMA
    - Create snapshot records for each declared line
 
-2. **Corrective Declaration** (with manual approval):
-   - Query lines where current weight differs from latest snapshot
-   - Calculate delta (positive or negative)
-   - Create declaration record with status `CORRECTIVE`
+2. **Late Declaration** (with manual approval):
+   - Daily job detects undeclared weight ticket lines from past months
+   - Group by waste stream number and period
+   - Create declaration record with status `WAITING_APPROVAL`
    - **Wait for manual approval** via UI
-   - Upon approval: Submit correction to LMA with delta values
-   - Create new snapshot record with current values
+   - Upon approval: Submit to LMA as first receival or monthly receival
+   - Create snapshot records for declared lines
 
 #### 7. Manual Approval Workflow
 
-To prevent the system from automatically sending large numbers of corrective declarations (especially during initial rollout), corrective declarations require manual approval:
+To prevent the system from automatically sending late declarations without human oversight, late declarations require manual approval:
 
-1. **Detection**: Daily job detects weight tickets needing correction
-2. **Creation**: Corrective declarations are created with status `CORRECTIVE`
-3. **Review**: User reviews pending corrective declarations in the LMA tab
-4. **Approval**: User clicks "Approve" button to send the declaration to LMA
-5. **Submission**: Upon approval, status changes to `SENT` and declaration is submitted
+1. **Detection**: Daily job at 23:00 detects undeclared weight tickets past their deadline
+2. **Creation**: Late declarations are created with status `WAITING_APPROVAL`
+3. **Review**: User reviews pending late declarations in the LMA tab
+4. **Approval**: User clicks "Goedkeuren" button to send the declaration to LMA
+5. **Submission**: Upon approval, status changes to `PENDING` and declaration is submitted
 
 **UI Changes (LMATab.tsx):**
 
@@ -265,20 +240,19 @@ Add an "Actions" column to the LMA declarations table:
 
 | Column | Content |
 |--------|---------|
-| Actions | "Goedkeuren" button (only visible for `CORRECTIVE` status) |
+| Actions | "Goedkeuren" button (only visible for `WAITING_APPROVAL` status) |
 
 Button behavior:
 
-- Visible only when `status === 'CORRECTIVE'`
+- Visible only when `status === 'WAITING_APPROVAL'`
 - On click: Calls API to approve and submit the declaration
 - Shows loading state during submission
 - Refreshes table after successful submission
 
 #### 8. Edge Cases
 
-- **Cancelled weight tickets**: If a declared ticket is cancelled, treat as correction with negative weight equal to declared amount
-- **Line removal**: If a line is deleted after declaration, detect via missing line with existing snapshot
-- **Line addition**: New lines on existing tickets are treated as late declarations
+- **Cancelled weight tickets**: Currently not handled - cancelled tickets are excluded from late declaration detection
+- **Line addition**: New lines on existing tickets are treated as late declarations if past the deadline
 
 ### Domain Model Changes
 
@@ -287,7 +261,7 @@ Button behavior:
 data class WeightTicketDeclarationSnapshot(
   val id: Long,
   val weightTicketId: WeightTicketId,
-  val weightTicketLineId: Long,
+  val weightTicketLineIndex: Int,
   val wasteStreamNumber: WasteStreamNumber,
   val declaredWeightValue: BigDecimal,
   val declarationId: String,
@@ -298,16 +272,17 @@ data class WeightTicketDeclarationSnapshot(
 // New port for snapshot persistence
 interface WeightTicketDeclarationSnapshots {
   fun save(snapshot: WeightTicketDeclarationSnapshot)
-  fun findLatestByWeightTicketLineId(lineId: Long): WeightTicketDeclarationSnapshot?
-  fun findUndeclaredLines(beforeMonth: YearMonth): List<UndeclaredWeightTicketLine>
-  fun findLinesNeedingCorrection(): List<WeightTicketLineCorrection>
+  fun saveAll(snapshots: List<WeightTicketDeclarationSnapshot>)
+  fun findLatestByWeightTicketLine(weightTicketId: Long, lineIndex: Int): WeightTicketDeclarationSnapshot?
+  fun findUndeclaredLines(cutoffDate: YearMonth): List<UndeclaredWeightTicketLine>
 }
 
-data class WeightTicketLineCorrection(
-  val weightTicketLine: WeightTicketLine,
-  val previouslyDeclaredWeight: BigDecimal,
-  val currentWeight: BigDecimal,
-  val delta: BigDecimal
+data class UndeclaredWeightTicketLine(
+  val weightTicketId: WeightTicketId,
+  val weightTicketLineIndex: Int,
+  val wasteStreamNumber: WasteStreamNumber,
+  val weightValue: BigDecimal,
+  val weightedAt: Instant
 )
 ```
 
@@ -385,6 +360,7 @@ The LMA system supports:
 
 ### Future Considerations
 
+- **Corrective declarations**: Support for weight tickets modified after declaration (corrections with positive/negative weight deltas) may be added based on user demand
 - Consider adding a UI to view declaration history per weight ticket
 - May need reconciliation tooling to verify declared vs actual weights
-- Consider alerting when corrections exceed certain thresholds
+- Consider alerting when late declarations exceed certain thresholds

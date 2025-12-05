@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { lmaDeclarationService } from '@/api/services/lmaDeclarationService';
 import { Pageable } from '@/api/client';
+import { toastService } from '@/components/ui/toast/toastService';
 
 interface UseLmaDeclarationsOptions {
   page?: number;
@@ -51,11 +52,24 @@ export function useLmaDeclarations(options?: UseLmaDeclarationsOptions) {
     });
   }, [lmaDeclarations, query]);
 
+  const approveMutation = useMutation({
+    mutationFn: (declarationId: string) => lmaDeclarationService.approve(declarationId),
+    onSuccess: () => {
+      toastService.success('Melding succesvol goedgekeurd en verzonden naar LMA');
+      queryClient.invalidateQueries({ queryKey: ['lmaDeclarations'] });
+    },
+    onError: () => {
+      toastService.error('Fout bij goedkeuren van melding');
+    },
+  });
+
   return {
     items: displayedDeclarations,
     setQuery,
     isFetching,
     totalElements: lmaDeclarationsPage?.totalElements ?? 0,
+    approveDeclaration: approveMutation.mutate,
+    isApproving: approveMutation.isPending,
     errorHandling: {
       error,
       reset: () => {

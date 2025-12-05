@@ -8,4 +8,7 @@ export const lmaDeclarationService = {
         const defaultPageable: Pageable = { page: 0, size: 10 };
         return lmaDeclarationApi.getDeclarations(pageable || defaultPageable).then((r) => r.data);
     },
+    approve: (declarationId: string) => {
+        return lmaDeclarationApi.approveDeclaration(declarationId).then((r) => r.data);
+    },
 };

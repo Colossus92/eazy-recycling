@@ -34,6 +34,7 @@ models/application-context-class-loader-parent-unnamed-module.ts
 models/application-context-class-loader-parent.ts
 models/application-context-class-loader.ts
 models/application-context.ts
+models/approve-declaration-response.ts
 models/authorization-url-response.ts
 models/cancel-weight-ticket-request.ts
 models/company-branch-response.ts

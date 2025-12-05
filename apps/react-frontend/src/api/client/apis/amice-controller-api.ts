@@ -24,6 +24,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { ApproveDeclarationResponse } from '../models';
+// @ts-ignore
 import type { DeclareFirstReceivalsRequest } from '../models';
 // @ts-ignore
 import type { DeclareFirstReceivalsResponse } from '../models';
@@ -36,6 +38,41 @@ import type { Pageable } from '../models';
  */
 export const AmiceControllerApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @param {string} declarationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        approveDeclaration: async (declarationId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'declarationId' is not null or undefined
+            assertParamExists('approveDeclaration', 'declarationId', declarationId)
+            const localVarPath = `/amice/declarations/{declarationId}/approve`
+                .replace(`{declarationId}`, encodeURIComponent(String(declarationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
@@ -122,6 +159,18 @@ export const AmiceControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {string} declarationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async approveDeclaration(declarationId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApproveDeclarationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.approveDeclaration(declarationId, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['AmiceControllerApi.approveDeclaration']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
          * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -155,6 +204,15 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
     return {
         /**
          * 
+         * @param {string} declarationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        approveDeclaration(declarationId: string, options?: any): AxiosPromise<ApproveDeclarationResponse> {
+            return localVarFp.approveDeclaration(declarationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -178,6 +236,17 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
  * AmiceControllerApi - object-oriented interface
  */
 export class AmiceControllerApi extends BaseAPI {
+    /**
+     * 
+     * @param {string} declarationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AmiceControllerApi
+     */
+    public approveDeclaration(declarationId: string, options?: RawAxiosRequestConfig) {
+        return AmiceControllerApiFp(this.configuration).approveDeclaration(declarationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @param {DeclareFirstReceivalsRequest} declareFirstReceivalsRequest 

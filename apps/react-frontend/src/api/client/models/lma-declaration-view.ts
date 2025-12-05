@@ -25,6 +25,12 @@ export interface LmaDeclarationView {
      * @type {string}
      * @memberof LmaDeclarationView
      */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LmaDeclarationView
+     */
     'wasteStreamNumber': string;
     /**
      * 
@@ -68,5 +74,11 @@ export interface LmaDeclarationView {
      * @memberof LmaDeclarationView
      */
     'errors'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof LmaDeclarationView
+     */
+    'transporters': Array<string>;
 }
 

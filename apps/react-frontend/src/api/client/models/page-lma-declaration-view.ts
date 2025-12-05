@@ -43,12 +43,6 @@ export interface PageLmaDeclarationView {
     'totalPages'?: number;
     /**
      * 
-     * @type {number}
-     * @memberof PageLmaDeclarationView
-     */
-    'numberOfElements'?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof PageLmaDeclarationView
      */
@@ -65,6 +59,12 @@ export interface PageLmaDeclarationView {
      * @memberof PageLmaDeclarationView
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {number}
+     * @memberof PageLmaDeclarationView
+     */
+    'numberOfElements'?: number;
     /**
      * 
      * @type {number}

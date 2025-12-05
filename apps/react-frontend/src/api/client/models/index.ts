@@ -8,6 +8,7 @@ export * from './application-context-class-loader-parent-unnamed-module';
 export * from './application-context-class-loader-parent-unnamed-module-class-loader';
 export * from './application-context-class-loader-parent-unnamed-module-class-loader-defined-packages-inner';
 export * from './application-context-class-loader-parent-unnamed-module-descriptor';
+export * from './approve-declaration-response';
 export * from './authorization-url-response';
 export * from './cancel-weight-ticket-request';
 export * from './company-branch-response';
