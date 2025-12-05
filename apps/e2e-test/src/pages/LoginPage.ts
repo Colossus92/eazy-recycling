@@ -13,6 +13,7 @@ export class LoginPage extends BasePage {
   private readonly passwordField: Locator;
   private readonly loginButton: Locator;
   private readonly formError: Locator;
+  private readonly forgotPasswordLink: Locator;
 
   constructor(page: Page) {
     super(page, '/login');
@@ -24,6 +25,7 @@ export class LoginPage extends BasePage {
     this.passwordField = page.locator('[data-testid="password"]');
     this.loginButton = page.locator('button[type="submit"]');
     this.formError = page.locator('.text-color-status-error-dark');
+    this.forgotPasswordLink = page.locator('[data-testid="forgot-password-link"]');
   }
 
   /**
@@ -112,5 +114,19 @@ export class LoginPage extends BasePage {
 
   async waitForButtonEnabled(): Promise<void> {
     await expect(this.loginButton).toBeEnabled();
+  }
+
+  /**
+   * Click the forgot password link
+   */
+  async clickForgotPassword(): Promise<void> {
+    await this.forgotPasswordLink.click();
+  }
+
+  /**
+   * Verify the forgot password link is visible
+   */
+  async verifyForgotPasswordLinkVisible(): Promise<void> {
+    await expect(this.forgotPasswordLink).toBeVisible();
   }
 }

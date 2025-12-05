@@ -1,12 +1,19 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { lazy } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { supabase } from '@/api/supabaseClient.tsx';
 import { AuthContext } from '@/components/auth/AuthContext.ts';
 import { User } from '@/api/services/userService.ts';
 
 const LoginPage = lazy(() => import('../../app/desktop/pages/LoginPage.tsx'));
+const ForgotPasswordPage = lazy(
+  () => import('../../app/desktop/pages/ForgotPasswordPage.tsx')
+);
+const ChangePasswordPage = lazy(
+  () => import('../../app/desktop/pages/ChangePasswordPage.tsx')
+);
 
 export interface AuthContextProps {
   session: Session | null;
@@ -37,6 +44,31 @@ function createUser(decodedClaims: JWTClaims): User {
     lastSignInAt: new Date().toISOString(),
   };
 }
+
+const UnauthenticatedRoutes = () => {
+  const location = useLocation();
+
+  // Check if we're on the change-password page with a recovery token in the URL
+  // Supabase implicit flow puts the token in the URL hash
+  const isRecoveryFlow =
+    location.pathname === '/change-password' &&
+    location.hash.includes('type=recovery');
+
+  // If it's a recovery flow, we need to let Supabase handle the token
+  // The ChangePasswordPage will handle the authentication state
+  if (isRecoveryFlow) {
+    return <ChangePasswordPage />;
+  }
+
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/change-password" element={<ChangePasswordPage />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
@@ -107,7 +139,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       <AuthContext.Provider
         value={{ session, signOut, userRoles, user, hasRole, userId }}
       >
-        <LoginPage />
+        <UnauthenticatedRoutes />
       </AuthContext.Provider>
     );
   }

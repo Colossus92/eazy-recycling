@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
 import { TextFormField } from '@/components/ui/form/TextFormField';
 import { Logo } from '@/components/ui/Logo';
@@ -79,16 +79,27 @@ export const LoginPage = () => {
               rules: { required: 'Email is verplicht' },
             }}
           />
-          <PasswordFormField
-            title="Wachtwoord"
-            placeholder="Voer wachtwoord in"
-            formHook={{
-              register,
-              name: 'password',
-              errors,
-              rules: { required: 'Wachtwoord is verplicht' },
-            }}
-          />
+          <div className="flex flex-col items-start self-stretch gap-1">
+            <PasswordFormField
+              title="Wachtwoord"
+              placeholder="Voer wachtwoord in"
+              formHook={{
+                register,
+                name: 'password',
+                errors,
+                rules: { required: 'Wachtwoord is verplicht' },
+              }}
+            />
+            <div className="flex justify-end w-full">
+              <Link
+                to="/forgot-password"
+                className="text-body-2 text-color-brand-primary hover:underline"
+                data-testid="forgot-password-link"
+              >
+                Wachtwoord vergeten?
+              </Link>
+            </div>
+          </div>
           {formError && (
             <span className="text-body-2 text-color-status-error-dark">
               {formError}
