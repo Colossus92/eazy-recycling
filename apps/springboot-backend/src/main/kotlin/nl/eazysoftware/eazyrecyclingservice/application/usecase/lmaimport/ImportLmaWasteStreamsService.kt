@@ -1,6 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.lmaimport
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportError
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErrorCode
@@ -76,6 +76,12 @@ class ImportLmaWasteStreamsService(
       // Skip private consignors (not supported yet)
       if (record.isPrivateConsignor) {
         logger.debug("Skipping row ${record.rowNumber}: private consignor")
+        skippedRows++
+        continue
+      }
+
+      if (record.locatieLand?.isNetherlands() != true) {
+        logger.debug("Skipping row ${record.rowNumber}: foreign address not supported")
         skippedRows++
         continue
       }
@@ -161,20 +167,20 @@ class ImportLmaWasteStreamsService(
     // Ensure processing method exists in database, create if missing
     ensureProcessingMethodExists(processingMethodCode, record.verwerkingsmethodeOmschrijving)
 
-    // Determine collection type
-    val collectionType = determineCollectionType(record)
-
-    // Build pickup location
-    val pickupLocation = buildPickupLocation(record)
-
-    // Create waste stream
     try {
+
+      // Determine collection type
+      val collectionType = determineCollectionType(record)
+
+      // Build pickup location
+      val pickupLocation = buildPickupLocation(record)
       val wasteType = WasteType(
         name = record.gebruikelijkeNaam ?: record.euralcodeOmschrijving ?: "Onbekend",
         euralCode = EuralCode(euralCode),
         processingMethod = ProcessingMethod(processingMethodCode)
       )
 
+      // Create waste stream
       val wasteStream = WasteStream(
         wasteStreamNumber = WasteStreamNumber(wasteStreamNumber),
         wasteType = wasteType,
@@ -258,32 +264,32 @@ class ImportLmaWasteStreamsService(
    * Builds pickup location from CSV record.
    * Uses ProximityDescription if nabijheidsbeschrijving is present, otherwise DutchAddress.
    */
-  private fun buildPickupLocation(record: LmaCsvRecord): nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location {
+  private fun buildPickupLocation(record: LmaCsvRecord): Location {
     // If there's a proximity description, use that
     if (!record.locatieNabijheid.isNullOrBlank()) {
-      return nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.ProximityDescription(
+      return Location.ProximityDescription(
         description = record.locatieNabijheid,
         postalCodeDigits = extractPostalCodeDigits(record.locatiePostcode),
-        city = nl.eazysoftware.eazyrecyclingservice.domain.model.address.City(record.locatiePlaats ?: ""),
+        city = City(record.locatiePlaats ?: ""),
         country = record.locatieLand ?: "Nederland"
       )
     }
 
     // If there's an address, use DutchAddress
     if (!record.locatieStraatnaam.isNullOrBlank()) {
-      val address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
-        streetName = nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName(record.locatieStraatnaam),
+      val address = Address(
+        streetName = StreetName(record.locatieStraatnaam),
         buildingNumber = record.locatieHuisnummer ?: "",
         buildingNumberAddition = record.locatieHuisnummerToevoeging,
-        postalCode = nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode(record.locatiePostcode ?: ""),
-        city = nl.eazysoftware.eazyrecyclingservice.domain.model.address.City(record.locatiePlaats ?: ""),
+        postalCode = DutchPostalCode(record.locatiePostcode ?: ""),
+        city = City(record.locatiePlaats ?: ""),
         country = record.locatieLand ?: "Nederland"
       )
-      return nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(address)
+      return Location.DutchAddress(address)
     }
 
     // No location specified
-    return nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+    return Location.NoLocation
   }
 
   /**
