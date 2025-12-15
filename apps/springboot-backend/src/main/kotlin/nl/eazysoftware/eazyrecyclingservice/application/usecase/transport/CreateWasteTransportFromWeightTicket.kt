@@ -39,9 +39,11 @@ class CreateWasteTransportFromWeightTicketService(
     val carrierParty = weightTicket.carrierParty ?: throw IllegalStateException("Weegbon moet een vervoerder hebben om een afvaltransport aan te maken")
 
     // Map WeightTicket lines to GoodsItems
-    val goods = weightTicket.lines.getLines().map { line ->
+    val goods = weightTicket.lines.getLines()
+      .filter { it.waste != null }
+      .map { line ->
       GoodsItem(
-        wasteStreamNumber = line.waste,
+        wasteStreamNumber = line.waste!!,
         netNetWeight = line.weight.value.toDouble(),
         unit = line.weight.unit.name,
         quantity = 1

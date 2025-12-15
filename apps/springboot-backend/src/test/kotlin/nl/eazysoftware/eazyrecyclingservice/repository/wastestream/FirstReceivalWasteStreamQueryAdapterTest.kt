@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
-import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -376,7 +375,7 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       dealerParty = null,
       collectorParty = null,
       brokerParty = null,
-      material = null,
+      catalogItem = null,
       processorParty = processorParty,
       status = status,
       consignorClassification = 1
@@ -397,6 +396,7 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
       WeightTicketLineDto(
         wasteStreamNumber = wasteStreamNumber,
+        catalogItemId = 1L,
         weightValue = weightValue.toBigDecimal(),
         weightUnit = WeightUnitDto.kg
       )

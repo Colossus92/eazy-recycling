@@ -13,6 +13,7 @@ class WeightTicketLines(
 
 
 data class WeightTicketLine(
-  val waste: WasteStreamNumber,
+  val waste: WasteStreamNumber?,
+  val catalogItemId: Long,
   val weight: Weight,
 )

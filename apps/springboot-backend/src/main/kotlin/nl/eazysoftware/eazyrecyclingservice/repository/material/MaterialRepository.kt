@@ -2,32 +2,35 @@ package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Materials
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
-interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
+interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
 
     @Query(
         value = """
             SELECT
-                m.id as id,
-                m.code as code,
-                m.name as name,
-                mg.id as materialGroupId,
-                mg.code as materialGroupCode,
-                mg.name as materialGroupName,
-                m.unit_of_measure as unitOfMeasure,
-                m.vat_code as vatCode,
-                m.gl_account_code as glAccountCode,
-                m.status as status,
-                m.created_at as createdAt,
-                m.created_by as createdBy,
-                m.last_modified_at as updatedAt,
-                m.last_modified_by as updatedBy
-            FROM materials m
-            INNER JOIN material_groups mg ON m.material_group_id = mg.id
+                ci.id as id,
+                ci.code as code,
+                ci.name as name,
+                cic.id as materialGroupId,
+                cic.code as materialGroupCode,
+                cic.name as materialGroupName,
+                ci.unit_of_measure as unitOfMeasure,
+                ci.vat_code as vatCode,
+                ci.sales_account_number as salesAccountNumber,
+                ci.purchase_account_number as purchaseAccountNumber,
+                ci.status as status,
+                ci.created_at as createdAt,
+                ci.created_by as createdBy,
+                ci.last_modified_at as updatedAt,
+                ci.last_modified_by as updatedBy
+            FROM catalog_items ci
+            LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            WHERE ci.type = 'MATERIAL'
         """,
         nativeQuery = true
     )
@@ -36,23 +39,24 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
     @Query(
         value = """
             SELECT
-                m.id as id,
-                m.code as code,
-                m.name as name,
-                mg.id as materialGroupId,
-                mg.code as materialGroupCode,
-                mg.name as materialGroupName,
-                m.unit_of_measure as unitOfMeasure,
-                m.vat_code as vatCode,
-                m.gl_account_code as glAccountCode,
-                m.status as status,
-                m.created_at as createdAt,
-                m.created_by as createdBy,
-                m.last_modified_at as updatedAt,
-                m.last_modified_by as updatedBy
-            FROM materials m
-            INNER JOIN material_groups mg ON m.material_group_id = mg.id
-            WHERE m.id = :id
+                ci.id as id,
+                ci.code as code,
+                ci.name as name,
+                cic.id as materialGroupId,
+                cic.code as materialGroupCode,
+                cic.name as materialGroupName,
+                ci.unit_of_measure as unitOfMeasure,
+                ci.vat_code as vatCode,
+                ci.sales_account_number as salesAccountNumber,
+                ci.purchase_account_number as purchaseAccountNumber,
+                ci.status as status,
+                ci.created_at as createdAt,
+                ci.created_by as createdBy,
+                ci.last_modified_at as updatedAt,
+                ci.last_modified_by as updatedBy
+            FROM catalog_items ci
+            LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            WHERE ci.id = :id AND ci.type = 'MATERIAL'
         """,
         nativeQuery = true
     )
@@ -61,25 +65,27 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
     @Query(
         value = """
             SELECT
-                m.id as id,
-                m.code as code,
-                m.name as name,
-                mg.id as materialGroupId,
-                mg.code as materialGroupCode,
-                mg.name as materialGroupName,
-                m.unit_of_measure as unitOfMeasure,
-                m.vat_code as vatCode,
-                m.gl_account_code as glAccountCode,
-                m.status as status,
-                m.created_at as createdAt,
-                m.created_by as createdBy,
-                m.last_modified_at as updatedAt,
-                m.last_modified_by as updatedBy
-            FROM materials m
-            INNER JOIN material_groups mg ON m.material_group_id = mg.id
-            WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :query, '%'))
-               OR LOWER(m.code) LIKE LOWER(CONCAT('%', :query, '%'))
-            ORDER BY m.name
+                ci.id as id,
+                ci.code as code,
+                ci.name as name,
+                cic.id as materialGroupId,
+                cic.code as materialGroupCode,
+                cic.name as materialGroupName,
+                ci.unit_of_measure as unitOfMeasure,
+                ci.vat_code as vatCode,
+                ci.sales_account_number as salesAccountNumber,
+                ci.purchase_account_number as purchaseAccountNumber,
+                ci.status as status,
+                ci.created_at as createdAt,
+                ci.created_by as createdBy,
+                ci.last_modified_at as updatedAt,
+                ci.last_modified_by as updatedBy
+            FROM catalog_items ci
+            LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            WHERE ci.type = 'MATERIAL'
+              AND (LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
+            ORDER BY ci.name
         """,
         nativeQuery = true
     )
@@ -91,10 +97,6 @@ class MaterialRepository(
     private val jpaRepository: MaterialJpaRepository,
     private val mapper: MaterialMapper
 ) : Materials {
-
-    override fun getAllMaterials(): List<Material> {
-        return jpaRepository.findAll().map { mapper.toDomain(it) }
-    }
 
     override fun getMaterialById(id: Long): Material? {
         return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }

@@ -193,7 +193,7 @@ create table if not exists waste_streams (
                                   collector_party_id uuid,
                                   broker_party_id uuid,
                                   processor_party_id text,
-                                  material_id bigint,
+                                  catalog_item_id bigint,
                                   status text,
                                   created_at timestamp with time zone not null default now(),
                                   created_by text,
@@ -255,11 +255,11 @@ create table if not exists weight_tickets (
 
 create table if not exists weight_ticket_lines (
                                  weight_ticket_id bigint not null,
-                                 waste_stream_number text not null,
+                                 waste_stream_number text,
+                                 catalog_item_id bigint not null,
                                  weight_value numeric(10,2) not null,
                                  weight_unit text not null,
-                                 constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id),
-                                 constraint fk_weight_ticket_lines_waste_stream foreign key (waste_stream_number) references waste_streams(number)
+                                 constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id)
 );
 
 
@@ -441,6 +441,41 @@ create table if not exists product_categories (
                                           last_modified_at timestamp with time zone not null default now(),
                                           last_modified_by text,
                                           primary key (id)
+);
+
+create table if not exists catalog_item_categories (
+                                          id bigint generated always as identity,
+                                          type text not null,
+                                          code text not null unique,
+                                          name text not null,
+                                          description text,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
+                                          primary key (id)
+);
+
+create table if not exists catalog_items (
+                                          id bigint generated always as identity,
+                                          type text not null,
+                                          code text not null unique,
+                                          name text not null,
+                                          category_id bigint,
+                                          consignor_party_id uuid,
+                                          unit_of_measure text not null,
+                                          vat_code text not null,
+                                          sales_account_number text,
+                                          purchase_account_number text,
+                                          default_price numeric(15,4),
+                                          status text not null,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
+                                          primary key (id),
+                                          foreign key (category_id) references catalog_item_categories(id),
+                                          foreign key (vat_code) references vat_rates(vat_code)
 );
 
 create table if not exists products (

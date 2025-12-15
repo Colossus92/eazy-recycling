@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.catalog
 
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupDto
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryDto
 import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryJpaRepository
@@ -38,7 +38,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var materialJpaRepository: MaterialJpaRepository
 
   @Autowired
-  private lateinit var materialGroupJpaRepository: MaterialGroupJpaRepository
+  private lateinit var catalogItemCategoryJpaRepository: CatalogItemCategoryJpaRepository
 
   @Autowired
   private lateinit var productJpaRepository: ProductJpaRepository
@@ -49,7 +49,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-  private var testMaterialGroupId: Long? = null
+  private var testMaterialCategoryId: Long? = null
   private var testProductCategoryId: Long? = null
   private val testVatCode = "VAT21"
 
@@ -59,7 +59,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
     materialJpaRepository.deleteAll()
     productJpaRepository.deleteAll()
     productCategoryJpaRepository.deleteAll()
-    materialGroupJpaRepository.deleteAll()
+    catalogItemCategoryJpaRepository.deleteAll()
 
     if (!vatRateJpaRepository.existsById(testVatCode)) {
       vatRateJpaRepository.save(
@@ -74,14 +74,15 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
       )
     }
 
-    val materialGroup = materialGroupJpaRepository.save(
-      MaterialGroupDto(
+    val materialCategory = catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = "MATERIAL",
         code = "TEST_GROUP",
         name = "Test Material Group",
         description = "Test Description"
       )
     )
-    testMaterialGroupId = materialGroup.id
+    testMaterialCategoryId = materialCategory.id
 
     val productCategory = productCategoryJpaRepository.save(
       ProductCategoryDto(
@@ -96,18 +97,22 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should search catalog and return both materials and products`() {
     // Given
-    val materialGroup = materialGroupJpaRepository.findById(testMaterialGroupId!!).get()
+    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
     val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
 
     materialJpaRepository.save(
-      MaterialDto(
+      CatalogItemDto(
+        type = "MATERIAL",
         code = "MAT001",
         name = "Steel Pipes",
-        materialGroup = materialGroup,
+        category = materialCategory,
+        consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
-        glAccountCode = "8000",
+        salesAccountNumber = "8000",
+        purchaseAccountNumber = null,
+        defaultPrice = null,
         status = "ACTIVE"
       )
     )
@@ -135,18 +140,22 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should search catalog with limit`() {
     // Given
-    val materialGroup = materialGroupJpaRepository.findById(testMaterialGroupId!!).get()
+    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     repeat(5) { i ->
       materialJpaRepository.save(
-        MaterialDto(
+        CatalogItemDto(
+          type = "MATERIAL",
           code = "MAT00$i",
           name = "Material $i",
-          materialGroup = materialGroup,
+          category = materialCategory,
+          consignorParty = null,
           unitOfMeasure = "KG",
           vatRate = vatRate,
-          glAccountCode = null,
+          salesAccountNumber = null,
+          purchaseAccountNumber = null,
+          defaultPrice = null,
           status = "ACTIVE"
         )
       )
@@ -161,17 +170,21 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get material by id from catalog`() {
     // Given
-    val materialGroup = materialGroupJpaRepository.findById(testMaterialGroupId!!).get()
+    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     val material = materialJpaRepository.save(
-      MaterialDto(
+      CatalogItemDto(
+        type = "MATERIAL",
         code = "MAT001",
         name = "Steel Pipes",
-        materialGroup = materialGroup,
+        category = materialCategory,
+        consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
-        glAccountCode = "8000",
+        salesAccountNumber = "8000",
+        purchaseAccountNumber = null,
+        defaultPrice = null,
         status = "ACTIVE"
       )
     )
@@ -243,18 +256,22 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should filter by type MATERIAL`() {
     // Given
-    val materialGroup = materialGroupJpaRepository.findById(testMaterialGroupId!!).get()
+    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
     val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
 
     materialJpaRepository.save(
-      MaterialDto(
+      CatalogItemDto(
+        type = "MATERIAL",
         code = "MAT001",
         name = "Test Item",
-        materialGroup = materialGroup,
+        category = materialCategory,
+        consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
+        defaultPrice = null,
         status = "ACTIVE"
       )
     )
@@ -283,18 +300,22 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should filter by type PRODUCT`() {
     // Given
-    val materialGroup = materialGroupJpaRepository.findById(testMaterialGroupId!!).get()
+    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
     val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
 
     materialJpaRepository.save(
-      MaterialDto(
+      CatalogItemDto(
+        type = "MATERIAL",
         code = "MAT001",
         name = "Test Item",
-        materialGroup = materialGroup,
+        category = materialCategory,
+        consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
+        defaultPrice = null,
         status = "ACTIVE"
       )
     )

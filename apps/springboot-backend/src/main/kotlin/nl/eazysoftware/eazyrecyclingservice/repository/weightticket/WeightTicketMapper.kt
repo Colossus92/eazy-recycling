@@ -105,8 +105,9 @@ class WeightTicketMapper(
     return domain.getLines()
       .map {
         WeightTicketLineDto(
-          wasteStreamNumber = it.waste.number,
+          wasteStreamNumber = it.waste?.number,
           weightValue = it.weight.value,
+          catalogItemId = it.catalogItemId,
           weightUnit = when (it.weight.unit) {
             Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
           },

@@ -3,10 +3,10 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
 
 @Entity
 @Table(name = "waste_streams")
@@ -71,8 +71,8 @@ data class WasteStreamDto(
   val brokerParty: CompanyDto?,
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "material_id", referencedColumnName = "id")
-  val material: MaterialDto?,
+  @JoinColumn(name = "catalog_item_id", referencedColumnName = "id")
+  val catalogItem: CatalogItemDto?,
 
   @Column(name = "status", nullable = false)
   val status: String

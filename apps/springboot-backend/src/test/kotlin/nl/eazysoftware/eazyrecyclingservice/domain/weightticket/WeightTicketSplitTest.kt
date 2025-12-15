@@ -26,6 +26,7 @@ class WeightTicketSplitTest {
             lines = listOf(
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
+                    catalogItemId = 1L,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -57,6 +58,7 @@ class WeightTicketSplitTest {
             lines = listOf(
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
+                    catalogItemId = 1L,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -81,14 +83,17 @@ class WeightTicketSplitTest {
             lines = listOf(
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
+                    catalogItemId = 1L,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 ),
                 WeightTicketLine(
                     waste = WasteStreamNumber("987654321098"),
+                    catalogItemId = 2L,
                     weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
                 ),
                 WeightTicketLine(
                     waste = WasteStreamNumber("555555555555"),
+                    catalogItemId = 3L,
                     weight = Weight(BigDecimal("50.50"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -121,8 +126,8 @@ class WeightTicketSplitTest {
         val wasteStream2 = WasteStreamNumber("987654321098")
         val originalTicket = createWeightTicketWithLines(
             lines = listOf(
-                WeightTicketLine(waste = wasteStream1, weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)),
-                WeightTicketLine(waste = wasteStream2, weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM))
+                WeightTicketLine(waste = wasteStream1, catalogItemId = 1L, weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)),
+                WeightTicketLine(waste = wasteStream2, catalogItemId = 2L, weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM))
             )
         )
 
@@ -162,6 +167,7 @@ class WeightTicketSplitTest {
                 listOf(
                     WeightTicketLine(
                         waste = WasteStreamNumber("123456789012"),
+                        catalogItemId = 1L,
                         weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                     )
                 )
@@ -319,6 +325,7 @@ class WeightTicketSplitTest {
             lines = listOf(
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
+                    catalogItemId = 1L,
                     weight = Weight(BigDecimal("100.33"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -359,6 +366,7 @@ class WeightTicketSplitTest {
         lines: List<WeightTicketLine> = listOf(
             WeightTicketLine(
                 waste = WasteStreamNumber("123456789012"),
+                catalogItemId = 1L,
                 weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
             )
         )

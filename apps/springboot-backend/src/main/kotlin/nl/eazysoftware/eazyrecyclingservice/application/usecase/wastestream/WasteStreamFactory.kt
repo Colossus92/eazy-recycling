@@ -39,7 +39,7 @@ class WasteStreamFactory(
       dealerParty = cmd.dealerParty,
       collectorParty = cmd.collectorParty,
       brokerParty = cmd.brokerParty,
-      materialId = cmd.materialId
+      catalogItemId = cmd.catalogItemId
     )
   }
 
@@ -60,7 +60,7 @@ class WasteStreamFactory(
       dealerParty = cmd.dealerParty,
       collectorParty = cmd.collectorParty,
       brokerParty = cmd.brokerParty,
-      materialId = cmd.materialId
+      materialId = cmd.catalogItemId
     )
 
     return wasteStream

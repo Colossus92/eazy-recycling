@@ -10,7 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Products
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialQueryResult
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 @Service
 class CatalogQueryService(
@@ -90,7 +90,7 @@ class CatalogQueryService(
             val filteredWasteStreams = if (query.isNullOrBlank()) {
                 wasteStreamResults
             } else {
-                wasteStreamResults.filter { 
+                wasteStreamResults.filter {
                     it.wasteType.name.contains(query, ignoreCase = true) ||
                     it.wasteStreamNumber.number.contains(query, ignoreCase = true)
                 }
@@ -132,7 +132,7 @@ private fun MaterialQueryResult.toCatalogItem(): CatalogItem.MaterialItem {
         name = getName(),
         unitOfMeasure = getUnitOfMeasure(),
         vatCode = getVatCode(),
-        glAccountCode = getGlAccountCode(),
+        glAccountCode = getSalesAccountNumber(),
         categoryName = getMaterialGroupName(),
         materialGroupId = getMaterialGroupId(),
     )
@@ -158,7 +158,7 @@ private fun WasteStream.toCatalogItem(): CatalogItem.WasteStreamItem {
         is nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor.Person -> "PERSON"
     }
     return CatalogItem.WasteStreamItem(
-        id = materialId ?: 0L,
+        id = catalogItemId ?: 0L,
         code = wasteStreamNumber.number,
         name = wasteType.name,
         unitOfMeasure = "kg",
@@ -166,7 +166,7 @@ private fun WasteStream.toCatalogItem(): CatalogItem.WasteStreamItem {
         glAccountCode = null,
         categoryName = null,
         wasteStreamNumber = wasteStreamNumber.number,
-        materialId = materialId,
+        materialId = catalogItemId,
         consignorPartyId = consignorId,
         euralCode = wasteType.euralCode.code,
         processingMethodCode = wasteType.processingMethod.code,

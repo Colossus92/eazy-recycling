@@ -75,24 +75,26 @@ class MaterialController(
 }
 
 data class MaterialRequest(
-    @field:NotBlank(message = "Code is verplicht")
+  @field:NotBlank(message = "Code is verplicht")
     val code: String,
 
-    @field:NotBlank(message = "Naam is verplicht")
+  @field:NotBlank(message = "Naam is verplicht")
     val name: String,
 
-    @field:Positive(message = "Material group ID moet een positief getal zijn")
+  @field:Positive(message = "Material group ID moet een positief getal zijn")
     val materialGroupId: Long,
 
-    @field:NotBlank(message = "Eenheid is verplicht")
+  @field:NotBlank(message = "Eenheid is verplicht")
     val unitOfMeasure: String,
 
-    @field:NotBlank(message = "VAT code is verplicht")
+  @field:NotBlank(message = "VAT code is verplicht")
     val vatCode: String,
 
-    val glAccountCode: String?,
+  val salesAccountNumber: String?,
 
-    @field:NotBlank(message = "Status is verplicht")
+  val purchaseAccountNumber: String?,
+
+  @field:NotBlank(message = "Status is verplicht")
     val status: String
 ) {
     fun toDomain(): Material {
@@ -103,7 +105,8 @@ data class MaterialRequest(
             materialGroupId = materialGroupId,
             unitOfMeasure = unitOfMeasure,
             vatCode = vatCode,
-            glAccountCode = glAccountCode,
+            salesAccountNumber = salesAccountNumber,
+            purchaseAccountNumber = purchaseAccountNumber,
             status = status,
             createdAt = null,
             updatedAt = null
@@ -112,20 +115,21 @@ data class MaterialRequest(
 }
 
 data class MaterialResponse(
-    val id: Long,
-    val code: String,
-    val name: String,
-    val materialGroupId: Long,
-    val materialGroupCode: String,
-    val materialGroupName: String,
-    val unitOfMeasure: String,
-    val vatCode: String,
-    val glAccountCode: String?,
-    val status: String,
-    val createdAt: String?,
-    val createdByName: String?,
-    val updatedAt: String?,
-    val updatedByName: String?,
+  val id: Long,
+  val code: String,
+  val name: String,
+  val materialGroupId: Long?,
+  val materialGroupCode: String?,
+  val materialGroupName: String?,
+  val unitOfMeasure: String,
+  val vatCode: String,
+  val salesAccountNumber: String?,
+  val purchaseAccountNumber: String?,
+  val status: String,
+  val createdAt: String?,
+  val createdByName: String?,
+  val updatedAt: String?,
+  val updatedByName: String?,
 )
 
 fun MaterialQueryResult.toResponse(): MaterialResponse {
@@ -138,7 +142,8 @@ fun MaterialQueryResult.toResponse(): MaterialResponse {
         materialGroupName = getMaterialGroupName(),
         unitOfMeasure = getUnitOfMeasure(),
         vatCode = getVatCode(),
-        glAccountCode = getGlAccountCode(),
+        salesAccountNumber = getSalesAccountNumber(),
+        purchaseAccountNumber = getPurchaseAccountNumber(),
         status = getStatus(),
         createdAt = getCreatedAt()?.toString(),
         createdByName = getCreatedBy(),

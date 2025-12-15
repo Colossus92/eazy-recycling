@@ -377,7 +377,7 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       dealerParty = null,
       collectorParty = null,
       brokerParty = null,
-      material = null,
+      catalogItem = null,
       processorParty = companyRepository.getReferenceById(processorCompanyId),
       status = "ACTIVE",
       consignorClassification = 1

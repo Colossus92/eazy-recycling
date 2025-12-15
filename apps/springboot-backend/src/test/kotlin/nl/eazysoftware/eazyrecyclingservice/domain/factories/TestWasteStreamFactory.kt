@@ -7,11 +7,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory.
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
-import java.time.Instant
 import java.util.*
 
 object TestWasteStreamFactory {
@@ -60,7 +60,7 @@ object TestWasteStreamFactory {
     dealerParty: CompanyDto? = null,
     collectorParty: CompanyDto? = null,
     brokerParty: CompanyDto? = null,
-    material: nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto? = null
+    catalogItem: CatalogItemDto? = null
   ): WasteStreamDto {
     return WasteStreamDto(
       number = number,
@@ -76,7 +76,7 @@ object TestWasteStreamFactory {
       dealerParty = dealerParty,
       collectorParty = collectorParty,
       brokerParty = brokerParty,
-      material = material,
+      catalogItem = catalogItem,
       status = WasteStreamStatus.DRAFT.name
     )
   }

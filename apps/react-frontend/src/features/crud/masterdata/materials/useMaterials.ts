@@ -26,12 +26,18 @@ export const useMaterialsCrud = () => {
     () =>
       materials.filter((material) => {
         return (
-          material.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.materialGroupCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.materialGroupName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.unitOfMeasure.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.vatCode.toLowerCase().includes(searchQuery.toLowerCase())
+          material.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          material.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          material.materialGroupCode
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          material.materialGroupName
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          material.unitOfMeasure
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          material.vatCode?.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }),
     [materials, searchQuery]

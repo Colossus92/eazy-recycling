@@ -29,7 +29,8 @@ data class WeightTicketDetailView(
 )
 
 data class WeightTicketLineView(
-  val wasteStreamNumber: String,
+  val wasteStreamNumber: String?,
+  val catalogItemId: Long,
   val weightValue: BigDecimal,
   val weightUnit: String,
 )

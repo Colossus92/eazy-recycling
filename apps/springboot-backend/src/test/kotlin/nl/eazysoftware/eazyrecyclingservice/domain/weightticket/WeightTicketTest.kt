@@ -26,6 +26,7 @@ private val SAMPLE_LINES = WeightTicketLines(
   listOf(
     WeightTicketLine(
       waste = WasteStreamNumber("123456789012"),
+      catalogItemId = 1L,
       weight = Weight(BigDecimal("100.50"), Weight.WeightUnit.KILOGRAM)
     )
   )
@@ -103,7 +104,7 @@ class WeightTicketTest {
 
     assertThat(weightTicket.lines).isEqualTo(SAMPLE_LINES)
     assertThat(weightTicket.lines.getLines()).hasSize(1)
-    assertThat(weightTicket.lines.getLines().first().waste.number).isEqualTo("123456789012")
+    assertThat(weightTicket.lines.getLines().first().waste?.number).isEqualTo("123456789012")
     assertThat(weightTicket.lines.getLines().first().weight.value).isEqualByComparingTo(BigDecimal("100.50"))
   }
 
@@ -333,14 +334,17 @@ class WeightTicketTest {
       listOf(
         WeightTicketLine(
           waste = WasteStreamNumber("111111111111"),
+          catalogItemId = 1L,
           weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("222222222222"),
+          catalogItemId = 2L,
           weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("333333333333"),
+          catalogItemId = 3L,
           weight = Weight(BigDecimal("300.00"), Weight.WeightUnit.KILOGRAM)
         )
       )
@@ -352,9 +356,9 @@ class WeightTicketTest {
     val copiedTicket = originalTicket.copy(WeightTicketId(999))
 
     assertThat(copiedTicket.lines.getLines()).hasSize(3)
-    assertThat(copiedTicket.lines.getLines()[0].waste.number).isEqualTo("111111111111")
-    assertThat(copiedTicket.lines.getLines()[1].waste.number).isEqualTo("222222222222")
-    assertThat(copiedTicket.lines.getLines()[2].waste.number).isEqualTo("333333333333")
+    assertThat(copiedTicket.lines.getLines()[0].waste?.number).isEqualTo("111111111111")
+    assertThat(copiedTicket.lines.getLines()[1].waste?.number).isEqualTo("222222222222")
+    assertThat(copiedTicket.lines.getLines()[2].waste?.number).isEqualTo("333333333333")
   }
 
   @Test

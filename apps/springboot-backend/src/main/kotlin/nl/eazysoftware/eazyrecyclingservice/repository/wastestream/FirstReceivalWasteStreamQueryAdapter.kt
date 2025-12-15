@@ -8,11 +8,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -73,7 +73,7 @@ class FirstReceivalWasteStreamQueryAdapter(
         ws.broker_party_id,
         ws.processor_party_id,
         ws.status,
-        ws.material_id,
+        ws.catalog_item_id,
         ws.last_modified_at,
         ws.consignor_classification,
         COALESCE(SUM(wtl.weight_value), 0) as total_weight,
@@ -151,9 +151,9 @@ class FirstReceivalWasteStreamQueryAdapter(
             it
           )
         },
-        material = result.materialId?.let {
+        catalogItem = result.catalogItemId?.let {
           entityManager.getReference(
-            MaterialDto::class.java,
+            CatalogItemDto::class.java,
             it
           )
         },
@@ -195,9 +195,9 @@ data class FirstReceivalWasteStreamQueryResult(
   val dealerPartyId: UUID?,
   val collectorPartyId: UUID?,
   val brokerPartyId: UUID?,
-  val materialId: Long?,
   val processorPartyId: String,
   val status: String,
+  val catalogItemId: Long?,
   val updatedAt: Instant,
   val consignorClassification: Int,
   val totalWeight: BigDecimal,

@@ -10,12 +10,13 @@ interface MaterialQueryResult {
     fun getId(): Long
     fun getCode(): String
     fun getName(): String
-    fun getMaterialGroupId(): Long
-    fun getMaterialGroupCode(): String
-    fun getMaterialGroupName(): String
+    fun getMaterialGroupId(): Long?
+    fun getMaterialGroupCode(): String?
+    fun getMaterialGroupName(): String?
     fun getUnitOfMeasure(): String
     fun getVatCode(): String
-    fun getGlAccountCode(): String?
+    fun getSalesAccountNumber(): String?
+    fun getPurchaseAccountNumber(): String?
     fun getStatus(): String
     fun getCreatedAt(): Instant?
     fun getCreatedBy(): String?

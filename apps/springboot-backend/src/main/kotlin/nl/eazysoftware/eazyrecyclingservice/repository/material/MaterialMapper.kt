@@ -2,6 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import org.springframework.stereotype.Component
 import kotlin.time.toKotlinInstant
@@ -11,29 +13,33 @@ class MaterialMapper(
     private val entityManager: EntityManager
 ) {
 
-    fun toDto(domain: Material): MaterialDto {
-        return MaterialDto(
+    fun toDto(domain: Material): CatalogItemDto {
+        return CatalogItemDto(
             id = domain.id,
+            type = "MATERIAL",
             code = domain.code,
             name = domain.name,
-            materialGroup = entityManager.getReference(MaterialGroupDto::class.java, domain.materialGroupId),
+            category = domain.materialGroupId?.let { entityManager.getReference(CatalogItemCategoryDto::class.java, it) },
             unitOfMeasure = domain.unitOfMeasure,
             vatRate = entityManager.getReference(VatRateDto::class.java, domain.vatCode),
-            glAccountCode = domain.glAccountCode,
+            consignorParty = null,
+            defaultPrice = null,
             status = domain.status,
-            // Audit fields are managed by Spring Data JPA
+            purchaseAccountNumber = null,
+            salesAccountNumber = null,
         )
     }
 
-    fun toDomain(dto: MaterialDto): Material {
+    fun toDomain(dto: CatalogItemDto): Material {
         return Material(
             id = dto.id,
             code = dto.code,
             name = dto.name,
-            materialGroupId = dto.materialGroup.id!!,
+            materialGroupId = dto.category?.id,
             unitOfMeasure = dto.unitOfMeasure,
             vatCode = dto.vatRate.vatCode,
-            glAccountCode = dto.glAccountCode,
+            salesAccountNumber = dto.salesAccountNumber,
+            purchaseAccountNumber = dto.purchaseAccountNumber,
             status = dto.status,
             createdAt = dto.createdAt?.toKotlinInstant(),
             createdBy = dto.createdBy,

@@ -170,7 +170,7 @@ data class WasteStreamRequest(
 
   val brokerParty: UUID? = null,
 
-  val materialId: Long? = null
+  val catalogItemId: Long? = null
 ) {
   fun toCommand(): WasteStreamCommand {
     return WasteStreamCommand(
@@ -190,7 +190,7 @@ data class WasteStreamRequest(
       dealerParty = dealerParty?.let { CompanyId(it) },
       collectorParty = collectorParty?.let { CompanyId(it) },
       brokerParty = brokerParty?.let { CompanyId(it) },
-      materialId = materialId,
+      catalogItemId = catalogItemId,
     )
   }
 }

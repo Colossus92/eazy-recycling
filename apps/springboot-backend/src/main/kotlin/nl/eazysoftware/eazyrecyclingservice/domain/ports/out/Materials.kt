@@ -4,7 +4,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialQueryResult
 
 interface Materials {
-  fun getAllMaterials(): List<Material>
   fun getMaterialById(id: Long): Material?
   fun getAllMaterialsWithGroupDetails(): List<MaterialQueryResult>
   fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?

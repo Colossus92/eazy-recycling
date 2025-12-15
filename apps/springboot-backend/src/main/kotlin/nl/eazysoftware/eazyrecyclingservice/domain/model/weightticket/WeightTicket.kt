@@ -122,14 +122,16 @@ class WeightTicket(
     val originalLines = lines.getLines().map { line ->
       WeightTicketLine(
         waste = line.waste,
-        weight = line.weight.multiplyByPercentage(originalPercentage)
+        weight = line.weight.multiplyByPercentage(originalPercentage),
+        catalogItemId = line.catalogItemId,
       )
     }
 
     val newLines = lines.getLines().map { line ->
       WeightTicketLine(
         waste = line.waste,
-        weight = line.weight.multiplyByPercentage(newPercentage)
+        weight = line.weight.multiplyByPercentage(newPercentage),
+        catalogItemId = line.catalogItemId,
       )
     }
 
@@ -179,7 +181,8 @@ class WeightTicket(
       lines = WeightTicketLines(this.lines.getLines().map { line ->
         WeightTicketLine(
           waste = line.waste,
-          weight = line.weight
+          weight = line.weight,
+          catalogItemId = line.catalogItemId,
         )
       }),
       secondWeighing = this.secondWeighing,

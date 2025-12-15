@@ -37,10 +37,12 @@ object TestWeightTicketFactory {
   fun createTestWeightTicketLine(
     wasteStreamNumber: String = "180101",
     weightValue: String = "100.50",
-    weightUnit: WeightUnitRequest = WeightUnitRequest.KG
+    weightUnit: WeightUnitRequest = WeightUnitRequest.KG,
+    catalogItemId: Long = 1L
   ): WeightTicketLineRequest {
     return WeightTicketLineRequest(
       wasteStreamNumber = wasteStreamNumber,
+      catalogItemId = catalogItemId,
       weight = WeightRequest(
         value = weightValue,
         unit = weightUnit
