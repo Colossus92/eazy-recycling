@@ -40,6 +40,7 @@ The UI must present these options in a unified, searchable dropdown while mainta
 | `material_group_id` | bigint | FK to material_groups |
 | `unit_of_measure` | text | Always "kg" currently |
 | `vat_code` | text | VAT rate code (e.g., "HOOG") |
+| `gl_account_code` | text | Ledger account for bookkeeping |
 | `status` | text | ACTIVE/INACTIVE |
 
 **Material Groups** (`material_groups` table):
@@ -154,6 +155,7 @@ data class Product(
     val categoryId: ProductCategoryId?,
     val unitOfMeasure: UnitOfMeasure,
     val vatCode: String,
+    val glAccountCode: String?,  // Ledger account for bookkeeping integration
     val status: ProductStatus,
     val defaultPrice: BigDecimal?,
     val description: String?,
@@ -206,6 +208,7 @@ sealed class CatalogItem {
     abstract val name: String
     abstract val unitOfMeasure: String
     abstract val vatCode: String
+    abstract val glAccountCode: String?  // Ledger account for bookkeeping
     abstract val categoryName: String?
     abstract val itemType: CatalogItemType
     
@@ -215,6 +218,7 @@ sealed class CatalogItem {
         override val name: String,
         override val unitOfMeasure: String,
         override val vatCode: String,
+        override val glAccountCode: String?,
         override val categoryName: String?,
         val materialGroupId: Long?,
     ) : CatalogItem() {
@@ -227,6 +231,7 @@ sealed class CatalogItem {
         override val name: String,
         override val unitOfMeasure: String,
         override val vatCode: String,
+        override val glAccountCode: String?,
         override val categoryName: String?,
         val productCategoryId: Long?,
         val defaultPrice: BigDecimal?,
@@ -264,6 +269,7 @@ CREATE TABLE products (
     product_category_id BIGINT REFERENCES product_categories(id),
     unit_of_measure TEXT NOT NULL,
     vat_code TEXT NOT NULL,
+    gl_account_code TEXT,              -- Ledger account for bookkeeping
     status TEXT NOT NULL DEFAULT 'ACTIVE',
     default_price NUMERIC(15,4),
     description TEXT,
@@ -602,10 +608,11 @@ When saving an invoice line:
 
 ### Phase 1: Products Infrastructure
 
-1. Create `product_categories` table
-2. Create `products` table
-3. Seed common product categories and products
-4. Implement Product domain model and repository
+1. Add `gl_account_code` column to existing `materials` table
+2. Create `product_categories` table
+3. Create `products` table (includes `gl_account_code`)
+4. Seed common product categories and products
+5. Implement Product domain model and repository
 
 ### Phase 2: Catalog Query Service
 

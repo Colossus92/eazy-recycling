@@ -12,10 +12,11 @@ Eazy Recycling needs to support invoicing functionality for both purchase (inkoo
 2. **Support two invoice types**: 
    - **Inkoop** (purchase): Customer delivers materials to the company
    - **Verkoop** (sales): Company delivers materials to a processor
-3. **Handle mixed invoice lines**: Materials (from weight tickets) and other products (e.g., transport hours)
-4. **Comply with Dutch tax authority regulations** for invoice numbering
-5. **Support legacy system transition**: Invoices from both legacy and new system must coexist with unique identifiers
-6. **Enable future extension** to cash receipts (kasbon)
+3. **Support credit notes**: Negative invoices to correct previous invoices
+4. **Handle mixed invoice lines**: Materials (from weight tickets) and other products (e.g., transport hours)
+5. **Comply with Dutch tax authority regulations** for invoice numbering
+6. **Support legacy system transition**: Invoices from both legacy and new system must coexist with unique identifiers
+7. **Enable future extension** to cash receipts (kasbon)
 
 ### Current State
 
@@ -67,13 +68,15 @@ Create `Invoice` as a new aggregate root with invoice lines that can reference e
 ```
 Invoice (Aggregate Root)
 ├── InvoiceId
-├── InvoiceNumber (year-prefixed, e.g., "ER-2025-00001")
+├── InvoiceNumber? (assigned on finalization, year-prefixed, e.g., "ER-2025-00001")
 ├── InvoiceType (PURCHASE / SALE)
+├── InvoiceDocumentType (INVOICE / CREDIT_NOTE)
 ├── InvoiceStatus (DRAFT / FINAL)
 ├── CustomerSnapshot (denormalized customer data)
 ├── InvoiceDate
-├── WeightTicketId? (optional link)
-├── TransportId? (optional link)
+├── WeightTicketIds[] (multiple weight tickets)
+├── TransportIds[] (multiple transports)
+├── OriginalInvoiceId? (for credit notes)
 └── InvoiceLines[]
     ├── InvoiceLine (abstract)
     │   ├── MaterialLine (references material + weight)
@@ -111,17 +114,20 @@ This approach provides:
 ```kotlin
 class Invoice(
     val id: InvoiceId,
-    val invoiceNumber: InvoiceNumber,
+    var invoiceNumber: InvoiceNumber?,  // Assigned on finalization, null for drafts
     val invoiceType: InvoiceType,
+    val documentType: InvoiceDocumentType,
     var status: InvoiceStatus,
     val invoiceDate: LocalDate,
     
     // Customer snapshot (denormalized at invoice creation)
     val customerSnapshot: CustomerSnapshot,
     
-    // Optional links to source documents
-    val weightTicketId: WeightTicketId?,
-    val transportId: TransportId?,
+    // Note: Weight tickets and transports reference this invoice via their invoice_id FK
+    // Use repository queries to find linked documents
+    
+    // For credit notes: reference to original invoice
+    val originalInvoiceId: InvoiceId?,
     
     // Lines
     val lines: MutableList<InvoiceLine>,
@@ -133,11 +139,23 @@ class Invoice(
     var updatedBy: String?,
     var finalizedAt: Instant?,
     var finalizedBy: String?,
-)
+) {
+    fun finalize(invoiceNumber: InvoiceNumber) {
+        require(status == InvoiceStatus.DRAFT) { "Only draft invoices can be finalized" }
+        this.invoiceNumber = invoiceNumber
+        this.status = InvoiceStatus.FINAL
+        this.finalizedAt = Instant.now()
+    }
+}
 
 enum class InvoiceType {
     PURCHASE,  // Inkoop - customer delivers materials to us
     SALE       // Verkoop - we deliver materials to processor
+}
+
+enum class InvoiceDocumentType {
+    INVOICE,      // Regular invoice
+    CREDIT_NOTE   // Credit note (negative invoice)
 }
 
 enum class InvoiceStatus {
@@ -149,18 +167,14 @@ enum class InvoiceStatus {
 #### Invoice Number Value Object
 
 ```kotlin
-data class InvoiceNumber(
-    val prefix: String,      // "ER" for Eazy Recycling, "LEG" for legacy
-    val year: Int,           // 2025
-    val sequence: Long       // Sequential within year
-) {
-    val formatted: String
-        get() = "$prefix-$year-${sequence.toString().padStart(5, '0')}"
-    
+data class InvoiceNumber(val value: String) {
     companion object {
-        fun parse(value: String): InvoiceNumber {
-            // Parse "ER-2025-00001" format
+        fun generate(prefix: String, year: Int, sequence: Long): InvoiceNumber {
+            val formatted = "$prefix-$year-${sequence.toString().padStart(5, '0')}"
+            return InvoiceNumber(formatted)
         }
+        
+        fun parse(value: String): InvoiceNumber = InvoiceNumber(value)
     }
 }
 ```
@@ -196,6 +210,8 @@ sealed class InvoiceLine {
     abstract val description: String
     abstract val orderReference: String?  // Weight ticket number, transport number, etc.
     abstract val vatCode: String
+    abstract val vatPercentage: BigDecimal  // Snapshot at invoice creation (rates can change)
+    abstract val glAccountCode: String?     // Ledger account code for bookkeeping
     abstract val quantity: BigDecimal
     abstract val unitPrice: BigDecimal
     abstract val totalExclVat: BigDecimal
@@ -207,6 +223,8 @@ sealed class InvoiceLine {
         override val description: String,
         override val orderReference: String?,
         override val vatCode: String,
+        override val vatPercentage: BigDecimal,
+        override val glAccountCode: String?,
         override val quantity: BigDecimal,      // Weight in kg
         override val unitPrice: BigDecimal,     // Price per kg
         override val totalExclVat: BigDecimal,
@@ -223,9 +241,12 @@ sealed class InvoiceLine {
         override val description: String,
         override val orderReference: String?,
         override val vatCode: String,
+        override val vatPercentage: BigDecimal,
+        override val glAccountCode: String?,
         override val quantity: BigDecimal,      // Hours, pieces, etc.
         override val unitPrice: BigDecimal,
         override val totalExclVat: BigDecimal,
+        val productId: Long?,
         val productCode: String?,
         val unitOfMeasure: String,              // "uur", "stuks", etc.
     ) : InvoiceLine()
@@ -234,11 +255,13 @@ sealed class InvoiceLine {
 
 #### Invoice Totals (Calculated)
 
+**VAT Rounding Rule**: VAT is calculated per line but **rounded to 2 decimals on the total VAT amount**, not per line. This ensures consistency with Exact Online bookkeeping software.
+
 ```kotlin
 data class InvoiceTotals(
     val totalExclVat: BigDecimal,
     val vatBreakdown: List<VatBreakdownLine>,
-    val totalVat: BigDecimal,
+    val totalVat: BigDecimal,           // Rounded to 2 decimals
     val totalInclVat: BigDecimal,
 )
 
@@ -246,41 +269,55 @@ data class VatBreakdownLine(
     val vatCode: String,
     val vatPercentage: BigDecimal,
     val baseAmount: BigDecimal,
-    val vatAmount: BigDecimal,
+    val vatAmount: BigDecimal,          // Unrounded (full precision)
 )
+
+fun Invoice.calculateTotals(): InvoiceTotals {
+    val totalExclVat = lines.sumOf { it.totalExclVat }
+    
+    // Group by VAT code and calculate VAT per group (unrounded)
+    val vatBreakdown = lines
+        .groupBy { it.vatCode to it.vatPercentage }
+        .map { (key, groupLines) ->
+            val (vatCode, vatPercentage) = key
+            val baseAmount = groupLines.sumOf { it.totalExclVat }
+            val vatAmount = baseAmount * vatPercentage / BigDecimal(100)  // No rounding here
+            VatBreakdownLine(vatCode, vatPercentage, baseAmount, vatAmount)
+        }
+    
+    // Sum all VAT amounts, then round the total to 2 decimals
+    val totalVat = vatBreakdown
+        .sumOf { it.vatAmount }
+        .setScale(2, RoundingMode.HALF_UP)  // Only round the final total
+    val totalInclVat = totalExclVat + totalVat
+    
+    return InvoiceTotals(totalExclVat, vatBreakdown, totalVat, totalInclVat)
+}
 ```
 
 ### 2. Database Schema
 
 ```sql
--- Invoice number sequence per year
-CREATE SEQUENCE invoice_number_seq_2025 START 1;
-CREATE SEQUENCE invoice_number_seq_2026 START 1;
--- ... (create sequences dynamically or use a single sequence with year tracking)
-
--- Alternative: Invoice number tracking table
+-- Invoice number tracking table (single sequence per year for all document types)
 CREATE TABLE invoice_number_sequences (
-    prefix VARCHAR(10) NOT NULL,
-    year INT NOT NULL,
-    last_sequence BIGINT NOT NULL DEFAULT 0,
-    PRIMARY KEY (prefix, year)
+    year INT NOT NULL PRIMARY KEY,
+    last_sequence BIGINT NOT NULL DEFAULT 0
 );
 
 -- Main invoice table
 CREATE TABLE invoices (
     id BIGINT PRIMARY KEY,
     
-    -- Invoice identification
-    invoice_number_prefix VARCHAR(10) NOT NULL,
-    invoice_number_year INT NOT NULL,
-    invoice_number_sequence BIGINT NOT NULL,
-    invoice_type VARCHAR(20) NOT NULL,  -- PURCHASE, SALE
-    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    -- Invoice identification (single formatted column, null until finalized)
+    invoice_number TEXT UNIQUE,  -- e.g., "ER-2025-00001", assigned on finalization
+    invoice_type TEXT NOT NULL,  -- PURCHASE, SALE
+    document_type TEXT NOT NULL,  -- INVOICE, CREDIT_NOTE
+    status TEXT NOT NULL,
     invoice_date DATE NOT NULL,
     
     -- Customer snapshot (denormalized)
     customer_company_id UUID NOT NULL REFERENCES companies(id),
-    customer_number VARCHAR(50),
+    customer_number TEXT,
     customer_name TEXT NOT NULL,
     customer_street_name TEXT NOT NULL,
     customer_building_number TEXT,
@@ -290,9 +327,8 @@ CREATE TABLE invoices (
     customer_country TEXT,
     customer_vat_number TEXT,
     
-    -- Links to source documents
-    weight_ticket_id BIGINT REFERENCES weight_tickets(id),
-    transport_id UUID REFERENCES transports(id),
+    -- For credit notes: reference to original invoice
+    original_invoice_id BIGINT REFERENCES invoices(id),
     
     -- Audit
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -300,11 +336,16 @@ CREATE TABLE invoices (
     last_modified_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     last_modified_by TEXT,
     finalized_at TIMESTAMPTZ,
-    finalized_by TEXT,
-    
-    -- Unique constraint on invoice number
-    UNIQUE (invoice_number_prefix, invoice_number_year, invoice_number_sequence)
+    finalized_by TEXT
 );
+
+-- Add invoice reference to weight_tickets (one invoice can have multiple WTs)
+ALTER TABLE weight_tickets ADD COLUMN invoice_id BIGINT REFERENCES invoices(id);
+CREATE INDEX idx_weight_tickets_invoice ON weight_tickets(invoice_id) WHERE invoice_id IS NOT NULL;
+
+-- Add invoice reference to transports (one invoice can have multiple transports)
+ALTER TABLE transports ADD COLUMN invoice_id BIGINT REFERENCES invoices(id);
+CREATE INDEX idx_transports_invoice ON transports(invoice_id) WHERE invoice_id IS NOT NULL;
 
 -- Invoice lines table
 CREATE TABLE invoice_lines (
@@ -318,6 +359,8 @@ CREATE TABLE invoice_lines (
     description TEXT NOT NULL,
     order_reference TEXT,
     vat_code TEXT NOT NULL,
+    vat_percentage NUMERIC(5,2) NOT NULL,  -- Snapshot of VAT rate at invoice creation
+    gl_account_code TEXT,                   -- Ledger account for bookkeeping
     quantity NUMERIC(15,4) NOT NULL,
     unit_price NUMERIC(15,4) NOT NULL,
     total_excl_vat NUMERIC(15,2) NOT NULL,
@@ -329,14 +372,14 @@ CREATE TABLE invoice_lines (
     material_name TEXT,
     
     -- Product-specific fields (nullable for material lines)
+    product_id BIGINT REFERENCES products(id),
     product_code TEXT,
+    product_name TEXT,
     
     UNIQUE (invoice_id, line_number)
 );
 
--- Index for querying invoices by weight ticket or transport
-CREATE INDEX idx_invoices_weight_ticket ON invoices(weight_ticket_id) WHERE weight_ticket_id IS NOT NULL;
-CREATE INDEX idx_invoices_transport ON invoices(transport_id) WHERE transport_id IS NOT NULL;
+-- Indexes for invoice queries
 CREATE INDEX idx_invoices_customer ON invoices(customer_company_id);
 CREATE INDEX idx_invoices_status ON invoices(status);
 CREATE INDEX idx_invoices_date ON invoices(invoice_date);
@@ -352,11 +395,13 @@ ALTER TABLE companies ADD COLUMN vat_number TEXT;
 
 ### 4. Invoice Number Generation Strategy
 
-To handle the legacy system transition:
+**Important**: Invoice numbers are only assigned when an invoice is **finalized**, not at creation. This ensures no gaps in the sequence for draft invoices that are never completed.
+
+**Single sequence per year**: Both regular invoices and credit notes share the same sequence to ensure continuous numbering for Dutch tax compliance.
 
 | Prefix | Source | Example |
-|--------|--------|---------|
-| `ER` | Eazy Recycling (this system) | ER-2025-00001 |
+|--------|--------|--------|
+| `ER` | Eazy Recycling (invoices and credit notes) | ER-2025-00001 |
 | `LEG` | Legacy system imports | LEG-2025-00500 |
 
 **Implementation**:
@@ -369,8 +414,8 @@ class InvoiceNumberGenerator(
     @Transactional
     fun nextNumber(prefix: String = "ER"): InvoiceNumber {
         val year = LocalDate.now().year
-        val sequence = invoiceNumberSequenceRepository.incrementAndGet(prefix, year)
-        return InvoiceNumber(prefix, year, sequence)
+        val sequence = invoiceNumberSequenceRepository.incrementAndGet(year)
+        return InvoiceNumber.generate(prefix, year, sequence)
     }
 }
 ```
@@ -440,10 +485,11 @@ data class FinalizeInvoiceCommand(
 ```
 
 When finalized:
-1. Status changes to FINAL
-2. Invoice PDF is generated
-3. Email is sent to bookkeeping and customer
-4. Linked weight ticket status changes to INVOICED
+1. **Invoice number is assigned** (from sequence)
+2. Status changes to FINAL
+3. Invoice PDF is generated
+4. Email is sent to bookkeeping and customer
+5. Linked weight ticket(s) status changes to INVOICED
 
 ### 6. Frontend Structure
 
@@ -530,9 +576,14 @@ enum class PaymentMethod {
 5. Implement CreateInvoice use case
 
 ### Phase 2: Weight Ticket Integration
-1. Implement CreateInvoiceFromWeightTicket use case
+1. Implement CreateInvoiceFromWeightTicket use case (supports multiple weight tickets)
 2. Update WeightTicket status to INVOICED on finalization
 3. Add bidirectional navigation in UI
+
+### Phase 2b: Credit Notes
+1. Implement CreateCreditNote use case
+2. Link credit note to original invoice
+3. Credit note specific PDF template
 
 ### Phase 3: Finalization & Notifications
 1. Implement FinalizeInvoice use case
