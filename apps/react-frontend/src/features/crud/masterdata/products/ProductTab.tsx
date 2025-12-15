@@ -1,38 +1,26 @@
 import { Column, DataTableProps, MasterDataTab } from '../MasterDataTab';
-import { MaterialResponse } from '@/api/client';
-import { useMaterialsCrud } from '@/features/crud/masterdata/materials/useMaterials';
+import { ProductResponse } from '@/api/client';
+import { useProductsCrud } from '@/features/crud/masterdata/products/useProducts';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
-import { MaterialForm } from './MaterialForm';
+import { ProductForm } from './ProductForm';
 import { EmptyState } from '../../EmptyState';
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 
-export const MaterialsTab = () => {
-  const { read, form, deletion } = useMaterialsCrud();
+export const ProductsTab = () => {
+  const { read, form, deletion } = useProductsCrud();
 
-  const columns: Column<MaterialResponse>[] = [
+  const columns: Column<ProductResponse>[] = [
     {
       key: 'code',
       label: 'Code',
-      width: '15',
+      width: '12',
       accessor: (item) => item.code,
     },
     {
       key: 'name',
       label: 'Naam',
-      width: '25',
+      width: '20',
       accessor: (item) => item.name,
-    },
-    {
-      key: 'materialGroupCode',
-      label: 'Materiaalgroepcode',
-      width: '15',
-      accessor: (item) => item.materialGroupCode,
-    },
-    {
-      key: 'materialGroupName',
-      label: 'Materiaalgroepnaam',
-      width: '15',
-      accessor: (item) => item.materialGroupName,
     },
     {
       key: 'unitOfMeasure',
@@ -49,12 +37,27 @@ export const MaterialsTab = () => {
     {
       key: 'glAccountCode',
       label: 'Grootboekrekening',
-      width: '10',
+      width: '12',
       accessor: (item) => item.glAccountCode,
+    },
+    {
+      key: 'defaultPrice',
+      label: 'Standaardprijs',
+      width: '12',
+      accessor: (item) =>
+        item.defaultPrice !== undefined
+          ? `€ ${item.defaultPrice.toFixed(2)}`
+          : undefined,
+    },
+    {
+      key: 'description',
+      label: 'Beschrijving',
+      width: '24',
+      accessor: (item) => item.description,
     },
   ];
 
-  const data: DataTableProps<MaterialResponse> = {
+  const data: DataTableProps<ProductResponse> = {
     columns,
     items: read.items,
   };
@@ -70,31 +73,25 @@ export const MaterialsTab = () => {
         renderEmptyState={(open) => (
           <EmptyState
             icon={ArchiveBook}
-            text={'Geen materialen gevonden'}
+            text={'Geen producten gevonden'}
             onClick={open}
           />
         )}
         isLoading={read.isLoading}
         errorHandling={read.errorHandling}
       />
-      {/*
-                Form to add or edit materials
-             */}
-      <MaterialForm
+      <ProductForm
         isOpen={form.isOpen}
         onCancel={form.close}
         onSubmit={form.submit}
         initialData={form.item}
       />
-      {/*
-                Dialog to confirm deletion of materials
-             */}
       <DeleteDialog
         isOpen={Boolean(deletion.item)}
         setIsOpen={deletion.cancel}
         onDelete={() => deletion.item && deletion.confirm(deletion.item)}
-        title={'Materiaal verwijderen'}
-        description={`Weet u zeker dat u materiaal "${deletion.item?.name}" wilt verwijderen?`}
+        title={'Product verwijderen'}
+        description={`Weet u zeker dat u product "${deletion.item?.name}" wilt verwijderen?`}
       />
     </>
   );

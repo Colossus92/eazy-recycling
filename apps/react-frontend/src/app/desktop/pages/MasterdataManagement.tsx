@@ -5,6 +5,8 @@ import { MaterialGroupsTab } from '@/features/crud/masterdata/materialgroups/Mat
 import { MaterialsTab } from '@/features/crud/masterdata/materials/MaterialTab';
 import { MaterialPricesTab } from '@/features/crud/masterdata/materialprices/MaterialPriceTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
+import { ProductCategoriesTab } from '@/features/crud/masterdata/productcategories/ProductCategoryTab';
+import { ProductsTab } from '@/features/crud/masterdata/products/ProductTab';
 import { TrucksTab } from '@/features/crud/masterdata/trucks/TrucksTab';
 import { VatRatesTab } from '@/features/crud/masterdata/vatrates/VatRateTab';
 import { WasteContainersTab } from '@/features/crud/masterdata/wastecontainers/WasteContainerTab';
@@ -54,6 +56,16 @@ export const MasterdataManagement = () => {
       component: () => (
         <MaterialPricesTab key={`materialprice-${selectedIndex}`} />
       ),
+    },
+    {
+      name: 'Productcategorieën',
+      component: () => (
+        <ProductCategoriesTab key={`productcategory-${selectedIndex}`} />
+      ),
+    },
+    {
+      name: 'Producten',
+      component: () => <ProductsTab key={`product-${selectedIndex}`} />,
     },
   ];
 

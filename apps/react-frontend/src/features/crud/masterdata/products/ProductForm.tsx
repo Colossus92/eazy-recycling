@@ -1,9 +1,9 @@
-import { MaterialRequest, MaterialResponse } from '@/api/client';
+import { ProductRequest, ProductResponse } from '@/api/client';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { TextFormField } from '@/components/ui/form/TextFormField';
-import { MaterialGroupSelectFormField } from '@/components/ui/form/selectfield/MaterialGroupSelectFormField';
+import { ProductCategorySelectFormField } from '@/components/ui/form/selectfield/ProductCategorySelectFormField';
 import { VatRateSelectFormField } from '@/components/ui/form/selectfield/VatRateSelectFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -12,27 +12,28 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
-interface MaterialFormProps {
+interface ProductFormProps {
   isOpen: boolean;
   onCancel: () => void;
-  onSubmit: (material: MaterialRequest) => void;
-  initialData?: MaterialResponse;
+  onSubmit: (product: ProductRequest) => void;
+  initialData?: ProductResponse;
 }
 
-type MaterialFormValues = Omit<
-  MaterialRequest,
-  'status' | 'materialGroupId' | 'glAccountCode'
+type ProductFormValues = Omit<
+  ProductRequest,
+  'status' | 'categoryId' | 'glAccountCode' | 'defaultPrice'
 > & {
-  materialGroupId: number | string;
+  categoryId: number | string;
   glAccountCode: string;
+  defaultPrice: string;
 };
 
-export const MaterialForm = ({
+export const ProductForm = ({
   isOpen,
   onCancel,
   onSubmit,
   initialData,
-}: MaterialFormProps) => {
+}: ProductFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
   const {
     register,
@@ -40,14 +41,16 @@ export const MaterialForm = ({
     reset,
     control,
     formState: { errors },
-  } = useForm<MaterialFormValues>({
+  } = useForm<ProductFormValues>({
     defaultValues: {
       code: '',
       name: '',
-      materialGroupId: '',
+      categoryId: '',
       unitOfMeasure: '',
       vatCode: '',
       glAccountCode: '',
+      defaultPrice: '',
+      description: '',
     },
   });
 
@@ -56,10 +59,12 @@ export const MaterialForm = ({
       reset({
         code: initialData.code,
         name: initialData.name,
-        materialGroupId: initialData.materialGroupId.toString(),
+        categoryId: initialData.categoryId?.toString() ?? '',
         unitOfMeasure: initialData.unitOfMeasure,
         vatCode: initialData.vatCode,
         glAccountCode: initialData.glAccountCode ?? '',
+        defaultPrice: initialData.defaultPrice?.toString() ?? '',
+        description: initialData.description ?? '',
       });
     }
   }, [initialData, reset]);
@@ -68,10 +73,12 @@ export const MaterialForm = ({
     reset({
       code: '',
       name: '',
-      materialGroupId: '',
+      categoryId: '',
       unitOfMeasure: '',
       vatCode: '',
       glAccountCode: '',
+      defaultPrice: '',
+      description: '',
     });
     onCancel();
   };
@@ -83,13 +90,19 @@ export const MaterialForm = ({
         await onSubmit({
           code: data.code,
           name: data.name,
-          materialGroupId:
-            typeof data.materialGroupId === 'string'
-              ? parseInt(data.materialGroupId, 10)
-              : data.materialGroupId,
+          categoryId:
+            data.categoryId && data.categoryId !== ''
+              ? typeof data.categoryId === 'string'
+                ? parseInt(data.categoryId, 10)
+                : data.categoryId
+              : undefined,
           unitOfMeasure: data.unitOfMeasure,
           vatCode: data.vatCode,
           glAccountCode: data.glAccountCode || undefined,
+          defaultPrice: data.defaultPrice
+            ? parseFloat(data.defaultPrice)
+            : undefined,
+          description: data.description || undefined,
           status: 'ACTIVE',
         });
         cancel();
@@ -107,7 +120,7 @@ export const MaterialForm = ({
           onSubmit={(e) => submitForm(e)}
         >
           <FormTopBar
-            title={initialData ? 'Materiaal bewerken' : 'Materiaal toevoegen'}
+            title={initialData ? 'Product bewerken' : 'Product toevoegen'}
             onClick={cancel}
           />
           <div className="flex flex-col items-center self-stretch p-4 gap-4">
@@ -135,11 +148,10 @@ export const MaterialForm = ({
               />
             </div>
             <div className="flex items-start self-stretch gap-4">
-              <MaterialGroupSelectFormField
+              <ProductCategorySelectFormField
                 formHook={{
                   register,
-                  name: 'materialGroupId',
-                  rules: { required: 'Materiaalgroep is verplicht' },
+                  name: 'categoryId',
                   errors,
                   control,
                 }}
@@ -149,7 +161,7 @@ export const MaterialForm = ({
               <div className="w-1/4">
                 <TextFormField
                   title={'Eenheid'}
-                  placeholder={'Bijv. kg'}
+                  placeholder={'Bijv. uur'}
                   formHook={{
                     register,
                     name: 'unitOfMeasure',
@@ -173,10 +185,30 @@ export const MaterialForm = ({
             <div className="flex items-start self-stretch gap-4">
               <TextFormField
                 title={'Grootboekrekening'}
-                placeholder={'Bijv. 8000'}
+                placeholder={'Bijv. 8100'}
                 formHook={{
                   register,
                   name: 'glAccountCode',
+                  errors,
+                }}
+              />
+              <TextFormField
+                title={'Standaardprijs'}
+                placeholder={'Bijv. 50.00'}
+                formHook={{
+                  register,
+                  name: 'defaultPrice',
+                  errors,
+                }}
+              />
+            </div>
+            <div className="flex items-start self-stretch gap-4">
+              <TextFormField
+                title={'Beschrijving'}
+                placeholder={'Vul een beschrijving in'}
+                formHook={{
+                  register,
+                  name: 'description',
                   errors,
                 }}
               />
