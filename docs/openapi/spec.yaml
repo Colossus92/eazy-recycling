@@ -321,6 +321,120 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UpdateContainerTransportResponse"
+  /products/{id}:
+    get:
+      tags:
+      - product-controller
+      operationId: getProductById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+    put:
+      tags:
+      - product-controller
+      operationId: updateProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+    delete:
+      tags:
+      - product-controller
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
+  /product-categories/{id}:
+    get:
+      tags:
+      - product-category-controller
+      operationId: getCategoryById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductCategoryResponse"
+    put:
+      tags:
+      - product-category-controller
+      operationId: updateCategory
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategoryRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductCategoryResponse"
+    delete:
+      tags:
+      - product-category-controller
+      operationId: deleteCategory
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
   /processing-methods/{code}:
     put:
       tags:
@@ -1115,6 +1229,68 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/CreateContainerTransportResponse"
+  /products:
+    get:
+      tags:
+      - product-controller
+      operationId: getAllProducts
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductResponse"
+    post:
+      tags:
+      - product-controller
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+  /product-categories:
+    get:
+      tags:
+      - product-category-controller
+      operationId: getAllCategories
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductCategoryResponse"
+    post:
+      tags:
+      - product-category-controller
+      operationId: createCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCategoryRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductCategoryResponse"
   /processing-methods:
     get:
       tags:
@@ -1747,6 +1923,109 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MaterialPriceResponse"
+  /catalog/products/{id}:
+    get:
+      tags:
+      - catalog-controller
+      operationId: getProductById_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogItemResponse"
+  /catalog/materials/{id}:
+    get:
+      tags:
+      - catalog-controller
+      operationId: getMaterialById_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogItemResponse"
+  /catalog/items:
+    get:
+      tags:
+      - catalog-controller
+      operationId: searchCatalogItems
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: itemTypes
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - MATERIAL
+            - PRODUCT
+          uniqueItems: true
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 50
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogItemResponse"
+  /catalog/items/{itemType}/{id}:
+    get:
+      tags:
+      - catalog-controller
+      operationId: getCatalogItemByTypeAndId
+      parameters:
+      - name: itemType
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - MATERIAL
+          - PRODUCT
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CatalogItemResponse"
   /amice:
     get:
       tags:
@@ -2462,6 +2741,117 @@ components:
       required:
       - status
       - transportId
+    ProductRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        categoryId:
+          type: integer
+          format: int64
+        unitOfMeasure:
+          type: string
+          minLength: 1
+        vatCode:
+          type: string
+          minLength: 1
+        glAccountCode:
+          type: string
+        status:
+          type: string
+          minLength: 1
+        defaultPrice:
+          type: number
+        description:
+          type: string
+      required:
+      - code
+      - name
+      - status
+      - unitOfMeasure
+      - vatCode
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        name:
+          type: string
+        categoryId:
+          type: integer
+          format: int64
+        unitOfMeasure:
+          type: string
+        vatCode:
+          type: string
+        glAccountCode:
+          type: string
+        status:
+          type: string
+        defaultPrice:
+          type: number
+        description:
+          type: string
+        createdAt:
+          type: string
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+        updatedByName:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - status
+      - unitOfMeasure
+      - vatCode
+    ProductCategoryRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+      required:
+      - code
+      - name
+    ProductCategoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+        createdByName:
+          type: string
+        updatedAt:
+          type: string
+        updatedByName:
+          type: string
+      required:
+      - code
+      - id
+      - name
     ProcessingMethodDto:
       type: object
       properties:
@@ -2720,6 +3110,8 @@ components:
         vatCode:
           type: string
           minLength: 1
+        glAccountCode:
+          type: string
         status:
           type: string
           minLength: 1
@@ -2750,6 +3142,8 @@ components:
         unitOfMeasure:
           type: string
         vatCode:
+          type: string
+        glAccountCode:
           type: string
         status:
           type: string
@@ -3805,14 +4199,6 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
         year:
           type: integer
           format: int32
@@ -3852,6 +4238,14 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -3868,17 +4262,6 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
-        nanosecond:
-          type: integer
-          format: int32
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -3931,6 +4314,17 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -3952,11 +4346,6 @@ components:
         value:
           type: string
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-        nanosecond:
-          type: integer
-          format: int32
         hour:
           type: integer
           format: int32
@@ -3966,6 +4355,11 @@ components:
         second:
           type: integer
           format: int32
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -4546,6 +4940,44 @@ components:
       - size
       - totalElements
       - totalPages
+    CatalogItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        name:
+          type: string
+        unitOfMeasure:
+          type: string
+        vatCode:
+          type: string
+        glAccountCode:
+          type: string
+        categoryName:
+          type: string
+        itemType:
+          type: string
+          enum:
+          - MATERIAL
+          - PRODUCT
+        materialGroupId:
+          type: integer
+          format: int64
+        productCategoryId:
+          type: integer
+          format: int64
+        defaultPrice:
+          type: number
+      required:
+      - code
+      - id
+      - itemType
+      - name
+      - unitOfMeasure
+      - vatCode
     Pageable:
       type: object
       properties:
@@ -4613,11 +5045,6 @@ components:
           type: boolean
         last:
           type: boolean
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        numberOfElements:
-          type: integer
-          format: int32
         size:
           type: integer
           format: int32
@@ -4630,11 +5057,21 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
       type: object
       properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
         paged:
           type: boolean
         pageNumber:
@@ -4645,19 +5082,14 @@ components:
           format: int32
         unpaged:
           type: boolean
-        offset:
-          type: integer
-          format: int64
-        sort:
-          $ref: "#/components/schemas/SortObject"
     SortObject:
       type: object
       properties:
+        empty:
+          type: boolean
         sorted:
           type: boolean
         unsorted:
-          type: boolean
-        empty:
           type: boolean
     LmaImportErrorDto:
       type: object
@@ -4746,6 +5178,11 @@ components:
     ApplicationContext:
       type: object
       properties:
+        parent: {}
+        id:
+          type: string
+        displayName:
+          type: string
         applicationName:
           type: string
         startupDate:
@@ -4753,11 +5190,6 @@ components:
           format: int64
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        parent: {}
-        id:
-          type: string
-        displayName:
-          type: string
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -4992,22 +5424,22 @@ components:
     FilterRegistration:
       type: object
       properties:
-        urlPatternMappings:
-          type: array
-          items:
-            type: string
         servletNameMappings:
           type: array
           items:
             type: string
-        initParameters:
-          type: object
-          additionalProperties:
+        urlPatternMappings:
+          type: array
+          items:
             type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     HttpStatus:
       allOf:
       - $ref: "#/components/schemas/HttpStatusCode"
@@ -5084,6 +5516,8 @@ components:
     HttpStatusCode:
       type: object
       properties:
+        error:
+          type: boolean
         is4xxClientError:
           type: boolean
         is5xxServerError:
@@ -5094,37 +5528,29 @@ components:
           type: boolean
         is3xxRedirection:
           type: boolean
-        error:
-          type: boolean
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
+        buffer:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -5134,13 +5560,19 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        elIgnored:
+          type: string
+        isXml:
           type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
           type: string
-        buffer:
+        deferredSyntaxAllowedAsLiteral:
           type: string
     RedirectView:
       type: object
@@ -5202,83 +5634,20 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
     ServletContext:
       type: object
       properties:
-        contextPath:
-          type: string
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
-        effectiveMajorVersion:
-          type: integer
-          format: int32
-        effectiveMinorVersion:
-          type: integer
-          format: int32
-        serverInfo:
-          type: string
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        defaultSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        requestCharacterEncoding:
-          type: string
-        responseCharacterEncoding:
-          type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -5322,33 +5691,89 @@ components:
         minorVersion:
           type: integer
           format: int32
-    ServletRegistration:
-      type: object
-      properties:
-        mappings:
+        attributeNames: {}
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        initParameterNames: {}
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
+        effectiveSessionTrackingModes:
           type: array
           items:
             type: string
-        runAsRole:
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        effectiveMajorVersion:
+          type: integer
+          format: int32
+        effectiveMinorVersion:
+          type: integer
+          format: int32
+        defaultSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        requestCharacterEncoding:
           type: string
-        initParameters:
+        responseCharacterEncoding:
+          type: string
+        servletRegistrations:
           type: object
           additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+    ServletRegistration:
+      type: object
+      properties:
+        runAsRole:
+          type: string
+        mappings:
+          type: array
+          items:
             type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     SessionCookieConfig:
       type: object
       properties:
-        secure:
-          type: boolean
-        maxAge:
-          type: integer
-          format: int32
-        httpOnly:
-          type: boolean
         domain:
           type: string
         path:
@@ -5362,12 +5787,19 @@ components:
         comment:
           type: string
           deprecated: true
+        maxAge:
+          type: integer
+          format: int32
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

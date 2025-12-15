@@ -100,6 +100,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "KG",
       vatCode = testVatCode1,
+      glAccountCode = null,
       status = "ACTIVE"
     )
 
@@ -138,6 +139,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroup = materialGroup,
       unitOfMeasure = "KG",
       vatRate = vatRate,
+      glAccountCode = null,
       status = "ACTIVE",
     )
     val material2 = MaterialDto(
@@ -146,6 +148,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroup = materialGroup,
       unitOfMeasure = "KG",
       vatRate = vatRate,
+      glAccountCode = null,
       status = "ACTIVE",
     )
     materialJpaRepository.saveAll(listOf(material1, material2))
@@ -172,6 +175,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroup = materialGroup,
       unitOfMeasure = "KG",
       vatRate = vatRate,
+      glAccountCode = null,
       status = "ACTIVE",
     )
     val saved = materialJpaRepository.save(material)
@@ -204,6 +208,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroup = materialGroup,
       unitOfMeasure = "KG",
       vatRate = vatRate,
+      glAccountCode = null,
       status = "ACTIVE",
     )
     val saved = materialJpaRepository.save(originalMaterial)
@@ -214,6 +219,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "TON",
       vatCode = testVatCode2,
+      glAccountCode = null,
       status = "INACTIVE"
     )
 
@@ -249,6 +255,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "KG",
       vatCode = testVatCode1,
+      glAccountCode = null,
       status = "ACTIVE"
     )
 
@@ -272,6 +279,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroup = materialGroup,
       unitOfMeasure = "KG",
       vatRate = vatRate,
+      glAccountCode = null,
       status = "ACTIVE",
     )
     val saved = materialJpaRepository.save(material)
@@ -322,6 +330,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = -1,
       unitOfMeasure = "KG",
       vatCode = testVatCode1,
+      glAccountCode = null,
       status = "ACTIVE"
     )
 
@@ -342,6 +351,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "KG",
       vatCode = "",
+      glAccountCode = null,
       status = "ACTIVE"
     )
 
@@ -362,6 +372,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "KG",
       vatCode = testVatCode1,
+      glAccountCode = null,
       status = "ACTIVE"
     )
     val request2 = MaterialRequest(
@@ -370,6 +381,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "L",
       vatCode = testVatCode2,
+      glAccountCode = null,
       status = "ACTIVE"
     )
 
@@ -401,6 +413,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
         materialGroupId = testMaterialGroupId!!,
         unitOfMeasure = unit,
         vatCode = testVatCode1,
+        glAccountCode = null,
         status = "ACTIVE"
       )
     }
@@ -429,6 +442,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       materialGroupId = testMaterialGroupId!!,
       unitOfMeasure = "KG",
       vatCode = testVatCode1,
+      glAccountCode = null,
       status = "ACTIVE"
     )
 

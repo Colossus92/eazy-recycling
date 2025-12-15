@@ -17,91 +17,91 @@
 /**
  * 
  * @export
- * @interface MaterialResponse
+ * @interface ProductResponse
  */
-export interface MaterialResponse {
+export interface ProductResponse {
     /**
      * 
      * @type {number}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'id': number;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'code': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'name': string;
     /**
      * 
      * @type {number}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
-    'materialGroupId': number;
+    'categoryId'?: number;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
-     */
-    'materialGroupCode': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialResponse
-     */
-    'materialGroupName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'unitOfMeasure': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'vatCode': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'glAccountCode'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'status': string;
     /**
      * 
+     * @type {number}
+     * @memberof ProductResponse
+     */
+    'defaultPrice'?: number;
+    /**
+     * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductResponse
      */
     'createdAt'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'createdByName'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'updatedAt'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof ProductResponse
      */
     'updatedByName'?: string;
 }

@@ -20,6 +20,7 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
                 mg.name as materialGroupName,
                 m.unit_of_measure as unitOfMeasure,
                 m.vat_code as vatCode,
+                m.gl_account_code as glAccountCode,
                 m.status as status,
                 m.created_at as createdAt,
                 m.created_by as createdBy,
@@ -43,6 +44,7 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
                 mg.name as materialGroupName,
                 m.unit_of_measure as unitOfMeasure,
                 m.vat_code as vatCode,
+                m.gl_account_code as glAccountCode,
                 m.status as status,
                 m.created_at as createdAt,
                 m.created_by as createdBy,
@@ -55,6 +57,33 @@ interface MaterialJpaRepository : JpaRepository<MaterialDto, Long> {
         nativeQuery = true
     )
     fun findMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
+
+    @Query(
+        value = """
+            SELECT
+                m.id as id,
+                m.code as code,
+                m.name as name,
+                mg.id as materialGroupId,
+                mg.code as materialGroupCode,
+                mg.name as materialGroupName,
+                m.unit_of_measure as unitOfMeasure,
+                m.vat_code as vatCode,
+                m.gl_account_code as glAccountCode,
+                m.status as status,
+                m.created_at as createdAt,
+                m.created_by as createdBy,
+                m.last_modified_at as updatedAt,
+                m.last_modified_by as updatedBy
+            FROM materials m
+            INNER JOIN material_groups mg ON m.material_group_id = mg.id
+            WHERE LOWER(m.name) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(m.code) LIKE LOWER(CONCAT('%', :query, '%'))
+            ORDER BY m.name
+        """,
+        nativeQuery = true
+    )
+    fun searchMaterials(query: String): List<MaterialQueryResult>
 }
 
 @Repository
@@ -93,5 +122,9 @@ class MaterialRepository(
 
     override fun deleteMaterial(id: Long) {
         jpaRepository.deleteById(id)
+    }
+
+    override fun searchMaterials(query: String, limit: Int): List<MaterialQueryResult> {
+        return jpaRepository.searchMaterials(query).take(limit)
     }
 }

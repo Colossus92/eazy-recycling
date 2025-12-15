@@ -1,5 +1,6 @@
 api.ts
 apis/amice-controller-api.ts
+apis/catalog-controller-api.ts
 apis/company-controller-api.ts
 apis/container-transport-controller-api.ts
 apis/driver-controller-api.ts
@@ -11,6 +12,8 @@ apis/material-group-controller-api.ts
 apis/material-price-controller-api.ts
 apis/planning-controller-api.ts
 apis/processing-method-controller-api.ts
+apis/product-category-controller-api.ts
+apis/product-controller-api.ts
 apis/signature-controller-api.ts
 apis/transport-controller-api.ts
 apis/truck-controller-api.ts
@@ -37,6 +40,7 @@ models/application-context.ts
 models/approve-declaration-response.ts
 models/authorization-url-response.ts
 models/cancel-weight-ticket-request.ts
+models/catalog-item-response.ts
 models/company-branch-response.ts
 models/company-consignor-view.ts
 models/company-consignor.ts
@@ -112,6 +116,10 @@ models/planning-transports-view.ts
 models/planning-view.ts
 models/processing-method-dto.ts
 models/processing-method-view.ts
+models/product-category-request.ts
+models/product-category-response.ts
+models/product-request.ts
+models/product-response.ts
 models/profile-dto.ts
 models/project-location-request.ts
 models/project-location-result.ts

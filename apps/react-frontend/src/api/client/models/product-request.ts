@@ -17,57 +17,62 @@
 /**
  * 
  * @export
- * @interface SessionCookieConfig
+ * @interface ProductRequest
  */
-export interface SessionCookieConfig {
+export interface ProductRequest {
     /**
      * 
      * @type {string}
-     * @memberof SessionCookieConfig
+     * @memberof ProductRequest
      */
-    'domain'?: string;
+    'code': string;
     /**
      * 
      * @type {string}
-     * @memberof SessionCookieConfig
+     * @memberof ProductRequest
      */
-    'path'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'name'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof SessionCookieConfig
-     */
-    'attributes'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     * @deprecated
-     */
-    'comment'?: string;
+    'name': string;
     /**
      * 
      * @type {number}
-     * @memberof SessionCookieConfig
+     * @memberof ProductRequest
      */
-    'maxAge'?: number;
+    'categoryId'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
+     * @type {string}
+     * @memberof ProductRequest
      */
-    'httpOnly'?: boolean;
+    'unitOfMeasure': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
+     * @type {string}
+     * @memberof ProductRequest
      */
-    'secure'?: boolean;
+    'vatCode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductRequest
+     */
+    'glAccountCode'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductRequest
+     */
+    'status': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProductRequest
+     */
+    'defaultPrice'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductRequest
+     */
+    'description'?: string;
 }
 

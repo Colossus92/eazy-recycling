@@ -15,6 +15,7 @@ interface MaterialQueryResult {
     fun getMaterialGroupName(): String
     fun getUnitOfMeasure(): String
     fun getVatCode(): String
+    fun getGlAccountCode(): String?
     fun getStatus(): String
     fun getCreatedAt(): Instant?
     fun getCreatedBy(): String?

@@ -17,26 +17,26 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface ProductCategoryRequest
  */
-export interface SortObject {
+export interface ProductCategoryRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof ProductCategoryRequest
      */
-    'empty'?: boolean;
+    'code': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof ProductCategoryRequest
      */
-    'sorted'?: boolean;
+    'name': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {string}
+     * @memberof ProductCategoryRequest
      */
-    'unsorted'?: boolean;
+    'description'?: string;
 }
 

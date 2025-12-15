@@ -90,6 +90,8 @@ data class MaterialRequest(
     @field:NotBlank(message = "VAT code is verplicht")
     val vatCode: String,
 
+    val glAccountCode: String?,
+
     @field:NotBlank(message = "Status is verplicht")
     val status: String
 ) {
@@ -101,6 +103,7 @@ data class MaterialRequest(
             materialGroupId = materialGroupId,
             unitOfMeasure = unitOfMeasure,
             vatCode = vatCode,
+            glAccountCode = glAccountCode,
             status = status,
             createdAt = null,
             updatedAt = null
@@ -117,6 +120,7 @@ data class MaterialResponse(
     val materialGroupName: String,
     val unitOfMeasure: String,
     val vatCode: String,
+    val glAccountCode: String?,
     val status: String,
     val createdAt: String?,
     val createdByName: String?,
@@ -134,6 +138,7 @@ fun MaterialQueryResult.toResponse(): MaterialResponse {
         materialGroupName = getMaterialGroupName(),
         unitOfMeasure = getUnitOfMeasure(),
         vatCode = getVatCode(),
+        glAccountCode = getGlAccountCode(),
         status = getStatus(),
         createdAt = getCreatedAt()?.toString(),
         createdByName = getCreatedBy(),

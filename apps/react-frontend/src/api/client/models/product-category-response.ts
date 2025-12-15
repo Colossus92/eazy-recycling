@@ -17,50 +17,56 @@
 /**
  * 
  * @export
- * @interface MaterialRequest
+ * @interface ProductCategoryResponse
  */
-export interface MaterialRequest {
+export interface ProductCategoryResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof ProductCategoryResponse
+     */
+    'id': number;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
     'code': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
     'name': string;
     /**
      * 
-     * @type {number}
-     * @memberof MaterialRequest
+     * @type {string}
+     * @memberof ProductCategoryResponse
      */
-    'materialGroupId': number;
+    'description'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
-    'unitOfMeasure': string;
+    'createdAt'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
-    'vatCode': string;
+    'createdByName'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
-    'glAccountCode'?: string;
+    'updatedAt'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialRequest
+     * @memberof ProductCategoryResponse
      */
-    'status': string;
+    'updatedByName'?: string;
 }
 

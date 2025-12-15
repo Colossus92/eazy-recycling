@@ -81,6 +81,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
             materialGroup = savedGroup,
             unitOfMeasure = "KG",
             vatRate = vatRate,
+            glAccountCode = null,
             status = "ACTIVE",
         )
         val savedMaterial = materialJpaRepository.save(material)

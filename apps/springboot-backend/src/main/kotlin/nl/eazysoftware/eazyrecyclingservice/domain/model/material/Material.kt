@@ -9,6 +9,7 @@ data class Material(
   val materialGroupId: Long,
   val unitOfMeasure: String,
   val vatCode: String,
+  val glAccountCode: String?,
   val status: String,
   val createdAt: Instant? = null,
   val createdBy: String? = null,

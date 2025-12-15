@@ -17,6 +17,7 @@
 
 
 export * from './apis/amice-controller-api';
+export * from './apis/catalog-controller-api';
 export * from './apis/company-controller-api';
 export * from './apis/container-transport-controller-api';
 export * from './apis/driver-controller-api';
@@ -28,6 +29,8 @@ export * from './apis/material-group-controller-api';
 export * from './apis/material-price-controller-api';
 export * from './apis/planning-controller-api';
 export * from './apis/processing-method-controller-api';
+export * from './apis/product-category-controller-api';
+export * from './apis/product-controller-api';
 export * from './apis/signature-controller-api';
 export * from './apis/transport-controller-api';
 export * from './apis/truck-controller-api';

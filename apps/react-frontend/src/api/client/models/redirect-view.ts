@@ -151,16 +151,16 @@ export interface RedirectView {
     'propagateQueryProperties'?: boolean;
     /**
      * 
-     * @type {{ [key: string]: any; }}
-     * @memberof RedirectView
-     */
-    'attributesMap'?: { [key: string]: any; };
-    /**
-     * 
      * @type {{ [key: string]: string; }}
      * @memberof RedirectView
      */
     'attributes'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof RedirectView
+     */
+    'attributesMap'?: { [key: string]: any; };
     /**
      * 
      * @type {string}

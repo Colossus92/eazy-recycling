@@ -330,6 +330,7 @@ create table if not exists materials (
                                           material_group_id bigint not null,
                                           unit_of_measure text not null,
                                           vat_code text not null,
+                                          gl_account_code text,
                                           status text not null,
                                           created_at timestamp with time zone not null default now(),
                                           created_by text,
@@ -428,3 +429,35 @@ create table if not exists weight_ticket_declaration_snapshots (
 create index if not exists idx_declaration_snapshots_weight_ticket on weight_ticket_declaration_snapshots(weight_ticket_id);
 create index if not exists idx_declaration_snapshots_waste_stream on weight_ticket_declaration_snapshots(waste_stream_number);
 create index if not exists idx_declaration_snapshots_period on weight_ticket_declaration_snapshots(declaration_period);
+
+create table if not exists product_categories (
+                                          id bigint generated always as identity,
+                                          code text not null unique,
+                                          name text not null,
+                                          description text,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
+                                          primary key (id)
+);
+
+create table if not exists products (
+                                          id bigint generated always as identity,
+                                          code text not null unique,
+                                          name text not null,
+                                          product_category_id bigint,
+                                          unit_of_measure text not null,
+                                          vat_code text not null,
+                                          gl_account_code text,
+                                          status text not null,
+                                          default_price numeric(15,4),
+                                          description text,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
+                                          primary key (id),
+                                          foreign key (product_category_id) references product_categories(id),
+                                          foreign key (vat_code) references vat_rates(vat_code)
+);

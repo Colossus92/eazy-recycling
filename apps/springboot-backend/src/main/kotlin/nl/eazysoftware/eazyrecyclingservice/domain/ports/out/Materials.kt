@@ -8,6 +8,7 @@ interface Materials {
   fun getMaterialById(id: Long): Material?
   fun getAllMaterialsWithGroupDetails(): List<MaterialQueryResult>
   fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
+  fun searchMaterials(query: String, limit: Int = 50): List<MaterialQueryResult>
   fun createMaterial(material: Material): Material
   fun updateMaterial(id: Long, material: Material): Material
   fun deleteMaterial(id: Long)

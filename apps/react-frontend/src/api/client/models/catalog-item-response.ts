@@ -17,92 +17,82 @@
 /**
  * 
  * @export
- * @interface MaterialResponse
+ * @interface CatalogItemResponse
  */
-export interface MaterialResponse {
+export interface CatalogItemResponse {
     /**
      * 
      * @type {number}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'id': number;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'code': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'name': string;
     /**
      * 
-     * @type {number}
-     * @memberof MaterialResponse
-     */
-    'materialGroupId': number;
-    /**
-     * 
      * @type {string}
-     * @memberof MaterialResponse
-     */
-    'materialGroupCode': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialResponse
-     */
-    'materialGroupName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'unitOfMeasure': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'vatCode': string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
     'glAccountCode'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
-    'status': string;
+    'categoryName'?: string;
     /**
      * 
      * @type {string}
-     * @memberof MaterialResponse
+     * @memberof CatalogItemResponse
      */
-    'createdAt'?: string;
+    'itemType': CatalogItemResponseItemTypeEnum;
     /**
      * 
-     * @type {string}
-     * @memberof MaterialResponse
+     * @type {number}
+     * @memberof CatalogItemResponse
      */
-    'createdByName'?: string;
+    'materialGroupId'?: number;
     /**
      * 
-     * @type {string}
-     * @memberof MaterialResponse
+     * @type {number}
+     * @memberof CatalogItemResponse
      */
-    'updatedAt'?: string;
+    'productCategoryId'?: number;
     /**
      * 
-     * @type {string}
-     * @memberof MaterialResponse
+     * @type {number}
+     * @memberof CatalogItemResponse
      */
-    'updatedByName'?: string;
+    'defaultPrice'?: number;
 }
+
+export const CatalogItemResponseItemTypeEnum = {
+    Material: 'MATERIAL',
+    Product: 'PRODUCT'
+} as const;
+
+export type CatalogItemResponseItemTypeEnum = typeof CatalogItemResponseItemTypeEnum[keyof typeof CatalogItemResponseItemTypeEnum];
+
 

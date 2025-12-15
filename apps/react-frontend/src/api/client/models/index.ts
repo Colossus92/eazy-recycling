@@ -11,6 +11,7 @@ export * from './application-context-class-loader-parent-unnamed-module-descript
 export * from './approve-declaration-response';
 export * from './authorization-url-response';
 export * from './cancel-weight-ticket-request';
+export * from './catalog-item-response';
 export * from './company-branch-response';
 export * from './company-consignor';
 export * from './company-consignor-view';
@@ -85,6 +86,10 @@ export * from './planning-transports-view';
 export * from './planning-view';
 export * from './processing-method-dto';
 export * from './processing-method-view';
+export * from './product-category-request';
+export * from './product-category-response';
+export * from './product-request';
+export * from './product-response';
 export * from './profile-dto';
 export * from './project-location-request';
 export * from './project-location-result';
