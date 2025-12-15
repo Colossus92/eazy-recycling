@@ -193,6 +193,7 @@ class WasteStreamQueryRepository(
       dealerParty = wasteStream.dealerParty?.let { CompanyViewMapper.map(it) },
       collectorParty = wasteStream.collectorParty?.let { CompanyViewMapper.map(it) },
       brokerParty = wasteStream.brokerParty?.let { CompanyViewMapper.map(it) },
+      materialId = wasteStream.material?.id,
       status = EffectiveStatusPolicy.compute(
         WasteStreamStatus.valueOf(wasteStream.status),
         wasteStream.updatedAt?.toKotlinInstant(),

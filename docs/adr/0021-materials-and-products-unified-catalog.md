@@ -51,6 +51,23 @@ The UI must present these options in a unified, searchable dropdown while mainta
 | `code` | text | Group code |
 | `name` | text | Group name (e.g., "Ijzer", "Kabel", "Sloop") |
 
+**Waste Streams** (`waste_streams` table):
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `number` | text | Primary key (12-digit waste stream number) |
+| `name` | text | Display name for this waste stream |
+| `consignor_party_id` | bigint | FK to companies - the consignor this waste stream belongs to |
+| `eural_code` | text | FK to eural codes |
+| `processing_method_code` | text | FK to processing methods |
+| `pickup_location_id` | bigint | FK to pickup locations |
+| `processor_party_id` | bigint | FK to companies - the processor |
+
+**Key Distinction**:
+
+- **Materials** are generic catalog items available to ALL customers (e.g., "Diverse metalen", "Koper")
+- **Waste Streams** are consignor-specific registrations that link a material to regulatory requirements (eural code, processing method, pickup location, etc.)
+
 **Weight Ticket Lines** currently reference `WasteStreamNumber`, not materials directly.
 
 ---
@@ -455,59 +472,193 @@ const CatalogItemSelect: React.FC<CatalogItemSelectProps> = ({
 };
 ```
 
-### 6. Impact on Weight Tickets
+### 6. Waste Stream to Material Linking
 
-Weight tickets serve as **order-like documents** that can include both materials and products. This requires a significant change to the weight ticket line structure.
+#### The Problem
 
-#### Current State
+When creating weight ticket lines, users need to select from a list of items. Currently, they select from **waste streams** which are consignor-specific. However:
 
-Weight ticket lines currently reference `WasteStreamNumber`, which indirectly links to materials.
+- **Materials** are generic catalog items (e.g., "Diverse metalen") available to all customers
+- **Waste Streams** are consignor-specific registrations with regulatory data (eural code, processing method, etc.)
+- **Products** are non-material items (transport hours, fees) available to all customers
 
-#### New Design
+For weight ticket lines, we need to show:
 
-Weight ticket lines should reference **catalog items** (materials OR products) directly:
+1. **Waste streams** belonging to the selected consignor (for materials with regulatory requirements)
+2. **Products** available to all customers (for non-material items like transport fees)
+
+#### Solution: Link Waste Streams to Materials
+
+Add a foreign key from `waste_streams` to `materials`:
+
+```sql
+ALTER TABLE waste_streams 
+ADD COLUMN material_id BIGINT REFERENCES materials(id);
+
+COMMENT ON COLUMN waste_streams.material_id IS 
+  'Links this waste stream to a generic material. The waste stream name overrides the material name for display purposes.';
+```
+
+This creates a relationship where:
+
+- A **Material** is a generic catalog item (e.g., "Diverse metalen")
+- A **Waste Stream** is a consignor-specific instance that references a material and adds regulatory data
+- The **waste stream name** is used for display (not the material name)
+
+#### Updated Domain Model
 
 ```kotlin
-data class WeightTicketLine(
-    val catalogItemId: Long,
-    val catalogItemType: CatalogItemType,  // MATERIAL or PRODUCT
-    val quantity: BigDecimal,              // Weight in kg for materials, hours/pieces for products
-    val unitOfMeasure: String,
-    
-    // Snapshot fields (denormalized at creation time)
-    val catalogItemCode: String,
-    val catalogItemName: String,
-    val wasteStreamNumber: String?,        // Only for materials linked to waste streams
+// Waste Stream now references a Material
+data class WasteStream(
+    val wasteStreamNumber: String,
+    val name: String,                    // Display name (overrides material name)
+    val materialId: Long?,               // FK to materials table
+    val consignorPartyId: Long,
+    val euralCode: String,
+    val processingMethodCode: String,
+    // ... other fields
 )
 ```
 
-#### Database Schema Change
+#### Catalog Item Types for Weight Ticket Lines
+
+For the weight ticket lines dropdown, we need three types of catalog items:
+
+```kotlin
+sealed class CatalogItem {
+    abstract val id: Long
+    abstract val code: String
+    abstract val name: String
+    abstract val unitOfMeasure: String
+    abstract val vatCode: String
+    abstract val glAccountCode: String?
+    abstract val categoryName: String?
+    abstract val itemType: CatalogItemType
+    
+    // Generic material (available to all customers)
+    data class MaterialItem(
+        override val id: Long,
+        override val code: String,
+        override val name: String,
+        override val unitOfMeasure: String,
+        override val vatCode: String,
+        override val glAccountCode: String?,
+        override val categoryName: String?,
+        val materialGroupId: Long?,
+    ) : CatalogItem() {
+        override val itemType = CatalogItemType.MATERIAL
+    }
+    
+    // Waste stream (consignor-specific, linked to a material)
+    data class WasteStreamItem(
+        override val id: Long,              // Use material_id for consistency
+        override val code: String,          // waste_stream_number
+        override val name: String,          // waste stream name (display name)
+        override val unitOfMeasure: String, // From linked material
+        override val vatCode: String,       // From linked material
+        override val glAccountCode: String?, // From linked material
+        override val categoryName: String?, // From linked material group
+        val wasteStreamNumber: String,
+        val materialId: Long,
+        val consignorPartyId: Long,
+        val euralCode: String,
+        val processingMethodCode: String,
+    ) : CatalogItem() {
+        override val itemType = CatalogItemType.WASTE_STREAM
+    }
+    
+    // Product (available to all customers)
+    data class ProductItem(
+        override val id: Long,
+        override val code: String,
+        override val name: String,
+        override val unitOfMeasure: String,
+        override val vatCode: String,
+        override val glAccountCode: String?,
+        override val categoryName: String?,
+        val productCategoryId: Long?,
+        val defaultPrice: BigDecimal?,
+    ) : CatalogItem() {
+        override val itemType = CatalogItemType.PRODUCT
+    }
+}
+
+enum class CatalogItemType {
+    MATERIAL,      // Generic material (all customers)
+    WASTE_STREAM,  // Consignor-specific waste stream (linked to material)
+    PRODUCT        // Non-material product (all customers)
+}
+```
+
+#### API Endpoint for Weight Ticket Lines
+
+```kotlin
+@GetMapping("/catalog/items/for-weight-ticket")
+fun getCatalogItemsForWeightTicket(
+    @RequestParam consignorPartyId: Long,
+    @RequestParam query: String?,
+    @RequestParam itemTypes: Set<CatalogItemType>? = null,
+    @RequestParam limit: Int = 50
+): List<CatalogItemResponse> {
+    // Returns:
+    // 1. WasteStreamItems for the given consignor (filtered by consignorPartyId)
+    // 2. ProductItems (available to all)
+    // 3. Materials (available to all)
+}
+```
+
+#### Weight Ticket Line Structure
+
+Weight ticket lines continue to reference `wasteStreamNumber` for materials (for regulatory compliance), but can now also reference products:
+
+```kotlin
+data class WeightTicketLine(
+    // For waste streams (materials with regulatory requirements)
+    val wasteStreamNumber: String?,
+    
+    // For products (non-material items)
+    val productId: Long?,
+    
+    // Common fields
+    val quantity: BigDecimal,
+    val unitOfMeasure: String,
+    
+    // Snapshot fields (denormalized at creation time)
+    val catalogItemName: String,
+)
+```
+
+#### Database Schema for Weight Ticket Lines
 
 ```sql
--- Updated weight_ticket_lines table
-ALTER TABLE weight_ticket_lines ADD COLUMN catalog_item_id BIGINT;
-ALTER TABLE weight_ticket_lines ADD COLUMN catalog_item_type TEXT;  -- 'MATERIAL' or 'PRODUCT'
-ALTER TABLE weight_ticket_lines ADD COLUMN catalog_item_code TEXT;
-ALTER TABLE weight_ticket_lines ADD COLUMN catalog_item_name TEXT;
-ALTER TABLE weight_ticket_lines ADD COLUMN unit_of_measure TEXT;
+-- Weight ticket lines can reference either a waste stream OR a product
+ALTER TABLE weight_ticket_lines 
+ADD COLUMN product_id BIGINT REFERENCES products(id);
 
--- waste_stream_number is RETAINED for materials (regulatory/traceability purposes)
--- Migration: Populate catalog_item_id/type from existing waste_stream_number -> material mapping
+-- Constraint: must have either waste_stream_number OR product_id, not both
+ALTER TABLE weight_ticket_lines 
+ADD CONSTRAINT chk_catalog_item_reference 
+CHECK (
+    (waste_stream_number IS NOT NULL AND product_id IS NULL) OR
+    (waste_stream_number IS NULL AND product_id IS NOT NULL)
+);
 ```
 
 #### Benefits
 
-- **Unified line handling**: Both materials and products in same line structure
-- **Direct pricing**: Can look up prices directly from catalog item
-- **Flexibility**: Add transport hours, fees, etc. directly to weight ticket
-- **Invoice generation**: Direct mapping from weight ticket lines to invoice lines
+- **Regulatory compliance**: Waste streams retain all regulatory data (eural code, processing method)
+- **Consignor filtering**: Only waste streams for the selected consignor are shown
+- **Material linking**: Waste streams inherit VAT code, GL account from linked material
+- **Product support**: Non-material items can be added to weight tickets
+- **Display name flexibility**: Waste stream name is used for display, not material name
 
 #### Migration Strategy
 
-1. Add new columns to `weight_ticket_lines`
-2. Create mapping from `waste_stream_number` to `material_id`
-3. Backfill existing lines with catalog item references
-4. Update UI to use catalog item selection (while retaining `waste_stream_number` for materials)
+1. Add `material_id` column to `waste_streams` table
+2. Add material select field to WasteStreamForm in frontend
+3. Use material name as waste stream name (snapshot in `name` field)
+4. Update `CatalogQueryService` to return all three types for weight ticket context
+5. Update frontend to use new catalog endpoint with consignor filtering
 
 ### 7. Impact on Invoice Lines (ADR-0020 Update)
 
@@ -606,27 +757,43 @@ When saving an invoice line:
 
 ## Implementation Phases
 
-### Phase 1: Products Infrastructure
+### Phase 1: Products Infrastructure (Completed)
 
-1. Add `gl_account_code` column to existing `materials` table
-2. Create `product_categories` table
-3. Create `products` table (includes `gl_account_code`)
+1. Add `gl_account_code` column to existing `materials` table ✓
+2. Create `product_categories` table ✓
+3. Create `products` table (includes `gl_account_code`) ✓
 4. Seed common product categories and products
-5. Implement Product domain model and repository
+5. Implement Product domain model and repository ✓
 
-### Phase 2: Catalog Query Service
+### Phase 2: Catalog Query Service (Completed)
 
-1. Implement `CatalogQueryService`
-2. Create REST endpoint `/api/catalog/items`
-3. Add OpenAPI documentation
+1. Implement `CatalogQueryService` ✓
+2. Create REST endpoint `/api/catalog/items` ✓
+3. Add OpenAPI documentation ✓
 
-### Phase 3: Frontend Integration
+### Phase 3: Waste Stream to Material Linking (New)
 
-1. Create `CatalogItemSelect` component
-2. Integrate into invoice form
-3. Add product management UI in master data section
+1. Add `material_id` column to `waste_streams` table
+2. Update `WasteStream` domain model to include `materialId`
+3. Create data migration to link existing waste streams to materials
+4. Add `WasteStreamItem` to `CatalogItem` sealed class
+5. Create `/api/catalog/items/for-weight-ticket` endpoint with consignor filtering
+6. Update `CatalogQueryService` to return waste streams for weight ticket context
 
-### Phase 4: Invoice Integration
+### Phase 4: Frontend Weight Ticket Integration
+
+1. Update `WeightTicketLinesTab` to fetch catalog items instead of waste streams
+2. Use new endpoint with `consignorPartyId` parameter
+3. Display waste stream name in dropdown (not material name)
+4. Retain `wasteStreamNumber` in form values for regulatory compliance
+
+### Phase 5: Product Support in Weight Tickets (Future)
+
+1. Add `product_id` column to `weight_ticket_lines` table
+2. Update weight ticket line form to support product selection
+3. Add constraint to ensure either `waste_stream_number` OR `product_id` is set
+
+### Phase 6: Invoice Integration (Future)
 
 1. Update invoice line creation to use catalog items
 2. Ensure proper snapshotting of item details

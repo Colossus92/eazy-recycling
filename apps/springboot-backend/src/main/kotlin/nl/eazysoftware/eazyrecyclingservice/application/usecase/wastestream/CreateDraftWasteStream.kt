@@ -30,6 +30,7 @@ data class WasteStreamCommand(
   val dealerParty: CompanyId?,
   val collectorParty: CompanyId?,
   val brokerParty: CompanyId?,
+  val materialId: Long? = null,
 )
 
 /**

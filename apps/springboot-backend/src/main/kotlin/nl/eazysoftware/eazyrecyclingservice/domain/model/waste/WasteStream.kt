@@ -38,6 +38,12 @@ class WasteStream(
    */
   var brokerParty: CompanyId? = null,
 
+  /**
+   * Reference to the generic material this waste stream is linked to.
+   * The waste stream name is a snapshot of the material name.
+   */
+  var materialId: Long? = null,
+
   val createdAt: Instant? = null,
   val createdBy: String? = null,
   var updatedAt: Instant? = Clock.System.now(),
@@ -118,7 +124,8 @@ class WasteStream(
     pickupParty: CompanyId = this.pickupParty,
     dealerParty: CompanyId? = this.dealerParty,
     collectorParty: CompanyId? = this.collectorParty,
-    brokerParty: CompanyId? = this.brokerParty
+    brokerParty: CompanyId? = this.brokerParty,
+    materialId: Long? = this.materialId
   ) {
     check(status == WasteStreamStatus.DRAFT) {
       "Afvalstroom kan alleen worden gewijzigd als de status DRAFT is. Huidige status: $status"
@@ -144,6 +151,7 @@ class WasteStream(
     this.dealerParty = dealerParty
     this.collectorParty = collectorParty
     this.brokerParty = brokerParty
+    this.materialId = materialId
     this.updatedAt = Clock.System.now()
   }
 

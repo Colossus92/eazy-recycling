@@ -25,13 +25,19 @@ export interface FilterRegistration {
      * @type {Array<string>}
      * @memberof FilterRegistration
      */
-    'servletNameMappings'?: Array<string>;
+    'urlPatternMappings'?: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof FilterRegistration
      */
-    'urlPatternMappings'?: Array<string>;
+    'servletNameMappings'?: Array<string>;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof FilterRegistration
+     */
+    'initParameters'?: { [key: string]: string; };
     /**
      * 
      * @type {string}
@@ -44,11 +50,5 @@ export interface FilterRegistration {
      * @memberof FilterRegistration
      */
     'className'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof FilterRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
 }
 

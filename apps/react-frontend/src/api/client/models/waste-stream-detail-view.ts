@@ -103,6 +103,12 @@ export interface WasteStreamDetailView {
     'brokerParty'?: CompanyView;
     /**
      * 
+     * @type {number}
+     * @memberof WasteStreamDetailView
+     */
+    'materialId'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof WasteStreamDetailView
      */

@@ -25,19 +25,31 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'buffer'?: string;
+    'defaultContentType'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
-    'defaultContentType'?: string;
+    'urlPatterns'?: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
     'errorOnELNotFound'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'elIgnored'?: string;
     /**
      * 
      * @type {string}
@@ -64,22 +76,10 @@ export interface JspPropertyGroupDescriptor {
     'includeCodas'?: Array<string>;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'urlPatterns'?: Array<string>;
-    /**
-     * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'elIgnored'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'isXml'?: string;
+    'deferredSyntaxAllowedAsLiteral'?: string;
     /**
      * 
      * @type {string}
@@ -97,6 +97,6 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'deferredSyntaxAllowedAsLiteral'?: string;
+    'buffer'?: string;
 }
 

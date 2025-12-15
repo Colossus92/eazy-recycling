@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.util.UUID
 
 @RestController
 @RequestMapping("/catalog")
@@ -50,6 +51,17 @@ class CatalogController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found")
         return item.toResponse()
     }
+
+    @GetMapping("/items/for-weight-ticket")
+    fun getCatalogItemsForWeightTicket(
+        @RequestParam consignorPartyId: UUID,
+        @RequestParam(required = false) query: String?,
+        @RequestParam(required = false) itemTypes: Set<CatalogItemType>?,
+        @RequestParam(required = false, defaultValue = "50") limit: Int
+    ): List<CatalogItemResponse> {
+        return catalogQueryService.getCatalogItemsForWeightTicket(consignorPartyId, query, itemTypes, limit)
+            .map { it.toResponse() }
+    }
 }
 
 data class CatalogItemResponse(
@@ -64,6 +76,11 @@ data class CatalogItemResponse(
     val materialGroupId: Long?,
     val productCategoryId: Long?,
     val defaultPrice: BigDecimal?,
+    val wasteStreamNumber: String?,
+    val materialId: Long?,
+    val consignorPartyId: String?,
+    val euralCode: String?,
+    val processingMethodCode: String?,
 )
 
 fun CatalogItem.toResponse(): CatalogItemResponse {
@@ -80,6 +97,11 @@ fun CatalogItem.toResponse(): CatalogItemResponse {
             materialGroupId = materialGroupId,
             productCategoryId = null,
             defaultPrice = null,
+            wasteStreamNumber = null,
+            materialId = null,
+            consignorPartyId = null,
+            euralCode = null,
+            processingMethodCode = null,
         )
         is CatalogItem.ProductItem -> CatalogItemResponse(
             id = id,
@@ -93,6 +115,29 @@ fun CatalogItem.toResponse(): CatalogItemResponse {
             materialGroupId = null,
             productCategoryId = productCategoryId,
             defaultPrice = defaultPrice,
+            wasteStreamNumber = null,
+            materialId = null,
+            consignorPartyId = null,
+            euralCode = null,
+            processingMethodCode = null,
+        )
+        is CatalogItem.WasteStreamItem -> CatalogItemResponse(
+            id = id,
+            code = code,
+            name = name,
+            unitOfMeasure = unitOfMeasure,
+            vatCode = vatCode,
+            glAccountCode = glAccountCode,
+            categoryName = categoryName,
+            itemType = itemType,
+            materialGroupId = null,
+            productCategoryId = null,
+            defaultPrice = null,
+            wasteStreamNumber = wasteStreamNumber,
+            materialId = materialId,
+            consignorPartyId = consignorPartyId,
+            euralCode = euralCode,
+            processingMethodCode = processingMethodCode,
         )
     }
 }

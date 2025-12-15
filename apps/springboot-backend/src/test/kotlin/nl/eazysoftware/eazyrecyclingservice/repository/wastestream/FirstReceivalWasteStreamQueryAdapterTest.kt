@@ -376,6 +376,7 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       dealerParty = null,
       collectorParty = null,
       brokerParty = null,
+      material = null,
       processorParty = processorParty,
       status = status,
       consignorClassification = 1

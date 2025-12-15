@@ -59,7 +59,8 @@ object TestWasteStreamFactory {
     pickupParty: CompanyDto = createTestCompany(),
     dealerParty: CompanyDto? = null,
     collectorParty: CompanyDto? = null,
-    brokerParty: CompanyDto? = null
+    brokerParty: CompanyDto? = null,
+    material: nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto? = null
   ): WasteStreamDto {
     return WasteStreamDto(
       number = number,
@@ -75,6 +76,7 @@ object TestWasteStreamFactory {
       dealerParty = dealerParty,
       collectorParty = collectorParty,
       brokerParty = brokerParty,
+      material = material,
       status = WasteStreamStatus.DRAFT.name
     )
   }

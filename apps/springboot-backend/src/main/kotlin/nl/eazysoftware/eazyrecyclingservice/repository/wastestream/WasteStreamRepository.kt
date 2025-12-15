@@ -1,9 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import java.util.UUID
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
@@ -24,6 +27,8 @@ interface WasteStreamJpaRepository : JpaRepository<WasteStreamDto, String> {
     LIMIT 1
   """)
   fun findHighestNumberByProcessorId(@Param("processorId") processorId: String): String?
+
+  fun findByConsignorPartyIdAndStatus(consignorPartyId: UUID, status: String): List<WasteStreamDto>
 }
 
 
@@ -61,5 +66,12 @@ class WasteStreamRepository(
   override fun findHighestNumberForProcessor(processorId: ProcessorPartyId): WasteStreamNumber? {
     return jpaRepository.findHighestNumberByProcessorId(processorId.number)
       ?.let { WasteStreamNumber(it) }
+  }
+
+  override fun findActiveByConsignorPartyId(consignorPartyId: CompanyId): List<WasteStream> {
+    return jpaRepository.findByConsignorPartyIdAndStatus(
+      consignorPartyId.uuid,
+      WasteStreamStatus.ACTIVE.name
+    ).map { wasteStreamMapper.toDomain(it) }
   }
 }

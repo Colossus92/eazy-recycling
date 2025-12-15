@@ -193,6 +193,7 @@ create table if not exists waste_streams (
                                   collector_party_id uuid,
                                   broker_party_id uuid,
                                   processor_party_id text,
+                                  material_id bigint,
                                   status text,
                                   created_at timestamp with time zone not null default now(),
                                   created_by text,

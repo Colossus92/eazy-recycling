@@ -6,7 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
-import java.time.Instant
+import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
 
 @Entity
 @Table(name = "waste_streams")
@@ -69,6 +69,10 @@ data class WasteStreamDto(
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "broker_party_id", referencedColumnName = "id")
   val brokerParty: CompanyDto?,
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "material_id", referencedColumnName = "id")
+  val material: MaterialDto?,
 
   @Column(name = "status", nullable = false)
   val status: String

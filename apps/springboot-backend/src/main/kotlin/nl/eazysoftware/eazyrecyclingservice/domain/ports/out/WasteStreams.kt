@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
@@ -28,4 +29,10 @@ interface WasteStreams {
   fun findHighestNumberForProcessor(processorId: ProcessorPartyId): WasteStreamNumber?
 
   fun findAllByNumber(wasteStreamNumbers: List<WasteStreamNumber>): List<WasteStream>
+
+  /**
+   * Finds all active waste streams for a given consignor.
+   * Used for catalog item selection in weight ticket lines.
+   */
+  fun findActiveByConsignorPartyId(consignorPartyId: CompanyId): List<WasteStream>
 }

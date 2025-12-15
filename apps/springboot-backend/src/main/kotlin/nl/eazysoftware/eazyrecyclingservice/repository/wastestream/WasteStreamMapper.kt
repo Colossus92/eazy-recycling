@@ -13,9 +13,9 @@ import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
+import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
 import org.hibernate.Hibernate
 import org.springframework.stereotype.Component
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -52,6 +52,7 @@ class WasteStreamMapper(
       dealerParty = dto.dealerParty?.let { CompanyId(it.id) },
       collectorParty = dto.collectorParty?.let { CompanyId(it.id) },
       brokerParty = dto.brokerParty?.let { CompanyId(it.id) },
+      materialId = dto.material?.id,
       createdAt = dto.createdAt?.toKotlinInstant(),
       createdBy = dto.createdBy,
       updatedAt = dto.updatedAt?.toKotlinInstant(),
@@ -83,6 +84,7 @@ class WasteStreamMapper(
       dealerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       collectorParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
       brokerParty = domain.brokerParty?.let { entityManager.getReference(CompanyDto::class.java, it.uuid) },
+      material = domain.materialId?.let { entityManager.getReference(MaterialDto::class.java, it) },
       status = domain.status.name
     )
   }

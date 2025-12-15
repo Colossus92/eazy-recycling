@@ -86,11 +86,42 @@ export interface CatalogItemResponse {
      * @memberof CatalogItemResponse
      */
     'defaultPrice'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'wasteStreamNumber'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CatalogItemResponse
+     */
+    'materialId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'consignorPartyId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'euralCode'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'processingMethodCode'?: string;
 }
 
 export const CatalogItemResponseItemTypeEnum = {
     Material: 'MATERIAL',
-    Product: 'PRODUCT'
+    Product: 'PRODUCT',
+    WasteStream: 'WASTE_STREAM'
 } as const;
 
 export type CatalogItemResponseItemTypeEnum = typeof CatalogItemResponseItemTypeEnum[keyof typeof CatalogItemResponseItemTypeEnum];

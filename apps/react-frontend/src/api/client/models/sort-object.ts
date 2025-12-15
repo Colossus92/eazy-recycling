@@ -25,7 +25,7 @@ export interface SortObject {
      * @type {boolean}
      * @memberof SortObject
      */
-    'empty'?: boolean;
+    'unsorted'?: boolean;
     /**
      * 
      * @type {boolean}
@@ -37,6 +37,6 @@ export interface SortObject {
      * @type {boolean}
      * @memberof SortObject
      */
-    'unsorted'?: boolean;
+    'empty'?: boolean;
 }
 

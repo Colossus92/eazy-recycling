@@ -18,6 +18,7 @@ data class WasteStreamDetailView(
   val dealerParty: CompanyView?,
   val collectorParty: CompanyView?,
   val brokerParty: CompanyView?,
+  val materialId: Long?,
   val status: String,
   val createdAt: Instant?,
   val createdBy: String?,

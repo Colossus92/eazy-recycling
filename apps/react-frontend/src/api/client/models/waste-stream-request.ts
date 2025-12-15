@@ -98,5 +98,11 @@ export interface WasteStreamRequest {
      * @memberof WasteStreamRequest
      */
     'brokerParty'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WasteStreamRequest
+     */
+    'materialId'?: number;
 }
 

@@ -38,9 +38,27 @@ sealed class CatalogItem {
     ) : CatalogItem() {
         override val itemType = CatalogItemType.PRODUCT
     }
+
+    data class WasteStreamItem(
+        override val id: Long,
+        override val code: String,
+        override val name: String,
+        override val unitOfMeasure: String,
+        override val vatCode: String,
+        override val glAccountCode: String?,
+        override val categoryName: String?,
+        val wasteStreamNumber: String,
+        val materialId: Long?,
+        val consignorPartyId: String,
+        val euralCode: String,
+        val processingMethodCode: String,
+    ) : CatalogItem() {
+        override val itemType = CatalogItemType.WASTE_STREAM
+    }
 }
 
 enum class CatalogItemType {
     MATERIAL,
-    PRODUCT
+    PRODUCT,
+    WASTE_STREAM
 }

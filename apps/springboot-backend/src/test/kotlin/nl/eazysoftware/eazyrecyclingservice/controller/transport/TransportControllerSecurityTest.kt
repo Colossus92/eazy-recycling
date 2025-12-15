@@ -252,6 +252,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       dealerParty = null,
       collectorParty = null,
       brokerParty = null,
+      material = null,
       status = WasteStreamStatus.ACTIVE.name,
     )
 

@@ -12,6 +12,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaReposit
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.ReceivalDeclarationFactory
+import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
@@ -72,6 +73,7 @@ class FirstReceivalWasteStreamQueryAdapter(
         ws.broker_party_id,
         ws.processor_party_id,
         ws.status,
+        ws.material_id,
         ws.last_modified_at,
         ws.consignor_classification,
         COALESCE(SUM(wtl.weight_value), 0) as total_weight,
@@ -149,6 +151,12 @@ class FirstReceivalWasteStreamQueryAdapter(
             it
           )
         },
+        material = result.materialId?.let {
+          entityManager.getReference(
+            MaterialDto::class.java,
+            it
+          )
+        },
         processorParty = companyRepository.findByProcessorIdAndDeletedAtIsNull(result.processorPartyId)
           ?: throw IllegalArgumentException("Processor company not found for processor_id: ${result.processorPartyId}"),
         status = result.status,
@@ -187,6 +195,7 @@ data class FirstReceivalWasteStreamQueryResult(
   val dealerPartyId: UUID?,
   val collectorPartyId: UUID?,
   val brokerPartyId: UUID?,
+  val materialId: Long?,
   val processorPartyId: String,
   val status: String,
   val updatedAt: Instant,

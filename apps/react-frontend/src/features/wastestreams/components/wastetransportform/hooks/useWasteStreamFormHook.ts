@@ -35,6 +35,10 @@ export interface WasteStreamFormValues {
   goodsName: string;
   processingMethodCode: string;
   euralCode: string;
+  /**
+   * Reference to the generic material this waste stream is linked to
+   */
+  materialId: string;
 }
 
 export const fieldsToValidate: Array<Array<keyof WasteStreamFormValues>> = [
@@ -68,6 +72,7 @@ export function useWasteStreamForm(
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
+      materialId: '',
     },
   });
 
@@ -184,6 +189,7 @@ export function useWasteStreamForm(
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
+      materialId: '',
     });
   };
 
@@ -242,6 +248,7 @@ const wasteStreamDetailsToFormValues = (
     goodsName: wasteStreamDetails.wasteType.name,
     processingMethodCode: wasteStreamDetails.wasteType.processingMethod.code,
     euralCode: wasteStreamDetails.wasteType.euralCode.code,
+    materialId: wasteStreamDetails.materialId?.toString() || '',
   };
 };
 
@@ -266,5 +273,6 @@ const formValuesToCreateWasteStreamRequest = (
     } as any,
     consignorClassification: Number(formValues.consignorClassification),
     pickupParty: formValues.pickupPartyId,
+    materialId: formValues.materialId ? Number(formValues.materialId) : undefined,
   };
 };
