@@ -1,191 +1,18 @@
-import { CatalogItemResponseItemTypeEnum } from '@/api/client';
 import { CatalogItem, catalogService } from '@/api/services/catalogService';
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
 import { DateFormField } from '@/components/ui/form/DateFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { NumberInput } from '@/components/ui/form/NumberInput';
-import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Controller, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
-import AsyncSelect from 'react-select/async';
-import { GroupBase, OptionsOrGroups } from 'react-select';
+import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useRef } from 'react';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 
 interface WeightTicketLinesTabProps {
   disabled?: boolean;
 }
-
-interface CatalogItemOption {
-  value: number;
-  label: string;
-  item: CatalogItem;
-}
-
-interface CatalogItemSelectProps {
-  index: number;
-  disabled: boolean;
-  loadOptions: (inputValue: string) => Promise<OptionsOrGroups<CatalogItemOption, GroupBase<CatalogItemOption>>>;
-  loadDefaultOptions: () => Promise<OptionsOrGroups<CatalogItemOption, GroupBase<CatalogItemOption>>>;
-  selectedItems: Map<number, CatalogItem>;
-  setSelectedItems: React.Dispatch<React.SetStateAction<Map<number, CatalogItem>>>;
-}
-
-const CatalogItemSelect = ({
-  index,
-  disabled,
-  loadOptions,
-  loadDefaultOptions,
-  selectedItems,
-  setSelectedItems,
-}: CatalogItemSelectProps) => {
-  const formContext = useFormContext<WeightTicketFormValues>();
-  const { control, formState: { errors } } = formContext;
-  const fieldName = `lines.${index}.catalogItemId` as const;
-  const error = errors.lines?.[index]?.catalogItemId?.message as string | undefined;
-
-  return (
-    <div className="flex flex-col items-start self-stretch gap-1 w-full">
-      <div className="flex items-center self-stretch justify-between">
-        <span className="text-caption-2">Naam</span>
-      </div>
-
-      <Controller
-        control={control}
-        name={fieldName}
-        rules={{
-          validate: (value) => {
-            const lines = formContext.getValues('lines');
-            const weightValue = lines[index]?.weightValue;
-            if (!value && !weightValue) {
-              return true;
-            }
-            if (!value && weightValue) {
-              return 'Catalogus item is verplicht';
-            }
-            return true;
-          },
-        }}
-        render={({ field }) => {
-          const selectedItem = field.value ? selectedItems.get(field.value) : null;
-          const selectedOption = selectedItem ? {
-            value: selectedItem.id,
-            label: selectedItem.wasteStreamNumber 
-              ? `${selectedItem.name} (${selectedItem.wasteStreamNumber})`
-              : selectedItem.name,
-            item: selectedItem,
-          } : null;
-
-          return (
-            <AsyncSelect<CatalogItemOption, false, GroupBase<CatalogItemOption>>
-              {...field}
-              value={selectedOption}
-              loadOptions={loadOptions}
-              defaultOptions
-              cacheOptions
-              placeholder="Zoek of selecteer een item"
-              isDisabled={disabled}
-              isClearable={true}
-              classNamePrefix="react-select"
-              noOptionsMessage={() => 'Geen items gevonden'}
-              loadingMessage={() => 'Laden...'}
-              menuPortalTarget={document.body}
-              className={clsx(
-                'w-full text-body-1',
-                disabled
-                  ? 'text-color-text-disabled cursor-not-allowed'
-                  : 'text-color-text-secondary'
-              )}
-              styles={{
-                control: (base, state) => ({
-                  ...base,
-                  minHeight: '40px',
-                  height: '40px',
-                  borderRadius: '8px',
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                  borderColor: disabled
-                    ? '#E3E8F3'
-                    : error
-                      ? '#F04438'
-                      : state.isFocused
-                        ? '#1E77F8'
-                        : '#E3E8F3',
-                  backgroundColor: '#FFFFFF',
-                  cursor: disabled ? 'not-allowed' : 'default',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    borderColor: disabled
-                      ? '#E3E8F3'
-                      : error
-                        ? '#F04438'
-                        : '#1E77F8',
-                    backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
-                  },
-                }),
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 9999,
-                }),
-                group: (base) => ({
-                  ...base,
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                }),
-                groupHeading: (base) => ({
-                  ...base,
-                  fontWeight: 600,
-                  fontSize: '12px',
-                  color: '#6B7280',
-                  textTransform: 'uppercase',
-                  backgroundColor: '#F9FAFB',
-                  padding: '8px 12px',
-                  marginBottom: 0,
-                }),
-                input: (base) => ({
-                  ...base,
-                  'input:focus': {
-                    boxShadow: 'none',
-                  },
-                }),
-              }}
-              classNames={{
-                placeholder: () => clsx('text-color-text-disabled', 'italic'),
-                option: ({ isSelected, isFocused }) =>
-                  clsx(
-                    'cursor-pointer',
-                    isSelected
-                      ? 'bg-color-primary text-color-text-secondary'
-                      : isFocused
-                        ? 'bg-color-surface-secondary text-color-text-primary'
-                        : 'bg-color-surface-primary text-color-text-primary'
-                  ),
-                singleValue: () => 'text-color-text-primary',
-                valueContainer: () => 'px-3 py-2',
-              }}
-              onChange={(selectedOption) => {
-                if (selectedOption) {
-                  field.onChange(selectedOption.value);
-                  setSelectedItems(prev => new Map(prev).set(selectedOption.item.id, selectedOption.item));
-                } else {
-                  field.onChange(null);
-                }
-              }}
-              onMenuOpen={() => {
-                loadDefaultOptions();
-              }}
-            />
-          );
-        }}
-      />
-      {error && (
-        <span className="text-caption-1 text-color-status-error-dark">
-          {error}
-        </span>
-      )}
-    </div>
-  );
-};
 
 export const UnitBadge = () => (
   <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary h-full">
@@ -276,64 +103,12 @@ export const WeightTicketLinesTab = ({
     name: 'lines',
   });
 
-  // Type labels for grouping
-  const typeLabels: Record<string, string> = {
-    [CatalogItemResponseItemTypeEnum.WasteStream]: 'Afvalstromen',
-    [CatalogItemResponseItemTypeEnum.Material]: 'Materialen',
-    [CatalogItemResponseItemTypeEnum.Product]: 'Producten',
-  };
-
-  // Type order for sorting groups
-  const typeOrder = [
-    CatalogItemResponseItemTypeEnum.WasteStream,
-    CatalogItemResponseItemTypeEnum.Material,
-    CatalogItemResponseItemTypeEnum.Product,
-  ];
-
-  // Store selected items to display them even when not in search results
-  const [selectedItems, setSelectedItems] = useState<Map<number, CatalogItem>>(new Map());
-
-  // Convert catalog items to grouped options
-  const catalogItemsToGroupedOptions = useCallback((items: CatalogItem[]): OptionsOrGroups<CatalogItemOption, GroupBase<CatalogItemOption>> => {
-    // Group items by type
-    const grouped = items.reduce((acc, item) => {
-      const type = item.itemType;
-      if (!acc[type]) {
-        acc[type] = [];
-      }
-      acc[type].push({
-        value: item.id,
-        label: item.wasteStreamNumber 
-          ? `${item.name} (${item.wasteStreamNumber})`
-          : item.name,
-        item,
-      });
-      return acc;
-    }, {} as Record<string, CatalogItemOption[]>);
-
-    // Sort groups by type order and create grouped options
-    return typeOrder
-      .filter(type => grouped[type]?.length > 0)
-      .map(type => ({
-        label: typeLabels[type],
-        options: grouped[type],
-      }));
-  }, []);
-
-  // Load options for async select
-  const loadOptions = useCallback(async (inputValue: string): Promise<OptionsOrGroups<CatalogItemOption, GroupBase<CatalogItemOption>>> => {
-    const items = await catalogService.search(inputValue || undefined, consignorPartyId || undefined);
-    // Store items for later reference
-    items.forEach(item => {
-      setSelectedItems(prev => new Map(prev).set(item.id, item));
-    });
-    return catalogItemsToGroupedOptions(items);
-  }, [consignorPartyId, catalogItemsToGroupedOptions]);
-
-  // Load default options when dropdown opens
-  const loadDefaultOptions = useCallback(async (): Promise<OptionsOrGroups<CatalogItemOption, GroupBase<CatalogItemOption>>> => {
-    return loadOptions('');
-  }, [loadOptions]);
+  // Fetch catalog items for the selected consignor
+  const { data: catalogItems = [] } = useQuery<CatalogItem[]>({
+    queryKey: ['catalogItems', consignorPartyId],
+    queryFn: () => catalogService.search(undefined, consignorPartyId || undefined),
+    enabled: !!consignorPartyId,
+  });
 
   // Calculate Weging 1 (sum of all line weights)
   const weging1 = useMemo(() => {
@@ -355,17 +130,25 @@ export const WeightTicketLinesTab = ({
     return bruto - tarra;
   }, [bruto, tarraWeightValue]);
 
+  const catalogItemOptions = useMemo(() => {
+    return catalogItems.map((item) => ({
+      value: String(item.id),
+      label: item.wasteStreamNumber
+        ? `${item.name} (${item.wasteStreamNumber})`
+        : item.name,
+    }));
+  }, [catalogItems]);
+
   const handleAddLine = () => {
     append({
-      catalogItemId: null,
-      wasteStreamNumber: undefined,
+      catalogItemId: '',
+      wasteStreamNumber: '',
       weightValue: '',
       weightUnit: 'KG',
     });
   };
 
   const hasConsignorSelected = consignorPartyId && consignorPartyId.length > 0;
-
   return (
     <div className="flex flex-col items-start self-stretch gap-4">
       <div className="w-1/44">
@@ -439,13 +222,33 @@ export const WeightTicketLinesTab = ({
 
                 <div className="flex items-start self-stretch gap-4">
                   <div className="flex-1">
-                    <CatalogItemSelect
-                      index={index}
+                    <SelectFormField
+                      title={'Naam'}
+                      placeholder={'Selecteer een item'}
+                      options={catalogItemOptions}
+                      testId={`catalog-item-select-${index}`}
                       disabled={disabled}
-                      loadOptions={loadOptions}
-                      loadDefaultOptions={loadDefaultOptions}
-                      selectedItems={selectedItems}
-                      setSelectedItems={setSelectedItems}
+                      formHook={{
+                        register,
+                        name: `lines.${index}.catalogItemId` as const,
+                        rules: {
+                          validate: (value) => {
+                            const lines = formContext.getValues('lines');
+                            const weightValue = lines[index]?.weightValue;
+                            // If both are empty, it's valid (will be filtered out)
+                            if (!value && !weightValue) {
+                              return true;
+                            }
+                            // If weight is filled but catalog item is not, show error
+                            if (!value && weightValue) {
+                              return 'Catalogus item is verplicht';
+                            }
+                            return true;
+                          },
+                        },
+                        errors,
+                        control,
+                      }}
                     />
                   </div>
 
@@ -461,11 +264,11 @@ export const WeightTicketLinesTab = ({
                         rules: {
                           validate: (value) => {
                             const lines = formContext.getValues('lines');
-                            const wasteStreamNumber =
-                              lines[index]?.wasteStreamNumber;
+                            const catalogItemId =
+                              lines[index]?.catalogItemId;
                             const numValue = typeof value === 'number' ? value : undefined;
                             // If both are empty, it's valid (will be filtered out)
-                            if (numValue === undefined && !wasteStreamNumber) {
+                            if (numValue === undefined && !catalogItemId) {
                               return true;
                             }
                             // Validate positive value

@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import {
   CompanyView,
@@ -9,18 +9,21 @@ import {
   WeightTicketDetailViewConsignorParty,
   WeightTicketRequest,
   WeightTicketRequestDirectionEnum,
-  WeightTicketRequestTarraWeightUnitEnum,
   WeightTicketRequestSecondWeighingUnitEnum,
+  WeightTicketRequestTarraWeightUnitEnum,
 } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
-import { LocationFormValue, createEmptyLocationFormValue } from '@/types/forms/LocationFormValue';
 import {
-  pickupLocationViewToFormValue,
+  createEmptyLocationFormValue,
+  LocationFormValue,
+} from '@/types/forms/LocationFormValue';
+import {
   locationFormValueToPickupLocationRequest,
+  pickupLocationViewToFormValue,
 } from '@/types/forms/locationConverters';
 
 export interface WeightTicketLineFormValues {
-  catalogItemId: number | null;
+  catalogItemId: string;
   wasteStreamNumber?: string;
   weightValue: string;
   weightUnit: string;
@@ -43,20 +46,20 @@ export interface WeightTicketFormValues {
   deliveryLocation: LocationFormValue;
 }
 
-export function useWeightTicketForm(
-  initialWeightTicketNumber?: number
-) {
+export function useWeightTicketForm(initialWeightTicketNumber?: number) {
   const queryClient = useQueryClient();
-  
+
   // Track the current weight ticket number internally
   // This allows switching from create to edit mode after saving
-  const [currentWeightTicketNumber, setCurrentWeightTicketNumber] = useState<number | undefined>(initialWeightTicketNumber);
-  
+  const [currentWeightTicketNumber, setCurrentWeightTicketNumber] = useState<
+    number | undefined
+  >(initialWeightTicketNumber);
+
   // Sync with prop when it changes (e.g., when opening a different weight ticket)
   useEffect(() => {
     setCurrentWeightTicketNumber(initialWeightTicketNumber);
   }, [initialWeightTicketNumber]);
-  
+
   const formContext = useForm<WeightTicketFormValues>({
     defaultValues: {
       consignorPartyId: '',
@@ -89,7 +92,7 @@ export function useWeightTicketForm(
     },
     enabled: !!currentWeightTicketNumber,
   });
-  
+
   const mutation = useMutation({
     mutationFn: async (data: WeightTicketFormValues) => {
       const request = formValuesToWeightTicketRequest(data);
@@ -102,12 +105,16 @@ export function useWeightTicketForm(
     onSuccess: async (response) => {
       await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
 
-      toastService.success(!currentWeightTicketNumber ? 'Weegbon aangemaakt' : 'Weegbon bijgewerkt');
-      
+      toastService.success(
+        !currentWeightTicketNumber ? 'Weegbon aangemaakt' : 'Weegbon bijgewerkt'
+      );
+
       // Reload form with the latest data
       if (currentWeightTicketNumber) {
         // For updates, response is void - fetch the full details
-        const fullDetails = await weightTicketService.getByNumber(currentWeightTicketNumber);
+        const fullDetails = await weightTicketService.getByNumber(
+          currentWeightTicketNumber
+        );
         const formValues = weightTicketDetailsToFormValues(fullDetails);
         formContext.reset(formValues);
       } else if ((response as any).id) {
@@ -138,7 +145,7 @@ export function useWeightTicketForm(
       await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
 
       toastService.success('Weegbon aangemaakt en verwerkt');
-      
+
       // Reload form with the latest data
       if ((response as any).id) {
         // Response is CreateWeightTicketResponse with just id
@@ -192,7 +199,6 @@ export function useWeightTicketForm(
   };
 }
 
-
 /**
  * Type guard to check if consignorParty is a company
  */
@@ -233,7 +239,7 @@ const weightTicketDetailsToFormValues = (
     reclamation: weightTicketDetails.reclamation || '',
     note: weightTicketDetails.note || '',
     lines: (weightTicketDetails.lines || []).map((line) => ({
-      catalogItemId: line.catalogItemId || null,
+      catalogItemId: line.catalogItemId?.toString() || '',
       wasteStreamNumber: line.wasteStreamNumber || undefined,
       weightValue: line.weightValue?.toString() || '',
       weightUnit: line.weightUnit || 'KG',
@@ -244,7 +250,10 @@ const weightTicketDetailsToFormValues = (
     tarraWeightUnit: weightTicketDetails.tarraWeightUnit,
     direction: weightTicketDetails.direction || 'INBOUND',
     weightedAt: weightTicketDetails.weightedAt
-      ? format(new Date(weightTicketDetails.weightedAt.toString()), 'yyyy-MM-dd')
+      ? format(
+          new Date(weightTicketDetails.weightedAt.toString()),
+          'yyyy-MM-dd'
+        )
       : undefined,
     pickupLocation: pickupLocationViewToFormValue(
       weightTicketDetails.pickupLocation
@@ -258,7 +267,9 @@ const weightTicketDetailsToFormValues = (
 /**
  * Normalizes number values by converting commas to periods for backend compatibility
  */
-const normalizeNumberForBackend = (value: string | number | undefined): string | undefined => {
+const normalizeNumberForBackend = (
+  value: string | number | undefined
+): string | undefined => {
   if (value === undefined || value === null || value === '') return undefined;
   if (typeof value === 'number' && isNaN(value)) return undefined;
   const stringValue = String(value);
@@ -283,18 +294,20 @@ const formValuesToWeightTicketRequest = (
     reclamation: formValues.reclamation || undefined,
     note: formValues.note || undefined,
     lines: formValues.lines
-      .filter((line) => line.catalogItemId !== null)
+      .filter((line) => line.catalogItemId)
       .map((line) => ({
-        catalogItemId: line.catalogItemId!,
-        wasteStreamNumber: line.wasteStreamNumber || '',
+        catalogItemId: parseInt(line.catalogItemId, 10),
+        wasteStreamNumber: line.wasteStreamNumber || undefined,
         weight: {
           value: normalizeNumberForBackend(line.weightValue) || '0',
           unit: 'KG',
         },
       })),
-    tarraWeightValue: normalizeNumberForBackend(formValues.tarraWeightValue) || undefined,
+    tarraWeightValue:
+      normalizeNumberForBackend(formValues.tarraWeightValue) || undefined,
     tarraWeightUnit: WeightTicketRequestTarraWeightUnitEnum.Kg,
-    secondWeighingValue: normalizeNumberForBackend(formValues.secondWeighingValue) || undefined,
+    secondWeighingValue:
+      normalizeNumberForBackend(formValues.secondWeighingValue) || undefined,
     secondWeighingUnit: WeightTicketRequestSecondWeighingUnitEnum.Kg,
     weightedAt: formValues.weightedAt,
     direction:

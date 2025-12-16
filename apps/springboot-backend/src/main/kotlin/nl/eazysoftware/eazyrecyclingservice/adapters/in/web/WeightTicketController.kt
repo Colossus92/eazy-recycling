@@ -222,11 +222,10 @@ data class WeightTicketRequest(
 data class CreateWeightTicketResponse(val id: Long)
 
 data class WeightTicketLineRequest(
-  val wasteStreamNumber: String,
+  val wasteStreamNumber: String?,
   val weight: WeightRequest,
   val catalogItemId: Long,
-) {
-}
+)
 
 data class WeightRequest(
   val value: String,
@@ -248,7 +247,7 @@ fun List<WeightTicketLineRequest>.toDomain(): WeightTicketLines {
   return WeightTicketLines(
     this.map { line ->
       WeightTicketLine(
-        waste = WasteStreamNumber(line.wasteStreamNumber),
+        waste = line.wasteStreamNumber?.let { WasteStreamNumber(it) },
         weight = line.weight.toDomain(),
         catalogItemId = line.catalogItemId,
       )

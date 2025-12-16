@@ -46,10 +46,10 @@ export interface ApplicationContext {
     'displayName'?: string;
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof ApplicationContext
      */
-    'applicationName'?: string;
+    'autowireCapableBeanFactory'?: any;
     /**
      * 
      * @type {number}
@@ -58,10 +58,10 @@ export interface ApplicationContext {
     'startupDate'?: number;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ApplicationContext
      */
-    'autowireCapableBeanFactory'?: any;
+    'applicationName'?: string;
     /**
      * 
      * @type {Environment}

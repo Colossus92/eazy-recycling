@@ -16,10 +16,13 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { FormProvider } from 'react-hook-form';
+import { FormProvider, useWatch } from 'react-hook-form';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
-import { useWeightTicketForm, WeightTicketFormValues, } from './useWeigtTicketFormHook';
+import {
+  useWeightTicketForm,
+  WeightTicketFormValues,
+} from './useWeigtTicketFormHook';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { WeightTicketLinesTab } from './WeightTicketLinesTab';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
@@ -152,11 +155,11 @@ export const WeightTicketForm = ({
       return null;
     }
 
-    // Filter out empty lines (lines where wasteStreamNumber is empty)
+    // Filter out empty lines (lines where catalogItemId is empty)
     return {
       ...formValues,
       lines: formValues.lines.filter(
-        (line) => line.wasteStreamNumber && line.wasteStreamNumber.trim() !== ''
+        (line) => line.catalogItemId && line.catalogItemId.trim() !== ''
       ),
     };
   };
@@ -176,7 +179,8 @@ export const WeightTicketForm = ({
 
     // Determine the weight ticket ID to complete
     // Priority: currentWeightTicketNumber (set after first save), then data.id, then response.id (for new tickets)
-    const weightTicketId = currentWeightTicketNumber ?? data?.id ?? (response as any)?.id;
+    const weightTicketId =
+      currentWeightTicketNumber ?? data?.id ?? (response as any)?.id;
 
     if (weightTicketId && onComplete) {
       onComplete(weightTicketId);
@@ -206,7 +210,8 @@ export const WeightTicketForm = ({
   );
 
   const routeHasError = !!(errors.pickupLocation || errors.deliveryLocation);
-
+  const formValues = useWatch({ control: formContext.control });
+  console.log('Form values:', formValues);
   const formContent = (
     <div className={'w-full h-[90vh]'}>
       <FormProvider {...formContext}>

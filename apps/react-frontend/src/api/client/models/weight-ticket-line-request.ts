@@ -28,7 +28,7 @@ export interface WeightTicketLineRequest {
      * @type {string}
      * @memberof WeightTicketLineRequest
      */
-    'wasteStreamNumber': string;
+    'wasteStreamNumber'?: string;
     /**
      * 
      * @type {WeightRequest}
