@@ -14,11 +14,11 @@ data class CatalogItemCategoryDto(
     val type: String,
 
     @Column(name = "code", nullable = false)
-    val code: String,
+    var code: String,
 
     @Column(name = "name", nullable = false)
-    val name: String,
+    var name: String,
 
     @Column(name = "description")
-    val description: String? = null,
+    var description: String? = null,
 ) : AuditableEntity()

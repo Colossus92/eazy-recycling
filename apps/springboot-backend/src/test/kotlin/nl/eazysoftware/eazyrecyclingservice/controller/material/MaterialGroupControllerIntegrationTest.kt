@@ -2,8 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.controller.material
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.MaterialGroupRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupDto
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupMapper.Companion.MATERIAL_TYPE
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -33,7 +33,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var objectMapper: ObjectMapper
 
   @Autowired
-  private lateinit var materialGroupJpaRepository: MaterialGroupJpaRepository
+  private lateinit var catalogItemCategoryJpaRepository: CatalogItemCategoryJpaRepository
 
   @BeforeEach
   fun setup() {
@@ -42,7 +42,9 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
 
   @AfterEach
   fun cleanup() {
-    materialGroupJpaRepository.deleteAll()
+    catalogItemCategoryJpaRepository.findByType(MATERIAL_TYPE).forEach {
+      catalogItemCategoryJpaRepository.delete(it)
+    }
   }
 
   @Test
@@ -68,7 +70,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.createdAt").exists())
 
     // Verify material group was saved in the database
-    val savedGroups = materialGroupJpaRepository.findAll()
+    val savedGroups = catalogItemCategoryJpaRepository.findByType(MATERIAL_TYPE)
     assertThat(savedGroups).hasSize(1)
     assertThat(savedGroups[0].code).isEqualTo("PLASTICS")
   }
@@ -76,17 +78,19 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get all material groups`() {
     // Given
-    val group1 = MaterialGroupDto(
+    val group1 = CatalogItemCategoryDto(
+      type = MATERIAL_TYPE,
       code = "METALS",
       name = "Metals",
       description = "All metal materials",
     )
-    val group2 = MaterialGroupDto(
+    val group2 = CatalogItemCategoryDto(
+      type = MATERIAL_TYPE,
       code = "WOOD",
       name = "Wood",
       description = "All wood materials",
     )
-    materialGroupJpaRepository.saveAll(listOf(group1, group2))
+    catalogItemCategoryJpaRepository.saveAll(listOf(group1, group2))
 
     // When & Then
     securedMockMvc.get("/material-groups")
@@ -101,12 +105,13 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get material group by id`() {
     // Given
-    val group = MaterialGroupDto(
+    val group = CatalogItemCategoryDto(
+      type = MATERIAL_TYPE,
       code = "GLASS",
       name = "Glass",
       description = "All glass materials",
     )
-    val saved = materialGroupJpaRepository.save(group)
+    val saved = catalogItemCategoryJpaRepository.save(group)
 
     // When & Then
     securedMockMvc.get("/material-groups/${saved.id}")
@@ -128,12 +133,13 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should update material group`() {
     // Given
-    val originalGroup = MaterialGroupDto(
+    val originalGroup = CatalogItemCategoryDto(
+      type = MATERIAL_TYPE,
       code = "PAPER",
       name = "Paper",
       description = "Paper materials",
     )
-    val saved = materialGroupJpaRepository.save(originalGroup)
+    val saved = catalogItemCategoryJpaRepository.save(originalGroup)
 
     val updatedRequest = MaterialGroupRequest(
       code = "PAPER_UPDATED",
@@ -155,7 +161,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
 
     // Verify material group was updated in the database
     val savedId = saved.id!!
-    val updatedGroup = materialGroupJpaRepository.findByIdOrNull(savedId)
+    val updatedGroup = catalogItemCategoryJpaRepository.findByIdAndType(savedId, MATERIAL_TYPE)
     assertThat(updatedGroup).isNotNull
     assertThat(updatedGroup?.code).isEqualTo("PAPER_UPDATED")
     assertThat(updatedGroup?.name).isEqualTo("Paper and Cardboard")
@@ -182,19 +188,20 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should delete material group`() {
     // Given
-    val group = MaterialGroupDto(
+    val group = CatalogItemCategoryDto(
+      type = MATERIAL_TYPE,
       code = "DELETE_ME",
       name = "Delete Me",
       description = "This will be deleted",
     )
-    val saved = materialGroupJpaRepository.save(group)
+    val saved = catalogItemCategoryJpaRepository.save(group)
 
     // When & Then
     securedMockMvc.delete("/material-groups/${saved.id!!}")
       .andExpect(status().isNoContent)
 
     // Verify material group was deleted
-    assertThat(materialGroupJpaRepository.findByIdOrNull(saved.id!!)).isNull()
+    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(saved.id!!, MATERIAL_TYPE)).isNull()
   }
 
   @Test
@@ -249,7 +256,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
     ).andExpect(status().isCreated)
 
     // Then
-    val allGroups = materialGroupJpaRepository.findAll()
+    val allGroups = catalogItemCategoryJpaRepository.findByType(MATERIAL_TYPE)
     assertThat(allGroups).hasSize(2)
     assertThat(allGroups.map { it.code }).containsExactlyInAnyOrder("TEXTILES", "ELECTRONICS")
   }

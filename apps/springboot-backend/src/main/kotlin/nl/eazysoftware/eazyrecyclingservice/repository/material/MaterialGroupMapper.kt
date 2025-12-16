@@ -1,23 +1,28 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.MaterialGroup
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import org.springframework.stereotype.Component
 import kotlin.time.toKotlinInstant
 
 @Component
 class MaterialGroupMapper {
 
-    fun toDto(domain: MaterialGroup): MaterialGroupDto {
-        return MaterialGroupDto(
+    companion object {
+        const val MATERIAL_TYPE = "MATERIAL"
+    }
+
+    fun toDto(domain: MaterialGroup): CatalogItemCategoryDto {
+        return CatalogItemCategoryDto(
             id = domain.id,
+            type = MATERIAL_TYPE,
             code = domain.code,
             name = domain.name,
             description = domain.description,
-            // Audit fields are managed by Spring Data JPA
         )
     }
 
-    fun toDomain(dto: MaterialGroupDto): MaterialGroup {
+    fun toDomain(dto: CatalogItemCategoryDto): MaterialGroup {
         return MaterialGroup(
             id = dto.id,
             code = dto.code,

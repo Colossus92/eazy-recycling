@@ -312,51 +312,6 @@ create table if not exists vat_rates (
                                          primary key (vat_code)
 );
 
-create table if not exists material_groups (
-                                                id bigint generated always as identity,
-                                                code text not null,
-                                                name text not null,
-                                                description text,
-                                                created_at timestamp with time zone not null default now(),
-                                                created_by text,
-                                                last_modified_at timestamp with time zone not null default now(),
-                                                last_modified_by text,
-                                                primary key (id)
-);
-
-create table if not exists materials (
-                                          id bigint generated always as identity,
-                                          code text not null,
-                                          name text not null,
-                                          material_group_id bigint not null,
-                                          unit_of_measure text not null,
-                                          vat_code text not null,
-                                          gl_account_code text,
-                                          status text not null,
-                                          created_at timestamp with time zone not null default now(),
-                                          created_by text,
-                                          last_modified_at timestamp with time zone not null default now(),
-                                          last_modified_by text,
-                                          primary key (id),
-                                          foreign key (material_group_id) references material_groups(id),
-                                          foreign key (vat_code) references vat_rates(vat_code)
-);
-
-create table if not exists material_prices (
-                                               id bigint generated always as identity,
-                                               material_id bigint not null,
-                                               price numeric(19,4) not null,
-                                               currency text not null,
-                                               valid_from timestamp with time zone not null,
-                                               valid_to timestamp with time zone,
-                                               created_at timestamp with time zone not null default now(),
-                                               created_by text,
-                                               last_modified_at timestamp with time zone not null default now(),
-                                               last_modified_by text,
-                                               primary key (id),
-                                               foreign key (material_id) references materials(id)
-);
-
 create table if not exists exact_tokens (
                                             id uuid not null,
                                             access_token text not null,
@@ -475,26 +430,6 @@ create table if not exists catalog_items (
                                           last_modified_by text,
                                           primary key (id),
                                           foreign key (category_id) references catalog_item_categories(id),
-                                          foreign key (vat_code) references vat_rates(vat_code)
-);
-
-create table if not exists products (
-                                          id bigint generated always as identity,
-                                          code text not null unique,
-                                          name text not null,
-                                          product_category_id bigint,
-                                          unit_of_measure text not null,
-                                          vat_code text not null,
-                                          gl_account_code text,
-                                          status text not null,
-                                          default_price numeric(15,4),
-                                          description text,
-                                          created_at timestamp with time zone not null default now(),
-                                          created_by text,
-                                          last_modified_at timestamp with time zone not null default now(),
-                                          last_modified_by text,
-                                          primary key (id),
-                                          foreign key (product_category_id) references product_categories(id),
                                           foreign key (vat_code) references vat_rates(vat_code)
 );
 
