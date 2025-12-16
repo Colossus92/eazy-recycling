@@ -106,7 +106,7 @@ export interface WasteStreamDetailView {
      * @type {number}
      * @memberof WasteStreamDetailView
      */
-    'materialId'?: number;
+    'catalogItemId'?: number;
     /**
      * 
      * @type {string}

@@ -25,7 +25,13 @@ export interface WeightTicketLineDto {
      * @type {string}
      * @memberof WeightTicketLineDto
      */
-    'wasteStreamNumber': string;
+    'wasteStreamNumber'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketLineDto
+     */
+    'catalogItemId': number;
     /**
      * 
      * @type {number}

@@ -55,7 +55,13 @@ export interface MaterialRequest {
      * @type {string}
      * @memberof MaterialRequest
      */
-    'glAccountCode'?: string;
+    'salesAccountNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialRequest
+     */
+    'purchaseAccountNumber'?: string;
     /**
      * 
      * @type {string}

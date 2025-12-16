@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.material
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.MaterialRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
@@ -136,7 +137,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material1 = CatalogItemDto(
-      type = "MATERIAL",
+      type = CatalogItemType.MATERIAL,
       code = "MAT002",
       name = "Aluminum",
       category = materialCategory,
@@ -149,7 +150,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       status = "ACTIVE",
     )
     val material2 = CatalogItemDto(
-      type = "MATERIAL",
+      type = CatalogItemType.MATERIAL,
       code = "MAT003",
       name = "Copper",
       category = materialCategory,
@@ -180,7 +181,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material = CatalogItemDto(
-      type = "MATERIAL",
+      type = CatalogItemType.MATERIAL,
       code = "MAT004",
       name = "Bronze",
       category = materialCategory,
@@ -217,7 +218,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val originalMaterial = CatalogItemDto(
-      type = "MATERIAL",
+      type = CatalogItemType.MATERIAL,
       code = "MAT005",
       name = "Iron",
       category = materialCategory,
@@ -294,7 +295,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material = CatalogItemDto(
-      type = "MATERIAL",
+      type = CatalogItemType.MATERIAL,
       code = "DELETE_ME",
       name = "Delete Me",
       category = materialCategory,

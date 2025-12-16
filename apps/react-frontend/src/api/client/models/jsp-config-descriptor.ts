@@ -28,15 +28,15 @@ import type { TaglibDescriptor } from './taglib-descriptor';
 export interface JspConfigDescriptor {
     /**
      * 
-     * @type {Array<TaglibDescriptor>}
-     * @memberof JspConfigDescriptor
-     */
-    'taglibs'?: Array<TaglibDescriptor>;
-    /**
-     * 
      * @type {Array<JspPropertyGroupDescriptor>}
      * @memberof JspConfigDescriptor
      */
     'jspPropertyGroups'?: Array<JspPropertyGroupDescriptor>;
+    /**
+     * 
+     * @type {Array<TaglibDescriptor>}
+     * @memberof JspConfigDescriptor
+     */
+    'taglibs'?: Array<TaglibDescriptor>;
 }
 

@@ -32,175 +32,12 @@ export const CatalogControllerApiAxiosParamCreator = function (configuration?: C
     return {
         /**
          * 
-         * @param {GetCatalogItemByTypeAndIdItemTypeEnum} itemType 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}}
-         */
-        getCatalogItemByTypeAndId: async (itemType: GetCatalogItemByTypeAndIdItemTypeEnum, id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'itemType' is not null or undefined
-            assertParamExists('getCatalogItemByTypeAndId', 'itemType', itemType)
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getCatalogItemByTypeAndId', 'id', id)
-            const localVarPath = `/catalog/items/{itemType}/{id}`
-                .replace(`{itemType}`, encodeURIComponent(String(itemType)))
-                .replace(`{id}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} consignorPartyId 
          * @param {string} [query] 
-         * @param {Set<GetCatalogItemsForWeightTicketItemTypesEnum>} [itemTypes] 
-         * @param {number} [limit] 
+         * @param {string} [consignorPartyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getCatalogItemsForWeightTicket: async (consignorPartyId: string, query?: string, itemTypes?: Set<GetCatalogItemsForWeightTicketItemTypesEnum>, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'consignorPartyId' is not null or undefined
-            assertParamExists('getCatalogItemsForWeightTicket', 'consignorPartyId', consignorPartyId)
-            const localVarPath = `/catalog/items/for-weight-ticket`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (consignorPartyId !== undefined) {
-                localVarQueryParameter['consignorPartyId'] = consignorPartyId;
-            }
-
-            if (query !== undefined) {
-                localVarQueryParameter['query'] = query;
-            }
-
-            if (itemTypes) {
-                localVarQueryParameter['itemTypes'] = itemTypes;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}}
-         */
-        getMaterialById1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getMaterialById1', 'id', id)
-            const localVarPath = `/catalog/materials/{id}`
-                .replace(`{id}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}}
-         */
-        getProductById1: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'id' is not null or undefined
-            assertParamExists('getProductById1', 'id', id)
-            const localVarPath = `/catalog/products/{id}`
-                .replace(`{id}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} [query] 
-         * @param {Set<SearchCatalogItemsItemTypesEnum>} [itemTypes] 
-         * @param {number} [limit] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}}
-         */
-        searchCatalogItems: async (query?: string, itemTypes?: Set<SearchCatalogItemsItemTypesEnum>, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchCatalogItems: async (query?: string, consignorPartyId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/catalog/items`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -221,12 +58,8 @@ export const CatalogControllerApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['query'] = query;
             }
 
-            if (itemTypes) {
-                localVarQueryParameter['itemTypes'] = itemTypes;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
+            if (consignorPartyId !== undefined) {
+                localVarQueryParameter['consignorPartyId'] = consignorPartyId;
             }
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -249,66 +82,13 @@ export const CatalogControllerApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @param {GetCatalogItemByTypeAndIdItemTypeEnum} itemType 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getCatalogItemByTypeAndId(itemType: GetCatalogItemByTypeAndIdItemTypeEnum, id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CatalogItemResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCatalogItemByTypeAndId(itemType, id, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['CatalogControllerApi.getCatalogItemByTypeAndId']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {string} consignorPartyId 
          * @param {string} [query] 
-         * @param {Set<GetCatalogItemsForWeightTicketItemTypesEnum>} [itemTypes] 
-         * @param {number} [limit] 
+         * @param {string} [consignorPartyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCatalogItemsForWeightTicket(consignorPartyId: string, query?: string, itemTypes?: Set<GetCatalogItemsForWeightTicketItemTypesEnum>, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CatalogItemResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCatalogItemsForWeightTicket(consignorPartyId, query, itemTypes, limit, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['CatalogControllerApi.getCatalogItemsForWeightTicket']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getMaterialById1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CatalogItemResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMaterialById1(id, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['CatalogControllerApi.getMaterialById1']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getProductById1(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CatalogItemResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getProductById1(id, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['CatalogControllerApi.getProductById1']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {string} [query] 
-         * @param {Set<SearchCatalogItemsItemTypesEnum>} [itemTypes] 
-         * @param {number} [limit] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async searchCatalogItems(query?: string, itemTypes?: Set<SearchCatalogItemsItemTypesEnum>, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CatalogItemResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchCatalogItems(query, itemTypes, limit, options);
+        async searchCatalogItems(query?: string, consignorPartyId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CatalogItemResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchCatalogItems(query, consignorPartyId, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['CatalogControllerApi.searchCatalogItems']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -324,54 +104,13 @@ export const CatalogControllerApiFactory = function (configuration?: Configurati
     return {
         /**
          * 
-         * @param {'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'} itemType 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getCatalogItemByTypeAndId(itemType: GetCatalogItemByTypeAndIdItemTypeEnum, id: number, options?: any): AxiosPromise<CatalogItemResponse> {
-            return localVarFp.getCatalogItemByTypeAndId(itemType, id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} consignorPartyId 
          * @param {string} [query] 
-         * @param {Set<'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'>} [itemTypes] 
-         * @param {number} [limit] 
+         * @param {string} [consignorPartyId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCatalogItemsForWeightTicket(consignorPartyId: string, query?: string, itemTypes?: Set<GetCatalogItemsForWeightTicketItemTypesEnum>, limit?: number, options?: any): AxiosPromise<Array<CatalogItemResponse>> {
-            return localVarFp.getCatalogItemsForWeightTicket(consignorPartyId, query, itemTypes, limit, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getMaterialById1(id: number, options?: any): AxiosPromise<CatalogItemResponse> {
-            return localVarFp.getMaterialById1(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getProductById1(id: number, options?: any): AxiosPromise<CatalogItemResponse> {
-            return localVarFp.getProductById1(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} [query] 
-         * @param {Set<'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'>} [itemTypes] 
-         * @param {number} [limit] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        searchCatalogItems(query?: string, itemTypes?: Set<SearchCatalogItemsItemTypesEnum>, limit?: number, options?: any): AxiosPromise<Array<CatalogItemResponse>> {
-            return localVarFp.searchCatalogItems(query, itemTypes, limit, options).then((request) => request(axios, basePath));
+        searchCatalogItems(query?: string, consignorPartyId?: string, options?: any): AxiosPromise<Array<CatalogItemResponse>> {
+            return localVarFp.searchCatalogItems(query, consignorPartyId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -382,62 +121,13 @@ export const CatalogControllerApiFactory = function (configuration?: Configurati
 export class CatalogControllerApi extends BaseAPI {
     /**
      * 
-     * @param {'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'} itemType 
-     * @param {number} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CatalogControllerApi
-     */
-    public getCatalogItemByTypeAndId(itemType: GetCatalogItemByTypeAndIdItemTypeEnum, id: number, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).getCatalogItemByTypeAndId(itemType, id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} consignorPartyId 
      * @param {string} [query] 
-     * @param {Set<'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'>} [itemTypes] 
-     * @param {number} [limit] 
+     * @param {string} [consignorPartyId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CatalogControllerApi
      */
-    public getCatalogItemsForWeightTicket(consignorPartyId: string, query?: string, itemTypes?: Set<GetCatalogItemsForWeightTicketItemTypesEnum>, limit?: number, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).getCatalogItemsForWeightTicket(consignorPartyId, query, itemTypes, limit, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {number} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CatalogControllerApi
-     */
-    public getMaterialById1(id: number, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).getMaterialById1(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {number} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CatalogControllerApi
-     */
-    public getProductById1(id: number, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).getProductById1(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} [query] 
-     * @param {Set<'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'>} [itemTypes] 
-     * @param {number} [limit] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof CatalogControllerApi
-     */
-    public searchCatalogItems(query?: string, itemTypes?: Set<SearchCatalogItemsItemTypesEnum>, limit?: number, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).searchCatalogItems(query, itemTypes, limit, options).then((request) => request(this.axios, this.basePath));
+    public searchCatalogItems(query?: string, consignorPartyId?: string, options?: RawAxiosRequestConfig) {
+        return CatalogControllerApiFp(this.configuration).searchCatalogItems(query, consignorPartyId, options).then((request) => request(this.axios, this.basePath));
     }
 }

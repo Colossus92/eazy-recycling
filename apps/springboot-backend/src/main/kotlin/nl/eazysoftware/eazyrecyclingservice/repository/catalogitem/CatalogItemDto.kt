@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.catalogitem
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
@@ -14,7 +15,8 @@ data class CatalogItemDto(
   val id: Long? = null,
 
   @Column(name = "type", nullable = false)
-  val type: String,
+  @Enumerated(EnumType.STRING)
+  val type: CatalogItemType,
 
   @Column(name = "code", nullable = false)
   val code: String,

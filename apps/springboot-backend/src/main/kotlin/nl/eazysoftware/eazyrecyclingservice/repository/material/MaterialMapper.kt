@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
@@ -16,7 +17,7 @@ class MaterialMapper(
     fun toDto(domain: Material): CatalogItemDto {
         return CatalogItemDto(
             id = domain.id,
-            type = "MATERIAL",
+            type = CatalogItemType.MATERIAL,
             code = domain.code,
             name = domain.name,
             category = domain.materialGroupId?.let { entityManager.getReference(CatalogItemCategoryDto::class.java, it) },

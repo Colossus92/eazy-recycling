@@ -25,7 +25,13 @@ export interface WeightTicketLineView {
      * @type {string}
      * @memberof WeightTicketLineView
      */
-    'wasteStreamNumber': string;
+    'wasteStreamNumber'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketLineView
+     */
+    'catalogItemId': number;
     /**
      * 
      * @type {number}

@@ -47,10 +47,16 @@ export const MaterialsTab = () => {
       accessor: (item) => item.vatCode,
     },
     {
-      key: 'glAccountCode',
-      label: 'Grootboekrekening',
+      key: 'salesAccountNumber',
+      label: 'Grbk verkoop',
       width: '10',
-      accessor: (item) => item.glAccountCode,
+      accessor: (item) => item.salesAccountNumber,
+    },
+    {
+      key: 'purchaseAccountNumber',
+      label: 'Grbk inkoop',
+      width: '10',
+      accessor: (item) => item.purchaseAccountNumber,
     },
   ];
 

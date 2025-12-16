@@ -23,7 +23,7 @@ type MaterialFormValues = Omit<
   MaterialRequest,
   'status' | 'materialGroupId' | 'glAccountCode'
 > & {
-  materialGroupId: number | string;
+  materialGroupId: number;
   glAccountCode: string;
 };
 
@@ -44,7 +44,7 @@ export const MaterialForm = ({
     defaultValues: {
       code: '',
       name: '',
-      materialGroupId: '',
+      materialGroupId: 0,
       unitOfMeasure: '',
       vatCode: '',
       glAccountCode: '',
@@ -56,10 +56,11 @@ export const MaterialForm = ({
       reset({
         code: initialData.code,
         name: initialData.name,
-        materialGroupId: initialData.materialGroupId.toString(),
+        materialGroupId: initialData.materialGroupId,
         unitOfMeasure: initialData.unitOfMeasure,
         vatCode: initialData.vatCode,
-        glAccountCode: initialData.glAccountCode ?? '',
+        purchaseAccountNumber: initialData.purchaseAccountNumber ?? '',
+        salesAccountNumber: initialData.salesAccountNumber ?? '',
       });
     }
   }, [initialData, reset]);
@@ -68,7 +69,7 @@ export const MaterialForm = ({
     reset({
       code: '',
       name: '',
-      materialGroupId: '',
+      materialGroupId: 0,
       unitOfMeasure: '',
       vatCode: '',
       glAccountCode: '',
@@ -83,13 +84,11 @@ export const MaterialForm = ({
         await onSubmit({
           code: data.code,
           name: data.name,
-          materialGroupId:
-            typeof data.materialGroupId === 'string'
-              ? parseInt(data.materialGroupId, 10)
-              : data.materialGroupId,
+          materialGroupId: data.materialGroupId,
           unitOfMeasure: data.unitOfMeasure,
           vatCode: data.vatCode,
-          glAccountCode: data.glAccountCode || undefined,
+          salesAccountNumber: data.salesAccountNumber || undefined,
+          purchaseAccountNumber: data.purchaseAccountNumber || undefined,
           status: 'ACTIVE',
         });
         cancel();
@@ -172,11 +171,20 @@ export const MaterialForm = ({
             </div>
             <div className="flex items-start self-stretch gap-4">
               <TextFormField
-                title={'Grootboekrekening'}
+                title={'Grbk inkoop'}
                 placeholder={'Bijv. 8000'}
                 formHook={{
                   register,
-                  name: 'glAccountCode',
+                  name: 'purchaseAccountNumber',
+                  errors,
+                }}
+              />
+              <TextFormField
+                title={'Grbk verkoop'}
+                placeholder={'Bijv. 8000'}
+                formHook={{
+                  register,
+                  name: 'salesAccountNumber',
                   errors,
                 }}
               />

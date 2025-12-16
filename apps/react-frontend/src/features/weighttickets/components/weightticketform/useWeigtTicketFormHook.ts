@@ -20,7 +20,8 @@ import {
 } from '@/types/forms/locationConverters';
 
 export interface WeightTicketLineFormValues {
-  wasteStreamNumber: string;
+  catalogItemId: number | null;
+  wasteStreamNumber?: string;
   weightValue: string;
   weightUnit: string;
 }
@@ -232,7 +233,8 @@ const weightTicketDetailsToFormValues = (
     reclamation: weightTicketDetails.reclamation || '',
     note: weightTicketDetails.note || '',
     lines: (weightTicketDetails.lines || []).map((line) => ({
-      wasteStreamNumber: line.wasteStreamNumber || '',
+      catalogItemId: line.catalogItemId || null,
+      wasteStreamNumber: line.wasteStreamNumber || undefined,
       weightValue: line.weightValue?.toString() || '',
       weightUnit: line.weightUnit || 'KG',
     })),
@@ -280,13 +282,16 @@ const formValuesToWeightTicketRequest = (
     truckLicensePlate: formValues.truckLicensePlate || undefined,
     reclamation: formValues.reclamation || undefined,
     note: formValues.note || undefined,
-    lines: formValues.lines.map((line) => ({
-      wasteStreamNumber: line.wasteStreamNumber,
-      weight: {
-        value: normalizeNumberForBackend(line.weightValue) || '0',
-        unit: 'KG',
-      },
-    })),
+    lines: formValues.lines
+      .filter((line) => line.catalogItemId !== null)
+      .map((line) => ({
+        catalogItemId: line.catalogItemId!,
+        wasteStreamNumber: line.wasteStreamNumber || '',
+        weight: {
+          value: normalizeNumberForBackend(line.weightValue) || '0',
+          unit: 'KG',
+        },
+      })),
     tarraWeightValue: normalizeNumberForBackend(formValues.tarraWeightValue) || undefined,
     tarraWeightUnit: WeightTicketRequestTarraWeightUnitEnum.Kg,
     secondWeighingValue: normalizeNumberForBackend(formValues.secondWeighingValue) || undefined,

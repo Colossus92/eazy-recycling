@@ -31,6 +31,12 @@ export interface CatalogItemResponse {
      * @type {string}
      * @memberof CatalogItemResponse
      */
+    'itemType': CatalogItemResponseItemTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
     'code': string;
     /**
      * 
@@ -55,49 +61,7 @@ export interface CatalogItemResponse {
      * @type {string}
      * @memberof CatalogItemResponse
      */
-    'glAccountCode'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CatalogItemResponse
-     */
     'categoryName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CatalogItemResponse
-     */
-    'itemType': CatalogItemResponseItemTypeEnum;
-    /**
-     * 
-     * @type {number}
-     * @memberof CatalogItemResponse
-     */
-    'materialGroupId'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CatalogItemResponse
-     */
-    'productCategoryId'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof CatalogItemResponse
-     */
-    'defaultPrice'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CatalogItemResponse
-     */
-    'wasteStreamNumber'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof CatalogItemResponse
-     */
-    'materialId'?: number;
     /**
      * 
      * @type {string}
@@ -109,13 +73,25 @@ export interface CatalogItemResponse {
      * @type {string}
      * @memberof CatalogItemResponse
      */
-    'euralCode'?: string;
+    'purchaseAccountNumber'?: string;
     /**
      * 
      * @type {string}
      * @memberof CatalogItemResponse
      */
-    'processingMethodCode'?: string;
+    'salesAccountNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'wasteStreamNumber'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CatalogItemResponse
+     */
+    'defaultPrice'?: number;
 }
 
 export const CatalogItemResponseItemTypeEnum = {

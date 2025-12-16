@@ -45,7 +45,7 @@ export const WasteStreamFormGoodsSection = ({
 
   const selectedMaterialId = useWatch({
     control: formContext.control,
-    name: 'materialId',
+    name: 'catalogItemId',
   });
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export const WasteStreamFormGoodsSection = ({
             disabled={disabled}
             formHook={{
               register: formContext.register,
-              name: 'materialId',
+              name: 'catalogItemId',
               errors: formContext.formState.errors,
               control: formContext.control,
             }}

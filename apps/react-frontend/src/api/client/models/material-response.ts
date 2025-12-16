@@ -43,19 +43,19 @@ export interface MaterialResponse {
      * @type {number}
      * @memberof MaterialResponse
      */
-    'materialGroupId': number;
+    'materialGroupId'?: number;
     /**
      * 
      * @type {string}
      * @memberof MaterialResponse
      */
-    'materialGroupCode': string;
+    'materialGroupCode'?: string;
     /**
      * 
      * @type {string}
      * @memberof MaterialResponse
      */
-    'materialGroupName': string;
+    'materialGroupName'?: string;
     /**
      * 
      * @type {string}
@@ -73,7 +73,13 @@ export interface MaterialResponse {
      * @type {string}
      * @memberof MaterialResponse
      */
-    'glAccountCode'?: string;
+    'salesAccountNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
+    'purchaseAccountNumber'?: string;
     /**
      * 
      * @type {string}

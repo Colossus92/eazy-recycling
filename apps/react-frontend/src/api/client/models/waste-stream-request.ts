@@ -103,6 +103,6 @@ export interface WasteStreamRequest {
      * @type {number}
      * @memberof WasteStreamRequest
      */
-    'materialId'?: number;
+    'catalogItemId'?: number;
 }
 

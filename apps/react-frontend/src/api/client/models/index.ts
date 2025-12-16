@@ -63,8 +63,6 @@ export * from './local-date-time';
 export * from './local-time';
 export * from './material-group-request';
 export * from './material-group-response';
-export * from './material-price-request';
-export * from './material-price-response';
 export * from './material-request';
 export * from './material-response';
 export * from './no-pickup-location-request';

@@ -35,5 +35,11 @@ export interface WeightTicketLineRequest {
      * @memberof WeightTicketLineRequest
      */
     'weight': WeightRequest;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketLineRequest
+     */
+    'catalogItemId': number;
 }
 

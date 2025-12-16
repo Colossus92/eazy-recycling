@@ -1,13 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.catalog
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
-import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryDto
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductDto
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -35,30 +32,21 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var securedMockMvc: SecuredMockMvc
 
   @Autowired
-  private lateinit var materialJpaRepository: MaterialJpaRepository
+  private lateinit var catalogItemJpaRepository: CatalogItemJpaRepository
 
   @Autowired
   private lateinit var catalogItemCategoryJpaRepository: CatalogItemCategoryJpaRepository
 
   @Autowired
-  private lateinit var productJpaRepository: ProductJpaRepository
-
-  @Autowired
-  private lateinit var productCategoryJpaRepository: ProductCategoryJpaRepository
-
-  @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-  private var testMaterialCategoryId: Long? = null
-  private var testProductCategoryId: Long? = null
+  private var testCategoryId: Long? = null
   private val testVatCode = "VAT21"
 
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
-    materialJpaRepository.deleteAll()
-    productJpaRepository.deleteAll()
-    productCategoryJpaRepository.deleteAll()
+    catalogItemJpaRepository.deleteAll()
     catalogItemCategoryJpaRepository.deleteAll()
 
     if (!vatRateJpaRepository.existsById(testVatCode)) {
@@ -74,39 +62,29 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
       )
     }
 
-    val materialCategory = catalogItemCategoryJpaRepository.save(
+    val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
         type = "MATERIAL",
         code = "TEST_GROUP",
-        name = "Test Material Group",
+        name = "Test Category",
         description = "Test Description"
       )
     )
-    testMaterialCategoryId = materialCategory.id
-
-    val productCategory = productCategoryJpaRepository.save(
-      ProductCategoryDto(
-        code = "TEST_CAT",
-        name = "Test Product Category",
-        description = "Test Category Description"
-      )
-    )
-    testProductCategoryId = productCategory.id
+    testCategoryId = category.id
   }
 
   @Test
-  fun `should search catalog and return both materials and products`() {
+  fun `should search catalog items by query`() {
     // Given
-    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
-    val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
 
-    materialJpaRepository.save(
+    catalogItemJpaRepository.save(
       CatalogItemDto(
-        type = "MATERIAL",
+        type = CatalogItemType.MATERIAL,
         code = "MAT001",
         name = "Steel Pipes",
-        category = materialCategory,
+        category = category,
         consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
@@ -117,17 +95,19 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
       )
     )
 
-    productJpaRepository.save(
-      ProductDto(
+    catalogItemJpaRepository.save(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "PROD001",
-        name = "Steel Service",
-        category = productCategory,
+        name = "Steel Product",
+        category = category,
+        consignorParty = null,
         unitOfMeasure = "HOUR",
         vatRate = vatRate,
-        glAccountCode = "8100",
-        status = "ACTIVE",
+        salesAccountNumber = "8100",
+        purchaseAccountNumber = null,
         defaultPrice = BigDecimal("50.00"),
-        description = "Steel processing service"
+        status = "ACTIVE"
       )
     )
 
@@ -138,18 +118,18 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should search catalog with limit`() {
+  fun `should return all catalog items when no query provided`() {
     // Given
-    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
-    repeat(5) { i ->
-      materialJpaRepository.save(
+    repeat(3) { i ->
+      catalogItemJpaRepository.save(
         CatalogItemDto(
-          type = "MATERIAL",
+          type = CatalogItemType.MATERIAL,
           code = "MAT00$i",
           name = "Material $i",
-          category = materialCategory,
+          category = category,
           consignorParty = null,
           unitOfMeasure = "KG",
           vatRate = vatRate,
@@ -162,87 +142,46 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
     }
 
     // When & Then
-    securedMockMvc.get("/catalog/items?query=Material&limit=3")
+    securedMockMvc.get("/catalog/items")
       .andExpect(status().isOk)
       .andExpect(jsonPath("$.length()").value(3))
   }
 
   @Test
-  fun `should get material by id from catalog`() {
+  fun `should return catalog item with correct response fields`() {
     // Given
-    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
-    val material = materialJpaRepository.save(
+    catalogItemJpaRepository.save(
       CatalogItemDto(
-        type = "MATERIAL",
+        type = CatalogItemType.MATERIAL,
         code = "MAT001",
         name = "Steel Pipes",
-        category = materialCategory,
+        category = category,
         consignorParty = null,
         unitOfMeasure = "KG",
         vatRate = vatRate,
         salesAccountNumber = "8000",
-        purchaseAccountNumber = null,
-        defaultPrice = null,
+        purchaseAccountNumber = "7000",
+        defaultPrice = BigDecimal("25.00"),
         status = "ACTIVE"
       )
     )
 
     // When & Then
-    securedMockMvc.get("/catalog/materials/${material.id}")
+    securedMockMvc.get("/catalog/items?query=Steel")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(material.id))
-      .andExpect(jsonPath("$.code").value("MAT001"))
-      .andExpect(jsonPath("$.name").value("Steel Pipes"))
-      .andExpect(jsonPath("$.itemType").value("MATERIAL"))
-      .andExpect(jsonPath("$.glAccountCode").value("8000"))
-      .andExpect(jsonPath("$.categoryName").value("Test Material Group"))
-  }
-
-  @Test
-  fun `should get product by id from catalog`() {
-    // Given
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
-    val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
-
-    val product = productJpaRepository.save(
-      ProductDto(
-        code = "PROD001",
-        name = "Steel Service",
-        category = productCategory,
-        unitOfMeasure = "HOUR",
-        vatRate = vatRate,
-        glAccountCode = "8100",
-        status = "ACTIVE",
-        defaultPrice = BigDecimal("50.00"),
-        description = "Steel processing service"
-      )
-    )
-
-    // When & Then
-    securedMockMvc.get("/catalog/products/${product.id}")
-      .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(product.id))
-      .andExpect(jsonPath("$.code").value("PROD001"))
-      .andExpect(jsonPath("$.name").value("Steel Service"))
-      .andExpect(jsonPath("$.itemType").value("PRODUCT"))
-      .andExpect(jsonPath("$.glAccountCode").value("8100"))
-      .andExpect(jsonPath("$.productCategoryId").value(testProductCategoryId))
-  }
-
-  @Test
-  fun `should return 404 when material not found`() {
-    // When & Then
-    securedMockMvc.get("/catalog/materials/99999")
-      .andExpect(status().isNotFound)
-  }
-
-  @Test
-  fun `should return 404 when product not found`() {
-    // When & Then
-    securedMockMvc.get("/catalog/products/99999")
-      .andExpect(status().isNotFound)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].code").value("MAT001"))
+      .andExpect(jsonPath("$[0].name").value("Steel Pipes"))
+      .andExpect(jsonPath("$[0].itemType").value("MATERIAL"))
+      .andExpect(jsonPath("$[0].unitOfMeasure").value("KG"))
+      .andExpect(jsonPath("$[0].vatCode").value(testVatCode))
+      .andExpect(jsonPath("$[0].categoryName").value("Test Category"))
+      .andExpect(jsonPath("$[0].salesAccountNumber").value("8000"))
+      .andExpect(jsonPath("$[0].purchaseAccountNumber").value("7000"))
+      .andExpect(jsonPath("$[0].defaultPrice").value(25.00))
   }
 
   @Test
@@ -251,93 +190,5 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
     securedMockMvc.get("/catalog/items?query=NonExistent")
       .andExpect(status().isOk)
       .andExpect(jsonPath("$.length()").value(0))
-  }
-
-  @Test
-  fun `should filter by type MATERIAL`() {
-    // Given
-    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
-    val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
-
-    materialJpaRepository.save(
-      CatalogItemDto(
-        type = "MATERIAL",
-        code = "MAT001",
-        name = "Test Item",
-        category = materialCategory,
-        consignorParty = null,
-        unitOfMeasure = "KG",
-        vatRate = vatRate,
-        salesAccountNumber = null,
-        purchaseAccountNumber = null,
-        defaultPrice = null,
-        status = "ACTIVE"
-      )
-    )
-
-    productJpaRepository.save(
-      ProductDto(
-        code = "PROD001",
-        name = "Test Item",
-        category = productCategory,
-        unitOfMeasure = "HOUR",
-        vatRate = vatRate,
-        glAccountCode = null,
-        status = "ACTIVE",
-        defaultPrice = null,
-        description = null
-      )
-    )
-
-    // When & Then
-    securedMockMvc.get("/catalog/items?query=Test&itemTypes=MATERIAL")
-      .andExpect(status().isOk)
-      .andExpect(jsonPath("$.length()").value(1))
-      .andExpect(jsonPath("$[0].itemType").value("MATERIAL"))
-  }
-
-  @Test
-  fun `should filter by type PRODUCT`() {
-    // Given
-    val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
-    val productCategory = productCategoryJpaRepository.findById(testProductCategoryId!!).get()
-
-    materialJpaRepository.save(
-      CatalogItemDto(
-        type = "MATERIAL",
-        code = "MAT001",
-        name = "Test Item",
-        category = materialCategory,
-        consignorParty = null,
-        unitOfMeasure = "KG",
-        vatRate = vatRate,
-        salesAccountNumber = null,
-        purchaseAccountNumber = null,
-        defaultPrice = null,
-        status = "ACTIVE"
-      )
-    )
-
-    productJpaRepository.save(
-      ProductDto(
-        code = "PROD001",
-        name = "Test Item",
-        category = productCategory,
-        unitOfMeasure = "HOUR",
-        vatRate = vatRate,
-        glAccountCode = null,
-        status = "ACTIVE",
-        defaultPrice = null,
-        description = null
-      )
-    )
-
-    // When & Then
-    securedMockMvc.get("/catalog/items?query=Test&itemTypes=PRODUCT")
-      .andExpect(status().isOk)
-      .andExpect(jsonPath("$.length()").value(1))
-      .andExpect(jsonPath("$[0].itemType").value("PRODUCT"))
   }
 }

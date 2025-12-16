@@ -38,7 +38,7 @@ export interface WasteStreamFormValues {
   /**
    * Reference to the generic material this waste stream is linked to
    */
-  materialId: string;
+  catalogItemId: string;
 }
 
 export const fieldsToValidate: Array<Array<keyof WasteStreamFormValues>> = [
@@ -72,7 +72,7 @@ export function useWasteStreamForm(
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
-      materialId: '',
+      catalogItemId: '',
     },
   });
 
@@ -189,7 +189,7 @@ export function useWasteStreamForm(
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
-      materialId: '',
+      catalogItemId: '',
     });
   };
 
@@ -248,7 +248,7 @@ const wasteStreamDetailsToFormValues = (
     goodsName: wasteStreamDetails.wasteType.name,
     processingMethodCode: wasteStreamDetails.wasteType.processingMethod.code,
     euralCode: wasteStreamDetails.wasteType.euralCode.code,
-    materialId: wasteStreamDetails.materialId?.toString() || '',
+    catalogItemId: wasteStreamDetails.catalogItemId?.toString() || '',
   };
 };
 
@@ -273,6 +273,6 @@ const formValuesToCreateWasteStreamRequest = (
     } as any,
     consignorClassification: Number(formValues.consignorClassification),
     pickupParty: formValues.pickupPartyId,
-    materialId: formValues.materialId ? Number(formValues.materialId) : undefined,
+    catalogItemId: formValues.catalogItemId ? Number(formValues.catalogItemId) : undefined,
   };
 };
