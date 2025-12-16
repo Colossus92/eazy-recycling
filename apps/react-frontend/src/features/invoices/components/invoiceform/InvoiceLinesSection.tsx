@@ -1,6 +1,11 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
-import { FieldArrayWithId, useFieldArray, useFormContext, useWatch, } from 'react-hook-form';
+import {
+  FieldArrayWithId,
+  useFieldArray,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 import { InvoiceFormValues, InvoiceLineFormValue } from './useInvoiceFormHook';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
 import { useMemo } from 'react';
