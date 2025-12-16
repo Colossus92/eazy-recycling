@@ -25,18 +25,6 @@ export interface MaterialPriceRequest {
      * @type {number}
      * @memberof MaterialPriceRequest
      */
-    'materialId': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof MaterialPriceRequest
-     */
     'price': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceRequest
-     */
-    'currency': string;
 }
 

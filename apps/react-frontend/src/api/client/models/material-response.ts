@@ -82,6 +82,12 @@ export interface MaterialResponse {
     'purchaseAccountNumber'?: string;
     /**
      * 
+     * @type {number}
+     * @memberof MaterialResponse
+     */
+    'defaultPrice'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof MaterialResponse
      */

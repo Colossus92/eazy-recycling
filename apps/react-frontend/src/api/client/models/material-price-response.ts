@@ -28,69 +28,39 @@ export interface MaterialPriceResponse {
     'id': number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof MaterialPriceResponse
      */
-    'materialId': number;
+    'code': string;
     /**
      * 
      * @type {string}
      * @memberof MaterialPriceResponse
      */
-    'materialCode': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceResponse
-     */
-    'materialName': string;
+    'name': string;
     /**
      * 
      * @type {number}
      * @memberof MaterialPriceResponse
      */
-    'price': number;
+    'materialGroupId'?: number;
     /**
      * 
      * @type {string}
      * @memberof MaterialPriceResponse
      */
-    'currency': string;
+    'materialGroupName'?: string;
     /**
      * 
      * @type {string}
      * @memberof MaterialPriceResponse
      */
-    'validFrom': string;
+    'unitOfMeasure': string;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof MaterialPriceResponse
      */
-    'validTo'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceResponse
-     */
-    'createdAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceResponse
-     */
-    'createdByName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceResponse
-     */
-    'updatedAt'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MaterialPriceResponse
-     */
-    'updatedByName'?: string;
+    'defaultPrice'?: number;
 }
 

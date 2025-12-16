@@ -17,6 +17,7 @@ interface MaterialQueryResult {
     fun getVatCode(): String
     fun getSalesAccountNumber(): String?
     fun getPurchaseAccountNumber(): String?
+    fun getDefaultPrice(): java.math.BigDecimal?
     fun getStatus(): String
     fun getCreatedAt(): Instant?
     fun getCreatedBy(): String?

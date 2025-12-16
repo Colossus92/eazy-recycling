@@ -34,14 +34,18 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
     return {
         /**
          * 
+         * @param {number} id 
          * @param {MaterialPriceRequest} materialPriceRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        createPrice: async (materialPriceRequest: MaterialPriceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createMaterialPrice: async (id: number, materialPriceRequest: MaterialPriceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('createMaterialPrice', 'id', id)
             // verify required parameter 'materialPriceRequest' is not null or undefined
-            assertParamExists('createPrice', 'materialPriceRequest', materialPriceRequest)
-            const localVarPath = `/material-prices`;
+            assertParamExists('createMaterialPrice', 'materialPriceRequest', materialPriceRequest)
+            const localVarPath = `/material-prices/{id}`
+                .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -75,9 +79,9 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        deletePrice: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteMaterialPrice: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('deletePrice', 'id', id)
+            assertParamExists('deleteMaterialPrice', 'id', id)
             const localVarPath = `/material-prices/{id}`
                 .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -106,45 +110,10 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
-         * @param {number} materialId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getActivePricesByMaterialId: async (materialId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'materialId' is not null or undefined
-            assertParamExists('getActivePricesByMaterialId', 'materialId', materialId)
-            const localVarPath = `/material-prices/material/{materialId}`
-                .replace(`{materialId}`, encodeURIComponent(String(materialId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}}
-         */
-        getAllActivePrices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAllMaterialsWithPrices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/material-prices`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -176,9 +145,9 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getPriceById: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMaterialPrice: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('getPriceById', 'id', id)
+            assertParamExists('getMaterialPrice', 'id', id)
             const localVarPath = `/material-prices/{id}`
                 .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -212,11 +181,11 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        updatePrice: async (id: number, materialPriceRequest: MaterialPriceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        updateMaterialPrice: async (id: number, materialPriceRequest: MaterialPriceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('updatePrice', 'id', id)
+            assertParamExists('updateMaterialPrice', 'id', id)
             // verify required parameter 'materialPriceRequest' is not null or undefined
-            assertParamExists('updatePrice', 'materialPriceRequest', materialPriceRequest)
+            assertParamExists('updateMaterialPrice', 'materialPriceRequest', materialPriceRequest)
             const localVarPath = `/material-prices/{id}`
                 .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -257,14 +226,15 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
     return {
         /**
          * 
+         * @param {number} id 
          * @param {MaterialPriceRequest} materialPriceRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createPrice(materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createPrice(materialPriceRequest, options);
+        async createMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMaterialPrice(id, materialPriceRequest, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.createPrice']?.[index]?.url;
+            const operationBasePath = operationServerMap['MaterialPriceControllerApi.createMaterialPrice']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -273,22 +243,10 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deletePrice(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deletePrice(id, options);
+        async deleteMaterialPrice(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMaterialPrice(id, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.deletePrice']?.[index]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {number} materialId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getActivePricesByMaterialId(materialId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MaterialPriceResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getActivePricesByMaterialId(materialId, options);
-            const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.getActivePricesByMaterialId']?.[index]?.url;
+            const operationBasePath = operationServerMap['MaterialPriceControllerApi.deleteMaterialPrice']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -296,10 +254,10 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllActivePrices(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MaterialPriceResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllActivePrices(options);
+        async getAllMaterialsWithPrices(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MaterialPriceResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllMaterialsWithPrices(options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.getAllActivePrices']?.[index]?.url;
+            const operationBasePath = operationServerMap['MaterialPriceControllerApi.getAllMaterialsWithPrices']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -308,10 +266,10 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPriceById(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getPriceById(id, options);
+        async getMaterialPrice(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMaterialPrice(id, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.getPriceById']?.[index]?.url;
+            const operationBasePath = operationServerMap['MaterialPriceControllerApi.getMaterialPrice']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -321,10 +279,10 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updatePrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePrice(id, materialPriceRequest, options);
+        async updateMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MaterialPriceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMaterialPrice(id, materialPriceRequest, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['MaterialPriceControllerApi.updatePrice']?.[index]?.url;
+            const operationBasePath = operationServerMap['MaterialPriceControllerApi.updateMaterialPrice']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
     };
@@ -338,12 +296,13 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
     return {
         /**
          * 
+         * @param {number} id 
          * @param {MaterialPriceRequest} materialPriceRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createPrice(materialPriceRequest: MaterialPriceRequest, options?: any): AxiosPromise<MaterialPriceResponse> {
-            return localVarFp.createPrice(materialPriceRequest, options).then((request) => request(axios, basePath));
+        createMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: any): AxiosPromise<MaterialPriceResponse> {
+            return localVarFp.createMaterialPrice(id, materialPriceRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -351,25 +310,16 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deletePrice(id: number, options?: any): AxiosPromise<void> {
-            return localVarFp.deletePrice(id, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {number} materialId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getActivePricesByMaterialId(materialId: number, options?: any): AxiosPromise<Array<MaterialPriceResponse>> {
-            return localVarFp.getActivePricesByMaterialId(materialId, options).then((request) => request(axios, basePath));
+        deleteMaterialPrice(id: number, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteMaterialPrice(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllActivePrices(options?: any): AxiosPromise<Array<MaterialPriceResponse>> {
-            return localVarFp.getAllActivePrices(options).then((request) => request(axios, basePath));
+        getAllMaterialsWithPrices(options?: any): AxiosPromise<Array<MaterialPriceResponse>> {
+            return localVarFp.getAllMaterialsWithPrices(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -377,8 +327,8 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPriceById(id: number, options?: any): AxiosPromise<MaterialPriceResponse> {
-            return localVarFp.getPriceById(id, options).then((request) => request(axios, basePath));
+        getMaterialPrice(id: number, options?: any): AxiosPromise<MaterialPriceResponse> {
+            return localVarFp.getMaterialPrice(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -387,8 +337,8 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updatePrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: any): AxiosPromise<MaterialPriceResponse> {
-            return localVarFp.updatePrice(id, materialPriceRequest, options).then((request) => request(axios, basePath));
+        updateMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: any): AxiosPromise<MaterialPriceResponse> {
+            return localVarFp.updateMaterialPrice(id, materialPriceRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -399,13 +349,14 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
 export class MaterialPriceControllerApi extends BaseAPI {
     /**
      * 
+     * @param {number} id 
      * @param {MaterialPriceRequest} materialPriceRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public createPrice(materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).createPrice(materialPriceRequest, options).then((request) => request(this.axios, this.basePath));
+    public createMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).createMaterialPrice(id, materialPriceRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -415,19 +366,8 @@ export class MaterialPriceControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public deletePrice(id: number, options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).deletePrice(id, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {number} materialId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MaterialPriceControllerApi
-     */
-    public getActivePricesByMaterialId(materialId: number, options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).getActivePricesByMaterialId(materialId, options).then((request) => request(this.axios, this.basePath));
+    public deleteMaterialPrice(id: number, options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).deleteMaterialPrice(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -436,8 +376,8 @@ export class MaterialPriceControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public getAllActivePrices(options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).getAllActivePrices(options).then((request) => request(this.axios, this.basePath));
+    public getAllMaterialsWithPrices(options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).getAllMaterialsWithPrices(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -447,8 +387,8 @@ export class MaterialPriceControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public getPriceById(id: number, options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).getPriceById(id, options).then((request) => request(this.axios, this.basePath));
+    public getMaterialPrice(id: number, options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).getMaterialPrice(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -459,7 +399,7 @@ export class MaterialPriceControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public updatePrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).updatePrice(id, materialPriceRequest, options).then((request) => request(this.axios, this.basePath));
+    public updateMaterialPrice(id: number, materialPriceRequest: MaterialPriceRequest, options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).updateMaterialPrice(id, materialPriceRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

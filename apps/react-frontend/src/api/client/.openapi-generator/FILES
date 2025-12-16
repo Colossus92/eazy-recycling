@@ -9,6 +9,7 @@ apis/exact-online-controller-api.ts
 apis/lma-import-controller-api.ts
 apis/material-controller-api.ts
 apis/material-group-controller-api.ts
+apis/material-price-controller-api.ts
 apis/planning-controller-api.ts
 apis/processing-method-controller-api.ts
 apis/product-category-controller-api.ts
@@ -92,6 +93,8 @@ models/local-date.ts
 models/local-time.ts
 models/material-group-request.ts
 models/material-group-response.ts
+models/material-price-request.ts
+models/material-price-response.ts
 models/material-request.ts
 models/material-response.ts
 models/no-pickup-location-request.ts

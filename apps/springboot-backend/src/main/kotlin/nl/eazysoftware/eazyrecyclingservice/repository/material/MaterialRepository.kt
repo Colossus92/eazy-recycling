@@ -4,9 +4,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Materials
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import java.math.BigDecimal
 
 interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
 
@@ -23,6 +25,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
                 ci.vat_code as vatCode,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
+                ci.default_price as defaultPrice,
                 ci.status as status,
                 ci.created_at as createdAt,
                 ci.created_by as createdBy,
@@ -49,6 +52,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
                 ci.vat_code as vatCode,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
+                ci.default_price as defaultPrice,
                 ci.status as status,
                 ci.created_at as createdAt,
                 ci.created_by as createdBy,
@@ -75,6 +79,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
                 ci.vat_code as vatCode,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
+                ci.default_price as defaultPrice,
                 ci.status as status,
                 ci.created_at as createdAt,
                 ci.created_by as createdBy,
@@ -90,6 +95,17 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
         nativeQuery = true
     )
     fun searchMaterials(query: String): List<MaterialQueryResult>
+
+    @Modifying
+    @Query(
+        value = """
+            UPDATE catalog_items 
+            SET default_price = :price, last_modified_at = NOW()
+            WHERE id = :id AND type = 'MATERIAL'
+        """,
+        nativeQuery = true
+    )
+    fun updateMaterialPrice(id: Long, price: BigDecimal?): Int
 }
 
 @Repository
@@ -128,5 +144,9 @@ class MaterialRepository(
 
     override fun searchMaterials(query: String, limit: Int): List<MaterialQueryResult> {
         return jpaRepository.searchMaterials(query).take(limit)
+    }
+
+    override fun updateMaterialPrice(id: Long, price: BigDecimal?): Boolean {
+        return jpaRepository.updateMaterialPrice(id, price) > 0
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.math.BigDecimal
 
 @RestController
 @RequestMapping("/materials")
@@ -125,6 +126,7 @@ data class MaterialResponse(
   val vatCode: String,
   val salesAccountNumber: String?,
   val purchaseAccountNumber: String?,
+  val defaultPrice: BigDecimal?,
   val status: String,
   val createdAt: String?,
   val createdByName: String?,
@@ -144,6 +146,7 @@ fun MaterialQueryResult.toResponse(): MaterialResponse {
         vatCode = getVatCode(),
         salesAccountNumber = getSalesAccountNumber(),
         purchaseAccountNumber = getPurchaseAccountNumber(),
+        defaultPrice = getDefaultPrice(),
         status = getStatus(),
         createdAt = getCreatedAt()?.toString(),
         createdByName = getCreatedBy(),
