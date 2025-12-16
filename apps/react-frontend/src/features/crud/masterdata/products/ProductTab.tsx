@@ -13,7 +13,7 @@ export const ProductsTab = () => {
     {
       key: 'code',
       label: 'Code',
-      width: '12',
+      width: '15',
       accessor: (item) => item.code,
     },
     {
@@ -35,25 +35,25 @@ export const ProductsTab = () => {
       accessor: (item) => item.vatCode,
     },
     {
-      key: 'glAccountCode',
-      label: 'Grootboekrekening',
-      width: '12',
-      accessor: (item) => item.glAccountCode,
+      key: 'salesAccountNumber',
+      label: 'Grbk verkoop',
+      width: '10',
+      accessor: (item) => item.salesAccountNumber,
+    },
+    {
+      key: 'purchaseAccountNumber',
+      label: 'Grbk inkoop',
+      width: '10',
+      accessor: (item) => item.purchaseAccountNumber,
     },
     {
       key: 'defaultPrice',
       label: 'Standaardprijs',
       width: '12',
       accessor: (item) =>
-        item.defaultPrice !== undefined
+        item.defaultPrice !== undefined && item.defaultPrice !== null
           ? `€ ${item.defaultPrice.toFixed(2)}`
           : undefined,
-    },
-    {
-      key: 'description',
-      label: 'Beschrijving',
-      width: '24',
-      accessor: (item) => item.description,
     },
   ];
 

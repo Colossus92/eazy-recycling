@@ -46,16 +46,16 @@ export interface ApplicationContext {
     'displayName'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof ApplicationContext
-     */
-    'startupDate'?: number;
-    /**
-     * 
      * @type {string}
      * @memberof ApplicationContext
      */
     'applicationName'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ApplicationContext
+     */
+    'startupDate'?: number;
     /**
      * 
      * @type {any}

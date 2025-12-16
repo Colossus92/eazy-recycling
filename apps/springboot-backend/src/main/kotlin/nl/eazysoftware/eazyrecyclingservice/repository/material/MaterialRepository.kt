@@ -176,10 +176,10 @@ class MaterialRepository(
       status = material.status
     )
     if (rowsUpdated == 0) {
-      throw IllegalArgumentException("Material with id $id not found or is not a MATERIAL type")
+      throw IllegalArgumentException("Materiaal met $id niet gevonden")
     }
     return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
-      ?: throw IllegalStateException("Failed to retrieve updated material with id $id")
+      ?: throw IllegalStateException("Het ophalen van materiaal met id $id is mislukt")
   }
 
   override fun deleteMaterial(id: Long) {

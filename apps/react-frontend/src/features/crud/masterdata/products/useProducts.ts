@@ -32,10 +32,10 @@ export const useProductsCrud = () => {
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           product.vatCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.glAccountCode
+          product.purchaseAccountNumber
             ?.toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
-          product.description
+          product.salesAccountNumber
             ?.toLowerCase()
             .includes(searchQuery.toLowerCase())
         );

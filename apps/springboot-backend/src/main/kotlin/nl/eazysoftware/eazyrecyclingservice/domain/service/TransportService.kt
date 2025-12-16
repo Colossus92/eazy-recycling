@@ -22,7 +22,7 @@ class TransportService(
 
     fun getTransportById(id: UUID): TransportDto {
         return transportRepository.findByIdOrNull(id)
-            ?: throw EntityNotFoundException("Transport with id $id not found")
+            ?: throw EntityNotFoundException("Transport met id $id niet gevonden")
     }
 
     fun markTransportAsFinished(id: UUID, transportHours: Double, driverNote: String): TransportDto {

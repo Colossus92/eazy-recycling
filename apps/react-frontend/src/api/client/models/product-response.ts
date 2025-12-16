@@ -61,7 +61,13 @@ export interface ProductResponse {
      * @type {string}
      * @memberof ProductResponse
      */
-    'glAccountCode'?: string;
+    'salesAccountNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductResponse
+     */
+    'purchaseAccountNumber'?: string;
     /**
      * 
      * @type {string}
@@ -74,12 +80,6 @@ export interface ProductResponse {
      * @memberof ProductResponse
      */
     'defaultPrice'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProductResponse
-     */
-    'description'?: string;
     /**
      * 
      * @type {string}

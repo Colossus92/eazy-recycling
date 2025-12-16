@@ -28,7 +28,7 @@ class MaterialPriceController(
     @GetMapping("/{id}")
     fun getMaterialPrice(@PathVariable id: Long): MaterialPriceResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
         return material.toPriceResponse()
     }
 
@@ -40,19 +40,19 @@ class MaterialPriceController(
         @Valid @RequestBody request: MaterialPriceRequest
     ): MaterialPriceResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
         if (material.getDefaultPrice() != null) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "Material with id $id already has a price. Use PUT to update.")
+            throw ResponseStatusException(HttpStatus.CONFLICT, "Materiaal met id $id heeft al een prijs. Update de bestaande prijs om aan te passen.")
         }
 
         val updated = materials.updateMaterialPrice(id, request.price)
         if (!updated) {
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create price for material")
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het aanmaken van een prijs voor het materiaal is mislukt")
         }
 
         return materials.getMaterialWithGroupDetailsById(id)?.toPriceResponse()
-            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve updated material")
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het ophalen van de aangepaste prijs is mislukt")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -63,7 +63,7 @@ class MaterialPriceController(
         @Valid @RequestBody request: MaterialPriceRequest
     ): MaterialPriceResponse {
         materials.getMaterialWithGroupDetailsById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
         val updated = materials.updateMaterialPrice(id, request.price)
         if (!updated) {
@@ -80,7 +80,7 @@ class MaterialPriceController(
     @Transactional
     fun deleteMaterialPrice(@PathVariable id: Long) {
         materials.getMaterialWithGroupDetailsById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
         val updated = materials.updateMaterialPrice(id, null)
         if (!updated) {

@@ -55,7 +55,13 @@ export interface ProductRequest {
      * @type {string}
      * @memberof ProductRequest
      */
-    'glAccountCode'?: string;
+    'salesAccountNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductRequest
+     */
+    'purchaseAccountNumber'?: string;
     /**
      * 
      * @type {string}
@@ -68,11 +74,5 @@ export interface ProductRequest {
      * @memberof ProductRequest
      */
     'defaultPrice'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ProductRequest
-     */
-    'description'?: string;
 }
 

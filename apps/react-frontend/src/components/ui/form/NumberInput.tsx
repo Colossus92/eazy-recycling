@@ -1,4 +1,4 @@
-import { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { FieldValues } from 'react-hook-form';
 import { FormProps } from './TextFormField.tsx';
@@ -26,15 +26,64 @@ const parseNumber = (value: string | number | undefined): number => {
   return parseFloat(normalizedValue);
 };
 
+/**
+ * Calculate decimal places from step value
+ */
+const getDecimalPlaces = (step: number | string): number => {
+  if (step === 'any') return 2;
+  const stepNum = typeof step === 'string' ? parseFloat(step) : step;
+  if (isNaN(stepNum) || stepNum <= 0) return 2;
+  return stepNum >= 1 ? 0 : Math.max(0, Math.round(-Math.log10(stepNum)));
+};
+
+/**
+ * Format a number value according to the step precision
+ */
+const formatValue = (value: string | number | undefined, step: number | string): string => {
+  const parsed = parseNumber(value);
+  if (isNaN(parsed)) return '';
+  return parsed.toFixed(getDecimalPlaces(step));
+};
+
 export const NumberInput = <TFieldValues extends FieldValues>({
   disabled = false,
   placeholder,
   formHook,
   step = 'any',
   onBlur: propsOnBlur,
+  defaultValue,
   ...props
 }: InputProps<TFieldValues>) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const fieldError = getFieldError(formHook?.errors, formHook?.name);
+
+  // Get register result to extract the ref
+  const registerResult = formHook?.register && formHook?.name
+    ? formHook.register(formHook.name, {
+        ...(formHook?.rules || {}),
+        setValueAs: (v: string) => {
+          if (v === '' || v === null || v === undefined) return undefined;
+          const parsed = parseNumber(v);
+          return isNaN(parsed) ? undefined : parsed;
+        }
+      } as any)
+    : null;
+
+  // Merge refs: our local ref + react-hook-form's ref
+  const setRef = (element: HTMLInputElement | null) => {
+    inputRef.current = element;
+    if (registerResult?.ref) {
+      registerResult.ref(element);
+    }
+  };
+
+  // Format the input value on initial render and when defaultValue changes
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value) {
+      inputRef.current.value = formatValue(inputRef.current.value, step);
+    }
+  }, [defaultValue, step]);
+
   const textColorClasses = disabled
     ? formInputClasses.text.disabled
     : formInputClasses.text.default;
@@ -48,21 +97,9 @@ export const NumberInput = <TFieldValues extends FieldValues>({
     : formInputClasses.background.hover;
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const parsed = parseNumber(value);
-    if (!isNaN(parsed)) {
-      // Determine decimal places based on step value
-      // step = 1 → 0 decimals, step = 0.1 → 1 decimal, step = 0.01 → 2 decimals
-      let decimalPlaces = 2; // default for 'any'
-      if (step !== 'any') {
-        const stepNum = typeof step === 'string' ? parseFloat(step) : step;
-        if (!isNaN(stepNum) && stepNum > 0) {
-          // Calculate decimal places from step: -log10(step) gives us the number of decimals
-          // For step=1: -log10(1) = 0, step=0.1: -log10(0.1) = 1, step=0.01: -log10(0.01) = 2
-          decimalPlaces = stepNum >= 1 ? 0 : Math.max(0, Math.round(-Math.log10(stepNum)));
-        }
-      }
-      e.target.value = parsed.toFixed(decimalPlaces);
+    const formatted = formatValue(e.target.value, step);
+    if (formatted) {
+      e.target.value = formatted;
     }
     propsOnBlur?.(e);
   };
@@ -70,6 +107,7 @@ export const NumberInput = <TFieldValues extends FieldValues>({
   return (
     <div className={clsx(formInputClasses.container, textColorClasses)}>
       <input
+        ref={setRef}
         type={'number'}
         step={step}
         placeholder={placeholder}
@@ -83,16 +121,9 @@ export const NumberInput = <TFieldValues extends FieldValues>({
           textColorClasses
         )}
         disabled={disabled}
-        {...(formHook?.register && formHook?.name
-          ? formHook?.register(formHook?.name, { 
-              ...(formHook?.rules || {}), 
-              setValueAs: (v: string) => {
-                if (v === '' || v === null || v === undefined) return undefined;
-                const parsed = parseNumber(v);
-                return isNaN(parsed) ? undefined : parsed;
-              }
-            } as any)
-          : {})}
+        defaultValue={defaultValue}
+        name={registerResult?.name}
+        onChange={registerResult?.onChange}
         {...props}
         onBlur={handleBlur}
       />

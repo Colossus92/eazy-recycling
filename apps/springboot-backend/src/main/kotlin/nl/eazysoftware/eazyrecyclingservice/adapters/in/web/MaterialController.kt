@@ -29,7 +29,7 @@ class MaterialController(
     @GetMapping("/{id}")
     fun getMaterialById(@PathVariable id: Long): MaterialResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
         return material.toResponse()
     }
 
@@ -42,7 +42,7 @@ class MaterialController(
         // Fetch with group details for response
         return materials.getMaterialWithGroupDetailsById(created.id!!)
             ?.toResponse()
-            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve created material")
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het ophalen van het materiaal is mislukt")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -53,14 +53,14 @@ class MaterialController(
     ): MaterialResponse {
         // Check if material exists
         materials.getMaterialById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
         val material = request.toDomain()
         materials.updateMaterial(id, material)
         // Fetch with group details for response
         return materials.getMaterialWithGroupDetailsById(id)
             ?.toResponse()
-            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve updated material")
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het ophalen van het aangepaste materiaal is mislukt")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -69,7 +69,7 @@ class MaterialController(
     fun deleteMaterial(@PathVariable id: Long) {
         // Check if material exists
         materials.getMaterialById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
         materials.deleteMaterial(id)
     }

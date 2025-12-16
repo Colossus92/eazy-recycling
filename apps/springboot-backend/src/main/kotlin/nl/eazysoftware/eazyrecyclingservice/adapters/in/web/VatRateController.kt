@@ -33,7 +33,7 @@ class VatRateController(
     @GetMapping("/{vatCode}")
     fun getVatRateByCode(@PathVariable vatCode: String): VatRateResponse {
         val vatRate = vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
         return vatRate.toResponse()
     }
 
@@ -54,7 +54,7 @@ class VatRateController(
     ): VatRateResponse {
         // Check if VAT rate exists
         vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
 
         val vatRate = request.toDomain(vatCode)
         val updated = vatRates.updateVatRate(vatCode, vatRate)
@@ -67,7 +67,7 @@ class VatRateController(
     fun deleteVatRate(@PathVariable vatCode: String) {
         // Check if VAT rate exists
         vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "VAT rate with code $vatCode not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
 
         vatRates.deleteVatRate(vatCode)
     }

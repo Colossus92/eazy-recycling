@@ -1,7 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.product
 
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.product.Product
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import org.springframework.stereotype.Component
 import kotlin.time.toKotlinInstant
@@ -11,22 +14,24 @@ class ProductMapper(
     private val entityManager: EntityManager
 ) {
 
-    fun toDto(domain: Product): ProductDto {
-        return ProductDto(
+    fun toDto(domain: Product): CatalogItemDto {
+        return CatalogItemDto(
             id = domain.id,
+            type = CatalogItemType.PRODUCT,
             code = domain.code,
             name = domain.name,
-            category = domain.categoryId?.let { entityManager.getReference(ProductCategoryDto::class.java, it) },
+            category = domain.categoryId?.let { entityManager.getReference(CatalogItemCategoryDto::class.java, it) },
             unitOfMeasure = domain.unitOfMeasure,
             vatRate = entityManager.getReference(VatRateDto::class.java, domain.vatCode),
-            glAccountCode = domain.glAccountCode,
-            status = domain.status,
+            consignorParty = null,
             defaultPrice = domain.defaultPrice,
-            description = domain.description,
+            status = domain.status,
+            purchaseAccountNumber = domain.purchaseAccountNumber,
+            salesAccountNumber = domain.salesAccountNumber,
         )
     }
 
-    fun toDomain(dto: ProductDto): Product {
+    fun toDomain(dto: CatalogItemDto): Product {
         return Product(
             id = dto.id,
             code = dto.code,
@@ -35,10 +40,10 @@ class ProductMapper(
             categoryName = dto.category?.name,
             unitOfMeasure = dto.unitOfMeasure,
             vatCode = dto.vatRate.vatCode,
-            glAccountCode = dto.glAccountCode,
+            salesAccountNumber = dto.salesAccountNumber,
+            purchaseAccountNumber = dto.purchaseAccountNumber,
             status = dto.status,
             defaultPrice = dto.defaultPrice,
-            description = dto.description,
             createdAt = dto.createdAt?.toKotlinInstant(),
             createdBy = dto.createdBy,
             updatedAt = dto.updatedAt?.toKotlinInstant(),

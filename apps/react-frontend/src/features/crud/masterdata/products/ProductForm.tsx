@@ -11,6 +11,7 @@ import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { NumberFormField } from '@/components/ui/form/NumberFormField';
 
 interface ProductFormProps {
   isOpen: boolean;
@@ -21,12 +22,8 @@ interface ProductFormProps {
 
 type ProductFormValues = Omit<
   ProductRequest,
-  'status' | 'categoryId' | 'glAccountCode' | 'defaultPrice'
-> & {
-  categoryId: number | string;
-  glAccountCode: string;
-  defaultPrice: string;
-};
+  'status'
+>;
 
 export const ProductForm = ({
   isOpen,
@@ -45,12 +42,12 @@ export const ProductForm = ({
     defaultValues: {
       code: '',
       name: '',
-      categoryId: '',
+      categoryId: undefined,
       unitOfMeasure: '',
       vatCode: '',
-      glAccountCode: '',
-      defaultPrice: '',
-      description: '',
+      salesAccountNumber: '',
+      purchaseAccountNumber: '',
+      defaultPrice: undefined,
     },
   });
 
@@ -59,12 +56,12 @@ export const ProductForm = ({
       reset({
         code: initialData.code,
         name: initialData.name,
-        categoryId: initialData.categoryId?.toString() ?? '',
+        categoryId: initialData.categoryId,
         unitOfMeasure: initialData.unitOfMeasure,
         vatCode: initialData.vatCode,
-        glAccountCode: initialData.glAccountCode ?? '',
-        defaultPrice: initialData.defaultPrice?.toString() ?? '',
-        description: initialData.description ?? '',
+        salesAccountNumber: initialData.salesAccountNumber ?? '',
+        purchaseAccountNumber: initialData.purchaseAccountNumber ?? '',
+        defaultPrice: initialData.defaultPrice,
       });
     }
   }, [initialData, reset]);
@@ -73,12 +70,12 @@ export const ProductForm = ({
     reset({
       code: '',
       name: '',
-      categoryId: '',
+      categoryId: undefined,
       unitOfMeasure: '',
       vatCode: '',
-      glAccountCode: '',
-      defaultPrice: '',
-      description: '',
+      salesAccountNumber: '',
+      purchaseAccountNumber: '',
+      defaultPrice: undefined,
     });
     onCancel();
   };
@@ -91,18 +88,16 @@ export const ProductForm = ({
           code: data.code,
           name: data.name,
           categoryId:
-            data.categoryId && data.categoryId !== ''
+            data.categoryId && data.categoryId !== undefined
               ? typeof data.categoryId === 'string'
                 ? parseInt(data.categoryId, 10)
                 : data.categoryId
               : undefined,
           unitOfMeasure: data.unitOfMeasure,
           vatCode: data.vatCode,
-          glAccountCode: data.glAccountCode || undefined,
-          defaultPrice: data.defaultPrice
-            ? parseFloat(data.defaultPrice)
-            : undefined,
-          description: data.description || undefined,
+          salesAccountNumber: data.salesAccountNumber || undefined,
+          purchaseAccountNumber: data.purchaseAccountNumber || undefined,
+          defaultPrice: data.defaultPrice,
           status: 'ACTIVE',
         });
         cancel();
@@ -184,33 +179,34 @@ export const ProductForm = ({
             </div>
             <div className="flex items-start self-stretch gap-4">
               <TextFormField
-                title={'Grootboekrekening'}
-                placeholder={'Bijv. 8100'}
+                title={'Grbk inkoop'}
+                placeholder={'Bijv. 8000'}
                 formHook={{
                   register,
-                  name: 'glAccountCode',
+                  name: 'purchaseAccountNumber',
                   errors,
                 }}
               />
               <TextFormField
-                title={'Standaardprijs'}
-                placeholder={'Bijv. 50.00'}
+                title={'Grbk verkoop'}
+                placeholder={'Bijv. 8000'}
                 formHook={{
                   register,
-                  name: 'defaultPrice',
+                  name: 'salesAccountNumber',
                   errors,
                 }}
               />
             </div>
             <div className="flex items-start self-stretch gap-4">
-              <TextFormField
-                title={'Beschrijving'}
-                placeholder={'Vul een beschrijving in'}
+              <NumberFormField
+                title={'Standaardprijs'}
+                placeholder={'Bijv. 10.50'}
                 formHook={{
                   register,
-                  name: 'description',
+                  name: 'defaultPrice',
                   errors,
                 }}
+                step={0.01}
               />
             </div>
             <AuditMetadataFooter

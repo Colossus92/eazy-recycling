@@ -26,7 +26,7 @@ class ProductCategoryController(
     @GetMapping("/{id}")
     fun getCategoryById(@PathVariable id: Long): ProductCategoryResponse {
         val category = productCategories.getCategoryById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product category with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Productcategorie met id $id niet gevonden")
         return category.toResponse()
     }
 
@@ -46,7 +46,7 @@ class ProductCategoryController(
         @Valid @RequestBody request: ProductCategoryRequest
     ): ProductCategoryResponse {
         productCategories.getCategoryById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product category with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Productcategorie met id $id niet gevonden")
 
         val category = request.toDomain()
         val updated = productCategories.updateCategory(id, category)
@@ -58,7 +58,7 @@ class ProductCategoryController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteCategory(@PathVariable id: Long) {
         productCategories.getCategoryById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product category with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Productcategorie met id $id niet gevonden")
 
         productCategories.deleteCategory(id)
     }

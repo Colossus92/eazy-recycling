@@ -2674,15 +2674,15 @@ components:
         vatCode:
           type: string
           minLength: 1
-        glAccountCode:
+        salesAccountNumber:
+          type: string
+        purchaseAccountNumber:
           type: string
         status:
           type: string
           minLength: 1
         defaultPrice:
           type: number
-        description:
-          type: string
       required:
       - code
       - name
@@ -2706,14 +2706,14 @@ components:
           type: string
         vatCode:
           type: string
-        glAccountCode:
+        salesAccountNumber:
+          type: string
+        purchaseAccountNumber:
           type: string
         status:
           type: string
         defaultPrice:
           type: number
-        description:
-          type: string
         createdAt:
           type: string
         createdByName:
@@ -4941,12 +4941,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -4963,11 +4963,11 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         empty:
           type: boolean
     PageableObject:
@@ -5089,11 +5089,11 @@ components:
           type: string
         displayName:
           type: string
+        applicationName:
+          type: string
         startupDate:
           type: integer
           format: int64
-        applicationName:
-          type: string
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
         environment:
@@ -5437,26 +5437,20 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
-          type: string
-        isXml:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
@@ -5472,13 +5466,19 @@ components:
           type: array
           items:
             type: string
-        defaultContentType:
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        elIgnored:
           type: string
-        deferredSyntaxAllowedAsLiteral:
+        isXml:
           type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
           type: string
     RedirectView:
       type: object
@@ -5597,10 +5597,15 @@ components:
         minorVersion:
           type: integer
           format: int32
-        contextPath:
+        attributeNames: {}
+        initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
           type: string
-        serverInfo:
-          type: string
+        sessionTimeout:
+          type: integer
+          format: int32
         servletContextName:
           type: string
         filterRegistrations:
@@ -5609,14 +5614,9 @@ components:
             $ref: "#/components/schemas/FilterRegistration"
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        attributeNames: {}
-        initParameterNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
+        contextPath:
+          type: string
+        serverInfo:
           type: string
         effectiveSessionTrackingModes:
           type: array
@@ -5627,16 +5627,10 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5656,19 +5650,25 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
@@ -5680,12 +5680,9 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        path:
-          type: string
-        maxAge:
-          type: integer
-          format: int32
         domain:
+          type: string
+        path:
           type: string
         name:
           type: string
@@ -5698,14 +5695,17 @@ components:
           deprecated: true
         secure:
           type: boolean
+        maxAge:
+          type: integer
+          format: int32
         httpOnly:
           type: boolean
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

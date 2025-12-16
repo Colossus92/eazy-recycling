@@ -2,9 +2,10 @@ package nl.eazysoftware.eazyrecyclingservice.controller.product
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.ProductRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryDto
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductDto
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
@@ -41,7 +42,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var productJpaRepository: ProductJpaRepository
 
   @Autowired
-  private lateinit var productCategoryJpaRepository: ProductCategoryJpaRepository
+  private lateinit var catalogItemCategoryJpaRepository: CatalogItemCategoryJpaRepository
 
   @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
@@ -52,8 +53,10 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
-    productJpaRepository.deleteAll()
-    productCategoryJpaRepository.deleteAll()
+    // Delete only PRODUCT type items
+    productJpaRepository.findAllProducts().forEach { 
+      productJpaRepository.deleteById(it.getId()) 
+    }
 
     if (!vatRateJpaRepository.existsById(testVatCode)) {
       vatRateJpaRepository.save(
@@ -68,8 +71,9 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       )
     }
 
-    val category = productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    val category = catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = "PRODUCT",
         code = "TEST_CAT",
         name = "Test Category",
         description = "Test Description"
@@ -87,10 +91,10 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       categoryId = testCategoryId,
       unitOfMeasure = "HOUR",
       vatCode = testVatCode,
-      glAccountCode = "8100",
+      salesAccountNumber = "8100",
+      purchaseAccountNumber = null,
       status = "ACTIVE",
-      defaultPrice = BigDecimal("50.00"),
-      description = "Test product description"
+      defaultPrice = BigDecimal("50.00")
     )
 
     // When & Then
@@ -106,48 +110,51 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.categoryId").value(testCategoryId))
       .andExpect(jsonPath("$.unitOfMeasure").value("HOUR"))
       .andExpect(jsonPath("$.vatCode").value(testVatCode))
-      .andExpect(jsonPath("$.glAccountCode").value("8100"))
+      .andExpect(jsonPath("$.salesAccountNumber").value("8100"))
       .andExpect(jsonPath("$.status").value("ACTIVE"))
       .andExpect(jsonPath("$.defaultPrice").value(50.00))
-      .andExpect(jsonPath("$.description").value("Test product description"))
       .andExpect(jsonPath("$.createdAt").exists())
 
     // Verify product was saved in the database
-    val savedProducts = productJpaRepository.findAll()
+    val savedProducts = productJpaRepository.findAllProducts()
     assertThat(savedProducts).hasSize(1)
-    assertThat(savedProducts[0].code).isEqualTo("PROD001")
+    assertThat(savedProducts[0].getCode()).isEqualTo("PROD001")
   }
 
   @Test
   fun `should get all products`() {
     // Given
-    val category = productCategoryJpaRepository.findById(testCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     productJpaRepository.save(
-      ProductDto(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Product 1",
         category = category,
+        consignorParty = null,
         unitOfMeasure = "HOUR",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
         status = "ACTIVE",
-        defaultPrice = null,
-        description = null
+        defaultPrice = null
       )
     )
     productJpaRepository.save(
-      ProductDto(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "PROD002",
         name = "Product 2",
         category = category,
+        consignorParty = null,
         unitOfMeasure = "PIECE",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
         status = "ACTIVE",
-        defaultPrice = null,
-        description = null
+        defaultPrice = null
       )
     )
 
@@ -162,20 +169,22 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get product by id`() {
     // Given
-    val category = productCategoryJpaRepository.findById(testCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     val product = productJpaRepository.save(
-      ProductDto(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Test Product",
         category = category,
+        consignorParty = null,
         unitOfMeasure = "HOUR",
         vatRate = vatRate,
-        glAccountCode = "8100",
+        salesAccountNumber = "8100",
+        purchaseAccountNumber = null,
         status = "ACTIVE",
-        defaultPrice = BigDecimal("75.00"),
-        description = "Test description"
+        defaultPrice = BigDecimal("75.00")
       )
     )
 
@@ -185,7 +194,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.id").value(product.id))
       .andExpect(jsonPath("$.code").value("PROD001"))
       .andExpect(jsonPath("$.name").value("Test Product"))
-      .andExpect(jsonPath("$.glAccountCode").value("8100"))
+      .andExpect(jsonPath("$.salesAccountNumber").value("8100"))
       .andExpect(jsonPath("$.defaultPrice").value(75.00))
   }
 
@@ -199,20 +208,22 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should update product`() {
     // Given
-    val category = productCategoryJpaRepository.findById(testCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     val product = productJpaRepository.save(
-      ProductDto(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Original Product",
         category = category,
+        consignorParty = null,
         unitOfMeasure = "HOUR",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
         status = "ACTIVE",
-        defaultPrice = null,
-        description = null
+        defaultPrice = null
       )
     )
 
@@ -222,10 +233,10 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       categoryId = testCategoryId,
       unitOfMeasure = "PIECE",
       vatCode = testVatCode,
-      glAccountCode = "8200",
+      salesAccountNumber = "8200",
+      purchaseAccountNumber = null,
       status = "INACTIVE",
-      defaultPrice = BigDecimal("100.00"),
-      description = "Updated description"
+      defaultPrice = BigDecimal("100.00")
     )
 
     // When & Then
@@ -236,13 +247,13 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isOk)
       .andExpect(jsonPath("$.code").value("PROD001_UPDATED"))
       .andExpect(jsonPath("$.name").value("Updated Product"))
-      .andExpect(jsonPath("$.glAccountCode").value("8200"))
+      .andExpect(jsonPath("$.salesAccountNumber").value("8200"))
       .andExpect(jsonPath("$.status").value("INACTIVE"))
 
     // Verify product was updated in the database
-    val updatedProduct = productJpaRepository.findByIdOrNull(product.id!!)
+    val updatedProduct = productJpaRepository.findProductById(product.id!!)
     assertThat(updatedProduct).isNotNull
-    assertThat(updatedProduct?.code).isEqualTo("PROD001_UPDATED")
+    assertThat(updatedProduct?.getCode()).isEqualTo("PROD001_UPDATED")
   }
 
   @Test
@@ -254,10 +265,10 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       categoryId = testCategoryId,
       unitOfMeasure = "HOUR",
       vatCode = testVatCode,
-      glAccountCode = null,
+      salesAccountNumber = null,
+      purchaseAccountNumber = null,
       status = "ACTIVE",
-      defaultPrice = null,
-      description = null
+      defaultPrice = null
     )
 
     // When & Then
@@ -271,20 +282,22 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should delete product`() {
     // Given
-    val category = productCategoryJpaRepository.findById(testCategoryId!!).get()
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
     val vatRate = vatRateJpaRepository.findById(testVatCode).get()
 
     val product = productJpaRepository.save(
-      ProductDto(
+      CatalogItemDto(
+        type = CatalogItemType.PRODUCT,
         code = "DELETE_ME",
         name = "Delete Me",
         category = category,
+        consignorParty = null,
         unitOfMeasure = "HOUR",
         vatRate = vatRate,
-        glAccountCode = null,
+        salesAccountNumber = null,
+        purchaseAccountNumber = null,
         status = "ACTIVE",
-        defaultPrice = null,
-        description = null
+        defaultPrice = null
       )
     )
 
@@ -293,7 +306,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isNoContent)
 
     // Verify product was deleted
-    assertThat(productJpaRepository.findByIdOrNull(product.id!!)).isNull()
+    assertThat(productJpaRepository.findProductById(product.id!!)).isNull()
   }
 
   @Test

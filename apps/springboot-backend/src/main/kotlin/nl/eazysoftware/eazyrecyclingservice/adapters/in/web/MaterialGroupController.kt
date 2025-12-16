@@ -26,7 +26,7 @@ class MaterialGroupController(
     @GetMapping("/{id}")
     fun getMaterialGroupById(@PathVariable id: Long): MaterialGroupResponse {
         val materialGroup = materialGroups.getMaterialGroupById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material group with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaalgroep met id $id niet gevonden")
         return materialGroup.toResponse()
     }
 
@@ -47,7 +47,7 @@ class MaterialGroupController(
     ): MaterialGroupResponse {
         // Check if material group exists
         materialGroups.getMaterialGroupById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material group with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaalgroep met id $id niet gevonden")
 
         val materialGroup = request.toDomain()
         val updated = materialGroups.updateMaterialGroup(id, materialGroup)
@@ -60,7 +60,7 @@ class MaterialGroupController(
     fun deleteMaterialGroup(@PathVariable id: Long) {
         // Check if material group exists
         materialGroups.getMaterialGroupById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Material group with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaalgroep met id $id niet gevonden")
 
         materialGroups.deleteMaterialGroup(id)
     }

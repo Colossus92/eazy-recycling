@@ -27,13 +27,13 @@ class WasteContainerService(
 
   fun getContainerById(id: String): WasteContainer {
     return wasteContainerRepository.findById(id)
-      ?: throw EntityNotFoundException("Container with id $id not found")
+      ?: throw EntityNotFoundException("Container met id $id niet gevonden")
   }
 
   @Transactional
   fun updateContainer(id: String, container: WasteContainer): WasteContainer {
     wasteContainerRepository.findById(id)
-      ?: throw EntityNotFoundException("Container with id $id not found")
+      ?: throw EntityNotFoundException("Container met id $id niet gevonden")
 
     wasteContainerRepository.save(container)
 

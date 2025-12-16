@@ -27,7 +27,7 @@ class ProductController(
     @GetMapping("/{id}")
     fun getProductById(@PathVariable id: Long): ProductResponse {
         val product = products.getProductById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
         return product.toResponse()
     }
 
@@ -47,7 +47,7 @@ class ProductController(
         @Valid @RequestBody request: ProductRequest
     ): ProductResponse {
         products.getProductById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
 
         val product = request.toDomain()
         val updated = products.updateProduct(id, product)
@@ -59,7 +59,7 @@ class ProductController(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteProduct(@PathVariable id: Long) {
         products.getProductById(id)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product with id $id not found")
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
 
         products.deleteProduct(id)
     }
@@ -80,14 +80,14 @@ data class ProductRequest(
     @field:NotBlank(message = "VAT code is verplicht")
     val vatCode: String,
 
-    val glAccountCode: String?,
+    val salesAccountNumber: String?,
+
+    val purchaseAccountNumber: String?,
 
     @field:NotBlank(message = "Status is verplicht")
     val status: String,
 
     val defaultPrice: BigDecimal?,
-
-    val description: String?,
 ) {
     fun toDomain(): Product {
         return Product(
@@ -98,10 +98,10 @@ data class ProductRequest(
             categoryName = null,
             unitOfMeasure = unitOfMeasure,
             vatCode = vatCode,
-            glAccountCode = glAccountCode,
+            salesAccountNumber = salesAccountNumber,
+            purchaseAccountNumber = purchaseAccountNumber,
             status = status,
             defaultPrice = defaultPrice,
-            description = description,
             createdAt = null,
             updatedAt = null
         )
@@ -115,10 +115,10 @@ data class ProductResponse(
     val categoryId: Long?,
     val unitOfMeasure: String,
     val vatCode: String,
-    val glAccountCode: String?,
+    val salesAccountNumber: String?,
+    val purchaseAccountNumber: String?,
     val status: String,
     val defaultPrice: BigDecimal?,
-    val description: String?,
     val createdAt: String?,
     val createdByName: String?,
     val updatedAt: String?,
@@ -133,10 +133,10 @@ fun Product.toResponse(): ProductResponse {
         categoryId = categoryId,
         unitOfMeasure = unitOfMeasure,
         vatCode = vatCode,
-        glAccountCode = glAccountCode,
+        salesAccountNumber = salesAccountNumber,
+        purchaseAccountNumber = purchaseAccountNumber,
         status = status,
         defaultPrice = defaultPrice,
-        description = description,
         createdAt = createdAt?.toString(),
         createdByName = createdBy,
         updatedAt = updatedAt?.toString(),
