@@ -1,16 +1,9 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { FieldArrayWithId, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { InvoiceFormValues, InvoiceLineFormValue } from './useInvoiceFormHook';
-import { catalogService } from '@/api/services/catalogService';
-import { useMemo, useState, useCallback } from 'react';
-import AsyncSelect from 'react-select/async';
-
-interface CatalogOption {
-  value: string;
-  label: string;
-  name: string;
-}
+import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
+import { useMemo } from 'react';
 
 const parseNumber = (value: string | number | undefined): number => {
   if (value === undefined || value === null || value === '') return 0;
@@ -27,73 +20,49 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+interface InvoiceLineRowProps {
+  index: number;
+  field: FieldArrayWithId<InvoiceFormValues, 'lines', 'id'>;
+  update: (index: number, value: InvoiceLineFormValue & { id: string }) => void;
+  onRemove: () => void;
+}
+
 const InvoiceLineRow = ({
   index,
+  field,
+  update,
   onRemove,
-}: {
-  index: number;
-  onRemove: () => void;
-}) => {
-  const { register, setValue, watch } = useFormContext<InvoiceFormValues>();
+}: InvoiceLineRowProps) => {
+  const { register, watch, formState: { errors } } = useFormContext<InvoiceFormValues>();
   const line = watch(`lines.${index}`);
   const lineTotal = parseNumber(line?.quantity) * parseNumber(line?.unitPrice);
 
-  const [selectedOption, setSelectedOption] = useState<CatalogOption | null>(
-    line?.catalogItemId
-      ? { value: line.catalogItemId, label: line.catalogItemName, name: line.catalogItemName }
-      : null
-  );
+  // Adapt field for CatalogItemAsyncSelectFormField (needs weightValue/weightUnit for compatibility)
+  const catalogField = {
+    id: field.id,
+    catalogItemId: field.catalogItemId,
+    wasteStreamNumber: undefined,
+    weightValue: '',
+    weightUnit: '',
+  };
 
-  const loadOptions = useCallback(async (inputValue: string): Promise<CatalogOption[]> => {
-    const items = await catalogService.search(inputValue || undefined, undefined);
-    return items.map((item) => ({
-      value: String(item.id),
-      label: item.wasteStreamNumber ? `${item.name} (${item.wasteStreamNumber})` : item.name,
-      name: item.name,
-    }));
-  }, []);
+  const handleCatalogUpdate = (idx: number, value: { id: string; catalogItemId: string; wasteStreamNumber?: string; weightValue: string; weightUnit: string }) => {
+    update(idx, {
+      ...field,
+      catalogItemId: value.catalogItemId,
+    });
+  };
 
   return (
     <tr className="border-t border-color-border">
       <td className="p-2">
-        <AsyncSelect<CatalogOption>
-          value={selectedOption}
-          loadOptions={loadOptions}
-          defaultOptions
-          cacheOptions
+        <CatalogItemAsyncSelectFormField
+          title=""
           placeholder="Selecteer artikel"
-          isClearable
-          classNamePrefix="react-select"
-          noOptionsMessage={() => 'Geen items gevonden'}
-          loadingMessage={() => 'Laden...'}
-          menuPortalTarget={document.body}
-          styles={{
-            control: (base) => ({
-              ...base,
-              minHeight: '32px',
-              height: '32px',
-              borderRadius: '4px',
-              fontSize: '14px',
-            }),
-            valueContainer: (base) => ({
-              ...base,
-              padding: '0 8px',
-            }),
-            input: (base) => ({
-              ...base,
-              margin: 0,
-              padding: 0,
-            }),
-            menuPortal: (base) => ({
-              ...base,
-              zIndex: 9999,
-            }),
-          }}
-          onChange={(option) => {
-            setSelectedOption(option);
-            setValue(`lines.${index}.catalogItemId`, option?.value || '');
-            setValue(`lines.${index}.catalogItemName`, option?.name || '');
-          }}
+          index={index}
+          field={catalogField}
+          update={handleCatalogUpdate}
+          errors={errors}
         />
       </td>
       <td className="p-2">
@@ -143,7 +112,7 @@ export const InvoiceLinesSection = () => {
   const formContext = useFormContext<InvoiceFormValues>();
   const { control } = formContext;
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'lines',
   });
@@ -208,6 +177,8 @@ export const InvoiceLinesSection = () => {
                 <InvoiceLineRow
                   key={field.id}
                   index={index}
+                  field={field}
+                  update={update}
                   onRemove={() => remove(index)}
                 />
               ))}
