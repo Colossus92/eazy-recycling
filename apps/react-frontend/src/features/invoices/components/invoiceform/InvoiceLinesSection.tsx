@@ -1,6 +1,6 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
-import { FieldArrayWithId, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { FieldArrayWithId, useFieldArray, useFormContext, useWatch, } from 'react-hook-form';
 import { InvoiceFormValues, InvoiceLineFormValue } from './useInvoiceFormHook';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
 import { useMemo } from 'react';
@@ -33,7 +33,11 @@ const InvoiceLineRow = ({
   update,
   onRemove,
 }: InvoiceLineRowProps) => {
-  const { register, watch, formState: { errors } } = useFormContext<InvoiceFormValues>();
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext<InvoiceFormValues>();
   const line = watch(`lines.${index}`);
   const lineTotal = parseNumber(line?.quantity) * parseNumber(line?.unitPrice);
 
@@ -46,7 +50,16 @@ const InvoiceLineRow = ({
     weightUnit: '',
   };
 
-  const handleCatalogUpdate = (idx: number, value: { id: string; catalogItemId: string; wasteStreamNumber?: string; weightValue: string; weightUnit: string }) => {
+  const handleCatalogUpdate = (
+    idx: number,
+    value: {
+      id: string;
+      catalogItemId: string;
+      wasteStreamNumber?: string;
+      weightValue: string;
+      weightUnit: string;
+    }
+  ) => {
     update(idx, {
       ...field,
       catalogItemId: value.catalogItemId,
@@ -185,8 +198,12 @@ export const InvoiceLinesSection = () => {
             </tbody>
             <tfoot className="bg-color-surface-secondary border-t border-color-border">
               <tr className="text-subtitle-2">
-                <td colSpan={4} className="p-2 text-right">Subtotaal excl. BTW:</td>
-                <td className="p-2 text-right">{formatCurrency(totals.totalExclVat)}</td>
+                <td colSpan={4} className="p-2 text-right">
+                  Subtotaal excl. BTW:
+                </td>
+                <td className="p-2 text-right">
+                  {formatCurrency(totals.totalExclVat)}
+                </td>
                 <td></td>
               </tr>
             </tfoot>
