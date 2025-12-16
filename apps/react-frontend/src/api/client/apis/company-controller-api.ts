@@ -203,9 +203,9 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getById1: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'id' is not null or undefined
-            assertParamExists('getById', 'id', id)
+            assertParamExists('getById1', 'id', id)
             const localVarPath = `/companies/{id}`
                 .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -440,10 +440,10 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompleteCompanyView>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getById(id, options);
+        async getById1(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompleteCompanyView>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getById1(id, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['CompanyControllerApi.getById']?.[index]?.url;
+            const operationBasePath = operationServerMap['CompanyControllerApi.getById1']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
@@ -543,8 +543,8 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getById(id: string, options?: any): AxiosPromise<CompleteCompanyView> {
-            return localVarFp.getById(id, options).then((request) => request(axios, basePath));
+        getById1(id: string, options?: any): AxiosPromise<CompleteCompanyView> {
+            return localVarFp.getById1(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -641,8 +641,8 @@ export class CompanyControllerApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof CompanyControllerApi
      */
-    public getById(id: string, options?: RawAxiosRequestConfig) {
-        return CompanyControllerApiFp(this.configuration).getById(id, options).then((request) => request(this.axios, this.basePath));
+    public getById1(id: string, options?: RawAxiosRequestConfig) {
+        return CompanyControllerApiFp(this.configuration).getById1(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

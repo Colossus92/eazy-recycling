@@ -15,49 +15,37 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { VatBreakdownLineView } from './vat-breakdown-line-view';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface InvoiceTotalsView
  */
-export interface PageableObject {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'paged'?: boolean;
+export interface InvoiceTotalsView {
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof InvoiceTotalsView
      */
-    'pageNumber'?: number;
+    'totalExclVat': number;
+    /**
+     * 
+     * @type {Array<VatBreakdownLineView>}
+     * @memberof InvoiceTotalsView
+     */
+    'vatBreakdown': Array<VatBreakdownLineView>;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof InvoiceTotalsView
      */
-    'pageSize'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageableObject
-     */
-    'unpaged'?: boolean;
+    'totalVat': number;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof InvoiceTotalsView
      */
-    'offset'?: number;
-    /**
-     * 
-     * @type {SortObject}
-     * @memberof PageableObject
-     */
-    'sort'?: SortObject;
+    'totalInclVat': number;
 }
 

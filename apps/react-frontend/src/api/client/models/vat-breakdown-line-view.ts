@@ -17,38 +17,32 @@
 /**
  * 
  * @export
- * @interface ServletRegistration
+ * @interface VatBreakdownLineView
  */
-export interface ServletRegistration {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ServletRegistration
-     */
-    'mappings'?: Array<string>;
+export interface VatBreakdownLineView {
     /**
      * 
      * @type {string}
-     * @memberof ServletRegistration
+     * @memberof VatBreakdownLineView
      */
-    'runAsRole'?: string;
+    'vatCode': string;
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof ServletRegistration
+     * @type {number}
+     * @memberof VatBreakdownLineView
      */
-    'initParameters'?: { [key: string]: string; };
+    'vatPercentage': number;
     /**
      * 
-     * @type {string}
-     * @memberof ServletRegistration
+     * @type {number}
+     * @memberof VatBreakdownLineView
      */
-    'name'?: string;
+    'baseAmount': number;
     /**
      * 
-     * @type {string}
-     * @memberof ServletRegistration
+     * @type {number}
+     * @memberof VatBreakdownLineView
      */
-    'className'?: string;
+    'vatAmount': number;
 }
 

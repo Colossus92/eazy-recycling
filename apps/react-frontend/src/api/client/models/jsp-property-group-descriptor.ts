@@ -25,13 +25,43 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'buffer'?: string;
+    'defaultContentType'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'urlPatterns'?: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'defaultContentType'?: string;
+    'elIgnored'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includeCodas'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'deferredSyntaxAllowedAsLiteral'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'trimDirectiveWhitespaces'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'errorOnUndeclaredNamespace'?: string;
     /**
      * 
      * @type {string}
@@ -52,51 +82,21 @@ export interface JspPropertyGroupDescriptor {
     'scriptingInvalid'?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includePreludes'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includeCodas'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'urlPatterns'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'elIgnored'?: string;
-    /**
-     * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
     'isXml'?: string;
     /**
      * 
-     * @type {string}
+     * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
-    'trimDirectiveWhitespaces'?: string;
+    'includePreludes'?: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'errorOnUndeclaredNamespace'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'deferredSyntaxAllowedAsLiteral'?: string;
+    'buffer'?: string;
 }
 

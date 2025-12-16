@@ -15,28 +15,25 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { JspPropertyGroupDescriptor } from './jsp-property-group-descriptor';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { TaglibDescriptor } from './taglib-descriptor';
+import type { InvoiceLineRequest } from './invoice-line-request';
 
 /**
  * 
  * @export
- * @interface JspConfigDescriptor
+ * @interface UpdateInvoiceRequest
  */
-export interface JspConfigDescriptor {
+export interface UpdateInvoiceRequest {
     /**
      * 
-     * @type {Array<TaglibDescriptor>}
-     * @memberof JspConfigDescriptor
+     * @type {string}
+     * @memberof UpdateInvoiceRequest
      */
-    'taglibs'?: Array<TaglibDescriptor>;
+    'invoiceDate': string;
     /**
      * 
-     * @type {Array<JspPropertyGroupDescriptor>}
-     * @memberof JspConfigDescriptor
+     * @type {Array<InvoiceLineRequest>}
+     * @memberof UpdateInvoiceRequest
      */
-    'jspPropertyGroups'?: Array<JspPropertyGroupDescriptor>;
+    'lines': Array<InvoiceLineRequest>;
 }
 

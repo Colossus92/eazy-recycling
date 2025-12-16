@@ -13,51 +13,48 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import type { SortObject } from './sort-object';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface InvoiceLineRequest
  */
-export interface PageableObject {
+export interface InvoiceLineRequest {
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof InvoiceLineRequest
      */
-    'paged'?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof PageableObject
-     */
-    'pageNumber'?: number;
+    'date': string;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof InvoiceLineRequest
      */
-    'pageSize'?: number;
+    'catalogItemId': number;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof InvoiceLineRequest
      */
-    'unpaged'?: boolean;
+    'description'?: string;
     /**
      * 
      * @type {number}
-     * @memberof PageableObject
+     * @memberof InvoiceLineRequest
      */
-    'offset'?: number;
+    'quantity': number;
     /**
      * 
-     * @type {SortObject}
-     * @memberof PageableObject
+     * @type {number}
+     * @memberof InvoiceLineRequest
      */
-    'sort'?: SortObject;
+    'unitPrice': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceLineRequest
+     */
+    'orderReference'?: string;
 }
 

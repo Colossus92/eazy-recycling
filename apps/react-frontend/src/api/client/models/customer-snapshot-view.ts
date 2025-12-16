@@ -15,49 +15,43 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { SortObject } from './sort-object';
+import type { AddressSnapshotView } from './address-snapshot-view';
 
 /**
  * 
  * @export
- * @interface PageableObject
+ * @interface CustomerSnapshotView
  */
-export interface PageableObject {
+export interface CustomerSnapshotView {
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof CustomerSnapshotView
      */
-    'paged'?: boolean;
+    'companyId': string;
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof CustomerSnapshotView
      */
-    'pageNumber'?: number;
+    'customerNumber'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof CustomerSnapshotView
      */
-    'pageSize'?: number;
+    'name': string;
     /**
      * 
-     * @type {boolean}
-     * @memberof PageableObject
+     * @type {AddressSnapshotView}
+     * @memberof CustomerSnapshotView
      */
-    'unpaged'?: boolean;
+    'address': AddressSnapshotView;
     /**
      * 
-     * @type {number}
-     * @memberof PageableObject
+     * @type {string}
+     * @memberof CustomerSnapshotView
      */
-    'offset'?: number;
-    /**
-     * 
-     * @type {SortObject}
-     * @memberof PageableObject
-     */
-    'sort'?: SortObject;
+    'vatNumber'?: string;
 }
 

@@ -497,3 +497,60 @@ create table if not exists products (
                                           foreign key (product_category_id) references product_categories(id),
                                           foreign key (vat_code) references vat_rates(vat_code)
 );
+
+-- Invoice tables
+create sequence if not exists invoices_id_seq start with 1 increment by 1;
+create sequence if not exists invoice_lines_id_seq start with 1 increment by 1;
+
+create table if not exists invoices (
+                                          id bigint not null default nextval('invoices_id_seq'),
+                                          invoice_number text unique,
+                                          invoice_type text not null check (invoice_type in ('PURCHASE', 'SALE')),
+                                          document_type text not null check (document_type in ('INVOICE', 'CREDIT_NOTE')),
+                                          status text not null check (status in ('DRAFT', 'FINAL')),
+                                          invoice_date date not null,
+                                          customer_company_id uuid not null,
+                                          customer_number text,
+                                          customer_name text not null,
+                                          customer_street_name text not null,
+                                          customer_building_number text,
+                                          customer_building_number_addition text,
+                                          customer_postal_code text not null,
+                                          customer_city text not null,
+                                          customer_country text,
+                                          customer_vat_number text,
+                                          original_invoice_id bigint,
+                                          created_at timestamp with time zone not null default now(),
+                                          created_by text,
+                                          last_modified_at timestamp with time zone not null default now(),
+                                          last_modified_by text,
+                                          finalized_at timestamp with time zone,
+                                          finalized_by text,
+                                          primary key (id),
+                                          foreign key (customer_company_id) references companies(id),
+                                          foreign key (original_invoice_id) references invoices(id)
+);
+
+create table if not exists invoice_lines (
+                                          id bigint not null default nextval('invoice_lines_id_seq'),
+                                          invoice_id bigint not null,
+                                          line_number int not null,
+                                          line_date date not null,
+                                          description text not null,
+                                          order_reference text,
+                                          vat_code text not null,
+                                          vat_percentage numeric(5,2) not null,
+                                          gl_account_code text,
+                                          quantity numeric(15,4) not null,
+                                          unit_price numeric(15,4) not null,
+                                          total_excl_vat numeric(15,2) not null,
+                                          unit_of_measure text not null,
+                                          catalog_item_id bigint,
+                                          catalog_item_code text not null,
+                                          catalog_item_name text not null,
+                                          catalog_item_type text not null check (catalog_item_type in ('MATERIAL', 'PRODUCT', 'WASTE_STREAM')),
+                                          primary key (id),
+                                          foreign key (invoice_id) references invoices(id) on delete cascade,
+                                          foreign key (catalog_item_id) references catalog_items(id),
+                                          unique (invoice_id, line_number)
+);

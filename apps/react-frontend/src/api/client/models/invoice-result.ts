@@ -17,26 +17,14 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface InvoiceResult
  */
-export interface SortObject {
+export interface InvoiceResult {
     /**
      * 
-     * @type {boolean}
-     * @memberof SortObject
+     * @type {number}
+     * @memberof InvoiceResult
      */
-    'sorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'unsorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'empty'?: boolean;
+    'invoiceId': number;
 }
 

@@ -17,38 +17,44 @@
 /**
  * 
  * @export
- * @interface FilterRegistration
+ * @interface AddressSnapshotView
  */
-export interface FilterRegistration {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof FilterRegistration
-     */
-    'urlPatternMappings'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof FilterRegistration
-     */
-    'servletNameMappings'?: Array<string>;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof FilterRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
+export interface AddressSnapshotView {
     /**
      * 
      * @type {string}
-     * @memberof FilterRegistration
+     * @memberof AddressSnapshotView
      */
-    'name'?: string;
+    'streetName': string;
     /**
      * 
      * @type {string}
-     * @memberof FilterRegistration
+     * @memberof AddressSnapshotView
      */
-    'className'?: string;
+    'buildingNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddressSnapshotView
+     */
+    'buildingNumberAddition'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddressSnapshotView
+     */
+    'postalCode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddressSnapshotView
+     */
+    'city': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AddressSnapshotView
+     */
+    'country'?: string;
 }
 
