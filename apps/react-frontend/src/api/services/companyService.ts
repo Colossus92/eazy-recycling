@@ -57,7 +57,7 @@ export const companyService = {
    * Get a single company by ID.
    */
   getById: (id: string): Promise<Company> => {
-    return companyApi.getById(id).then((r) => r.data);
+    return companyApi.getById1(id).then((r) => r.data);
   },
 
   /**

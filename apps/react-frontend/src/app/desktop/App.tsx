@@ -6,6 +6,7 @@ import { useMobileHook } from '@/hooks/useMobileHook.ts';
 import { Sidebar } from '@/components/layouts/sidebar/Sidebar.tsx';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
 import WeightTicketManagement from './pages/WeightTicketManagement.tsx';
+import FinancieelManagement from './pages/FinancieelManagement.tsx';
 import { ScreenSizeSafeguard } from '@/components/safeguards/ScreenSizeSafeguard.tsx';
 
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));
@@ -52,6 +53,10 @@ export const App = () => {
               <Route
                 path="/weight-tickets"
                 element={<WeightTicketManagement />}
+              />
+              <Route
+                path="/financieel"
+                element={<FinancieelManagement />}
               />
               <Route
                 path="/users"

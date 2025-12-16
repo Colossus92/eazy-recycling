@@ -14,7 +14,7 @@ export const wasteStreamService = {
     wasteStreamApi
       .findCompatibleWasteStreams(wasteStreamNumber)
       .then((r) => r.data),
-  delete: (id: string) => wasteStreamApi._delete(id),
+  delete: (id: string) => wasteStreamApi.delete1(id),
 
   // Draft endpoints
   createDraft: (wasteStreamRequest: WasteStreamRequest) =>

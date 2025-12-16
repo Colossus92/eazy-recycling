@@ -6,6 +6,7 @@ import IdentificationCard from '@/assets/icons/IdentificationCard.svg?react';
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
+import IcBaselineEuro from '@/assets/icons/IcBaselineEuro.svg?react';
 import { NavItem } from '@/components/layouts/sidebar/NavItem.tsx';
 import { SidebarHeader } from '@/components/layouts/sidebar/SidebarHeader.tsx';
 import { useAuth } from '@/components/auth/useAuthHook.ts';
@@ -25,6 +26,11 @@ export const Sidebar = () => {
     { icon: BuildingOffice, label: 'Relaties', to: '/crm' },
     { icon: BxRecycle, label: 'Afvalstroombeheer', to: '/waste-streams' },
     { icon: Scale, label: 'Weegbonnen', to: '/weight-tickets' },
+    { icon: IcBaselineEuro, 
+      label: 'Financieel', 
+      to: '/financieel', 
+      requiredRole: 'admin',
+     },
     {
       icon: IdentificationCard,
       label: 'Gebruikersbeheer',

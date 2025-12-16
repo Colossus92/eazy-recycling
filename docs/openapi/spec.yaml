@@ -5309,17 +5309,17 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
+        totalPages:
+          type: integer
+          format: int32
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         first:
           type: boolean
         last:
@@ -5341,6 +5341,8 @@ components:
     PageableObject:
       type: object
       properties:
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -5349,8 +5351,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
         offset:
           type: integer
           format: int64
@@ -5359,9 +5359,9 @@ components:
     SortObject:
       type: object
       properties:
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
         empty:
           type: boolean
@@ -5824,16 +5824,6 @@ components:
             type: string
         elIgnored:
           type: string
-        includeCodas:
-          type: array
-          items:
-            type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
-          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -5846,6 +5836,16 @@ components:
           type: array
           items:
             type: string
+        includeCodas:
+          type: array
+          items:
+            type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
         buffer:
           type: string
     RedirectView:
@@ -5911,51 +5911,34 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesCSV:
-          type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
         attributeNames: {}
-        contextPath:
-          type: string
-        initParameterNames: {}
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
+        contextPath:
+          type: string
+        initParameterNames: {}
         effectiveMajorVersion:
           type: integer
           format: int32
-        servletContextName:
-          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
+          type: string
+        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -5981,10 +5964,27 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         classLoader:
           type: object
           properties:
