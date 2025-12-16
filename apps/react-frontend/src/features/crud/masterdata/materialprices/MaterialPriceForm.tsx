@@ -1,31 +1,27 @@
-import { MaterialPriceRequest, MaterialPriceResponse } from '@/api/client';
+import { MaterialPriceResponse } from '@/api/client';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
-import { TextFormField } from '@/components/ui/form/TextFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { MaterialSelectFormField } from '@/components/ui/form/selectfield/MaterialSelectFormField';
+import { TextFormField } from '@/components/ui/form/TextFormField';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
-import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface MaterialPriceFormProps {
   isOpen: boolean;
   onCancel: () => void;
-  onSubmit: (materialPrice: MaterialPriceRequest) => void;
+  onSubmit: (catalogItemId: number, price: number) => void;
   initialData?: MaterialPriceResponse;
 }
 
-type MaterialPriceFormValues = Omit<
-  MaterialPriceRequest,
-  'materialId' | 'price'
-> & {
-  materialId: number | string;
+interface MaterialPriceFormValues {
+  catalogItemId: number | string;
   price: number;
-};
+}
 
 export const MaterialPriceForm = ({
   isOpen,
@@ -42,33 +38,29 @@ export const MaterialPriceForm = ({
     formState: { errors },
   } = useForm<MaterialPriceFormValues>({
     defaultValues: {
-      materialId: '',
+      catalogItemId: '',
       price: 0,
-      currency: 'EUR',
     },
   });
 
   useEffect(() => {
     if (initialData) {
       reset({
-        materialId: initialData.materialId.toString(),
-        price: initialData.price,
-        currency: initialData.currency,
+        catalogItemId: initialData.id.toString(),
+        price: initialData.defaultPrice ?? 0,
       });
     } else {
       reset({
-        materialId: '',
+        catalogItemId: '',
         price: 0,
-        currency: 'EUR',
       });
     }
   }, [initialData, reset]);
 
   const cancel = () => {
     reset({
-      materialId: '',
+      catalogItemId: '',
       price: 0,
-      currency: 'EUR',
     });
     onCancel();
   };
@@ -77,14 +69,11 @@ export const MaterialPriceForm = ({
     e.preventDefault();
     await handleSubmit(async (data) => {
       try {
-        await onSubmit({
-          materialId:
-            typeof data.materialId === 'string'
-              ? parseInt(data.materialId, 10)
-              : data.materialId,
-          price: data.price,
-          currency: data.currency,
-        });
+        const catalogItemId =
+          typeof data.catalogItemId === 'string'
+            ? parseInt(data.catalogItemId, 10)
+            : data.catalogItemId;
+        await onSubmit(catalogItemId, data.price);
         cancel();
       } catch (error) {
         handleError(error);
@@ -112,11 +101,12 @@ export const MaterialPriceForm = ({
               <MaterialSelectFormField
                 formHook={{
                   register,
-                  name: 'materialId',
+                  name: 'catalogItemId',
                   rules: { required: 'Materiaal is verplicht' },
                   errors,
                   control,
                 }}
+                disabled={!!initialData}
               />
             </div>
             <div className="flex items-start self-stretch gap-4">
@@ -135,20 +125,8 @@ export const MaterialPriceForm = ({
                 title={'Valuta'}
                 placeholder={'Bijv. EUR'}
                 disabled={true}
-                formHook={{
-                  register,
-                  name: 'currency',
-                  rules: { required: 'Valuta is verplicht' },
-                  errors,
-                }}
               />
             </div>
-            <AuditMetadataFooter
-              createdAt={initialData?.createdAt}
-              createdByName={initialData?.createdByName}
-              updatedAt={initialData?.updatedAt}
-              updatedByName={initialData?.updatedByName}
-            />
           </div>
           <FormActionButtons onClick={cancel} item={undefined} />
         </form>

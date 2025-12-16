@@ -25,10 +25,10 @@ export interface DataTableProps<T> {
 export interface MasterDataTabProps<T> {
   data: DataTableProps<T>;
   searchQuery: (query: string) => void;
-  openAddForm: () => void;
+  openAddForm?: () => void;
   editAction: (item: T) => void;
   removeAction: (item: T) => void;
-  renderEmptyState: (onClick: () => void) => ReactNode;
+  renderEmptyState: (onClick?: () => void) => ReactNode;
   isLoading: boolean;
   errorHandling: {
     error: Error | null;
@@ -61,12 +61,13 @@ export const MasterDataTab = <T,>({
       }
     >
       <ContentTitleBar setQuery={setQueryAndResetPage}>
-        <Button
-          variant={'primary'}
-          icon={Plus}
-          label={'Voeg toe'}
-          onClick={openAddForm}
-        />
+        {openAddForm &&
+          <Button
+            variant={'primary'}
+            icon={Plus}
+            label={'Voeg toe'}
+            onClick={openAddForm}
+          />}
       </ContentTitleBar>
       <ErrorBoundary
         fallbackRender={fallbackRender}

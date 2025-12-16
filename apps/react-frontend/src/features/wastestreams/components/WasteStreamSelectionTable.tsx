@@ -130,8 +130,6 @@ export const WasteStreamSelectionTable = ({
               <EmptyState
                 icon={BxRecycle}
                 text="Maak een afvalstroomnummer aan via afvalstroombeheer"
-                onClick={() => { }}
-                showButton={false}
               />
             </div>
           ) : (

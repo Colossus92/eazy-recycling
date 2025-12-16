@@ -1,6 +1,6 @@
 import { SelectFormField } from './SelectFormField';
 import { useQuery } from '@tanstack/react-query';
-import { materialService } from '@/api/services/materialService';
+import { catalogService } from '@/api/services/catalogService';
 import {
   Control,
   FieldErrors,
@@ -11,7 +11,7 @@ import {
 } from 'react-hook-form';
 import { useMemo } from 'react';
 
-interface MaterialSelectFormFieldProps<TFieldValues extends FieldValues> {
+interface CatalogItemSelectFormFieldProps<TFieldValues extends FieldValues> {
   formHook: {
     register: UseFormRegister<TFieldValues>;
     name: Path<TFieldValues>;
@@ -22,32 +22,34 @@ interface MaterialSelectFormFieldProps<TFieldValues extends FieldValues> {
   disabled?: boolean;
 }
 
-export const MaterialSelectFormField = ({
+export const CatalogItemSelectFormField = ({
   formHook,
   disabled = false,
-}: MaterialSelectFormFieldProps<any>) => {
+}: CatalogItemSelectFormFieldProps<any>) => {
   const { register } = formHook;
 
-  // Fetch materials for dropdown
-  const { data: materials = [] } = useQuery({
-    queryKey: ['materials'],
-    queryFn: () => materialService.getAll(),
+  // Fetch catalog items for dropdown
+  const { data: catalogItems = [] } = useQuery({
+    queryKey: ['catalogItems'],
+    queryFn: () => catalogService.search(),
   });
 
-  const materialOptions = useMemo(
+  const catalogItemOptions = useMemo(
     () =>
-      materials.map((material) => ({
-        value: material.id.toString(),
-        label: `${material.code} - ${material.name}`,
+      catalogItems.map((item) => ({
+        value: item.id.toString(),
+        label: item.wasteStreamNumber
+          ? `${item.name} (${item.wasteStreamNumber})`
+          : item.name,
       })),
-    [materials]
+    [catalogItems]
   );
 
   return (
     <SelectFormField
-      title={'Materiaal'}
-      placeholder={'Selecteer een materiaal'}
-      options={materialOptions}
+      title={'Catalogus item'}
+      placeholder={'Selecteer een catalogus item'}
+      options={catalogItemOptions}
       formHook={{
         register,
         name: formHook.name,
@@ -55,7 +57,7 @@ export const MaterialSelectFormField = ({
         errors: formHook.errors,
         control: formHook.control,
       }}
-      testId="material-select"
+      testId="catalog-item-select"
       disabled={disabled}
     />
   );

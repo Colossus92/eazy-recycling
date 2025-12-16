@@ -153,8 +153,6 @@ export const LMATab = () => {
           <EmptyState
             icon={BxRecycle}
             text="Geen LMA gegevens gevonden"
-            onClick={() => {}}
-            showButton={false}
           />
         ) : (
           <div className="flex-1 items-start self-stretch border-t-solid border-t border-t-color-border-primary overflow-y-auto">

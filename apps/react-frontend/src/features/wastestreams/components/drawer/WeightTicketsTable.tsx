@@ -103,8 +103,6 @@ export const WeightTicketsTable = ({
               <EmptyState
                 icon={Scale}
                 text="Geen weegbonnen gevonden voor dit afvalstroomnummer"
-                onClick={() => {}}
-                showButton={false}
               />
             </div>
           ) : (

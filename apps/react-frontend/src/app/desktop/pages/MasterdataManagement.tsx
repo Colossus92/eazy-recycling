@@ -2,6 +2,7 @@ import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Tab } from '@/components/ui/tab/Tab';
 import { EuralCodesTab } from '@/features/crud/masterdata/euralcodes/EuralCodeTab';
 import { MaterialGroupsTab } from '@/features/crud/masterdata/materialgroups/MaterialGroupTab';
+import { MaterialPricesTab } from '@/features/crud/masterdata/materialprices/MaterialPriceTab';
 import { MaterialsTab } from '@/features/crud/masterdata/materials/MaterialTab';
 import { ProcessingMethodsTab } from '@/features/crud/masterdata/processingmethods/ProcessingMethodsTab';
 import { ProductCategoriesTab } from '@/features/crud/masterdata/productcategories/ProductCategoryTab';
@@ -49,6 +50,10 @@ export const MasterdataManagement = () => {
     {
       name: 'Materialen',
       component: () => <MaterialsTab key={`material-${selectedIndex}`} />,
+    },
+    {
+      name: 'Materiaalprijzen',
+      component: () => <MaterialPricesTab key={`materialprices-${selectedIndex}`} />,
     },
     {
       name: 'Productcategorieën',

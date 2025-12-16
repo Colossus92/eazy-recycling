@@ -4,11 +4,10 @@ import Plus from '@/assets/icons/Plus.svg?react';
 interface EmptyStateProps {
   icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
   text: string;
-  onClick: () => void;
-  showButton?: boolean;
+  onClick?: () => void;
 }
 
-export const EmptyState = ({ icon: Icon, text, onClick, showButton = true }: EmptyStateProps) => {
+export const EmptyState = ({ icon: Icon, text, onClick}: EmptyStateProps) => {
   return (
     <div className="flex flex-col flex-[1_0_0] justify-center items-center self-stretch gap-3 border-t border-solid border-color-border-primary">
       <div className="flex flex-col items-center gap-5">
@@ -18,7 +17,7 @@ export const EmptyState = ({ icon: Icon, text, onClick, showButton = true }: Emp
         <div className="flex flex-col items-center self-stretch gap-3">
           <span>{text}</span>
         </div>
-        {showButton && <Button
+        {onClick && <Button
           variant={'secondary'}
           label={'Voeg toe'}
           icon={Plus}
