@@ -13,7 +13,7 @@ Eazy Recycling needs to support invoicing functionality for both purchase (inkoo
    - **Inkoop** (purchase): Customer delivers materials to the company
    - **Verkoop** (sales): Company delivers materials to a processor
 3. **Support credit notes**: Negative invoices to correct previous invoices
-4. **Handle mixed invoice lines**: Materials (from weight tickets) and other products (e.g., transport hours)
+4. **Handle invoice lines**: Catalog items (materials, products, services) from weight tickets or added manually
 5. **Comply with Dutch tax authority regulations** for invoice numbering
 6. **Support legacy system transition**: Invoices from both legacy and new system must coexist with unique identifiers
 7. **Enable future extension** to cash receipts (kasbon)
@@ -29,16 +29,13 @@ Eazy Recycling needs to support invoicing functionality for both purchase (inkoo
 - `status`: DRAFT, COMPLETED, INVOICED, CANCELLED
 - Links to `weight_ticket_lines` with waste stream references and weights
 
-**Materials** (`materials` table):
+**Catalog Items** (`catalog_items` table):
 - `id` (bigint): Primary key
-- `code`, `name`: Material identification
+- `code`, `name`: Item identification
+- `item_type`: MATERIAL, PRODUCT, SERVICE
 - `vat_code`: Links to VAT rates
-- `unit_of_measure`: kg, ton, etc.
-
-**Material Prices** (`material_prices` table):
-- `material_id`: FK to materials
-- `price`, `currency`: Pricing info
-- `valid_from`, `valid_to`: Time-bound pricing
+- `unit_of_measure`: kg, ton, uur, stuks, etc.
+- `default_price`, `currency`: Default pricing info
 
 **VAT Rates** (`vat_rates` table):
 - `vat_code`: Primary key (e.g., "V21", "V0")
@@ -62,7 +59,7 @@ Eazy Recycling needs to support invoicing functionality for both purchase (inkoo
 
 ### Option 1: Invoice as Aggregate Root with Polymorphic Lines
 
-Create `Invoice` as a new aggregate root with invoice lines that can reference either materials or generic products.
+Create `Invoice` as a new aggregate root with invoice lines that reference catalog items.
 
 **Structure**:
 ```
@@ -78,9 +75,7 @@ Invoice (Aggregate Root)
 ├── TransportIds[] (multiple transports)
 ├── OriginalInvoiceId? (for credit notes)
 └── InvoiceLines[]
-    ├── InvoiceLine (abstract)
-    │   ├── MaterialLine (references material + weight)
-    │   └── ProductLine (generic: description, quantity, unit price)
+    └── InvoiceLine (references catalog item + quantity + price)
 ```
 
 ### Option 2: Separate Invoice Types with Shared Base
@@ -89,7 +84,7 @@ Create separate `PurchaseInvoice` and `SalesInvoice` aggregates with shared valu
 
 ### Option 3: Single Invoice Entity with Line Type Discriminator
 
-Single `Invoice` entity where lines have a `type` field discriminating between material and product lines.
+Single `Invoice` entity where lines reference catalog items directly without polymorphism.
 
 ---
 
@@ -99,7 +94,7 @@ Single `Invoice` entity where lines have a `type` field discriminating between m
 
 This approach provides:
 - Clean separation of concerns
-- Flexibility for mixed line types
+- Unified catalog item reference for all line types (materials, products, services)
 - Easy extension for future cash receipts (same structure, different payment method)
 - Maintains referential integrity to weight tickets and transports
 
@@ -200,56 +195,34 @@ data class AddressSnapshot(
 )
 ```
 
-#### Invoice Lines (Polymorphic)
+#### Invoice Line
 
 ```kotlin
-sealed class InvoiceLine {
-    abstract val id: InvoiceLineId
-    abstract val lineNumber: Int
-    abstract val date: LocalDate
-    abstract val description: String
-    abstract val orderReference: String?  // Weight ticket number, transport number, etc.
-    abstract val vatCode: String
-    abstract val vatPercentage: BigDecimal  // Snapshot at invoice creation (rates can change)
-    abstract val glAccountCode: String?     // Ledger account code for bookkeeping
-    abstract val quantity: BigDecimal
-    abstract val unitPrice: BigDecimal
-    abstract val totalExclVat: BigDecimal
+data class InvoiceLine(
+    val id: InvoiceLineId,
+    val lineNumber: Int,
+    val date: LocalDate,
+    val description: String,
+    val orderReference: String?,  // Weight ticket number, transport number, etc.
+    val vatCode: String,
+    val vatPercentage: BigDecimal,  // Snapshot at invoice creation (rates can change)
+    val glAccountCode: String?,     // Ledger account code for bookkeeping
+    val quantity: BigDecimal,
+    val unitPrice: BigDecimal,
+    val totalExclVat: BigDecimal,
     
-    data class MaterialLine(
-        override val id: InvoiceLineId,
-        override val lineNumber: Int,
-        override val date: LocalDate,
-        override val description: String,
-        override val orderReference: String?,
-        override val vatCode: String,
-        override val vatPercentage: BigDecimal,
-        override val glAccountCode: String?,
-        override val quantity: BigDecimal,      // Weight in kg
-        override val unitPrice: BigDecimal,     // Price per kg
-        override val totalExclVat: BigDecimal,
-        val materialId: Long,
-        val materialCode: String,
-        val materialName: String,
-        val unitOfMeasure: String,
-    ) : InvoiceLine()
-    
-    data class ProductLine(
-        override val id: InvoiceLineId,
-        override val lineNumber: Int,
-        override val date: LocalDate,
-        override val description: String,
-        override val orderReference: String?,
-        override val vatCode: String,
-        override val vatPercentage: BigDecimal,
-        override val glAccountCode: String?,
-        override val quantity: BigDecimal,      // Hours, pieces, etc.
-        override val unitPrice: BigDecimal,
-        override val totalExclVat: BigDecimal,
-        val productId: Long?,
-        val productCode: String?,
-        val unitOfMeasure: String,              // "uur", "stuks", etc.
-    ) : InvoiceLine()
+    // Catalog item snapshot (denormalized at invoice creation)
+    val catalogItemId: Long,
+    val catalogItemCode: String,
+    val catalogItemName: String,
+    val catalogItemType: CatalogItemType,  // MATERIAL, PRODUCT, SERVICE
+    val unitOfMeasure: String,
+)
+
+enum class CatalogItemType {
+    MATERIAL,  // Physical materials (waste streams)
+    PRODUCT,   // Physical products (containers, etc.)
+    SERVICE    // Services (transport hours, etc.)
 }
 ```
 
@@ -352,7 +325,6 @@ CREATE TABLE invoice_lines (
     id BIGINT PRIMARY KEY,
     invoice_id BIGINT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
     line_number INT NOT NULL,
-    line_type VARCHAR(20) NOT NULL,  -- MATERIAL, PRODUCT
     
     -- Common fields
     line_date DATE NOT NULL,
@@ -366,15 +338,11 @@ CREATE TABLE invoice_lines (
     total_excl_vat NUMERIC(15,2) NOT NULL,
     unit_of_measure TEXT NOT NULL,
     
-    -- Material-specific fields (nullable for product lines)
-    material_id BIGINT REFERENCES materials(id),
-    material_code TEXT,
-    material_name TEXT,
-    
-    -- Product-specific fields (nullable for material lines)
-    product_id BIGINT REFERENCES products(id),
-    product_code TEXT,
-    product_name TEXT,
+    -- Catalog item snapshot (denormalized)
+    catalog_item_id BIGINT REFERENCES catalog_items(id),
+    catalog_item_code TEXT NOT NULL,
+    catalog_item_name TEXT NOT NULL,
+    catalog_item_type TEXT NOT NULL,  -- MATERIAL, PRODUCT, SERVICE
     
     UNIQUE (invoice_id, line_number)
 );
@@ -436,26 +404,14 @@ data class CreateInvoiceCommand(
     val lines: List<InvoiceLineCommand>,
 )
 
-sealed class InvoiceLineCommand {
-    data class MaterialLineCommand(
-        val date: LocalDate,
-        val materialId: Long,
-        val quantity: BigDecimal,
-        val unitPrice: BigDecimal,
-        val orderReference: String?,
-    ) : InvoiceLineCommand()
-    
-    data class ProductLineCommand(
-        val date: LocalDate,
-        val description: String,
-        val productCode: String?,
-        val quantity: BigDecimal,
-        val unitPrice: BigDecimal,
-        val unitOfMeasure: String,
-        val vatCode: String,
-        val orderReference: String?,
-    ) : InvoiceLineCommand()
-}
+data class InvoiceLineCommand(
+    val date: LocalDate,
+    val catalogItemId: Long,
+    val description: String?,  // Optional override of catalog item name
+    val quantity: BigDecimal,
+    val unitPrice: BigDecimal,  // Can be overridden from catalog item default
+    val orderReference: String?,
+)
 ```
 
 #### Create Invoice from Weight Ticket
@@ -533,17 +489,16 @@ enum class PaymentMethod {
 
 ## Pros and Cons of the Options
 
-### Option 1: Invoice as Aggregate Root with Polymorphic Lines (Chosen)
+### Option 1: Invoice as Aggregate Root with Catalog Item Lines (Chosen)
 
 **Pros**:
 - Single aggregate for all invoice types
-- Polymorphic lines allow mixing materials and products
+- Unified catalog item reference simplifies line handling
 - Clean extension path for cash receipts
 - Matches existing DDD patterns in codebase
 
 **Cons**:
-- Slightly more complex line handling
-- Need to handle polymorphism in persistence layer
+- Requires catalog items to be set up before invoicing
 
 ### Option 2: Separate Invoice Types
 
@@ -615,6 +570,5 @@ enum class PaymentMethod {
 - Invoice must contain: date, number, seller/buyer details, VAT breakdown
 
 ### Open Questions
-1. Should products (non-materials) have a master data table, or are they free-text?
-2. What email template/service to use for invoice notifications?
-3. Should invoice PDF generation happen synchronously or async?
+1. What email template/service to use for invoice notifications?
+2. Should invoice PDF generation happen synchronously or async?
