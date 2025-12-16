@@ -1,11 +1,9 @@
-import { CatalogItem, catalogService } from '@/api/services/catalogService';
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
 import { DateFormField } from '@/components/ui/form/DateFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { NumberInput } from '@/components/ui/form/NumberInput';
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
-import { useQuery } from '@tanstack/react-query';
+import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
 import { useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
@@ -51,7 +49,7 @@ export const WeightTicketLinesTab = ({
     formState: { errors },
   } = formContext;
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: 'lines',
   });
@@ -103,13 +101,6 @@ export const WeightTicketLinesTab = ({
     name: 'lines',
   });
 
-  // Fetch catalog items for the selected consignor
-  const { data: catalogItems = [] } = useQuery<CatalogItem[]>({
-    queryKey: ['catalogItems', consignorPartyId],
-    queryFn: () => catalogService.search(undefined, consignorPartyId || undefined),
-    enabled: !!consignorPartyId,
-  });
-
   // Calculate Weging 1 (sum of all line weights)
   const weging1 = useMemo(() => {
     return lineWeights.reduce((sum, field) => {
@@ -129,15 +120,6 @@ export const WeightTicketLinesTab = ({
     const tarra = parseNumber(tarraWeightValue as unknown as string);
     return bruto - tarra;
   }, [bruto, tarraWeightValue]);
-
-  const catalogItemOptions = useMemo(() => {
-    return catalogItems.map((item) => ({
-      value: String(item.id),
-      label: item.wasteStreamNumber
-        ? `${item.name} (${item.wasteStreamNumber})`
-        : item.name,
-    }));
-  }, [catalogItems]);
 
   const handleAddLine = () => {
     append({
@@ -222,33 +204,16 @@ export const WeightTicketLinesTab = ({
 
                 <div className="flex items-start self-stretch gap-4">
                   <div className="flex-1">
-                    <SelectFormField
-                      title={'Naam'}
-                      placeholder={'Selecteer een item'}
-                      options={catalogItemOptions}
-                      testId={`catalog-item-select-${index}`}
+                    <CatalogItemAsyncSelectFormField
+                      title="Naam"
+                      placeholder="Zoek of selecteer een item"
+                      consignorPartyId={consignorPartyId}
                       disabled={disabled}
-                      formHook={{
-                        register,
-                        name: `lines.${index}.catalogItemId` as const,
-                        rules: {
-                          validate: (value) => {
-                            const lines = formContext.getValues('lines');
-                            const weightValue = lines[index]?.weightValue;
-                            // If both are empty, it's valid (will be filtered out)
-                            if (!value && !weightValue) {
-                              return true;
-                            }
-                            // If weight is filled but catalog item is not, show error
-                            if (!value && weightValue) {
-                              return 'Catalogus item is verplicht';
-                            }
-                            return true;
-                          },
-                        },
-                        errors,
-                        control,
-                      }}
+                      testId={`catalog-item-select-${index}`}
+                      index={index}
+                      field={field}
+                      update={update}
+                      errors={errors}
                     />
                   </div>
 
