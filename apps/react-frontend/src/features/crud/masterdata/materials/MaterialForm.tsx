@@ -19,13 +19,7 @@ interface MaterialFormProps {
   initialData?: MaterialResponse;
 }
 
-type MaterialFormValues = Omit<
-  MaterialRequest,
-  'status' | 'materialGroupId' | 'glAccountCode'
-> & {
-  materialGroupId: number;
-  glAccountCode: string;
-};
+type MaterialFormValues = Omit<MaterialRequest, 'status'>;
 
 export const MaterialForm = ({
   isOpen,
@@ -47,7 +41,8 @@ export const MaterialForm = ({
       materialGroupId: 0,
       unitOfMeasure: '',
       vatCode: '',
-      glAccountCode: '',
+      purchaseAccountNumber: '',
+      salesAccountNumber: '',
     },
   });
 
@@ -72,7 +67,8 @@ export const MaterialForm = ({
       materialGroupId: 0,
       unitOfMeasure: '',
       vatCode: '',
-      glAccountCode: '',
+      purchaseAccountNumber: '',
+      salesAccountNumber: '',
     });
     onCancel();
   };

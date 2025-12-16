@@ -37,7 +37,9 @@ export const useMaterialsCrud = () => {
           material.unitOfMeasure
             ?.toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
-          material.vatCode?.toLowerCase().includes(searchQuery.toLowerCase())
+          material.vatCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          material.salesAccountNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          material.purchaseAccountNumber?.toLowerCase().includes(searchQuery.toLowerCase())
         );
       }),
     [materials, searchQuery]

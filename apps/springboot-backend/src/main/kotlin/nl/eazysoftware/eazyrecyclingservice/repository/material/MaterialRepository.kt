@@ -8,12 +8,13 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 
 interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
 
-    @Query(
-        value = """
+  @Query(
+    value = """
             SELECT
                 ci.id as id,
                 ci.code as code,
@@ -35,12 +36,12 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             WHERE ci.type = 'MATERIAL'
         """,
-        nativeQuery = true
-    )
-    fun findAllMaterialsWithGroupDetails(): List<MaterialQueryResult>
+    nativeQuery = true
+  )
+  fun findAllMaterialsWithGroupDetails(): List<MaterialQueryResult>
 
-    @Query(
-        value = """
+  @Query(
+    value = """
             SELECT
                 ci.id as id,
                 ci.code as code,
@@ -62,12 +63,12 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             WHERE ci.id = :id AND ci.type = 'MATERIAL'
         """,
-        nativeQuery = true
-    )
-    fun findMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
+    nativeQuery = true
+  )
+  fun findMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
 
-    @Query(
-        value = """
+  @Query(
+    value = """
             SELECT
                 ci.id as id,
                 ci.code as code,
@@ -92,61 +93,104 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
                OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
             ORDER BY ci.name
         """,
-        nativeQuery = true
-    )
-    fun searchMaterials(query: String): List<MaterialQueryResult>
+    nativeQuery = true
+  )
+  fun searchMaterials(query: String): List<MaterialQueryResult>
 
-    @Modifying
-    @Query(
-        value = """
-            UPDATE catalog_items 
+  @Modifying
+  @Query(
+    value = """
+            UPDATE catalog_items
             SET default_price = :price, last_modified_at = NOW()
             WHERE id = :id AND type = 'MATERIAL'
         """,
-        nativeQuery = true
-    )
-    fun updateMaterialPrice(id: Long, price: BigDecimal?): Int
+    nativeQuery = true
+  )
+  fun updateMaterialPrice(id: Long, price: BigDecimal?): Int
+
+  @Modifying(clearAutomatically = true)
+  @Query(
+    value = """
+            UPDATE catalog_items
+            SET code = :code,
+                name = :name,
+                category_id = :categoryId,
+                unit_of_measure = :unitOfMeasure,
+                vat_code = :vatCode,
+                purchase_account_number = :purchaseAccountNumber,
+                sales_account_number = :salesAccountNumber,
+                status = :status,
+                last_modified_at = NOW()
+            WHERE id = :id AND type = 'MATERIAL'
+        """,
+    nativeQuery = true
+  )
+  fun updateMaterialFields(
+    id: Long,
+    code: String,
+    name: String,
+    categoryId: Long?,
+    unitOfMeasure: String,
+    vatCode: String,
+    purchaseAccountNumber: String?,
+    salesAccountNumber: String?,
+    status: String
+  ): Int
 }
 
 @Repository
 class MaterialRepository(
-    private val jpaRepository: MaterialJpaRepository,
-    private val mapper: MaterialMapper
+  private val jpaRepository: MaterialJpaRepository,
+  private val mapper: MaterialMapper
 ) : Materials {
 
-    override fun getMaterialById(id: Long): Material? {
-        return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
-    }
+  override fun getMaterialById(id: Long): Material? {
+    return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
+  }
 
-    override fun getAllMaterialsWithGroupDetails(): List<MaterialQueryResult> {
-        return jpaRepository.findAllMaterialsWithGroupDetails()
-    }
+  override fun getAllMaterialsWithGroupDetails(): List<MaterialQueryResult> {
+    return jpaRepository.findAllMaterialsWithGroupDetails()
+  }
 
-    override fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult? {
-        return jpaRepository.findMaterialWithGroupDetailsById(id)
-    }
+  override fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult? {
+    return jpaRepository.findMaterialWithGroupDetailsById(id)
+  }
 
-    override fun createMaterial(material: Material): Material {
-        val dto = mapper.toDto(material.copy(id = null))
-        val saved = jpaRepository.save(dto)
-        return mapper.toDomain(saved)
-    }
+  override fun createMaterial(material: Material): Material {
+    val dto = mapper.toDto(material.copy(id = null))
+    val saved = jpaRepository.save(dto)
+    return mapper.toDomain(saved)
+  }
 
-    override fun updateMaterial(id: Long, material: Material): Material {
-        val dto = mapper.toDto(material.copy(id = id))
-        val saved = jpaRepository.save(dto)
-        return mapper.toDomain(saved)
+  @Transactional
+  override fun updateMaterial(id: Long, material: Material): Material {
+    val rowsUpdated = jpaRepository.updateMaterialFields(
+      id = id,
+      code = material.code,
+      name = material.name,
+      categoryId = material.materialGroupId,
+      unitOfMeasure = material.unitOfMeasure,
+      vatCode = material.vatCode,
+      purchaseAccountNumber = material.purchaseAccountNumber,
+      salesAccountNumber = material.salesAccountNumber,
+      status = material.status
+    )
+    if (rowsUpdated == 0) {
+      throw IllegalArgumentException("Material with id $id not found or is not a MATERIAL type")
     }
+    return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
+      ?: throw IllegalStateException("Failed to retrieve updated material with id $id")
+  }
 
-    override fun deleteMaterial(id: Long) {
-        jpaRepository.deleteById(id)
-    }
+  override fun deleteMaterial(id: Long) {
+    jpaRepository.deleteById(id)
+  }
 
-    override fun searchMaterials(query: String, limit: Int): List<MaterialQueryResult> {
-        return jpaRepository.searchMaterials(query).take(limit)
-    }
+  override fun searchMaterials(query: String, limit: Int): List<MaterialQueryResult> {
+    return jpaRepository.searchMaterials(query).take(limit)
+  }
 
-    override fun updateMaterialPrice(id: Long, price: BigDecimal?): Boolean {
-        return jpaRepository.updateMaterialPrice(id, price) > 0
-    }
+  override fun updateMaterialPrice(id: Long, price: BigDecimal?): Boolean {
+    return jpaRepository.updateMaterialPrice(id, price) > 0
+  }
 }

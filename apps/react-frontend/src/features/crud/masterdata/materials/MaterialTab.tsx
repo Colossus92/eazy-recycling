@@ -19,7 +19,7 @@ export const MaterialsTab = () => {
     {
       key: 'name',
       label: 'Naam',
-      width: '25',
+      width: '15',
       accessor: (item) => item.name,
     },
     {

@@ -26,8 +26,8 @@ class MaterialMapper(
             consignorParty = null,
             defaultPrice = null,
             status = domain.status,
-            purchaseAccountNumber = null,
-            salesAccountNumber = null,
+            purchaseAccountNumber = domain.purchaseAccountNumber,
+            salesAccountNumber = domain.salesAccountNumber,
         )
     }
 
