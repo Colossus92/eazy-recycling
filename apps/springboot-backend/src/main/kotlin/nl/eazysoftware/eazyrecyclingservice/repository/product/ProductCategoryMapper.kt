@@ -1,22 +1,28 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.product
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.product.ProductCategory
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import org.springframework.stereotype.Component
 import kotlin.time.toKotlinInstant
 
 @Component
 class ProductCategoryMapper {
 
-    fun toDto(domain: ProductCategory): ProductCategoryDto {
-        return ProductCategoryDto(
+    companion object {
+        const val PRODUCT_TYPE = "PRODUCT"
+    }
+
+    fun toDto(domain: ProductCategory): CatalogItemCategoryDto {
+        return CatalogItemCategoryDto(
             id = domain.id,
+            type = PRODUCT_TYPE,
             code = domain.code,
             name = domain.name,
             description = domain.description,
         )
     }
 
-    fun toDomain(dto: ProductCategoryDto): ProductCategory {
+    fun toDomain(dto: CatalogItemCategoryDto): ProductCategory {
         return ProductCategory(
             id = dto.id,
             code = dto.code,

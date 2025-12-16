@@ -2,8 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.controller.product
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.ProductCategoryRequest
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryDto
-import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryMapper.Companion.PRODUCT_TYPE
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
@@ -32,12 +32,14 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var objectMapper: ObjectMapper
 
   @Autowired
-  private lateinit var productCategoryJpaRepository: ProductCategoryJpaRepository
+  private lateinit var catalogItemCategoryJpaRepository: CatalogItemCategoryJpaRepository
 
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
-    productCategoryJpaRepository.deleteAll()
+    catalogItemCategoryJpaRepository.findByType(PRODUCT_TYPE).forEach {
+      catalogItemCategoryJpaRepository.delete(it)
+    }
   }
 
   @Test
@@ -63,7 +65,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.createdAt").exists())
 
     // Verify category was saved in the database
-    val savedCategories = productCategoryJpaRepository.findAll()
+    val savedCategories = catalogItemCategoryJpaRepository.findByType(PRODUCT_TYPE)
     assertThat(savedCategories).hasSize(1)
     assertThat(savedCategories[0].code).isEqualTo("CAT001")
   }
@@ -71,15 +73,17 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get all product categories`() {
     // Given
-    productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Category 1",
         description = "Description 1"
       )
     )
-    productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = PRODUCT_TYPE,
         code = "CAT002",
         name = "Category 2",
         description = "Description 2"
@@ -97,8 +101,9 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should get product category by id`() {
     // Given
-    val category = productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    val category = catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Test Category",
         description = "Test description"
@@ -124,8 +129,9 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should update product category`() {
     // Given
-    val category = productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    val category = catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Original Category",
         description = "Original description"
@@ -149,7 +155,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.description").value("Updated description"))
 
     // Verify category was updated in the database
-    val updatedCategory = productCategoryJpaRepository.findByIdOrNull(category.id!!)
+    val updatedCategory = catalogItemCategoryJpaRepository.findByIdAndType(category.id!!, PRODUCT_TYPE)
     assertThat(updatedCategory).isNotNull
     assertThat(updatedCategory?.code).isEqualTo("CAT001_UPDATED")
   }
@@ -174,8 +180,9 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should delete product category`() {
     // Given
-    val category = productCategoryJpaRepository.save(
-      ProductCategoryDto(
+    val category = catalogItemCategoryJpaRepository.save(
+      CatalogItemCategoryDto(
+        type = PRODUCT_TYPE,
         code = "DELETE_ME",
         name = "Delete Me",
         description = "To be deleted"
@@ -187,7 +194,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isNoContent)
 
     // Verify category was deleted
-    assertThat(productCategoryJpaRepository.findByIdOrNull(category.id!!)).isNull()
+    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(category.id!!, PRODUCT_TYPE)).isNull()
   }
 
   @Test

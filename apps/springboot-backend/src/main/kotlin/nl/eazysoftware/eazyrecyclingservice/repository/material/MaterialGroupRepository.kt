@@ -28,7 +28,7 @@ class MaterialGroupRepository(
 
     override fun updateMaterialGroup(id: Long, materialGroup: MaterialGroup): MaterialGroup {
         val existing = jpaRepository.findByIdAndType(id, MATERIAL_TYPE)
-            ?: throw NoSuchElementException("MaterialGroup with id $id not found")
+            ?: throw NoSuchElementException("Materiaalgroep met id $id niet gevonden")
         existing.code = materialGroup.code
         existing.name = materialGroup.name
         existing.description = materialGroup.description
@@ -38,7 +38,7 @@ class MaterialGroupRepository(
 
     override fun deleteMaterialGroup(id: Long) {
         val existing = jpaRepository.findByIdAndType(id, MATERIAL_TYPE)
-            ?: throw NoSuchElementException("MaterialGroup with id $id not found")
+            ?: throw NoSuchElementException("Materiaalgroep met id $id niet gevonden")
         jpaRepository.delete(existing)
     }
 }
