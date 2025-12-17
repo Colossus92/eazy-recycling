@@ -11,68 +11,76 @@ import java.util.UUID
 
 @Entity
 @Table(name = "invoices")
-data class InvoiceDto(
+class InvoiceDto(
   @Id
-    @Column(name = "id")
-    val id: Long,
+  @Column(name = "id")
+  val id: Long,
 
   @Column(name = "invoice_number")
-    val invoiceNumber: String?,
+  val invoiceNumber: String?,
 
   @Enumerated(EnumType.STRING)
-    @Column(name = "invoice_type", nullable = false)
-    val invoiceType: InvoiceType,
+  @Column(name = "invoice_type", nullable = false)
+  val invoiceType: InvoiceType,
 
   @Enumerated(EnumType.STRING)
-    @Column(name = "document_type", nullable = false)
-    val documentType: InvoiceDocumentType,
+  @Column(name = "document_type", nullable = false)
+  val documentType: InvoiceDocumentType,
 
   @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    val status: InvoiceStatus,
+  @Column(name = "status", nullable = false)
+  val status: InvoiceStatus,
 
   @Column(name = "invoice_date", nullable = false)
-    val invoiceDate: LocalDate,
+  val invoiceDate: LocalDate,
 
   @Column(name = "customer_company_id", nullable = false)
-    val customerCompanyId: UUID,
+  val customerCompanyId: UUID,
 
   @Column(name = "customer_number")
-    val customerNumber: String?,
+  val customerNumber: String?,
 
   @Column(name = "customer_name", nullable = false)
-    val customerName: String,
+  val customerName: String,
 
   @Column(name = "customer_street_name", nullable = false)
-    val customerStreetName: String,
+  val customerStreetName: String,
 
   @Column(name = "customer_building_number")
-    val customerBuildingNumber: String?,
+  val customerBuildingNumber: String?,
 
   @Column(name = "customer_building_number_addition")
-    val customerBuildingNumberAddition: String?,
+  val customerBuildingNumberAddition: String?,
 
   @Column(name = "customer_postal_code", nullable = false)
-    val customerPostalCode: String,
+  val customerPostalCode: String,
 
   @Column(name = "customer_city", nullable = false)
-    val customerCity: String,
+  val customerCity: String,
 
   @Column(name = "customer_country")
-    val customerCountry: String?,
+  val customerCountry: String?,
 
   @Column(name = "customer_vat_number")
-    val customerVatNumber: String?,
+  val customerVatNumber: String?,
 
   @Column(name = "original_invoice_id")
-    val originalInvoiceId: Long?,
+  val originalInvoiceId: Long?,
 
   @OneToMany(mappedBy = "invoice", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
-    val lines: MutableList<InvoiceLineDto> = mutableListOf(),
+  val lines: MutableList<InvoiceLineDto> = mutableListOf(),
 
   @Column(name = "finalized_at")
-    val finalizedAt: Instant?,
+  val finalizedAt: Instant?,
 
   @Column(name = "finalized_by")
-    val finalizedBy: String?,
-) : AuditableEntity()
+  val finalizedBy: String?,
+) : AuditableEntity() {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (other !is InvoiceLineDto) return false
+      return id == other.id
+    }
+
+    override fun hashCode(): Int = id.hashCode() ?: 0
+}

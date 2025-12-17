@@ -3243,6 +3243,9 @@ components:
     InvoiceLineRequest:
       type: object
       properties:
+        id:
+          type: integer
+          format: int64
         date:
           type: string
           format: date
@@ -5047,8 +5050,6 @@ components:
         date:
           type: string
           format: date
-        description:
-          type: string
         orderReference:
           type: string
         vatCode:
@@ -5080,7 +5081,6 @@ components:
       - catalogItemName
       - catalogItemType
       - date
-      - description
       - id
       - lineNumber
       - quantity
@@ -5315,15 +5315,15 @@ components:
         totalPages:
           type: integer
           format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
         numberOfElements:
           type: integer
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
-        first:
-          type: boolean
-        last:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -5341,16 +5341,16 @@ components:
     PageableObject:
       type: object
       properties:
-        unpaged:
-          type: boolean
-        paged:
-          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
         offset:
           type: integer
           format: int64
@@ -5922,14 +5922,31 @@ components:
     ServletContext:
       type: object
       properties:
+        contextPath:
+          type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        initParameterNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
         attributeNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        contextPath:
-          type: string
-        initParameterNames: {}
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5964,27 +5981,10 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         classLoader:
           type: object
           properties:
@@ -6053,10 +6053,10 @@ components:
         maxAge:
           type: integer
           format: int32
-        httpOnly:
-          type: boolean
         domain:
           type: string
+        httpOnly:
+          type: boolean
         path:
           type: string
         name:
@@ -6071,9 +6071,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

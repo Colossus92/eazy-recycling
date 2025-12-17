@@ -42,6 +42,7 @@ class InvoiceController(
             originalInvoiceId = request.originalInvoiceId,
             lines = request.lines.map { line ->
                 InvoiceLineCommand(
+                    id = line.id,
                     date = line.date,
                     catalogItemId = line.catalogItemId,
                     description = line.description,
@@ -79,6 +80,7 @@ class InvoiceController(
             invoiceDate = request.invoiceDate,
             lines = request.lines.map { line ->
                 InvoiceLineCommand(
+                    id = line.id,
                     date = line.date,
                     catalogItemId = line.catalogItemId,
                     description = line.description,
@@ -123,18 +125,16 @@ class InvoiceController(
     )
 
     data class InvoiceLineRequest(
+        val id: Long? = null,
         val date: LocalDate,
-
         @field:NotNull
         @field:Positive
         val catalogItemId: Long,
 
-        val description: String?,
+        val description: String? = null,
 
-        @field:NotNull
         val quantity: BigDecimal,
 
-        @field:NotNull
         val unitPrice: BigDecimal,
 
         val orderReference: String?,

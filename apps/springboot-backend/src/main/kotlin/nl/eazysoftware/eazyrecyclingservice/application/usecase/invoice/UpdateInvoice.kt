@@ -51,8 +51,10 @@ class UpdateInvoiceService(
         val totalExclVat = cmd.quantity.multiply(cmd.unitPrice)
         val vatPercentage = BigDecimal(vatRate.percentage)
 
+        val lineId = cmd.id ?: invoices.nextLineId()
+
         return InvoiceLine(
-            id = InvoiceLineId(invoices.nextLineId()),
+            id = InvoiceLineId(lineId),
             lineNumber = lineNumber,
             date = cmd.date,
             description = cmd.description ?: catalogItem.name,

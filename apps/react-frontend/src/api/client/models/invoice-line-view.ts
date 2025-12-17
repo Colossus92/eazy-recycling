@@ -43,12 +43,6 @@ export interface InvoiceLineView {
      * @type {string}
      * @memberof InvoiceLineView
      */
-    'description': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InvoiceLineView
-     */
     'orderReference'?: string;
     /**
      * 

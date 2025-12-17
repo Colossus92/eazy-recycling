@@ -34,16 +34,16 @@ export interface SessionCookieConfig {
     'maxAge'?: number;
     /**
      * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'httpOnly'?: boolean;
-    /**
-     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
     'domain'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {string}

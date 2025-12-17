@@ -22,6 +22,12 @@
 export interface InvoiceLineRequest {
     /**
      * 
+     * @type {number}
+     * @memberof InvoiceLineRequest
+     */
+    'id'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof InvoiceLineRequest
      */

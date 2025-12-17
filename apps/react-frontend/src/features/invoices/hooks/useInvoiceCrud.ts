@@ -1,8 +1,6 @@
-import { InvoiceView, InvoiceControllerApi } from '@/api/client';
+import { InvoiceView } from '@/api/client';
 import { useCallback, useEffect, useState } from 'react';
-import { apiInstance } from '@/api/services/apiInstance';
-
-const invoiceApi = new InvoiceControllerApi(apiInstance.config);
+import { invoiceService } from '@/api/services/invoiceService';
 
 export const useInvoiceCrud = () => {
   const [items, setItems] = useState<InvoiceView[]>([]);
@@ -20,8 +18,8 @@ export const useInvoiceCrud = () => {
   const fetchInvoices = useCallback(async () => {
     setIsFetching(true);
     try {
-      const response = await invoiceApi.getAll();
-      let filteredItems = response.data;
+      const data = await invoiceService.getAll();
+      let filteredItems = data;
       
       if (query) {
         const lowerQuery = query.toLowerCase();
@@ -75,7 +73,7 @@ export const useInvoiceCrud = () => {
 
   const confirmDelete = async () => {
     if (deletionItem) {
-      await invoiceApi._delete(deletionItem);
+      await invoiceService.delete(deletionItem);
       setDeletionItem(undefined);
       fetchInvoices();
     }

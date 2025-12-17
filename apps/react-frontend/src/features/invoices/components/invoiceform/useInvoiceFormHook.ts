@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { InvoiceControllerApi, CreateInvoiceRequest, UpdateInvoiceRequest, InvoiceLineRequest } from '@/api/client';
-import { apiInstance } from '@/api/services/apiInstance';
+import { CreateInvoiceRequest, UpdateInvoiceRequest, InvoiceLineRequest } from '@/api/client';
+import { invoiceService } from '@/api/services/invoiceService';
+import { toastService } from '@/components/ui/toast/toastService';
 import { format } from 'date-fns';
 
-const invoiceApi = new InvoiceControllerApi(apiInstance.config);
-
 export interface InvoiceLineFormValue {
+  id?: number;
   catalogItemId: string;
   catalogItemName: string;
   date: string;
@@ -50,8 +50,7 @@ export const useInvoiceFormHook = () => {
   const loadInvoice = useCallback(async (invoiceId: number) => {
     setIsLoading(true);
     try {
-      const response = await invoiceApi.getById(invoiceId);
-      const invoice = response.data;
+      const invoice = await invoiceService.getById(invoiceId);
 
       formContext.reset({
         customerId: invoice.customer.companyId,
@@ -59,6 +58,7 @@ export const useInvoiceFormHook = () => {
         invoiceType: invoice.invoiceType,
         documentType: invoice.documentType,
         lines: invoice.lines.map((line) => ({
+          id: line.id,
           catalogItemId: String(line.catalogItemId),
           catalogItemName: line.catalogItemName,
           date: line.date,
@@ -72,6 +72,7 @@ export const useInvoiceFormHook = () => {
       });
     } catch (error) {
       console.error('Error loading invoice:', error);
+      toastService.error('Er is een fout opgetreden bij het laden van de factuur');
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +89,7 @@ export const useInvoiceFormHook = () => {
       const lines: InvoiceLineRequest[] = values.lines
         .filter((line) => line.catalogItemId)
         .map((line) => ({
+          id: typeof line.id === 'number' ? line.id : undefined,
           date: line.date || values.invoiceDate,
           catalogItemId: parseInt(line.catalogItemId, 10),
           description: line.description,
@@ -101,7 +103,7 @@ export const useInvoiceFormHook = () => {
           invoiceDate: values.invoiceDate,
           lines,
         };
-        await invoiceApi.update2(invoiceId, updateRequest);
+        await invoiceService.update(invoiceId, updateRequest);
       } else {
         const createRequest: CreateInvoiceRequest = {
           invoiceType: values.invoiceType,
@@ -110,12 +112,15 @@ export const useInvoiceFormHook = () => {
           invoiceDate: values.invoiceDate,
           lines,
         };
-        await invoiceApi.create2(createRequest);
+        await invoiceService.create(createRequest);
       }
       
       return true;
     } catch (error) {
       console.error('Error saving invoice:', error);
+      toastService.error(
+        `Er is een fout opgetreden bij het ${invoiceId ? 'bijwerken' : 'aanmaken'} van de factuur`
+      );
       return false;
     } finally {
       setIsSaving(false);

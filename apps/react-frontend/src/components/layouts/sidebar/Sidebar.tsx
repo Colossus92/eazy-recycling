@@ -28,7 +28,7 @@ export const Sidebar = () => {
     { icon: Scale, label: 'Weegbonnen', to: '/weight-tickets' },
     { icon: IcBaselineEuro, 
       label: 'Financieel', 
-      to: '/financieel', 
+      to: '/financials', 
       requiredRole: 'admin',
      },
     {

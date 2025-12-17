@@ -193,6 +193,7 @@ export const InvoiceLinesSection = () => {
           icon={Plus}
           onClick={handleAddLine}
           title='Voeg regel toe'
+          type='button'
         />
       </div>
 

@@ -55,7 +55,7 @@ export const App = () => {
                 element={<WeightTicketManagement />}
               />
               <Route
-                path="/financieel"
+                path="/financials"
                 element={<FinancieelManagement />}
               />
               <Route

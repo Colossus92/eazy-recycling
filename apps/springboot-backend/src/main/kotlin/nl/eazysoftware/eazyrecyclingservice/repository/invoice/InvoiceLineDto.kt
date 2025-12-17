@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 @Entity
 @Table(name = "invoice_lines")
-data class InvoiceLineDto(
+class InvoiceLineDto(
   @Id
   @Column(name = "id")
   val id: Long,
@@ -61,4 +61,12 @@ data class InvoiceLineDto(
   @Enumerated(EnumType.STRING)
   @Column(name = "catalog_item_type", nullable = false)
   val catalogItemType: CatalogItemType,
-)
+) {
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is InvoiceLineDto) return false
+    return id == other.id
+  }
+
+  override fun hashCode(): Int = id.hashCode()
+}

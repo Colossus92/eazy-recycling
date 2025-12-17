@@ -22,9 +22,10 @@ data class UpdateInvoiceCommand(
 )
 
 data class InvoiceLineCommand(
+    val id: Long? = null,
     val date: LocalDate,
     val catalogItemId: Long,
-    val description: String?,
+    val description: String? = null,
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
     val orderReference: String?,
