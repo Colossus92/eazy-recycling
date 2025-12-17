@@ -43,28 +43,10 @@ export interface ServletContext {
     'contextPath'?: string;
     /**
      * 
-     * @type {{ [key: string]: ServletRegistration; }}
-     * @memberof ServletContext
-     */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
-    /**
-     * 
      * @type {any}
      * @memberof ServletContext
      */
     'initParameterNames'?: any;
-    /**
-     * 
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'sessionTimeout'?: number;
-    /**
-     * 
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'attributeNames'?: any;
     /**
      * 
      * @type {SessionCookieConfig}
@@ -79,10 +61,22 @@ export interface ServletContext {
     'virtualServerName'?: string;
     /**
      * 
+     * @type {{ [key: string]: ServletRegistration; }}
+     * @memberof ServletContext
+     */
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    /**
+     * 
      * @type {Set<string>}
      * @memberof ServletContext
      */
     'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
+    /**
+     * 
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
     /**
      * 
      * @type {number}
@@ -143,6 +137,12 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'responseCharacterEncoding'?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
     /**
      * 
      * @type {ApplicationContextClassLoaderParentUnnamedModuleClassLoader}

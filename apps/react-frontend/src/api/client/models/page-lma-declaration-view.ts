@@ -34,25 +34,13 @@ export interface PageLmaDeclarationView {
      * @type {number}
      * @memberof PageLmaDeclarationView
      */
-    'totalElements'?: number;
+    'totalPages'?: number;
     /**
      * 
      * @type {number}
      * @memberof PageLmaDeclarationView
      */
-    'totalPages'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageLmaDeclarationView
-     */
-    'first'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PageLmaDeclarationView
-     */
-    'last'?: boolean;
+    'totalElements'?: number;
     /**
      * 
      * @type {number}
@@ -65,6 +53,18 @@ export interface PageLmaDeclarationView {
      * @memberof PageLmaDeclarationView
      */
     'pageable'?: PageableObject;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageLmaDeclarationView
+     */
+    'first'?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PageLmaDeclarationView
+     */
+    'last'?: boolean;
     /**
      * 
      * @type {number}

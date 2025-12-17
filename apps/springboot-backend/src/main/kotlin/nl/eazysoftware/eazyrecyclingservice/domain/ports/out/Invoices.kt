@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 interface Invoices {
     fun nextId(): InvoiceId
     fun nextLineId(): Long
+    fun nextInvoiceNumberSequence(year: Int): Long
     fun save(aggregate: Invoice): Invoice
     fun findById(id: InvoiceId): Invoice?
     fun findAll(): List<Invoice>

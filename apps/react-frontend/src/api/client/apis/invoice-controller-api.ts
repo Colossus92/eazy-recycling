@@ -112,6 +112,78 @@ export const InvoiceControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
+         * @param {CreateInvoiceRequest} createInvoiceRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        createCompleted1: async (createInvoiceRequest: CreateInvoiceRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createInvoiceRequest' is not null or undefined
+            assertParamExists('createCompleted1', 'createInvoiceRequest', createInvoiceRequest)
+            const localVarPath = `/invoices/completed`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createInvoiceRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        finalize: async (id: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('finalize', 'id', id)
+            const localVarPath = `/invoices/{id}/finalize`
+                .replace(`{id}`, encodeURIComponent(String(id)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
@@ -252,6 +324,30 @@ export const InvoiceControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {CreateInvoiceRequest} createInvoiceRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createCompleted1(createInvoiceRequest: CreateInvoiceRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createCompleted1(createInvoiceRequest, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['InvoiceControllerApi.createCompleted1']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async finalize(id: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.finalize(id, options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['InvoiceControllerApi.finalize']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -315,6 +411,24 @@ export const InvoiceControllerApiFactory = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {CreateInvoiceRequest} createInvoiceRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createCompleted1(createInvoiceRequest: CreateInvoiceRequest, options?: any): AxiosPromise<InvoiceResult> {
+            return localVarFp.createCompleted1(createInvoiceRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} id 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        finalize(id: number, options?: any): AxiosPromise<InvoiceResult> {
+            return localVarFp.finalize(id, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -367,6 +481,28 @@ export class InvoiceControllerApi extends BaseAPI {
      */
     public create2(createInvoiceRequest: CreateInvoiceRequest, options?: RawAxiosRequestConfig) {
         return InvoiceControllerApiFp(this.configuration).create2(createInvoiceRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {CreateInvoiceRequest} createInvoiceRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceControllerApi
+     */
+    public createCompleted1(createInvoiceRequest: CreateInvoiceRequest, options?: RawAxiosRequestConfig) {
+        return InvoiceControllerApiFp(this.configuration).createCompleted1(createInvoiceRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} id 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceControllerApi
+     */
+    public finalize(id: number, options?: RawAxiosRequestConfig) {
+        return InvoiceControllerApiFp(this.configuration).finalize(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

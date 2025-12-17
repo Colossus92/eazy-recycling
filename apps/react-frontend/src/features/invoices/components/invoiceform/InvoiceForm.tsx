@@ -1,8 +1,10 @@
-import X from '@/assets/icons/X.svg?react';
 import { Button } from '@/components/ui/button/Button';
+import { SplitButton } from '@/components/ui/button/SplitButton';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { DateFormField } from '@/components/ui/form/DateFormField';
+import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
+import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { useEffect } from 'react';
 import { FormProvider } from 'react-hook-form';
@@ -32,6 +34,7 @@ export const InvoiceForm = ({
     loadInvoice,
     resetForm,
     handleSubmit,
+    handleSubmitAndFinalize,
   } = useInvoiceFormHook();
 
   const isEditMode = invoiceId !== undefined;
@@ -48,6 +51,14 @@ export const InvoiceForm = ({
 
   const onSubmit = async () => {
     const success = await handleSubmit(invoiceId);
+    if (success) {
+      onComplete();
+      setIsOpen(false);
+    }
+  };
+
+  const onSubmitAndFinalize = async () => {
+    const success = await handleSubmitAndFinalize(invoiceId);
     if (success) {
       onComplete();
       setIsOpen(false);
@@ -71,116 +82,105 @@ export const InvoiceForm = ({
 
   return (
     <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[800px]">
-      {/* Header */}
-      <div className="flex py-3 px-4 items-center gap-4 self-stretch border-b border-solid border-color-border-primary">
-        <div className="flex-1">
-          <h4>{isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur'}</h4>
-        </div>
-        <Button
-          icon={X}
-          showText={false}
-          variant="tertiary"
-          iconPosition="right"
-          onClick={handleClose}
-        />
-      </div>
+      <FormProvider {...formContext}>
+        <form
+          onSubmit={formContext.handleSubmit(onSubmit)}
+          className="flex flex-col h-full"
+        >
+          <FormTopBar
+            title={isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur'}
+            actions={
+              isEditMode && (
+                <FormActionMenu
+                  onDelete={() => {
+                    if (invoiceId) {
+                      onDelete(invoiceId);
+                      setIsOpen(false);
+                    }
+                  }}
+                />
+              )
+            }
+            onClick={handleClose}
+          />
 
-      {/* Content */}
-      <div className="flex flex-col self-stretch p-4 max-h-[70vh] overflow-y-auto">
-        {isLoading ? (
-          <div className="flex justify-center items-center h-48">
-            <ClipLoader size={20} aria-label="Laden..." />
+          {/* Content */}
+          <div className="flex flex-col self-stretch p-4 max-h-[70vh] overflow-y-auto flex-1">
+            {isLoading ? (
+              <div className="flex justify-center items-center h-48">
+                <ClipLoader size={20} aria-label="Laden..." />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {/* Invoice header section */}
+                <div className="grid grid-cols-2 gap-4">
+                  <CompanySelectFormField
+                    title="Klant"
+                    placeholder="Selecteer een klant"
+                    name="customerId"
+                    rules={{ required: 'Klant is verplicht' }}
+                  />
+                  <DateFormField
+                    title="Factuurdatum"
+                    placeholder="Selecteer een datum"
+                    formHook={{
+                      register: formContext.register,
+                      name: 'invoiceDate',
+                      rules: { required: 'Factuurdatum is verplicht' },
+                      errors: formContext.formState.errors,
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <SelectFormField
+                    title="Type"
+                    placeholder="Selecteer type"
+                    options={invoiceTypeOptions}
+                    formHook={{
+                      register: formContext.register,
+                      name: 'invoiceType',
+                      rules: { required: 'Type is verplicht' },
+                      errors: formContext.formState.errors,
+                    }}
+                  />
+                  <SelectFormField
+                    title="Document type"
+                    placeholder="Selecteer document type"
+                    options={documentTypeOptions}
+                    formHook={{
+                      register: formContext.register,
+                      name: 'documentType',
+                      rules: { required: 'Document type is verplicht' },
+                      errors: formContext.formState.errors,
+                    }}
+                  />
+                </div>
+
+                {/* Invoice lines section */}
+                <InvoiceLinesSection />
+              </div>
+            )}
           </div>
-        ) : (
-          <FormProvider {...formContext}>
-            <form
-              onSubmit={formContext.handleSubmit(onSubmit)}
-              className="flex flex-col gap-6"
-            >
-              {/* Invoice header section */}
-              <div className="grid grid-cols-2 gap-4">
-                <CompanySelectFormField
-                  title="Klant"
-                  placeholder="Selecteer een klant"
-                  name="customerId"
-                  rules={{ required: 'Klant is verplicht' }}
-                />
-                <DateFormField
-                  title="Factuurdatum"
-                  placeholder="Selecteer een datum"
-                  formHook={{
-                    register: formContext.register,
-                    name: 'invoiceDate',
-                    rules: { required: 'Factuurdatum is verplicht' },
-                    errors: formContext.formState.errors,
-                  }}
-                />
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <SelectFormField
-                  title="Type"
-                  placeholder="Selecteer type"
-                  options={invoiceTypeOptions}
-                  formHook={{
-                    register: formContext.register,
-                    name: 'invoiceType',
-                    rules: { required: 'Type is verplicht' },
-                    errors: formContext.formState.errors,
-                  }}
-                />
-                <SelectFormField
-                  title="Document type"
-                  placeholder="Selecteer document type"
-                  options={documentTypeOptions}
-                  formHook={{
-                    register: formContext.register,
-                    name: 'documentType',
-                    rules: { required: 'Document type is verplicht' },
-                    errors: formContext.formState.errors,
-                  }}
-                />
-              </div>
-
-              {/* Invoice lines section */}
-              <InvoiceLinesSection />
-
-              {/* Footer with actions */}
-              <div className="flex justify-between items-center pt-4 border-t border-color-border-primary">
-                <div>
-                  {isEditMode && (
-                    <Button
-                      variant="destructive"
-                      label="Verwijderen"
-                      onClick={() => {
-                        if (invoiceId) {
-                          onDelete(invoiceId);
-                          setIsOpen(false);
-                        }
-                      }}
-                      type="button"
-                    />
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    label="Annuleren"
-                    onClick={handleClose}
-                    type="button"
-                  />
-                  <Button
-                    variant="primary"
-                    label={isSaving ? 'Opslaan...' : 'Opslaan'}
-                    type="submit"
-                    disabled={isSaving}
-                  />
-                </div>
-              </div>
-            </form>
-          </FormProvider>
-        )}
-      </div>
+          {/* Footer with actions */}
+          <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
+            <Button
+              variant="secondary"
+              label="Annuleren"
+              onClick={handleClose}
+              type="button"
+            />
+            <SplitButton
+              primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
+              secondaryLabel={isEditMode ? 'Verwerken' : 'Opslaan en verwerken'}
+              onPrimaryClick={onSubmit}
+              onSecondaryClick={onSubmitAndFinalize}
+              isSubmitting={isSaving}
+            />
+          </div>
+        </form>
+      </FormProvider>
     </FormDialog>
   );
 };

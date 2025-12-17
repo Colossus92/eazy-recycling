@@ -6,7 +6,7 @@ import { useMobileHook } from '@/hooks/useMobileHook.ts';
 import { Sidebar } from '@/components/layouts/sidebar/Sidebar.tsx';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute.tsx';
 import WeightTicketManagement from './pages/WeightTicketManagement.tsx';
-import FinancieelManagement from './pages/FinancieelManagement.tsx';
+import FinancieelManagement from './pages/FinancialManagement.tsx';
 import { ScreenSizeSafeguard } from '@/components/safeguards/ScreenSizeSafeguard.tsx';
 
 const PlanningPage = lazy(() => import('./pages/PlanningPage'));

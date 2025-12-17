@@ -25,7 +25,9 @@ import java.util.*
 @RequestMapping("/invoices")
 class InvoiceController(
     private val createInvoice: CreateInvoice,
+    private val createCompletedInvoice: CreateCompletedInvoice,
     private val updateInvoice: UpdateInvoice,
+    private val finalizeInvoice: FinalizeInvoice,
     private val deleteInvoice: DeleteInvoice,
     private val getAllInvoices: GetAllInvoices,
     private val getInvoiceById: GetInvoiceById,
@@ -91,6 +93,36 @@ class InvoiceController(
             },
         )
         return updateInvoice.handle(command)
+    }
+
+    @PostMapping("/completed")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createCompleted(@Valid @RequestBody request: CreateInvoiceRequest): InvoiceResult {
+        val command = CreateInvoiceCommand(
+            invoiceType = InvoiceType.valueOf(request.invoiceType),
+            documentType = InvoiceDocumentType.valueOf(request.documentType),
+            customerId = UUID.fromString(request.customerId),
+            invoiceDate = request.invoiceDate,
+            originalInvoiceId = request.originalInvoiceId,
+            lines = request.lines.map { line ->
+                InvoiceLineCommand(
+                    id = line.id,
+                    date = line.date,
+                    catalogItemId = line.catalogItemId,
+                    description = line.description,
+                    quantity = line.quantity,
+                    unitPrice = line.unitPrice,
+                    orderReference = line.orderReference,
+                )
+            },
+        )
+        return createCompletedInvoice.handle(command)
+    }
+
+    @PostMapping("/{id}/finalize")
+    @ResponseStatus(HttpStatus.OK)
+    fun finalize(@PathVariable id: Long): InvoiceResult {
+        return finalizeInvoice.handle(FinalizeInvoiceCommand(id))
     }
 
     @DeleteMapping("/{id}")

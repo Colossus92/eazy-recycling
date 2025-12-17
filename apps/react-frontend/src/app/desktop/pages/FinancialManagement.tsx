@@ -7,9 +7,9 @@ import { ReactNode, useState } from 'react';
 export const FinancieelManagement = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const tabs: {name: string, component: () => ReactNode}[] = [
-    {name: "Facturen", component: () => <InvoicesTab key={`invoices-${selectedIndex}`} />},
-    {name: "Kasbonnen", component: () => <div className="flex items-center justify-center h-full text-color-text-secondary">Kasbonnen worden binnenkort ondersteund</div>},
+  const tabs: {name: string, disabled: boolean, component: () => ReactNode}[] = [
+    {name: "Facturen", disabled: false, component: () => <InvoicesTab key={`invoices-${selectedIndex}`} />},
+    {name: "Kasbonnen", disabled: true, component: () => <div className="flex items-center justify-center h-full text-color-text-secondary">Kasbonnen worden binnenkort ondersteund</div>},
   ];
 
   return (
@@ -23,7 +23,7 @@ export const FinancieelManagement = () => {
           <TabList className="relative z-10">
             {
               tabs.map((tab) => (
-                <Tab label={tab.name} key={tab.name} />
+                <Tab label={tab.name} key={tab.name}  disabled={tab.disabled} />
               ))
             }
           </TabList>

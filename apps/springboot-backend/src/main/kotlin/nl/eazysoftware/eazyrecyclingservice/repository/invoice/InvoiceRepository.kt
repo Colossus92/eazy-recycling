@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.invoice
 
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.Invoice
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
@@ -20,6 +21,7 @@ interface InvoiceJpaRepository : JpaRepository<InvoiceDto, Long> {
 class InvoiceRepository(
     private val jpaRepository: InvoiceJpaRepository,
     private val mapper: InvoiceMapper,
+    private val entityManager: EntityManager,
 ) : Invoices {
 
     override fun nextId(): InvoiceId {
@@ -29,6 +31,19 @@ class InvoiceRepository(
 
     override fun nextLineId(): Long {
         return jpaRepository.getNextLineSequenceValue()
+    }
+
+    override fun nextInvoiceNumberSequence(year: Int): Long {
+        val sql = """
+            INSERT INTO invoice_number_sequences (year, last_sequence) 
+            VALUES (:year, 1)
+            ON CONFLICT (year) 
+            DO UPDATE SET last_sequence = invoice_number_sequences.last_sequence + 1
+            RETURNING last_sequence
+        """
+        return entityManager.createNativeQuery(sql)
+            .setParameter("year", year)
+            .singleResult as Long
     }
 
     override fun save(aggregate: Invoice): Invoice {

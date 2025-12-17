@@ -22,28 +22,28 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'secure'?: boolean;
-    /**
-     * 
      * @type {number}
      * @memberof SessionCookieConfig
      */
     'maxAge'?: number;
     /**
      * 
-     * @type {string}
+     * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'httpOnly'?: boolean;
+    'secure'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'domain'?: string;
     /**
      * 
      * @type {string}

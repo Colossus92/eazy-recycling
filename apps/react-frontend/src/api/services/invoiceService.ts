@@ -23,8 +23,16 @@ export const invoiceService = {
     return invoiceApi.create2(request).then((r) => r.data);
   },
 
+  createCompleted: (request: CreateInvoiceRequest): Promise<InvoiceResult> => {
+    return invoiceApi.createCompleted1(request).then((r) => r.data);
+  },
+
   update: (id: number, request: UpdateInvoiceRequest): Promise<InvoiceResult> => {
     return invoiceApi.update2(id, request).then((r) => r.data);
+  },
+
+  finalize: (id: number): Promise<InvoiceResult> => {
+    return invoiceApi.finalize(id).then((r) => r.data);
   },
 
   delete: (id: number): Promise<void> => {

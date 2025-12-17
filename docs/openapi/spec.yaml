@@ -1496,6 +1496,43 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/InvoiceResult"
+  /invoices/{id}/finalize:
+    post:
+      tags:
+      - invoice-controller
+      operationId: finalize
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InvoiceResult"
+  /invoices/completed:
+    post:
+      tags:
+      - invoice-controller
+      operationId: createCompleted_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInvoiceRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InvoiceResult"
   /eural:
     get:
       tags:
@@ -5309,21 +5346,21 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
+        totalElements:
+          type: integer
+          format: int64
         numberOfElements:
           type: integer
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5341,14 +5378,14 @@ components:
     PageableObject:
       type: object
       properties:
+        paged:
+          type: boolean
         pageNumber:
           type: integer
           format: int32
         pageSize:
           type: integer
           format: int32
-        paged:
-          type: boolean
         unpaged:
           type: boolean
         offset:
@@ -5359,9 +5396,9 @@ components:
     SortObject:
       type: object
       properties:
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
         empty:
           type: boolean
@@ -5826,11 +5863,11 @@ components:
           type: string
         errorOnELNotFound:
           type: string
+        isXml:
+          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -5911,32 +5948,28 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
-        attributesCSV:
-          type: string
-          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
+          writeOnly: true
+        attributesCSV:
+          type: string
           writeOnly: true
     ServletContext:
       type: object
       properties:
         contextPath:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         initParameterNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        attributeNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -5947,6 +5980,9 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        sessionTimeout:
+          type: integer
+          format: int32
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5985,6 +6021,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6031,12 +6068,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6048,15 +6085,15 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        secure:
-          type: boolean
         maxAge:
           type: integer
           format: int32
-        domain:
-          type: string
         httpOnly:
           type: boolean
+        secure:
+          type: boolean
+        domain:
+          type: string
         path:
           type: string
         name:
