@@ -9,9 +9,10 @@ import { EmptyState } from '@/features/crud/EmptyState';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { InvoiceForm } from './invoiceform/InvoiceForm';
 import { InvoiceStatusTag } from './InvoiceStatusTag';
+import { InvoiceDetailsDrawer } from './drawer/InvoiceDetailsDrawer';
 import { useInvoiceCrud } from '../hooks/useInvoiceCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
@@ -34,7 +35,46 @@ const formatCurrency = (value: number) => {
 export const InvoicesTab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useInvoiceCrud();
+
+  const handleRowClick = (item: InvoiceView) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    clickTimeoutRef.current = setTimeout(() => {
+      setSelectedInvoiceId(item.id);
+      setIsDrawerOpen(true);
+      clickTimeoutRef.current = null;
+    }, 200);
+  };
+
+  const handleRowDoubleClick = (item: InvoiceView) => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
+    setIsDrawerOpen(false);
+    form.openForEdit(item);
+  };
+
+  const handleDrawerEdit = () => {
+    setIsDrawerOpen(false);
+    const item = read.items.find((i) => i.id === selectedInvoiceId);
+    if (item) {
+      form.openForEdit(item);
+    }
+  };
+
+  const handleDrawerDelete = () => {
+    if (selectedInvoiceId) {
+      setIsDrawerOpen(false);
+      deletion.initiate(selectedInvoiceId);
+    }
+  };
 
   const columns: Column[] = [
     {
@@ -49,7 +89,7 @@ export const InvoicesTab = () => {
       label: 'Klant',
       accessor: (item) => item.customerName,
       title: (item) => item.customerName,
-      width: '30%',
+      width: '45%',
     },
     {
       key: 'totalInclVat',
@@ -129,8 +169,9 @@ export const InvoicesTab = () => {
                   .map((item, index) => (
                     <tr
                       key={index}
-                      className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                      onDoubleClick={() => form.openForEdit(item)}
+                      className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary cursor-pointer"
+                      onClick={() => handleRowClick(item)}
+                      onDoubleClick={() => handleRowDoubleClick(item)}
                     >
                       {columns.map((col) => (
                         <td
@@ -141,7 +182,7 @@ export const InvoicesTab = () => {
                           {col.accessor(item)}
                         </td>
                       ))}
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
                         {item.status === 'DRAFT' && (
                           <ActionMenu<InvoiceView>
                             onEdit={form.openForEdit}
@@ -183,6 +224,13 @@ export const InvoicesTab = () => {
         title="Factuur verwijderen"
         description="Weet u zeker dat u deze factuur wilt verwijderen?"
         onDelete={deletion.confirm}
+      />
+      <InvoiceDetailsDrawer
+        isDrawerOpen={isDrawerOpen}
+        setIsDrawerOpen={setIsDrawerOpen}
+        invoiceId={selectedInvoiceId}
+        onEdit={handleDrawerEdit}
+        onDelete={handleDrawerDelete}
       />
     </>
   );

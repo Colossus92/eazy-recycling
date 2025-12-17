@@ -33,6 +33,7 @@ interface InvoiceLineRowProps {
   update: (index: number, value: InvoiceLineFormValue & { id: string }) => void;
   onRemove: () => void;
   onCatalogItemSelected: (index: number, item: CatalogItem) => void;
+  isReadOnly?: boolean;
 }
 
 const InvoiceLineRow = ({
@@ -41,6 +42,7 @@ const InvoiceLineRow = ({
   update,
   onRemove,
   onCatalogItemSelected,
+  isReadOnly = false,
 }: InvoiceLineRowProps) => {
   const {
     register,
@@ -89,6 +91,7 @@ const InvoiceLineRow = ({
           field={catalogField}
           update={handleCatalogUpdate}
           errors={errors}
+          disabled={isReadOnly}
         />
       </td>
       <td className="p-2">
@@ -98,6 +101,7 @@ const InvoiceLineRow = ({
           className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right"
           placeholder="0"
           {...register(`lines.${index}.quantity`)}
+          disabled={isReadOnly}
         />
       </td>
       <td className="p-2">
@@ -115,26 +119,33 @@ const InvoiceLineRow = ({
           className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right"
           placeholder="0.00"
           {...register(`lines.${index}.unitPrice`)}
+          disabled={isReadOnly}
         />
       </td>
       <td className="p-2 text-right text-body-2">
         {formatCurrency(lineTotal)}
       </td>
       <td className="p-2">
-        <Button
-          variant="icon"
-          size="small"
-          icon={TrashSimple}
-          showText={false}
-          onClick={onRemove}
-          type="button"
-        />
+        {!isReadOnly && (
+          <Button
+            variant="icon"
+            size="small"
+            icon={TrashSimple}
+            showText={false}
+            onClick={onRemove}
+            type="button"
+          />
+        )}
       </td>
     </tr>
   );
 };
 
-export const InvoiceLinesSection = () => {
+interface InvoiceLinesSectionProps {
+  isReadOnly?: boolean;
+}
+
+export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionProps) => {
   const formContext = useFormContext<InvoiceFormValues>();
   const { control } = formContext;
 
@@ -187,14 +198,16 @@ export const InvoiceLinesSection = () => {
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <span className="text-subtitle-1">Factuurregels</span>
-        <Button
-          variant='icon'
-          showText={false}
-          icon={Plus}
-          onClick={handleAddLine}
-          title='Voeg regel toe'
-          type='button'
-        />
+        {!isReadOnly && (
+          <Button
+            variant='icon'
+            showText={false}
+            icon={Plus}
+            onClick={handleAddLine}
+            title='Voeg regel toe'
+            type='button'
+          />
+        )}
       </div>
 
       {fields.length === 0 ? (
@@ -223,6 +236,7 @@ export const InvoiceLinesSection = () => {
                   update={update}
                   onRemove={() => remove(index)}
                   onCatalogItemSelected={handleCatalogItemSelected}
+                  isReadOnly={isReadOnly}
                 />
               ))}
             </tbody>

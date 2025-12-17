@@ -37,20 +37,29 @@ const defaultValues: InvoiceFormValues = {
 export const useInvoiceFormHook = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [invoiceStatus, setInvoiceStatus] = useState<string | null>(null);
+  const [invoiceNumber, setInvoiceNumber] = useState<string | null>(null);
 
   const formContext = useForm<InvoiceFormValues>({
     defaultValues,
     mode: 'onChange',
   });
 
+  const isReadOnly = invoiceStatus === 'FINAL';
+
   const resetForm = useCallback(() => {
     formContext.reset(defaultValues);
+    setInvoiceStatus(null);
+    setInvoiceNumber(null);
   }, [formContext]);
 
   const loadInvoice = useCallback(async (invoiceId: number) => {
     setIsLoading(true);
     try {
       const invoice = await invoiceService.getById(invoiceId);
+
+      setInvoiceStatus(invoice.status);
+      setInvoiceNumber(invoice.invoiceNumber || null);
 
       formContext.reset({
         customerId: invoice.customer.companyId,
@@ -178,6 +187,8 @@ export const useInvoiceFormHook = () => {
     formContext,
     isLoading,
     isSaving,
+    isReadOnly,
+    invoiceNumber,
     loadInvoice,
     resetForm,
     handleSubmit,

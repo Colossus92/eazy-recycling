@@ -31,6 +31,8 @@ export const InvoiceForm = ({
     formContext,
     isLoading,
     isSaving,
+    isReadOnly,
+    invoiceNumber,
     loadInvoice,
     resetForm,
     handleSubmit,
@@ -38,6 +40,13 @@ export const InvoiceForm = ({
   } = useInvoiceFormHook();
 
   const isEditMode = invoiceId !== undefined;
+
+  const getFormTitle = () => {
+    if (invoiceNumber) {
+      return `Factuur #${invoiceNumber}`;
+    }
+    return isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur';
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -71,12 +80,12 @@ export const InvoiceForm = ({
   };
 
   const invoiceTypeOptions = [
-    { value: 'SALE', label: 'Verkoop' },
     { value: 'PURCHASE', label: 'Inkoop' },
+    { value: 'SALE', label: 'Verkoop' },
   ];
 
   const documentTypeOptions = [
-    { value: 'INVOICE', label: 'Fa  ctuur' },
+    { value: 'INVOICE', label: 'Factuur' },
     { value: 'CREDIT_NOTE', label: 'Creditnota' },
   ];
 
@@ -88,9 +97,9 @@ export const InvoiceForm = ({
           className="flex flex-col h-full w-full"
         >
           <FormTopBar
-            title={isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur'}
+            title={getFormTitle()}
             actions={
-              isEditMode && (
+              isEditMode && !isReadOnly && (
                 <FormActionMenu
                   onDelete={() => {
                     if (invoiceId) {
@@ -119,10 +128,12 @@ export const InvoiceForm = ({
                     placeholder="Selecteer een klant"
                     name="customerId"
                     rules={{ required: 'Klant is verplicht' }}
+                    disabled={isReadOnly}
                   />
                   <DateFormField
                     title="Factuurdatum"
                     placeholder="Selecteer een datum"
+                    disabled={isReadOnly}
                     formHook={{
                       register: formContext.register,
                       name: 'invoiceDate',
@@ -137,6 +148,7 @@ export const InvoiceForm = ({
                     title="Type"
                     placeholder="Selecteer type"
                     options={invoiceTypeOptions}
+                    disabled={isReadOnly}
                     formHook={{
                       register: formContext.register,
                       name: 'invoiceType',
@@ -148,6 +160,7 @@ export const InvoiceForm = ({
                     title="Document type"
                     placeholder="Selecteer document type"
                     options={documentTypeOptions}
+                    disabled={isReadOnly}
                     formHook={{
                       register: formContext.register,
                       name: 'documentType',
@@ -158,7 +171,7 @@ export const InvoiceForm = ({
                 </div>
 
                 {/* Invoice lines section */}
-                <InvoiceLinesSection />
+                <InvoiceLinesSection isReadOnly={isReadOnly} />
               </div>
             )}
           </div>
@@ -167,17 +180,19 @@ export const InvoiceForm = ({
           <div className="flex py-3 px-4 justify-end items-center self-stretch gap-4 border-t border-solid border-color-border-primary">
             <Button
               variant="secondary"
-              label="Annuleren"
+              label={isReadOnly ? 'Sluiten' : 'Annuleren'}
               onClick={handleClose}
               type="button"
             />
-            <SplitButton
-              primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
-              secondaryLabel={isEditMode ? 'Verwerken' : 'Opslaan en verwerken'}
-              onPrimaryClick={onSubmit}
-              onSecondaryClick={onSubmitAndFinalize}
-              isSubmitting={isSaving}
-            />
+            {!isReadOnly && (
+              <SplitButton
+                primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
+                secondaryLabel={isEditMode ? 'Verwerken' : 'Opslaan en verwerken'}
+                onPrimaryClick={onSubmit}
+                onSecondaryClick={onSubmitAndFinalize}
+                isSubmitting={isSaving}
+              />
+            )}
           </div>
         </form>
       </FormProvider>
