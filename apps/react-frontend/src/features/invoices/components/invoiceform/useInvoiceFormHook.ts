@@ -62,7 +62,7 @@ export const useInvoiceFormHook = () => {
           catalogItemId: String(line.catalogItemId),
           catalogItemName: line.catalogItemName,
           date: line.date,
-          description: line.description,
+          description: undefined,
           quantity: String(line.quantity),
           unitPrice: String(line.unitPrice),
           unitOfMeasure: line.unitOfMeasure || '',
