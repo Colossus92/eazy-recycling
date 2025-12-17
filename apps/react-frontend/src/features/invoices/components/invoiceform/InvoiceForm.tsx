@@ -76,7 +76,7 @@ export const InvoiceForm = ({
   ];
 
   const documentTypeOptions = [
-    { value: 'INVOICE', label: 'Factuur' },
+    { value: 'INVOICE', label: 'Fa  ctuur' },
     { value: 'CREDIT_NOTE', label: 'Creditnota' },
   ];
 
@@ -85,7 +85,7 @@ export const InvoiceForm = ({
       <FormProvider {...formContext}>
         <form
           onSubmit={formContext.handleSubmit(onSubmit)}
-          className="flex flex-col h-full"
+          className="flex flex-col h-full w-full"
         >
           <FormTopBar
             title={isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur'}
