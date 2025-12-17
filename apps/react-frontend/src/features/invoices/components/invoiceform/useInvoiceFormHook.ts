@@ -13,6 +13,8 @@ export interface InvoiceLineFormValue {
   description: string;
   quantity: string;
   unitPrice: string;
+  unitOfMeasure: string;
+  vatPercentage: string;
   orderReference: string;
 }
 
@@ -63,6 +65,8 @@ export const useInvoiceFormHook = () => {
           description: line.description,
           quantity: String(line.quantity),
           unitPrice: String(line.unitPrice),
+          unitOfMeasure: line.unitOfMeasure || '',
+          vatPercentage: String(line.vatPercentage),
           orderReference: line.orderReference || '',
         })),
       });

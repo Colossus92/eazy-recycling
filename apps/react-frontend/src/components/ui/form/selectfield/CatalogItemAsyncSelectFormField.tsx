@@ -31,7 +31,7 @@ interface CatalogItemAsyncSelectFormFieldProps {
   required?: boolean;
   index: number;
   field: LineFieldValue;
-  update: (index: number, value: LineFieldValue) => void;
+  update: (index: number, value: LineFieldValue, selectedItem?: CatalogItem) => void;
   errors?: FieldErrors;
 }
 
@@ -285,7 +285,7 @@ export const CatalogItemAsyncSelectFormField = ({
               ...field,
               catalogItemId: option.value,
               wasteStreamNumber: option.item.wasteStreamNumber || undefined,
-            });
+            }, option.item);
 
             // Cache the selected item
             setSelectedItems((prev) =>

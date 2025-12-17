@@ -40,8 +40,8 @@ export const InvoicesTab = () => {
     {
       key: 'invoiceNumber',
       label: 'Factuurnummer',
-      accessor: (item) => item.invoiceNumber || `#${item.id}`,
-      title: (item) => item.invoiceNumber || `#${item.id}`,
+      accessor: (item) => item.invoiceNumber ? `#${item.invoiceNumber}` : '-',
+      title: (item) => item.invoiceNumber ? `#${item.invoiceNumber}` : undefined,
       width: '20%',
     },
     {

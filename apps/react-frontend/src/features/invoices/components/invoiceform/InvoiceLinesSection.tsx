@@ -9,6 +9,8 @@ import {
 import { InvoiceFormValues, InvoiceLineFormValue } from './useInvoiceFormHook';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
 import { useMemo } from 'react';
+import { Button } from '@/components/ui/button/Button';
+import { CatalogItem } from '@/api/services/catalogService';
 
 const parseNumber = (value: string | number | undefined): number => {
   if (value === undefined || value === null || value === '') return 0;
@@ -30,6 +32,7 @@ interface InvoiceLineRowProps {
   field: FieldArrayWithId<InvoiceFormValues, 'lines', 'id'>;
   update: (index: number, value: InvoiceLineFormValue & { id: string }) => void;
   onRemove: () => void;
+  onCatalogItemSelected: (index: number, item: CatalogItem) => void;
 }
 
 const InvoiceLineRow = ({
@@ -37,6 +40,7 @@ const InvoiceLineRow = ({
   field,
   update,
   onRemove,
+  onCatalogItemSelected,
 }: InvoiceLineRowProps) => {
   const {
     register,
@@ -63,12 +67,16 @@ const InvoiceLineRow = ({
       wasteStreamNumber?: string;
       weightValue: string;
       weightUnit: string;
-    }
+    },
+    selectedItem?: CatalogItem
   ) => {
     update(idx, {
       ...field,
       catalogItemId: value.catalogItemId,
     });
+    if (selectedItem) {
+      onCatalogItemSelected(idx, selectedItem);
+    }
   };
 
   return (
@@ -85,19 +93,19 @@ const InvoiceLineRow = ({
       </td>
       <td className="p-2">
         <input
-          type="text"
-          className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2"
-          placeholder="Omschrijving"
-          {...register(`lines.${index}.description`)}
-        />
-      </td>
-      <td className="p-2">
-        <input
           type="number"
           step="0.01"
           className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right"
           placeholder="0"
           {...register(`lines.${index}.quantity`)}
+        />
+      </td>
+      <td className="p-2">
+        <input
+          type="text"
+          className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 bg-color-surface-secondary"
+          disabled
+          {...register(`lines.${index}.unitOfMeasure`)}
         />
       </td>
       <td className="p-2">
@@ -113,14 +121,14 @@ const InvoiceLineRow = ({
         {formatCurrency(lineTotal)}
       </td>
       <td className="p-2">
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="small"
+          icon={TrashSimple}
+          showText={false}
           onClick={onRemove}
-          className="flex items-center justify-center w-6 h-6 rounded-radius-sm text-color-error hover:bg-color-error hover:text-color-on-error transition-colors"
-          title="Verwijder regel"
-        >
-          <TrashSimple className="w-4 h-4" />
-        </button>
+          type="button"
+        />
       </td>
     </tr>
   );
@@ -139,12 +147,16 @@ export const InvoiceLinesSection = () => {
 
   const totals = useMemo(() => {
     let totalExclVat = 0;
+    let totalVat = 0;
     lines?.forEach((line: InvoiceLineFormValue) => {
       const qty = parseNumber(line.quantity);
       const price = parseNumber(line.unitPrice);
-      totalExclVat += qty * price;
+      const lineTotal = qty * price;
+      const vatPercentage = parseNumber(line.vatPercentage) || 21;
+      totalExclVat += lineTotal;
+      totalVat += lineTotal * (vatPercentage / 100);
     });
-    return { totalExclVat };
+    return { totalExclVat, totalVat, totalInclVat: totalExclVat + totalVat };
   }, [lines]);
 
   const handleAddLine = () => {
@@ -155,7 +167,19 @@ export const InvoiceLinesSection = () => {
       description: '',
       quantity: '1',
       unitPrice: '0',
+      unitOfMeasure: '',
+      vatPercentage: '21',
       orderReference: '',
+    });
+  };
+
+  const handleCatalogItemSelected = (index: number, item: CatalogItem) => {
+    const currentLine = formContext.getValues(`lines.${index}`);
+    formContext.setValue(`lines.${index}`, {
+      ...currentLine,
+      catalogItemName: item.name,
+      unitOfMeasure: item.unitOfMeasure || '',
+      unitPrice: String(item.defaultPrice ?? 0),
     });
   };
 
@@ -163,14 +187,13 @@ export const InvoiceLinesSection = () => {
     <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
         <span className="text-subtitle-1">Factuurregels</span>
-        <button
-          type="button"
+        <Button
+          variant='icon'
+          showText={false}
+          icon={Plus}
           onClick={handleAddLine}
-          className="flex items-center justify-center w-8 h-8 rounded-radius-sm bg-color-primary text-color-on-primary hover:bg-color-primary-hover transition-colors"
-          title="Voeg regel toe"
-        >
-          <Plus className="w-5 h-5" />
-        </button>
+          title='Voeg regel toe'
+        />
       </div>
 
       {fields.length === 0 ? (
@@ -182,12 +205,12 @@ export const InvoiceLinesSection = () => {
           <table className="w-full">
             <thead className="bg-color-surface-secondary">
               <tr className="text-caption-2 text-left">
-                <th className="p-2 w-[30%]">Artikel</th>
-                <th className="p-2 w-[25%]">Omschrijving</th>
+                <th className="p-2 w-[35%]">Artikel</th>
                 <th className="p-2 w-[12%] text-right">Aantal</th>
+                <th className="p-2 w-[12%]">Eenheid</th>
                 <th className="p-2 w-[15%] text-right">Prijs</th>
-                <th className="p-2 w-[13%] text-right">Totaal</th>
-                <th className="p-2 w-[5%]"></th>
+                <th className="p-2 w-[18%] text-right">Totaal</th>
+                <th className="p-2 w-[8%]"></th>
               </tr>
             </thead>
             <tbody>
@@ -198,16 +221,35 @@ export const InvoiceLinesSection = () => {
                   field={field}
                   update={update}
                   onRemove={() => remove(index)}
+                  onCatalogItemSelected={handleCatalogItemSelected}
                 />
               ))}
             </tbody>
             <tfoot className="bg-color-surface-secondary border-t border-color-border">
-              <tr className="text-subtitle-2">
+              <tr className="text-body-2">
                 <td colSpan={4} className="p-2 text-right">
                   Subtotaal excl. BTW:
                 </td>
                 <td className="p-2 text-right">
                   {formatCurrency(totals.totalExclVat)}
+                </td>
+                <td></td>
+              </tr>
+              <tr className="text-body-2">
+                <td colSpan={4} className="p-2 text-right">
+                  BTW:
+                </td>
+                <td className="p-2 text-right">
+                  {formatCurrency(totals.totalVat)}
+                </td>
+                <td></td>
+              </tr>
+              <tr className="text-subtitle-2">
+                <td colSpan={4} className="p-2 text-right">
+                  Totaal incl. BTW:
+                </td>
+                <td className="p-2 text-right">
+                  {formatCurrency(totals.totalInclVat)}
                 </td>
                 <td></td>
               </tr>
