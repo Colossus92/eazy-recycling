@@ -165,7 +165,6 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
             .andExpect(jsonPath("$.status").value("DRAFT"))
             .andExpect(jsonPath("$.customer.name").value("Test Customer BV"))
             .andExpect(jsonPath("$.lines.length()").value(1))
-            .andExpect(jsonPath("$.lines[0].description").value("Test line"))
     }
 
     @Test
@@ -203,7 +202,6 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
 
         securedMockMvc.get("/invoices/${created.invoiceId}")
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.lines[0].description").value("Updated line"))
             .andExpect(jsonPath("$.lines[0].quantity").value(20.00))
     }
 

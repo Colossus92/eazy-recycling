@@ -59,7 +59,6 @@ export const useInvoiceCrud = () => {
   };
 
   const completeForm = () => {
-    closeForm();
     fetchInvoices();
   };
 

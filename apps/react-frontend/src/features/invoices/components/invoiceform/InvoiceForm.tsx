@@ -62,7 +62,6 @@ export const InvoiceForm = ({
     const success = await handleSubmit(invoiceId);
     if (success) {
       onComplete();
-      setIsOpen(false);
     }
   };
 
@@ -70,7 +69,6 @@ export const InvoiceForm = ({
     const success = await handleSubmitAndFinalize(invoiceId);
     if (success) {
       onComplete();
-      setIsOpen(false);
     }
   };
 

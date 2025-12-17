@@ -72,10 +72,13 @@ const InvoiceLineRow = ({
     },
     selectedItem?: CatalogItem
   ) => {
+    // Preserve the database row id (line.id) when updating
+    const currentLine = watch(`lines.${idx}`);
     update(idx, {
       ...field,
+      id: currentLine?.id, // Preserve the database row id
       catalogItemId: value.catalogItemId,
-    });
+    } as InvoiceLineFormValue & { id: string });
     if (selectedItem) {
       onCatalogItemSelected(idx, selectedItem);
     }
