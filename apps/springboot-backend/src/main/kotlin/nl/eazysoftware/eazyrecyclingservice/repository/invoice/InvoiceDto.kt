@@ -75,6 +75,9 @@ class InvoiceDto(
 
   @Column(name = "finalized_by")
   val finalizedBy: String?,
+
+  @Column(name = "pdf_url")
+  var pdfUrl: String? = null,
 ) : AuditableEntity() {
     override fun equals(other: Any?): Boolean {
       if (this === other) return true

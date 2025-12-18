@@ -7,10 +7,12 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionOutbox
 import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.HttpMethod
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.EdgeFunctionOutboxRepository
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -20,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 class EdgeFunctionOutboxProcessor(
     private val outboxRepository: EdgeFunctionOutboxRepository,
     private val supabaseClient: SupabaseClient,
-    @Suppress("unused") private val objectMapper: ObjectMapper,
+    private val objectMapper: ObjectMapper,
+    private val invoices: Invoices,
 ) {
     private val logger = LoggerFactory.getLogger(EdgeFunctionOutboxProcessor::class.java)
 
@@ -82,6 +85,10 @@ class EdgeFunctionOutboxProcessor(
         if (response?.success == true) {
             logger.info("Edge function ${entry.functionName} completed successfully for entry ${entry.id.value}. Storage path: ${response.storagePath}")
             entry.markAsCompleted()
+            
+            if (entry.functionName == EdgeFunctionName.INVOICE_PDF_GENERATOR && entry.aggregateId != null && response.storagePath != null) {
+                updateInvoicePdfUrl(entry.aggregateId!!, response.storagePath!!)
+            }
         } else {
             val errorMessage = response?.error ?: response?.message ?: "Unknown error"
             logger.error("Edge function ${entry.functionName} returned error for entry ${entry.id.value}: $errorMessage")
@@ -89,6 +96,22 @@ class EdgeFunctionOutboxProcessor(
         }
         
         outboxRepository.save(entry)
+    }
+
+    private fun updateInvoicePdfUrl(invoiceId: String, storagePath: String) {
+        try {
+            val id = InvoiceId(invoiceId.toLong())
+            val invoice = invoices.findById(id)
+            if (invoice != null) {
+                invoice.pdfUrl = storagePath
+                invoices.save(invoice)
+                logger.info("Updated invoice $invoiceId with PDF URL: $storagePath")
+            } else {
+                logger.warn("Invoice $invoiceId not found when trying to update PDF URL")
+            }
+        } catch (e: Exception) {
+            logger.error("Failed to update invoice $invoiceId with PDF URL: ${e.message}", e)
+        }
     }
 
     private fun extractErrorMessage(responseBody: String?): String {

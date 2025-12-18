@@ -449,6 +449,7 @@ create table if not exists invoices (
                                           last_modified_by text,
                                           finalized_at timestamp with time zone,
                                           finalized_by text,
+                                          pdf_url text,
                                           primary key (id),
                                           foreign key (customer_company_id) references companies(id),
                                           foreign key (original_invoice_id) references invoices(id)

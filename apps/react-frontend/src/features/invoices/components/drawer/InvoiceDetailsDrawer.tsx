@@ -7,6 +7,8 @@ import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import CurrencyEur from '@/assets/icons/IcBaselineEuro.svg?react';
 import { InvoiceStatusTag } from '../InvoiceStatusTag';
+import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
+import { InvoiceDocumentSection } from './InvoiceDocumentSection';
 
 interface InvoiceDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -206,6 +208,16 @@ export const InvoiceDetailsDrawer = ({
               ))}
             </div>
           </div>
+
+          {/* Documents Section */}
+          {data.pdfUrl && (
+            <DocumentsSection>
+              <InvoiceDocumentSection
+                pdfUrl={data.pdfUrl}
+                invoiceNumber={data.invoiceNumber || 'Concept'}
+              />
+            </DocumentsSection>
+          )}
         </div>
       )}
     </Drawer>

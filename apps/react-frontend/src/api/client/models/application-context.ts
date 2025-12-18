@@ -28,16 +28,16 @@ import type { Environment } from './environment';
 export interface ApplicationContext {
     /**
      * 
-     * @type {string}
-     * @memberof ApplicationContext
-     */
-    'applicationName'?: string;
-    /**
-     * 
      * @type {number}
      * @memberof ApplicationContext
      */
     'startupDate'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApplicationContext
+     */
+    'applicationName'?: string;
     /**
      * 
      * @type {any}

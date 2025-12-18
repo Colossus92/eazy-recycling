@@ -109,6 +109,7 @@ class GetInvoiceByIdQuery(
             updatedBy = invoice.updatedBy,
             finalizedAt = invoice.finalizedAt?.toString(),
             finalizedBy = invoice.finalizedBy,
+            pdfUrl = invoice.pdfUrl,
         )
     }
 }
@@ -143,6 +144,7 @@ data class InvoiceDetailView(
     val updatedBy: String?,
     val finalizedAt: String?,
     val finalizedBy: String?,
+    val pdfUrl: String?,
 )
 
 data class CustomerSnapshotView(

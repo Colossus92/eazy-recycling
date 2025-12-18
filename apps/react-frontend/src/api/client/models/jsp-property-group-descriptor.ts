@@ -28,28 +28,16 @@ export interface JspPropertyGroupDescriptor {
     'defaultContentType'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'deferredSyntaxAllowedAsLiteral'?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
     'urlPatterns'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'elIgnored'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'errorOnELNotFound'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'isXml'?: string;
     /**
      * 
      * @type {string}
@@ -61,7 +49,13 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'scriptingInvalid'?: string;
+    'errorOnELNotFound'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'trimDirectiveWhitespaces'?: string;
     /**
      * 
      * @type {Array<string>}
@@ -70,22 +64,28 @@ export interface JspPropertyGroupDescriptor {
     'includePreludes'?: Array<string>;
     /**
      * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'scriptingInvalid'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'elIgnored'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
+    /**
+     * 
      * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
     'includeCodas'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'deferredSyntaxAllowedAsLiteral'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'trimDirectiveWhitespaces'?: string;
     /**
      * 
      * @type {string}

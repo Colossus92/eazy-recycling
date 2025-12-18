@@ -40,6 +40,7 @@ class InvoiceMapper {
             updatedBy = dto.updatedBy,
             finalizedAt = dto.finalizedAt?.toKotlinInstant(),
             finalizedBy = dto.finalizedBy,
+            pdfUrl = dto.pdfUrl,
         )
     }
 
@@ -64,6 +65,7 @@ class InvoiceMapper {
             originalInvoiceId = domain.originalInvoiceId?.value,
             finalizedAt = domain.finalizedAt?.toJavaInstant(),
             finalizedBy = domain.finalizedBy,
+            pdfUrl = domain.pdfUrl,
         )
 
         dto.lines.clear()

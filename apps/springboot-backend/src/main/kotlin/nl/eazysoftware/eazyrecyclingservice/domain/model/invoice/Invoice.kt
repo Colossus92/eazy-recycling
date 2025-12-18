@@ -23,6 +23,7 @@ class Invoice(
     var updatedBy: String?,
     var finalizedAt: Instant?,
     var finalizedBy: String?,
+    var pdfUrl: String? = null,
 ) {
     fun finalize(invoiceNumber: InvoiceNumber, finalizedBy: String?) {
         require(status == InvoiceStatus.DRAFT) { "Alleen concept facturen kunnen worden gefinaliseerd." }

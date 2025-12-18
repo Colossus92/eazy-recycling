@@ -125,5 +125,11 @@ export interface InvoiceDetailView {
      * @memberof InvoiceDetailView
      */
     'finalizedBy'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceDetailView
+     */
+    'pdfUrl'?: string;
 }
 

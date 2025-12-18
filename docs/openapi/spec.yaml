@@ -5065,6 +5065,8 @@ components:
           type: string
         finalizedBy:
           type: string
+        pdfUrl:
+          type: string
       required:
       - createdAt
       - customer
@@ -5346,21 +5348,21 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
         numberOfElements:
           type: integer
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
-        first:
-          type: boolean
-        last:
-          type: boolean
         size:
           type: integer
           format: int32
@@ -5489,11 +5491,11 @@ components:
     ApplicationContext:
       type: object
       properties:
-        applicationName:
-          type: string
         startupDate:
           type: integer
           format: int64
+        applicationName:
+          type: string
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
         parent: {}
@@ -5735,11 +5737,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
@@ -5855,32 +5857,32 @@ components:
       properties:
         defaultContentType:
           type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         urlPatterns:
           type: array
           items:
             type: string
-        elIgnored:
+        pageEncoding:
           type: string
         errorOnELNotFound:
           type: string
-        isXml:
-          type: string
-        pageEncoding:
-          type: string
-        scriptingInvalid:
+        trimDirectiveWhitespaces:
           type: string
         includePreludes:
           type: array
           items:
             type: string
+        scriptingInvalid:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
         includeCodas:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
         errorOnUndeclaredNamespace:
           type: string
         buffer:
@@ -5959,6 +5961,7 @@ components:
     ServletContext:
       type: object
       properties:
+        attributeNames: {}
         contextPath:
           type: string
         initParameterNames: {}
@@ -5966,10 +5969,6 @@ components:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -5983,15 +5982,19 @@ components:
         sessionTimeout:
           type: integer
           format: int32
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6021,7 +6024,6 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6068,12 +6070,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6085,15 +6087,15 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        secure:
+          type: boolean
         maxAge:
           type: integer
           format: int32
-        httpOnly:
-          type: boolean
-        secure:
-          type: boolean
         domain:
           type: string
+        httpOnly:
+          type: boolean
         path:
           type: string
         name:
@@ -6108,9 +6110,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object
