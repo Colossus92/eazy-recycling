@@ -473,7 +473,36 @@ create table if not exists invoice_lines (
                                           catalog_item_name text not null,
                                           catalog_item_type text not null check (catalog_item_type in ('MATERIAL', 'PRODUCT', 'WASTE_STREAM')),
                                           primary key (id),
-                                          foreign key (invoice_id) references invoices(id) on delete cascade,
-                                          foreign key (catalog_item_id) references catalog_items(id),
-                                          unique (invoice_id, line_number)
+                                         foreign key (invoice_id) references invoices(id) on delete cascade,
+                                         foreign key (catalog_item_id) references catalog_items(id),
+                                         unique (invoice_id, line_number)
+);
+
+CREATE SEQUENCE IF NOT EXISTS edge_function_outbox_id_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE IF NOT EXISTS edge_function_outbox (
+    id bigint not null default nextval('edge_function_outbox_id_seq'),
+    function_name text not null,
+    http_method text not null,
+    payload jsonb,
+    status text not null default 'PENDING',
+    attempts int not null default 0,
+    last_attempt_at timestamp with time zone,
+    error_message text,
+    processed_at timestamp with time zone,
+    created_at timestamp with time zone not null default now(),
+    aggregate_type text,
+    aggregate_id text,
+    primary key (id),
+    constraint chk_function_name check (function_name in ('INVOICE_PDF_GENERATOR')),
+    constraint chk_http_method check (http_method in ('GET', 'POST', 'PUT', 'DELETE')),
+    constraint chk_status check (status in ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_status ON edge_function_outbox(status);
+CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_created_at ON edge_function_outbox(created_at);
+
+CREATE TABLE IF NOT EXISTS invoice_number_sequences (
+    year int not null primary key,
+    last_sequence bigint not null default 0
 );

@@ -1,3 +1,4 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { generateInvoicePdf } from './pdf.ts';
 import { InvoiceData } from './types.ts';
 
@@ -5,6 +6,7 @@ import { InvoiceData } from './types.ts';
 type ApiResponse = {
   success: boolean;
   message: string;
+  storagePath?: string;
   error?: string;
 };
 
@@ -22,16 +24,32 @@ function createApiResponse(status: number, body: ApiResponse): Response {
 }
 
 /**
- * Create a PDF response
+ * Upload PDF to Supabase Storage
  */
-function createPdfResponse(pdfBytes: Uint8Array, filename: string): Response {
-  return new Response(pdfBytes, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-    },
-  });
+async function uploadToStorage(pdfBytes: Uint8Array, companyCode: string, invoiceNumber: string): Promise<string> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+  const storagePath = `${companyCode}/invoice-${invoiceNumber}.pdf`;
+
+  const { error } = await supabase.storage
+    .from('invoices')
+    .upload(storagePath, pdfBytes, {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
+
+  if (error) {
+    throw new Error(`Failed to upload PDF to storage: ${error.message}`);
+  }
+
+  return storagePath;
 }
 
 /**
@@ -43,6 +61,7 @@ function getTestInvoiceData(): InvoiceData {
     invoiceNumber: 'ER26000001',
     invoiceDate: '2024-12-18',
     paymentTermDays: 9,
+    companyCode: '1000024',
     tenant: {
       name: 'WHD Kabel- en metaalrecycling',
       address: {
@@ -344,11 +363,16 @@ Deno.serve(async (req) => {
     
     console.log(`PDF successfully generated for invoice ${invoiceData.invoiceNumber}`);
 
-    // Generate filename
-    const filename = `${invoiceData.invoiceType.toLowerCase()}_${invoiceData.invoiceNumber}.pdf`;
+    // Upload to Supabase Storage
+    const storagePath = await uploadToStorage(pdfBytes, invoiceData.companyCode, invoiceData.invoiceNumber);
+    
+    console.log(`PDF uploaded to storage: ${storagePath}`);
 
-    // Return PDF as downloadable file
-    return createPdfResponse(pdfBytes, filename);
+    return createApiResponse(200, {
+      success: true,
+      message: `Invoice PDF generated and stored successfully`,
+      storagePath,
+    });
 
   } catch (err) {
     // Log error and return appropriate error response

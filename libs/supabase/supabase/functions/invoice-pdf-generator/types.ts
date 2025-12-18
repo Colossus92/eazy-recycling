@@ -60,6 +60,7 @@ export interface InvoiceData {
   invoiceNumber: string;
   invoiceDate: string;
   paymentTermDays: number;
+  companyCode: string;
   tenant: TenantInfo;
   customer: CustomerInfo;
   lines: InvoiceLine[];
