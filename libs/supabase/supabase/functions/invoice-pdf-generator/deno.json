@@ -1,0 +1,23 @@
+{
+  "imports": {},
+  "compilerOptions": {
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "checkJs": true,
+    "lib": ["deno.window", "dom", "dom.iterable", "dom.asynciterable"]
+  },
+  "lint": {
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  },
+  "fmt": {
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  },
+  "tasks": {
+    "dev": "deno run --allow-net --allow-env --allow-read index.ts"
+  }
+}

@@ -324,3 +324,10 @@ verify_jwt = true
 import_map = "./functions/weight-ticket-pdf-generator/deno.json"
 entrypoint = "./functions/weight-ticket-pdf-generator/index.ts"
 static_files = [ "./functions/weight-ticket-pdf-generator/logo.png" ]
+
+[functions.invoice-pdf-generator]
+enabled = true
+verify_jwt = true
+import_map = "./functions/invoice-pdf-generator/deno.json"
+entrypoint = "./functions/invoice-pdf-generator/index.ts"
+static_files = [ "./functions/invoice-pdf-generator/logo.png" ]
