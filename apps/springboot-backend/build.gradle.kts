@@ -80,9 +80,6 @@ dependencies {
   // Code
   implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.21")
 
-  // EBA Schema Library
-  implementation("nl.eazysoftware:eba-schema:0.0.1")
-
   // Environment variables
   implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
 

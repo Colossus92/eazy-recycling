@@ -2,11 +2,6 @@
   "name": "springboot-backend",
   "root": "apps/springboot-backend",
   "targets": {
-    "build": {
-      "dependsOn": [
-        "eba-schema:build"
-      ]
-    },
     "ci-build": {
       "executor": "@nx/gradle:gradle",
       "inputs": [
@@ -22,7 +17,7 @@
       "options": {
         "taskName": ":bootJar"
       },
-      "dependsOn": ["eba-schema:build", "test"],
+      "dependsOn": ["test"],
       "excludeDependsOn": false
     },
     "docker:build": {
@@ -34,8 +29,5 @@
       "dependsOn": ["ci-build"],
       "excludeDependsOn": false
     }
-  },
-  "implicitDependencies": [
-    "eba-schema"
-  ]
+  }
 }

@@ -31,7 +31,6 @@ jobs:
               - 'apps/springboot-backend/Dockerfile'
               - 'apps/springboot-backend/build.gradle.kts'
               - 'apps/react-frontend/**'
-              - 'libs/eba-schema/**'
               - 'nx.json'
               - 'package.json'
               - 'package-lock.json'
