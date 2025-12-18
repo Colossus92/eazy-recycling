@@ -39,6 +39,7 @@ export const useInvoiceFormHook = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [invoiceStatus, setInvoiceStatus] = useState<string | null>(null);
   const [invoiceNumber, setInvoiceNumber] = useState<string | null>(null);
+  const [currentInvoiceId, setCurrentInvoiceId] = useState<number | null>(null);
 
   const formContext = useForm<InvoiceFormValues>({
     defaultValues,
@@ -51,6 +52,7 @@ export const useInvoiceFormHook = () => {
     formContext.reset(defaultValues);
     setInvoiceStatus(null);
     setInvoiceNumber(null);
+    setCurrentInvoiceId(null);
   }, [formContext]);
 
   const loadInvoice = useCallback(async (invoiceId: number) => {
@@ -58,6 +60,7 @@ export const useInvoiceFormHook = () => {
     try {
       const invoice = await invoiceService.getById(invoiceId);
 
+      setCurrentInvoiceId(invoiceId);
       setInvoiceStatus(invoice.status);
       setInvoiceNumber(invoice.invoiceNumber || null);
 
@@ -128,56 +131,70 @@ export const useInvoiceFormHook = () => {
     };
   };
 
-  const handleSubmit = async (invoiceId?: number): Promise<boolean> => {
+  const handleSubmit = async (): Promise<number | null> => {
     const isValid = await formContext.trigger();
-    if (!isValid) return false;
+    if (!isValid) return null;
 
     setIsSaving(true);
     try {
       const values = formContext.getValues();
+      let savedInvoiceId: number;
 
-      if (invoiceId) {
-        await invoiceService.update(invoiceId, buildUpdateRequest(values));
+      if (currentInvoiceId) {
+        await invoiceService.update(currentInvoiceId, buildUpdateRequest(values));
+        savedInvoiceId = currentInvoiceId;
       } else {
-        await invoiceService.create(buildCreateRequest(values));
+        const result = await invoiceService.create(buildCreateRequest(values));
+        savedInvoiceId = result.invoiceId;
       }
       
-      return true;
+      // Reload the invoice to get the updated state
+      await loadInvoice(savedInvoiceId);
+      toastService.success('Factuur succesvol opgeslagen');
+      
+      return savedInvoiceId;
     } catch (error) {
       console.error('Error saving invoice:', error);
       toastService.error(
-        `Er is een fout opgetreden bij het ${invoiceId ? 'bijwerken' : 'aanmaken'} van de factuur`
+        `Er is een fout opgetreden bij het ${currentInvoiceId ? 'bijwerken' : 'aanmaken'} van de factuur`
       );
-      return false;
+      return null;
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleSubmitAndFinalize = async (invoiceId?: number): Promise<boolean> => {
+  const handleSubmitAndFinalize = async (): Promise<number | null> => {
     const isValid = await formContext.trigger();
-    if (!isValid) return false;
+    if (!isValid) return null;
 
     setIsSaving(true);
     try {
       const values = formContext.getValues();
+      let finalizedInvoiceId: number;
 
-      if (invoiceId) {
+      if (currentInvoiceId) {
         // Update existing invoice, then finalize
-        await invoiceService.update(invoiceId, buildUpdateRequest(values));
-        await invoiceService.finalize(invoiceId);
+        await invoiceService.update(currentInvoiceId, buildUpdateRequest(values));
+        await invoiceService.finalize(currentInvoiceId);
+        finalizedInvoiceId = currentInvoiceId;
       } else {
         // Create and finalize in one call
-        await invoiceService.createCompleted(buildCreateRequest(values));
+        const result = await invoiceService.createCompleted(buildCreateRequest(values));
+        finalizedInvoiceId = result.invoiceId;
       }
       
-      return true;
+      // Reload the invoice to get the updated state
+      await loadInvoice(finalizedInvoiceId);
+      toastService.success('Factuur succesvol verwerkt');
+      
+      return finalizedInvoiceId;
     } catch (error) {
       console.error('Error saving and finalizing invoice:', error);
       toastService.error(
         `Er is een fout opgetreden bij het verwerken van de factuur`
       );
-      return false;
+      return null;
     } finally {
       setIsSaving(false);
     }
@@ -189,6 +206,7 @@ export const useInvoiceFormHook = () => {
     isSaving,
     isReadOnly,
     invoiceNumber,
+    currentInvoiceId,
     loadInvoice,
     resetForm,
     handleSubmit,

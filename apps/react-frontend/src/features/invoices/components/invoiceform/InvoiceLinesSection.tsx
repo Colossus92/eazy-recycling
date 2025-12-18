@@ -33,6 +33,7 @@ interface InvoiceLineRowProps {
   update: (index: number, value: InvoiceLineFormValue & { id: string }) => void;
   onRemove: () => void;
   onCatalogItemSelected: (index: number, item: CatalogItem) => void;
+  consignorPartyId?: string;
   isReadOnly?: boolean;
 }
 
@@ -42,6 +43,7 @@ const InvoiceLineRow = ({
   update,
   onRemove,
   onCatalogItemSelected,
+  consignorPartyId,
   isReadOnly = false,
 }: InvoiceLineRowProps) => {
   const {
@@ -90,6 +92,7 @@ const InvoiceLineRow = ({
         <CatalogItemAsyncSelectFormField
           title=""
           placeholder="Selecteer artikel"
+          consignorPartyId={consignorPartyId}
           index={index}
           field={catalogField}
           update={handleCatalogUpdate}
@@ -158,6 +161,7 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
   });
 
   const lines = useWatch({ control, name: 'lines' });
+  const customerId = useWatch({ control, name: 'customerId' });
 
   const totals = useMemo(() => {
     let totalExclVat = 0;
@@ -239,6 +243,7 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
                   update={update}
                   onRemove={() => remove(index)}
                   onCatalogItemSelected={handleCatalogItemSelected}
+                  consignorPartyId={customerId}
                   isReadOnly={isReadOnly}
                 />
               ))}

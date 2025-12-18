@@ -33,13 +33,15 @@ export const InvoiceForm = ({
     isSaving,
     isReadOnly,
     invoiceNumber,
+    currentInvoiceId,
     loadInvoice,
     resetForm,
     handleSubmit,
     handleSubmitAndFinalize,
   } = useInvoiceFormHook();
 
-  const isEditMode = invoiceId !== undefined;
+  // Use the hook's currentInvoiceId to determine edit mode (handles newly created invoices)
+  const isEditMode = invoiceId !== undefined || currentInvoiceId !== null;
 
   const getFormTitle = () => {
     if (invoiceNumber) {
@@ -59,15 +61,17 @@ export const InvoiceForm = ({
   }, [isOpen, invoiceId, loadInvoice, resetForm]);
 
   const onSubmit = async () => {
-    const success = await handleSubmit(invoiceId);
-    if (success) {
+    const savedInvoiceId = await handleSubmit();
+    if (savedInvoiceId !== null) {
+      // Refresh the list, form stays open with the saved invoice loaded
       onComplete();
     }
   };
 
   const onSubmitAndFinalize = async () => {
-    const success = await handleSubmitAndFinalize(invoiceId);
-    if (success) {
+    const finalizedInvoiceId = await handleSubmitAndFinalize();
+    if (finalizedInvoiceId !== null) {
+      // Refresh the list, form stays open with the finalized invoice loaded
       onComplete();
     }
   };
@@ -100,8 +104,9 @@ export const InvoiceForm = ({
               isEditMode && !isReadOnly && (
                 <FormActionMenu
                   onDelete={() => {
-                    if (invoiceId) {
-                      onDelete(invoiceId);
+                    const idToDelete = currentInvoiceId ?? invoiceId;
+                    if (idToDelete) {
+                      onDelete(idToDelete);
                       setIsOpen(false);
                     }
                   }}
