@@ -117,7 +117,7 @@ export const InvoicesTab = ({ invoiceIdToOpen, onInvoiceOpened }: InvoicesTabPro
     {
       key: 'status',
       label: 'Status',
-      accessor: (item) => <InvoiceStatusTag status={item.status} />,
+      accessor: (item) => <InvoiceStatusTag status={item.status as 'DRAFT' | 'FINAL'} />,
       title: (item) => item.status,
       width: '15%',
     },

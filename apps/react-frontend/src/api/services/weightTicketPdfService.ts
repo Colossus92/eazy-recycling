@@ -78,3 +78,32 @@ export const downloadWeightTicketPdf = (
   link.click();
   document.body.removeChild(link);
 };
+
+/**
+ * Downloads a weight ticket PDF directly from Supabase storage using the storage path
+ * @param pdfUrl - The storage path of the weight ticket PDF (e.g., "123/weegbon.pdf")
+ * @param fileName - The filename to use for the downloaded file
+ * @throws Error if there's an issue downloading the weight ticket PDF
+ */
+export const downloadWeightTicketPdfDirect = async (
+  pdfUrl: string,
+  fileName: string
+): Promise<void> => {
+  const { data: pdfData, error } = await supabase.storage
+    .from('weight-tickets')
+    .download(pdfUrl);
+
+  if (error) {
+    console.error('Error downloading weight ticket PDF:', error);
+    throw new Error('Fout bij het downloaden van weegbon PDF');
+  }
+
+  const url = URL.createObjectURL(pdfData);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

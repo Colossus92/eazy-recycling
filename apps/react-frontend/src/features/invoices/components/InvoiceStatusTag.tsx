@@ -11,7 +11,7 @@ export const InvoiceStatusTag = ({ status }: InvoiceStatusTagProps) => {
   }[status];
 
   const text = {
-    DRAFT: 'Openstaand',
+    DRAFT: 'Concept',
     FINAL: 'Definitief',
   }[status];
   return <Tag color={color} text={text} />;

@@ -39,6 +39,7 @@ class WeightTicketMapper(
       weightedAt = dto.weightedAt?.toKotlinInstant(),
       cancellationReason = dto.cancellationReason?.let { CancellationReason(it) },
       linkedInvoiceId = dto.linkedInvoiceId,
+      pdfUrl = dto.pdfUrl,
       lines = dto.lines
         .map { it.toDomain() }
         .toMutableList()
@@ -93,6 +94,7 @@ class WeightTicketMapper(
       weightedAt = domain.weightedAt?.toJavaInstant(),
       cancellationReason = domain.cancellationReason?.value,
       linkedInvoiceId = domain.linkedInvoiceId,
+      pdfUrl = domain.pdfUrl,
     )
   }
 

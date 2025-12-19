@@ -13,7 +13,7 @@ export const WeightTicketStatusTag = ({ status }: WeightTicketStatusTagProps) =>
   }[status];
 
   const text = {
-    DRAFT: 'Openstaand',
+    DRAFT: 'Concept',
     COMPLETED: 'Verwerkt',
     INVOICED: 'Factureerd',
     CANCELLED: 'Geannuleerd',

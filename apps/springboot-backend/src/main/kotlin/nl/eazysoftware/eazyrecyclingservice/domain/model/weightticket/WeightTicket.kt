@@ -29,6 +29,7 @@ class WeightTicket(
   var note: Note?,
   var cancellationReason: CancellationReason? = null,
   var linkedInvoiceId: Long? = null,
+  var pdfUrl: String? = null,
   val createdAt: Instant? = Clock.System.now(),
   val createdBy: String? = null,
   var updatedBy: String? = null,

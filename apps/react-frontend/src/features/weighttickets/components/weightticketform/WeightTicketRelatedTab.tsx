@@ -1,15 +1,13 @@
 import { weightTicketService } from '@/api/services/weightTicketService';
-import { supabase } from '@/api/supabaseClient';
-import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
 import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
 import IcBaselineEuro from '@/assets/icons/IcBaselineEuro.svg?react';
-import { Button } from '@/components/ui/button/Button';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { TransportCard } from './TransportCard';
 import { invoiceService } from '@/api/services/invoiceService';
+import { InvoiceCard } from '@/features/invoices/components/InvoiceCard';
+import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
@@ -18,7 +16,6 @@ interface WeightTicketRelatedTabProps {
 export const WeightTicketRelatedTab = ({
   weightTicketId,
 }: WeightTicketRelatedTabProps) => {
-  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['weight-ticket-transports', weightTicketId],
@@ -55,34 +52,6 @@ export const WeightTicketRelatedTab = ({
     enabled: !!linkedInvoiceId,
   });
 
-  const handleDownloadPdf = async () => {
-    const pdfUrl = weightTicketDetails?.pdfUrl;
-    if (!pdfUrl) return;
-
-    setIsDownloadingPdf(true);
-    try {
-      // Download PDF from Supabase storage
-      const { data, error } = await supabase.storage
-        .from('weight-tickets')
-        .download(pdfUrl);
-
-      if (error) throw error;
-
-      // Create download link
-      const url = URL.createObjectURL(data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = pdfUrl.split('/').pop() || 'weegbon.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-    } finally {
-      setIsDownloadingPdf(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -124,18 +93,19 @@ export const WeightTicketRelatedTab = ({
   return (
     <div className="flex flex-col items-start gap-6">
       {/* PDF Section */}
-      {hasPdf && (
+      {hasPdf && weightTicketDetails && (
         <div className="flex flex-col items-start gap-3 w-full">
           <div className="flex items-center gap-2">
             <Scale />
             <span className="text-subtitle-1">Weegbon</span>
           </div>
-          <Button
-            onClick={handleDownloadPdf}
-            disabled={isDownloadingPdf}
-            variant={"primary"}
-            icon={FilePdf}
-            label="Download PDF"
+          <WeightTicketCard
+            weightTicketId={weightTicketDetails.id}
+            createdAt={typeof weightTicketDetails.createdAt === 'object' && weightTicketDetails.createdAt !== null 
+              ? (weightTicketDetails.createdAt as any).value$kotlinx_datetime 
+              : weightTicketDetails.createdAt || ''}
+            status={weightTicketDetails.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'}
+            pdfUrl={weightTicketDetails.pdfUrl ?? null}
           />
         </div>
       )}
@@ -168,27 +138,13 @@ export const WeightTicketRelatedTab = ({
             <IcBaselineEuro />
             <span className="text-subtitle-1">Factuur</span>
           </div>
-          <div className="flex flex-col items-start self-stretch gap-2 p-3 border border-color-border-secondary rounded-lg bg-color-surface-secondary">
-            <div className="flex items-center justify-between w-full">
-              <span className="text-body-2 text-color-text-primary">
-                Factuur {linkedInvoice.invoiceNumber || linkedInvoice.id}
-              </span>
-              <span className="text-body-2 text-color-text-secondary">
-                {linkedInvoice.status}
-              </span>
-            </div>
-            {linkedInvoice.pdfUrl && (
-              <Button
-                variant="secondary"
-                icon={FilePdf}
-                label="Download PDF"
-                onClick={() => {
-                  // TODO: Implement invoice PDF download
-                  console.log('Download invoice PDF:', linkedInvoice.pdfUrl);
-                }}
-              />
-            )}
-          </div>
+          <InvoiceCard
+            invoiceId={linkedInvoice.id}
+            invoiceNumber={linkedInvoice.invoiceNumber ?? null}
+            invoiceDate={linkedInvoice.invoiceDate}
+            status={linkedInvoice.status as 'DRAFT' | 'FINAL'}
+            pdfUrl={linkedInvoice.pdfUrl ?? null}
+          />
         </div>
       )}
     </div>

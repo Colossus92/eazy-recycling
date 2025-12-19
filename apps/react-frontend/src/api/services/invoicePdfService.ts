@@ -81,3 +81,32 @@ export const downloadInvoicePdf = (
   link.click();
   document.body.removeChild(link);
 };
+
+/**
+ * Downloads an invoice PDF directly from Supabase storage using the storage path
+ * @param pdfUrl - The storage path of the invoice PDF (e.g., "companyCode/invoice-123.pdf")
+ * @param fileName - The filename to use for the downloaded file
+ * @throws Error if there's an issue downloading the invoice PDF
+ */
+export const downloadInvoicePdfDirect = async (
+  pdfUrl: string,
+  fileName: string
+): Promise<void> => {
+  const { data: pdfData, error } = await supabase.storage
+    .from('invoices')
+    .download(pdfUrl);
+
+  if (error) {
+    console.error('Error downloading invoice PDF:', error);
+    throw new Error('Fout bij het downloaden van factuur PDF');
+  }
+
+  const url = URL.createObjectURL(pdfData);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

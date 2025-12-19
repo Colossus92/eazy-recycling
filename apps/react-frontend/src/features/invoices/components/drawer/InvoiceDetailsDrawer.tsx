@@ -8,13 +8,10 @@ import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import CurrencyEur from '@/assets/icons/IcBaselineEuro.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
-import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import { InvoiceStatusTag } from '../InvoiceStatusTag';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { InvoiceDocumentSection } from './InvoiceDocumentSection';
-import { Button } from '@/components/ui/button/Button';
-import { supabase } from '@/api/supabaseClient';
-import { useState } from 'react';
+import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
 
 interface InvoiceDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -46,7 +43,6 @@ export const InvoiceDetailsDrawer = ({
   onEdit,
   onDelete,
 }: InvoiceDetailsDrawerProps) => {
-  const [isDownloadingWeightTicketPdf, setIsDownloadingWeightTicketPdf] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
@@ -71,32 +67,6 @@ export const InvoiceDetailsDrawer = ({
     enabled: !!sourceWeightTicketId,
   });
 
-  const handleDownloadWeightTicketPdf = async () => {
-    const pdfUrl = linkedWeightTicket?.pdfUrl;
-    if (!pdfUrl) return;
-
-    setIsDownloadingWeightTicketPdf(true);
-    try {
-      const { data: pdfData, error } = await supabase.storage
-        .from('weight-tickets')
-        .download(pdfUrl);
-
-      if (error) throw error;
-
-      const url = URL.createObjectURL(pdfData);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = pdfUrl.split('/').pop() || 'weegbon.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading weight ticket PDF:', error);
-    } finally {
-      setIsDownloadingWeightTicketPdf(false);
-    }
-  };
 
   const isFinal = data?.status === 'FINAL';
 
@@ -140,7 +110,7 @@ export const InvoiceDetailsDrawer = ({
                     Status
                   </span>
                 </div>
-                <InvoiceStatusTag status={data.status} />
+                <InvoiceStatusTag status={data.status as 'DRAFT' | 'FINAL'} />
               </div>
               {data.invoiceNumber && (
                 <div className={'flex items-center gap-2 self-stretch'}>
@@ -268,29 +238,16 @@ export const InvoiceDetailsDrawer = ({
           {/* Linked Weight Ticket Section */}
           {linkedWeightTicket && (
             <div className={'flex flex-col items-start self-stretch gap-3'}>
-              <span className={'text-subtitle-1'}>Weegbon</span>
-              <div className={'flex flex-col items-start self-stretch gap-2 p-3 border border-color-border-secondary rounded-lg bg-color-surface-secondary'}>
-                <div className={'flex items-center justify-between w-full'}>
-                  <div className="flex items-center gap-2">
-                    <Scale className={'w-5 h-5 text-color-text-secondary'} />
-                    <span className={'text-body-2 text-color-text-primary'}>
-                      Weegbon {linkedWeightTicket.id}
-                    </span>
-                  </div>
-                  <span className={'text-body-2 text-color-text-secondary'}>
-                    {linkedWeightTicket.status}
-                  </span>
-                </div>
-                {linkedWeightTicket.pdfUrl && (
-                  <Button
-                    variant="secondary"
-                    icon={FilePdf}
-                    label="Download PDF"
-                    onClick={handleDownloadWeightTicketPdf}
-                    disabled={isDownloadingWeightTicketPdf}
-                  />
-                )}
+              <div className="flex items-center gap-2">
+                <Scale className={'w-5 h-5 text-color-text-secondary'} />
+                <span className={'text-subtitle-1'}>Weegbon</span>
               </div>
+              <WeightTicketCard
+                weightTicketId={linkedWeightTicket.id}
+                createdAt={typeof linkedWeightTicket.createdAt === 'string' ? linkedWeightTicket.createdAt : linkedWeightTicket.createdAt?.value$kotlinx_datetime || new Date().toISOString()}
+                status={linkedWeightTicket.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'}
+                pdfUrl={linkedWeightTicket.pdfUrl ?? null}
+              />
             </div>
           )}
         </div>
