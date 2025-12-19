@@ -1,14 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { invoiceService } from '@/api/services/invoiceService';
+import { weightTicketService } from '@/api/services/weightTicketService';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import Hash from '@/assets/icons/Hash.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import CurrencyEur from '@/assets/icons/IcBaselineEuro.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
+import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import { InvoiceStatusTag } from '../InvoiceStatusTag';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { InvoiceDocumentSection } from './InvoiceDocumentSection';
+import { Button } from '@/components/ui/button/Button';
+import { supabase } from '@/api/supabaseClient';
+import { useState } from 'react';
 
 interface InvoiceDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -40,6 +46,8 @@ export const InvoiceDetailsDrawer = ({
   onEdit,
   onDelete,
 }: InvoiceDetailsDrawerProps) => {
+  const [isDownloadingWeightTicketPdf, setIsDownloadingWeightTicketPdf] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
@@ -51,6 +59,44 @@ export const InvoiceDetailsDrawer = ({
     },
     enabled: isDrawerOpen && !!invoiceId,
   });
+
+  const sourceWeightTicketId = data?.sourceWeightTicketId;
+
+  const { data: linkedWeightTicket } = useQuery({
+    queryKey: ['linked-weight-ticket', sourceWeightTicketId],
+    queryFn: async () => {
+      if (!sourceWeightTicketId) return null;
+      return await weightTicketService.getByNumber(sourceWeightTicketId);
+    },
+    enabled: !!sourceWeightTicketId,
+  });
+
+  const handleDownloadWeightTicketPdf = async () => {
+    const pdfUrl = linkedWeightTicket?.pdfUrl;
+    if (!pdfUrl) return;
+
+    setIsDownloadingWeightTicketPdf(true);
+    try {
+      const { data: pdfData, error } = await supabase.storage
+        .from('weight-tickets')
+        .download(pdfUrl);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(pdfData);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = pdfUrl.split('/').pop() || 'weegbon.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading weight ticket PDF:', error);
+    } finally {
+      setIsDownloadingWeightTicketPdf(false);
+    }
+  };
 
   const isFinal = data?.status === 'FINAL';
 
@@ -217,6 +263,35 @@ export const InvoiceDetailsDrawer = ({
                 invoiceNumber={data.invoiceNumber || 'Concept'}
               />
             </DocumentsSection>
+          )}
+
+          {/* Linked Weight Ticket Section */}
+          {linkedWeightTicket && (
+            <div className={'flex flex-col items-start self-stretch gap-3'}>
+              <span className={'text-subtitle-1'}>Weegbon</span>
+              <div className={'flex flex-col items-start self-stretch gap-2 p-3 border border-color-border-secondary rounded-lg bg-color-surface-secondary'}>
+                <div className={'flex items-center justify-between w-full'}>
+                  <div className="flex items-center gap-2">
+                    <Scale className={'w-5 h-5 text-color-text-secondary'} />
+                    <span className={'text-body-2 text-color-text-primary'}>
+                      Weegbon {linkedWeightTicket.id}
+                    </span>
+                  </div>
+                  <span className={'text-body-2 text-color-text-secondary'}>
+                    {linkedWeightTicket.status}
+                  </span>
+                </div>
+                {linkedWeightTicket.pdfUrl && (
+                  <Button
+                    variant="secondary"
+                    icon={FilePdf}
+                    label="Download PDF"
+                    onClick={handleDownloadWeightTicketPdf}
+                    disabled={isDownloadingWeightTicketPdf}
+                  />
+                )}
+              </div>
+            </div>
           )}
         </div>
       )}

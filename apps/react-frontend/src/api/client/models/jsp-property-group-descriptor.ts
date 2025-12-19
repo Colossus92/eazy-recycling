@@ -28,12 +28,6 @@ export interface JspPropertyGroupDescriptor {
     'defaultContentType'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'deferredSyntaxAllowedAsLiteral'?: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
@@ -44,24 +38,6 @@ export interface JspPropertyGroupDescriptor {
      * @memberof JspPropertyGroupDescriptor
      */
     'pageEncoding'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'errorOnELNotFound'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'trimDirectiveWhitespaces'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includePreludes'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -79,19 +55,43 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'isXml'?: string;
+    'errorOnELNotFound'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'includeCodas'?: Array<string>;
+    'deferredSyntaxAllowedAsLiteral'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'trimDirectiveWhitespaces'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
     'errorOnUndeclaredNamespace'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includePreludes'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includeCodas'?: Array<string>;
     /**
      * 
      * @type {string}

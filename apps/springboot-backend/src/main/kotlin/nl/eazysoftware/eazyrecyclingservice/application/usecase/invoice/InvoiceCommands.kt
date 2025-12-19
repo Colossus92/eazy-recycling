@@ -12,6 +12,7 @@ data class CreateInvoiceCommand(
     val customerId: UUID,
     val invoiceDate: LocalDate,
     val originalInvoiceId: Long?,
+    val sourceWeightTicketId: Long? = null,
     val lines: List<InvoiceLineCommand>,
 )
 

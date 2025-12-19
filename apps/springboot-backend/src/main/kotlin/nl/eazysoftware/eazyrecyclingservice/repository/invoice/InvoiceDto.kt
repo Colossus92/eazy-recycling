@@ -67,6 +67,9 @@ class InvoiceDto(
   @Column(name = "original_invoice_id")
   val originalInvoiceId: Long?,
 
+  @Column(name = "source_weight_ticket_id")
+  val sourceWeightTicketId: Long?,
+
   @OneToMany(mappedBy = "invoice", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   val lines: MutableList<InvoiceLineDto> = mutableListOf(),
 

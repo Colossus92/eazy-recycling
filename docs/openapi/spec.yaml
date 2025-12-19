@@ -990,6 +990,25 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SplitWeightTicketResponse"
+  /weight-tickets/{weightTicketId}/invoice:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: createInvoice
+      parameters:
+      - name: weightTicketId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateInvoiceFromWeightTicketResult"
   /weight-tickets/{weightTicketId}/copy:
     post:
       tags:
@@ -3626,6 +3645,18 @@ components:
       required:
       - newWeightTicketId
       - originalWeightTicketId
+    CreateInvoiceFromWeightTicketResult:
+      type: object
+      properties:
+        invoiceId:
+          type: integer
+          format: int64
+        weightTicketId:
+          type: integer
+          format: int64
+      required:
+      - invoiceId
+      - weightTicketId
     CopyWeightTicketResponse:
       type: object
       properties:
@@ -3907,6 +3938,9 @@ components:
           format: date-time
         cancellationReason:
           type: string
+        linkedInvoiceId:
+          type: integer
+          format: int64
         pdfUrl:
           type: string
         createdAt:
@@ -4516,6 +4550,9 @@ components:
           type: string
         cancellationReason:
           type: string
+        linkedInvoiceId:
+          type: integer
+          format: int64
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
         createdByName:
@@ -5047,6 +5084,9 @@ components:
         originalInvoiceId:
           type: integer
           format: int64
+        sourceWeightTicketId:
+          type: integer
+          format: int64
         lines:
           type: array
           items:
@@ -5348,21 +5388,21 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
+        totalElements:
+          type: integer
+          format: int64
         numberOfElements:
           type: integer
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
         size:
           type: integer
           format: int32
@@ -5491,11 +5531,11 @@ components:
     ApplicationContext:
       type: object
       properties:
+        applicationName:
+          type: string
         startupDate:
           type: integer
           format: int64
-        applicationName:
-          type: string
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
         parent: {}
@@ -5857,34 +5897,34 @@ components:
       properties:
         defaultContentType:
           type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
         urlPatterns:
           type: array
           items:
             type: string
         pageEncoding:
           type: string
+        scriptingInvalid:
+          type: string
+        elIgnored:
+          type: string
         errorOnELNotFound:
           type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
+        isXml:
           type: string
         includePreludes:
           type: array
           items:
             type: string
-        scriptingInvalid:
-          type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         includeCodas:
           type: array
           items:
             type: string
-        errorOnUndeclaredNamespace:
-          type: string
         buffer:
           type: string
     RedirectView:
@@ -5950,25 +5990,31 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesCSV:
-          type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        attributeNames: {}
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        sessionTimeout:
+          type: integer
+          format: int32
         contextPath:
           type: string
-        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        initParameterNames: {}
         sessionTrackingModes:
           type: array
           items:
@@ -5979,22 +6025,15 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
-        servletContextName:
-          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
+          type: string
+        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6024,6 +6063,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6070,12 +6110,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6087,11 +6127,11 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        secure:
-          type: boolean
         maxAge:
           type: integer
           format: int32
+        secure:
+          type: boolean
         domain:
           type: string
         httpOnly:

@@ -37,7 +37,7 @@ export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDualFormOpen, setIsDualFormOpen] = useState(false);
-  const { read, form, deletion, split, copy, createTransport, error } = useWeightTicketCrud();
+  const { read, form, deletion, split, copy, createTransport, createInvoice, error } = useWeightTicketCrud();
 
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -103,6 +103,29 @@ export const WeightTicketManagement = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [createTransport.response]);
+
+  // Handle invoice creation response and show toast
+  useEffect(() => {
+    if (createInvoice.response) {
+      const toastContent = (
+        <div className="flex flex-col gap-1">
+          <span>Factuur aangemaakt van weegbon</span>
+          <button
+            onClick={() => {
+              navigate(`/invoices`);
+            }}
+            className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
+          >
+            Bekijk facturen →
+          </button>
+        </div>
+      );
+      
+      toastService.success(toastContent);
+      createInvoice.clearResponse();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [createInvoice.response]);
 
   const columns: Column[] = [
     { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
@@ -235,6 +258,7 @@ export const WeightTicketManagement = () => {
           onSplit={split.initiate}
           onCopy={copy.confirm}
           onCreateTransport={createTransport.confirm}
+          onCreateInvoice={createInvoice.confirm}
         />
       ) : split.response ? (
         <WeightTicketDualForm

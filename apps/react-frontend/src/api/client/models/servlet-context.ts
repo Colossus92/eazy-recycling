@@ -37,22 +37,22 @@ import type { SessionCookieConfig } from './session-cookie-config';
 export interface ServletContext {
     /**
      * 
-     * @type {any}
+     * @type {{ [key: string]: ServletRegistration; }}
      * @memberof ServletContext
      */
-    'attributeNames'?: any;
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    /**
+     * 
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
     /**
      * 
      * @type {string}
      * @memberof ServletContext
      */
     'contextPath'?: string;
-    /**
-     * 
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
     /**
      * 
      * @type {SessionCookieConfig}
@@ -67,6 +67,12 @@ export interface ServletContext {
     'virtualServerName'?: string;
     /**
      * 
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
+    /**
+     * 
      * @type {Set<string>}
      * @memberof ServletContext
      */
@@ -76,25 +82,7 @@ export interface ServletContext {
      * @type {number}
      * @memberof ServletContext
      */
-    'sessionTimeout'?: number;
-    /**
-     * 
-     * @type {{ [key: string]: ServletRegistration; }}
-     * @memberof ServletContext
-     */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
-    /**
-     * 
-     * @type {number}
-     * @memberof ServletContext
-     */
     'effectiveMajorVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'servletContextName'?: string;
     /**
      * 
      * @type {number}
@@ -107,6 +95,12 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'serverInfo'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'servletContextName'?: string;
     /**
      * 
      * @type {{ [key: string]: FilterRegistration; }}
@@ -143,6 +137,12 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'responseCharacterEncoding'?: string;
+    /**
+     * 
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
     /**
      * 
      * @type {ApplicationContextClassLoaderParentUnnamedModuleClassLoader}

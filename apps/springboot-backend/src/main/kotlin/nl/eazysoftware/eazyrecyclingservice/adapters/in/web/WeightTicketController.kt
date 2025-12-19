@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicket
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicketCommand
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicketResult
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
@@ -36,6 +39,7 @@ class WeightTicketController(
   private val splitWeightTicket: SplitWeightTicket,
   private val copyWeightTicket: CopyWeightTicket,
   private val completeWeightTicket: CompleteWeightTicket,
+  private val createInvoiceFromWeightTicket: CreateInvoiceFromWeightTicket,
 ) {
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -148,6 +152,20 @@ class WeightTicketController(
     return CopyWeightTicketResponse(
       originalWeightTicketId = weightTicketId,
       newWeightTicketId = newTicketId.number,
+    )
+  }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/{weightTicketId}/invoice")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createInvoice(
+    @PathVariable
+    weightTicketId: Long,
+  ): CreateInvoiceFromWeightTicketResult {
+    return createInvoiceFromWeightTicket.handle(
+      CreateInvoiceFromWeightTicketCommand(
+        WeightTicketId(weightTicketId)
+      )
     )
   }
 }

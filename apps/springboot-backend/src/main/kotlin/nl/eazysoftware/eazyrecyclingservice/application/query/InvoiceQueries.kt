@@ -71,6 +71,7 @@ class GetInvoiceByIdQuery(
                 vatNumber = invoice.customerSnapshot.vatNumber,
             ),
             originalInvoiceId = invoice.originalInvoiceId?.value,
+            sourceWeightTicketId = invoice.sourceWeightTicketId,
             lines = invoice.lines.map { line ->
                 InvoiceLineView(
                     id = line.id.value,
@@ -136,6 +137,7 @@ data class InvoiceDetailView(
     val invoiceDate: LocalDate,
     val customer: CustomerSnapshotView,
     val originalInvoiceId: Long?,
+    val sourceWeightTicketId: Long?,
     val lines: List<InvoiceLineView>,
     val totals: InvoiceTotalsView,
     val createdAt: String,

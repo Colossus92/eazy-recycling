@@ -71,6 +71,7 @@ class WeightTicketQueryRepository(
       reclamation = weightTicket.reclamation,
       note = weightTicket.note,
       cancellationReason = weightTicket.cancellationReason,
+      linkedInvoiceId = weightTicket.linkedInvoiceId,
       createdAt = weightTicket.createdAt?.toKotlinInstant()?.toDisplayTime(),
       createdByName = weightTicket.createdBy,
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),

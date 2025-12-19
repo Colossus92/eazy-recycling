@@ -48,6 +48,7 @@ class CreateInvoiceService(
             invoiceDate = cmd.invoiceDate,
             customerSnapshot = customerSnapshot,
             originalInvoiceId = originalInvoiceId,
+            sourceWeightTicketId = cmd.sourceWeightTicketId,
             lines = lines,
             createdAt = Clock.System.now(),
             createdBy = null,

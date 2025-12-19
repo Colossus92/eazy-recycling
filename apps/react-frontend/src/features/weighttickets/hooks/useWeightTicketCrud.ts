@@ -1,4 +1,4 @@
-import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse, CopyWeightTicketResponse, CreateFromWeightTicketResponse } from '@/api/client';
+import { WeightTicketRequest, WeightTicketListView, WeightTicketDetailView, SplitWeightTicketResponse, CopyWeightTicketResponse, CreateFromWeightTicketResponse, CreateInvoiceFromWeightTicketResult } from '@/api/client';
 import { weightTicketService } from '@/api/services/weightTicketService';
 import { createWasteTransportFromWeightTicket } from '@/api/services/transportService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -30,6 +30,7 @@ export function useWeightTicketCrud() {
   const [copyResponse, setCopyResponse] = useState<CopyWeightTicketResponse | undefined>(undefined);
   const [itemToCreateTransport, setItemToCreateTransport] = useState<number | undefined>(undefined);
   const [createTransportResponse, setCreateTransportResponse] = useState<CreateFromWeightTicketResponse | undefined>(undefined);
+  const [createInvoiceResponse, setCreateInvoiceResponse] = useState<CreateInvoiceFromWeightTicketResult | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
     isDraft: false,
@@ -239,6 +240,27 @@ export function useWeightTicketCrud() {
     }
   };
 
+  const createInvoice = async (weightTicketId: number): Promise<void> => {
+    try {
+      const createResponse = await weightTicketService.createInvoice(weightTicketId);
+      
+      // Invalidate queries to refresh data
+      await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
+      await queryClient.invalidateQueries({ queryKey: ['weight-ticket-details', weightTicketId] });
+      
+      // Store response for the component to handle toast/navigation
+      setCreateInvoiceResponse(createResponse);
+      
+      // Refetch the weight ticket to update the form with new status
+      const refetchedWeightTicket = await weightTicketService.getByNumber(weightTicketId);
+      setItemToEdit(refetchedWeightTicket);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het aanmaken van factuur';
+      setErrorMessage(message);
+      throw error;
+    }
+  };
+
   return {
     read: {
       items: displayedWeightTickets,
@@ -317,6 +339,11 @@ export function useWeightTicketCrud() {
       confirm: createTransport,
       cancel: () => setItemToCreateTransport(undefined),
       clearResponse: () => setCreateTransportResponse(undefined),
+    },
+    createInvoice: {
+      response: createInvoiceResponse,
+      confirm: createInvoice,
+      clearResponse: () => setCreateInvoiceResponse(undefined),
     },
     error: {
       message: errorMessage,

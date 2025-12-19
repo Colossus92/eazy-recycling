@@ -3,11 +3,13 @@ import { supabase } from '@/api/supabaseClient';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
 import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
+import IcBaselineEuro from '@/assets/icons/IcBaselineEuro.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import { TransportCard } from './TransportCard';
+import { invoiceService } from '@/api/services/invoiceService';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
@@ -40,9 +42,21 @@ export const WeightTicketRelatedTab = ({
     enabled: !!weightTicketId,
   });
 
+  const linkedInvoiceId = weightTicketDetails?.linkedInvoiceId;
+
+  // Fetch linked invoice details if available - MUST be called before any early returns
+  const { data: linkedInvoice } = useQuery({
+    queryKey: ['linked-invoice', linkedInvoiceId],
+    queryFn: async () => {
+      if (!linkedInvoiceId) return null;
+      const response = await invoiceService.getById(linkedInvoiceId);
+      return response;
+    },
+    enabled: !!linkedInvoiceId,
+  });
+
   const handleDownloadPdf = async () => {
-    // Type assertion until API client is regenerated with pdfUrl field
-    const pdfUrl = (weightTicketDetails as any)?.pdfUrl as string | undefined;
+    const pdfUrl = weightTicketDetails?.pdfUrl;
     if (!pdfUrl) return;
 
     setIsDownloadingPdf(true);
@@ -92,11 +106,12 @@ export const WeightTicketRelatedTab = ({
     );
   }
 
-  // Type assertion until API client is regenerated with pdfUrl field
-  const hasPdf = (weightTicketDetails as any)?.pdfUrl;
+  const hasPdf = weightTicketDetails?.pdfUrl;
   const hasTransports = data && data.transports.length > 0;
 
-  if (!hasPdf && !hasTransports) {
+  const hasLinkedInvoice = !!linkedInvoiceId;
+
+  if (!hasPdf && !hasTransports && !hasLinkedInvoice) {
     return (
       <div className="flex justify-center items-center p-8">
         <span className="text-body-2 text-color-text-secondary">
@@ -142,6 +157,37 @@ export const WeightTicketRelatedTab = ({
                 status={transport.status}
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Linked Invoice Section */}
+      {hasLinkedInvoice && linkedInvoice && (
+        <div className="flex flex-col items-start gap-3 w-full">
+          <div className="flex items-center gap-2">
+            <IcBaselineEuro />
+            <span className="text-subtitle-1">Factuur</span>
+          </div>
+          <div className="flex flex-col items-start self-stretch gap-2 p-3 border border-color-border-secondary rounded-lg bg-color-surface-secondary">
+            <div className="flex items-center justify-between w-full">
+              <span className="text-body-2 text-color-text-primary">
+                Factuur {linkedInvoice.invoiceNumber || linkedInvoice.id}
+              </span>
+              <span className="text-body-2 text-color-text-secondary">
+                {linkedInvoice.status}
+              </span>
+            </div>
+            {linkedInvoice.pdfUrl && (
+              <Button
+                variant="secondary"
+                icon={FilePdf}
+                label="Download PDF"
+                onClick={() => {
+                  // TODO: Implement invoice PDF download
+                  console.log('Download invoice PDF:', linkedInvoice.pdfUrl);
+                }}
+              />
+            )}
           </div>
         </div>
       )}

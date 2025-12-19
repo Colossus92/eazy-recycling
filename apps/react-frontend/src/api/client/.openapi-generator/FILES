@@ -61,6 +61,7 @@ models/container-transport-request.ts
 models/copy-weight-ticket-response.ts
 models/create-container-transport-response.ts
 models/create-from-weight-ticket-response.ts
+models/create-invoice-from-weight-ticket-result.ts
 models/create-invoice-request.ts
 models/create-signature-request.ts
 models/create-user-request.ts

@@ -28,6 +28,7 @@ class WeightTicket(
   var reclamation: String?,
   var note: Note?,
   var cancellationReason: CancellationReason? = null,
+  var linkedInvoiceId: Long? = null,
   val createdAt: Instant? = Clock.System.now(),
   val createdBy: String? = null,
   var updatedBy: String? = null,

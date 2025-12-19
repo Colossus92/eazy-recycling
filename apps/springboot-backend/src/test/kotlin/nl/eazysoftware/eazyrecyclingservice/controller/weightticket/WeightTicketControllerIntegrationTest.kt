@@ -4,11 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.CancelWeightTicketRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.invoice.InvoiceJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
+import java.math.BigDecimal
+import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,8 +41,19 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     @Autowired
     private lateinit var companyRepository: CompanyJpaRepository
 
+    @Autowired
+    private lateinit var invoiceRepository: InvoiceJpaRepository
+
+    @Autowired
+    private lateinit var catalogItemRepository: CatalogItemJpaRepository
+
+    @Autowired
+    private lateinit var vatRateRepository: VatRateJpaRepository
+
     private lateinit var testConsignorCompany: CompanyDto
     private lateinit var testCarrierCompany: CompanyDto
+    private lateinit var testCatalogItem: CatalogItemDto
+    private lateinit var testVatRate: VatRateDto
 
     @BeforeEach
     fun setup() {
@@ -53,6 +72,33 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             vihbId = "123456VXXX",
             name = "Test Carrier Company"
         ))
+
+        testVatRate = vatRateRepository.save(
+            VatRateDto(
+                vatCode = "VAT21",
+                percentage = BigDecimal("21"),
+                validFrom = Instant.now().minusSeconds(86400),
+                validTo = null,
+                countryCode = "NL",
+                description = "Standard VAT 21%",
+            )
+        )
+
+        testCatalogItem = catalogItemRepository.save(
+            CatalogItemDto(
+                code = "WASTE001",
+                name = "Test Waste Stream",
+                type = CatalogItemType.WASTE_STREAM,
+                unitOfMeasure = "kg",
+                vatRate = testVatRate,
+                category = null,
+                consignorParty = null,
+                defaultPrice = BigDecimal("10.00"),
+                status = "ACTIVE",
+                purchaseAccountNumber = "7000",
+                salesAccountNumber = "8000",
+            )
+        )
     }
 
     @Test
@@ -408,5 +454,126 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val completedWeightTicket = weightTicketRepository.findById(weightTicketId)
         assertThat(completedWeightTicket).isPresent
         assertThat(completedWeightTicket.get().status.name).isEqualTo("COMPLETED")
+    }
+
+    @Test
+    fun `can create invoice from completed weight ticket`() {
+        // Given - create and complete a weight ticket
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "150.75",
+                    catalogItemId = testCatalogItem.id!!
+                )
+            ),
+            note = "Weight ticket for invoice"
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // Complete the weight ticket
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+            .andExpect(status().isNoContent)
+
+        // When - create invoice from weight ticket
+        val invoiceResult = securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isCreated)
+            .andExpect(jsonPath("$.invoiceId").exists())
+            .andExpect(jsonPath("$.weightTicketId").value(weightTicketId))
+            .andReturn()
+
+        val response = objectMapper.readTree(invoiceResult.response.contentAsString)
+        val invoiceId = response.get("invoiceId").asLong()
+
+        // Then - verify invoice was created with correct data
+        val savedInvoice = invoiceRepository.findById(invoiceId)
+        assertThat(savedInvoice).isPresent
+        assertThat(savedInvoice.get().sourceWeightTicketId).isEqualTo(weightTicketId)
+        assertThat(savedInvoice.get().customerName).isEqualTo("Test Consignor Company")
+        assertThat(savedInvoice.get().status.name).isEqualTo("DRAFT")
+
+        // Verify weight ticket was updated
+        val updatedWeightTicket = weightTicketRepository.findById(weightTicketId)
+        assertThat(updatedWeightTicket).isPresent
+        assertThat(updatedWeightTicket.get().linkedInvoiceId).isEqualTo(invoiceId)
+        assertThat(updatedWeightTicket.get().status.name).isEqualTo("INVOICED")
+    }
+
+    @Test
+    fun `cannot create invoice from draft weight ticket`() {
+        // Given - create a weight ticket (still in DRAFT status)
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testCatalogItem.id!!
+                )
+            )
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // When & Then - attempt to create invoice should fail
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `cannot create invoice from weight ticket that already has linked invoice`() {
+        // Given - create, complete, and invoice a weight ticket
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "200.00",
+                    catalogItemId = testCatalogItem.id!!
+                )
+            )
+        )
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // Complete and create first invoice
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+            .andExpect(status().isNoContent)
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isCreated)
+
+        // When & Then - attempt to create second invoice should fail
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `cannot create invoice from non-existent weight ticket`() {
+        // When & Then
+        securedMockMvc.post("/weight-tickets/999999/invoice", "")
+            .andExpect(status().isNotFound)
     }
 }

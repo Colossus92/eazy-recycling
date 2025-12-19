@@ -243,13 +243,14 @@ create table if not exists weight_tickets (
                                  reclamation text,
                                  note text,
                                  status text not null,
+                                 cancellation_reason text,
+                                 linked_invoice_id bigint,
+                                 pdf_url text,
+                                 weighted_at timestamp with time zone,
                                  created_at timestamp with time zone not null default now(),
                                  created_by text,
                                  last_modified_at timestamp with time zone not null default now(),
                                  last_modified_by text,
-                                 weighted_at timestamp with time zone ,
-                                 cancellation_reason text,
-                                 pdf_url text,
                                  primary key (id)
 );
 
@@ -443,6 +444,7 @@ create table if not exists invoices (
                                           customer_country text,
                                           customer_vat_number text,
                                           original_invoice_id bigint,
+                                          source_weight_ticket_id bigint,
                                           created_at timestamp with time zone not null default now(),
                                           created_by text,
                                           last_modified_at timestamp with time zone not null default now(),

@@ -75,6 +75,9 @@ data class WeightTicketDto(
   @Column(name = "cancellation_reason", nullable = true)
   val cancellationReason: String?,
 
+  @Column(name = "linked_invoice_id")
+  val linkedInvoiceId: Long? = null,
+
   @Column(name = "pdf_url")
   val pdfUrl: String? = null,
 ) : AuditableEntity()

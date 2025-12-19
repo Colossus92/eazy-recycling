@@ -16,6 +16,7 @@ class Invoice(
     val invoiceDate: LocalDate,
     val customerSnapshot: CustomerSnapshot,
     val originalInvoiceId: InvoiceId?,
+    val sourceWeightTicketId: Long?,
     val lines: MutableList<InvoiceLine>,
     val createdAt: Instant,
     val createdBy: String?,

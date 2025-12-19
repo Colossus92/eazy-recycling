@@ -20,6 +20,7 @@ data class WeightTicketDetailView(
   val reclamation: String?,
   val note: String?,
   val cancellationReason: String?,
+  val linkedInvoiceId: Long?,
   val createdAt: LocalDateTime?,
   val createdByName: String?,
   val updatedAt: LocalDateTime?,

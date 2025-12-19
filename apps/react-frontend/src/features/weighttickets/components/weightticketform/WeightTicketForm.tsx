@@ -42,6 +42,7 @@ interface WeightTicketFormProps {
     pickupDateTime: string,
     deliveryDateTime?: string
   ) => Promise<void>;
+  onCreateInvoice?: (id: number) => void;
   noDialog?: boolean;
 }
 
@@ -55,6 +56,7 @@ export const WeightTicketForm = ({
   onCopy,
   onComplete,
   onCreateTransport,
+  onCreateInvoice,
   noDialog = false,
 }: WeightTicketFormProps) => {
   const {
@@ -232,6 +234,7 @@ export const WeightTicketForm = ({
                   onCreateTransport={
                     onCreateTransport ? handleCreateTransport : undefined
                   }
+                  onCreateInvoice={onCreateInvoice}
                 />
               )
             }

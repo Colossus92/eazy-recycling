@@ -79,6 +79,12 @@ export interface InvoiceDetailView {
     'originalInvoiceId'?: number;
     /**
      * 
+     * @type {number}
+     * @memberof InvoiceDetailView
+     */
+    'sourceWeightTicketId'?: number;
+    /**
+     * 
      * @type {Array<InvoiceLineView>}
      * @memberof InvoiceDetailView
      */

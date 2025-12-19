@@ -2,6 +2,7 @@ import Plus from '@/assets/icons/Plus.svg?react';
 import CheckCircleOutline from '@/assets/icons/CheckCircleOutline.svg?react';
 import IcBaselineContentCopy from '@/assets/icons/IcBaselineContentCopy.svg?react';
 import TruckTrailer from '@/assets/icons/TruckTrailer.svg?react';
+import IcBaselineEuro from '@/assets/icons/IcBaselineEuro.svg?react';
 import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
 import { WeightTicketDetailView } from '@/api/client/models';
 
@@ -12,6 +13,7 @@ interface WeightTicketFormActionMenuProps {
   onCopy?: (id: number) => void;
   onComplete?: (id: number) => void;
   onCreateTransport?: (id: number) => void;
+  onCreateInvoice?: (id: number) => void;
 }
 
 export const WeightTicketFormActionMenu = ({
@@ -21,6 +23,7 @@ export const WeightTicketFormActionMenu = ({
   onCopy,
   onComplete,
   onCreateTransport,
+  onCreateInvoice,
 }: WeightTicketFormActionMenuProps) => {
   const actions = [];
   if (weightTicket.status === 'DRAFT' && onSplit) {
@@ -42,6 +45,13 @@ export const WeightTicketFormActionMenu = ({
       label: 'Transport aanmaken',
       icon: TruckTrailer,
       onClick: () => onCreateTransport(weightTicket.id),
+    });
+  }
+  if (weightTicket.status === 'COMPLETED' && !weightTicket.linkedInvoiceId && onCreateInvoice) {
+    actions.push({
+      label: 'Factuur aanmaken',
+      icon: IcBaselineEuro,
+      onClick: () => onCreateInvoice(weightTicket.id),
     });
   }
   if (weightTicket.status === 'DRAFT' && onComplete) {

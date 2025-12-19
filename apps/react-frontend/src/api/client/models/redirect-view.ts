@@ -157,15 +157,15 @@ export interface RedirectView {
     'attributesMap'?: { [key: string]: any; };
     /**
      * 
-     * @type {{ [key: string]: string; }}
-     * @memberof RedirectView
-     */
-    'attributes'?: { [key: string]: string; };
-    /**
-     * 
      * @type {string}
      * @memberof RedirectView
      */
     'attributesCSV'?: string;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof RedirectView
+     */
+    'attributes'?: { [key: string]: string; };
 }
 
