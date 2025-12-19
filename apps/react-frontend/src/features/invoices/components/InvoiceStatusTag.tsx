@@ -1,29 +1,18 @@
+import { Tag, TagColor } from "@/components/ui/tag/Tag";
+
 interface InvoiceStatusTagProps {
-  status: string;
+  status: 'DRAFT' | 'FINAL';
 }
 
-const statusConfig: Record<string, { label: string; className: string }> = {
-  DRAFT: {
-    label: 'Concept',
-    className: 'bg-color-status-warning-light text-color-status-warning-dark',
-  },
-  FINAL: {
-    label: 'Definitief',
-    className: 'bg-color-status-success-light text-color-status-success-dark',
-  },
-};
-
 export const InvoiceStatusTag = ({ status }: InvoiceStatusTagProps) => {
-  const config = statusConfig[status] || {
-    label: status,
-    className: 'bg-color-surface-tertiary text-color-text-secondary',
-  };
+  const color = {
+    DRAFT: TagColor.YELLOW,
+    FINAL: TagColor.GREEN,
+  }[status];
 
-  return (
-    <span
-      className={`inline-flex items-center px-2 py-1 rounded-radius-sm text-caption-1 font-medium ${config.className}`}
-    >
-      {config.label}
-    </span>
-  );
+  const text = {
+    DRAFT: 'Openstaand',
+    FINAL: 'Definitief',
+  }[status];
+  return <Tag color={color} text={text} />;
 };
