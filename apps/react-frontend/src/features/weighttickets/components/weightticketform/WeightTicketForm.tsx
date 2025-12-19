@@ -16,7 +16,7 @@ import { fallbackRender } from '@/utils/fallbackRender';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { FormProvider, useWatch } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
 import {

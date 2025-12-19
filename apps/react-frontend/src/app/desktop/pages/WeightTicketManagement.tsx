@@ -16,9 +16,11 @@ import { WeightTicketFilterForm } from '@/features/weighttickets/components/Weig
 import { WeightTicketForm } from '@/features/weighttickets/components/weightticketform/WeightTicketForm';
 import { WeightTicketDualForm } from '@/features/weighttickets/components/WeightTicketDualForm';
 import { WeightTicketStatusTag, WeightTicketStatusTagProps } from '@/features/weighttickets/components/WeightTicketStatusTag';
+import { WeightTicketDetailsDrawer } from '@/features/weighttickets/components/drawer/WeightTicketDetailsDrawer';
 import { useWeightTicketCrud } from '@/features/weighttickets/hooks/useWeightTicketCrud';
+import { useRowClickHandler } from '@/hooks/useRowClickHandler';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { toastService } from '@/components/ui/toast/toastService';
@@ -37,10 +39,58 @@ export const WeightTicketManagement = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDualFormOpen, setIsDualFormOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedWeightTicketId, setSelectedWeightTicketId] = useState<number | null>(null);
   const { read, form, deletion, split, copy, createTransport, createInvoice, error } = useWeightTicketCrud();
 
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle URL params for opening weight ticket drawer
+  useEffect(() => {
+    const weightTicketDrawerId = searchParams.get('weightTicketDrawerId');
+    
+    if (weightTicketDrawerId) {
+      const weightTicketNumber = parseInt(weightTicketDrawerId, 10);
+      if (!isNaN(weightTicketNumber)) {
+        setSelectedWeightTicketId(weightTicketNumber);
+        setIsDrawerOpen(true);
+      }
+      
+      // Clear the URL params after opening
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
+
+  const handleSingleClick = useCallback((item: WeightTicketListView) => {
+    setSelectedWeightTicketId(item.id);
+    setIsDrawerOpen(true);
+  }, []);
+
+  const handleDoubleClick = useCallback((item: WeightTicketListView) => {
+    setIsDrawerOpen(false);
+    form.openForEdit(item);
+  }, [form]);
+
+  const { handleClick, handleDoubleClick: handleRowDoubleClick } = useRowClickHandler<WeightTicketListView>({
+    onSingleClick: handleSingleClick,
+    onDoubleClick: handleDoubleClick,
+  });
+
+  const handleDrawerEdit = () => {
+    setIsDrawerOpen(false);
+    const item = read.items.find((i) => i.id === selectedWeightTicketId);
+    if (item) {
+      form.openForEdit(item);
+    }
+  };
+
+  const handleDrawerDelete = () => {
+    if (selectedWeightTicketId) {
+      setIsDrawerOpen(false);
+      deletion.initiate(selectedWeightTicketId);
+    }
+  };
   
   // Handle URL params for opening weight ticket form from transport details
   useEffect(() => {
@@ -196,8 +246,9 @@ export const WeightTicketManagement = () => {
                       .map((item, index) => (
                         <tr
                           key={index}
-                          className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                          onDoubleClick={() => form.openForEdit(item)}
+                          className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary cursor-pointer"
+                          onClick={() => handleClick(item)}
+                          onDoubleClick={() => handleRowDoubleClick(item)}
                         >
                           {columns.map((col) => (
                             <td className={`p-4 ${col.key !== 'status' ? 'truncate' : ''}`} key={String(col.key)} title={col.title(item)}>
@@ -309,6 +360,13 @@ export const WeightTicketManagement = () => {
           }
         }}
         errorMessage={error.message || ''}
+      />
+      <WeightTicketDetailsDrawer
+        isDrawerOpen={isDrawerOpen}
+        setIsDrawerOpen={setIsDrawerOpen}
+        weightTicketId={selectedWeightTicketId}
+        onEdit={handleDrawerEdit}
+        onDelete={handleDrawerDelete}
       />
     </>
   );

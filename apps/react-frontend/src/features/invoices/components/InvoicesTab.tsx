@@ -34,10 +34,12 @@ const formatCurrency = (value: number) => {
 
 interface InvoicesTabProps {
   invoiceIdToOpen?: number | null;
+  invoiceDrawerIdToOpen?: number | null;
   onInvoiceOpened?: () => void;
+  onInvoiceDrawerOpened?: () => void;
 }
 
-export const InvoicesTab = ({ invoiceIdToOpen, onInvoiceOpened }: InvoicesTabProps) => {
+export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceOpened, onInvoiceDrawerOpened }: InvoicesTabProps) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -55,6 +57,15 @@ export const InvoicesTab = ({ invoiceIdToOpen, onInvoiceOpened }: InvoicesTabPro
       }
     }
   }, [invoiceIdToOpen, read.items, form, onInvoiceOpened]);
+
+  // Handle opening invoice drawer from URL parameter
+  useEffect(() => {
+    if (invoiceDrawerIdToOpen && read.items.length > 0) {
+      setSelectedInvoiceId(invoiceDrawerIdToOpen);
+      setIsDrawerOpen(true);
+      onInvoiceDrawerOpened?.();
+    }
+  }, [invoiceDrawerIdToOpen, read.items, onInvoiceDrawerOpened]);
 
   const handleRowClick = (item: InvoiceView) => {
     if (clickTimeoutRef.current) {

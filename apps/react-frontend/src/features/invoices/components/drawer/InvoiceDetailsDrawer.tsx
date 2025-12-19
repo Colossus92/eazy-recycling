@@ -1,18 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
 import { invoiceService } from '@/api/services/invoiceService';
-import { weightTicketService } from '@/api/services/weightTicketService';
-import { Drawer } from '@/components/ui/drawer/Drawer';
-import Hash from '@/assets/icons/Hash.svg?react';
-import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
-import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
-import CurrencyEur from '@/assets/icons/IcBaselineEuro.svg?react';
-import { InvoiceStatusTag } from '../InvoiceStatusTag';
+import Calendar from '@/assets/icons/CalendarDots.svg?react';
+import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
+import Hash from '@/assets/icons/Hash.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
+import { Drawer } from '@/components/ui/drawer/Drawer';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
-import { InvoiceDocumentSection } from './InvoiceDocumentSection';
 import { WeightTicketDownloadSection } from '@/features/planning/components/drawer/WeightTicketDownloadSection';
-import { WeightTicketLinkSection } from '@/features/planning/components/drawer/WeightTicketLinkSection';
-import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
+import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { InvoiceStatusTag } from '../InvoiceStatusTag';
+import { InvoiceDocumentSection } from './InvoiceDocumentSection';
 
 interface InvoiceDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -44,6 +42,8 @@ export const InvoiceDetailsDrawer = ({
   onEdit,
   onDelete,
 }: InvoiceDetailsDrawerProps) => {
+  const navigate = useNavigate();
+  
   const { data, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
@@ -58,16 +58,6 @@ export const InvoiceDetailsDrawer = ({
 
   const sourceWeightTicketId = data?.sourceWeightTicketId;
 
-  const { data: linkedWeightTicket } = useQuery({
-    queryKey: ['linked-weight-ticket', sourceWeightTicketId],
-    queryFn: async () => {
-      if (!sourceWeightTicketId) return null;
-      return await weightTicketService.getByNumber(sourceWeightTicketId);
-    },
-    enabled: !!sourceWeightTicketId,
-  });
-
-
   const isFinal = data?.status === 'FINAL';
 
   return (
@@ -75,7 +65,7 @@ export const InvoiceDetailsDrawer = ({
       title={'Factuur details'}
       isOpen={isDrawerOpen}
       setIsOpen={setIsDrawerOpen}
-      onEdit={isFinal ? undefined : onEdit}
+      onEdit={onEdit}
       onDelete={isFinal ? undefined : onDelete}
     >
       {isLoading && <div>Factuur laden...</div>}
@@ -149,7 +139,27 @@ export const InvoiceDetailsDrawer = ({
                   {data.customer.name}
                 </span>
               </div>
-              <WeightTicketLinkSection weightTicketId={sourceWeightTicketId} />
+              {sourceWeightTicketId && (
+                <div 
+                  className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    navigate(`/weight-tickets?weightTicketDrawerId=${sourceWeightTicketId}`);
+                  }}
+                >
+                  <div className="flex items-center flex-1 gap-2">
+                    <Scale
+                      className={'w-5 h-5 text-color-text-secondary'}
+                    />
+                    <span className={'text-body-2 text-color-text-secondary'}>
+                      Weegbon
+                    </span>
+                  </div>
+                  <span className={'text-body-2 truncate text-color-brand-primary underline'}>
+                    {sourceWeightTicketId}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
