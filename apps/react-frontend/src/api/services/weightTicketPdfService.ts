@@ -107,3 +107,24 @@ export const downloadWeightTicketPdfDirect = async (
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+/**
+ * Opens a weight ticket PDF in a new browser tab using the storage path
+ * @param pdfUrl - The storage path of the weight ticket PDF (e.g., "123/weegbon.pdf")
+ * @throws Error if there's an issue opening the weight ticket PDF
+ */
+export const openWeightTicketPdfInNewTab = async (
+  pdfUrl: string
+): Promise<void> => {
+  const { data: signedUrlData, error } = await supabase.storage
+    .from('weight-tickets')
+    .createSignedUrl(pdfUrl, 3600); // 1 hour expiry
+
+  if (error) {
+    console.error('Error creating signed URL:', error);
+    throw new Error('Fout bij het ophalen van weegbon PDF');
+  }
+
+  // Open in new tab
+  window.open(signedUrlData.signedUrl, '_blank');
+};

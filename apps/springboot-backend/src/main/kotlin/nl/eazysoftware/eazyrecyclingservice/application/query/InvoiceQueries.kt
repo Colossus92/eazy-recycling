@@ -36,7 +36,7 @@ class GetAllInvoicesQuery(
                 totalExclVat = totals.totalExclVat,
                 totalInclVat = totals.totalInclVat,
             )
-        }
+        }.sortedBy { it.invoiceNumber }
     }
 }
 

@@ -212,8 +212,6 @@ export const WeightTicketForm = ({
   );
 
   const routeHasError = !!(errors.pickupLocation || errors.deliveryLocation);
-  const formValues = useWatch({ control: formContext.control });
-  console.log('Form values:', formValues);
   const formContent = (
     <div className={'w-full h-[90vh]'}>
       <FormProvider {...formContext}>

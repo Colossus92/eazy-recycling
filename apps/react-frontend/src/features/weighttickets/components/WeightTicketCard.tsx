@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button/Button';
 import { WeightTicketStatusTag } from './WeightTicketStatusTag';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { downloadWeightTicketPdfDirect } from '@/api/services/weightTicketPdfService';
+import { openWeightTicketPdfInNewTab } from '@/api/services/weightTicketPdfService';
 
 interface WeightTicketCardProps {
     weightTicketId: number;
@@ -28,10 +28,9 @@ export const WeightTicketCard = ({
 
         setIsDownloadingPdf(true);
         try {
-            const fileName = pdfUrl.split('/').pop() || `weegbon-${weightTicketId}.pdf`;
-            await downloadWeightTicketPdfDirect(pdfUrl, fileName);
+            await openWeightTicketPdfInNewTab(pdfUrl);
         } catch (error) {
-            console.error('Error downloading weight ticket PDF:', error);
+            console.error('Error opening weight ticket PDF:', error);
         } finally {
             setIsDownloadingPdf(false);
         }
@@ -61,6 +60,7 @@ export const WeightTicketCard = ({
                         disabled={isDownloadingPdf}
                         title="Download weegbon PDF"
                         showText={false}
+                        type="button"
                     />
                 )}
                 <Button
@@ -69,6 +69,7 @@ export const WeightTicketCard = ({
                     onClick={handleViewDetails}
                     title="Bekijk weegbon"
                     showText={false}
+                    type="button"
                 />
             </div>
         </div>

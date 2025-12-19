@@ -5,7 +5,7 @@ import EyeSolid from '@/assets/icons/EyeSolid.svg?react';
 import { Button } from '@/components/ui/button/Button';
 import { InvoiceStatusTag } from './InvoiceStatusTag';
 import { useState } from 'react';
-import { downloadInvoicePdfDirect } from '@/api/services/invoicePdfService';
+import { openInvoicePdfInNewTab } from '@/api/services/invoicePdfService';
 
 interface InvoiceCardProps {
     invoiceId: number;
@@ -30,10 +30,9 @@ export const InvoiceCard = ({
 
         setIsDownloadingPdf(true);
         try {
-            const fileName = pdfUrl.split('/').pop() || `factuur-${invoiceNumber || invoiceId}.pdf`;
-            await downloadInvoicePdfDirect(pdfUrl, fileName);
+            await openInvoicePdfInNewTab(pdfUrl);
         } catch (error) {
-            console.error('Error downloading invoice PDF:', error);
+            console.error('Error opening invoice PDF:', error);
         } finally {
             setIsDownloadingPdf(false);
         }
@@ -63,6 +62,7 @@ export const InvoiceCard = ({
                         disabled={isDownloadingPdf}
                         title="Download factuur PDF"
                         showText={false}
+                        type="button"
                     />
                 )}
                 <Button
@@ -71,6 +71,7 @@ export const InvoiceCard = ({
                     onClick={handleViewDetails}
                     title="Bekijk factuur"
                     showText={false}
+                    type="button"
                 />
             </div>
         </div>

@@ -108,10 +108,10 @@ export const InvoicesTab = ({ invoiceIdToOpen, onInvoiceOpened }: InvoicesTabPro
       width: '45%',
     },
     {
-      key: 'totalInclVat',
-      label: 'Totaal',
-      accessor: (item) => formatCurrency(item.totalInclVat),
-      title: (item) => formatCurrency(item.totalInclVat),
+      key: 'totalExclVat',
+      label: 'Totaal (excl. BTW)',
+      accessor: (item) => formatCurrency(item.totalExclVat),
+      title: (item) => formatCurrency(item.totalExclVat),
       width: '20%',
     },
     {

@@ -7,10 +7,11 @@ import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import BuildingOffice from '@/assets/icons/BuildingOffice.svg?react';
 import CurrencyEur from '@/assets/icons/IcBaselineEuro.svg?react';
-import Scale from '@/assets/icons/Scale.svg?react';
 import { InvoiceStatusTag } from '../InvoiceStatusTag';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { InvoiceDocumentSection } from './InvoiceDocumentSection';
+import { WeightTicketDownloadSection } from '@/features/planning/components/drawer/WeightTicketDownloadSection';
+import { WeightTicketLinkSection } from '@/features/planning/components/drawer/WeightTicketLinkSection';
 import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
 
 interface InvoiceDetailsDrawerProps {
@@ -43,7 +44,6 @@ export const InvoiceDetailsDrawer = ({
   onEdit,
   onDelete,
 }: InvoiceDetailsDrawerProps) => {
-
   const { data, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
@@ -149,6 +149,7 @@ export const InvoiceDetailsDrawer = ({
                   {data.customer.name}
                 </span>
               </div>
+              <WeightTicketLinkSection weightTicketId={sourceWeightTicketId} />
             </div>
           </div>
 
@@ -226,30 +227,17 @@ export const InvoiceDetailsDrawer = ({
           </div>
 
           {/* Documents Section */}
-          {data.pdfUrl && (
-            <DocumentsSection>
+          <DocumentsSection>
+            {data.pdfUrl && (
               <InvoiceDocumentSection
                 pdfUrl={data.pdfUrl}
                 invoiceNumber={data.invoiceNumber || 'Concept'}
               />
-            </DocumentsSection>
-          )}
+            )}
+            <WeightTicketDownloadSection weightTicketId={sourceWeightTicketId} />
+          </DocumentsSection>
 
-          {/* Linked Weight Ticket Section */}
-          {linkedWeightTicket && (
-            <div className={'flex flex-col items-start self-stretch gap-3'}>
-              <div className="flex items-center gap-2">
-                <Scale className={'w-5 h-5 text-color-text-secondary'} />
-                <span className={'text-subtitle-1'}>Weegbon</span>
-              </div>
-              <WeightTicketCard
-                weightTicketId={linkedWeightTicket.id}
-                createdAt={typeof linkedWeightTicket.createdAt === 'string' ? linkedWeightTicket.createdAt : linkedWeightTicket.createdAt?.value$kotlinx_datetime || new Date().toISOString()}
-                status={linkedWeightTicket.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'}
-                pdfUrl={linkedWeightTicket.pdfUrl ?? null}
-              />
-            </div>
-          )}
+        
         </div>
       )}
     </Drawer>

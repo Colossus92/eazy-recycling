@@ -35,7 +35,7 @@ export const FormDialog = ({ isOpen, setIsOpen, children, width = 'w-[488px]' }:
       <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-xs flex w-screen items-center justify-center p-4">
         <div ref={containerRef}>
           <DialogPanel className={`flex flex-col items-center justify-center shrink-0 ${width} bg-color-surface-primary rounded-radius-lg`}>
-            <div className="dialog-content flex flex-col items-center justify-center shrink-0 self-stretch bg-color-surface-primary rounded-radius-lg">
+            <div className="dialog-content flex flex-col items-center justify-center shrink-0 self-stretch bg-color-surface-primary rounded-radius-lg h-full">
               {children}
             </div>
           </DialogPanel>

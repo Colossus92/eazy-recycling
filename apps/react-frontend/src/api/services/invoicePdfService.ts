@@ -110,3 +110,24 @@ export const downloadInvoicePdfDirect = async (
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 };
+
+/**
+ * Opens an invoice PDF in a new browser tab using the storage path
+ * @param pdfUrl - The storage path of the invoice PDF (e.g., "companyCode/invoice-123.pdf")
+ * @throws Error if there's an issue opening the invoice PDF
+ */
+export const openInvoicePdfInNewTab = async (
+  pdfUrl: string
+): Promise<void> => {
+  const { data: signedUrlData, error } = await supabase.storage
+    .from('invoices')
+    .createSignedUrl(pdfUrl, 3600); // 1 hour expiry
+
+  if (error) {
+    console.error('Error creating signed URL:', error);
+    throw new Error('Fout bij het ophalen van factuur PDF');
+  }
+
+  // Open in new tab
+  window.open(signedUrlData.signedUrl, '_blank');
+};
