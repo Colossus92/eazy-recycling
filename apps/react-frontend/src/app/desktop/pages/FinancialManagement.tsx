@@ -2,13 +2,31 @@ import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Tab } from '@/components/ui/tab/Tab';
 import { InvoicesTab } from '@/features/invoices/components/InvoicesTab';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export const FinancieelManagement = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [invoiceIdToOpen, setInvoiceIdToOpen] = useState<number | null>(null);
+
+  // Handle URL params for opening invoice form
+  useEffect(() => {
+    const invoiceId = searchParams.get('invoiceId');
+    
+    if (invoiceId) {
+      const parsedInvoiceId = parseInt(invoiceId, 10);
+      if (!isNaN(parsedInvoiceId)) {
+        setInvoiceIdToOpen(parsedInvoiceId);
+      }
+      
+      // Clear the URL params after capturing
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   const tabs: {name: string, disabled: boolean, component: () => ReactNode}[] = [
-    {name: "Facturen", disabled: false, component: () => <InvoicesTab key={`invoices-${selectedIndex}`} />},
+    {name: "Facturen", disabled: false, component: () => <InvoicesTab key={`invoices-${selectedIndex}`} invoiceIdToOpen={invoiceIdToOpen} onInvoiceOpened={() => setInvoiceIdToOpen(null)} />},
     {name: "Kasbonnen", disabled: true, component: () => <div className="flex items-center justify-center h-full text-color-text-secondary">Kasbonnen worden binnenkort ondersteund</div>},
   ];
 

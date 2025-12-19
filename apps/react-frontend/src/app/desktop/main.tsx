@@ -1,11 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@/index.css';
-import { ToastContainer } from 'react-toastify';
 import { App } from './App.tsx';
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalErrorHandler } from '@/components/error/GlobalErrorHandler';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { ToastPortal } from '@/components/ui/toast/ToastPortal';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,6 +13,6 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <App />
     </ErrorBoundary>
-    <ToastContainer style={{ zIndex: 9999 }} />
+    <ToastPortal />
   </StrictMode>
 );

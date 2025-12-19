@@ -111,12 +111,13 @@ export const WeightTicketManagement = () => {
         <div className="flex flex-col gap-1">
           <span>Factuur aangemaakt van weegbon</span>
           <button
-            onClick={() => {
-              navigate(`/invoices`);
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent toast click handler from interfering
+              navigate(`/financials?invoiceId=${createInvoice.response!.invoiceId}`);
             }}
             className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
           >
-            Bekijk facturen →
+            Bekijk factuur →
           </button>
         </div>
       );

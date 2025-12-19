@@ -12,7 +12,7 @@ import { InvoiceStatusTag } from './InvoiceStatusTag';
 import { InvoiceDetailsDrawer } from './drawer/InvoiceDetailsDrawer';
 import { useInvoiceCrud } from '../hooks/useInvoiceCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
@@ -32,13 +32,29 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-export const InvoicesTab = () => {
+interface InvoicesTabProps {
+  invoiceIdToOpen?: number | null;
+  onInvoiceOpened?: () => void;
+}
+
+export const InvoicesTab = ({ invoiceIdToOpen, onInvoiceOpened }: InvoicesTabProps) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useInvoiceCrud();
+
+  // Handle opening invoice form from URL parameter
+  useEffect(() => {
+    if (invoiceIdToOpen && read.items.length > 0) {
+      const invoice = read.items.find((item) => item.id === invoiceIdToOpen);
+      if (invoice) {
+        form.openForEdit(invoice);
+        onInvoiceOpened?.();
+      }
+    }
+  }, [invoiceIdToOpen, read.items, form, onInvoiceOpened]);
 
   const handleRowClick = (item: InvoiceView) => {
     if (clickTimeoutRef.current) {
