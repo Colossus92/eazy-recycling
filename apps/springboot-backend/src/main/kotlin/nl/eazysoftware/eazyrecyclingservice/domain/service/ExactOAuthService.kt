@@ -6,11 +6,15 @@ import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenRepositor
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.retry.annotation.Backoff
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.HttpClientErrorException
+import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.time.Instant
@@ -117,8 +121,30 @@ class ExactOAuthService(
     }
 
     /**
-     * Refresh the access token using a specific refresh token
+     * Refresh the access token using a specific refresh token.
+     * 
+     * Retries automatically on 503/504 errors (e.g., Exact Online maintenance windows)
+     * with exponential backoff covering up to ~1 hour.
+     * 
+     * Maintenance window: 04:00-04:30 CET daily (30 minutes)
+     * Default retry schedule with 1.5x multiplier and 10min cap:
+     * 1m, 2.5m, 4.75m, 8.1m, 13.2m, 23.2m, 33.2m, 43.2m, 53.2m, 63.2m (total ~63min)
+     * 
+     * Retry settings are configurable via properties for testing:
+     * - exact.oauth.retry.max-attempts (default: 10)
+     * - exact.oauth.retry.delay (default: 60000ms)
+     * - exact.oauth.retry.multiplier (default: 1.5)
+     * - exact.oauth.retry.max-delay (default: 600000ms)
      */
+    @Retryable(
+        retryFor = [ExactMaintenanceException::class],
+        maxAttemptsExpression = "\${exact.oauth.retry.max-attempts:10}",
+        backoff = Backoff(
+            delayExpression = "\${exact.oauth.retry.delay:60000}",
+            multiplierExpression = "\${exact.oauth.retry.multiplier:1.5}",
+            maxDelayExpression = "\${exact.oauth.retry.max-delay:600000}"
+        )
+    )
     fun refreshAccessToken(refreshToken: String): TokenResponse {
         val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
         requestBody.add("grant_type", "refresh_token")
@@ -146,8 +172,21 @@ class ExactOAuthService(
             logger.info("Successfully refreshed access token")
             return tokenResponse
 
+        } catch (e: HttpServerErrorException) {
+            // Handle 503/504 errors (maintenance window) - these will be retried
+            when (e.statusCode) {
+                HttpStatus.SERVICE_UNAVAILABLE, HttpStatus.GATEWAY_TIMEOUT -> {
+                    logger.warn("Exact Online temporarily unavailable (${e.statusCode}), will retry: ${e.responseBodyAsString}")
+                    throw ExactMaintenanceException("Exact Online is under maintenance or temporarily unavailable", e)
+                }
+                else -> {
+                    logger.error("Server error during token refresh: ${e.statusCode} - ${e.responseBodyAsString}")
+                    throw ExactOAuthException("Server error during token refresh: ${e.message}", e)
+                }
+            }
         } catch (e: HttpClientErrorException) {
-            logger.error("Failed to refresh token: ${e.statusCode} - ${e.responseBodyAsString}")
+            // 4xx errors are permanent - don't retry
+            logger.error("Client error during token refresh: ${e.statusCode} - ${e.responseBodyAsString}")
             throw ExactOAuthException("Failed to refresh token: ${e.message}", e)
         } catch (e: Exception) {
             logger.error("Unexpected error during token refresh", e)
@@ -220,4 +259,10 @@ class ExactOAuthService(
     }
 
     class ExactOAuthException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+    
+    /**
+     * Exception thrown when Exact Online is under maintenance or temporarily unavailable.
+     * This exception triggers retry with exponential backoff.
+     */
+    class ExactMaintenanceException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 }

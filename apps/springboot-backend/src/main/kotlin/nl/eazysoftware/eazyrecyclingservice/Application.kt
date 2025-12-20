@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
 import org.springframework.context.event.EventListener
+import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.stereotype.Component
 import java.util.*
@@ -29,6 +30,7 @@ import java.util.*
   security = [SecurityRequirement(name = "bearerAuth")]
 )
 @EnableScheduling
+@EnableRetry
 @SpringBootApplication
 class Application {
     @PostConstruct

@@ -38,6 +38,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa:$springVersion")
   implementation("org.springframework.boot:spring-boot-starter-web:$springVersion")
   implementation("org.springframework.boot:spring-boot-starter-validation:$springVersion")
+  implementation("org.springframework.retry:spring-retry:2.0.11")
+  implementation("org.springframework:spring-aspects:6.2.2")
 
   implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
   implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
