@@ -33,3 +33,9 @@ amice.enabled: false
 exact:
   oauth:
     refresh-enabled: false
+
+logging:
+  config: classpath:logback-local.xml
+  structured:
+    format:
+      console:

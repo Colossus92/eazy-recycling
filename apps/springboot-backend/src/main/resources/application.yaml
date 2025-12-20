@@ -56,6 +56,9 @@ exact:
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
 
 logging:
+  structured:
+    format:
+      console: logstash
   level:
     root: info
     nl.eazysoftware.eazyrecyclingservice: debug
