@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable
 
 interface LmaDeclarations {
   fun saveAll(declarations: List<LmaDeclarationDto>): List<LmaDeclarationDto>
+  fun save(declaration: LmaDeclarationDto): LmaDeclarationDto
   fun findByIds(ids: List<String>): List<LmaDeclarationDto>
   fun findById(id: String): LmaDeclarationDto?
   fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>)

@@ -7,16 +7,19 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErro
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportResult
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaImportErrors
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
+import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.io.InputStream
+import java.time.Instant
 import java.util.*
 
 /**
@@ -29,7 +32,8 @@ class ImportLmaWasteStreamsService(
   private val companies: Companies,
   private val lmaImportErrors: LmaImportErrors,
   private val euralRepository: EuralRepository,
-  private val processingMethodRepository: ProcessingMethodRepository
+  private val processingMethodRepository: ProcessingMethodRepository,
+  private val lmaDeclarations: LmaDeclarations,
 ) : ImportLmaWasteStreams {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -194,6 +198,20 @@ class ImportLmaWasteStreamsService(
       )
 
       wasteStreams.save(wasteStream)
+      lmaDeclarations.save(
+        LmaDeclarationDto(
+          wasteStreamNumber = wasteStream.wasteStreamNumber.number,
+          period = "LEGACY",
+          status = LmaDeclarationDto.Status.COMPLETED,
+          totalWeight = 0,
+          id = "LEGACY-${wasteStream.wasteStreamNumber}",
+          amiceUUID = UUID.randomUUID(),
+          transporters = emptyList(),
+          totalShipments = 0,
+          createdAt = Instant.now(),
+          errors = emptyList(),
+        )
+      )
       logger.debug("Successfully imported waste stream: $wasteStreamNumber")
       return ProcessResult.Success
 

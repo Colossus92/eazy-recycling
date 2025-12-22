@@ -27,6 +27,11 @@ class LmaDeclarationRepository(
   private val entityManager: EntityManager,
   private val pickupLocationMapper: PickupLocationMapper,
 ) : LmaDeclarations {
+
+  override fun save(declaration: LmaDeclarationDto): LmaDeclarationDto {
+    return jpaRepository.save(declaration)
+  }
+
   override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
     val declarations = LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING)
     jpaRepository.saveAll(declarations)
