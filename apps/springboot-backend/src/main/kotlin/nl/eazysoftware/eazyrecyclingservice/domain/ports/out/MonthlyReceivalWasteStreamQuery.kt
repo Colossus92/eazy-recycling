@@ -8,9 +8,13 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
  *
  * A waste stream should have a monthly receival declaration when:
  * - It has active transports (weight tickets) in the given month
- * - It has already been declared before (has existing declarations)
+ * - It has already been declared before (has existing declarations from PREVIOUS periods only)
  * - The waste stream is in ACTIVE status
  * - Only for processor_id of current tenant
+ *
+ * Note: Only waste streams with declarations from periods BEFORE the current yearMonth are included.
+ * This ensures job execution order independence - if FIRST_RECEIVALS runs before MONTHLY_RECEIVALS,
+ * the newly created declarations for the current period won't cause duplicate declarations.
  */
 interface MonthlyReceivalWasteStreamQuery {
 

@@ -77,6 +77,7 @@ class AmiceController(
   /**
    * Test endpoint for declaring first receivals to Amice.
    * This allows manual testing of the FirstReceivalDeclarator integration.
+   * // TODO remove when production ready
    */
   @PostMapping("/declare-first-receivals")
   @ResponseStatus(HttpStatus.OK)
@@ -252,7 +253,7 @@ class AmiceController(
 
   /**
    * Approves and submits a corrective declaration to LMA.
-   * 
+   *
    * Corrective declarations are created with status CORRECTIVE and require manual approval
    * before being submitted. This endpoint handles the approval process.
    */
@@ -262,7 +263,7 @@ class AmiceController(
     @PathVariable declarationId: String
   ): ApproveDeclarationResponse {
     val result = approveCorrectiveDeclaration.approve(declarationId)
-    
+
     return ApproveDeclarationResponse(
       success = result.success,
       message = result.message,

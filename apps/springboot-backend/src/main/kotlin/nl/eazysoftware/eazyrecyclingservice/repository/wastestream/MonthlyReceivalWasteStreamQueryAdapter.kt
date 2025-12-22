@@ -23,7 +23,8 @@ import java.time.ZoneOffset
  * Queries waste streams based on:
  * - Weight tickets received in the given month (via weight_ticket_lines and weight_tickets)
  * - Only waste streams with processor_id of current tenant
- * - Declaration history to identify waste streams that have been declared before
+ * - Declaration history to identify waste streams that have been declared in PREVIOUS periods only
+ *   (excludes current period to ensure job execution order independence)
  * - Aggregation of weight from weight_ticket_lines and shipment counts from weight_tickets
  * - Transporter information from carrier companies
  */
@@ -50,6 +51,9 @@ class MonthlyReceivalWasteStreamQueryAdapter(
     }
     val endOfMonth = OffsetDateTime.of(endOfMonthDate.atStartOfDay(), ZoneOffset.UTC)
 
+    // Calculate the current period string (MMYYYY format)
+    val currentPeriod = "${yearMonth.month.number.toString().padStart(2, '0')}${yearMonth.year}"
+    
     val query = """
       SELECT
         ws.number,
@@ -69,6 +73,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
         AND EXISTS (
           SELECT 1 FROM lma_declarations d
           WHERE d.waste_stream_number = ws.number
+            AND d.period < :currentPeriod
         )
       GROUP BY ws.number
       HAVING COUNT(DISTINCT wt.id) > 0
@@ -78,6 +83,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
     val results = entityManager.createNativeQuery(query, MonthlyReceivalWasteStreamQueryResult::class.java)
       .setParameter("startOfMonth", startOfMonth)
       .setParameter("endOfMonth", endOfMonth)
+      .setParameter("currentPeriod", currentPeriod)
       .resultList as List<MonthlyReceivalWasteStreamQueryResult>
 
     logger.info("Found {} waste streams for monthly receival declarations", results.size)

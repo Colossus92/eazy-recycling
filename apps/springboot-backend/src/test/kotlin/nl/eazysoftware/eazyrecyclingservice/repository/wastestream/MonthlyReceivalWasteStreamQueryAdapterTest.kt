@@ -32,7 +32,8 @@ import java.util.*
  * - Aggregation of weight from weight_ticket_lines
  * - Aggregation of shipments from weight_tickets
  * - Collection of unique transporters
- * - Inclusion of only waste streams that have been declared before (EXISTS check)
+ * - Inclusion of only waste streams with declarations from PREVIOUS periods (period < current)
+ * - Exclusion of waste streams with declarations ONLY in the current period (job order independence)
  * - Exclusion of cancelled weight tickets
  */
 @SpringBootTest
@@ -396,6 +397,51 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     val declaration = results.first()
     assertThat(declaration.totalWeight).isEqualTo(1500) // Only COMPLETED + INVOICED
     assertThat(declaration.totalShipments).isEqualTo(2)
+  }
+
+  @Test
+  fun `should exclude waste streams with declarations ONLY in the current period - race condition fix`() {
+    // Given - a waste stream with weight tickets in November AND a declaration for November (current period)
+    // This simulates the race condition where FIRST_RECEIVALS job runs before MONTHLY_RECEIVALS job
+    val wasteStreamNumber = "087970000013"
+    val yearMonth = YearMonth(2025, 11)
+
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createLmaDeclaration(wasteStreamNumber, "112025") // Declaration for CURRENT period only
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId1,
+      weightedAt = OffsetDateTime.of(2025, 11, 15, 10, 0, 0, 0, ZoneOffset.UTC),
+      lines = listOf(wasteStreamNumber to 1000.0)
+    )
+
+    // When
+    val results = queryAdapter.findMonthlyReceivalDeclarations(yearMonth)
+
+    // Then - should be excluded because it only has a declaration for the current period
+    assertThat(results).isEmpty()
+  }
+
+  @Test
+  fun `should include waste streams with declarations in both previous and current periods`() {
+    // Given - a waste stream with declarations in both October (previous) and November (current)
+    val wasteStreamNumber = "087970000014"
+    val yearMonth = YearMonth(2025, 11)
+
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createLmaDeclaration(wasteStreamNumber, "102025") // Previous period
+    createLmaDeclaration(wasteStreamNumber, "112025") // Current period
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId1,
+      weightedAt = OffsetDateTime.of(2025, 11, 15, 10, 0, 0, 0, ZoneOffset.UTC),
+      lines = listOf(wasteStreamNumber to 1000.0)
+    )
+
+    // When
+    val results = queryAdapter.findMonthlyReceivalDeclarations(yearMonth)
+
+    // Then - should be included because it has a declaration from a previous period
+    assertThat(results).hasSize(1)
+    assertThat(results.first().wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
   }
 
   // Helper methods for test data setup

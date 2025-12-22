@@ -201,7 +201,7 @@ class ImportLmaWasteStreamsService(
       lmaDeclarations.save(
         LmaDeclarationDto(
           wasteStreamNumber = wasteStream.wasteStreamNumber.number,
-          period = "LEGACY",
+          period = "012024",
           status = LmaDeclarationDto.Status.COMPLETED,
           totalWeight = 0,
           id = "LEGACY-${wasteStream.wasteStreamNumber}",
