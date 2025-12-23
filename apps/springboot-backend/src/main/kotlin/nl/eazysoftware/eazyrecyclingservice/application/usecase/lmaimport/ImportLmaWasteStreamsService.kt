@@ -204,7 +204,7 @@ class ImportLmaWasteStreamsService(
           period = "012024",
           status = LmaDeclarationDto.Status.COMPLETED,
           totalWeight = 0,
-          id = "LEGACY-${wasteStream.wasteStreamNumber}",
+          id = "LEGACY-${wasteStream.wasteStreamNumber.number}",
           amiceUUID = UUID.randomUUID(),
           transporters = emptyList(),
           totalShipments = 0,
