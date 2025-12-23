@@ -34,6 +34,18 @@ export interface WeightTicketListView {
     'consignorPartyName': string;
     /**
      * 
+     * @type {number}
+     * @memberof WeightTicketListView
+     */
+    'totalWeight'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketListView
+     */
+    'weighingDate'?: string;
+    /**
+     * 
      * @type {string}
      * @memberof WeightTicketListView
      */

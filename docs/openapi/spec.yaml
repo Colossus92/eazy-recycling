@@ -4293,6 +4293,12 @@ components:
           format: int64
         consignorPartyName:
           type: string
+        totalWeight:
+          type: number
+          format: double
+        weighingDate:
+          type: string
+          format: date-time
         note:
           type: string
         status:
@@ -5388,17 +5394,17 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
-        numberOfElements:
+        totalPages:
           type: integer
           format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -5420,6 +5426,8 @@ components:
     PageableObject:
       type: object
       properties:
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -5428,8 +5436,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
         offset:
           type: integer
           format: int64
@@ -5438,9 +5444,9 @@ components:
     SortObject:
       type: object
       properties:
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
         empty:
           type: boolean
@@ -5884,14 +5890,14 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -5901,19 +5907,13 @@ components:
           type: array
           items:
             type: string
-        pageEncoding:
-          type: string
-        scriptingInvalid:
-          type: string
         elIgnored:
           type: string
         errorOnELNotFound:
           type: string
-        deferredSyntaxAllowedAsLiteral:
+        pageEncoding:
           type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
+        scriptingInvalid:
           type: string
         isXml:
           type: string
@@ -5925,6 +5925,12 @@ components:
           type: array
           items:
             type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
         buffer:
           type: string
     RedirectView:
@@ -6001,20 +6007,16 @@ components:
     ServletContext:
       type: object
       properties:
+        attributeNames: {}
+        initParameterNames: {}
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        sessionTimeout:
-          type: integer
-          format: int32
-        contextPath:
-          type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        initParameterNames: {}
         sessionTrackingModes:
           type: array
           items:
@@ -6025,6 +6027,9 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        sessionTimeout:
+          type: integer
+          format: int32
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6063,7 +6068,8 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        attributeNames: {}
+        contextPath:
+          type: string
         classLoader:
           type: object
           properties:
@@ -6110,12 +6116,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6127,17 +6133,17 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        path:
+          type: string
+        secure:
+          type: boolean
         maxAge:
           type: integer
           format: int32
-        secure:
-          type: boolean
         domain:
           type: string
         httpOnly:
           type: boolean
-        path:
-          type: string
         name:
           type: string
         attributes:

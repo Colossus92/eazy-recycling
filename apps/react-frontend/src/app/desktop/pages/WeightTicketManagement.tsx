@@ -179,9 +179,11 @@ export const WeightTicketManagement = () => {
   }, [createInvoice.response]);
 
   const columns: Column[] = [
-    { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '14%' },
+    { key: 'id', label: 'Nummer', accessor: (item) => item.id, title: (item) => String(item.id), width: '10%' },
     { key: 'consignorPartyName', label: 'Afzender', accessor: (item) => item.consignorPartyName, title: (item) => item.consignorPartyName, width: '14%' },
-    { key: 'note', label: 'Opmerking', accessor: (item) => item.note, title: (item) => item.note, width: '64%' },
+    { key: 'totalWeight', label: 'Totaal gewicht', accessor: (item) => item.totalWeight ? `${item.totalWeight.toFixed(2)} kg` : '-', title: (item) => item.totalWeight ? `${item.totalWeight.toFixed(2)} kg` : '-', width: '12%' },
+    { key: 'weighingDate', label: 'Weegdatum', accessor: (item) => item.weighingDate ? format(new Date(item.weighingDate), 'dd-MM-yyyy') : '-', title: (item) => item.weighingDate ? format(new Date(item.weighingDate), 'dd-MM-yyyy HH:mm') : '-', width: '12%' },
+    { key: 'note', label: 'Opmerking', accessor: (item) => item.note, title: (item) => item.note, width: '44%' },
     { key: 'status', label: 'Status', accessor: (item) => <WeightTicketStatusTag status={item.status as WeightTicketStatusTagProps['status']} />, title: (item) => item.status, width: '8%' },
   ];
 
@@ -233,7 +235,7 @@ export const WeightTicketManagement = () => {
                   <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
                     <tr className="text-subtitle-1">
                       {columns.map((col) => (
-                        <th className={'px-4 py-3 text-left truncate'} key={String(col.key)}>
+                        <th className={`px-4 py-3 truncate ${col.key === 'totalWeight' ? 'text-right' : 'text-left'}`} key={String(col.key)}>
                           {col.label}
                         </th>
                       ))}
@@ -251,7 +253,7 @@ export const WeightTicketManagement = () => {
                           onDoubleClick={() => handleRowDoubleClick(item)}
                         >
                           {columns.map((col) => (
-                            <td className={`p-4 ${col.key !== 'status' ? 'truncate' : ''}`} key={String(col.key)} title={col.title(item)}>
+                            <td className={`p-4 ${col.key !== 'status' ? 'truncate' : ''} ${col.key === 'totalWeight' ? 'text-right' : ''}`} key={String(col.key)} title={col.title(item)}>
                               {col.accessor(item)}
                             </td>
                           ))}

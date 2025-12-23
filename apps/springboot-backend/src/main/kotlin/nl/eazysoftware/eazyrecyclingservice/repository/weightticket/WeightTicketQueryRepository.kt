@@ -23,8 +23,12 @@ class WeightTicketQueryRepository(
             SELECT
                 wt.id,
                 c.name,
-                wt.status,
+                (SELECT SUM(wtl.weight_value) 
+                 FROM weight_ticket_lines wtl 
+                 WHERE wtl.weight_ticket_id = wt.id) as total_weight,
+                wt.weighted_at,
                 wt.note,
+                wt.status,
                 wt.created_at
             FROM weight_tickets wt
             JOIN companies c ON wt.consignor_party_id = c.id
@@ -38,8 +42,10 @@ class WeightTicketQueryRepository(
       WeightTicketListView(
         id = columns[0] as Long,
         consignorPartyName = columns[1] as String,
-        status = WeightTicketStatus.valueOf(columns[2] as String),
-        note = columns[3] as String?,
+        totalWeight = (columns[2] as? Number)?.toDouble(),
+        weighingDate = columns[3] as? java.time.Instant,
+        note = columns[4] as String?,
+        status = WeightTicketStatus.valueOf(columns[5] as String),
       )
     }
   }

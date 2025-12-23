@@ -28,6 +28,18 @@ class LmaDeclarationSessionRepository(
     )
   }
 
+  override fun saveMonthlyReceivalSession(meldingSessieResponseDetails: MeldingSessieResponseDetails,  ids: List<String>) {
+    lmaDeclarationSessionJpaRepository.save(
+      LmaDeclarationSessionDto(
+        id = UUID.fromString(meldingSessieResponseDetails.meldingSessieUUID),
+        type = LmaDeclarationSessionDto.Type.MONTHLY_RECEIVAL,
+        declarationIds = ids.map { it },
+        status = LmaDeclarationSessionDto.Status.PENDING,
+        createdAt = Clock.System.now().toJavaInstant(),
+      )
+    )
+  }
+
   override fun findPending(): List<LmaDeclarationSessionDto> {
     return lmaDeclarationSessionJpaRepository.findByStatus(LmaDeclarationSessionDto.Status.PENDING)
   }

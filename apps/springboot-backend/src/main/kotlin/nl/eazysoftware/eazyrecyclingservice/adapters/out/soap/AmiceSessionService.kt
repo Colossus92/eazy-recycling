@@ -56,7 +56,7 @@ class AmiceSessionService(
     }
 
     val response = meldingServiceClient.apply(melding)
-    lmaDeclarationSessions.saveFirstReceivalSession(response.meldingSessieResponseDetails, monthlyReceivals.map { it.meldingsNummerMelder })
+    lmaDeclarationSessions.saveMonthlyReceivalSession(response.meldingSessieResponseDetails, monthlyReceivals.map { it.meldingsNummerMelder })
 
     try {
       val success = response.meldingSessieResponseDetails.isMeldingSessieResult
