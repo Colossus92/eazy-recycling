@@ -13,7 +13,7 @@ interface CompanySelectFormFieldProps<TFieldValues extends FieldValues> {
   title: string;
   placeholder: string;
   name: Path<TFieldValues>;
-  rules: any;
+  rules?: any;
   disabled?: boolean;
   role?: string;
   pageSize?: number;

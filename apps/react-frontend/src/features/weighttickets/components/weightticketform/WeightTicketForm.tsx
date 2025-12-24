@@ -318,7 +318,6 @@ export const WeightTicketForm = ({
                           title={'Vervoerder'}
                           placeholder={'Selecteer een vervoerder'}
                           name={'carrierPartyId'}
-                          rules={{ required: 'Vervoerder is verplicht' }}
                           disabled={isDisabled}
                         />
                       </div>
