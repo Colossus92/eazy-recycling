@@ -16,7 +16,8 @@ class ReceivalDeclarationFactory(
     transporters: List<String>,
     totalWeight: Int,
     totalShipments: Short,
-    yearMonth: YearMonth
+    yearMonth: YearMonth,
+    weightTicketIds: List<Long>,
   ): FirstReceivalDeclaration {
     val id = idGenerator.nextId()
     return FirstReceivalDeclaration(
@@ -25,7 +26,8 @@ class ReceivalDeclarationFactory(
       transporters = transporters,
       totalWeight = totalWeight,
       totalShipments = totalShipments,
-      yearMonth = yearMonth
+      yearMonth = yearMonth,
+      weightTicketIds = weightTicketIds,
     )
   }
 }

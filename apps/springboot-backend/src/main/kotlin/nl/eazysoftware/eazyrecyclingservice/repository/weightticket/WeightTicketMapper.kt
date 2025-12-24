@@ -115,6 +115,8 @@ class WeightTicketMapper(
           weightUnit = when (it.weight.unit) {
             Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
           },
+          declaredWeight = it.declarationState.declaredWeight,
+          lastDeclaredAt = it.declarationState.lastDeclaredAt?.toJavaInstant(),
         )
       }
   }

@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.LineDeclarationState
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 
@@ -16,4 +17,5 @@ data class WeightTicketLine(
   val waste: WasteStreamNumber?,
   val catalogItemId: Long,
   val weight: Weight,
+  val declarationState: LineDeclarationState = LineDeclarationState.undeclared(),
 )

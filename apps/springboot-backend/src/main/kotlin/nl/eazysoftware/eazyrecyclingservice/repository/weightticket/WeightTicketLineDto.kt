@@ -4,10 +4,13 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.LineDeclarationState
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
 import java.math.BigDecimal
+import java.time.Instant
+import kotlin.time.toKotlinInstant
 
 @Embeddable
 data class WeightTicketLineDto(
@@ -23,13 +26,23 @@ data class WeightTicketLineDto(
   @Enumerated(EnumType.STRING)
   @Column(name = "weight_unit", nullable = false)
   val weightUnit: WeightUnitDto,
+
+  @Column(name = "declared_weight", precision = 10, scale = 2)
+  val declaredWeight: BigDecimal? = null,
+
+  @Column(name = "last_declared_at")
+  val lastDeclaredAt: Instant? = null,
 ) {
   fun toDomain() = WeightTicketLine(
     waste = this.wasteStreamNumber?.let { WasteStreamNumber(it) },
     catalogItemId = this.catalogItemId,
     weight = Weight(this.weightValue, when(this.weightUnit) {
       WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
-    })
+    }),
+    declarationState = LineDeclarationState(
+      declaredWeight = this.declaredWeight,
+      lastDeclaredAt = this.lastDeclaredAt?.toKotlinInstant()
+    )
   )
 }
 

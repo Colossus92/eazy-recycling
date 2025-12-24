@@ -31,7 +31,12 @@ sealed interface Location {
     fun country(): String = address.country
 
     override fun toAddressLine() =
-      streetName() + " " + buildingNumber() + " " + buildingNumberAddition() + ", " + city()
+      streetName() +
+        " " +
+        buildingNumber() +
+        buildingNumberAddition()?.let { " $it" } +
+        ", " +
+        city()
   }
 
 

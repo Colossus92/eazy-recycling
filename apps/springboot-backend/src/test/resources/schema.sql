@@ -260,8 +260,14 @@ create table if not exists weight_ticket_lines (
                                  catalog_item_id bigint not null,
                                  weight_value numeric(10,2) not null,
                                  weight_unit text not null,
+                                 declared_weight numeric(10,2) default null,
+                                 last_declared_at timestamp with time zone default null,
                                  constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id)
 );
+
+create index if not exists idx_weight_ticket_lines_declaration_state
+  on weight_ticket_lines(declared_weight, last_declared_at)
+  where declared_weight is not null;
 
 
 create table lma_declaration_sessions (

@@ -78,10 +78,12 @@ class FirstReceivalWasteStreamQueryAdapter(
         ws.consignor_classification,
         COALESCE(SUM(wtl.weight_value), 0) as total_weight,
         COUNT(DISTINCT wt.id) as total_shipments,
-        ARRAY_AGG(DISTINCT c.vihb_id) FILTER (WHERE c.vihb_id IS NOT NULL) as transporters
+        ARRAY_AGG(DISTINCT c.vihb_id) FILTER (WHERE c.vihb_id IS NOT NULL) as transporters,
+        ARRAY_AGG(DISTINCT wt.id) FILTER (WHERE wt.id IS NOT NULL) as weight_ticket_ids
       FROM waste_streams ws
       JOIN companies proc ON ws.processor_party_id = proc.processor_id
       LEFT JOIN weight_ticket_lines wtl ON wtl.waste_stream_number = ws.number
+        AND (wtl.declared_weight IS NULL OR wtl.declared_weight != wtl.weight_value)
       LEFT JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
         AND wt.weighted_at >= :startOfMonth
         AND wt.weighted_at < :endOfMonth
@@ -167,13 +169,15 @@ class FirstReceivalWasteStreamQueryAdapter(
       val totalWeight = result.totalWeight.toInt()
       val totalShipments = result.totalShipments.toShort()
       val transporters = result.transporters?.toList() ?: emptyList()
+      val weightTicketIds = result.weightTicketIds?.toList() ?: emptyList()
 
       receivalDeclarationFactory.create(
         wasteStream = wasteStream,
         transporters = transporters,
         totalWeight = totalWeight,
         totalShipments = totalShipments,
-        yearMonth = yearMonth
+        yearMonth = yearMonth,
+        weightTicketIds = weightTicketIds
       )
     }
   }
@@ -202,5 +206,6 @@ data class FirstReceivalWasteStreamQueryResult(
   val consignorClassification: Int,
   val totalWeight: BigDecimal,
   val totalShipments: Long,
-  val transporters: Array<String>?
+  val transporters: Array<String>?,
+  val weightTicketIds: Array<Long>?
 )

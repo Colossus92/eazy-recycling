@@ -181,7 +181,8 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
         transporters = listOf("VIHB001", "VIHB002"),
         totalWeight = 5000,
         totalShipments = 10,
-        yearMonth = yearMonth
+        yearMonth = yearMonth,
+        weightTicketIds = listOf(1L, 2L)
       ),
       MonthlyReceivalDeclaration(
         id = "DECL-002",
@@ -189,7 +190,8 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
         transporters = listOf("VIHB003"),
         totalWeight = 3000,
         totalShipments = 5,
-        yearMonth = yearMonth
+        yearMonth = yearMonth,
+        weightTicketIds = listOf(3L, 4L)
       )
     )
     whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(yearMonth))

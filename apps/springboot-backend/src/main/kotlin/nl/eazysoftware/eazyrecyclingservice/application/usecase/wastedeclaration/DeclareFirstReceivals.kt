@@ -14,9 +14,11 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import kotlin.time.Clock
 
 interface DeclareFirstReceivals {
 
@@ -29,7 +31,8 @@ data class FirstReceivalDeclaration(
   val transporters: List<String>,
   val totalWeight: Int,
   val totalShipments: Short,
-  val yearMonth: YearMonth
+  val yearMonth: YearMonth,
+  val weightTicketIds: List<Long>,
 )
 
 /**
@@ -39,7 +42,8 @@ data class FirstReceivalDeclaration(
 class DeclareFirstReceivalsService(
   private val amiceSessions: AmiceSessions,
   private val lmaDeclarations: LmaDeclarations,
-  private val companies: Companies
+  private val companies: Companies,
+  private val weightTickets: WeightTickets
 ): DeclareFirstReceivals {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -54,6 +58,19 @@ class DeclareFirstReceivalsService(
 
     lmaDeclarations.saveAllPendingFirstReceivals(message)
     amiceSessions.declareFirstReceivals(message)
+
+    // Mark weight ticket lines as declared - use the exact weight ticket IDs from each declaration
+    val declaredAt = Clock.System.now()
+    var totalUpdatedCount = 0
+    firstReceivalDeclarations.forEach { declaration ->
+      val updatedCount = weightTickets.markLinesAsDeclared(
+        wasteStreamNumber = declaration.wasteStream.wasteStreamNumber,
+        weightTicketIds = declaration.weightTicketIds,
+        declaredAt = declaredAt
+      )
+      totalUpdatedCount += updatedCount
+    }
+    logger.info("Marked {} weight ticket lines as declared for first receivals", totalUpdatedCount)
   }
 
   @Suppress("DuplicatedCode")

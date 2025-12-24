@@ -7,9 +7,11 @@ import jakarta.persistence.SqlResultSetMapping
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -127,13 +129,13 @@ class LmaDeclarationRepository(
       // Fetch pickup location if available
       val pickupLocation = if (result.pickupLocationId != null) {
         val pickupLocationDto = entityManager.find(
-          nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto::class.java,
+          PickupLocationDto::class.java,
           result.pickupLocationId
         )
         pickupLocationDto?.let { pickupLocationMapper.toDomain(it) }
-          ?: nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+          ?: Location.NoLocation
       } else {
-        nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.NoLocation
+        Location.NoLocation
       }
 
       LmaDeclaration(
