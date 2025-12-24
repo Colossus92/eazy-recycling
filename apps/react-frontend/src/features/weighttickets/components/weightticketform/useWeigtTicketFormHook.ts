@@ -85,15 +85,21 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       const response = await weightTicketService.getByNumber(
         currentWeightTicketNumber!!
       );
-      const formValues = weightTicketDetailsToFormValues(response);
-      formContext.reset(formValues);
-
       return response;
     },
     enabled: !!currentWeightTicketNumber,
     staleTime: 30000,
     gcTime: 300000,
   });
+
+  // Populate form when data is available (from fetch or cache)
+  // This ensures form is populated even when query doesn't re-run due to cached data
+  useEffect(() => {
+    if (data) {
+      const formValues = weightTicketDetailsToFormValues(data);
+      formContext.reset(formValues);
+    }
+  }, [data]);
 
   const mutation = useMutation({
     mutationFn: async (data: WeightTicketFormValues) => {

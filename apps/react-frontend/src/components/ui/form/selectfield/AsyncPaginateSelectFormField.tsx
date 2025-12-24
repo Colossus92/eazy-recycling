@@ -100,27 +100,37 @@ export const AsyncPaginateSelectFormField = <TFieldValues extends FieldValues>({
     const loadInitialOption = async () => {
       // Get the current form value from the control
       const currentValue = control?._formValues?.[name as string];
-      if (currentValue && !selectedOption) {
-        // If we have a dedicated loader for single values, use it
-        if (loadOptionByValue) {
-          const option = await loadOptionByValue(currentValue);
-          if (option) {
-            setSelectedOption(option);
-            return;
-          }
+      
+      // Clear selected option if form value is empty
+      if (!currentValue) {
+        setSelectedOption(null);
+        return;
+      }
+
+      // Skip if we already have the correct option
+      if (selectedOption && selectedOption.value === currentValue) {
+        return;
+      }
+
+      // If we have a dedicated loader for single values, use it
+      if (loadOptionByValue) {
+        const option = await loadOptionByValue(currentValue);
+        if (option) {
+          setSelectedOption(option);
+          return;
         }
-        // Fallback: Load first page to find the matching one
-        const result = await loadOptions({ inputValue: '', page: 0 });
-        const matchingOption = result.options.find(
-          (opt) => opt.value === currentValue
-        );
-        if (matchingOption) {
-          setSelectedOption(matchingOption);
-        }
+      }
+      // Fallback: Load first page to find the matching one
+      const result = await loadOptions({ inputValue: '', page: 0 });
+      const matchingOption = result.options.find(
+        (opt) => opt.value === currentValue
+      );
+      if (matchingOption) {
+        setSelectedOption(matchingOption);
       }
     };
     loadInitialOption();
-  }, [control, name, loadOptions, loadOptionByValue, selectedOption]);
+  }, [control?._formValues?.[name as string], name, loadOptions, loadOptionByValue]);
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">

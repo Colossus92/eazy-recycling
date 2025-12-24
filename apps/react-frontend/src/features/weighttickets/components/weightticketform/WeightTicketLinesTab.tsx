@@ -60,11 +60,12 @@ export const WeightTicketLinesTab = ({
     name: 'consignorPartyId',
   });
 
-  // Track previous consignorPartyId to detect actual changes (not initial load)
+  // Track previous consignorPartyId to detect actual changes (not initial load or form resets)
   const previousConsignorPartyIdRef = useRef<string | undefined>(undefined);
   const isInitialMount = useRef(true);
+  const hasUserInteracted = useRef(false);
 
-  // When the consignorPartyId changes (but not on initial load), reset the lines
+  // When the consignorPartyId changes (but not on initial load or form resets), reset the lines
   useEffect(() => {
     // Skip on initial mount to preserve loaded data
     if (isInitialMount.current) {
@@ -73,16 +74,23 @@ export const WeightTicketLinesTab = ({
       return;
     }
 
-    // Only reset if consignor actually changed from a previous value
+    // Only reset if:
+    // 1. User has interacted with the form (not a form reset)
+    // 2. Consignor actually changed from a previous non-empty value  
+    // 3. Lines exist to clear
     if (
+      hasUserInteracted.current &&
       previousConsignorPartyIdRef.current !== undefined &&
-      previousConsignorPartyIdRef.current !== consignorPartyId
+      previousConsignorPartyIdRef.current !== '' &&
+      previousConsignorPartyIdRef.current !== consignorPartyId &&
+      fields.length > 0
     ) {
       remove();
     }
 
     previousConsignorPartyIdRef.current = consignorPartyId;
-  }, [consignorPartyId, append, remove]);
+  }, [consignorPartyId, fields.length, remove]);
+
 
   // Watch weight values for calculations
   const secondWeighingValue = useWatch({
@@ -122,6 +130,7 @@ export const WeightTicketLinesTab = ({
   }, [bruto, tarraWeightValue]);
 
   const handleAddLine = () => {
+    hasUserInteracted.current = true;
     append({
       catalogItemId: '',
       wasteStreamNumber: '',
