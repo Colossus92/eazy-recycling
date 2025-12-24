@@ -14,7 +14,7 @@ import { Tab } from '@/components/ui/tab/Tab';
 import { Note } from '@/features/planning/components/note/Note';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider } from 'react-hook-form';
 import { TransportFromWeightTicketForm } from '../TransportFromWeightTicketForm';
@@ -193,25 +193,36 @@ export const WeightTicketForm = ({
     ? (e: React.FormEvent) => e.preventDefault()
     : onSubmit;
 
-  // Detect errors in each tab
+  // Detect errors in each tab - memoized to prevent recalculation on every render
   const errors = formContext.formState.errors;
 
-  const algemeneenHasError = !!(
-    errors.direction ||
-    errors.consignorPartyId ||
-    errors.carrierPartyId ||
-    errors.truckLicensePlate ||
-    errors.reclamation ||
-    errors.note
+  const algemeneenHasError = useMemo(
+    () =>
+      !!(
+        errors.direction ||
+        errors.consignorPartyId ||
+        errors.carrierPartyId ||
+        errors.truckLicensePlate ||
+        errors.reclamation ||
+        errors.note
+      ),
+    [errors]
   );
 
-  const sorteerweginHasError = !!(
-    errors.lines &&
-    Array.isArray(errors.lines) &&
-    errors.lines.some((e) => e)
+  const sorteerweginHasError = useMemo(
+    () =>
+      !!(
+        errors.lines &&
+        Array.isArray(errors.lines) &&
+        errors.lines.some((e) => e)
+      ),
+    [errors.lines]
   );
 
-  const routeHasError = !!(errors.pickupLocation || errors.deliveryLocation);
+  const routeHasError = useMemo(
+    () => !!(errors.pickupLocation || errors.deliveryLocation),
+    [errors.pickupLocation, errors.deliveryLocation]
+  );
   const formContent = (
     <div className={'w-full h-[90vh]'}>
       <FormProvider {...formContext}>
@@ -278,7 +289,7 @@ export const WeightTicketForm = ({
                     <Tab label="Gerelateerd" />
                   </TabList>
                   <TabPanels className="flex flex-col flex-1 bg-color-surface-primary border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary pt-4 gap-4 min-h-0 -mt-[2px] overflow-y-auto">
-                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                    <TabPanel unmount={false} className="flex flex-col items-start gap-4 px-4 pb-4">
                       <RadioFormField
                         title={'Richting'}
                         options={[
@@ -344,10 +355,10 @@ export const WeightTicketForm = ({
                         }}
                       />
                     </TabPanel>
-                    <TabPanel className="px-4 pb-4">
+                    <TabPanel unmount={false} className="px-4 pb-4">
                       <WeightTicketLinesTab disabled={isDisabled} />
                     </TabPanel>
-                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                    <TabPanel unmount={false} className="flex flex-col items-start gap-4 px-4 pb-4">
                       <AddressFormField
                         name="pickupLocation"
                         control={formContext.control}
@@ -368,7 +379,7 @@ export const WeightTicketForm = ({
                       />
                     </TabPanel>
                     {data && (
-                      <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                      <TabPanel unmount={false} className="flex flex-col items-start gap-4 px-4 pb-4">
                         <WeightTicketRelatedTab weightTicketId={data.id} />
                       </TabPanel>
                     )}

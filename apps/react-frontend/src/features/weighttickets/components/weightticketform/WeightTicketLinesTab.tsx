@@ -4,7 +4,7 @@ import { DateFormField } from '@/components/ui/form/DateFormField';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { NumberInput } from '@/components/ui/form/NumberInput';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
-import { useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 
@@ -12,18 +12,18 @@ interface WeightTicketLinesTabProps {
   disabled?: boolean;
 }
 
-export const UnitBadge = () => (
+export const UnitBadge = memo(() => (
   <div className="flex items-center justify-center px-3 py-1 bg-color-surface-tertiary rounded-radius-sm border border-color-border text-body-1 text-color-text-secondary h-full">
     kg
   </div>
-);
+));
 
-const LineRow = () => (
+const LineRow = memo(() => (
   <>
     <div></div>
     <div className="w-full col-span-3 h-px bg-color-border-hover"></div>
   </>
-);
+));
 
 /**
  * Helper function to parse number strings that may use comma or period as decimal separator

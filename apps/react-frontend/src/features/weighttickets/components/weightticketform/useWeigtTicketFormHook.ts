@@ -91,6 +91,8 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       return response;
     },
     enabled: !!currentWeightTicketNumber,
+    staleTime: 30000,
+    gcTime: 300000,
   });
 
   const mutation = useMutation({
@@ -103,8 +105,6 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       }
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
-
       toastService.success(
         !currentWeightTicketNumber ? 'Weegbon aangemaakt' : 'Weegbon bijgewerkt'
       );
@@ -117,6 +117,11 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
         );
         const formValues = weightTicketDetailsToFormValues(fullDetails);
         formContext.reset(formValues);
+        // Update the cache directly to prevent flicker
+        queryClient.setQueryData(
+          ['weightTickets', currentWeightTicketNumber],
+          fullDetails
+        );
       } else if ((response as any).id) {
         // For creates, response is CreateWeightTicketResponse with just id
         // Switch to edit mode by setting the new weight ticket number
@@ -126,7 +131,16 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
         const fullDetails = await weightTicketService.getByNumber(createdId);
         const formValues = weightTicketDetailsToFormValues(fullDetails);
         formContext.reset(formValues);
+        // Set the cache directly to prevent flicker
+        queryClient.setQueryData(['weightTickets', createdId], fullDetails);
       }
+
+      // Invalidate list queries after cache is updated to refresh lists
+      await queryClient.invalidateQueries({
+        queryKey: ['weightTickets'],
+        exact: false,
+        refetchType: 'none',
+      });
     },
     onError: (error) => {
       console.error('Error submitting form:', error);
@@ -142,8 +156,6 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       return weightTicketService.createCompleted(request);
     },
     onSuccess: async (response) => {
-      await queryClient.invalidateQueries({ queryKey: ['weightTickets'] });
-
       toastService.success('Weegbon aangemaakt en verwerkt');
 
       // Reload form with the latest data
@@ -156,7 +168,16 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
         const fullDetails = await weightTicketService.getByNumber(createdId);
         const formValues = weightTicketDetailsToFormValues(fullDetails);
         formContext.reset(formValues);
+        // Set the cache directly to prevent flicker
+        queryClient.setQueryData(['weightTickets', createdId], fullDetails);
       }
+
+      // Invalidate list queries after cache is updated to refresh lists
+      await queryClient.invalidateQueries({
+        queryKey: ['weightTickets'],
+        exact: false,
+        refetchType: 'none',
+      });
     },
     onError: (error) => {
       console.error('Error submitting form:', error);
