@@ -53,7 +53,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
 
     // Calculate the current period string (MMYYYY format)
     val currentPeriod = "${yearMonth.month.number.toString().padStart(2, '0')}${yearMonth.year}"
-    
+
     val query = """
       SELECT
         ws.number,
@@ -75,7 +75,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
         AND EXISTS (
           SELECT 1 FROM lma_declarations d
           WHERE d.waste_stream_number = ws.number
-            AND d.period < :currentPeriod
+            AND d.period <= :currentPeriod
         )
       GROUP BY ws.number
       HAVING COUNT(DISTINCT wt.id) > 0

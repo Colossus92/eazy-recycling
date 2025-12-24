@@ -400,9 +400,8 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should exclude waste streams with declarations ONLY in the current period - race condition fix`() {
+  fun `should include waste streams with declarations ONLY in the current period - race condition fix`() {
     // Given - a waste stream with weight tickets in November AND a declaration for November (current period)
-    // This simulates the race condition where FIRST_RECEIVALS job runs before MONTHLY_RECEIVALS job
     val wasteStreamNumber = "087970000013"
     val yearMonth = YearMonth(2025, 11)
 
@@ -417,8 +416,9 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     // When
     val results = queryAdapter.findMonthlyReceivalDeclarations(yearMonth)
 
-    // Then - should be excluded because it only has a declaration for the current period
-    assertThat(results).isEmpty()
+    // Then
+    assertThat(results).hasSize(1)
+    assertThat(results.first().wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
   }
 
   @Test
@@ -442,6 +442,43 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     // Then - should be included because it has a declaration from a previous period
     assertThat(results).hasSize(1)
     assertThat(results.first().wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
+  }
+
+  @Test
+  fun `should only include undeclared weight ticket lines when same waste stream has both declared and undeclared lines`() {
+    // Given - a waste stream with two weight tickets sharing the same waste stream number
+    // One ticket line is already declared (declared_weight set), one is not (declared_weight NULL)
+    val wasteStreamNumber = "087970000015"
+    val yearMonth = YearMonth(2025, 11)
+
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createLmaDeclaration(wasteStreamNumber, "112025") // Previous declaration exists
+
+    // Create first weight ticket with declared line
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId1,
+      weightedAt = OffsetDateTime.of(2025, 11, 10, 10, 0, 0, 0, ZoneOffset.UTC),
+      lines = listOf(wasteStreamNumber to 1000.0),
+      declared = true
+    )
+
+    // Create second weight ticket with undeclared line (declared_weight remains NULL)
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId2,
+      weightedAt = OffsetDateTime.of(2025, 11, 20, 14, 0, 0, 0, ZoneOffset.UTC),
+      lines = listOf(wasteStreamNumber to 1500.0)
+    )
+
+    // When
+    val results = queryAdapter.findMonthlyReceivalDeclarations(yearMonth)
+
+    // Then - should only include the undeclared weight ticket
+    assertThat(results).hasSize(1)
+    val declaration = results.first()
+    assertThat(declaration.wasteStreamNumber.number).isEqualTo(wasteStreamNumber)
+    assertThat(declaration.totalWeight).isEqualTo(1500) // Only the undeclared ticket
+    assertThat(declaration.totalShipments).isEqualTo(1) // Only one shipment counted
+    assertThat(declaration.transporters).containsExactly("VIHB002") // Only second carrier
   }
 
   // Helper methods for test data setup
@@ -533,18 +570,24 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     carrierPartyId: UUID,
     weightedAt: OffsetDateTime,
     status: String = "COMPLETED",
-    lines: List<Pair<String, Double>> = emptyList()
+    lines: List<Pair<String, Double>> = emptyList(),
+    declared: Boolean = false,
   ): Long {
     // Convert OffsetDateTime to Instant (which is what the DTO expects)
     val weightedAtInstant = weightedAt.toInstant()
 
     // Create weight ticket lines from the provided pairs (wasteStreamNumber, weightValue)
     val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
+      val declaredWeight = if (declared) weightValue.toBigDecimal() else null
+      val lastDeclaredAt = if (declared) weightedAt else null
+
       WeightTicketLineDto(
         wasteStreamNumber = wasteStreamNumber,
         catalogItemId = 1L,
         weightValue = weightValue.toBigDecimal(),
-        weightUnit = WeightUnitDto.kg
+        weightUnit = WeightUnitDto.kg,
+        declaredWeight = declaredWeight,
+        lastDeclaredAt = lastDeclaredAt?.toInstant(),
       )
     }
 
@@ -565,7 +608,7 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       note = null,
       status = WeightTicketStatusDto.valueOf(status),
       weightedAt = weightedAtInstant,
-      cancellationReason = null
+      cancellationReason = null,
     )
     return weightTicketRepository.save(ticket).id
   }
