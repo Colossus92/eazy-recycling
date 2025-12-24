@@ -51,7 +51,7 @@ class ApproveCorrectiveDeclarationService(
     if (declaration.status != LmaDeclarationDto.Status.WAITING_APPROVAL) {
       return ApprovalResult(
         success = false,
-        message = "Declaration is not in CORRECTIVE status: ${declaration.status}",
+        message = "Melding is niet in goedkeuringsstatus: ${declaration.status}",
         declarationId = declarationId,
       )
     }

@@ -6,7 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.util.DeclarationCutoffDa
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.UndeclaredWeightTicketLine
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTicketDeclarationSnapshots
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -22,7 +22,7 @@ import kotlin.time.toJavaInstant
  */
 @Service
 class DetectLateDeclarations(
-  private val weightTicketDeclarationSnapshots: WeightTicketDeclarationSnapshots,
+  private val weightTickets: WeightTickets,
   private val lmaDeclarations: LmaDeclarations,
 ) {
 
@@ -37,7 +37,7 @@ class DetectLateDeclarations(
     val cutoffDate = DeclarationCutoffDateCalculator.calculateDeclarationCutoffDate(Clock.System.now())
     logger.info("Detecting late first receivals with cutoff date: {}", cutoffDate)
 
-    val undeclaredLines = weightTicketDeclarationSnapshots.findUndeclaredLines(cutoffDate)
+    val undeclaredLines = weightTickets.findUndeclaredLines(cutoffDate)
 
     if (undeclaredLines.isEmpty()) {
       logger.info("No undeclared weight ticket lines found for late first receivals")

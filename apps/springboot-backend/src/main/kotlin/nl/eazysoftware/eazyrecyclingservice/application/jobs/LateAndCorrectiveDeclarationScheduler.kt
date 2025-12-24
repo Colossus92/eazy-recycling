@@ -5,7 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob.JobType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJobs
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTicketDeclarationSnapshots
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -24,7 +24,7 @@ import kotlin.time.Clock
 @Component
 class LateAndCorrectiveDeclarationScheduler(
   private val monthlyWasteDeclarationJobs: MonthlyWasteDeclarationJobs,
-  private val weightTicketDeclarationSnapshots: WeightTicketDeclarationSnapshots,
+  private val weightTickets: WeightTickets,
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -44,7 +44,7 @@ class LateAndCorrectiveDeclarationScheduler(
       logger.info("Declaration cutoff date: {} (only processing weight tickets from before this date)", cutoffDate)
 
       // Check if there are undeclared lines to process
-      val undeclaredLines = weightTicketDeclarationSnapshots.findUndeclaredLines(cutoffDate)
+      val undeclaredLines = weightTickets.findUndeclaredLines(cutoffDate)
       if (undeclaredLines.isNotEmpty()) {
         logger.info("Found {} undeclared weight ticket line(s) - creating late declaration jobs", undeclaredLines.size)
         createLateDeclarationJobs(now)

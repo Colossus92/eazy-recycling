@@ -4,7 +4,7 @@ import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.application.util.DeclarationCutoffDateCalculator
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJob
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MonthlyWasteDeclarationJobs
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTicketDeclarationSnapshots
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,16 +16,16 @@ import kotlin.time.toKotlinInstant
 class LateDeclarationSchedulerIntegrationTest {
 
   private lateinit var monthlyWasteDeclarationJobs: MonthlyWasteDeclarationJobs
-  private lateinit var weightTicketDeclarationSnapshots: WeightTicketDeclarationSnapshots
+  private lateinit var weightTickets: WeightTickets
   private lateinit var scheduler: LateAndCorrectiveDeclarationScheduler
 
   @BeforeEach
   fun setUp() {
     monthlyWasteDeclarationJobs = mock()
-    weightTicketDeclarationSnapshots = mock()
+    weightTickets = mock()
     scheduler = LateAndCorrectiveDeclarationScheduler(
       monthlyWasteDeclarationJobs,
-      weightTicketDeclarationSnapshots
+      weightTickets
     )
   }
 
@@ -88,7 +88,7 @@ class LateDeclarationSchedulerIntegrationTest {
   @Test
   fun `triggerLateDeclarations creates late declaration jobs when undeclared lines exist`() {
     // Given
-    whenever(weightTicketDeclarationSnapshots.findUndeclaredLines(any()))
+    whenever(weightTickets.findUndeclaredLines(any()))
       .thenReturn(listOf(mock()))
 
     // When
@@ -103,7 +103,7 @@ class LateDeclarationSchedulerIntegrationTest {
   @Test
   fun `triggerLateDeclarations does not create jobs when no work needed`() {
     // Given
-    whenever(weightTicketDeclarationSnapshots.findUndeclaredLines(any()))
+    whenever(weightTickets.findUndeclaredLines(any()))
       .thenReturn(emptyList())
 
     // When
