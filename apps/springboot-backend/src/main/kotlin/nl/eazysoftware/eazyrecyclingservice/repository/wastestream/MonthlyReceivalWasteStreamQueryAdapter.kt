@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTimezoneBoundaries
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
@@ -13,9 +14,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 
 /**
  * Adapter implementation for querying waste streams that need monthly receival declarations.
@@ -40,16 +38,10 @@ class MonthlyReceivalWasteStreamQueryAdapter(
   override fun findMonthlyReceivalDeclarations(yearMonth: YearMonth): List<MonthlyReceivalDeclaration> {
     logger.info("Finding monthly receival declarations for yearMonth={}", yearMonth)
 
-    // Create proper OffsetDateTime objects for the month boundaries
-    val startOfMonthDate = LocalDate.of(yearMonth.year, yearMonth.month.number, 1)
-    val startOfMonth = OffsetDateTime.of(startOfMonthDate.atStartOfDay(), ZoneOffset.UTC)
-
-    val endOfMonthDate = if (yearMonth.month.number == 12) {
-      LocalDate.of(yearMonth.year + 1, 1, 1)
-    } else {
-      LocalDate.of(yearMonth.year, yearMonth.month.number + 1, 1)
-    }
-    val endOfMonth = OffsetDateTime.of(endOfMonthDate.atStartOfDay(), ZoneOffset.UTC)
+    // Calculate month boundaries in display timezone (Europe/Amsterdam) for business logic
+    // This ensures weight tickets entered on the last day of a month in CET are not
+    // incorrectly included in the next month's declarations
+    val (startOfMonth, endOfMonth) = yearMonth.toDisplayTimezoneBoundaries()
 
     // Calculate the current period string (MMYYYY format)
     val currentPeriod = "${yearMonth.month.number.toString().padStart(2, '0')}${yearMonth.year}"

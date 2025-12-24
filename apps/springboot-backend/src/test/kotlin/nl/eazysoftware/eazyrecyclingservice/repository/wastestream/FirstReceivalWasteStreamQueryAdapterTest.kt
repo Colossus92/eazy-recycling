@@ -246,14 +246,57 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
 
   @Test
   fun `should handle month boundary correctly for December`() {
-    // Given - weight tickets in December 2025
+    // Given - weight tickets in December 2025 (in CET timezone)
+    // December 31, 2025 22:00 UTC = December 31, 2025 23:00 CET (still in December)
     val wasteStreamNumber = "087970000007"
     val yearMonth = YearMonth(2025, 12)
 
     createWasteStream(wasteStreamNumber, "ACTIVE")
     createWeightTicket(
       carrierPartyId = carrierCompanyId1,
-      weightedAt = OffsetDateTime.of(2025, 12, 31, 23, 59, 0, 0, ZoneOffset.UTC),
+      weightedAt = OffsetDateTime.of(2025, 12, 31, 22, 0, 0, 0, ZoneOffset.UTC),
+      lines = listOf(wasteStreamNumber to 1000.0)
+    )
+
+    // When
+    val results = queryAdapter.findFirstReceivalDeclarations(yearMonth)
+
+    // Then
+    assertThat(results).hasSize(1)
+  }
+
+  @Test
+  fun `should exclude weight tickets from next month when entered at midnight CET`() {
+    // Given - weight ticket entered on December 1st 00:00 CET (November 30th 23:00 UTC)
+    // This should NOT be included in November declarations
+    val wasteStreamNumber = "087970000020"
+    val yearMonth = YearMonth(2025, 11)
+
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId1,
+      weightedAt = OffsetDateTime.of(2025, 11, 30, 23, 0, 0, 0, ZoneOffset.UTC), // Dec 1 00:00 CET
+      lines = listOf(wasteStreamNumber to 1000.0)
+    )
+
+    // When
+    val results = queryAdapter.findFirstReceivalDeclarations(yearMonth)
+
+    // Then
+    assertThat(results).isEmpty()
+  }
+
+  @Test
+  fun `should include weight tickets from last second of month in CET`() {
+    // Given - weight ticket entered on November 30th 23:59 CET (November 30th 22:59 UTC)
+    // This SHOULD be included in November declarations
+    val wasteStreamNumber = "087970000021"
+    val yearMonth = YearMonth(2025, 11)
+
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createWeightTicket(
+      carrierPartyId = carrierCompanyId1,
+      weightedAt = OffsetDateTime.of(2025, 11, 30, 22, 59, 0, 0, ZoneOffset.UTC), // Nov 30 23:59 CET
       lines = listOf(wasteStreamNumber to 1000.0)
     )
 

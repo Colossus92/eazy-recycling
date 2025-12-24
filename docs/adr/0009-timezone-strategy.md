@@ -1,12 +1,17 @@
 # Timezone Strategy for Eazy Recycling
 
-## Policy: Store UTC, Display Local
+## Status: Accepted
+
+## Date: 2025-12-24
+
+## Policy: Store UTC, Display CET/CEST, Business Logic in Display Timezone
 
 ### Core Principles
 
-1. **All timestamps stored in UTC** - Database, domain models, and business logic use UTC
-2. **Display in Europe/Amsterdam** - Frontend shows times in CET/CEST for users
+1. **All timestamps stored in UTC** - Database, domain models use UTC for storage
+2. **Display in Europe/Amsterdam** - Frontend and logs show times in CET/CEST for users
 3. **Calendar arithmetic in UTC** - Adding years/months uses UTC to avoid DST issues
+4. **Business logic uses display timezone** - Month boundaries, date comparisons use CET/CEST to match user expectations
 
 ## Why UTC for Domain Logic?
 
@@ -42,21 +47,43 @@ class Application {
 ```
 
 ### 2. Configuration Constants (TimeConfiguration.kt)
+
 ```kotlin
 object TimeConfiguration {
     // For domain logic and calendar arithmetic
     val DOMAIN_TIMEZONE: TimeZone = TimeZone.UTC
     
-    // For display/UI purposes only
-    val DISPLAY_TIMEZONE: ZoneId = ZoneId.of("Europe/Amsterdam")
+    // For display/UI purposes AND business logic that needs user timezone
+    val DISPLAY_ZONE_ID: ZoneId = ZoneId.of("Europe/Amsterdam")
     val DISPLAY_TIMEZONE_KX: TimeZone = TimeZone.of("Europe/Amsterdam")
+}
+
+// Extension function for month boundaries in display timezone
+fun YearMonth.toDisplayTimezoneBoundaries(): Pair<Instant, Instant> {
+    val startOfMonthLocal = LocalDate.of(this.year, this.month.number, 1)
+    val startOfMonth = startOfMonthLocal.atStartOfDay()
+        .atZone(TimeConfiguration.DISPLAY_ZONE_ID)
+        .toInstant()
+    
+    val endOfMonthLocal = if (this.month.number == 12) {
+        LocalDate.of(this.year + 1, 1, 1)
+    } else {
+        LocalDate.of(this.year, this.month.number + 1, 1)
+    }
+    val endOfMonth = endOfMonthLocal.atStartOfDay()
+        .atZone(TimeConfiguration.DISPLAY_ZONE_ID)
+        .toInstant()
+    
+    return Pair(startOfMonth, endOfMonth)
 }
 ```
 
-**Important:** `DISPLAY_TIMEZONE` is ONLY for converting UTC to local time for display. 
-All business logic uses UTC via `DOMAIN_TIMEZONE`.
+**Important:** `DISPLAY_ZONE_ID` is used for:
+1. Converting UTC to local time for display
+2. Business logic that needs to match user expectations (e.g., month boundaries)
 
 ### 3. Spring Configuration (application.yaml)
+
 ```yaml
 spring:
   jpa:
@@ -67,6 +94,84 @@ spring:
     time-zone: UTC
     serialization:
       write-dates-as-timestamps: false
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS}{Europe/Amsterdam} [%thread] %-5level %logger{36} - %msg%n"
+```
+
+### 4. Logging Configuration (logback-local.xml)
+
+```xml
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss}{Europe/Amsterdam} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+</configuration>
+```
+
+**Note:** Logs display timestamps in CET/CEST for easier debugging and monitoring by users in the Europe/Amsterdam timezone.
+
+## Business Logic Timezone Usage
+
+### When to Use Display Timezone
+
+Some business logic must use the display timezone (CET/CEST) to match user expectations:
+
+#### Month Boundaries for Declarations
+
+```kotlin
+// Query weight tickets for November 2025 declarations
+val yearMonth = YearMonth(2025, 11)
+val (startOfMonth, endOfMonth) = yearMonth.toDisplayTimezoneBoundaries()
+
+// startOfMonth = 2025-10-31T23:00:00Z (Nov 1 00:00 CET)
+// endOfMonth = 2025-11-30T23:00:00Z (Dec 1 00:00 CET)
+
+val weightTickets = repository.findByWeightedAtBetween(startOfMonth, endOfMonth)
+```
+
+**Why this matters:** A weight ticket entered on December 1st at 00:00 CET (November 30th 23:00 UTC) should NOT be included in November's declaration. Without timezone-aware boundaries, it would incorrectly be included because its UTC timestamp falls within November.
+
+#### Cutoff Date Calculations
+
+```kotlin
+// Calculate declaration cutoff based on current day in CET
+fun calculateDeclarationCutoffDate(now: Instant): YearMonth {
+    val currentYearMonth = now.toYearMonth()
+    
+    // Get day of month in display timezone
+    val zonedDateTime = java.time.Instant.ofEpochMilli(now.toEpochMilliseconds())
+        .atZone(TimeConfiguration.DISPLAY_ZONE_ID)
+    val dayOfMonth = zonedDateTime.dayOfMonth
+    
+    return if (dayOfMonth < 20) {
+        currentYearMonth.minusMonths(1)
+    } else {
+        currentYearMonth
+    }
+}
+```
+
+### Extension Functions for Conversions
+
+```kotlin
+// Convert LocalDateTime (from user input) to UTC Instant
+fun LocalDateTime.toCetKotlinInstant(): Instant {
+    return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant().toKotlinInstant()
+}
+
+// Convert UTC Instant to LocalDateTime for display
+fun java.time.Instant.toDisplayLocalDateTime(): LocalDateTime {
+    return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toLocalDateTime()
+}
+
+// Convert UTC Instant to LocalDate for display
+fun java.time.Instant.toDisplayLocalDate(): LocalDate {
+    return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toLocalDate()
+}
 ```
 
 ## Usage Examples
@@ -189,6 +294,7 @@ CREATE TABLE waste_streams (
 ## Testing
 
 ### Unit Tests
+
 ```kotlin
 @Test
 fun `should expire after 5 years`() {
@@ -205,7 +311,8 @@ fun `should expire after 5 years`() {
 }
 ```
 
-### Integration Tests
+### Integration Tests - Timezone Boundaries
+
 ```kotlin
 @Test
 fun `should handle DST transitions correctly`() {
@@ -216,30 +323,92 @@ fun `should handle DST transitions correctly`() {
     // Should be exactly 5 years later, no DST weirdness
     assertEquals("2030-03-29T23:00:00Z", afterDST.toString())
 }
+
+@Test
+fun `should exclude weight tickets from next month when entered at midnight CET`() {
+    // Weight ticket entered on December 1st 00:00 CET (November 30th 23:00 UTC)
+    // This should NOT be included in November declarations
+    val wasteStreamNumber = "087970000020"
+    val yearMonth = YearMonth(2025, 11)
+    
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createWeightTicket(
+        carrierPartyId = carrierCompanyId1,
+        weightedAt = OffsetDateTime.of(2025, 11, 30, 23, 0, 0, 0, ZoneOffset.UTC), // Dec 1 00:00 CET
+        lines = listOf(wasteStreamNumber to 1000.0)
+    )
+    
+    val results = queryAdapter.findFirstReceivalDeclarations(yearMonth)
+    
+    assertThat(results).isEmpty()
+}
+
+@Test
+fun `should include weight tickets from last second of month in CET`() {
+    // Weight ticket entered on November 30th 23:59 CET (November 30th 22:59 UTC)
+    // This SHOULD be included in November declarations
+    val wasteStreamNumber = "087970000021"
+    val yearMonth = YearMonth(2025, 11)
+    
+    createWasteStream(wasteStreamNumber, "ACTIVE")
+    createWeightTicket(
+        carrierPartyId = carrierCompanyId1,
+        weightedAt = OffsetDateTime.of(2025, 11, 30, 22, 59, 0, 0, ZoneOffset.UTC), // Nov 30 23:59 CET
+        lines = listOf(wasteStreamNumber to 1000.0)
+    )
+    
+    val results = queryAdapter.findFirstReceivalDeclarations(yearMonth)
+    
+    assertThat(results).hasSize(1)
+}
 ```
 
 ## Common Pitfalls to Avoid
 
-### ❌ Don't Use Local Timezone for Business Logic
+### ❌ Don't Use Hardcoded Timezones
+
+```kotlin
+// WRONG: Hardcoded timezone string
+val zonedTime = instant.atZone(ZoneId.of("Europe/Amsterdam"))
+
+// CORRECT: Use centralized configuration
+val zonedTime = instant.atZone(TimeConfiguration.DISPLAY_ZONE_ID)
+```
+
+### ❌ Don't Use UTC for Month Boundaries in Business Logic
+
+```kotlin
+// WRONG: Month boundaries in UTC don't match user expectations
+val startOfMonth = LocalDate.of(2025, 11, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+val endOfMonth = LocalDate.of(2025, 12, 1).atStartOfDay().toInstant(ZoneOffset.UTC)
+// A weight ticket at Nov 30 23:30 UTC (Dec 1 00:30 CET) would be included in November!
+
+// CORRECT: Use display timezone boundaries
+val (startOfMonth, endOfMonth) = YearMonth(2025, 11).toDisplayTimezoneBoundaries()
+// Now Nov 30 23:30 UTC is correctly excluded from November
+```
+
+### ❌ Don't Use Local Timezone for Calendar Arithmetic
+
 ```kotlin
 // WRONG: Business logic should not depend on local timezone
 val expiry = lastActivity.plus(5, DateTimeUnit.YEAR, TimeZone.currentSystemDefault())
-```
 
-### ❌ Don't Mix java.time and kotlinx.datetime Carelessly
-```kotlin
-// WRONG: Mixing without proper conversion
-val javaInstant = java.time.Instant.now()
-val kotlinInstant = Instant.fromEpochMilliseconds(javaInstant.toEpochMilli())
+// CORRECT: Use UTC for calendar arithmetic
+val expiry = lastActivity.plus(5, DateTimeUnit.YEAR, TimeConfiguration.DOMAIN_TIMEZONE)
 ```
 
 ### ✅ Do Use Extension Functions for Conversions
-```kotlin
-fun java.time.Instant.toKotlinInstant(): Instant = 
-    Instant.fromEpochMilliseconds(this.toEpochMilli())
 
-fun Instant.toJavaInstant(): java.time.Instant = 
-    java.time.Instant.ofEpochMilli(this.toEpochMilliseconds())
+```kotlin
+// Centralized in JavaLocalDateTimeExtensions.kt
+fun LocalDateTime.toCetKotlinInstant(): Instant {
+    return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant().toKotlinInstant()
+}
+
+fun java.time.Instant.toDisplayLocalDateTime(): LocalDateTime {
+    return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toLocalDateTime()
+}
 ```
 
 ## References

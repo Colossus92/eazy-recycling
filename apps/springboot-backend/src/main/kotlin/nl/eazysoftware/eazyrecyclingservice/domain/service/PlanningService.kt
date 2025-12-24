@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityManager
+import nl.eazysoftware.eazyrecyclingservice.config.clock.TimeConfiguration
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayLocalDate
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Trucks
@@ -10,7 +12,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
 
@@ -33,8 +34,8 @@ class PlanningService(
 
         // Get all transports for the week
         val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
-            daysInWeek.last().atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
+            daysInWeek.first().atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant(),
+            daysInWeek.last().atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
         )
             .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
             .filter { transport -> driverId == null || transport.driver?.id == driverId }
@@ -119,9 +120,9 @@ class PlanningService(
             }
 
             // Update the date while preserving the time of day
-            val currentDateTime = transport.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam"))
+            val currentDateTime = transport.pickupDateTime.atZone(TimeConfiguration.DISPLAY_ZONE_ID)
             val newPickupDateTime = date.atTime(currentDateTime.toLocalTime())
-                .atZone(ZoneId.of("Europe/Amsterdam"))
+                .atZone(TimeConfiguration.DISPLAY_ZONE_ID)
                 .toInstant()
 
             transport.copy(
@@ -140,10 +141,10 @@ class PlanningService(
     fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
         return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
             driverId,
-            startDate.atStartOfDay().atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
-            endDate.atTime(23, 59, 59).atZone(ZoneId.of("Europe/Amsterdam")).toInstant()
+            startDate.atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant(),
+            endDate.atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
         )
-            .groupBy { it.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate() }
+            .groupBy { it.pickupDateTime.toDisplayLocalDate() }
             .mapValues { (_, transportsByDate) ->
                 transportsByDate
                     .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }

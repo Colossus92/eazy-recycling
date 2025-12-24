@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.Create
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.CreateContainerTransportCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransport
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.UpdateContainerTransportCommand
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
@@ -22,10 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.*
-import kotlin.time.Instant
 import kotlin.time.toKotlinInstant
 
 @RestController
@@ -109,9 +107,9 @@ fun ContainerTransportRequest.toCommand(): CreateContainerTransportCommand {
     consignorParty = CompanyId(this.consignorPartyId),
     carrierParty = CompanyId(this.carrierPartyId),
     pickupLocation = this.pickupLocation.toCommand(),
-    pickupDateTime = this.pickupDateTime.toCetInstant(),
+    pickupDateTime = this.pickupDateTime.toCetInstant().toKotlinInstant(),
     deliveryLocation = this.deliveryLocation.toCommand(),
-    deliveryDateTime = this.deliveryDateTime?.toCetInstant(),
+    deliveryDateTime = this.deliveryDateTime?.toCetInstant()?.toKotlinInstant(),
     transportType = this.transportType,
     wasteContainer = this.containerId?.takeIf { it.isNotBlank() }?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
@@ -141,7 +139,4 @@ fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContaine
     note = Note(this.note),
   )
 
-}
-fun LocalDateTime.toCetInstant(): Instant {
-  return this.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant()
 }

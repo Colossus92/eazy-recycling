@@ -2,12 +2,12 @@ package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import nl.eazysoftware.eazyrecyclingservice.config.clock.TimeConfiguration
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -43,22 +43,22 @@ class WaybillDocumentService(
         when (request.party) {
             "consignor" -> {
                 signatures.consignorEmail = request.email
-                signatures.consignorSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
+                signatures.consignorSignedAt = ZonedDateTime.now(TimeConfiguration.DISPLAY_ZONE_ID)
             }
 
             "consignee" -> {
                 signatures.consigneeEmail = request.email
-                signatures.consigneeSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
+                signatures.consigneeSignedAt = ZonedDateTime.now(TimeConfiguration.DISPLAY_ZONE_ID)
             }
 
             "carrier" -> {
                 signatures.carrierEmail = request.email
-                signatures.carrierSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
+                signatures.carrierSignedAt = ZonedDateTime.now(TimeConfiguration.DISPLAY_ZONE_ID)
             }
 
             "pickup" -> {
                 signatures.pickupEmail = request.email
-                signatures.pickupSignedAt = ZonedDateTime.now(ZoneId.of("Europe/Amsterdam"))
+                signatures.pickupSignedAt = ZonedDateTime.now(TimeConfiguration.DISPLAY_ZONE_ID)
             }
 
             else -> throw IllegalArgumentException("Ongeldige partij: ${request.party}")

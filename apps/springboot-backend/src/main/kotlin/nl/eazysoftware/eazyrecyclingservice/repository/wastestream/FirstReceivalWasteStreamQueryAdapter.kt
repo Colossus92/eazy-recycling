@@ -2,8 +2,8 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTimezoneBoundaries
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.FirstReceivalWasteStreamQuery
@@ -18,9 +18,6 @@ import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.Instant
-import java.time.LocalDate
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 /**
@@ -47,16 +44,10 @@ class FirstReceivalWasteStreamQueryAdapter(
   override fun findFirstReceivalDeclarations(yearMonth: YearMonth): List<FirstReceivalDeclaration> {
     logger.info("Finding first receival declarations for yearMonth={}", yearMonth)
 
-    // Create proper OffsetDateTime objects for the month boundaries
-    val startOfMonthDate = LocalDate.of(yearMonth.year, yearMonth.month.number, 1)
-    val startOfMonth = OffsetDateTime.of(startOfMonthDate.atStartOfDay(), ZoneOffset.UTC)
-
-    val endOfMonthDate = if (yearMonth.month.number == 12) {
-      LocalDate.of(yearMonth.year + 1, 1, 1)
-    } else {
-      LocalDate.of(yearMonth.year, yearMonth.month.number + 1, 1)
-    }
-    val endOfMonth = OffsetDateTime.of(endOfMonthDate.atStartOfDay(), ZoneOffset.UTC)
+    // Calculate month boundaries in display timezone (Europe/Amsterdam) for business logic
+    // This ensures weight tickets entered on the last day of a month in CET are not
+    // incorrectly included in the next month's declarations
+    val (startOfMonth, endOfMonth) = yearMonth.toDisplayTimezoneBoundaries()
 
     val query = """
       SELECT

@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.util
 
 import kotlinx.datetime.YearMonth
 import kotlinx.datetime.number
+import nl.eazysoftware.eazyrecyclingservice.config.clock.TimeConfiguration
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 
 /**
@@ -26,10 +27,10 @@ object DeclarationCutoffDateCalculator {
   fun calculateDeclarationCutoffDate(now: kotlin.time.Instant): YearMonth {
     val currentYearMonth = now.toYearMonth()
 
-    // Get the day of month from the instant
+    // Get the day of month from the instant in display timezone
     val epochMillis = now.toEpochMilliseconds()
     val javaInstant = java.time.Instant.ofEpochMilli(epochMillis)
-    val zonedDateTime = javaInstant.atZone(java.time.ZoneId.of("Europe/Amsterdam"))
+    val zonedDateTime = javaInstant.atZone(TimeConfiguration.DISPLAY_ZONE_ID)
     val dayOfMonth = zonedDateTime.dayOfMonth
 
     return if (dayOfMonth < 20) {

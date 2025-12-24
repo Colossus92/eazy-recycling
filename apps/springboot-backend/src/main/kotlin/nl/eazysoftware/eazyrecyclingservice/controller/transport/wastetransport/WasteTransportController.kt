@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport
 
 import jakarta.validation.Valid
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Roles
@@ -22,10 +23,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.*
 import kotlin.time.Clock
-import kotlin.time.toKotlinInstant
 
 @RestController
 @RequestMapping("/transport")
@@ -176,8 +175,8 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
 
   return CreateWasteTransportCommand(
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
+    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
+    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant()
       ?: Clock.System.now(),
     transportType = this.transportType,
     goods = this.goods.map {
@@ -207,8 +206,8 @@ fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTranspo
   return UpdateWasteTransportCommand(
     transportId = TransportId(transportId),
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
+    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
+    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant()
       ?: Clock.System.now(),
     transportType = this.transportType,
     goods = this.goods.map {

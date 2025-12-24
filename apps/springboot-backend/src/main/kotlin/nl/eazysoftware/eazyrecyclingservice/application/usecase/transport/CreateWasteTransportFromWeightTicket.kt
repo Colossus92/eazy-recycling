@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.GoodsItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
@@ -8,8 +9,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
-import java.time.ZoneId
-import kotlin.time.toKotlinInstant
 
 
 interface CreateWasteTransportFromWeightTicket {
@@ -50,9 +49,9 @@ class CreateWasteTransportFromWeightTicketService(
       )
     }
 
-    // Convert LocalDateTime to Instant using CET timezone
-    val pickupInstant = cmd.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toInstant().toKotlinInstant()
-    val deliveryInstant = cmd.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toInstant()?.toKotlinInstant()
+    // Convert LocalDateTime to Instant using display timezone (CET/CEST)
+    val pickupInstant = cmd.pickupDateTime.toCetKotlinInstant()
+    val deliveryInstant = cmd.deliveryDateTime?.toCetKotlinInstant()
 
     // Create the WasteTransport using the existing use case
     val createCommand = CreateWasteTransportCommand(

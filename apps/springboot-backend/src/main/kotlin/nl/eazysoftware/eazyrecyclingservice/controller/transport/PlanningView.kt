@@ -1,12 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.transport
 
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayLocalDate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import org.hibernate.Hibernate
-import java.time.ZoneId
 
 
 data class PlanningView(
@@ -35,8 +35,8 @@ data class PlanningTransportView(
 ) {
 
   constructor(transportDto: TransportDto) : this(
-    pickupDate = transportDto.pickupDateTime.atZone(ZoneId.of("Europe/Amsterdam")).toLocalDate().toString(),
-    deliveryDate = transportDto.deliveryDateTime?.atZone(ZoneId.of("Europe/Amsterdam"))?.toLocalDate()?.toString()
+    pickupDate = transportDto.pickupDateTime.toDisplayLocalDate().toString(),
+    deliveryDate = transportDto.deliveryDateTime?.toDisplayLocalDate()?.toString()
       .takeIf { transportDto.deliveryDateTime != null },
     id = transportDto.id.toString(),
     truck = transportDto.truck,
@@ -54,7 +54,7 @@ data class PlanningTransportView(
 fun getCityFrom(location: PickupLocationDto) =
   when (val unproxied = Hibernate.unproxy(location)) {
     is PickupLocationDto.DutchAddressDto -> unproxied.city
-    is PickupLocationDto.PickupCompanyDto -> unproxied.company.address.city ?: "niet bekend"
+    is PickupLocationDto.PickupCompanyDto -> unproxied.company.address.city
     is PickupLocationDto.PickupProjectLocationDto -> unproxied.city
     is PickupLocationDto.NoPickupLocationDto -> "n.v.t."
     is PickupLocationDto.ProximityDescriptionDto -> unproxied.city
