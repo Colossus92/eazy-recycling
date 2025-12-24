@@ -34,7 +34,7 @@ sealed interface Location {
       streetName() +
         " " +
         buildingNumber() +
-        buildingNumberAddition()?.let { " $it" } +
+        buildingNumberAddition().orEmpty() +
         ", " +
         city()
   }

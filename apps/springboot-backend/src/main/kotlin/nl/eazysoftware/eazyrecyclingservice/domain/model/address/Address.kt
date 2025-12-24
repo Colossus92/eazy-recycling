@@ -11,7 +11,7 @@ data class Address(
   // Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
   // Validation is enforced at controller level for user-created data and by LMA validation for declarations.
 
-  fun toAddressLine() = "${streetName.value} $buildingNumber${buildingNumberAddition ?: ""}, ${city.value}"
+  fun toAddressLine() = "${streetName.value} $buildingNumber${buildingNumberAddition.orEmpty()}, ${city.value}"
 }
 
 

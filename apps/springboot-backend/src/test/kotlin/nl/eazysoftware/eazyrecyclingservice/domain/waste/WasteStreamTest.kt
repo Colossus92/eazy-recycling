@@ -378,6 +378,20 @@ class WasteStreamTest {
         )
       }
     }
+
+    @Test
+    fun `toAddressLine does not print null`() {
+      val addressString = Location.DutchAddress(
+        address = Address(
+          streetName = StreetName("Stadstraat"),
+          postalCode = DutchPostalCode("1234 AB"),
+          buildingNumber = "123",
+          city = City("Test city")
+        )
+      ).toAddressLine()
+
+      assertThat(addressString).isEqualTo("Stadstraat 123, Test city")
+    }
   }
 
   @Nested
