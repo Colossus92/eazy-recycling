@@ -197,6 +197,81 @@ supabase db push
   supabase start --fresh
   ```
 
+# Workflow: Populating Local Supabase with Production Data
+
+This guide documents how to refresh your local Supabase `public` schema with production data. This method is superior to `supabase db reset` because it **preserves** your local Auth users, Storage buckets, and Edge Function configurations.
+
+## Prerequisites
+* Supabase CLI installed and logged in.
+* IntelliJ IDEA (Ultimate or Community) with the Database plugin enabled.
+* Docker running (hosting the local Supabase instance).
+
+---
+
+## Step 1: Dump Remote Data
+
+Use the Supabase CLI to pull **data only** from your production instance. We target only the `public` schema to avoid messing with Auth/Storage system tables.
+
+Run this in your terminal:
+
+```bash
+# Replace <db-url> with your production connection string (from Supabase Dashboard > Settings > Database)
+# We use -f to save it to a file
+supabase db dump \
+  --data-only \
+  --schema public \
+  -f supabase/prod_data.sql
+```
+
+## Step 2: Prepare the Import File
+To avoid "Foreign Key Constraint" errors during import (because data might be inserted in the wrong order), we must instruct Postgres to ignore constraints temporarily.
+
+Open supabase/prod_data.sql in IntelliJ and wrap the content with the session_replication_role commands.
+
+Add this to the very top of the file:
+
+```SQL
+SET session_replication_role = 'replica';
+```
+Add this to the very bottom of the file:
+```SQL
+SET session_replication_role = 'origin';
+```
+
+
+## Step 3: Clean Local Public Schema
+Before importing, we must remove existing local data to avoid "Duplicate Key" errors. Instead of dropping the entire schema (which kills permissions), we simply truncate all tables.
+
+  1. Open your Database Tool Window.
+  2. Connect to your local Supabase, execute `supabase status` to retrieve the credentials 
+  3. Open a New Query Console attached to this connection.
+  4. Run this script to truncate all tables in public
+
+```SQL
+DO $$
+DECLARE
+r RECORD;
+BEGIN
+-- Loop over every table in the public schema
+FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+-- Truncate the table and cascade to clear dependent rows
+EXECUTE 'TRUNCATE TABLE public.' || quote_ident(r.tablename) || ' CASCADE;';
+END LOOP;
+END $$;
+```
+
+## Step 4: Run import
+In case of using intellij: 
+
+1. In the IntelliJ Project View (file explorer), locate supabase/prod_data.sql. 
+2. Right-Click the file.
+3. Select Run 'prod_data.sql'... 
+4. In the popup, select your Local Supabase connection as the target. 
+5. IntelliJ will stream the file directly to the database.
+
+6. Done! Your local database now mirrors production data, while your local Auth and Storage remain untouched.
+
+
 ## Additional Resources
 
 - [Supabase Documentation](https://supabase.com/docs)
