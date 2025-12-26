@@ -19,6 +19,7 @@ interface LmaDeclarations {
   fun saveCorrectiveDeclaration(declaration: LmaDeclarationDto): LmaDeclarationDto
   fun findAll(pageable: Pageable): Page<LmaDeclaration>
   fun hasExistingDeclaration(wasteStreamNumber: String): Boolean
+  fun deletePendingLateDeclarations(wasteStreamNumber: String, period: String)
 }
 
 

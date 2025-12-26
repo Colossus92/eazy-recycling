@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.jobs
 
+import jakarta.transaction.Transactional
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareFirstReceivals
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DeclareMonthlyReceivals
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.DetectLateDeclarations
@@ -34,7 +35,8 @@ class WasteDeclarationJobProcessScheduler(
   /**
    * Processes pending monthly waste declaration jobs every 10 minutes.
    */
-  @Scheduled(cron = "0 */10 * * * *")
+  @Scheduled(cron = "0 */1 * * * *")
+  @Transactional
   fun processPendingJobs() {
     logger.info("Starting monthly waste declaration job processing")
 

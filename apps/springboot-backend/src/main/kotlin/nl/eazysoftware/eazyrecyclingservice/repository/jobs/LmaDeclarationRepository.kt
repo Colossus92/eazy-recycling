@@ -21,7 +21,9 @@ import org.springframework.stereotype.Repository
 import kotlin.time.Clock
 import kotlin.time.toJavaInstant
 
-interface LmaDeclarationJpaRepository : JpaRepository<LmaDeclarationDto, String>
+interface LmaDeclarationJpaRepository : JpaRepository<LmaDeclarationDto, String> {
+  fun deleteByIdIn(ids: List<String>)
+}
 
 @Repository
 class LmaDeclarationRepository(
@@ -81,10 +83,31 @@ class LmaDeclarationRepository(
 
   override fun hasExistingDeclaration(wasteStreamNumber: String): Boolean {
     val query = entityManager.createNativeQuery(
-      "SELECT COUNT(*) FROM lma_declarations WHERE waste_stream_number = :wasteStreamNumber"
+      "SELECT COUNT(*) FROM lma_declarations WHERE waste_stream_number = :wasteStreamNumber AND status = 'COMPLETED'"
     )
       .setParameter("wasteStreamNumber", wasteStreamNumber)
     return (query.singleResult as Number).toLong() > 0
+  }
+
+  override fun deletePendingLateDeclarations(wasteStreamNumber: String, period: String) {
+    val query = entityManager.createNativeQuery(
+      """
+        SELECT id FROM lma_declarations
+        WHERE waste_stream_number = :wasteStreamNumber
+        AND period = :period
+        AND status = 'WAITING_APPROVAL'
+        AND (id LIKE 'LATE-FIRST-%' OR id LIKE 'LATE-MONTHLY-%')
+      """.trimIndent()
+    )
+      .setParameter("wasteStreamNumber", wasteStreamNumber)
+      .setParameter("period", period)
+
+    @Suppress("UNCHECKED_CAST")
+    val ids = query.resultList as List<String>
+
+    if (ids.isNotEmpty()) {
+      jpaRepository.deleteByIdIn(ids)
+    }
   }
 
   override fun findAll(pageable: Pageable): Page<LmaDeclaration> {
