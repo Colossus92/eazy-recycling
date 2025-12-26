@@ -63,4 +63,3 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS}{Europe/Amsterdam} [%thread] %-5level %logger{36} - %msg%n"
   level:
     root: info
-    nl.eazysoftware.eazyrecyclingservice: debug
