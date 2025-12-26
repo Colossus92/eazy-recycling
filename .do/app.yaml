@@ -135,10 +135,6 @@ services:
       tag: main
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-1gb-fixed
-    log_destinations:
-      - logtail:
-          token: 4WUPyLjj2Vd4xsLMxrdwSCNg
-        name: Better Stack
     name: ers
 static_sites:
   - build_command: npm install && npm run build
