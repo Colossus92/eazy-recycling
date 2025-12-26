@@ -113,6 +113,14 @@ services:
       - key: FRONTEND_URL
         scope: RUN_AND_BUILD_TIME
         value: https://app.eazyrecycling.nl
+      - key: BETTERSTACK_SOURCE_TOKEN
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:V8wmhmd+jDEmWcX4z+zi+sgEtzPP5iMF:mYcjPQfs9kn6kHfetOPKNqXaXe3o2ThgRJm2QEdqR8ktHjvezNqIww==]
+      - key: BETTERSTACK_INGESTING_HOST
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: EV[1:ySM45tAfut5iCtoPE69QUjGtvqhi/ejG:sI47yi7Q64C7FAZOXcsZMgcl375OBPjjYkbT0OEmgy6vSVcQWT2WCFqLdGxsnAXEg9oZXVk=]
     health_check:
       failure_threshold: 20
       period_seconds: 10

@@ -98,7 +98,7 @@ class ExactOAuthService(
             // Store tokens in database
             saveTokens(tokenResponse)
 
-            logger.info("Successfully exchanged authorization code for tokens")
+            logger.debug("Successfully exchanged authorization code for tokens")
             return tokenResponse
 
         } catch (e: HttpClientErrorException) {
@@ -122,14 +122,14 @@ class ExactOAuthService(
 
     /**
      * Refresh the access token using a specific refresh token.
-     * 
+     *
      * Retries automatically on 503/504 errors (e.g., Exact Online maintenance windows)
      * with exponential backoff covering up to ~1 hour.
-     * 
+     *
      * Maintenance window: 04:00-04:30 CET daily (30 minutes)
      * Default retry schedule with 1.5x multiplier and 10min cap:
      * 1m, 2.5m, 4.75m, 8.1m, 13.2m, 23.2m, 33.2m, 43.2m, 53.2m, 63.2m (total ~63min)
-     * 
+     *
      * Retry settings are configurable via properties for testing:
      * - exact.oauth.retry.max-attempts (default: 10)
      * - exact.oauth.retry.delay (default: 60000ms)
@@ -169,7 +169,7 @@ class ExactOAuthService(
             // Update tokens in database
             saveTokens(tokenResponse)
 
-            logger.info("Successfully refreshed access token")
+            logger.debug("Successfully refreshed access token")
             return tokenResponse
 
         } catch (e: HttpServerErrorException) {
@@ -259,7 +259,7 @@ class ExactOAuthService(
     }
 
     class ExactOAuthException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
-    
+
     /**
      * Exception thrown when Exact Online is under maintenance or temporarily unavailable.
      * This exception triggers retry with exponential backoff.

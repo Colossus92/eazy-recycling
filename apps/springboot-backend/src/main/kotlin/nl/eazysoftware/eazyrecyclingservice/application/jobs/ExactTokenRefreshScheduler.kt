@@ -68,7 +68,7 @@ class ExactTokenRefreshScheduler(
     private fun refreshTokenAndReschedule(refreshToken: String) {
         try {
             exactOAuthService.refreshAccessToken(refreshToken)
-            logger.info("Successfully refreshed Exact Online token")
+            logger.debug("Successfully refreshed Exact Online token")
             // Schedule the next refresh based on the new token
             scheduleNextRefresh()
         } catch (e: Exception) {

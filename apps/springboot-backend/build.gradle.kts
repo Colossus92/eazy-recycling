@@ -78,6 +78,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.9.0")
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
   implementation("jakarta.validation:jakarta.validation-api:3.1.1")
+  implementation("com.logtail:logback-logtail:0.3.5")
 
   // Code
   implementation("org.jetbrains.kotlin:kotlin-reflect:2.2.21")
