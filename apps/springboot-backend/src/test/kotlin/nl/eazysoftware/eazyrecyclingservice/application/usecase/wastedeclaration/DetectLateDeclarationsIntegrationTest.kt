@@ -440,19 +440,22 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
   ): Long {
     val weightedAtInstant = weightedAt.toInstant()
 
+    val ticketId = System.currentTimeMillis() + (Math.random() * 1000).toLong()
     val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
       WeightTicketLineDto(
+        id = UUID.randomUUID(),
+        weightTicketId = ticketId,
         wasteStreamNumber = wasteStreamNumber,
-        catalogItemId = 1L,
+        catalogItemId = UUID.randomUUID(),
         weightValue = weightValue.toBigDecimal(),
         weightUnit = WeightUnitDto.kg
       )
     }
 
     val ticket = WeightTicketDto(
-      id = System.currentTimeMillis() + (Math.random() * 1000).toLong(),
+      id = ticketId,
       consignorParty = companyRepository.getReferenceById(consignorCompanyId),
-      lines = ticketLines,
+      lines = ticketLines.toMutableList(),
       secondWeighingValue = null,
       secondWeighingUnit = null,
       tarraWeightValue = null,

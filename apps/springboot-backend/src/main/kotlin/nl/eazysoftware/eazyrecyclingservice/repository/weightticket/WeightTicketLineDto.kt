@@ -1,24 +1,30 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
-import jakarta.persistence.Column
-import jakarta.persistence.Embeddable
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
+import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.LineDeclarationState
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 import kotlin.time.toKotlinInstant
 
-@Embeddable
+@Entity
+@Table(name = "weight_ticket_lines")
 data class WeightTicketLineDto(
+  @Id
+  @Column(name = "id")
+  val id: UUID,
+
+  @Column(name = "weight_ticket_id", nullable = false)
+  val weightTicketId: Long,
+
   @Column(name = "waste_stream_number")
   val wasteStreamNumber: String?,
 
   @Column(name = "catalog_item_id", nullable = false)
-  val catalogItemId: Long,
+  val catalogItemId: UUID,
 
   @Column(name = "weight_value", nullable = false, precision = 10, scale = 2)
   val weightValue: BigDecimal,
@@ -33,9 +39,9 @@ data class WeightTicketLineDto(
   @Column(name = "last_declared_at")
   val lastDeclaredAt: Instant? = null,
 ) {
-  fun toDomain() = WeightTicketLine(
+  fun toDomain(catalogItemId: UUID) = WeightTicketLine(
     waste = this.wasteStreamNumber?.let { WasteStreamNumber(it) },
-    catalogItemId = this.catalogItemId,
+    catalogItemId = catalogItemId,
     weight = Weight(this.weightValue, when(this.weightUnit) {
       WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
     }),

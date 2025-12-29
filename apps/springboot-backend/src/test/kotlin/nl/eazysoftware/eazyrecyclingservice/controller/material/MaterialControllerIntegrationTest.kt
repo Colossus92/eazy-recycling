@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,7 +49,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-  private var testMaterialCategoryId: Long? = null
+  private var testMaterialCategoryId: UUID? = null
   private var testVatCode1: String = "TEST_VAT_1"
   private var testVatCode2: String = "TEST_VAT_2"
 
@@ -77,6 +78,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
 
     // Create a test material category for foreign key constraint
     val materialCategory = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = "MATERIAL",
       code = "TEST_GROUP",
       name = "Test Material Group",
@@ -114,7 +116,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     )
       .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").isNumber)
+      .andExpect(jsonPath("$.id").isString)
       .andExpect(jsonPath("$.code").value("MAT001"))
       .andExpect(jsonPath("$.name").value("Steel Pipes"))
       .andExpect(jsonPath("$.materialGroupCode").value("TEST_GROUP"))
@@ -137,6 +139,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material1 = CatalogItemDto(
+      id = UUID.randomUUID(),
       type = CatalogItemType.MATERIAL,
       code = "MAT002",
       name = "Aluminum",
@@ -150,6 +153,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       status = "ACTIVE",
     )
     val material2 = CatalogItemDto(
+      id = UUID.randomUUID(),
       type = CatalogItemType.MATERIAL,
       code = "MAT003",
       name = "Copper",
@@ -181,6 +185,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material = CatalogItemDto(
+      id = UUID.randomUUID(),
       type = CatalogItemType.MATERIAL,
       code = "MAT004",
       name = "Bronze",
@@ -199,7 +204,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     securedMockMvc.get("/materials/${saved.id}")
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").value(saved.id))
+      .andExpect(jsonPath("$.id").value(saved.id.toString()))
       .andExpect(jsonPath("$.code").value("MAT004"))
       .andExpect(jsonPath("$.name").value("Bronze"))
   }
@@ -207,7 +212,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should return not found when getting material with non-existent id`() {
     // When & Then
-    securedMockMvc.get("/materials/99999")
+    securedMockMvc.get("/materials/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -218,6 +223,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val originalMaterial = CatalogItemDto(
+      id = UUID.randomUUID(),
       type = CatalogItemType.MATERIAL,
       code = "MAT005",
       name = "Iron",
@@ -244,13 +250,13 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     )
 
     // When & Then
-    val savedId = saved.id!!
+    val savedId = saved.id
     securedMockMvc.put(
       "/materials/$savedId",
       objectMapper.writeValueAsString(updatedRequest)
     )
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(savedId))
+      .andExpect(jsonPath("$.id").value(savedId.toString()))
       .andExpect(jsonPath("$.code").value("MAT005_UPDATED"))
       .andExpect(jsonPath("$.name").value("Cast Iron"))
       .andExpect(jsonPath("$.unitOfMeasure").value("TON"))
@@ -282,7 +288,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/materials/99999",
+      "/materials/${UUID.randomUUID()}",
       objectMapper.writeValueAsString(request)
     )
       .andExpect(status().isNotFound)
@@ -295,6 +301,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
 
     val material = CatalogItemDto(
+      id = UUID.randomUUID(),
       type = CatalogItemType.MATERIAL,
       code = "DELETE_ME",
       name = "Delete Me",
@@ -310,17 +317,17 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     val saved = materialJpaRepository.save(material)
 
     // When & Then
-    securedMockMvc.delete("/materials/${saved.id!!}")
+    securedMockMvc.delete("/materials/${saved.id}")
       .andExpect(status().isNoContent)
 
     // Verify material was deleted
-    assertThat(materialJpaRepository.findByIdOrNull(saved.id!!)).isNull()
+    assertThat(materialJpaRepository.findByIdOrNull(saved.id)).isNull()
   }
 
   @Test
   fun `should return not found when deleting non-existent material`() {
     // When & Then
-    securedMockMvc.delete("/materials/99999")
+    securedMockMvc.delete("/materials/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -342,28 +349,6 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
     securedMockMvc.post(
       "/materials",
       invalidRequest
-    )
-      .andExpect(status().isBadRequest)
-  }
-
-  @Test
-  fun `should validate positive material group id`() {
-    // Given
-    val invalidRequest = MaterialRequest(
-      code = "MAT_INVALID",
-      name = "Invalid Material",
-      materialGroupId = -1,
-      unitOfMeasure = "KG",
-      vatCode = testVatCode1,
-      salesAccountNumber = null,
-      purchaseAccountNumber = null,
-      status = "ACTIVE"
-    )
-
-    // When & Then
-    securedMockMvc.post(
-      "/materials",
-      objectMapper.writeValueAsString(invalidRequest)
     )
       .andExpect(status().isBadRequest)
   }

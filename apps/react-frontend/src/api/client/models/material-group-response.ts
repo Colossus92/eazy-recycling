@@ -22,10 +22,10 @@
 export interface MaterialGroupResponse {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof MaterialGroupResponse
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}

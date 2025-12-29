@@ -18,6 +18,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -63,7 +64,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
     )
       .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").isNumber)
+      .andExpect(jsonPath("$.id").isString)
       .andExpect(jsonPath("$.code").value("PLASTICS"))
       .andExpect(jsonPath("$.name").value("Plastics"))
       .andExpect(jsonPath("$.description").value("All plastic materials"))
@@ -79,12 +80,14 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get all material groups`() {
     // Given
     val group1 = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = MATERIAL_TYPE,
       code = "METALS",
       name = "Metals",
       description = "All metal materials",
     )
     val group2 = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = MATERIAL_TYPE,
       code = "WOOD",
       name = "Wood",
@@ -106,6 +109,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get material group by id`() {
     // Given
     val group = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = MATERIAL_TYPE,
       code = "GLASS",
       name = "Glass",
@@ -117,7 +121,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
     securedMockMvc.get("/material-groups/${saved.id}")
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").value(saved.id))
+      .andExpect(jsonPath("$.id").value(saved.id.toString()))
       .andExpect(jsonPath("$.code").value("GLASS"))
       .andExpect(jsonPath("$.name").value("Glass"))
       .andExpect(jsonPath("$.description").value("All glass materials"))
@@ -126,7 +130,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should return not found when getting material group with non-existent id`() {
     // When & Then
-    securedMockMvc.get("/material-groups/99999")
+    securedMockMvc.get("/material-groups/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -134,6 +138,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   fun `should update material group`() {
     // Given
     val originalGroup = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = MATERIAL_TYPE,
       code = "PAPER",
       name = "Paper",
@@ -149,18 +154,18 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/material-groups/${saved.id!!}",
+      "/material-groups/${saved.id}",
       objectMapper.writeValueAsString(updatedRequest)
     )
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(saved.id!!))
+      .andExpect(jsonPath("$.id").value(saved.id.toString()))
       .andExpect(jsonPath("$.code").value("PAPER_UPDATED"))
       .andExpect(jsonPath("$.name").value("Paper and Cardboard"))
       .andExpect(jsonPath("$.description").value("All paper and cardboard materials"))
       .andExpect(jsonPath("$.updatedAt").exists())
 
     // Verify material group was updated in the database
-    val savedId = saved.id!!
+    val savedId = saved.id
     val updatedGroup = catalogItemCategoryJpaRepository.findByIdAndType(savedId, MATERIAL_TYPE)
     assertThat(updatedGroup).isNotNull
     assertThat(updatedGroup?.code).isEqualTo("PAPER_UPDATED")
@@ -179,7 +184,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/material-groups/99999",
+      "/material-groups/${UUID.randomUUID()}",
       objectMapper.writeValueAsString(request)
     )
       .andExpect(status().isNotFound)
@@ -189,6 +194,7 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
   fun `should delete material group`() {
     // Given
     val group = CatalogItemCategoryDto(
+      id = UUID.randomUUID(),
       type = MATERIAL_TYPE,
       code = "DELETE_ME",
       name = "Delete Me",
@@ -197,17 +203,17 @@ class MaterialGroupControllerIntegrationTest : BaseIntegrationTest() {
     val saved = catalogItemCategoryJpaRepository.save(group)
 
     // When & Then
-    securedMockMvc.delete("/material-groups/${saved.id!!}")
+    securedMockMvc.delete("/material-groups/${saved.id}")
       .andExpect(status().isNoContent)
 
     // Verify material group was deleted
-    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(saved.id!!, MATERIAL_TYPE)).isNull()
+    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(saved.id, MATERIAL_TYPE)).isNull()
   }
 
   @Test
   fun `should return not found when deleting non-existent material group`() {
     // When & Then
-    securedMockMvc.delete("/material-groups/99999")
+    securedMockMvc.delete("/material-groups/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 

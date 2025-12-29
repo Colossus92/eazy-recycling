@@ -100,9 +100,9 @@ export interface WasteStreamRequest {
     'brokerParty'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WasteStreamRequest
      */
-    'catalogItemId'?: number;
+    'catalogItemId'?: string;
 }
 

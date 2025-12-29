@@ -1,16 +1,17 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.material
 
 import java.time.Instant
+import java.util.*
 
 /**
  * Projection interface for native query results that include material group details.
  * Used to efficiently fetch material data with group code and name in a single query.
  */
 interface MaterialQueryResult {
-    fun getId(): Long
+    fun getId(): UUID
     fun getCode(): String
     fun getName(): String
-    fun getMaterialGroupId(): Long?
+    fun getMaterialGroupId(): UUID?
     fun getMaterialGroupCode(): String?
     fun getMaterialGroupName(): String?
     fun getUnitOfMeasure(): String

@@ -81,7 +81,7 @@ export const useProductsCrud = () => {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (params: { id: number; data: ProductRequest }) =>
+    mutationFn: (params: { id: string; data: ProductRequest }) =>
       productService.update(params.id, params.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] }).then(() => {
@@ -91,7 +91,7 @@ export const useProductsCrud = () => {
     },
   });
 
-  const update = async (id: number, item: ProductRequest): Promise<void> => {
+  const update = async (id: string, item: ProductRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       updateMutation.mutate(
         { id, data: item },

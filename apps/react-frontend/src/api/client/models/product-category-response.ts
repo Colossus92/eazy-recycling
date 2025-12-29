@@ -22,10 +22,10 @@
 export interface ProductCategoryResponse {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ProductCategoryResponse
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}

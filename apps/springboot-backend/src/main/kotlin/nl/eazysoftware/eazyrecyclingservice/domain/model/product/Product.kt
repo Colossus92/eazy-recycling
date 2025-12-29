@@ -1,13 +1,14 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.product
 
 import java.math.BigDecimal
+import java.util.*
 import kotlin.time.Instant
 
 data class Product(
-    val id: Long?,
+    val id: UUID?,
     val code: String,
     val name: String,
-    val categoryId: Long?,
+    val categoryId: UUID?,
     val categoryName: String?,
     val unitOfMeasure: String,
     val vatCode: String,

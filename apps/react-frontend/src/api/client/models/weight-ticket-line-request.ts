@@ -37,9 +37,9 @@ export interface WeightTicketLineRequest {
     'weight': WeightRequest;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WeightTicketLineRequest
      */
-    'catalogItemId': number;
+    'catalogItemId': string;
 }
 

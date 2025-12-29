@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotBlank
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.*
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicket
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicketCommand
-import nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket.CreateInvoiceFromWeightTicketResult
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
@@ -242,7 +239,7 @@ data class CreateWeightTicketResponse(val id: Long)
 data class WeightTicketLineRequest(
   val wasteStreamNumber: String?,
   val weight: WeightRequest,
-  val catalogItemId: Long,
+  val catalogItemId: UUID,
 )
 
 data class WeightRequest(

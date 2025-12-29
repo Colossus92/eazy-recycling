@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.MaterialGroups
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialGroupMapper.Companion.MATERIAL_TYPE
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class MaterialGroupRepository(
@@ -16,17 +17,17 @@ class MaterialGroupRepository(
         return jpaRepository.findByType(MATERIAL_TYPE).map { mapper.toDomain(it) }
     }
 
-    override fun getMaterialGroupById(id: Long): MaterialGroup? {
+    override fun getMaterialGroupById(id: UUID): MaterialGroup? {
         return jpaRepository.findByIdAndType(id, MATERIAL_TYPE)?.let { mapper.toDomain(it) }
     }
 
     override fun createMaterialGroup(materialGroup: MaterialGroup): MaterialGroup {
-        val dto = mapper.toDto(materialGroup.copy(id = null))
+        val dto = mapper.toDto(materialGroup.copy(id = UUID.randomUUID()))
         val saved = jpaRepository.save(dto)
         return mapper.toDomain(saved)
     }
 
-    override fun updateMaterialGroup(id: Long, materialGroup: MaterialGroup): MaterialGroup {
+    override fun updateMaterialGroup(id: UUID, materialGroup: MaterialGroup): MaterialGroup {
         val existing = jpaRepository.findByIdAndType(id, MATERIAL_TYPE)
             ?: throw NoSuchElementException("Materiaalgroep met id $id niet gevonden")
         existing.code = materialGroup.code
@@ -36,7 +37,7 @@ class MaterialGroupRepository(
         return mapper.toDomain(saved)
     }
 
-    override fun deleteMaterialGroup(id: Long) {
+    override fun deleteMaterialGroup(id: UUID) {
         val existing = jpaRepository.findByIdAndType(id, MATERIAL_TYPE)
             ?: throw NoSuchElementException("Materiaalgroep met id $id niet gevonden")
         jpaRepository.delete(existing)

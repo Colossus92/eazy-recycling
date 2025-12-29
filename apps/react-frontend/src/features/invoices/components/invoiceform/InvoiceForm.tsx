@@ -18,9 +18,9 @@ import { useInvoiceFormHook } from './useInvoiceFormHook';
 interface InvoiceFormProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  invoiceId?: number;
+  invoiceId?: string;
   onComplete: () => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export const InvoiceForm = ({
@@ -95,7 +95,11 @@ export const InvoiceForm = ({
   ];
 
   return (
-    <FormDialog isOpen={isOpen} setIsOpen={handleClose} width="w-[800px] h-[90vh]">
+    <FormDialog
+      isOpen={isOpen}
+      setIsOpen={handleClose}
+      width="w-[800px] h-[90vh]"
+    >
       <FormProvider {...formContext}>
         <form
           onSubmit={formContext.handleSubmit(onSubmit)}
@@ -104,7 +108,8 @@ export const InvoiceForm = ({
           <FormTopBar
             title={getFormTitle()}
             actions={
-              isEditMode && !isReadOnly && (
+              isEditMode &&
+              !isReadOnly && (
                 <FormActionMenu
                   onDelete={() => {
                     const idToDelete = currentInvoiceId ?? invoiceId;
@@ -136,54 +141,54 @@ export const InvoiceForm = ({
                     {/* General Tab */}
                     <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
                       <div className="flex flex-col gap-6 w-full">
-                      {/* Invoice header section */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <CompanySelectFormField
-                          title="Klant"
-                          placeholder="Selecteer een klant"
-                          name="customerId"
-                          rules={{ required: 'Klant is verplicht' }}
-                          disabled={isReadOnly}
-                        />
-                        <DateFormField
-                          title="Factuurdatum"
-                          placeholder="Selecteer een datum"
-                          disabled={isReadOnly}
-                          formHook={{
-                            register: formContext.register,
-                            name: 'invoiceDate',
-                            rules: { required: 'Factuurdatum is verplicht' },
-                            errors: formContext.formState.errors,
-                          }}
-                        />
-                      </div>
+                        {/* Invoice header section */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <CompanySelectFormField
+                            title="Klant"
+                            placeholder="Selecteer een klant"
+                            name="customerId"
+                            rules={{ required: 'Klant is verplicht' }}
+                            disabled={isReadOnly}
+                          />
+                          <DateFormField
+                            title="Factuurdatum"
+                            placeholder="Selecteer een datum"
+                            disabled={isReadOnly}
+                            formHook={{
+                              register: formContext.register,
+                              name: 'invoiceDate',
+                              rules: { required: 'Factuurdatum is verplicht' },
+                              errors: formContext.formState.errors,
+                            }}
+                          />
+                        </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <SelectFormField
-                          title="Type"
-                          placeholder="Selecteer type"
-                          options={invoiceTypeOptions}
-                          disabled={isReadOnly}
-                          formHook={{
-                            register: formContext.register,
-                            name: 'invoiceType',
-                            rules: { required: 'Type is verplicht' },
-                            errors: formContext.formState.errors,
-                          }}
-                        />
-                        <SelectFormField
-                          title="Document type"
-                          placeholder="Selecteer document type"
-                          options={documentTypeOptions}
-                          disabled={isReadOnly}
-                          formHook={{
-                            register: formContext.register,
-                            name: 'documentType',
-                            rules: { required: 'Document type is verplicht' },
-                            errors: formContext.formState.errors,
-                          }}
-                        />
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <SelectFormField
+                            title="Type"
+                            placeholder="Selecteer type"
+                            options={invoiceTypeOptions}
+                            disabled={isReadOnly}
+                            formHook={{
+                              register: formContext.register,
+                              name: 'invoiceType',
+                              rules: { required: 'Type is verplicht' },
+                              errors: formContext.formState.errors,
+                            }}
+                          />
+                          <SelectFormField
+                            title="Document type"
+                            placeholder="Selecteer document type"
+                            options={documentTypeOptions}
+                            disabled={isReadOnly}
+                            formHook={{
+                              register: formContext.register,
+                              name: 'documentType',
+                              rules: { required: 'Document type is verplicht' },
+                              errors: formContext.formState.errors,
+                            }}
+                          />
+                        </div>
 
                         {/* Invoice lines section */}
                         <InvoiceLinesSection isReadOnly={isReadOnly} />
@@ -192,7 +197,9 @@ export const InvoiceForm = ({
 
                     {/* Related Tab */}
                     <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
-                      <InvoiceRelatedTab invoiceId={currentInvoiceId ?? invoiceId} />
+                      <InvoiceRelatedTab
+                        invoiceId={currentInvoiceId ?? invoiceId}
+                      />
                     </TabPanel>
                   </TabPanels>
                 </TabGroup>
@@ -211,7 +218,9 @@ export const InvoiceForm = ({
             {!isReadOnly && (
               <SplitButton
                 primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
-                secondaryLabel={isEditMode ? 'Verwerken' : 'Opslaan en verwerken'}
+                secondaryLabel={
+                  isEditMode ? 'Verwerken' : 'Opslaan en verwerken'
+                }
                 onPrimaryClick={onSubmit}
                 onSecondaryClick={onSubmitAndFinalize}
                 isSubmitting={isSaving}

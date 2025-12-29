@@ -22,10 +22,10 @@
 export interface ProductResponse {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ProductResponse
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}
@@ -40,10 +40,10 @@ export interface ProductResponse {
     'name': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ProductResponse
      */
-    'categoryId'?: number;
+    'categoryId'?: string;
     /**
      * 
      * @type {string}

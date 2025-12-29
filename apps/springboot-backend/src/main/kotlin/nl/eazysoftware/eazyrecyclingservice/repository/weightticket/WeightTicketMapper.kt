@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import org.springframework.stereotype.Component
+import java.util.*
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
@@ -41,7 +42,7 @@ class WeightTicketMapper(
       linkedInvoiceId = dto.linkedInvoiceId,
       pdfUrl = dto.pdfUrl,
       lines = dto.lines
-        .map { it.toDomain() }
+        .map { it.toDomain(it.catalogItemId) }
         .toMutableList()
         .let { WeightTicketLines(it) },
       secondWeighing = dto.secondWeighingValue?.let {
@@ -78,7 +79,7 @@ class WeightTicketMapper(
     return WeightTicketDto(
       id = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
-      lines = toDto(domain.lines),
+      lines = toDto(domain.lines, domain.id.number),
       secondWeighingValue = domain.secondWeighing?.value,
       secondWeighingUnit = toDto(domain.secondWeighing?.unit),
       tarraWeightValue = domain.tarraWeight?.value,
@@ -105,10 +106,12 @@ class WeightTicketMapper(
     }
   }
 
-  private fun toDto(domain: WeightTicketLines): List<WeightTicketLineDto> {
+  private fun toDto(domain: WeightTicketLines, weightTicketId: Long): MutableList<WeightTicketLineDto> {
     return domain.getLines()
       .map {
         WeightTicketLineDto(
+          id = UUID.randomUUID(),
+          weightTicketId = weightTicketId,
           wasteStreamNumber = it.waste?.number,
           weightValue = it.weight.value,
           catalogItemId = it.catalogItemId,
@@ -118,7 +121,7 @@ class WeightTicketMapper(
           declaredWeight = it.declarationState.declaredWeight,
           lastDeclaredAt = it.declarationState.lastDeclaredAt?.toJavaInstant(),
         )
-      }
+      }.toMutableList()
   }
 
   private fun toDomainStatus(dto: WeightTicketStatusDto): WeightTicketStatus {

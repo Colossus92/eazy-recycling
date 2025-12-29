@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.util.*
 
 @RestController
 @RequestMapping("/material-prices")
@@ -26,7 +27,7 @@ class MaterialPriceController(
     }
 
     @GetMapping("/{id}")
-    fun getMaterialPrice(@PathVariable id: Long): MaterialPriceResponse {
+    fun getMaterialPrice(@PathVariable id: UUID): MaterialPriceResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
         return material.toPriceResponse()
@@ -36,7 +37,7 @@ class MaterialPriceController(
     @PostMapping("/{id}")
     @Transactional
     fun createMaterialPrice(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: MaterialPriceRequest
     ): MaterialPriceResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
@@ -59,7 +60,7 @@ class MaterialPriceController(
     @PutMapping("/{id}")
     @Transactional
     fun updateMaterialPrice(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: MaterialPriceRequest
     ): MaterialPriceResponse {
         materials.getMaterialWithGroupDetailsById(id)
@@ -78,7 +79,7 @@ class MaterialPriceController(
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
-    fun deleteMaterialPrice(@PathVariable id: Long) {
+    fun deleteMaterialPrice(@PathVariable id: UUID) {
         materials.getMaterialWithGroupDetailsById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
 
@@ -95,10 +96,10 @@ data class MaterialPriceRequest(
 )
 
 data class MaterialPriceResponse(
-    val id: Long,
+    val id: UUID,
     val code: String,
     val name: String,
-    val materialGroupId: Long?,
+    val materialGroupId: UUID?,
     val materialGroupName: String?,
     val unitOfMeasure: String,
     val defaultPrice: BigDecimal?,

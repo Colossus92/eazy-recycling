@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,7 +41,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-  private var testCategoryId: Long? = null
+  private var testCategoryId: UUID? = null
   private val testVatCode = "VAT21"
 
   @BeforeEach
@@ -64,6 +65,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
 
     val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = "MATERIAL",
         code = "TEST_GROUP",
         name = "Test Category",
@@ -81,6 +83,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.MATERIAL,
         code = "MAT001",
         name = "Steel Pipes",
@@ -97,6 +100,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Steel Product",
@@ -126,6 +130,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
     repeat(3) { i ->
       catalogItemJpaRepository.save(
         CatalogItemDto(
+          id = UUID.randomUUID(),
           type = CatalogItemType.MATERIAL,
           code = "MAT00$i",
           name = "Material $i",
@@ -155,6 +160,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.MATERIAL,
         code = "MAT001",
         name = "Steel Pipes",

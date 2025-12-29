@@ -11,13 +11,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.EdgeFunctionOutboxR
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 interface FinalizeInvoice {
     fun handle(cmd: FinalizeInvoiceCommand): InvoiceResult
 }
 
 data class FinalizeInvoiceCommand(
-    val invoiceId: Long,
+    val invoiceId: UUID,
 )
 
 @Service

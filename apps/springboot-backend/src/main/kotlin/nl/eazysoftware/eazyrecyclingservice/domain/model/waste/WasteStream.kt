@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import java.util.*
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -42,7 +43,7 @@ class WasteStream(
    * Reference to the generic material this waste stream is linked to.
    * The waste stream name is a snapshot of the material name.
    */
-  var catalogItemId: Long? = null,
+  var catalogItemId: UUID? = null,
 
   val createdAt: Instant? = null,
   val createdBy: String? = null,
@@ -125,7 +126,7 @@ class WasteStream(
     dealerParty: CompanyId? = this.dealerParty,
     collectorParty: CompanyId? = this.collectorParty,
     brokerParty: CompanyId? = this.brokerParty,
-    materialId: Long? = this.catalogItemId
+    materialId: UUID? = this.catalogItemId
   ) {
     check(status == WasteStreamStatus.DRAFT) {
       "Afvalstroom kan alleen worden gewijzigd als de status DRAFT is. Huidige status: $status"

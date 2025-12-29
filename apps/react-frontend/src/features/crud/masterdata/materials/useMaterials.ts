@@ -38,8 +38,12 @@ export const useMaterialsCrud = () => {
             ?.toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           material.vatCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.salesAccountNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          material.purchaseAccountNumber?.toLowerCase().includes(searchQuery.toLowerCase())
+          material.salesAccountNumber
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          material.purchaseAccountNumber
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase())
         );
       }),
     [materials, searchQuery]
@@ -83,7 +87,7 @@ export const useMaterialsCrud = () => {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (params: { id: number; data: MaterialRequest }) =>
+    mutationFn: (params: { id: string; data: MaterialRequest }) =>
       materialService.update(params.id, params.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['materials'] }).then(() => {
@@ -93,7 +97,7 @@ export const useMaterialsCrud = () => {
     },
   });
 
-  const update = async (id: number, item: MaterialRequest): Promise<void> => {
+  const update = async (id: string, item: MaterialRequest): Promise<void> => {
     return new Promise((resolve, reject) => {
       updateMutation.mutate(
         { id, data: item },

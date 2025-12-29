@@ -7,14 +7,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import java.time.Instant
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Entity
 @Table(name = "invoices")
 class InvoiceDto(
   @Id
   @Column(name = "id")
-  val id: Long,
+  val id: UUID,
 
   @Column(name = "invoice_number")
   val invoiceNumber: String?,
@@ -65,7 +65,7 @@ class InvoiceDto(
   val customerVatNumber: String?,
 
   @Column(name = "original_invoice_id")
-  val originalInvoiceId: Long?,
+  val originalInvoiceId: UUID?,
 
   @Column(name = "source_weight_ticket_id")
   val sourceWeightTicketId: Long?,

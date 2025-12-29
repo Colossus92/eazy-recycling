@@ -9,13 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.UUID
+import java.util.*
 
-interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
+interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
 
     @Query(
         value = """
-            SELECT 
+            SELECT
                 ci.id as id,
                 ci.type as type,
                 ci.code as code,
@@ -32,12 +32,12 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             WHERE ci.status = 'ACTIVE'
               AND (ci.consignor_party_id IS NULL OR ci.consignor_party_id = :consignorPartyId)
-              AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%')) 
+              AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
                    OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
-            
+
             UNION ALL
-            
-            SELECT 
+
+            SELECT
                 ci.id as id,
                 'WASTE_STREAM' as type,
                 ci.code as code,
@@ -55,9 +55,9 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             WHERE ws.status = 'ACTIVE'
               AND ws.consignor_party_id = :consignorPartyId
-              AND (:query IS NULL OR LOWER(ws.name) LIKE LOWER(CONCAT('%', :query, '%')) 
+              AND (:query IS NULL OR LOWER(ws.name) LIKE LOWER(CONCAT('%', :query, '%'))
                    OR LOWER(ws.number) LIKE LOWER(CONCAT('%', :query, '%')))
-            
+
             ORDER BY name
         """,
         nativeQuery = true
@@ -69,7 +69,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
 
     @Query(
         value = """
-            SELECT 
+            SELECT
                 ci.id as id,
                 ci.type as type,
                 ci.code as code,
@@ -86,7 +86,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             WHERE ci.status = 'ACTIVE'
               AND ci.consignor_party_id IS NULL
-              AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%')) 
+              AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
                    OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
             ORDER BY ci.name
         """,
@@ -96,7 +96,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, Long> {
 }
 
 interface CatalogItemQueryProjection {
-    fun getId(): Long
+    fun getId(): UUID
     fun getType(): String
     fun getCode(): String
     fun getName(): String

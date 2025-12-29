@@ -7,7 +7,7 @@ export const materialService = {
   getAll: () => materialApi.getAllMaterials().then((r) => r.data),
   create: (material: MaterialRequest) =>
     materialApi.createMaterial(material).then((r) => r.data),
-  update: (id: number, material: MaterialRequest) =>
+  update: (id: string, material: MaterialRequest) =>
     materialApi.updateMaterial(id, material).then((r) => r.data),
-  delete: (id: number) => materialApi.deleteMaterial(id),
+  delete: (id: string) => materialApi.deleteMaterial(id),
 };

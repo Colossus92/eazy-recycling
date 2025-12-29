@@ -3,9 +3,10 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.catalog
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import java.math.BigDecimal
+import java.util.*
 
 data class CatalogItem (
-  val id: Long,
+  val id: UUID,
   val type: CatalogItemType,
   val code: String,
   val name: String,

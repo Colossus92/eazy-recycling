@@ -34,10 +34,10 @@ export interface MaterialRequest {
     'name': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof MaterialRequest
      */
-    'materialGroupId': number;
+    'materialGroupId': string;
     /**
      * 
      * @type {string}

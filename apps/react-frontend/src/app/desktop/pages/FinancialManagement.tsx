@@ -2,42 +2,62 @@ import { ContentContainer } from '@/components/layouts/ContentContainer';
 import { Tab } from '@/components/ui/tab/Tab';
 import { InvoicesTab } from '@/features/invoices/components/InvoicesTab';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 export const FinancieelManagement = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [invoiceIdToOpen, setInvoiceIdToOpen] = useState<number | null>(null);
-  const [invoiceDrawerIdToOpen, setInvoiceDrawerIdToOpen] = useState<number | null>(null);
+  const [invoiceIdToOpen, setInvoiceIdToOpen] = useState<string | null>(null);
+  const [invoiceDrawerIdToOpen, setInvoiceDrawerIdToOpen] = useState<
+    string | null
+  >(null);
 
   // Handle URL params for opening invoice form or drawer
   useEffect(() => {
     const invoiceId = searchParams.get('invoiceId');
     const invoiceDrawerId = searchParams.get('invoiceDrawerId');
-    
+
     if (invoiceId) {
-      const parsedInvoiceId = parseInt(invoiceId, 10);
-      if (!isNaN(parsedInvoiceId)) {
-        setInvoiceIdToOpen(parsedInvoiceId);
-      }
-      
+      setInvoiceIdToOpen(invoiceId);
+
       // Clear the URL params after capturing
       setSearchParams({});
     } else if (invoiceDrawerId) {
-      const parsedInvoiceDrawerId = parseInt(invoiceDrawerId, 10);
-      if (!isNaN(parsedInvoiceDrawerId)) {
-        setInvoiceDrawerIdToOpen(parsedInvoiceDrawerId);
-      }
-      
+      setInvoiceDrawerIdToOpen(invoiceDrawerId);
+
       // Clear the URL params after capturing
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
 
-  const tabs: {name: string, disabled: boolean, component: () => ReactNode}[] = [
-    {name: "Facturen", disabled: false, component: () => <InvoicesTab key={`invoices-${selectedIndex}`} invoiceIdToOpen={invoiceIdToOpen} invoiceDrawerIdToOpen={invoiceDrawerIdToOpen} onInvoiceOpened={() => setInvoiceIdToOpen(null)} onInvoiceDrawerOpened={() => setInvoiceDrawerIdToOpen(null)} />},
-    {name: "Kasbonnen", disabled: true, component: () => <div className="flex items-center justify-center h-full text-color-text-secondary">Kasbonnen worden binnenkort ondersteund</div>},
+  const tabs: {
+    name: string;
+    disabled: boolean;
+    component: () => ReactNode;
+  }[] = [
+    {
+      name: 'Facturen',
+      disabled: false,
+      component: () => (
+        <InvoicesTab
+          key={`invoices-${selectedIndex}`}
+          invoiceIdToOpen={invoiceIdToOpen}
+          invoiceDrawerIdToOpen={invoiceDrawerIdToOpen}
+          onInvoiceOpened={() => setInvoiceIdToOpen(null)}
+          onInvoiceDrawerOpened={() => setInvoiceDrawerIdToOpen(null)}
+        />
+      ),
+    },
+    {
+      name: 'Kasbonnen',
+      disabled: true,
+      component: () => (
+        <div className="flex items-center justify-center h-full text-color-text-secondary">
+          Kasbonnen worden binnenkort ondersteund
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -49,11 +69,9 @@ export const FinancieelManagement = () => {
           className="w-full flex-1 flex flex-col min-h-0"
         >
           <TabList className="relative z-10">
-            {
-              tabs.map((tab) => (
-                <Tab label={tab.name} key={tab.name}  disabled={tab.disabled} />
-              ))
-            }
+            {tabs.map((tab) => (
+              <Tab label={tab.name} key={tab.name} disabled={tab.disabled} />
+            ))}
           </TabList>
           <TabPanels
             className="
@@ -66,13 +84,14 @@ export const FinancieelManagement = () => {
               -mt-[2px]
             "
           >
-            {
-              tabs.map((tab, index) => (
-                <TabPanel key={index} className="flex-1 flex flex-col items-start self-stretch gap-4 overflow-hidden">
-                  {tab.component()}
-                </TabPanel>
-              ))
-            }
+            {tabs.map((tab, index) => (
+              <TabPanel
+                key={index}
+                className="flex-1 flex flex-col items-start self-stretch gap-4 overflow-hidden"
+              >
+                {tab.component()}
+              </TabPanel>
+            ))}
           </TabPanels>
         </TabGroup>
       </div>

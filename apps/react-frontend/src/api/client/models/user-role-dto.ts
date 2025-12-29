@@ -22,10 +22,10 @@
 export interface UserRoleDto {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof UserRoleDto
      */
-    'id'?: number;
+    'id': string;
     /**
      * 
      * @type {string}

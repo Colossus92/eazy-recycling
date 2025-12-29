@@ -13,14 +13,16 @@ export const useInvoiceCrud = () => {
   const [formItem, setFormItem] = useState<InvoiceView | undefined>(undefined);
 
   // Deletion state
-  const [deletionItem, setDeletionItem] = useState<number | undefined>(undefined);
+  const [deletionItem, setDeletionItem] = useState<string | undefined>(
+    undefined
+  );
 
   const fetchInvoices = useCallback(async () => {
     setIsFetching(true);
     try {
       const data = await invoiceService.getAll();
       let filteredItems = data;
-      
+
       if (query) {
         const lowerQuery = query.toLowerCase();
         filteredItems = filteredItems.filter(
@@ -29,7 +31,7 @@ export const useInvoiceCrud = () => {
             item.customerName.toLowerCase().includes(lowerQuery)
         );
       }
-      
+
       setItems(filteredItems);
       setError(null);
     } catch (err) {
@@ -62,7 +64,7 @@ export const useInvoiceCrud = () => {
     fetchInvoices();
   };
 
-  const initiateDelete = (id: number) => {
+  const initiateDelete = (id: string) => {
     setDeletionItem(id);
   };
 

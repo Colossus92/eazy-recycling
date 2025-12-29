@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.model.invoice
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.*
 
 data class InvoiceLine(
     val id: InvoiceLineId,
@@ -16,11 +17,11 @@ data class InvoiceLine(
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
     val totalExclVat: BigDecimal,
-    val catalogItemId: Long,
+    val catalogItemId: UUID,
     val catalogItemCode: String,
     val catalogItemName: String,
     val catalogItemType: CatalogItemType,
     val unitOfMeasure: String,
 )
 
-data class InvoiceLineId(val value: Long)
+data class InvoiceLineId(val value: UUID)

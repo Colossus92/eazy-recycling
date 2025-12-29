@@ -28,10 +28,10 @@ export interface WeightTicketLineView {
     'wasteStreamNumber'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WeightTicketLineView
      */
-    'catalogItemId': number;
+    'catalogItemId': string;
     /**
      * 
      * @type {number}

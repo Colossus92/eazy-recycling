@@ -331,8 +331,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -349,8 +349,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -373,8 +373,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -388,8 +388,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -406,8 +406,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -430,8 +430,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -500,8 +500,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -518,8 +518,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -542,8 +542,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -557,8 +557,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -575,8 +575,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -599,8 +599,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -623,8 +623,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -638,8 +638,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -656,8 +656,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -680,8 +680,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -695,8 +695,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -713,8 +713,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -737,8 +737,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -1525,8 +1525,8 @@ paths:
         in: path
         required: true
         schema:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -2335,8 +2335,8 @@ components:
         weight:
           $ref: "#/components/schemas/WeightRequest"
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       required:
       - catalogItemId
       - weight
@@ -2444,8 +2444,8 @@ components:
           type: string
           format: uuid
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       required:
       - collectionType
       - consignorClassification
@@ -2804,8 +2804,8 @@ components:
           type: string
           minLength: 1
         categoryId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         unitOfMeasure:
           type: string
           minLength: 1
@@ -2831,15 +2831,15 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         code:
           type: string
         name:
           type: string
         categoryId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         unitOfMeasure:
           type: string
         vatCode:
@@ -2885,8 +2885,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         code:
           type: string
         name:
@@ -3136,14 +3136,15 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int32
+          type: string
+          format: uuid
         userId:
           type: string
           format: uuid
         role:
           type: string
       required:
+      - id
       - role
     MaterialRequest:
       type: object
@@ -3155,8 +3156,8 @@ components:
           type: string
           minLength: 1
         materialGroupId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         unitOfMeasure:
           type: string
           minLength: 1
@@ -3181,15 +3182,15 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         code:
           type: string
         name:
           type: string
         materialGroupId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         materialGroupCode:
           type: string
         materialGroupName:
@@ -3232,15 +3233,15 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         code:
           type: string
         name:
           type: string
         materialGroupId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         materialGroupName:
           type: string
         unitOfMeasure:
@@ -3270,8 +3271,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         code:
           type: string
         name:
@@ -3294,14 +3295,14 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         date:
           type: string
           format: date
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         description:
           type: string
         quantity:
@@ -3332,8 +3333,8 @@ components:
       type: object
       properties:
         invoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
       required:
       - invoiceId
     Eural:
@@ -3643,8 +3644,8 @@ components:
       type: object
       properties:
         invoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         weightTicketId:
           type: integer
           format: int64
@@ -3933,8 +3934,8 @@ components:
         cancellationReason:
           type: string
         linkedInvoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         pdfUrl:
           type: string
         createdAt:
@@ -3956,11 +3957,17 @@ components:
     WeightTicketLineDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+        weightTicketId:
+          type: integer
+          format: int64
         wasteStreamNumber:
           type: string
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         weightValue:
           type: number
         weightUnit:
@@ -3974,6 +3981,8 @@ components:
           format: date-time
       required:
       - catalogItemId
+      - id
+      - weightTicketId
       - weightUnit
       - weightValue
     CreateWasteTransportResponse:
@@ -4038,8 +4047,8 @@ components:
           type: string
           format: date
         originalInvoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         lines:
           type: array
           items:
@@ -4246,14 +4255,14 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
       required:
       - day
       - dayOfMonth
@@ -4322,6 +4331,9 @@ components:
         day:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -4330,9 +4342,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
       required:
       - date
       - day
@@ -4363,11 +4372,11 @@ components:
         second:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
       required:
       - hour
       - minute
@@ -4428,8 +4437,8 @@ components:
         cancellationReason:
           type: string
         linkedInvoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
         createdByName:
@@ -4454,8 +4463,8 @@ components:
         wasteStreamNumber:
           type: string
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         weightValue:
           type: number
         weightUnit:
@@ -4563,8 +4572,8 @@ components:
         brokerParty:
           $ref: "#/components/schemas/CompanyView"
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         status:
           type: string
         createdAt:
@@ -4872,8 +4881,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         invoiceNumber:
           type: string
         invoiceType:
@@ -4943,8 +4952,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         invoiceNumber:
           type: string
         invoiceType:
@@ -4959,8 +4968,8 @@ components:
         customer:
           $ref: "#/components/schemas/CustomerSnapshotView"
         originalInvoiceId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         sourceWeightTicketId:
           type: integer
           format: int64
@@ -4998,8 +5007,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         lineNumber:
           type: integer
           format: int32
@@ -5021,8 +5030,8 @@ components:
         totalExclVat:
           type: number
         catalogItemId:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         catalogItemCode:
           type: string
         catalogItemName:
@@ -5172,8 +5181,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          type: string
+          format: uuid
         itemType:
           type: string
           enum:
@@ -5386,13 +5395,13 @@ components:
           type: string
         displayName:
           type: string
-        applicationName:
-          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
+        applicationName:
+          type: string
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -5734,21 +5743,33 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
         buffer:
           type: string
-        defaultContentType:
+        deferredSyntaxAllowedAsLiteral:
           type: string
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -5763,19 +5784,7 @@ components:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
+        defaultContentType:
           type: string
     RedirectView:
       type: object
@@ -5833,21 +5842,21 @@ components:
           type: array
           items:
             type: string
-        redirectView:
-          type: boolean
         propagateQueryProperties:
+          type: boolean
+        redirectView:
           type: boolean
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
     ServletContext:
       type: object
       properties:
@@ -5894,27 +5903,6 @@ components:
         minorVersion:
           type: integer
           format: int32
-        attributeNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        serverInfo:
-          type: string
-        contextPath:
-          type: string
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -5924,10 +5912,6 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -5947,6 +5931,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         sessionTrackingModes:
           type: array
           items:
@@ -5957,15 +5945,36 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        contextPath:
+          type: string
+        serverInfo:
+          type: string
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
+        initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        attributeNames: {}
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         name:
           type: string
         className:
@@ -6000,9 +6009,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

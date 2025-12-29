@@ -10,8 +10,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.util.*
 
-interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
+interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
 
   @Query(
     value = """
@@ -65,7 +66,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
         """,
     nativeQuery = true
   )
-  fun findMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
+  fun findMaterialWithGroupDetailsById(id: UUID): MaterialQueryResult?
 
   @Query(
     value = """
@@ -106,7 +107,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
         """,
     nativeQuery = true
   )
-  fun updateMaterialPrice(id: Long, price: BigDecimal?): Int
+  fun updateMaterialPrice(id: UUID, price: BigDecimal?): Int
 
   @Modifying(clearAutomatically = true)
   @Query(
@@ -126,10 +127,10 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, Long> {
     nativeQuery = true
   )
   fun updateMaterialFields(
-    id: Long,
+    id: UUID,
     code: String,
     name: String,
-    categoryId: Long?,
+    categoryId: UUID?,
     unitOfMeasure: String,
     vatCode: String,
     purchaseAccountNumber: String?,
@@ -144,7 +145,7 @@ class MaterialRepository(
   private val mapper: MaterialMapper
 ) : Materials {
 
-  override fun getMaterialById(id: Long): Material? {
+  override fun getMaterialById(id: UUID): Material? {
     return jpaRepository.findByIdOrNull(id)?.let { mapper.toDomain(it) }
   }
 
@@ -152,7 +153,7 @@ class MaterialRepository(
     return jpaRepository.findAllMaterialsWithGroupDetails()
   }
 
-  override fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult? {
+  override fun getMaterialWithGroupDetailsById(id: UUID): MaterialQueryResult? {
     return jpaRepository.findMaterialWithGroupDetailsById(id)
   }
 
@@ -163,7 +164,7 @@ class MaterialRepository(
   }
 
   @Transactional
-  override fun updateMaterial(id: Long, material: Material): Material {
+  override fun updateMaterial(id: UUID, material: Material): Material {
     val rowsUpdated = jpaRepository.updateMaterialFields(
       id = id,
       code = material.code,
@@ -182,7 +183,7 @@ class MaterialRepository(
       ?: throw IllegalStateException("Het ophalen van materiaal met id $id is mislukt")
   }
 
-  override fun deleteMaterial(id: Long) {
+  override fun deleteMaterial(id: UUID) {
     jpaRepository.deleteById(id)
   }
 
@@ -190,7 +191,7 @@ class MaterialRepository(
     return jpaRepository.searchMaterials(query).take(limit)
   }
 
-  override fun updateMaterialPrice(id: Long, price: BigDecimal?): Boolean {
+  override fun updateMaterialPrice(id: UUID, price: BigDecimal?): Boolean {
     return jpaRepository.updateMaterialPrice(id, price) > 0
   }
 }

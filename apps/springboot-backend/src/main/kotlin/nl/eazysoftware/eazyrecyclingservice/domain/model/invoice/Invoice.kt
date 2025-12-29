@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.invoice
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
+import java.util.*
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -67,7 +67,7 @@ class Invoice(
     }
 }
 
-data class InvoiceId(val value: Long)
+data class InvoiceId(val value: UUID)
 
 data class InvoiceNumber(val value: String) {
     companion object {

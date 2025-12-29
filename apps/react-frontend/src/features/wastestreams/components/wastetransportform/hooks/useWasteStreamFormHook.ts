@@ -273,6 +273,6 @@ const formValuesToCreateWasteStreamRequest = (
     } as any,
     consignorClassification: Number(formValues.consignorClassification),
     pickupParty: formValues.pickupPartyId,
-    catalogItemId: formValues.catalogItemId ? Number(formValues.catalogItemId) : undefined,
+    catalogItemId: formValues.catalogItemId || undefined,
   };
 };

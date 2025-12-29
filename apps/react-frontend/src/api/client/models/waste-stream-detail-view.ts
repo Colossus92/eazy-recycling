@@ -103,10 +103,10 @@ export interface WasteStreamDetailView {
     'brokerParty'?: CompanyView;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WasteStreamDetailView
      */
-    'catalogItemId'?: number;
+    'catalogItemId'?: string;
     /**
      * 
      * @type {string}

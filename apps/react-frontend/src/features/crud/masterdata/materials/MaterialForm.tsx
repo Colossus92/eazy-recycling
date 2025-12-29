@@ -38,7 +38,7 @@ export const MaterialForm = ({
     defaultValues: {
       code: '',
       name: '',
-      materialGroupId: 0,
+      materialGroupId: '',
       unitOfMeasure: '',
       vatCode: '',
       purchaseAccountNumber: '',
@@ -64,7 +64,7 @@ export const MaterialForm = ({
     reset({
       code: '',
       name: '',
-      materialGroupId: 0,
+      materialGroupId: '',
       unitOfMeasure: '',
       vatCode: '',
       purchaseAccountNumber: '',

@@ -2,16 +2,17 @@ package nl.eazysoftware.eazyrecyclingservice.repository.product
 
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 /**
  * Projection interface for native query results that include product category details.
  * Used to efficiently fetch product data with category code and name in a single query.
  */
 interface ProductQueryResult {
-  fun getId(): Long
+  fun getId(): UUID
   fun getCode(): String
   fun getName(): String
-  fun getCategoryId(): Long?
+  fun getCategoryId(): UUID?
   fun getCategoryCode(): String?
   fun getCategoryName(): String?
   fun getUnitOfMeasure(): String

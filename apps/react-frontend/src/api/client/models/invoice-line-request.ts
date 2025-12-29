@@ -22,10 +22,10 @@
 export interface InvoiceLineRequest {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceLineRequest
      */
-    'id'?: number;
+    'id'?: string;
     /**
      * 
      * @type {string}
@@ -34,10 +34,10 @@ export interface InvoiceLineRequest {
     'date': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceLineRequest
      */
-    'catalogItemId': number;
+    'catalogItemId': string;
     /**
      * 
      * @type {string}

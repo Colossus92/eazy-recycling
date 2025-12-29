@@ -7,8 +7,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.CatalogItems
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 
 interface UpdateInvoice {
     fun handle(cmd: UpdateInvoiceCommand): InvoiceResult
@@ -51,10 +51,10 @@ class UpdateInvoiceService(
         val totalExclVat = cmd.quantity.multiply(cmd.unitPrice)
         val vatPercentage = BigDecimal(vatRate.percentage)
 
-        val lineId = cmd.id ?: invoices.nextLineId()
+        val lineId = cmd.id?.let { InvoiceLineId(it) } ?: invoices.nextLineId()
 
         return InvoiceLine(
-            id = InvoiceLineId(lineId),
+            id = lineId,
             lineNumber = lineNumber,
             date = cmd.date,
             description = cmd.description ?: catalogItem.name,

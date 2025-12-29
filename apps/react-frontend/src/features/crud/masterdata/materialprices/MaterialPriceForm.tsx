@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 interface MaterialPriceFormProps {
   isOpen: boolean;
   onCancel: () => void;
-  onSubmit: (catalogItemId: number, price: number) => void;
+  onSubmit: (catalogItemId: string, price: number) => void;
   initialData?: MaterialPriceResponse;
 }
 
@@ -71,8 +71,8 @@ export const MaterialPriceForm = ({
       try {
         const catalogItemId =
           typeof data.catalogItemId === 'string'
-            ? parseInt(data.catalogItemId, 10)
-            : data.catalogItemId;
+            ? data.catalogItemId
+            : String(data.catalogItemId);
         await onSubmit(catalogItemId, data.price);
         cancel();
       } catch (error) {

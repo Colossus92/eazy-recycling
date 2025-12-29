@@ -1,19 +1,18 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 interface GetAllInvoices {
     fun handle(): List<InvoiceView>
 }
 
 interface GetInvoiceById {
-    fun handle(invoiceId: Long): InvoiceDetailView?
+    fun handle(invoiceId: UUID): InvoiceDetailView?
 }
 
 @Service
@@ -45,7 +44,7 @@ class GetInvoiceByIdQuery(
     private val invoices: Invoices,
 ) : GetInvoiceById {
 
-    override fun handle(invoiceId: Long): InvoiceDetailView? {
+    override fun handle(invoiceId: UUID): InvoiceDetailView? {
         val invoice = invoices.findById(InvoiceId(invoiceId)) ?: return null
         val totals = invoice.calculateTotals()
 
@@ -116,7 +115,7 @@ class GetInvoiceByIdQuery(
 }
 
 data class InvoiceView(
-    val id: Long,
+    val id: UUID,
     val invoiceNumber: String?,
     val invoiceType: String,
     val documentType: String,
@@ -129,14 +128,14 @@ data class InvoiceView(
 )
 
 data class InvoiceDetailView(
-    val id: Long,
+    val id: UUID,
     val invoiceNumber: String?,
     val invoiceType: String,
     val documentType: String,
     val status: String,
     val invoiceDate: LocalDate,
     val customer: CustomerSnapshotView,
-    val originalInvoiceId: Long?,
+    val originalInvoiceId: UUID?,
     val sourceWeightTicketId: Long?,
     val lines: List<InvoiceLineView>,
     val totals: InvoiceTotalsView,
@@ -167,7 +166,7 @@ data class AddressSnapshotView(
 )
 
 data class InvoiceLineView(
-    val id: Long,
+    val id: UUID,
     val lineNumber: Int,
     val date: LocalDate,
     val orderReference: String?,
@@ -177,7 +176,7 @@ data class InvoiceLineView(
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
     val totalExclVat: BigDecimal,
-    val catalogItemId: Long,
+    val catalogItemId: UUID,
     val catalogItemCode: String,
     val catalogItemName: String,
     val catalogItemType: String,

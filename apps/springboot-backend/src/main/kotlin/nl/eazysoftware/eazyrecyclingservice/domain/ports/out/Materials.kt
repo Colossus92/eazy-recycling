@@ -3,14 +3,15 @@ package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
 import nl.eazysoftware.eazyrecyclingservice.repository.material.MaterialQueryResult
 import java.math.BigDecimal
+import java.util.*
 
 interface Materials {
-  fun getMaterialById(id: Long): Material?
+  fun getMaterialById(id: UUID): Material?
   fun getAllMaterialsWithGroupDetails(): List<MaterialQueryResult>
-  fun getMaterialWithGroupDetailsById(id: Long): MaterialQueryResult?
+  fun getMaterialWithGroupDetailsById(id: UUID): MaterialQueryResult?
   fun searchMaterials(query: String, limit: Int = 50): List<MaterialQueryResult>
   fun createMaterial(material: Material): Material
-  fun updateMaterial(id: Long, material: Material): Material
-  fun deleteMaterial(id: Long)
-  fun updateMaterialPrice(id: Long, price: BigDecimal?): Boolean
+  fun updateMaterial(id: UUID, material: Material): Material
+  fun deleteMaterial(id: UUID)
+  fun updateMaterialPrice(id: UUID, price: BigDecimal?): Boolean
 }

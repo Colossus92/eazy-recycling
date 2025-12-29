@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Positive
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.Material
@@ -13,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.util.*
 
 @RestController
 @RequestMapping("/materials")
@@ -27,7 +27,7 @@ class MaterialController(
     }
 
     @GetMapping("/{id}")
-    fun getMaterialById(@PathVariable id: Long): MaterialResponse {
+    fun getMaterialById(@PathVariable id: UUID): MaterialResponse {
         val material = materials.getMaterialWithGroupDetailsById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
         return material.toResponse()
@@ -48,7 +48,7 @@ class MaterialController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PutMapping("/{id}")
     fun updateMaterial(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: MaterialRequest
     ): MaterialResponse {
         // Check if material exists
@@ -66,7 +66,7 @@ class MaterialController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteMaterial(@PathVariable id: Long) {
+    fun deleteMaterial(@PathVariable id: UUID) {
         // Check if material exists
         materials.getMaterialById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaal met id $id niet gevonden")
@@ -82,8 +82,7 @@ data class MaterialRequest(
   @field:NotBlank(message = "Naam is verplicht")
     val name: String,
 
-  @field:Positive(message = "Material group ID moet een positief getal zijn")
-    val materialGroupId: Long,
+    val materialGroupId: UUID,
 
   @field:NotBlank(message = "Eenheid is verplicht")
     val unitOfMeasure: String,
@@ -116,10 +115,10 @@ data class MaterialRequest(
 }
 
 data class MaterialResponse(
-  val id: Long,
+  val id: UUID,
   val code: String,
   val name: String,
-  val materialGroupId: Long?,
+  val materialGroupId: UUID?,
   val materialGroupCode: String?,
   val materialGroupName: String?,
   val unitOfMeasure: String,

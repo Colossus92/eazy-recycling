@@ -31,10 +31,10 @@ import type { InvoiceTotalsView } from './invoice-totals-view';
 export interface InvoiceDetailView {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceDetailView
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}
@@ -73,10 +73,10 @@ export interface InvoiceDetailView {
     'customer': CustomerSnapshotView;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceDetailView
      */
-    'originalInvoiceId'?: number;
+    'originalInvoiceId'?: string;
     /**
      * 
      * @type {number}

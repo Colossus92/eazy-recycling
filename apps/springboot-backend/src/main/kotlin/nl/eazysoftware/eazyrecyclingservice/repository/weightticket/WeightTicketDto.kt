@@ -19,12 +19,9 @@ data class WeightTicketDto(
   @JoinColumn(name = "consignor_party_id", nullable = false)
   val consignorParty: CompanyDto,
 
-  @ElementCollection(fetch = FetchType.LAZY)
-  @CollectionTable(
-    name = "weight_ticket_lines",
-    joinColumns = [JoinColumn(name = "weight_ticket_id")]
-  )
-  val lines: List<WeightTicketLineDto> = emptyList(),
+  @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+  @JoinColumn(name = "weight_ticket_id")
+  val lines: MutableList<WeightTicketLineDto> = mutableListOf(),
 
   @Column(name = "second_weighing_value", nullable = true)
   val secondWeighingValue: BigDecimal?,
@@ -76,7 +73,7 @@ data class WeightTicketDto(
   val cancellationReason: String?,
 
   @Column(name = "linked_invoice_id")
-  val linkedInvoiceId: Long? = null,
+  val linkedInvoiceId: java.util.UUID? = null,
 
   @Column(name = "pdf_url")
   val pdfUrl: String? = null,

@@ -3,14 +3,13 @@ package nl.eazysoftware.eazyrecyclingservice.application.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.functions.functions
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionName
 import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionOutbox
-import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.HttpMethod
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.EdgeFunctionOutboxRepository
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.slf4j.LoggerFactory
@@ -81,11 +80,11 @@ class EdgeFunctionOutboxProcessor(
 
     private fun handleSuccessfulResponse(entry: EdgeFunctionOutbox, responseBody: String?) {
         val response = responseBody?.let { parseResponse(it) }
-        
+
         if (response?.success == true) {
             logger.info("Edge function ${entry.functionName} completed successfully for entry ${entry.id.value}. Storage path: ${response.storagePath}")
             entry.markAsCompleted()
-            
+
             if (entry.functionName == EdgeFunctionName.INVOICE_PDF_GENERATOR && entry.aggregateId != null && response.storagePath != null) {
                 updateInvoicePdfUrl(entry.aggregateId!!, response.storagePath!!)
             }
@@ -94,13 +93,13 @@ class EdgeFunctionOutboxProcessor(
             logger.error("Edge function ${entry.functionName} returned error for entry ${entry.id.value}: $errorMessage")
             entry.markAsFailed(errorMessage)
         }
-        
+
         outboxRepository.save(entry)
     }
 
     private fun updateInvoicePdfUrl(invoiceId: String, storagePath: String) {
         try {
-            val id = InvoiceId(invoiceId.toLong())
+            val id = InvoiceId(java.util.UUID.fromString(invoiceId))
             val invoice = invoices.findById(id)
             if (invoice != null) {
                 invoice.pdfUrl = storagePath
@@ -118,7 +117,7 @@ class EdgeFunctionOutboxProcessor(
         if (responseBody.isNullOrBlank()) {
             return "No error message"
         }
-        
+
         return try {
             val response = parseResponse(responseBody)
             response?.error ?: response?.message ?: responseBody

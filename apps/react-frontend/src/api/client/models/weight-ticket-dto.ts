@@ -133,10 +133,10 @@ export interface WeightTicketDto {
     'cancellationReason'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WeightTicketDto
      */
-    'linkedInvoiceId'?: number;
+    'linkedInvoiceId'?: string;
     /**
      * 
      * @type {string}

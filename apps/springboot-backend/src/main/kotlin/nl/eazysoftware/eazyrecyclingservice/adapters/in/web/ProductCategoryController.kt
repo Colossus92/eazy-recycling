@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @RestController
 @RequestMapping("/product-categories")
@@ -24,7 +25,7 @@ class ProductCategoryController(
     }
 
     @GetMapping("/{id}")
-    fun getCategoryById(@PathVariable id: Long): ProductCategoryResponse {
+    fun getCategoryById(@PathVariable id: UUID): ProductCategoryResponse {
         val category = productCategories.getCategoryById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Productcategorie met id $id niet gevonden")
         return category.toResponse()
@@ -42,7 +43,7 @@ class ProductCategoryController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PutMapping("/{id}")
     fun updateCategory(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: ProductCategoryRequest
     ): ProductCategoryResponse {
         productCategories.getCategoryById(id)
@@ -56,7 +57,7 @@ class ProductCategoryController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteCategory(@PathVariable id: Long) {
+    fun deleteCategory(@PathVariable id: UUID) {
         productCategories.getCategoryById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Productcategorie met id $id niet gevonden")
 
@@ -86,7 +87,7 @@ data class ProductCategoryRequest(
 }
 
 data class ProductCategoryResponse(
-    val id: Long,
+    val id: UUID,
     val code: String,
     val name: String,
     val description: String?,

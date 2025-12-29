@@ -22,10 +22,10 @@
 export interface InvoiceView {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceView
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}

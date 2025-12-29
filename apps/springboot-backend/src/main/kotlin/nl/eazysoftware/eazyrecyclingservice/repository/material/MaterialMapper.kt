@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCa
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import org.springframework.stereotype.Component
+import java.util.*
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -16,7 +17,7 @@ class MaterialMapper(
 
     fun toDto(domain: Material): CatalogItemDto {
         return CatalogItemDto(
-            id = domain.id,
+            id = domain.id ?: UUID.randomUUID(),
             type = CatalogItemType.MATERIAL,
             code = domain.code,
             name = domain.name,

@@ -5,9 +5,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 interface DeleteInvoice {
-    fun handle(invoiceId: Long)
+    fun handle(invoiceId: UUID)
 }
 
 @Service
@@ -16,7 +17,7 @@ class DeleteInvoiceService(
 ) : DeleteInvoice {
 
     @Transactional
-    override fun handle(invoiceId: Long) {
+    override fun handle(invoiceId: UUID) {
         val invoice = invoices.findById(InvoiceId(invoiceId))
             ?: throw IllegalArgumentException("Factuur niet gevonden: $invoiceId")
 

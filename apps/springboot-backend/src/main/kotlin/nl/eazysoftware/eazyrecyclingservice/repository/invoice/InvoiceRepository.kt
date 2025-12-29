@@ -3,19 +3,13 @@ package nl.eazysoftware.eazyrecyclingservice.repository.invoice
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.Invoice
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceLineId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.util.*
 
-interface InvoiceJpaRepository : JpaRepository<InvoiceDto, Long> {
-
-    @Query(value = "SELECT nextval('invoices_id_seq')", nativeQuery = true)
-    fun getNextSequenceValue(): Long
-
-    @Query(value = "SELECT nextval('invoice_lines_id_seq')", nativeQuery = true)
-    fun getNextLineSequenceValue(): Long
-}
+interface InvoiceJpaRepository : JpaRepository<InvoiceDto, UUID>
 
 @Repository
 class InvoiceRepository(
@@ -25,19 +19,18 @@ class InvoiceRepository(
 ) : Invoices {
 
     override fun nextId(): InvoiceId {
-        val nextValue = jpaRepository.getNextSequenceValue()
-        return InvoiceId(nextValue)
+        return InvoiceId(UUID.randomUUID())
     }
 
-    override fun nextLineId(): Long {
-        return jpaRepository.getNextLineSequenceValue()
+    override fun nextLineId(): InvoiceLineId {
+        return InvoiceLineId(UUID.randomUUID())
     }
 
     override fun nextInvoiceNumberSequence(year: Int): Long {
         val sql = """
-            INSERT INTO invoice_number_sequences (year, last_sequence) 
+            INSERT INTO invoice_number_sequences (year, last_sequence)
             VALUES (:year, 1)
-            ON CONFLICT (year) 
+            ON CONFLICT (year)
             DO UPDATE SET last_sequence = invoice_number_sequences.last_sequence + 1
             RETURNING last_sequence
         """

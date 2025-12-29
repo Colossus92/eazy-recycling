@@ -38,7 +38,7 @@ object TestWeightTicketFactory {
     wasteStreamNumber: String = "180101",
     weightValue: String = "100.50",
     weightUnit: WeightUnitRequest = WeightUnitRequest.KG,
-    catalogItemId: Long = 1L
+    catalogItemId: UUID = UUID.randomUUID()
   ): WeightTicketLineRequest {
     return WeightTicketLineRequest(
       wasteStreamNumber = wasteStreamNumber,

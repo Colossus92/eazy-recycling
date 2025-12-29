@@ -83,6 +83,7 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
 
         testCatalogItem = catalogItemRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 code = "MAT001",
                 name = "Test Material",
                 type = CatalogItemType.MATERIAL,
@@ -110,7 +111,7 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
                 "lines": [
                     {
                         "date": "${LocalDate.now()}",
-                        "catalogItemId": ${testCatalogItem.id},
+                        "catalogItemId": "${testCatalogItem.id}",
                         "description": "Test line",
                         "quantity": 10.00,
                         "unitPrice": 5.00,
@@ -226,7 +227,7 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
                 "lines": [
                     {
                         "date": "${LocalDate.now()}",
-                        "catalogItemId": ${testCatalogItem.id},
+                        "catalogItemId": "${testCatalogItem.id}",
                         "description": "Test line",
                         "quantity": 10.00,
                         "unitPrice": 5.00,

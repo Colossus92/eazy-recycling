@@ -4,28 +4,28 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocument
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 data class CreateInvoiceCommand(
     val invoiceType: InvoiceType,
     val documentType: InvoiceDocumentType,
     val customerId: UUID,
     val invoiceDate: LocalDate,
-    val originalInvoiceId: Long?,
+    val originalInvoiceId: UUID?,
     val sourceWeightTicketId: Long? = null,
     val lines: List<InvoiceLineCommand>,
 )
 
 data class UpdateInvoiceCommand(
-    val invoiceId: Long,
+    val invoiceId: UUID,
     val invoiceDate: LocalDate,
     val lines: List<InvoiceLineCommand>,
 )
 
 data class InvoiceLineCommand(
-    val id: Long? = null,
+    val id: UUID? = null,
     val date: LocalDate,
-    val catalogItemId: Long,
+    val catalogItemId: UUID,
     val description: String? = null,
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
@@ -33,5 +33,5 @@ data class InvoiceLineCommand(
 )
 
 data class InvoiceResult(
-    val invoiceId: Long
+    val invoiceId: UUID
 )

@@ -8,14 +8,15 @@ import { InvoiceCard } from '@/features/invoices/components/InvoiceCard';
 import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
 
 interface InvoiceRelatedTabProps {
-  invoiceId?: number;
+  invoiceId?: string;
 }
 
-export const InvoiceRelatedTab = ({
-  invoiceId,
-}: InvoiceRelatedTabProps) => {
-
-  const { data: invoiceDetails, isLoading, error } = useQuery({
+export const InvoiceRelatedTab = ({ invoiceId }: InvoiceRelatedTabProps) => {
+  const {
+    data: invoiceDetails,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['invoice-details', invoiceId],
     queryFn: async () => {
       if (!invoiceId) return null;
@@ -32,7 +33,8 @@ export const InvoiceRelatedTab = ({
     queryKey: ['source-weight-ticket', sourceWeightTicketId],
     queryFn: async () => {
       if (!sourceWeightTicketId) return null;
-      const response = await weightTicketService.getByNumber(sourceWeightTicketId);
+      const response =
+        await weightTicketService.getByNumber(sourceWeightTicketId);
       return response;
     },
     enabled: !!sourceWeightTicketId,
@@ -101,10 +103,19 @@ export const InvoiceRelatedTab = ({
           </div>
           <WeightTicketCard
             weightTicketId={sourceWeightTicket.id}
-            createdAt={typeof sourceWeightTicket.createdAt === 'object' && sourceWeightTicket.createdAt !== null 
-              ? (sourceWeightTicket.createdAt as any).value$kotlinx_datetime 
-              : sourceWeightTicket.createdAt || ''}
-            status={sourceWeightTicket.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'}
+            createdAt={
+              typeof sourceWeightTicket.createdAt === 'object' &&
+              sourceWeightTicket.createdAt !== null
+                ? (sourceWeightTicket.createdAt as any).value$kotlinx_datetime
+                : sourceWeightTicket.createdAt || ''
+            }
+            status={
+              sourceWeightTicket.status as
+                | 'DRAFT'
+                | 'COMPLETED'
+                | 'INVOICED'
+                | 'CANCELLED'
+            }
             pdfUrl={sourceWeightTicket.pdfUrl ?? null}
           />
         </div>

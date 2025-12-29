@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProductCategories
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductCategoryMapper.Companion.PRODUCT_TYPE
 import org.springframework.stereotype.Repository
+import java.util.*
 
 @Repository
 class ProductCategoryRepository(
@@ -16,17 +17,17 @@ class ProductCategoryRepository(
         return jpaRepository.findByType(PRODUCT_TYPE).map { mapper.toDomain(it) }
     }
 
-    override fun getCategoryById(id: Long): ProductCategory? {
+    override fun getCategoryById(id: UUID): ProductCategory? {
         return jpaRepository.findByIdAndType(id, PRODUCT_TYPE)?.let { mapper.toDomain(it) }
     }
 
     override fun createCategory(category: ProductCategory): ProductCategory {
-        val dto = mapper.toDto(category.copy(id = null))
+        val dto = mapper.toDto(category.copy(id = UUID.randomUUID()))
         val saved = jpaRepository.save(dto)
         return mapper.toDomain(saved)
     }
 
-    override fun updateCategory(id: Long, category: ProductCategory): ProductCategory {
+    override fun updateCategory(id: UUID, category: ProductCategory): ProductCategory {
         val existing = jpaRepository.findByIdAndType(id, PRODUCT_TYPE)
             ?: throw NoSuchElementException("Productcategorie met id $id niet gevonden")
         existing.code = category.code
@@ -36,7 +37,7 @@ class ProductCategoryRepository(
         return mapper.toDomain(saved)
     }
 
-    override fun deleteCategory(id: Long) {
+    override fun deleteCategory(id: UUID) {
         val existing = jpaRepository.findByIdAndType(id, PRODUCT_TYPE)
             ?: throw NoSuchElementException("Productcategorie met id $id niet gevonden")
         jpaRepository.delete(existing)

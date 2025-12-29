@@ -17,6 +17,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,7 +59,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     )
       .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").isNumber)
+      .andExpect(jsonPath("$.id").isString)
       .andExpect(jsonPath("$.code").value("CAT001"))
       .andExpect(jsonPath("$.name").value("Test Category"))
       .andExpect(jsonPath("$.description").value("Test category description"))
@@ -75,6 +76,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     // Given
     catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Category 1",
@@ -83,6 +85,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     )
     catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = PRODUCT_TYPE,
         code = "CAT002",
         name = "Category 2",
@@ -103,6 +106,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     // Given
     val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Test Category",
@@ -113,7 +117,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     // When & Then
     securedMockMvc.get("/product-categories/${category.id}")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(category.id))
+      .andExpect(jsonPath("$.id").value(category.id.toString()))
       .andExpect(jsonPath("$.code").value("CAT001"))
       .andExpect(jsonPath("$.name").value("Test Category"))
       .andExpect(jsonPath("$.description").value("Test description"))
@@ -122,7 +126,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should return not found when getting non-existent category`() {
     // When & Then
-    securedMockMvc.get("/product-categories/99999")
+    securedMockMvc.get("/product-categories/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -131,6 +135,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     // Given
     val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = PRODUCT_TYPE,
         code = "CAT001",
         name = "Original Category",
@@ -155,7 +160,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.description").value("Updated description"))
 
     // Verify category was updated in the database
-    val updatedCategory = catalogItemCategoryJpaRepository.findByIdAndType(category.id!!, PRODUCT_TYPE)
+    val updatedCategory = catalogItemCategoryJpaRepository.findByIdAndType(category.id, PRODUCT_TYPE)
     assertThat(updatedCategory).isNotNull
     assertThat(updatedCategory?.code).isEqualTo("CAT001_UPDATED")
   }
@@ -171,7 +176,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/product-categories/99999",
+      "/product-categories/${UUID.randomUUID()}",
       objectMapper.writeValueAsString(request)
     )
       .andExpect(status().isNotFound)
@@ -182,6 +187,7 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
     // Given
     val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = PRODUCT_TYPE,
         code = "DELETE_ME",
         name = "Delete Me",
@@ -194,13 +200,13 @@ class ProductCategoryControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isNoContent)
 
     // Verify category was deleted
-    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(category.id!!, PRODUCT_TYPE)).isNull()
+    assertThat(catalogItemCategoryJpaRepository.findByIdAndType(category.id, PRODUCT_TYPE)).isNull()
   }
 
   @Test
   fun `should return not found when deleting non-existent category`() {
     // When & Then
-    securedMockMvc.delete("/product-categories/99999")
+    securedMockMvc.delete("/product-categories/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 }

@@ -17,13 +17,13 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,15 +47,15 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-  private var testCategoryId: Long? = null
+  private var testCategoryId: UUID? = null
   private val testVatCode = "VAT21"
 
   @BeforeEach
   fun setup() {
     securedMockMvc = SecuredMockMvc(mockMvc)
     // Delete only PRODUCT type items
-    productJpaRepository.findAllProducts().forEach { 
-      productJpaRepository.deleteById(it.getId()) 
+    productJpaRepository.findAllProducts().forEach {
+      productJpaRepository.deleteById(it.getId())
     }
 
     if (!vatRateJpaRepository.existsById(testVatCode)) {
@@ -73,6 +73,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     val category = catalogItemCategoryJpaRepository.save(
       CatalogItemCategoryDto(
+        id = UUID.randomUUID(),
         type = "PRODUCT",
         code = "TEST_CAT",
         name = "Test Category",
@@ -104,10 +105,10 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
     )
       .andExpect(status().isCreated)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-      .andExpect(jsonPath("$.id").isNumber)
+      .andExpect(jsonPath("$.id").isString)
       .andExpect(jsonPath("$.code").value("PROD001"))
       .andExpect(jsonPath("$.name").value("Test Product"))
-      .andExpect(jsonPath("$.categoryId").value(testCategoryId))
+      .andExpect(jsonPath("$.categoryId").value(testCategoryId.toString()))
       .andExpect(jsonPath("$.unitOfMeasure").value("HOUR"))
       .andExpect(jsonPath("$.vatCode").value(testVatCode))
       .andExpect(jsonPath("$.salesAccountNumber").value("8100"))
@@ -129,6 +130,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     productJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Product 1",
@@ -144,6 +146,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
     )
     productJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "PROD002",
         name = "Product 2",
@@ -174,6 +177,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     val product = productJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Test Product",
@@ -191,7 +195,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
     // When & Then
     securedMockMvc.get("/products/${product.id}")
       .andExpect(status().isOk)
-      .andExpect(jsonPath("$.id").value(product.id))
+      .andExpect(jsonPath("$.id").value(product.id.toString()))
       .andExpect(jsonPath("$.code").value("PROD001"))
       .andExpect(jsonPath("$.name").value("Test Product"))
       .andExpect(jsonPath("$.salesAccountNumber").value("8100"))
@@ -201,7 +205,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should return not found when getting non-existent product`() {
     // When & Then
-    securedMockMvc.get("/products/99999")
+    securedMockMvc.get("/products/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -213,6 +217,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     val product = productJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "PROD001",
         name = "Original Product",
@@ -273,7 +278,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/products/99999",
+      "/products/${UUID.randomUUID()}",
       objectMapper.writeValueAsString(request)
     )
       .andExpect(status().isNotFound)
@@ -287,6 +292,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
 
     val product = productJpaRepository.save(
       CatalogItemDto(
+        id = UUID.randomUUID(),
         type = CatalogItemType.PRODUCT,
         code = "DELETE_ME",
         name = "Delete Me",
@@ -312,7 +318,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should return not found when deleting non-existent product`() {
     // When & Then
-    securedMockMvc.delete("/products/99999")
+    securedMockMvc.delete("/products/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 }

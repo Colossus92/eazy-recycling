@@ -10,8 +10,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.util.*
 
-interface ProductJpaRepository : JpaRepository<CatalogItemDto, Long> {
+interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
 
   @Query(
     value = """
@@ -65,7 +66,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, Long> {
         """,
     nativeQuery = true
   )
-  fun findProductById(id: Long): ProductQueryResult?
+  fun findProductById(id: UUID): ProductQueryResult?
 
   @Query(
     value = """
@@ -143,10 +144,10 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, Long> {
     nativeQuery = true
   )
   fun updateProductFields(
-    id: Long,
+    id: UUID,
     code: String,
     name: String,
-    categoryId: Long?,
+    categoryId: UUID?,
     unitOfMeasure: String,
     vatCode: String,
     purchaseAccountNumber: String?,
@@ -166,7 +167,7 @@ class ProductRepository(
     return jpaRepository.findAllProducts().map { it.toDomain() }
   }
 
-  override fun getProductById(id: Long): Product? {
+  override fun getProductById(id: UUID): Product? {
     return jpaRepository.findProductById(id)?.toDomain()
   }
 
@@ -185,7 +186,7 @@ class ProductRepository(
   }
 
   @Transactional
-  override fun updateProduct(id: Long, product: Product): Product {
+  override fun updateProduct(id: UUID, product: Product): Product {
     val rowsUpdated = jpaRepository.updateProductFields(
       id = id,
       code = product.code,
@@ -205,7 +206,7 @@ class ProductRepository(
       ?: throw IllegalStateException("Het ophalen van product met id $id is mislukt")
   }
 
-  override fun deleteProduct(id: Long) {
+  override fun deleteProduct(id: UUID) {
     jpaRepository.deleteById(id)
   }
 }

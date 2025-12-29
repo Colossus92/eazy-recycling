@@ -20,10 +20,7 @@ interface ProductFormProps {
   initialData?: ProductResponse;
 }
 
-type ProductFormValues = Omit<
-  ProductRequest,
-  'status'
->;
+type ProductFormValues = Omit<ProductRequest, 'status'>;
 
 export const ProductForm = ({
   isOpen,
@@ -87,12 +84,7 @@ export const ProductForm = ({
         await onSubmit({
           code: data.code,
           name: data.name,
-          categoryId:
-            data.categoryId && data.categoryId !== undefined
-              ? typeof data.categoryId === 'string'
-                ? parseInt(data.categoryId, 10)
-                : data.categoryId
-              : undefined,
+          categoryId: data.categoryId || undefined,
           unitOfMeasure: data.unitOfMeasure,
           vatCode: data.vatCode,
           salesAccountNumber: data.salesAccountNumber || undefined,

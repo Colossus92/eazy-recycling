@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.material
 import nl.eazysoftware.eazyrecyclingservice.domain.model.material.MaterialGroup
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemCategoryDto
 import org.springframework.stereotype.Component
+import java.util.*
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -14,7 +15,7 @@ class MaterialGroupMapper {
 
     fun toDto(domain: MaterialGroup): CatalogItemCategoryDto {
         return CatalogItemCategoryDto(
-            id = domain.id,
+            id = domain.id ?: UUID.randomUUID(),
             type = MATERIAL_TYPE,
             code = domain.code,
             name = domain.name,

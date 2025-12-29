@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.math.BigDecimal
+import java.util.*
 
 @RestController
 @RequestMapping("/products")
@@ -25,7 +26,7 @@ class ProductController(
     }
 
     @GetMapping("/{id}")
-    fun getProductById(@PathVariable id: Long): ProductResponse {
+    fun getProductById(@PathVariable id: UUID): ProductResponse {
         val product = products.getProductById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
         return product.toResponse()
@@ -43,7 +44,7 @@ class ProductController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PutMapping("/{id}")
     fun updateProduct(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: ProductRequest
     ): ProductResponse {
         products.getProductById(id)
@@ -57,7 +58,7 @@ class ProductController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteProduct(@PathVariable id: Long) {
+    fun deleteProduct(@PathVariable id: UUID) {
         products.getProductById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
 
@@ -72,7 +73,7 @@ data class ProductRequest(
     @field:NotBlank(message = "Naam is verplicht")
     val name: String,
 
-    val categoryId: Long?,
+    val categoryId: UUID?,
 
     @field:NotBlank(message = "Eenheid is verplicht")
     val unitOfMeasure: String,
@@ -109,10 +110,10 @@ data class ProductRequest(
 }
 
 data class ProductResponse(
-    val id: Long,
+    val id: UUID,
     val code: String,
     val name: String,
-    val categoryId: Long?,
+    val categoryId: UUID?,
     val unitOfMeasure: String,
     val vatCode: String,
     val salesAccountNumber: String?,

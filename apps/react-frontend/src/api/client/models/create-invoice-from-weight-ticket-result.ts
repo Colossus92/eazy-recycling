@@ -22,10 +22,10 @@
 export interface CreateInvoiceFromWeightTicketResult {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CreateInvoiceFromWeightTicketResult
      */
-    'invoiceId': number;
+    'invoiceId': string;
     /**
      * 
      * @type {number}

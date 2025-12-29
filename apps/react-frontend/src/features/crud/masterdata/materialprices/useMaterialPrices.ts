@@ -18,8 +18,12 @@ export const useMaterialPricesCrud = () => {
     queryFn: () => materialPriceService.getAll(),
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<MaterialPriceResponse | undefined>(undefined);
-  const [itemToDelete, setItemToDelete] = useState<MaterialPriceResponse | undefined>(undefined);
+  const [itemToEdit, setItemToEdit] = useState<
+    MaterialPriceResponse | undefined
+  >(undefined);
+  const [itemToDelete, setItemToDelete] = useState<
+    MaterialPriceResponse | undefined
+  >(undefined);
 
   const displayedMaterialPrices = useMemo(
     () =>
@@ -36,7 +40,7 @@ export const useMaterialPricesCrud = () => {
   );
 
   const createMutation = useMutation({
-    mutationFn: (params: { id: number; data: MaterialPriceRequest }) =>
+    mutationFn: (params: { id: string; data: MaterialPriceRequest }) =>
       materialPriceService.create(params.id, params.data),
     onSuccess: () => {
       queryClient
@@ -58,12 +62,18 @@ export const useMaterialPricesCrud = () => {
     },
   });
 
-  const create = async (id: number, item: MaterialPriceRequest): Promise<void> => {
+  const create = async (
+    id: string,
+    item: MaterialPriceRequest
+  ): Promise<void> => {
     return new Promise((resolve, reject) => {
-      createMutation.mutate({ id, data: item }, {
-        onSuccess: () => resolve(),
-        onError: (error) => reject(error),
-      });
+      createMutation.mutate(
+        { id, data: item },
+        {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error),
+        }
+      );
     });
   };
 
@@ -77,7 +87,7 @@ export const useMaterialPricesCrud = () => {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (params: { id: number; data: MaterialPriceRequest }) =>
+    mutationFn: (params: { id: string; data: MaterialPriceRequest }) =>
       materialPriceService.update(params.id, params.data),
     onSuccess: () => {
       queryClient
@@ -90,7 +100,7 @@ export const useMaterialPricesCrud = () => {
   });
 
   const update = async (
-    id: number,
+    id: string,
     item: MaterialPriceRequest
   ): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -131,7 +141,7 @@ export const useMaterialPricesCrud = () => {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
-      submit: async (catalogItemId: number, price: number) => {
+      submit: async (catalogItemId: string, price: number) => {
         const request: MaterialPriceRequest = { price };
         if (itemToEdit) {
           return update(itemToEdit.id, request);

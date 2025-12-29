@@ -192,7 +192,7 @@ data class FirstReceivalWasteStreamQueryResult(
   val brokerPartyId: UUID?,
   val processorPartyId: String,
   val status: String,
-  val catalogItemId: Long?,
+  val catalogItemId: UUID?,
   val updatedAt: Instant,
   val consignorClassification: Int,
   val totalWeight: BigDecimal,

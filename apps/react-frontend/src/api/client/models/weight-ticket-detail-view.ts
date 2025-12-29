@@ -133,10 +133,10 @@ export interface WeightTicketDetailView {
     'cancellationReason'?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof WeightTicketDetailView
      */
-    'linkedInvoiceId'?: number;
+    'linkedInvoiceId'?: string;
     /**
      * 
      * @type {LocalDateTime}

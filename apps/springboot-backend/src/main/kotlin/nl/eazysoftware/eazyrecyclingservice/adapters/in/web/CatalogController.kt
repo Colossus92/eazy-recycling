@@ -5,9 +5,12 @@ import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
-import java.util.UUID
+import java.util.*
 
 @RestController
 @RequestMapping("/catalog")
@@ -27,7 +30,7 @@ class CatalogController(
 }
 
 data class CatalogItemResponse(
-  val id: Long,
+  val id: UUID,
   val itemType: CatalogItemType,
   val code: String,
   val name: String,

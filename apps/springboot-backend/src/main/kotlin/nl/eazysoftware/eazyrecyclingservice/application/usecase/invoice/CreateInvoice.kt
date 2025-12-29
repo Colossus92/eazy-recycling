@@ -1,6 +1,5 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
@@ -9,8 +8,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 import org.springframework.transaction.annotation.Transactional
+import java.math.BigDecimal
 import kotlin.time.Clock
 
 interface CreateInvoice {
@@ -90,10 +89,10 @@ class CreateInvoiceService(
         val totalExclVat = cmd.quantity.multiply(cmd.unitPrice)
         val vatPercentage = BigDecimal(vatRate.percentage)
 
-        val lineId = cmd.id ?: invoices.nextLineId()
+        val lineId = cmd.id?.let { InvoiceLineId(it) } ?: invoices.nextLineId()
 
         return InvoiceLine(
-            id = InvoiceLineId(lineId),
+            id = lineId,
             lineNumber = lineNumber,
             date = cmd.date,
             description = cmd.description ?: catalogItem.name,

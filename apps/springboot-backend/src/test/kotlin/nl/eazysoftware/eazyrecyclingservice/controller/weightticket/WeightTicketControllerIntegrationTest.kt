@@ -15,8 +15,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
-import java.math.BigDecimal
-import java.time.Instant
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.*
 
 class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
 
@@ -86,6 +87,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
 
         testCatalogItem = catalogItemRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 code = "WASTE001",
                 name = "Test Waste Stream",
                 type = CatalogItemType.WASTE_STREAM,
@@ -492,7 +494,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             .andReturn()
 
         val response = objectMapper.readTree(invoiceResult.response.contentAsString)
-        val invoiceId = response.get("invoiceId").asLong()
+        val invoiceId = java.util.UUID.fromString(response.get("invoiceId").asText())
 
         // Then - verify invoice was created with correct data
         val savedInvoice = invoiceRepository.findById(invoiceId)

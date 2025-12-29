@@ -4,13 +4,14 @@ import jakarta.persistence.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.*
 
 @Entity
 @Table(name = "invoice_lines")
 class InvoiceLineDto(
   @Id
   @Column(name = "id")
-  val id: Long,
+  val id: UUID,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "invoice_id", nullable = false)
@@ -50,7 +51,7 @@ class InvoiceLineDto(
   val unitOfMeasure: String,
 
   @Column(name = "catalog_item_id")
-  val catalogItemId: Long,
+  val catalogItemId: UUID,
 
   @Column(name = "catalog_item_code", nullable = false)
   val catalogItemCode: String,

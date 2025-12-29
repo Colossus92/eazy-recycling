@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import jakarta.persistence.EntityNotFoundException
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.*
 import kotlin.time.Clock
 
 interface CreateInvoiceFromWeightTicket {
@@ -23,7 +23,7 @@ data class CreateInvoiceFromWeightTicketCommand(
 )
 
 data class CreateInvoiceFromWeightTicketResult(
-    val invoiceId: Long,
+    val invoiceId: UUID,
     val weightTicketId: Long,
 )
 
@@ -86,7 +86,7 @@ class CreateInvoiceFromWeightTicketService(
             val vatPercentage = BigDecimal(vatRate.percentage)
 
             InvoiceLine(
-                id = InvoiceLineId(invoices.nextLineId()),
+                id = invoices.nextLineId(),
                 lineNumber = index + 1,
                 date = LocalDate.now(),
                 description = catalogItem.name,

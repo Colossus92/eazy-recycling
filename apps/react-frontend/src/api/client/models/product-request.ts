@@ -34,10 +34,10 @@ export interface ProductRequest {
     'name': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ProductRequest
      */
-    'categoryId'?: number;
+    'categoryId'?: string;
     /**
      * 
      * @type {string}

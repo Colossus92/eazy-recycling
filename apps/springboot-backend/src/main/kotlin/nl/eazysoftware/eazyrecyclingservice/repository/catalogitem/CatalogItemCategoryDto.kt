@@ -1,14 +1,18 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.catalogitem
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
+import java.util.*
 
 @Entity
 @Table(name = "catalog_item_categories")
 data class CatalogItemCategoryDto(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    @Column(name = "id")
+    val id: UUID,
 
     @Column(name = "type", nullable = false)
     val type: String,

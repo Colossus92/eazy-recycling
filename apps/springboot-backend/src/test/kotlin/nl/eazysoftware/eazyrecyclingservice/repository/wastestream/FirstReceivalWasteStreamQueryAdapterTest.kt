@@ -436,20 +436,23 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     // Convert OffsetDateTime to Instant (which is what the DTO expects)
     val weightedAtInstant = weightedAt.toInstant()
 
+    val ticketId = System.currentTimeMillis() + (Math.random() * 1000).toLong()
     // Create weight ticket lines from the provided pairs (wasteStreamNumber, weightValue)
     val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
       WeightTicketLineDto(
+        id = UUID.randomUUID(),
+        weightTicketId = ticketId,
         wasteStreamNumber = wasteStreamNumber,
-        catalogItemId = 1L,
+        catalogItemId = UUID.randomUUID(),
         weightValue = weightValue.toBigDecimal(),
         weightUnit = WeightUnitDto.kg
       )
     }
 
     val ticket = WeightTicketDto(
-      id = System.currentTimeMillis() + (Math.random() * 1000).toLong(),
+      id = ticketId,
       consignorParty = companyRepository.getReferenceById(consignorCompanyId),
-      lines = ticketLines,
+      lines = ticketLines.toMutableList(),
       secondWeighingValue = null,
       secondWeighingUnit = null,
       tarraWeightValue = null,

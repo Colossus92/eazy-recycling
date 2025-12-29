@@ -1,12 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.material
 
+import java.util.*
 import kotlin.time.Instant
 
 data class Material(
-  val id: Long?,
+  val id: UUID?,
   val code: String,
   val name: String,
-  val materialGroupId: Long?,
+  val materialGroupId: UUID?,
   val unitOfMeasure: String,
   val vatCode: String,
   val purchaseAccountNumber: String?,

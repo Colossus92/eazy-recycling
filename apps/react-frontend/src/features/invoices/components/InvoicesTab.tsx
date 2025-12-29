@@ -12,7 +12,7 @@ import { InvoiceStatusTag } from './InvoiceStatusTag';
 import { InvoiceDetailsDrawer } from './drawer/InvoiceDetailsDrawer';
 import { useInvoiceCrud } from '../hooks/useInvoiceCrud';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
@@ -33,17 +33,24 @@ const formatCurrency = (value: number) => {
 };
 
 interface InvoicesTabProps {
-  invoiceIdToOpen?: number | null;
-  invoiceDrawerIdToOpen?: number | null;
+  invoiceIdToOpen?: string | null;
+  invoiceDrawerIdToOpen?: string | null;
   onInvoiceOpened?: () => void;
   onInvoiceDrawerOpened?: () => void;
 }
 
-export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceOpened, onInvoiceDrawerOpened }: InvoicesTabProps) => {
+export const InvoicesTab = ({
+  invoiceIdToOpen,
+  invoiceDrawerIdToOpen,
+  onInvoiceOpened,
+  onInvoiceDrawerOpened,
+}: InvoicesTabProps) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(null);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    null
+  );
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useInvoiceCrud();
 
@@ -61,7 +68,7 @@ export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceO
   // Handle opening invoice drawer from URL parameter
   useEffect(() => {
     if (invoiceDrawerIdToOpen && read.items.length > 0) {
-      setSelectedInvoiceId(invoiceDrawerIdToOpen);
+      setSelectedInvoiceId(String(invoiceDrawerIdToOpen));
       setIsDrawerOpen(true);
       onInvoiceDrawerOpened?.();
     }
@@ -107,8 +114,9 @@ export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceO
     {
       key: 'invoiceNumber',
       label: 'Factuurnummer',
-      accessor: (item) => item.invoiceNumber ? `#${item.invoiceNumber}` : '-',
-      title: (item) => item.invoiceNumber ? `#${item.invoiceNumber}` : undefined,
+      accessor: (item) => (item.invoiceNumber ? `#${item.invoiceNumber}` : '-'),
+      title: (item) =>
+        item.invoiceNumber ? `#${item.invoiceNumber}` : undefined,
       width: '20%',
     },
     {
@@ -128,7 +136,9 @@ export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceO
     {
       key: 'status',
       label: 'Status',
-      accessor: (item) => <InvoiceStatusTag status={item.status as 'DRAFT' | 'FINAL'} />,
+      accessor: (item) => (
+        <InvoiceStatusTag status={item.status as 'DRAFT' | 'FINAL'} />
+      ),
       title: (item) => item.status,
       width: '15%',
     },
@@ -209,11 +219,16 @@ export const InvoicesTab = ({ invoiceIdToOpen, invoiceDrawerIdToOpen, onInvoiceO
                           {col.accessor(item)}
                         </td>
                       ))}
-                      <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
+                      <td
+                        className="p-4 text-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {item.status === 'DRAFT' && (
                           <ActionMenu<InvoiceView>
                             onEdit={form.openForEdit}
-                            onDelete={(invoice) => deletion.initiate(invoice.id)}
+                            onDelete={(invoice) =>
+                              deletion.initiate(invoice.id)
+                            }
                             item={item}
                           />
                         )}

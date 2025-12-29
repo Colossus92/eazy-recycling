@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPat
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,7 +41,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     @Autowired
     private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
-    private var testCategoryId: Long? = null
+    private var testCategoryId: UUID? = null
     private val testVatCode = "VAT21"
 
     @BeforeEach
@@ -64,6 +65,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val category = catalogItemCategoryJpaRepository.save(
             CatalogItemCategoryDto(
+                id = UUID.randomUUID(),
                 type = "MATERIAL",
                 code = "TEST_GROUP",
                 name = "Test Category",
@@ -81,6 +83,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -97,6 +100,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT002",
                 name = "Copper Wire",
@@ -127,6 +131,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -144,7 +149,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
         // When & Then
         securedMockMvc.get("/material-prices/${material.id}")
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.id").value(material.id))
+            .andExpect(jsonPath("$.id").value(material.id.toString()))
             .andExpect(jsonPath("$.code").value("MAT001"))
             .andExpect(jsonPath("$.name").value("Steel Pipes"))
             .andExpect(jsonPath("$.defaultPrice").value(25.00))
@@ -153,7 +158,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     @Test
     fun `should return 404 when material not found`() {
         // When & Then
-        securedMockMvc.get("/material-prices/99999")
+        securedMockMvc.get("/material-prices/${UUID.randomUUID()}")
             .andExpect(status().isNotFound)
     }
 
@@ -165,6 +170,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -184,7 +190,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
         // When & Then
         securedMockMvc.post("/material-prices/${material.id}", requestBody)
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.id").value(material.id))
+            .andExpect(jsonPath("$.id").value(material.id.toString()))
             .andExpect(jsonPath("$.defaultPrice").value(30.50))
     }
 
@@ -196,6 +202,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -225,6 +232,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -244,7 +252,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
         // When & Then
         securedMockMvc.put("/material-prices/${material.id}", requestBody)
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.id").value(material.id))
+            .andExpect(jsonPath("$.id").value(material.id.toString()))
             .andExpect(jsonPath("$.defaultPrice").value(35.75))
     }
 
@@ -256,6 +264,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",
@@ -288,6 +297,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 type = CatalogItemType.MATERIAL,
                 code = "MAT001",
                 name = "Steel Pipes",

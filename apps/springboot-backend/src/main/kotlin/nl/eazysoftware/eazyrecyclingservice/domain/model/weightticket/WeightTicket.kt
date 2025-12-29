@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import java.math.BigDecimal
+import java.util.*
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -28,7 +29,7 @@ class WeightTicket(
   var reclamation: String?,
   var note: Note?,
   var cancellationReason: CancellationReason? = null,
-  var linkedInvoiceId: Long? = null,
+  var linkedInvoiceId: UUID? = null,
   var pdfUrl: String? = null,
   val createdAt: Instant? = Clock.System.now(),
   val createdBy: String? = null,

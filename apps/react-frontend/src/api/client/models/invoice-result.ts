@@ -22,9 +22,9 @@
 export interface InvoiceResult {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceResult
      */
-    'invoiceId': number;
+    'invoiceId': string;
 }
 

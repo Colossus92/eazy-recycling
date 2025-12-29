@@ -22,10 +22,10 @@
 export interface InvoiceLineView {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceLineView
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {number}
@@ -82,10 +82,10 @@ export interface InvoiceLineView {
     'totalExclVat': number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof InvoiceLineView
      */
-    'catalogItemId': number;
+    'catalogItemId': string;
     /**
      * 
      * @type {string}

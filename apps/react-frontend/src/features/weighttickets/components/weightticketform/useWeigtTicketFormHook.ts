@@ -323,7 +323,7 @@ const formValuesToWeightTicketRequest = (
     lines: formValues.lines
       .filter((line) => line.catalogItemId)
       .map((line) => ({
-        catalogItemId: parseInt(line.catalogItemId, 10),
+        catalogItemId: line.catalogItemId,
         wasteStreamNumber: line.wasteStreamNumber || undefined,
         weight: {
           value: normalizeNumberForBackend(line.weightValue) || '0',

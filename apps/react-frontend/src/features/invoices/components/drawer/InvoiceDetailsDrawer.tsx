@@ -15,7 +15,7 @@ import { InvoiceDocumentSection } from './InvoiceDocumentSection';
 interface InvoiceDetailsDrawerProps {
   isDrawerOpen: boolean;
   setIsDrawerOpen: (value: boolean) => void;
-  invoiceId: number | null;
+  invoiceId: string | null;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -43,7 +43,7 @@ export const InvoiceDetailsDrawer = ({
   onDelete,
 }: InvoiceDetailsDrawerProps) => {
   const navigate = useNavigate();
-  
+
   const { data, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: async () => {
@@ -140,22 +140,28 @@ export const InvoiceDetailsDrawer = ({
                 </span>
               </div>
               {sourceWeightTicketId && (
-                <div 
-                  className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
+                <div
+                  className={
+                    'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'
+                  }
                   onClick={() => {
                     setIsDrawerOpen(false);
-                    navigate(`/weight-tickets?weightTicketDrawerId=${sourceWeightTicketId}`);
+                    navigate(
+                      `/weight-tickets?weightTicketDrawerId=${sourceWeightTicketId}`
+                    );
                   }}
                 >
                   <div className="flex items-center flex-1 gap-2">
-                    <Scale
-                      className={'w-5 h-5 text-color-text-secondary'}
-                    />
+                    <Scale className={'w-5 h-5 text-color-text-secondary'} />
                     <span className={'text-body-2 text-color-text-secondary'}>
                       Weegbon
                     </span>
                   </div>
-                  <span className={'text-body-2 truncate text-color-brand-primary underline'}>
+                  <span
+                    className={
+                      'text-body-2 truncate text-color-brand-primary underline'
+                    }
+                  >
                     {sourceWeightTicketId}
                   </span>
                 </div>
@@ -168,15 +174,23 @@ export const InvoiceDetailsDrawer = ({
             <div className="flex items-center gap-2">
               <span className={'text-subtitle-1'}>Overzicht</span>
             </div>
-            <div className={'flex flex-col items-start self-stretch border border-solid border-color-border-primary rounded-radius-md overflow-hidden'}>
+            <div
+              className={
+                'flex flex-col items-start self-stretch border border-solid border-color-border-primary rounded-radius-md overflow-hidden'
+              }
+            >
               {/* Invoice Lines */}
               {data.lines.map((line, index) => (
                 <div
                   key={index}
-                  className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 border-b border-solid border-color-border-primary last:border-b-0'}
+                  className={
+                    'flex items-center justify-between gap-4 self-stretch px-3 py-2 border-b border-solid border-color-border-primary last:border-b-0'
+                  }
                 >
                   <div className="flex flex-col flex-1 gap-0.5">
-                    <span className={'text-body-2'}>{line.catalogItemName}</span>
+                    <span className={'text-body-2'}>
+                      {line.catalogItemName}
+                    </span>
                     <span className={'text-caption text-color-text-secondary'}>
                       {line.quantity} x {formatCurrency(line.unitPrice)}
                     </span>
@@ -187,17 +201,39 @@ export const InvoiceDetailsDrawer = ({
                 </div>
               ))}
               {/* Totals */}
-              <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'}>
-                <span className={'text-body-2 text-color-text-secondary'}>Subtotaal</span>
-                <span className={'text-body-2'}>{formatCurrency(data.totals.totalExclVat)}</span>
+              <div
+                className={
+                  'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'
+                }
+              >
+                <span className={'text-body-2 text-color-text-secondary'}>
+                  Subtotaal
+                </span>
+                <span className={'text-body-2'}>
+                  {formatCurrency(data.totals.totalExclVat)}
+                </span>
               </div>
-              <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'}>
-                <span className={'text-body-2 text-color-text-secondary'}>BTW</span>
-                <span className={'text-body-2'}>{formatCurrency(data.totals.totalVat)}</span>
+              <div
+                className={
+                  'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'
+                }
+              >
+                <span className={'text-body-2 text-color-text-secondary'}>
+                  BTW
+                </span>
+                <span className={'text-body-2'}>
+                  {formatCurrency(data.totals.totalVat)}
+                </span>
               </div>
-              <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary border-t border-solid border-color-border-primary'}>
+              <div
+                className={
+                  'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary border-t border-solid border-color-border-primary'
+                }
+              >
                 <span className={'text-body-2 font-semibold'}>Totaal</span>
-                <span className={'text-body-2 font-semibold'}>{formatCurrency(data.totals.totalInclVat)}</span>
+                <span className={'text-body-2 font-semibold'}>
+                  {formatCurrency(data.totals.totalInclVat)}
+                </span>
               </div>
             </div>
           </div>
@@ -210,10 +246,10 @@ export const InvoiceDetailsDrawer = ({
                 invoiceNumber={data.invoiceNumber || 'Concept'}
               />
             )}
-            <WeightTicketDownloadSection weightTicketId={sourceWeightTicketId} />
+            <WeightTicketDownloadSection
+              weightTicketId={sourceWeightTicketId}
+            />
           </DocumentsSection>
-
-        
         </div>
       )}
     </Drawer>

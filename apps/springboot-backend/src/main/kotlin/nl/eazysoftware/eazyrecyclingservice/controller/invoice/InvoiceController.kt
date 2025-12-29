@@ -3,7 +3,6 @@ package nl.eazysoftware.eazyrecyclingservice.controller.invoice
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Positive
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllInvoices
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetInvoiceById
 import nl.eazysoftware.eazyrecyclingservice.application.query.InvoiceDetailView
@@ -63,7 +62,7 @@ class InvoiceController(
     }
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: Long): ResponseEntity<InvoiceDetailView> {
+    fun getById(@PathVariable id: UUID): ResponseEntity<InvoiceDetailView> {
         val invoice = getInvoiceById.handle(id)
         return if (invoice != null) {
             ResponseEntity.ok(invoice)
@@ -74,7 +73,7 @@ class InvoiceController(
 
     @PutMapping("/{id}")
     fun update(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: UpdateInvoiceRequest
     ): InvoiceResult {
         val command = UpdateInvoiceCommand(
@@ -121,13 +120,13 @@ class InvoiceController(
 
     @PostMapping("/{id}/finalize")
     @ResponseStatus(HttpStatus.OK)
-    fun finalize(@PathVariable id: Long): InvoiceResult {
+    fun finalize(@PathVariable id: UUID): InvoiceResult {
         return finalizeInvoice.handle(FinalizeInvoiceCommand(id))
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun delete(@PathVariable id: Long) {
+    fun delete(@PathVariable id: UUID) {
         deleteInvoice.handle(id)
     }
 
@@ -143,7 +142,7 @@ class InvoiceController(
 
         val invoiceDate: LocalDate,
 
-        val originalInvoiceId: Long?,
+        val originalInvoiceId: UUID?,
 
         @field:Valid
         val lines: List<InvoiceLineRequest>,
@@ -157,11 +156,10 @@ class InvoiceController(
     )
 
     data class InvoiceLineRequest(
-        val id: Long? = null,
+        val id: UUID? = null,
         val date: LocalDate,
         @field:NotNull
-        @field:Positive
-        val catalogItemId: Long,
+        val catalogItemId: UUID,
 
         val description: String? = null,
 

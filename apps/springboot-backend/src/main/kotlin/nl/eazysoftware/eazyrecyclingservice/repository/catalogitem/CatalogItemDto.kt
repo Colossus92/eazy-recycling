@@ -6,13 +6,14 @@ import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import java.math.BigDecimal
+import java.util.*
 
 @Entity
 @Table(name = "catalog_items")
 data class CatalogItemDto(
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  val id: Long? = null,
+  @Column(name = "id")
+  val id: UUID,
 
   @Column(name = "type", nullable = false)
   @Enumerated(EnumType.STRING)

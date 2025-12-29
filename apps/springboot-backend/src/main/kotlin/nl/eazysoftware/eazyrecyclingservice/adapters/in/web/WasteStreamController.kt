@@ -170,7 +170,7 @@ data class WasteStreamRequest(
 
   val brokerParty: UUID? = null,
 
-  val catalogItemId: Long? = null
+  val catalogItemId: UUID? = null
 ) {
   fun toCommand(): WasteStreamCommand {
     return WasteStreamCommand(

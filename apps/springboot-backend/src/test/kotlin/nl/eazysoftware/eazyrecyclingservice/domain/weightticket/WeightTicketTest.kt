@@ -26,7 +26,7 @@ private val SAMPLE_LINES = WeightTicketLines(
   listOf(
     WeightTicketLine(
       waste = WasteStreamNumber("123456789012"),
-      catalogItemId = 1L,
+      catalogItemId = UUID.randomUUID(),
       weight = Weight(BigDecimal("100.50"), Weight.WeightUnit.KILOGRAM)
     )
   )
@@ -334,17 +334,17 @@ class WeightTicketTest {
       listOf(
         WeightTicketLine(
           waste = WasteStreamNumber("111111111111"),
-          catalogItemId = 1L,
+          catalogItemId = UUID.randomUUID(),
           weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("222222222222"),
-          catalogItemId = 2L,
+          catalogItemId = UUID.randomUUID(),
           weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("333333333333"),
-          catalogItemId = 3L,
+          catalogItemId = UUID.randomUUID(),
           weight = Weight(BigDecimal("300.00"), Weight.WeightUnit.KILOGRAM)
         )
       )

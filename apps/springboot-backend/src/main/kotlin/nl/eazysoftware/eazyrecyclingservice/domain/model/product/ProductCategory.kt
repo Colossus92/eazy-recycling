@@ -1,9 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.product
 
+import java.util.*
 import kotlin.time.Instant
 
 data class ProductCategory(
-    val id: Long?,
+    val id: UUID?,
     val code: String,
     val name: String,
     val description: String?,

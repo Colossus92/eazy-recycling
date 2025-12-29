@@ -180,7 +180,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         id = testDriverId,
         firstName = "Test",
         lastName = "Driver",
-        roles = mutableListOf(UserRoleDto(id = 1, userId = testDriverId, role = Roles.CHAUFFEUR))
+        roles = mutableListOf(UserRoleDto(id = UUID.randomUUID(), userId = testDriverId, role = Roles.CHAUFFEUR))
       ),
       consignorParty = consignor,
       carrierParty = carrier,
@@ -201,7 +201,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
         id = otherDriverId,
         firstName = "Second",
         lastName = "Driver",
-        roles = mutableListOf(UserRoleDto(id = 2, userId = otherDriverId, role = Roles.CHAUFFEUR))
+        roles = mutableListOf(UserRoleDto(id = UUID.randomUUID(), userId = otherDriverId, role = Roles.CHAUFFEUR))
       ),
     )
 

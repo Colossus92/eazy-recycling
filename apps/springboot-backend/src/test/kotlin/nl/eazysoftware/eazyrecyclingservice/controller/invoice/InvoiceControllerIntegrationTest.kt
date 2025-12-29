@@ -80,6 +80,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
 
         testCatalogItem = catalogItemRepository.save(
             CatalogItemDto(
+                id = UUID.randomUUID(),
                 code = "MAT001",
                 name = "Test Material",
                 type = CatalogItemType.MATERIAL,
@@ -103,7 +104,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
         lines: List<InvoiceController.InvoiceLineRequest> = listOf(
             InvoiceController.InvoiceLineRequest(
                 date = LocalDate.now(),
-                catalogItemId = testCatalogItem.id!!,
+                catalogItemId = testCatalogItem.id,
                 description = "Test line",
                 quantity = BigDecimal("10.00"),
                 unitPrice = BigDecimal("5.00"),
@@ -161,7 +162,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
 
         securedMockMvc.get("/invoices/${created.invoiceId}")
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.id").value(created.invoiceId))
+            .andExpect(jsonPath("$.id").value(created.invoiceId.toString()))
             .andExpect(jsonPath("$.status").value("DRAFT"))
             .andExpect(jsonPath("$.customer.name").value("Test Customer BV"))
             .andExpect(jsonPath("$.lines.length()").value(1))
@@ -169,7 +170,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
 
     @Test
     fun `get invoice by id - not found returns 404`() {
-        securedMockMvc.get("/invoices/999999")
+        securedMockMvc.get("/invoices/${UUID.randomUUID()}")
             .andExpect(status().isNotFound)
     }
 
@@ -185,7 +186,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
             lines = listOf(
                 InvoiceController.InvoiceLineRequest(
                     date = LocalDate.now(),
-                    catalogItemId = testCatalogItem.id!!,
+                    catalogItemId = testCatalogItem.id,
                     description = "Updated line",
                     quantity = BigDecimal("20.00"),
                     unitPrice = BigDecimal("10.00"),
@@ -225,7 +226,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
             lines = listOf(
                 InvoiceController.InvoiceLineRequest(
                     date = LocalDate.now(),
-                    catalogItemId = testCatalogItem.id!!,
+                    catalogItemId = testCatalogItem.id,
                     description = "Line 1",
                     quantity = BigDecimal("10.00"),
                     unitPrice = BigDecimal("5.00"),
@@ -233,7 +234,7 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
                 ),
                 InvoiceController.InvoiceLineRequest(
                     date = LocalDate.now(),
-                    catalogItemId = testCatalogItem.id!!,
+                    catalogItemId = testCatalogItem.id,
                     description = "Line 2",
                     quantity = BigDecimal("5.00"),
                     unitPrice = BigDecimal("20.00"),

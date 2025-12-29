@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 
 @RestController
 @RequestMapping("/material-groups")
@@ -24,7 +25,7 @@ class MaterialGroupController(
     }
 
     @GetMapping("/{id}")
-    fun getMaterialGroupById(@PathVariable id: Long): MaterialGroupResponse {
+    fun getMaterialGroupById(@PathVariable id: UUID): MaterialGroupResponse {
         val materialGroup = materialGroups.getMaterialGroupById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaalgroep met id $id niet gevonden")
         return materialGroup.toResponse()
@@ -42,7 +43,7 @@ class MaterialGroupController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @PutMapping("/{id}")
     fun updateMaterialGroup(
-        @PathVariable id: Long,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: MaterialGroupRequest
     ): MaterialGroupResponse {
         // Check if material group exists
@@ -57,7 +58,7 @@ class MaterialGroupController(
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteMaterialGroup(@PathVariable id: Long) {
+    fun deleteMaterialGroup(@PathVariable id: UUID) {
         // Check if material group exists
         materialGroups.getMaterialGroupById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Materiaalgroep met id $id niet gevonden")
@@ -88,7 +89,7 @@ data class MaterialGroupRequest(
 }
 
 data class MaterialGroupResponse(
-    val id: Long,
+    val id: UUID,
     val code: String,
     val name: String,
     val description: String?,

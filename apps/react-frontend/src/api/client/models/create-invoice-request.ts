@@ -49,10 +49,10 @@ export interface CreateInvoiceRequest {
     'invoiceDate': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CreateInvoiceRequest
      */
-    'originalInvoiceId'?: number;
+    'originalInvoiceId'?: string;
     /**
      * 
      * @type {Array<InvoiceLineRequest>}

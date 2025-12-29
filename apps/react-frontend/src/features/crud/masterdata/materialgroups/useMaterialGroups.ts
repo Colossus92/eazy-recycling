@@ -85,7 +85,7 @@ export const useMaterialGroupsCrud = () => {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (params: { id: number; data: MaterialGroupRequest }) =>
+    mutationFn: (params: { id: string; data: MaterialGroupRequest }) =>
       materialGroupService.update(params.id, params.data),
     onSuccess: () => {
       queryClient
@@ -98,7 +98,7 @@ export const useMaterialGroupsCrud = () => {
   });
 
   const update = async (
-    id: number,
+    id: string,
     item: MaterialGroupRequest
   ): Promise<void> => {
     return new Promise((resolve, reject) => {

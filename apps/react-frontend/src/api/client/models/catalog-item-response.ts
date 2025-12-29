@@ -22,10 +22,10 @@
 export interface CatalogItemResponse {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CatalogItemResponse
      */
-    'id': number;
+    'id': string;
     /**
      * 
      * @type {string}
