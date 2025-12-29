@@ -76,10 +76,10 @@ class WeightTicketMapper(
       Consignor.Person -> throw IllegalArgumentException("Particuliere opdrachtgever wordt nog niet ondersteund.")
     }
 
-    return WeightTicketDto(
+    val weightTicketDto = WeightTicketDto(
       id = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
-      lines = toDto(domain.lines, domain.id.number),
+      lines = mutableListOf(),
       secondWeighingValue = domain.secondWeighing?.value,
       secondWeighingUnit = toDto(domain.secondWeighing?.unit),
       tarraWeightValue = domain.tarraWeight?.value,
@@ -97,6 +97,11 @@ class WeightTicketMapper(
       linkedInvoiceId = domain.linkedInvoiceId,
       pdfUrl = domain.pdfUrl,
     )
+    
+    // Set lines after creating parent to establish bidirectional relationship
+    weightTicketDto.lines.addAll(toDto(domain.lines, weightTicketDto))
+    
+    return weightTicketDto
   }
 
   private fun toDto(domain: Weight.WeightUnit?): WeightUnitDto? {
@@ -106,12 +111,12 @@ class WeightTicketMapper(
     }
   }
 
-  private fun toDto(domain: WeightTicketLines, weightTicketId: Long): MutableList<WeightTicketLineDto> {
+  private fun toDto(domain: WeightTicketLines, weightTicket: WeightTicketDto): MutableList<WeightTicketLineDto> {
     return domain.getLines()
       .map {
         WeightTicketLineDto(
           id = UUID.randomUUID(),
-          weightTicketId = weightTicketId,
+          weightTicket = weightTicket,
           wasteStreamNumber = it.waste?.number,
           weightValue = it.weight.value,
           catalogItemId = it.catalogItemId,

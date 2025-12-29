@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.math.BigDecimal
+import java.util.*
 import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
@@ -20,6 +21,11 @@ interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, Long> {
 
     @Query(value = "SELECT nextval('weight_tickets_id_seq')", nativeQuery = true)
     fun getNextSequenceValue(): Long
+
+    @org.springframework.transaction.annotation.Transactional
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE WeightTicketDto wt SET wt.linkedInvoiceId = NULL, wt.status = 'COMPLETED' WHERE wt.linkedInvoiceId = :invoiceId")
+    fun nullifyLinkedInvoiceId(invoiceId: UUID): Int
 }
 
 @Repository
@@ -99,5 +105,9 @@ class WeightTicketRepository(
                 weightedAt = (row[4] as java.time.Instant).toKotlinInstant(),
             )
         }
+    }
+
+    override fun nullifyLinkedInvoiceId(invoiceId: UUID): Int {
+        return jpaRepository.nullifyLinkedInvoiceId(invoiceId)
     }
 }

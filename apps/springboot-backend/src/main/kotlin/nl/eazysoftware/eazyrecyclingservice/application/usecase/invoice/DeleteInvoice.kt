@@ -14,6 +14,7 @@ interface DeleteInvoice {
 @Service
 class DeleteInvoiceService(
     private val invoices: Invoices,
+    private val weightTickets: nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets,
 ) : DeleteInvoice {
 
     @Transactional
@@ -24,6 +25,9 @@ class DeleteInvoiceService(
         require(invoice.status == InvoiceStatus.DRAFT) {
             "Alleen concept facturen kunnen worden verwijderd."
         }
+
+        // Remove references from weight tickets before deleting the invoice
+        weightTickets.nullifyLinkedInvoiceId(invoiceId)
 
         invoices.delete(InvoiceId(invoiceId))
     }

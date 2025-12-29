@@ -39,4 +39,13 @@ interface WeightTickets {
    * @return List of undeclared weight ticket lines
    */
   fun findUndeclaredLines(cutoffDate: YearMonth): List<UndeclaredWeightTicketLine>
+  
+  /**
+   * Nullifies the linked_invoice_id for all weight tickets that reference the given invoice.
+   * This is necessary before deleting an invoice to avoid foreign key constraint violations.
+   *
+   * @param invoiceId The invoice ID to remove references to
+   * @return The number of weight tickets updated
+   */
+  fun nullifyLinkedInvoiceId(invoiceId: java.util.UUID): Int
 }

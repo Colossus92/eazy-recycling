@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.invoice
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice.InvoiceResult
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
@@ -11,6 +12,9 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.invoice.InvoiceJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketStatusDto
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
 import nl.eazysoftware.eazyrecyclingservice.test.util.SecuredMockMvc
 import org.assertj.core.api.Assertions.assertThat
@@ -38,6 +42,8 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
     val companyRepository: CompanyJpaRepository,
     val catalogItemRepository: CatalogItemJpaRepository,
     val vatRateRepository: VatRateJpaRepository,
+    val weightTicketRepository: WeightTicketJpaRepository,
+    val entityManager: jakarta.persistence.EntityManager,
 ) : BaseIntegrationTest() {
 
     private lateinit var securedMockMvc: SecuredMockMvc
@@ -254,5 +260,59 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
             .andExpect(jsonPath("$.totals.totalExclVat").value(150.00))
             .andExpect(jsonPath("$.totals.totalVat").value(31.50))
             .andExpect(jsonPath("$.totals.totalInclVat").value(181.50))
+    }
+
+    @Test
+    fun `delete invoice with linked weight tickets - nullifies references and deletes successfully`() {
+        // Create an invoice
+        val req = createInvoiceRequest()
+        val mvcResult = securedMockMvc.post("/invoices", objectMapper.writeValueAsString(req))
+            .andReturn()
+        val created = objectMapper.readValue(mvcResult.response.contentAsString, InvoiceResult::class.java)
+
+        // Create a weight ticket that references this invoice with INVOICED status
+        val weightTicket = WeightTicketDto(
+            id = System.currentTimeMillis(),
+            consignorParty = testCompany,
+            lines = mutableListOf(),
+            secondWeighingValue = null,
+            secondWeighingUnit = null,
+            tarraWeightValue = null,
+            tarraWeightUnit = null,
+            direction = WeightTicketDirection.INBOUND,
+            pickupLocation = null,
+            deliveryLocation = null,
+            carrierParty = testCompany,
+            truckLicensePlate = "AB-123-CD",
+            reclamation = null,
+            note = null,
+            status = WeightTicketStatusDto.INVOICED,
+            weightedAt = Instant.now(),
+            cancellationReason = null,
+            linkedInvoiceId = created.invoiceId,
+            pdfUrl = null
+        )
+        weightTicketRepository.save(weightTicket)
+
+        // Verify the weight ticket has the linked invoice ID and INVOICED status
+        val savedWeightTicket = weightTicketRepository.findById(weightTicket.id).get()
+        assertThat(savedWeightTicket.linkedInvoiceId).isEqualTo(created.invoiceId)
+        assertThat(savedWeightTicket.status).isEqualTo(WeightTicketStatusDto.INVOICED)
+
+        // Delete the invoice
+        securedMockMvc.delete("/invoices/${created.invoiceId}")
+            .andExpect(status().isNoContent)
+
+        // Verify the invoice is deleted
+        securedMockMvc.get("/invoices/${created.invoiceId}")
+            .andExpect(status().isNotFound)
+
+        // Clear the entity manager to avoid reading stale cached data
+        entityManager.clear()
+
+        // Verify the weight ticket's linked_invoice_id has been nullified and status changed to COMPLETED
+        val updatedWeightTicket = weightTicketRepository.findById(weightTicket.id).get()
+        assertThat(updatedWeightTicket.linkedInvoiceId).isNull()
+        assertThat(updatedWeightTicket.status).isEqualTo(WeightTicketStatusDto.COMPLETED)
     }
 }

@@ -623,27 +623,11 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     val weightedAtInstant = weightedAt.toInstant()
 
     val ticketId = System.currentTimeMillis() + (Math.random() * 1000).toLong()
-    // Create weight ticket lines from the provided pairs (wasteStreamNumber, weightValue)
-    val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
-      val declaredWeight = if (declared) weightValue.toBigDecimal() else null
-      val lastDeclaredAt = if (declared) weightedAt else null
-
-      WeightTicketLineDto(
-        id = UUID.randomUUID(),
-        weightTicketId = ticketId,
-        wasteStreamNumber = wasteStreamNumber,
-        catalogItemId = UUID.randomUUID(),
-        weightValue = weightValue.toBigDecimal(),
-        weightUnit = WeightUnitDto.kg,
-        declaredWeight = declaredWeight,
-        lastDeclaredAt = lastDeclaredAt?.toInstant(),
-      )
-    }
 
     val ticket = WeightTicketDto(
       id = ticketId,
       consignorParty = companyRepository.getReferenceById(consignorCompanyId),
-      lines = ticketLines.toMutableList(),
+      lines = mutableListOf(),
       secondWeighingValue = null,
       secondWeighingUnit = null,
       tarraWeightValue = null,
@@ -659,6 +643,25 @@ class MonthlyReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
       weightedAt = weightedAtInstant,
       cancellationReason = null,
     )
+    
+    // Add lines with parent reference for bidirectional relationship
+    val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
+      val declaredWeight = if (declared) weightValue.toBigDecimal() else null
+      val lastDeclaredAt = if (declared) weightedAt else null
+
+      WeightTicketLineDto(
+        id = UUID.randomUUID(),
+        weightTicket = ticket,
+        wasteStreamNumber = wasteStreamNumber,
+        catalogItemId = UUID.randomUUID(),
+        weightValue = weightValue.toBigDecimal(),
+        weightUnit = WeightUnitDto.kg,
+        declaredWeight = declaredWeight,
+        lastDeclaredAt = lastDeclaredAt?.toInstant(),
+      )
+    }
+    ticket.lines.addAll(ticketLines)
+    
     return weightTicketRepository.save(ticket).id
   }
 

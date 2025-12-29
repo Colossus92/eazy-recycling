@@ -17,8 +17,9 @@ data class WeightTicketLineDto(
   @Column(name = "id")
   val id: UUID,
 
-  @Column(name = "weight_ticket_id", nullable = false)
-  val weightTicketId: Long,
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "weight_ticket_id", nullable = false)
+  val weightTicket: WeightTicketDto? = null,
 
   @Column(name = "waste_stream_number")
   val wasteStreamNumber: String?,

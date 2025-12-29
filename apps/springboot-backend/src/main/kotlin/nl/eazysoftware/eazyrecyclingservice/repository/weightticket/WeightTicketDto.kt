@@ -19,8 +19,7 @@ data class WeightTicketDto(
   @JoinColumn(name = "consignor_party_id", nullable = false)
   val consignorParty: CompanyDto,
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
-  @JoinColumn(name = "weight_ticket_id")
+  @OneToMany(mappedBy = "weightTicket", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
   val lines: MutableList<WeightTicketLineDto> = mutableListOf(),
 
   @Column(name = "second_weighing_value", nullable = true)
