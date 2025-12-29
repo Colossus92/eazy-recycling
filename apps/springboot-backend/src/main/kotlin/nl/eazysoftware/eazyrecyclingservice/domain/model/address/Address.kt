@@ -15,8 +15,13 @@ data class Address(
 }
 
 
-data class StreetName(val value: String)
+data class StreetName(val value: String) {
+  override fun toString() = value
+}
 // Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
 
-data class City(val value: String)
+data class City(val value: String) {
+
+  override fun toString() = value
+}
 // Domain constraints relaxed per ADR-0017 to allow Exact Online sync with incomplete data.
