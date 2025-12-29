@@ -25,19 +25,13 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'defaultContentType'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'urlPatterns'?: Array<string>;
+    'buffer'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'elIgnored'?: string;
+    'defaultContentType'?: string;
     /**
      * 
      * @type {string}
@@ -58,12 +52,6 @@ export interface JspPropertyGroupDescriptor {
     'scriptingInvalid'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'isXml'?: string;
-    /**
-     * 
      * @type {Array<string>}
      * @memberof JspPropertyGroupDescriptor
      */
@@ -74,6 +62,24 @@ export interface JspPropertyGroupDescriptor {
      * @memberof JspPropertyGroupDescriptor
      */
     'includeCodas'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'elIgnored'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'urlPatterns'?: Array<string>;
     /**
      * 
      * @type {string}
@@ -92,11 +98,5 @@ export interface JspPropertyGroupDescriptor {
      * @memberof JspPropertyGroupDescriptor
      */
     'errorOnUndeclaredNamespace'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'buffer'?: string;
 }
 

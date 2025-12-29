@@ -24,45 +24,15 @@ class AmiceController(
 ) {
 
   @GetMapping
-  fun getDeclarations(pageable: Pageable): Page<LmaDeclarationView> {
-    return lmaDeclarations.findAll(pageable)
+  fun getDeclarations(pageable: Pageable) =
+    lmaDeclarations.findAll(pageable)
       .map { LmaDeclarationView.fromDomain(it) }
-  }
+      .let { PagedLmaDeclarationResponse.from(it) }
 
   @GetMapping("/pending-approvals")
   fun hasPendingApprovals(): PendingApprovalsResponse {
     val hasPending = lmaDeclarations.hasDeclarationsWithStatus("WAITING_APPROVAL")
     return PendingApprovalsResponse(hasPendingApprovals = hasPending)
-  }
-
-  data class LmaDeclarationView(
-    val id: String,
-    val wasteStreamNumber: String,
-    val period: String,
-    val totalWeight: Int,
-    val totalShipments: Int,
-    val status: String,
-    val wasteName: String,
-    val pickupLocation: String,
-    val errors: List<String>?,
-    val transporters: List<String>,
-  ) {
-    companion object {
-      fun fromDomain(lmaDeclaration: LmaDeclaration): LmaDeclarationView {
-        return LmaDeclarationView(
-          id = lmaDeclaration.id,
-          wasteStreamNumber = lmaDeclaration.wasteStreamNumber.number,
-          period = "${lmaDeclaration.period.month.number.toString().padStart(2, '0')}-${lmaDeclaration.period.year}",
-          totalWeight = lmaDeclaration.totalWeight,
-          totalShipments = lmaDeclaration.totalTransports,
-          status = lmaDeclaration.status,
-          wasteName = lmaDeclaration.wasteName,
-          pickupLocation = lmaDeclaration.pickupLocation.toAddressLine(),
-          errors = lmaDeclaration.errors?.toList(),
-          transporters = lmaDeclaration.transporters,
-        )
-      }
-    }
   }
 
   /**
@@ -94,4 +64,54 @@ class AmiceController(
   data class PendingApprovalsResponse(
     val hasPendingApprovals: Boolean,
   )
+
+  data class PagedLmaDeclarationResponse(
+    val content: List<LmaDeclarationView>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+  ) {
+    companion object {
+      fun from(page: Page<LmaDeclarationView>): PagedLmaDeclarationResponse {
+        return PagedLmaDeclarationResponse(
+          content = page.content,
+          page = page.number,
+          size = page.size,
+          totalElements = page.totalElements,
+          totalPages = page.totalPages,
+        )
+      }
+    }
+  }
+
+  data class LmaDeclarationView(
+    val id: String,
+    val wasteStreamNumber: String,
+    val period: String,
+    val totalWeight: Int,
+    val totalShipments: Int,
+    val status: String,
+    val wasteName: String,
+    val pickupLocation: String,
+    val errors: List<String>?,
+    val transporters: List<String>,
+  ) {
+    companion object {
+      fun fromDomain(lmaDeclaration: LmaDeclaration): LmaDeclarationView {
+        return LmaDeclarationView(
+          id = lmaDeclaration.id,
+          wasteStreamNumber = lmaDeclaration.wasteStreamNumber.number,
+          period = "${lmaDeclaration.period.month.number.toString().padStart(2, '0')}-${lmaDeclaration.period.year}",
+          totalWeight = lmaDeclaration.totalWeight,
+          totalShipments = lmaDeclaration.totalTransports,
+          status = lmaDeclaration.status,
+          wasteName = lmaDeclaration.wasteName,
+          pickupLocation = lmaDeclaration.pickupLocation.toAddressLine(),
+          errors = lmaDeclaration.errors?.toList(),
+          transporters = lmaDeclaration.transporters,
+        )
+      }
+    }
+  }
 }

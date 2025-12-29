@@ -37,7 +37,12 @@ import { BASE_PATH, BaseAPI, COLLECTION_FORMATS, operationServerMap, type Reques
 // @ts-ignore
 // @ts-ignore
 // @ts-ignore
-import type { ApproveDeclarationResponse, Pageable, PageLmaDeclarationView, PendingApprovalsResponse } from '../models';
+import type {
+  ApproveDeclarationResponse,
+  Pageable,
+  PagedLmaDeclarationResponse,
+  PendingApprovalsResponse
+} from '../models';
 
 /**
  * AmiceControllerApi - axios parameter creator
@@ -175,7 +180,7 @@ export const AmiceControllerApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getDeclarations(pageable: Pageable, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PageLmaDeclarationView>> {
+        async getDeclarations(pageable: Pageable, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PagedLmaDeclarationResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getDeclarations(pageable, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['AmiceControllerApi.getDeclarations']?.[index]?.url;
@@ -216,7 +221,7 @@ export const AmiceControllerApiFactory = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getDeclarations(pageable: Pageable, options?: any): AxiosPromise<PageLmaDeclarationView> {
+        getDeclarations(pageable: Pageable, options?: any): AxiosPromise<PagedLmaDeclarationResponse> {
             return localVarFp.getDeclarations(pageable, options).then((request) => request(axios, basePath));
         },
         /**

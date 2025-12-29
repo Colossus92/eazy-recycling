@@ -106,10 +106,9 @@ models/material-request.ts
 models/material-response.ts
 models/no-pickup-location-request.ts
 models/no-pickup-view.ts
-models/page-lma-declaration-view.ts
-models/pageable-object.ts
 models/pageable.ts
 models/paged-company-response.ts
+models/paged-lma-declaration-response.ts
 models/pending-approvals-response.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
@@ -141,7 +140,6 @@ models/servlet-context.ts
 models/servlet-registration.ts
 models/session-cookie-config.ts
 models/signature-status-view.ts
-models/sort-object.ts
 models/split-weight-ticket-request.ts
 models/split-weight-ticket-response.ts
 models/sync-conflict-dto.ts

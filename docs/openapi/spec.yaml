@@ -2078,7 +2078,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageLmaDeclarationView"
+                $ref: "#/components/schemas/PagedLmaDeclarationResponse"
   /amice/pending-approvals:
     get:
       tags:
@@ -4207,14 +4207,6 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
         year:
           type: integer
           format: int32
@@ -4254,6 +4246,14 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -4270,17 +4270,6 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
-        nanosecond:
-          type: integer
-          format: int32
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4333,6 +4322,17 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -4354,11 +4354,6 @@ components:
         value:
           type: string
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-        nanosecond:
-          type: integer
-          format: int32
         hour:
           type: integer
           format: int32
@@ -4368,6 +4363,11 @@ components:
         second:
           type: integer
           format: int32
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -5262,65 +5262,31 @@ components:
       - transporters
       - wasteName
       - wasteStreamNumber
-    PageLmaDeclarationView:
+    PagedLmaDeclarationResponse:
       type: object
       properties:
-        totalPages:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/LmaDeclarationView"
+        page:
+          type: integer
+          format: int32
+        size:
           type: integer
           format: int32
         totalElements:
           type: integer
           format: int64
-        numberOfElements:
+        totalPages:
           type: integer
           format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/LmaDeclarationView"
-        number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        empty:
-          type: boolean
-    PageableObject:
-      type: object
-      properties:
-        paged:
-          type: boolean
-        pageNumber:
-          type: integer
-          format: int32
-        pageSize:
-          type: integer
-          format: int32
-        unpaged:
-          type: boolean
-        offset:
-          type: integer
-          format: int64
-        sort:
-          $ref: "#/components/schemas/SortObject"
-    SortObject:
-      type: object
-      properties:
-        sorted:
-          type: boolean
-        unsorted:
-          type: boolean
-        empty:
-          type: boolean
+      required:
+      - content
+      - page
+      - size
+      - totalElements
+      - totalPages
     PendingApprovalsResponse:
       type: object
       properties:
@@ -5415,6 +5381,11 @@ components:
     ApplicationContext:
       type: object
       properties:
+        parent: {}
+        id:
+          type: string
+        displayName:
+          type: string
         applicationName:
           type: string
         startupDate:
@@ -5422,11 +5393,6 @@ components:
           format: int64
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        parent: {}
-        id:
-          type: string
-        displayName:
-          type: string
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -5669,14 +5635,14 @@ components:
           type: array
           items:
             type: string
-        initParameters:
-          type: object
-          additionalProperties:
-            type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     HttpStatus:
       allOf:
       - $ref: "#/components/schemas/HttpStatusCode"
@@ -5753,6 +5719,8 @@ components:
     HttpStatusCode:
       type: object
       properties:
+        error:
+          type: boolean
         is4xxClientError:
           type: boolean
         is5xxServerError:
@@ -5763,37 +5731,29 @@ components:
           type: boolean
         is3xxRedirection:
           type: boolean
-        error:
-          type: boolean
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
+        buffer:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -5803,13 +5763,19 @@ components:
           type: array
           items:
             type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
         deferredSyntaxAllowedAsLiteral:
           type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
-          type: string
-        buffer:
           type: string
     RedirectView:
       type: object
@@ -5885,69 +5851,6 @@ components:
     ServletContext:
       type: object
       properties:
-        initParameterNames: {}
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        effectiveMajorVersion:
-          type: integer
-          format: int32
-        servletContextName:
-          type: string
-        effectiveMinorVersion:
-          type: integer
-          format: int32
-        serverInfo:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        defaultSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        requestCharacterEncoding:
-          type: string
-        responseCharacterEncoding:
-          type: string
-        contextPath:
-          type: string
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -5991,6 +5894,69 @@ components:
         minorVersion:
           type: integer
           format: int32
+        attributeNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        initParameterNames: {}
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        effectiveMajorVersion:
+          type: integer
+          format: int32
+        effectiveMinorVersion:
+          type: integer
+          format: int32
+        defaultSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        requestCharacterEncoding:
+          type: string
+        responseCharacterEncoding:
+          type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
     ServletRegistration:
       type: object
       properties:
@@ -6000,28 +5966,24 @@ components:
             type: string
         runAsRole:
           type: string
-        initParameters:
-          type: object
-          additionalProperties:
-            type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     SessionCookieConfig:
       type: object
       properties:
-        domain:
-          type: string
         path:
           type: string
         maxAge:
           type: integer
           format: int32
-        httpOnly:
-          type: boolean
-        secure:
-          type: boolean
+        domain:
+          type: string
         name:
           type: string
         attributes:
@@ -6031,12 +5993,16 @@ components:
         comment:
           type: string
           deprecated: true
+        httpOnly:
+          type: boolean
+        secure:
+          type: boolean
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

@@ -13,48 +13,45 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { LmaDeclarationView } from './lma-declaration-view';
 
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface PagedLmaDeclarationResponse
  */
-export interface LocalTime {
+export interface PagedLmaDeclarationResponse {
     /**
      * 
-     * @type {string}
-     * @memberof LocalTime
+     * @type {Array<LmaDeclarationView>}
+     * @memberof PagedLmaDeclarationResponse
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
+    'content': Array<LmaDeclarationView>;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof PagedLmaDeclarationResponse
      */
-    'minute': number;
+    'page': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof PagedLmaDeclarationResponse
      */
-    'second': number;
+    'size': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof PagedLmaDeclarationResponse
      */
-    'nanosecond': number;
+    'totalElements': number;
     /**
      * 
-     * @type {string}
-     * @memberof LocalTime
+     * @type {number}
+     * @memberof PagedLmaDeclarationResponse
      */
-    'value$kotlinx_datetime': string;
+    'totalPages': number;
 }
 
