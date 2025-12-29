@@ -1703,24 +1703,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProjectLocationResult"
-  /amice/declare-first-receivals:
-    post:
-      tags:
-      - amice-controller
-      operationId: declareFirstReceivals
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/DeclareFirstReceivalsRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DeclareFirstReceivalsResponse"
   /amice/declarations/{declarationId}/approve:
     post:
       tags:
@@ -2097,6 +2079,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageLmaDeclarationView"
+  /amice/pending-approvals:
+    get:
+      tags:
+      - amice-controller
+      operationId: hasPendingApprovals
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PendingApprovalsResponse"
   /admin/lma/import/errors:
     get:
       tags:
@@ -3973,6 +3967,11 @@ components:
           type: string
           enum:
           - kg
+        declaredWeight:
+          type: number
+        lastDeclaredAt:
+          type: string
+          format: date-time
       required:
       - catalogItemId
       - weightUnit
@@ -4063,134 +4062,6 @@ components:
       required:
       - companyId
       - projectLocationId
-    ConsignorPartyRequest:
-      type: object
-      properties:
-        type:
-          type: string
-          minLength: 1
-        companyId:
-          type: string
-      required:
-      - type
-    DeclareFirstReceivalsRequest:
-      type: object
-      properties:
-        declarations:
-          type: array
-          items:
-            $ref: "#/components/schemas/ReceivalDeclarationRequest"
-          minItems: 1
-      required:
-      - declarations
-    DeliveryLocationRequest:
-      type: object
-      properties:
-        processorPartyId:
-          type: string
-          minLength: 1
-          pattern: "^\\d{5}$"
-      required:
-      - processorPartyId
-    ReceivalDeclarationRequest:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-          minLength: 1
-          pattern: "^\\d{12}$"
-        wasteType:
-          $ref: "#/components/schemas/WasteTypeRequest"
-        collectionType:
-          type: string
-          minLength: 1
-        pickupLocation:
-          oneOf:
-          - $ref: "#/components/schemas/PickupLocationRequest"
-          - $ref: "#/components/schemas/DutchAddressRequest"
-          - $ref: "#/components/schemas/NoPickupLocationRequest"
-          - $ref: "#/components/schemas/PickupCompanyRequest"
-          - $ref: "#/components/schemas/ProjectLocationRequest"
-          - $ref: "#/components/schemas/ProximityDescriptionRequest"
-        deliveryLocation:
-          $ref: "#/components/schemas/DeliveryLocationRequest"
-        consignorParty:
-          $ref: "#/components/schemas/ConsignorPartyRequest"
-        consignorClassification:
-          type: integer
-          format: int32
-        pickupParty:
-          type: string
-          minLength: 1
-        dealerParty:
-          type: string
-        collectorParty:
-          type: string
-        brokerParty:
-          type: string
-        transporterIds:
-          type: array
-          items:
-            type: string
-          minItems: 1
-        totalWeight:
-          type: integer
-          format: int32
-        totalShipments:
-          type: integer
-          format: int32
-        year:
-          type: integer
-          format: int32
-        month:
-          type: integer
-          format: int32
-      required:
-      - collectionType
-      - consignorClassification
-      - consignorParty
-      - deliveryLocation
-      - month
-      - pickupParty
-      - totalShipments
-      - totalWeight
-      - transporterIds
-      - wasteStreamNumber
-      - wasteType
-      - year
-    WasteTypeRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-        euralCode:
-          type: string
-          minLength: 1
-          pattern: "^\\d{6}\\*?$"
-        processingMethod:
-          type: string
-          minLength: 1
-          pattern: "^[A-Z]\\.?\\d{2}$"
-      required:
-      - euralCode
-      - name
-      - processingMethod
-    DeclareFirstReceivalsResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-        declaredWasteStreamNumbers:
-          type: array
-          items:
-            type: string
-      required:
-      - declaredWasteStreamNumbers
-      - message
-      - success
     ApproveDeclarationResponse:
       type: object
       properties:
@@ -5394,14 +5265,12 @@ components:
     PageLmaDeclarationView:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
+        totalElements:
+          type: integer
+          format: int64
         numberOfElements:
           type: integer
           format: int32
@@ -5409,6 +5278,8 @@ components:
           type: boolean
         last:
           type: boolean
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         size:
           type: integer
           format: int32
@@ -5426,8 +5297,6 @@ components:
     PageableObject:
       type: object
       properties:
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -5436,6 +5305,8 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
         offset:
           type: integer
           format: int64
@@ -5444,12 +5315,19 @@ components:
     SortObject:
       type: object
       properties:
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
         empty:
           type: boolean
+    PendingApprovalsResponse:
+      type: object
+      properties:
+        hasPendingApprovals:
+          type: boolean
+      required:
+      - hasPendingApprovals
     LmaImportErrorDto:
       type: object
       properties:
@@ -5890,14 +5768,14 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -5993,30 +5871,21 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        attributeNames: {}
         initParameterNames: {}
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
         sessionTrackingModes:
           type: array
           items:
@@ -6027,18 +5896,26 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
         sessionTimeout:
           type: integer
           format: int32
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6070,6 +5947,7 @@ components:
           type: string
         contextPath:
           type: string
+        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6133,16 +6011,16 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
         path:
           type: string
-        secure:
-          type: boolean
         maxAge:
           type: integer
           format: int32
-        domain:
-          type: string
         httpOnly:
+          type: boolean
+        secure:
           type: boolean
         name:
           type: string
@@ -6156,9 +6034,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

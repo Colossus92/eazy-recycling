@@ -54,7 +54,6 @@ models/company-view.ts
 models/complete-company-view.ts
 models/connection-status-response.ts
 models/consignor-data-response.ts
-models/consignor-party-request.ts
 models/consignor-request.ts
 models/consignor-view.ts
 models/container-transport-request.ts
@@ -70,10 +69,7 @@ models/create-waste-transport-from-weight-ticket-request.ts
 models/create-waste-transport-response.ts
 models/create-weight-ticket-response.ts
 models/customer-snapshot-view.ts
-models/declare-first-receivals-request.ts
-models/declare-first-receivals-response.ts
 models/default-http-status-code.ts
-models/delivery-location-request.ts
 models/delivery-location-view.ts
 models/driver-planning-item.ts
 models/driver-view.ts
@@ -114,6 +110,7 @@ models/page-lma-declaration-view.ts
 models/pageable-object.ts
 models/pageable.ts
 models/paged-company-response.ts
+models/pending-approvals-response.ts
 models/person-consignor-view.ts
 models/person-consignor.ts
 models/pickup-company-request.ts
@@ -137,8 +134,6 @@ models/project-location-result.ts
 models/project-location-view.ts
 models/proximity-description-request.ts
 models/proximity-description-view.ts
-models/receival-declaration-request-pickup-location.ts
-models/receival-declaration-request.ts
 models/redirect-view-status-code.ts
 models/redirect-view.ts
 models/refresh-token-response.ts
@@ -182,7 +177,6 @@ models/waste-stream-list-view.ts
 models/waste-stream-request.ts
 models/waste-stream-validation-response.ts
 models/waste-transport-request.ts
-models/waste-type-request.ts
 models/waste-type-view.ts
 models/weight-request.ts
 models/weight-ticket-detail-view-consignor-party.ts

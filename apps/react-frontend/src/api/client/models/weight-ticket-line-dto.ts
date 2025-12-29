@@ -44,6 +44,18 @@ export interface WeightTicketLineDto {
      * @memberof WeightTicketLineDto
      */
     'weightUnit': WeightTicketLineDtoWeightUnitEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketLineDto
+     */
+    'declaredWeight'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WeightTicketLineDto
+     */
+    'lastDeclaredAt'?: string;
 }
 
 export const WeightTicketLineDtoWeightUnitEnum = {

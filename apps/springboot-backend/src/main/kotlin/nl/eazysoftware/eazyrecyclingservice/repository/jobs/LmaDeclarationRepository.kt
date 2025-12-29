@@ -106,6 +106,14 @@ class LmaDeclarationRepository(
     }
   }
 
+  override fun hasDeclarationsWithStatus(status: String): Boolean {
+    val query = entityManager.createNativeQuery(
+      "SELECT COUNT(*) FROM lma_declarations WHERE status = :status"
+    )
+      .setParameter("status", status)
+    return (query.singleResult as Number).toLong() > 0
+  }
+
   override fun findAll(pageable: Pageable): Page<LmaDeclaration> {
     // Count query for pagination
     val countQuery = entityManager.createNativeQuery(

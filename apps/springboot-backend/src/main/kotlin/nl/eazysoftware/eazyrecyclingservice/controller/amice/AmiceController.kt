@@ -29,6 +29,12 @@ class AmiceController(
       .map { LmaDeclarationView.fromDomain(it) }
   }
 
+  @GetMapping("/pending-approvals")
+  fun hasPendingApprovals(): PendingApprovalsResponse {
+    val hasPending = lmaDeclarations.hasDeclarationsWithStatus("WAITING_APPROVAL")
+    return PendingApprovalsResponse(hasPendingApprovals = hasPending)
+  }
+
   data class LmaDeclarationView(
     val id: String,
     val wasteStreamNumber: String,
@@ -83,5 +89,9 @@ class AmiceController(
     val success: Boolean,
     val message: String,
     val declarationId: String,
+  )
+
+  data class PendingApprovalsResponse(
+    val hasPendingApprovals: Boolean,
   )
 }

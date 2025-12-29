@@ -17,26 +17,14 @@
 /**
  * 
  * @export
- * @interface SortObject
+ * @interface PendingApprovalsResponse
  */
-export interface SortObject {
+export interface PendingApprovalsResponse {
     /**
      * 
      * @type {boolean}
-     * @memberof SortObject
+     * @memberof PendingApprovalsResponse
      */
-    'sorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'unsorted'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SortObject
-     */
-    'empty'?: boolean;
+    'hasPendingApprovals': boolean;
 }
 

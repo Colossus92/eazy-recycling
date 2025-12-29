@@ -11,10 +11,12 @@ import { NavItem } from '@/components/layouts/sidebar/NavItem.tsx';
 import { SidebarHeader } from '@/components/layouts/sidebar/SidebarHeader.tsx';
 import { useAuth } from '@/components/auth/useAuthHook.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
+import { usePendingApprovals } from '@/features/wastestreams/hooks/usePendingApprovals';
 
 export const Sidebar = () => {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const { hasRole } = useAuth();
+  const { hasPendingApprovals } = usePendingApprovals();
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
@@ -26,11 +28,12 @@ export const Sidebar = () => {
     { icon: BuildingOffice, label: 'Relaties', to: '/crm' },
     { icon: BxRecycle, label: 'Afvalstroombeheer', to: '/waste-streams' },
     { icon: Scale, label: 'Weegbonnen', to: '/weight-tickets' },
-    { icon: IcBaselineEuro, 
-      label: 'Financieel', 
-      to: '/financials', 
+    {
+      icon: IcBaselineEuro,
+      label: 'Financieel',
+      to: '/financials',
       requiredRole: 'admin',
-     },
+    },
     {
       icon: IdentificationCard,
       label: 'Gebruikersbeheer',
@@ -51,19 +54,25 @@ export const Sidebar = () => {
   );
 
   return (
-    <div 
+    <div
       className="h-full flex flex-col items-start shrink-0 border border-solid border-primary rounded-radius-lg group transition-all duration-300"
       data-testid="sidebar"
     >
       <ErrorBoundary fallbackRender={fallbackRender}>
         <SidebarHeader collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        <div className="flex flex-col items-start gap-2 self-stretch p-4" data-testid="sidebar-nav">
+        <div
+          className="flex flex-col items-start gap-2 self-stretch p-4"
+          data-testid="sidebar-nav"
+        >
           {navItems.map((item, key) => (
             <NavItem
               to={item.to}
               icon={item.icon}
               label={item.label}
               collapsed={collapsed}
+              hasNotification={
+                item.to === '/waste-streams' && hasPendingApprovals
+              }
               key={key}
             />
           ))}

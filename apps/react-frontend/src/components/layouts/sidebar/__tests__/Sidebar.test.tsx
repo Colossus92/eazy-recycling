@@ -14,6 +14,13 @@ vi.mock('@/components/auth/useAuthHook.ts', () => ({
   }),
 }));
 
+// Mock the usePendingApprovals hook
+vi.mock('@/features/wastestreams/hooks/usePendingApprovals', () => ({
+  usePendingApprovals: () => ({
+    hasPendingApprovals: false,
+  }),
+}));
+
 describe('Sidebar', () => {
   beforeEach(() => {
     // Reset the mock before each test
