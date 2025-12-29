@@ -52,14 +52,21 @@ export function useLmaDeclarations(options?: UseLmaDeclarationsOptions) {
     });
   }, [lmaDeclarations, query]);
 
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+
   const approveMutation = useMutation({
-    mutationFn: (declarationId: string) => lmaDeclarationService.approve(declarationId),
+    mutationFn: (declarationId: string) => {
+      setApprovingId(declarationId);
+      return lmaDeclarationService.approve(declarationId);
+    },
     onSuccess: () => {
       toastService.success('Melding succesvol goedgekeurd en verzonden naar LMA');
       queryClient.invalidateQueries({ queryKey: ['lmaDeclarations'] });
+      setApprovingId(null);
     },
     onError: () => {
       toastService.error('Fout bij goedkeuren van melding');
+      setApprovingId(null);
     },
   });
 
@@ -70,6 +77,7 @@ export function useLmaDeclarations(options?: UseLmaDeclarationsOptions) {
     totalElements: lmaDeclarationsPage?.totalElements ?? 0,
     approveDeclaration: approveMutation.mutate,
     isApproving: approveMutation.isPending,
+    approvingId,
     errorHandling: {
       error,
       reset: () => {

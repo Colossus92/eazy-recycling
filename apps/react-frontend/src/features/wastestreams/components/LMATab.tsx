@@ -25,7 +25,7 @@ type Column = {
 export const LMATab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { items, setQuery, isFetching, totalElements, errorHandling, approveDeclaration, isApproving } = useLmaDeclarations({
+  const { items, setQuery, isFetching, totalElements, errorHandling, approveDeclaration, isApproving, approvingId } = useLmaDeclarations({
     page,
     pageSize: rowsPerPage,
   });
@@ -108,11 +108,12 @@ export const LMATab = () => {
         if (item.status !== 'WAITING_APPROVAL') {
           return <span className="text-color-text-tertiary">-</span>;
         }
+        const isThisItemApproving = approvingId === item.id;
         return (
           <Button
             variant="secondary"
             size="small"
-            label={isApproving ? 'Bezig...' : 'Goedkeuren'}
+            label={isThisItemApproving ? 'Bezig...' : 'Goedkeuren'}
             onClick={(e) => {
               e.stopPropagation();
               approveDeclaration(item.id);
