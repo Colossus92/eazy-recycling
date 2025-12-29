@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaratio
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarationSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
+import java.time.Instant
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -370,7 +372,7 @@ class SessionResultResolverTest {
     declarationIds = listOf(declarationId1, declarationId2),
     type = LmaDeclarationSessionDto.Type.FIRST_RECEIVAL,
     status = LmaDeclarationSessionDto.Status.PENDING,
-    createdAt = java.time.Instant.now(),
+    createdAt = Instant.now(),
     errors = null
   )
 
@@ -384,7 +386,8 @@ class SessionResultResolverTest {
     transporters = listOf("TRANS-001"),
     totalWeight = 1000L,
     totalShipments = 10L,
-    createdAt = java.time.Instant.now()
+    type = LmaDeclaration.Type.MONTHLY_RECEIVAL,
+    createdAt = Instant.now()
   )
 
   private fun createResponseWithError(errorCode: String, errorDescription: String): OpvragenResultaatVerwerkingMeldingSessieResponse {

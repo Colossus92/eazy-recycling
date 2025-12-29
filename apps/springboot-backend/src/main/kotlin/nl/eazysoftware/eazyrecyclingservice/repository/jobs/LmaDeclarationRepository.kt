@@ -1,9 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
-import jakarta.persistence.ColumnResult
-import jakarta.persistence.ConstructorResult
 import jakarta.persistence.EntityManager
-import jakarta.persistence.SqlResultSetMapping
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
@@ -95,8 +92,7 @@ class LmaDeclarationRepository(
         SELECT id FROM lma_declarations
         WHERE waste_stream_number = :wasteStreamNumber
         AND period = :period
-        AND status = 'WAITING_APPROVAL'
-        AND (id LIKE 'LATE-FIRST-%' OR id LIKE 'LATE-MONTHLY-%')
+        AND status = '${LmaDeclarationDto.Status.WAITING_APPROVAL.name}'
       """.trimIndent()
     )
       .setParameter("wasteStreamNumber", wasteStreamNumber)
@@ -129,6 +125,7 @@ class LmaDeclarationRepository(
         ws.name as waste_name,
         ws.pickup_location_id,
         d.errors,
+        d.type,
         d.transporters
       FROM lma_declarations d
       LEFT JOIN waste_streams ws ON d.waste_stream_number = ws.number
@@ -169,6 +166,7 @@ class LmaDeclarationRepository(
         totalWeight = result.totalWeight.toInt(),
         totalTransports = result.totalShipments.toInt(),
         period = yearMonth,
+        type = LmaDeclaration.Type.valueOf(result.type),
         status = result.status,
         errors = result.errors,
         transporters = result.transporters?.toList() ?: emptyList(),
@@ -187,30 +185,6 @@ class LmaDeclarationRepository(
 }
 
 
-/**
- * Result type for LMA declaration queries.
- * Maps native SQL query results to typed properties.
- */
-@SqlResultSetMapping(
-  name = "LmaDeclarationQueryResultMapping",
-  classes = [
-    ConstructorResult(
-      targetClass = LmaDeclarationQueryResult::class,
-      columns = [
-        ColumnResult(name = "id", type = String::class),
-        ColumnResult(name = "waste_stream_number", type = String::class),
-        ColumnResult(name = "period", type = String::class),
-        ColumnResult(name = "total_weight", type = Long::class),
-        ColumnResult(name = "total_shipments", type = Long::class),
-        ColumnResult(name = "status", type = String::class),
-        ColumnResult(name = "waste_name", type = String::class),
-        ColumnResult(name = "pickup_location_id", type = String::class),
-        ColumnResult(name = "errors", type = Array<String>::class),
-        ColumnResult(name = "transporters", type = Array<String>::class)
-      ]
-    )
-  ]
-)
 data class LmaDeclarationQueryResult(
   val id: String,
   val wasteStreamNumber: String,
@@ -221,6 +195,7 @@ data class LmaDeclarationQueryResult(
   val wasteName: String?,
   val pickupLocationId: String?,
   val errors: Array<String>?,
+  val type: String,
   val transporters: Array<String>?,
 )
 
@@ -237,6 +212,7 @@ object LmaDeclarationMapper {
       transporters = firstReceival.vervoerders.split(",").map { it.trim() },
       totalWeight = firstReceival.totaalGewicht.toLong(),
       totalShipments = firstReceival.aantalVrachten.toLong(),
+      type = LmaDeclaration.Type.FIRST_RECEIVAL,
       createdAt = Clock.System.now().toJavaInstant(),
       status = status,
     )
@@ -253,6 +229,7 @@ object LmaDeclarationMapper {
       transporters = monthlyReceival.vervoerders.split(",").map { it.trim() },
       totalWeight = monthlyReceival.totaalGewicht.toLong(),
       totalShipments = monthlyReceival.aantalVrachten.toLong(),
+      type = LmaDeclaration.Type.FIRST_RECEIVAL,
       createdAt = Clock.System.now().toJavaInstant(),
       status = status,
     )

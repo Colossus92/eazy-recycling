@@ -32,6 +32,14 @@ data class LmaDeclaration(
   val totalTransports: Int,
   val period: YearMonth,
   val status: String,
+  val type: Type,
   val errors: Array<String>?,
   val transporters: List<String>,
-)
+) {
+
+  enum class Type {
+    FIRST_RECEIVAL,
+    MONTHLY_RECEIVAL,
+    LEGACY,
+  }
+}

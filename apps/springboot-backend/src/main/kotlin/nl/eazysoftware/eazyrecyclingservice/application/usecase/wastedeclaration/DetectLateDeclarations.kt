@@ -6,12 +6,13 @@ import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.util.DeclarationCutoffDateCalculator
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.UndeclaredWeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclarationIdGenerator
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.*
 import kotlin.time.Clock
 import kotlin.time.toJavaInstant
 
@@ -25,6 +26,7 @@ import kotlin.time.toJavaInstant
 class DetectLateDeclarations(
   private val weightTickets: WeightTickets,
   private val lmaDeclarations: LmaDeclarations,
+  private val idGenerator: ReceivalDeclarationIdGenerator,
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -59,19 +61,20 @@ class DetectLateDeclarations(
       val totalWeight = lines.sumOf { it.weightValue.toLong() }
 
       val formattedPeriod = formatPeriod(period)
-      
+
       // Delete any existing pending late declarations for this waste stream and period
       lmaDeclarations.deletePendingLateDeclarations(wasteStreamNumber, formattedPeriod)
-      
+
       if (!hasExistingDeclaration) {
         // This is a first receival - create a CORRECTIVE declaration for manual approval
         val declaration = LmaDeclarationDto(
-          id = "LATE-FIRST-${UUID.randomUUID()}",
+          id = idGenerator.nextId(),
           wasteStreamNumber = wasteStreamNumber,
           period = formattedPeriod,
           transporters = emptyList(), // Transporters are not relevant for late declarations, transporters can only be declared once for a period
           totalWeight = totalWeight,
           totalShipments = lines.size.toLong(),
+          type = LmaDeclaration.Type.FIRST_RECEIVAL,
           createdAt = Clock.System.now().toJavaInstant(),
           status = LmaDeclarationDto.Status.WAITING_APPROVAL,
         )
@@ -80,12 +83,13 @@ class DetectLateDeclarations(
         logger.info("Created late first receival declaration for waste stream {} period {} (overwriting any previous pending)", wasteStreamNumber, period)
       } else {
         val declaration = LmaDeclarationDto(
-          id = "LATE-MONTHLY-${UUID.randomUUID()}",
+          id = idGenerator.nextId(),
           wasteStreamNumber = wasteStreamNumber,
           period = formattedPeriod,
           transporters = emptyList(), // Transporters are not relevant for late declarations, transporters can only be declared once for a period
           totalWeight = totalWeight,
           totalShipments = lines.size.toLong(),
+          type = LmaDeclaration.Type.MONTHLY_RECEIVAL,
           createdAt = Clock.System.now().toJavaInstant(),
           status = LmaDeclarationDto.Status.WAITING_APPROVAL,
         )

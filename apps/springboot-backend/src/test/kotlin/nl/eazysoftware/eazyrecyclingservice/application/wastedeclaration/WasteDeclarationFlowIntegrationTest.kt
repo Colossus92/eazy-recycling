@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
@@ -426,10 +427,10 @@ class WasteDeclarationFlowIntegrationTest : BaseIntegrationTest() {
     jdbcTemplate.update(
       """
       INSERT INTO lma_declarations (id, amice_uuid, waste_stream_number, period, transporters,
-                                    total_weight, total_shipments, created_at, errors, status)
-      VALUES (?, ?, ?, ?, ARRAY[]::text[], 0, 0, NOW(), ARRAY[]::text[], 'COMPLETED')
+                                    total_weight, total_shipments, type, created_at, errors, status)
+      VALUES (?, ?, ?, ?, ARRAY[]::text[], 0, 0, ?, NOW(), ARRAY[]::text[], 'COMPLETED')
       """,
-      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period
+      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period, LmaDeclaration.Type.FIRST_RECEIVAL.name
     )
   }
 

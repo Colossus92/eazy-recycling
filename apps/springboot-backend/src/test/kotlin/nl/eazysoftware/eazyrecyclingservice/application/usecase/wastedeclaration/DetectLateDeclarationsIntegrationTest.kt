@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaratio
 
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
@@ -68,7 +69,7 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should create LATE-FIRST declaration for undeclared waste stream with no prior declarations`() {
+  fun `should create FIRST_RECEIVAL declaration for undeclared waste stream with no prior declarations`() {
     val wasteStreamNumber = "087970000001"
 
     createWasteStream(wasteStreamNumber, "ACTIVE")
@@ -82,14 +83,15 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     val declarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(declarations).hasSize(1)
-    assertThat(declarations.first().id).startsWith("LATE-FIRST-")
+    assertThat(declarations.first().id).hasSize(12)
     assertThat(declarations.first().totalWeight).isEqualTo(1000L)
     assertThat(declarations.first().totalShipments).isEqualTo(1L)
     assertThat(declarations.first().status).isEqualTo(LmaDeclarationDto.Status.WAITING_APPROVAL)
+    assertThat(declarations.first().type).isEqualTo(LmaDeclaration.Type.FIRST_RECEIVAL)
   }
 
   @Test
-  fun `should create LATE-MONTHLY declaration for undeclared waste stream with prior declarations`() {
+  fun `should create MONTHLY_RECEIVAL declaration for undeclared waste stream with prior declarations`() {
     val wasteStreamNumber = "087970000002"
 
     createWasteStream(wasteStreamNumber, "ACTIVE")
@@ -105,13 +107,14 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     val declarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(declarations).hasSize(1)
-    assertThat(declarations.first().id).startsWith("LATE-MONTHLY-")
+    assertThat(declarations.first().id).hasSize(12)
     assertThat(declarations.first().totalWeight).isEqualTo(2500L)
     assertThat(declarations.first().totalShipments).isEqualTo(1L)
+    assertThat(declarations.first().type).isEqualTo(LmaDeclaration.Type.MONTHLY_RECEIVAL)
   }
 
   @Test
-  fun `should overwrite pending LATE-FIRST declaration when new undeclared tickets are added for same period`() {
+  fun `should overwrite pending FIRST_RECIEVAL declaration when new undeclared tickets are added for same period`() {
     val wasteStreamNumber = "087970000003"
     val weightedAt = OffsetDateTime.of(2025, 10, 15, 10, 0, 0, 0, ZoneOffset.UTC)
 
@@ -127,9 +130,10 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
     val firstDeclarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(firstDeclarations).hasSize(1)
     val firstDeclarationId = firstDeclarations.first().id
-    assertThat(firstDeclarationId).startsWith("LATE-FIRST-")
+    assertThat(firstDeclarationId).hasSize(12)
     assertThat(firstDeclarations.first().totalWeight).isEqualTo(1000L)
     assertThat(firstDeclarations.first().totalShipments).isEqualTo(1L)
+    assertThat(firstDeclarations.first().type).isEqualTo(LmaDeclaration.Type.FIRST_RECEIVAL)
 
     createWeightTicket(
       carrierPartyId = carrierCompanyId,
@@ -142,13 +146,14 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
     val secondDeclarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(secondDeclarations).hasSize(1)
     assertThat(secondDeclarations.first().id).isNotEqualTo(firstDeclarationId)
-    assertThat(secondDeclarations.first().id).startsWith("LATE-FIRST-")
+    assertThat(secondDeclarations.first().id).hasSize(12)
     assertThat(secondDeclarations.first().totalWeight).isEqualTo(1500L)
     assertThat(secondDeclarations.first().totalShipments).isEqualTo(2L)
+    assertThat(secondDeclarations.first().type).isEqualTo(LmaDeclaration.Type.FIRST_RECEIVAL)
   }
 
   @Test
-  fun `should overwrite pending LATE-MONTHLY declaration when new undeclared tickets are added for same period`() {
+  fun `should overwrite pending MONTHLY_RECEIVAL declaration when new undeclared tickets are added for same period`() {
     val wasteStreamNumber = "087970000004"
     val weightedAt = OffsetDateTime.of(2025, 10, 18, 10, 0, 0, 0, ZoneOffset.UTC)
 
@@ -165,10 +170,12 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     val firstDeclarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(firstDeclarations).hasSize(1)
-    val firstDeclarationId = firstDeclarations.first().id
-    assertThat(firstDeclarationId).startsWith("LATE-MONTHLY-")
-    assertThat(firstDeclarations.first().totalWeight).isEqualTo(2000L)
-    assertThat(firstDeclarations.first().totalShipments).isEqualTo(1L)
+    val firstDeclaration = firstDeclarations.first()
+    assertThat(firstDeclaration.id).hasSize(12)
+    assertThat(firstDeclaration.totalWeight).isEqualTo(2000L)
+    assertThat(firstDeclaration.totalShipments).isEqualTo(1L)
+    assertThat(firstDeclaration.type).isEqualTo(LmaDeclaration.Type.MONTHLY_RECEIVAL)
+
 
     createWeightTicket(
       carrierPartyId = carrierCompanyId,
@@ -185,10 +192,11 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     val secondDeclarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(secondDeclarations).hasSize(1)
-    assertThat(secondDeclarations.first().id).isNotEqualTo(firstDeclarationId)
-    assertThat(secondDeclarations.first().id).startsWith("LATE-MONTHLY-")
+    assertThat(secondDeclarations.first().id).isNotEqualTo(firstDeclaration.id)
+    assertThat(secondDeclarations.first().id).hasSize(12)
     assertThat(secondDeclarations.first().totalWeight).isEqualTo(4000L)
     assertThat(secondDeclarations.first().totalShipments).isEqualTo(3L)
+    assertThat(secondDeclarations.first().type).isEqualTo(LmaDeclaration.Type.MONTHLY_RECEIVAL)
   }
 
   @Test
@@ -226,7 +234,7 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     createWasteStream(wasteStreamNumber, "ACTIVE")
 
-    val completedDeclarationId = "LATE-FIRST-COMPLETED-123"
+    val completedDeclarationId = "000000000123"
     createLmaDeclarationWithStatus(wasteStreamNumber, "112025", "COMPLETED", completedDeclarationId, 1000L, 1L)
 
     createWeightTicket(
@@ -255,8 +263,8 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     createWasteStream(wasteStreamNumber, "ACTIVE")
 
-    createLmaDeclarationWithStatus(wasteStreamNumber, "112025", "WAITING_APPROVAL", "LATE-FIRST-OLD-1", 1000L, 1L)
-    createLmaDeclarationWithStatus(wasteStreamNumber, "112025", "WAITING_APPROVAL", "LATE-FIRST-OLD-2", 2000L, 2L)
+    createLmaDeclarationWithStatus(wasteStreamNumber, "112025", "WAITING_APPROVAL", "000000000001", 1000L, 1L)
+    createLmaDeclarationWithStatus(wasteStreamNumber, "112025", "WAITING_APPROVAL", "000000000002", 2000L, 2L)
 
     createWeightTicket(
       carrierPartyId = carrierCompanyId,
@@ -268,7 +276,7 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
     val declarations = findLmaDeclarations(wasteStreamNumber, "WAITING_APPROVAL")
     assertThat(declarations).hasSize(1)
-    assertThat(declarations.first().id).isNotIn("LATE-FIRST-OLD-1", "LATE-FIRST-OLD-2")
+    assertThat(declarations.first().id).isNotIn("000000000001", "000000000002")
     assertThat(declarations.first().totalWeight).isEqualTo(5000L)
   }
 
@@ -284,6 +292,7 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
           transporters = (rs.getArray("transporters")?.array as Array<*>).map { it.toString() },
           totalWeight = rs.getLong("total_weight"),
           totalShipments = rs.getLong("total_shipments"),
+          type = LmaDeclaration.Type.valueOf(rs.getString("type")),
           createdAt = rs.getTimestamp("created_at").toInstant(),
           errors = null,
           status = LmaDeclarationDto.Status.valueOf(rs.getString("status"))
@@ -309,6 +318,7 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
             transporters = (rs.getArray("transporters")?.array as Array<*>).map { it.toString() },
             totalWeight = rs.getLong("total_weight"),
             totalShipments = rs.getLong("total_shipments"),
+            type = LmaDeclaration.Type.valueOf(rs.getString("type")),
             createdAt = rs.getTimestamp("created_at").toInstant(),
             errors = null,
             status = LmaDeclarationDto.Status.valueOf(rs.getString("status"))
@@ -323,10 +333,10 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
     jdbcTemplate.update(
       """
       INSERT INTO lma_declarations (id, amice_uuid, waste_stream_number, period, transporters,
-                                    total_weight, total_shipments, created_at, errors, status)
-      VALUES (?, ?, ?, ?, ARRAY[]::text[], 0, 0, NOW(), ARRAY[]::text[], 'COMPLETED')
+                                    total_weight, total_shipments, type, created_at, errors, status)
+      VALUES (?, ?, ?, ?, ARRAY[]::text[], 0, 0, ?, NOW(), ARRAY[]::text[], 'COMPLETED')
       """,
-      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period
+      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period, LmaDeclaration.Type.MONTHLY_RECEIVAL.name
     )
   }
 
@@ -341,10 +351,10 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
     jdbcTemplate.update(
       """
       INSERT INTO lma_declarations (id, amice_uuid, waste_stream_number, period, transporters,
-                                    total_weight, total_shipments, created_at, errors, status)
-      VALUES (?, ?, ?, ?, ARRAY[]::text[], ?, ?, NOW(), ARRAY[]::text[], ?)
+                                    total_weight, total_shipments, type, created_at, errors, status)
+      VALUES (?, ?, ?, ?, ARRAY[]::text[], ?, ?, ?, NOW(), ARRAY[]::text[], ?)
       """,
-      id, UUID.randomUUID(), wasteStreamNumber, period, totalWeight, totalShipments, status
+      id, UUID.randomUUID(), wasteStreamNumber, period, totalWeight, totalShipments, LmaDeclaration.Type.FIRST_RECEIVAL.name, status
     )
   }
 

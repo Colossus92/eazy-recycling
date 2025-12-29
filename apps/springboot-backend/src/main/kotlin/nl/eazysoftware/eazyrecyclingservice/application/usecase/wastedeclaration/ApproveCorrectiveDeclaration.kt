@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaratio
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
@@ -43,7 +44,7 @@ class ApproveCorrectiveDeclarationService(
     val declaration = lmaDeclarations.findById(declarationId)
       ?: return ApprovalResult(
         success = false,
-        message = "Declaration not found: $declarationId",
+        message = "Declaratie niet gevonden: $declarationId",
         declarationId = declarationId,
       )
 
@@ -56,11 +57,8 @@ class ApproveCorrectiveDeclarationService(
       )
     }
 
-    // Determine if this is a first receival or monthly receival based on the ID prefix
-    val isFirstReceival = declarationId.startsWith("LATE-FIRST-")
-
     try {
-      if (isFirstReceival) {
+      if (declaration.type == LmaDeclaration.Type.FIRST_RECEIVAL) {
         // Submit as first receival
         val soapMessage = mapToFirstReceivalSoapMessage(declaration)
         amiceSessions.declareFirstReceivals(listOf(soapMessage))

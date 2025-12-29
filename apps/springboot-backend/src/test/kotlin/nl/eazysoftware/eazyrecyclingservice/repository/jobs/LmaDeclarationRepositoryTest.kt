@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
@@ -389,10 +390,10 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
     jdbcTemplate.update(
       """
       INSERT INTO lma_declarations (id, amice_uuid, waste_stream_number, period, transporters,
-                                    total_weight, total_shipments, created_at, errors, status)
-      VALUES (?, ?, ?, ?, ARRAY[]::text[], ?, ?, NOW(), ARRAY[]::text[], 'PENDING')
+                                    total_weight, total_shipments, type, created_at, errors, status)
+      VALUES (?, ?, ?, ?, ARRAY[]::text[], ?, ?, ?, NOW(), ARRAY[]::text[], 'PENDING')
       """,
-      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period, totalWeight.toLong(), totalShipments.toLong()
+      UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period, totalWeight.toLong(), totalShipments.toLong(), LmaDeclaration.Type.FIRST_RECEIVAL.name
     )
   }
 

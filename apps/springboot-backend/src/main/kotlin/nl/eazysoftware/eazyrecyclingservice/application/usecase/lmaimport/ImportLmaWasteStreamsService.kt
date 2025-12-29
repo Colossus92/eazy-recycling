@@ -6,10 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErro
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErrorCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportResult
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaImportErrors
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
@@ -34,6 +31,7 @@ class ImportLmaWasteStreamsService(
   private val euralRepository: EuralRepository,
   private val processingMethodRepository: ProcessingMethodRepository,
   private val lmaDeclarations: LmaDeclarations,
+  private val idGenerator: ReceivalDeclarationIdGenerator
 ) : ImportLmaWasteStreams {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -204,11 +202,12 @@ class ImportLmaWasteStreamsService(
           period = "012024",
           status = LmaDeclarationDto.Status.COMPLETED,
           totalWeight = 0,
-          id = "LEGACY-${wasteStream.wasteStreamNumber.number}",
+          id = idGenerator.nextId(),
           amiceUUID = UUID.randomUUID(),
           transporters = emptyList(),
           totalShipments = 0,
           createdAt = Instant.now(),
+          type = LmaDeclaration.Type.LEGACY,
           errors = emptyList(),
         )
       )

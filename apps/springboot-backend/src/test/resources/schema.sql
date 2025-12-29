@@ -288,6 +288,7 @@ create table lma_declarations (
                                            "transporters" text[] not null,
                                            "total_weight" bigint not null,
                                            "total_shipments" bigint not null,
+                                           "type" text not null,
                                            "created_at" timestamp with time zone not null default now(),
                                            "errors" text[],
                                            "status" text not null,

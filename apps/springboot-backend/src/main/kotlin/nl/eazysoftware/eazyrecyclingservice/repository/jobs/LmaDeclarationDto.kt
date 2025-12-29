@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import java.time.Instant
 import java.util.*
 
@@ -28,6 +29,10 @@ data class LmaDeclarationDto(
 
   @Column(name = "total_shipments", nullable = false)
   val totalShipments: Long,
+
+  @Column(name = "type", nullable = false)
+  @Enumerated(EnumType.STRING)
+  val type: LmaDeclaration.Type,
 
   @Column(name = "created_at", nullable = false)
   val createdAt: Instant,
