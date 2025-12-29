@@ -1,10 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
 
+import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -32,6 +35,8 @@ data class ApprovalResult(
 class ApproveCorrectiveDeclarationService(
   private val lmaDeclarations: LmaDeclarations,
   private val amiceSessions: AmiceSessions,
+  private val wasteStreams: WasteStreams,
+  private val firstReceivalMessageMapper: FirstReceivalMessageMapper,
 ) : ApproveCorrectiveDeclaration {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -76,7 +81,7 @@ class ApproveCorrectiveDeclarationService(
 
       return ApprovalResult(
         success = true,
-        message = "Declaration approved and submitted to LMA",
+        message = "Melding goedgekeurd en verstuurd naar LMA",
         declarationId = declarationId,
       )
     } catch (e: Exception) {
@@ -85,29 +90,32 @@ class ApproveCorrectiveDeclarationService(
       // Update status to FAILED
       val failedDeclaration = declaration.copy(
         status = LmaDeclarationDto.Status.FAILED,
-        errors = listOf(e.message ?: "Unknown error"),
+        errors = listOf(e.message ?: "Onbekende fout"),
       )
       lmaDeclarations.saveAll(listOf(failedDeclaration))
 
       return ApprovalResult(
         success = false,
-        message = "Failed to submit declaration: ${e.message}",
+        message = "Fout bij versturen van LMA melding: ${e.message}",
         declarationId = declarationId,
       )
     }
   }
 
   private fun mapToFirstReceivalSoapMessage(declaration: LmaDeclarationDto): EersteOntvangstMeldingDetails {
-    val message = EersteOntvangstMeldingDetails()
-    message.meldingsNummerMelder = declaration.id
-    message.afvalstroomNummer = declaration.wasteStreamNumber
-    message.periodeMelding = declaration.period
-    message.vervoerders = declaration.transporters.joinToString(",")
-    message.totaalGewicht = declaration.totalWeight.toInt()
-    message.aantalVrachten = declaration.totalShipments.toShort()
-    // Note: Other fields like consignor, pickup location, etc. would need to be fetched
-    // from the waste stream configuration. For now, we're sending minimal data.
-    return message
+    val wasteStream = wasteStreams.findByNumber(WasteStreamNumber(declaration.wasteStreamNumber))
+      ?: throw IllegalStateException("Afvalstroomnummer niet gevonden: ${declaration.wasteStreamNumber}")
+
+    val yearMonth = YearMonth.parse(declaration.period)
+
+    return firstReceivalMessageMapper.mapToSoapMessage(
+      declarationId = declaration.id,
+      wasteStream = wasteStream,
+      transporters = declaration.transporters,
+      totalWeight = declaration.totalWeight.toInt(),
+      totalShipments = declaration.totalShipments.toShort(),
+      yearMonth = yearMonth
+    )
   }
 
   private fun mapToMonthlyReceivalSoapMessage(declaration: LmaDeclarationDto): MaandelijkseOntvangstMeldingDetails {
