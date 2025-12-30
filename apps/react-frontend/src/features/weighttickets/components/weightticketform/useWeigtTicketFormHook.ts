@@ -145,7 +145,6 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       await queryClient.invalidateQueries({
         queryKey: ['weightTickets'],
         exact: false,
-        refetchType: 'none',
       });
     },
     onError: (error) => {
@@ -182,7 +181,6 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       await queryClient.invalidateQueries({
         queryKey: ['weightTickets'],
         exact: false,
-        refetchType: 'none',
       });
     },
     onError: (error) => {
