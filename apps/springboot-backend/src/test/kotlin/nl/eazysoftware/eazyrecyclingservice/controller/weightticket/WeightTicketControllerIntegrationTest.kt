@@ -519,7 +519,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "100.00",
-                    catalogItemId = testCatalogItem.id!!
+                    catalogItemId = testCatalogItem.id
                 )
             )
         )
@@ -547,7 +547,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "200.00",
-                    catalogItemId = testCatalogItem.id!!
+                    catalogItemId = testCatalogItem.id
                 )
             )
         )

@@ -63,7 +63,7 @@ class EdgeFunctionOutboxProcessor(
                 val response = supabaseClient.functions.invoke(
                     function = functionName,
                     body = body,
-                    headers = io.ktor.http.Headers.build {
+                    headers = Headers.build {
                         append(HttpHeaders.ContentType, "application/json")
                     }
                 )
@@ -87,7 +87,7 @@ class EdgeFunctionOutboxProcessor(
             entry.markAsCompleted()
 
             if (entry.functionName == EdgeFunctionName.INVOICE_PDF_GENERATOR && entry.aggregateId != null && response.storagePath != null) {
-                updateInvoicePdfUrl(entry.aggregateId!!, response.storagePath!!)
+                updateInvoicePdfUrl(entry.aggregateId, response.storagePath)
             }
         } else {
             val errorMessage = response?.error ?: response?.message ?: "Unknown error"
