@@ -467,7 +467,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "150.75",
-                    catalogItemId = testCatalogItem.id!!
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             note = "Weight ticket for invoice"
@@ -499,7 +499,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // Then - verify invoice was created with correct data
         val savedInvoice = invoiceRepository.findById(invoiceId)
         assertThat(savedInvoice).isPresent
-        assertThat(savedInvoice.get().sourceWeightTicketId).isEqualTo(weightTicketId)
+        assertThat(savedInvoice.get().weightTicket?.number).isEqualTo(weightTicketId)
         assertThat(savedInvoice.get().customerName).isEqualTo("Test Consignor Company")
         assertThat(savedInvoice.get().status.name).isEqualTo("DRAFT")
 

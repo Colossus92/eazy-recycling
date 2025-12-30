@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocumentType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -12,7 +13,7 @@ data class CreateInvoiceCommand(
     val customerId: UUID,
     val invoiceDate: LocalDate,
     val originalInvoiceId: UUID?,
-    val sourceWeightTicketId: Long? = null,
+    val sourceWeightTicketId: WeightTicketId? = null,
     val lines: List<InvoiceLineCommand>,
 )
 

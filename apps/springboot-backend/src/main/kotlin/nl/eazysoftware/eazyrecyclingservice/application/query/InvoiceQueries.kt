@@ -70,7 +70,7 @@ class GetInvoiceByIdQuery(
                 vatNumber = invoice.customerSnapshot.vatNumber,
             ),
             originalInvoiceId = invoice.originalInvoiceId?.value,
-            sourceWeightTicketId = invoice.sourceWeightTicketId,
+            sourceWeightTicketId = invoice.sourceWeightTicketId?.number,
             lines = invoice.lines.map { line ->
                 InvoiceLineView(
                     id = line.id.value,

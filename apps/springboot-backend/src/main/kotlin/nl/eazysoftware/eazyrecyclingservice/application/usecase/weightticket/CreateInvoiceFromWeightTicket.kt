@@ -117,7 +117,7 @@ class CreateInvoiceFromWeightTicketService(
             invoiceDate = LocalDate.now(),
             customerSnapshot = customerSnapshot,
             originalInvoiceId = null,
-            sourceWeightTicketId = weightTicket.id.number,
+            sourceWeightTicketId = weightTicket.id,
             lines = invoiceLines,
             createdAt = Clock.System.now(),
             createdBy = null,

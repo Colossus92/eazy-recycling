@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.invoice
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -13,10 +14,10 @@ class Invoice(
     val invoiceType: InvoiceType,
     val documentType: InvoiceDocumentType,
     var status: InvoiceStatus,
-    val invoiceDate: LocalDate,
+    var invoiceDate: LocalDate,
     val customerSnapshot: CustomerSnapshot,
     val originalInvoiceId: InvoiceId?,
-    val sourceWeightTicketId: Long?,
+    val sourceWeightTicketId: WeightTicketId?,
     val lines: MutableList<InvoiceLine>,
     val createdAt: Instant,
     val createdBy: String?,
@@ -40,6 +41,7 @@ class Invoice(
         updatedBy: String? = null,
     ) {
         require(status == InvoiceStatus.DRAFT) { "Alleen concept facturen kunnen worden gewijzigd." }
+        this.invoiceDate = invoiceDate
         this.lines.clear()
         this.lines.addAll(lines)
         this.updatedAt = Clock.System.now()

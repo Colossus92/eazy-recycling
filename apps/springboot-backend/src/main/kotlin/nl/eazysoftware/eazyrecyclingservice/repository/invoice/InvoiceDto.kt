@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocument
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -67,8 +68,9 @@ class InvoiceDto(
   @Column(name = "original_invoice_id")
   val originalInvoiceId: UUID?,
 
-  @Column(name = "source_weight_ticket_id")
-  val sourceWeightTicketId: Long?,
+  @OneToOne
+  @JoinColumn(name = "source_weight_ticket_id", referencedColumnName = "id", nullable = true)
+  val weightTicket: WeightTicketDto? = null,
 
   @OneToMany(mappedBy = "invoice", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
   val lines: MutableList<InvoiceLineDto> = mutableListOf(),
@@ -88,5 +90,5 @@ class InvoiceDto(
       return id == other.id
     }
 
-    override fun hashCode(): Int = id.hashCode() ?: 0
+    override fun hashCode(): Int = id.hashCode()
 }

@@ -15,7 +15,8 @@ export interface WeightTicketLine {
 
 export interface WeightTicketData {
   weightTicket: {
-    id: number;
+    id: string;
+    number: number;
     truck_license_plate: string;
     reclamation?: string;
     note?: string;
@@ -111,6 +112,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
     const ticketResult = await connection.queryObject`
       SELECT
         id,
+        number,
         consignor_party_id,
         carrier_party_id,
         truck_license_plate,
@@ -132,7 +134,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
       FROM
         weight_tickets
       WHERE
-        id = ${id}
+        number = ${id}
     `;
 
     if (ticketResult.rows.length === 0) {
@@ -145,7 +147,8 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
     }
 
     interface WeightTicketRow {
-      id: number;
+      id: string;
+      number: number;
       consignor_party_id?: string;
       carrier_party_id?: string;
       truck_license_plate: string;
@@ -254,10 +257,12 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
         wtl.weight_unit
       FROM
         weight_ticket_lines wtl
+      INNER JOIN
+        weight_tickets wt ON wtl.weight_ticket_id = wt.id
       LEFT JOIN
         waste_streams ws ON wtl.waste_stream_number = ws.number
       WHERE
-        wtl.weight_ticket_id = ${id}
+        wt.number = ${id}
       GROUP BY
         ws.name, wtl.weight_unit
       ORDER BY
@@ -270,6 +275,7 @@ export async function fetchWeightTicketData(ticketId: string): Promise<{ data?: 
       data: {
         weightTicket: {
           id: ticket.id,
+          number: ticket.number,
           truck_license_plate: ticket.truck_license_plate,
           reclamation: ticket.reclamation,
           note: ticket.note,

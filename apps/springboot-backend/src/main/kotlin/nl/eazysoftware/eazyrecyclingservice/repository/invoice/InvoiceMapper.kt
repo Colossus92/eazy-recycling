@@ -1,14 +1,18 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.invoice
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import org.springframework.stereotype.Component
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
-class InvoiceMapper {
+class InvoiceMapper(
+    private val entityManager: EntityManager
+) {
 
     fun toDomain(dto: InvoiceDto): Invoice {
         return Invoice(
@@ -33,7 +37,7 @@ class InvoiceMapper {
                 vatNumber = dto.customerVatNumber,
             ),
             originalInvoiceId = dto.originalInvoiceId?.let { InvoiceId(it) },
-            sourceWeightTicketId = dto.sourceWeightTicketId,
+            sourceWeightTicketId = dto.weightTicket?.let { WeightTicketId(it.id, it.number) },
             lines = dto.lines.map { toDomainLine(it) }.toMutableList(),
             createdAt = dto.createdAt?.toKotlinInstant() ?: kotlin.time.Clock.System.now(),
             createdBy = dto.createdBy,
@@ -64,7 +68,7 @@ class InvoiceMapper {
             customerCountry = domain.customerSnapshot.address.country,
             customerVatNumber = domain.customerSnapshot.vatNumber,
             originalInvoiceId = domain.originalInvoiceId?.value,
-            sourceWeightTicketId = domain.sourceWeightTicketId,
+            weightTicket = domain.sourceWeightTicketId?.let { entityManager.getReference(WeightTicketDto::class.java, it.id) },
             finalizedAt = domain.finalizedAt?.toJavaInstant(),
             finalizedBy = domain.finalizedBy,
             pdfUrl = domain.pdfUrl,

@@ -432,7 +432,7 @@ create table if not exists invoices (
                                           customer_country text,
                                           customer_vat_number text,
                                           original_invoice_id uuid,
-                                          source_weight_ticket_id bigint,
+                                          source_weight_ticket_id uuid,
                                           created_at timestamp with time zone not null default now(),
                                           created_by text,
                                           last_modified_at timestamp with time zone not null default now(),

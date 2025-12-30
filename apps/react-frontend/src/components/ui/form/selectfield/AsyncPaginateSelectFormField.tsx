@@ -100,7 +100,7 @@ export const AsyncPaginateSelectFormField = <TFieldValues extends FieldValues>({
     const loadInitialOption = async () => {
       // Get the current form value from the control
       const currentValue = control?._formValues?.[name as string];
-      
+
       // Clear selected option if form value is empty
       if (!currentValue) {
         setSelectedOption(null);
@@ -130,7 +130,12 @@ export const AsyncPaginateSelectFormField = <TFieldValues extends FieldValues>({
       }
     };
     loadInitialOption();
-  }, [control?._formValues?.[name as string], name, loadOptions, loadOptionByValue]);
+  }, [
+    control?._formValues?.[name as string],
+    name,
+    loadOptions,
+    loadOptionByValue,
+  ]);
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
@@ -146,7 +151,7 @@ export const AsyncPaginateSelectFormField = <TFieldValues extends FieldValues>({
         name={name}
         rules={rules}
         defaultValue={value}
-        render={({ field }) => (
+        render={({ field: { ref, ...field } }) => (
           <AsyncPaginate
             {...field}
             loadOptions={loadOptionsAdapter}

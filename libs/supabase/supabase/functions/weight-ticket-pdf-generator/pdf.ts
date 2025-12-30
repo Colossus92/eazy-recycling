@@ -1,6 +1,6 @@
 import type { PDFPage } from 'npm:pdf-lib';
 import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib';
-import { WeightTicketData, WeightTicketLine, formatDateTime } from './db.ts';
+import { formatDateTime, WeightTicketData, WeightTicketLine } from './db.ts';
 
 // Hardcoded company address for top right
 const COMPANY_ADDRESS = {
@@ -424,7 +424,7 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
     await drawHeader(page, pdfDoc);
 
     // Draw title
-    await drawTitle(page, pdfDoc, data.weightTicket.id);
+    await drawTitle(page, pdfDoc, data.weightTicket.number);
 
     // Main content area starts here
     let contentY = height - 250;

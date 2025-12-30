@@ -7,14 +7,10 @@ import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import jakarta.annotation.PostConstruct
-import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.boot.runApplication
-import org.springframework.context.event.EventListener
 import org.springframework.retry.annotation.EnableRetry
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.stereotype.Component
 import java.util.*
 
 @SecurityScheme(
@@ -42,17 +38,4 @@ class Application {
 
 fun main(args: Array<String>) {
     runApplication<Application>(*args)
-}
-
-@Component
-class StartupLogger {
-    private val logger = LoggerFactory.getLogger(StartupLogger::class.java)
-
-    @EventListener(ApplicationReadyEvent::class)
-    fun logApplicationStartup() {
-        val version = "0.0.1"
-        logger.info("========================================")
-        logger.info("✅ Eazy Recycling Service v{} is ready!", version)
-        logger.info("========================================")
-    }
 }
