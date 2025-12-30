@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.number
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTimezoneBoundaries
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.UndeclaredWeightTicketLine
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
@@ -82,6 +82,11 @@ class WeightTicketRepository(
     }
 
     override fun findUndeclaredLines(cutoffDate: YearMonth): List<UndeclaredWeightTicketLine> {
+        // Calculate month boundaries in display timezone (Europe/Amsterdam) for business logic
+        // This ensures weight tickets entered on the last day of a month in CET are not
+        // incorrectly included in the next month's declarations
+        val (startOfMonth, _) = cutoffDate.toDisplayTimezoneBoundaries()
+
         val query = """
             SELECT
                 wt.id as weight_ticket_id,
@@ -95,12 +100,13 @@ class WeightTicketRepository(
             WHERE wt.status IN ('COMPLETED', 'INVOICED')
               AND wt.weighted_at < :cutoffDate
               AND (wtl.declared_weight IS NULL OR wtl.declared_weight != wtl.weight_value)
+              AND wtl.waste_stream_number IS NOT NULL
             ORDER BY wt.weighted_at, wt.id
         """.trimIndent()
 
         @Suppress("UNCHECKED_CAST")
         val results = entityManager.createNativeQuery(query)
-            .setParameter("cutoffDate", java.time.YearMonth.of(cutoffDate.year, cutoffDate.month.number).atDay(1).atStartOfDay())
+            .setParameter("cutoffDate", startOfMonth)
             .resultList as List<Array<Any>>
 
         return results.map { row ->
