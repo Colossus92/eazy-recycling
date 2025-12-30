@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ClipLoader } from 'react-spinners';
 import { InvoiceCard } from '@/features/invoices/components/InvoiceCard';
 import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
+import { useEffect } from 'react';
 
 interface InvoiceRelatedTabProps {
   invoiceId?: string;
@@ -16,6 +17,7 @@ export const InvoiceRelatedTab = ({ invoiceId }: InvoiceRelatedTabProps) => {
     data: invoiceDetails,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['invoice-details', invoiceId],
     queryFn: async () => {
@@ -25,6 +27,19 @@ export const InvoiceRelatedTab = ({ invoiceId }: InvoiceRelatedTabProps) => {
     },
     enabled: !!invoiceId,
   });
+
+  // Poll for new documents every 5 seconds when not in DRAFT state
+  useEffect(() => {
+    if (!invoiceDetails || invoiceDetails.status === 'DRAFT') {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      refetch();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [invoiceDetails, refetch]);
 
   const sourceWeightTicketId = invoiceDetails?.sourceWeightTicketId;
 

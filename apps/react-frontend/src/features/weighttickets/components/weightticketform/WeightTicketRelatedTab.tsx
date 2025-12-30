@@ -8,6 +8,7 @@ import { TransportCard } from './TransportCard';
 import { invoiceService } from '@/api/services/invoiceService';
 import { InvoiceCard } from '@/features/invoices/components/InvoiceCard';
 import { WeightTicketCard } from '@/features/weighttickets/components/WeightTicketCard';
+import { useEffect } from 'react';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
@@ -28,7 +29,7 @@ export const WeightTicketRelatedTab = ({
     enabled: !!weightTicketId,
   });
 
-  const { data: weightTicketDetails } = useQuery({
+  const { data: weightTicketDetails, refetch: refetchWeightTicketDetails } = useQuery({
     queryKey: ['weight-ticket-details', weightTicketId],
     queryFn: async () => {
       if (!weightTicketId) return null;
@@ -38,6 +39,19 @@ export const WeightTicketRelatedTab = ({
     },
     enabled: !!weightTicketId,
   });
+
+  // Poll for new documents every 5 seconds when not in DRAFT state
+  useEffect(() => {
+    if (!weightTicketDetails || weightTicketDetails.status === 'DRAFT') {
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      refetchWeightTicketDetails();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [weightTicketDetails, refetchWeightTicketDetails]);
 
   const linkedInvoiceId = weightTicketDetails?.linkedInvoiceId;
 
