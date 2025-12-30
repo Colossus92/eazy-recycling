@@ -1,9 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import jakarta.persistence.EntityManager
-import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
@@ -152,7 +152,7 @@ class LmaDeclarationRepository(
 
     val declarations = results.map { result ->
       // Parse period from MMYYYY format to YearMonth
-      val yearMonth = parsePeriod(result.period)
+      val yearMonth = result.period.toYearMonth()
 
       // Fetch pickup location if available
       val pickupLocation = if (result.pickupLocationId != null) {
@@ -182,13 +182,6 @@ class LmaDeclarationRepository(
     }
 
     return PageImpl(declarations, pageable, total)
-  }
-
-  private fun parsePeriod(period: String): YearMonth {
-    // Period format is MMYYYY (e.g., "112025" for November 2025)
-    val month = period.take(2).toInt()
-    val year = period.substring(2).toInt()
-    return YearMonth(year, month)
   }
 }
 

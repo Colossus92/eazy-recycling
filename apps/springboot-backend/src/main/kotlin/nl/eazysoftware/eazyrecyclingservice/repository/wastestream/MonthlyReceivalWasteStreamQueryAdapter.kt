@@ -2,9 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.repository.wastestream
 
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
-import kotlinx.datetime.number
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTimezoneBoundaries
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toLmaPeriod
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
@@ -44,9 +44,6 @@ class MonthlyReceivalWasteStreamQueryAdapter(
     // incorrectly included in the next month's declarations
     val (startOfMonth, endOfMonth) = yearMonth.toDisplayTimezoneBoundaries()
 
-    // Calculate the current period string (MMYYYY format)
-    val currentPeriod = "${yearMonth.month.number.toString().padStart(2, '0')}${yearMonth.year}"
-
     val query = """
       SELECT
         ws.number,
@@ -78,7 +75,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
     val results = entityManager.createNativeQuery(query, MonthlyReceivalWasteStreamQueryResult::class.java)
       .setParameter("startOfMonth", startOfMonth)
       .setParameter("endOfMonth", endOfMonth)
-      .setParameter("currentPeriod", currentPeriod)
+      .setParameter("currentPeriod", yearMonth.toLmaPeriod())
       .resultList as List<MonthlyReceivalWasteStreamQueryResult>
 
     logger.info("Found {} waste streams for monthly receival declarations", results.size)

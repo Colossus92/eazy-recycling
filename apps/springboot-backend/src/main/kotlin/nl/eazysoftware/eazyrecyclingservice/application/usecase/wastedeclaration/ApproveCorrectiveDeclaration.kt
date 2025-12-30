@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
 
-import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
@@ -106,18 +106,15 @@ class ApproveCorrectiveDeclarationService(
     val wasteStream = wasteStreams.findByNumber(WasteStreamNumber(declaration.wasteStreamNumber))
       ?: throw IllegalStateException("Afvalstroomnummer niet gevonden: ${declaration.wasteStreamNumber}")
 
-    val yearMonth = YearMonth.parse(declaration.period)
-
     return firstReceivalMessageMapper.mapToSoapMessage(
       declarationId = declaration.id,
       wasteStream = wasteStream,
       transporters = declaration.transporters,
       totalWeight = declaration.totalWeight.toInt(),
       totalShipments = declaration.totalShipments.toShort(),
-      yearMonth = yearMonth
+      yearMonth = declaration.period.toYearMonth()
     )
   }
-
   private fun mapToMonthlyReceivalSoapMessage(declaration: LmaDeclarationDto): MaandelijkseOntvangstMeldingDetails {
     val message = MaandelijkseOntvangstMeldingDetails()
     message.meldingsNummerMelder = declaration.id
