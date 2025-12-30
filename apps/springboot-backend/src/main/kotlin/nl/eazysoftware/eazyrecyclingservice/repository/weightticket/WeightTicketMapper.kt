@@ -23,7 +23,7 @@ class WeightTicketMapper(
 
   fun toDomain(dto: WeightTicketDto): WeightTicket {
     return WeightTicket(
-      id = WeightTicketId(dto.id),
+      id = WeightTicketId(dto.id, dto.number),
       carrierParty = dto.carrierParty?.id?.let { CompanyId(it) },
       consignorParty = Consignor.Company(CompanyId(dto.consignorParty.id)),
       direction = dto.direction,
@@ -77,7 +77,8 @@ class WeightTicketMapper(
     }
 
     val weightTicketDto = WeightTicketDto(
-      id = domain.id.number,
+      id = domain.id.id,
+      number = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
       lines = mutableListOf(),
       secondWeighingValue = domain.secondWeighing?.value,

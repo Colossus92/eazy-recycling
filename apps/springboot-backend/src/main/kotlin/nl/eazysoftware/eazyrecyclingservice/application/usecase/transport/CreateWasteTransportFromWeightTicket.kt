@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.GoodsItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,7 +19,7 @@ interface CreateWasteTransportFromWeightTicket {
  * Includes optional pickup and delivery datetime overrides.
  */
 data class CreateWasteTransportFromWeightTicketCommand(
-  val weightTicketId: WeightTicketId,
+  val weightTicketNumber: Long,
   val pickupDateTime: LocalDateTime,
   val deliveryDateTime: LocalDateTime?,
 )
@@ -33,8 +32,8 @@ class CreateWasteTransportFromWeightTicketService(
 
   @Transactional
   override fun execute(cmd: CreateWasteTransportFromWeightTicketCommand): CreateWasteTransportResult {
-    val weightTicket = weightTickets.findById(cmd.weightTicketId)
-      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketId.number} niet gevonden")
+    val weightTicket = weightTickets.findByNumber(cmd.weightTicketNumber)
+      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketNumber} niet gevonden")
     val carrierParty = weightTicket.carrierParty ?: throw IllegalStateException("Weegbon moet een vervoerder hebben om een afvaltransport aan te maken")
 
     // Map WeightTicket lines to GoodsItems
@@ -65,7 +64,7 @@ class CreateWasteTransportFromWeightTicketService(
       truck = weightTicket.truckLicensePlate,
       driver = null,
       note = weightTicket.note,
-      weightTicketId = cmd.weightTicketId,
+      weightTicketId = weightTicket.id,
     )
 
     return createWasteTransport.handle(createCommand)

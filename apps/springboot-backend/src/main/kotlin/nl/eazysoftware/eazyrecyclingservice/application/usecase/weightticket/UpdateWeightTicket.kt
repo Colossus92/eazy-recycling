@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.weightticket
 
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDomain
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
@@ -10,7 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 interface UpdateWeightTicket {
-  fun handle(weightTicketId: WeightTicketId, cmd: WeightTicketCommand)
+  fun handle(weightTicketNumber: Long, cmd: WeightTicketCommand)
 }
 
 @Service
@@ -21,9 +20,9 @@ class UpdateWeightTicketService(
 ) : UpdateWeightTicket {
 
   @Transactional
-  override fun handle(weightTicketId: WeightTicketId, cmd: WeightTicketCommand) {
-    val weightTicket = weightTickets.findById(weightTicketId)
-      ?: throw EntityNotFoundException("Weegbon met nummer ${weightTicketId.number} bestaat niet")
+  override fun handle(weightTicketNumber: Long, cmd: WeightTicketCommand) {
+    val weightTicket = weightTickets.findByNumber(weightTicketNumber)
+      ?: throw EntityNotFoundException("Weegbon met nummer $weightTicketNumber bestaat niet")
 
     weightTicket.update(
       lines = cmd.lines,

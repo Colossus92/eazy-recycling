@@ -3,11 +3,9 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import kotlin.time.toKotlinInstant
 
@@ -21,10 +19,10 @@ class WeightTicketQueryRepository(
   override fun execute(): List<WeightTicketListView> {
     val query = """
             SELECT
-                wt.id,
+                wt.number,
                 c.name,
-                (SELECT SUM(wtl.weight_value) 
-                 FROM weight_ticket_lines wtl 
+                (SELECT SUM(wtl.weight_value)
+                 FROM weight_ticket_lines wtl
                  WHERE wtl.weight_ticket_id = wt.id) as total_weight,
                 wt.weighted_at,
                 wt.note,
@@ -32,7 +30,7 @@ class WeightTicketQueryRepository(
                 wt.created_at
             FROM weight_tickets wt
             JOIN companies c ON wt.consignor_party_id = c.id
-            ORDER BY wt.id
+            ORDER BY wt.number
         """.trimIndent()
 
     val results = entityManager.createNativeQuery(query).resultList
@@ -50,11 +48,11 @@ class WeightTicketQueryRepository(
     }
   }
 
-  override fun execute(weightTicketid: WeightTicketId): WeightTicketDetailView? {
-    val weightTicket = jpaRepository.findByIdOrNull(weightTicketid.number) ?: return null
+  override fun execute(weightTicketNumber: Long): WeightTicketDetailView? {
+    val weightTicket = jpaRepository.findByNumber(weightTicketNumber) ?: return null
 
     return WeightTicketDetailView(
-      id = weightTicket.id,
+      id = weightTicket.number,
       consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(weightTicket.consignorParty)),
       status = weightTicket.status.name,
       lines = weightTicket.lines.map { line ->

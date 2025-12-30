@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayString
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,7 +16,7 @@ import java.util.*
  * - Read-only operation with @Transactional(readOnly = true)
  */
 interface GetWasteTransportsFromWeightTicket {
-  fun execute(weightTicketId: Long): List<WeightTicketTransportView>
+  fun execute(weightTicketNumber: Long): List<WeightTicketTransportView>
 }
 
 @Service
@@ -26,17 +25,15 @@ class GetWasteTransportsFromWeightTicketService(
   private val wasteTransports: WasteTransports
 ) : GetWasteTransportsFromWeightTicket {
 
-  override fun execute(weightTicketId: Long): List<WeightTicketTransportView> {
-    val weightTicketIdDomain = WeightTicketId(weightTicketId)
-    
-    return wasteTransports.findByWeightTicketId(weightTicketIdDomain)
+  override fun execute(weightTicketNumber: Long): List<WeightTicketTransportView> {
+    return wasteTransports.findByWeightTicketNumber(weightTicketNumber)
       .map { transport ->
         WeightTicketTransportView(
           transportId = transport.transportId.uuid,
           displayNumber = transport.displayNumber?.value ?: "",
           pickupDateTime = LocalDateTime.parse(transport.pickupDateTime.toDisplayString()),
           status = transport.getStatus().name,
-          weightTicketId = weightTicketId
+          weightTicketNumber = weightTicketNumber
         )
       }
   }
@@ -51,5 +48,5 @@ data class WeightTicketTransportView(
   val displayNumber: String,
   val pickupDateTime: LocalDateTime,
   val status: String,
-  val weightTicketId: Long
+  val weightTicketNumber: Long
 )

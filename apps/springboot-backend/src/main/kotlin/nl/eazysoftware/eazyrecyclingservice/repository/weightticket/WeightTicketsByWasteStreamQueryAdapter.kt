@@ -22,14 +22,14 @@ class WeightTicketsByWasteStreamQueryAdapter(
     override fun execute(wasteStreamNumber: WasteStreamNumber): List<WeightTicketsByWasteStreamView> {
         val query = """
             SELECT
-                wt.id as weight_ticket_number,
+                wt.number as weight_ticket_number,
                 wt.weighted_at,
                 wtl.weight_value as amount,
                 wt.created_by
             FROM weight_tickets wt
             JOIN weight_ticket_lines wtl ON wt.id = wtl.weight_ticket_id
             WHERE wtl.waste_stream_number = :wasteStreamNumber
-            ORDER BY wt.weighted_at DESC NULLS LAST, wt.id DESC
+            ORDER BY wt.weighted_at DESC NULLS LAST, wt.number DESC
         """.trimIndent()
 
         @Suppress("UNCHECKED_CAST")

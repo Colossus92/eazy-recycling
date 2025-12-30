@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
 class EdgeFunctionOutboxProcessor(
@@ -99,7 +100,7 @@ class EdgeFunctionOutboxProcessor(
 
     private fun updateInvoicePdfUrl(invoiceId: String, storagePath: String) {
         try {
-            val id = InvoiceId(java.util.UUID.fromString(invoiceId))
+            val id = InvoiceId(UUID.fromString(invoiceId))
             val invoice = invoices.findById(id)
             if (invoice != null) {
                 invoice.pdfUrl = storagePath

@@ -15,7 +15,10 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -62,106 +65,106 @@ class WeightTicketController(
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @GetMapping("/{weightTicketId}")
+  @GetMapping("/{weightTicketNumber}")
   fun getWeightTicketByNumber(
     @PathVariable
-    weightTicketId: Long
+    weightTicketNumber: Long
   ): WeightTicketDetailView {
-    return weightTicketService.getWeightTicketByNumber(WeightTicketId(weightTicketId))
+    return weightTicketService.getWeightTicketByNumber(weightTicketNumber)
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PutMapping("/{weightTicketId}")
+  @PutMapping("/{weightTicketNumber}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun update(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
     @Valid @RequestBody request: WeightTicketRequest
   ) {
-    updateWeightTicket.handle(WeightTicketId(weightTicketId), request.toCommand())
+    updateWeightTicket.handle(weightTicketNumber, request.toCommand())
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PostMapping("/{weightTicketId}/cancel")
+  @PostMapping("/{weightTicketNumber}/cancel")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun cancel(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
     @Valid @RequestBody request: CancelWeightTicketRequest
   ) {
     cancelWeightTicket.handle(
       CancelWeightTicketCommand(
-        WeightTicketId(weightTicketId),
+        weightTicketNumber,
         CancellationReason(request.cancellationReason),
       )
     )
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PostMapping("/{weightTicketId}/split")
+  @PostMapping("/{weightTicketNumber}/split")
   @ResponseStatus(HttpStatus.OK)
   fun split(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
     @Valid @RequestBody request: SplitWeightTicketRequest
   ): SplitWeightTicketResponse {
     val newTicketId = splitWeightTicket.handle(
       SplitWeightTicketCommand(
-        WeightTicketId(weightTicketId),
+        weightTicketNumber,
         request.originalWeightTicketPercentage,
         request.newWeightTicketPercentage,
       )
     )
 
     return SplitWeightTicketResponse(
-      originalWeightTicketId = weightTicketId,
+      originalWeightTicketId = weightTicketNumber,
       newWeightTicketId = newTicketId.number,
     )
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PostMapping("/{weightTicketId}/complete")
+  @PostMapping("/{weightTicketNumber}/complete")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   fun complete(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
   ) {
     completeWeightTicket.handle(
       CompleteWeightTicketCommand(
-        WeightTicketId(weightTicketId)
+        weightTicketNumber
       )
     )
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PostMapping("/{weightTicketId}/copy")
+  @PostMapping("/{weightTicketNumber}/copy")
   @ResponseStatus(HttpStatus.OK)
   fun copy(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
   ): CopyWeightTicketResponse {
     val newTicketId = copyWeightTicket.handle(
       CopyWeightTicketCommand(
-        WeightTicketId(weightTicketId)
+        weightTicketNumber
       )
     )
 
     return CopyWeightTicketResponse(
-      originalWeightTicketId = weightTicketId,
+      originalWeightTicketId = weightTicketNumber,
       newWeightTicketId = newTicketId.number,
     )
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
-  @PostMapping("/{weightTicketId}/invoice")
+  @PostMapping("/{weightTicketNumber}/invoice")
   @ResponseStatus(HttpStatus.CREATED)
   fun createInvoice(
     @PathVariable
-    weightTicketId: Long,
+    weightTicketNumber: Long,
   ): CreateInvoiceFromWeightTicketResult {
     return createInvoiceFromWeightTicket.handle(
       CreateInvoiceFromWeightTicketCommand(
-        WeightTicketId(weightTicketId)
+        weightTicketNumber
       )
     )
   }

@@ -84,7 +84,7 @@ create table if not exists transports (
                           sequence_number integer,
                           transport_hours NUMERIC(3,1),
                           driver_note text,
-                          weight_ticket_id bigint,
+                          weight_ticket_id uuid,
                           created_at timestamp with time zone not null default now(),
                           created_by text,
                           last_modified_at timestamp with time zone not null default now(),
@@ -230,7 +230,8 @@ create table if not exists pickup_locations (
 create sequence if not exists weight_tickets_id_seq start with 1 increment by 1;
 
 create table if not exists weight_tickets (
-                                 id bigint not null,
+                                 id uuid not null,
+                                 number bigint not null unique,
                                  consignor_party_id uuid not null,
                                  carrier_party_id uuid,
                                  direction text not null,
@@ -257,7 +258,7 @@ create table if not exists weight_tickets (
 
 create table if not exists weight_ticket_lines (
                                  id uuid not null,
-                                 weight_ticket_id bigint not null,
+                                 weight_ticket_id uuid not null,
                                  waste_stream_number text,
                                  catalog_item_id uuid not null,
                                  weight_value numeric(10,2) not null,

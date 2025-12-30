@@ -10,6 +10,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.util.*
 import kotlin.time.Clock
 
 interface DeclareMonthlyReceivals {
@@ -23,7 +24,7 @@ data class MonthlyReceivalDeclaration(
   val totalWeight: Int,
   val totalShipments: Short,
   val yearMonth: YearMonth,
-  val weightTicketIds: List<Long>,
+  val weightTicketIds: List<UUID>,
 )
 
 /**

@@ -11,5 +11,5 @@ interface TransportRepository : JpaRepository<TransportDto, UUID> {
 
     fun findByDriverIdAndPickupDateTimeIsBetween(driverId: UUID, startDate: Instant, enDate: Instant): List<TransportDto>
     
-    fun findByWeightTicketId(weightTicketId: Long): List<TransportDto>
+    fun findByWeightTicketNumber(weightTicketNumber: Long): List<TransportDto>
 }

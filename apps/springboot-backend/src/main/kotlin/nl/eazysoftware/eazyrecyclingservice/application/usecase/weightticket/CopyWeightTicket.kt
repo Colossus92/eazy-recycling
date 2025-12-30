@@ -16,7 +16,7 @@ interface CopyWeightTicket {
  * but with a new ID and status set to DRAFT.
  */
 data class CopyWeightTicketCommand(
-  val originalWeightTicketId: WeightTicketId,
+  val originalWeightTicketNumber: Long,
 )
 
 @Service
@@ -27,8 +27,8 @@ class CopyWeightTicketService(
   @Transactional
   override fun handle(cmd: CopyWeightTicketCommand): WeightTicketId {
     // 1. Load aggregate from repository
-    val originalTicket = weightTickets.findById(cmd.originalWeightTicketId)
-      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.originalWeightTicketId.number} bestaat niet")
+    val originalTicket = weightTickets.findByNumber(cmd.originalWeightTicketNumber)
+      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.originalWeightTicketNumber} bestaat niet")
 
     // 2. Domain logic creates new aggregate
     val copiedTicket = originalTicket.copy(

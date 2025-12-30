@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ReceivalDeclarationIdGenerator
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class ReceivalDeclarationFactory(
@@ -17,7 +18,7 @@ class ReceivalDeclarationFactory(
     totalWeight: Int,
     totalShipments: Short,
     yearMonth: YearMonth,
-    weightTicketIds: List<Long>,
+    weightTicketIds: List<UUID>,
   ): FirstReceivalDeclaration {
     val id = idGenerator.nextId()
     return FirstReceivalDeclaration(

@@ -271,8 +271,9 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
         val created = objectMapper.readValue(mvcResult.response.contentAsString, InvoiceResult::class.java)
 
         // Create a weight ticket that references this invoice with INVOICED status
+        val weightTicketNumber = System.currentTimeMillis()
         val weightTicket = WeightTicketDto(
-            id = System.currentTimeMillis(),
+            number = weightTicketNumber,
             consignorParty = testCompany,
             lines = mutableListOf(),
             secondWeighingValue = null,

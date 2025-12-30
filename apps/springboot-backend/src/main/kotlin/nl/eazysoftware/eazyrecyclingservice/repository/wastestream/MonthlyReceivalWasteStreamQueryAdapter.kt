@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.util.*
 
 /**
  * Adapter implementation for querying waste streams that need monthly receival declarations.
@@ -111,7 +112,7 @@ data class MonthlyReceivalWasteStreamQueryResult(
   val totalWeight: BigDecimal,
   val totalShipments: Long,
   val transporters: Array<String>?,
-  val weightTicketIds: Array<Long>?
+  val weightTicketIds: Array<UUID>?
 ) {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

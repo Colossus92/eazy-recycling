@@ -432,14 +432,14 @@ class FirstReceivalWasteStreamQueryAdapterTest : BaseIntegrationTest() {
     weightedAt: OffsetDateTime,
     status: String = "COMPLETED",
     lines: List<Pair<String, Double>> = emptyList()
-  ): Long {
+  ): UUID {
     // Convert OffsetDateTime to Instant (which is what the DTO expects)
     val weightedAtInstant = weightedAt.toInstant()
 
-    val ticketId = System.currentTimeMillis() + (Math.random() * 1000).toLong()
+    val ticketNumber = System.currentTimeMillis() + (Math.random() * 1000).toLong()
 
     val ticket = WeightTicketDto(
-      id = ticketId,
+      number = ticketNumber,
       consignorParty = companyRepository.getReferenceById(consignorCompanyId),
       lines = mutableListOf(),
       secondWeighingValue = null,

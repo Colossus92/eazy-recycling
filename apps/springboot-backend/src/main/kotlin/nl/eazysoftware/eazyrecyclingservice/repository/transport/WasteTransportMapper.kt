@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.transport
 
 import jakarta.persistence.EntityManager
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
@@ -22,7 +21,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteConta
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import org.springframework.stereotype.Component
-import java.time.ZoneId
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
@@ -77,7 +75,7 @@ class WasteTransportMapper(
       driverNote = domain.driverNote?.description,
       pickupLocation = locationMapper.toDto(wasteStream.pickupLocation),
       deliveryLocation = locationMapper.toDto(deliveryLocation),
-      weightTicket = domain.weightTicketId?.let { entityManager.getReference(WeightTicketDto::class.java, it.number) },
+      weightTicket = domain.weightTicketId?.let { entityManager.getReference(WeightTicketDto::class.java, it.id) },
     )
   }
 
@@ -105,7 +103,7 @@ class WasteTransportMapper(
       updatedAt = dto.updatedAt?.toKotlinInstant(),
       updatedBy = dto.updatedBy,
       sequenceNumber = dto.sequenceNumber,
-      weightTicketId = dto.weightTicket?.let { WeightTicketId(it.id) },
+      weightTicketId = dto.weightTicket?.let { WeightTicketId(it.id, it.number) },
     )
   }
 

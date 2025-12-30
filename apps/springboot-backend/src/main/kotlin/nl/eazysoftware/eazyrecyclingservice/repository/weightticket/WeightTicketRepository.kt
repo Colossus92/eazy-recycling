@@ -17,10 +17,12 @@ import kotlin.time.Instant
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
-interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, Long> {
+interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, UUID> {
 
     @Query(value = "SELECT nextval('weight_tickets_id_seq')", nativeQuery = true)
     fun getNextSequenceValue(): Long
+
+    fun findByNumber(number: Long): WeightTicketDto?
 
     @org.springframework.transaction.annotation.Transactional
     @org.springframework.data.jpa.repository.Modifying
@@ -37,7 +39,7 @@ class WeightTicketRepository(
 
     override fun nextId(): WeightTicketId {
         val nextValue = jpaRepository.getNextSequenceValue()
-        return WeightTicketId(nextValue)
+        return WeightTicketId(UUID.randomUUID(), nextValue)
     }
 
     override fun save(aggregate: WeightTicket): WeightTicket {
@@ -47,14 +49,18 @@ class WeightTicketRepository(
     }
 
     override fun findById(id: WeightTicketId): WeightTicket? {
-        return jpaRepository.findById(id.number)
+        return jpaRepository.findById(id.id)
             .map { mapper.toDomain(it) }
             .orElse(null)
     }
 
+    override fun findByNumber(number: Long): WeightTicket? {
+        return jpaRepository.findByNumber(number)?.let { mapper.toDomain(it) }
+    }
+
     override fun markLinesAsDeclared(
         wasteStreamNumber: WasteStreamNumber,
-        weightTicketIds: List<Long>,
+        weightTicketIds: List<UUID>,
         declaredAt: Instant
     ): Int {
         if (weightTicketIds.isEmpty()) return 0
@@ -79,6 +85,7 @@ class WeightTicketRepository(
         val query = """
             SELECT
                 wt.id as weight_ticket_id,
+                wt.number as weight_ticket_number,
                 row_number() OVER (PARTITION BY wt.id ORDER BY wtl.waste_stream_number) - 1 as line_index,
                 wtl.waste_stream_number,
                 wtl.weight_value,
@@ -98,11 +105,11 @@ class WeightTicketRepository(
 
         return results.map { row ->
             UndeclaredWeightTicketLine(
-                weightTicketId = WeightTicketId((row[0] as Number).toLong()),
-                weightTicketLineIndex = (row[1] as Number).toInt(),
-                wasteStreamNumber = WasteStreamNumber(row[2] as String),
-                weightValue = row[3] as BigDecimal,
-                weightedAt = (row[4] as java.time.Instant).toKotlinInstant(),
+                weightTicketId = WeightTicketId(row[0] as UUID, (row[1] as Number).toLong()),
+                weightTicketLineIndex = (row[2] as Number).toInt(),
+                wasteStreamNumber = WasteStreamNumber(row[3] as String),
+                weightValue = row[4] as BigDecimal,
+                weightedAt = (row[5] as java.time.Instant).toKotlinInstant(),
             )
         }
     }

@@ -15,7 +15,7 @@ interface SplitWeightTicket {
  * It will split the weight ticket into two weight tickets based on the given percentages.
  */
 data class SplitWeightTicketCommand(
-  val originalWeightTicketId: WeightTicketId,
+  val originalWeightTicketNumber: Long,
   val originalWeightTicketPercentage: Int,
   val newWeightTicketPercentage: Int,
 )
@@ -28,8 +28,8 @@ class SplitWeightTicketService(
   @Transactional
   override fun handle(cmd: SplitWeightTicketCommand): WeightTicketId {
     // 1. Load aggregate from repository
-    val originalTicket = weightTickets.findById(cmd.originalWeightTicketId)
-      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.originalWeightTicketId.number} bestaat niet")
+    val originalTicket = weightTickets.findByNumber(cmd.originalWeightTicketNumber)
+      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.originalWeightTicketNumber} bestaat niet")
 
     // 2. Domain logic creates new aggregate
     val newTicket = originalTicket.split(

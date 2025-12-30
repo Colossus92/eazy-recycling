@@ -33,8 +33,9 @@ class WeightTicketSplitTest {
         )
 
         // When
+        val newId = WeightTicketId(UUID.randomUUID(), 2)
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = newId,
             originalPercentage = 50,
             newPercentage = 50
         )
@@ -45,7 +46,7 @@ class WeightTicketSplitTest {
         assertThat(originalTicket.updatedAt).isNotNull()
 
         // Then - New ticket should have 50% of weight
-        assertThat(newTicket.id).isEqualTo(WeightTicketId(2))
+        assertThat(newTicket.id).isEqualTo(newId)
         assertThat(newTicket.lines.getLines()).hasSize(1)
         assertThat(newTicket.lines.getLines()[0].weight.value).isEqualByComparingTo(BigDecimal("50.00"))
         assertThat(newTicket.status).isEqualTo(WeightTicketStatus.DRAFT)
@@ -66,7 +67,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 70,
             newPercentage = 30
         )
@@ -101,7 +102,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 60,
             newPercentage = 40
         )
@@ -133,7 +134,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 50,
             newPercentage = 50
         )
@@ -157,7 +158,7 @@ class WeightTicketSplitTest {
       val pickupLocation = TestLocationFactory.createDutchAddress()
       val deliveryLocation = TestLocationFactory.createCompanyAddress()
       val originalTicket = WeightTicket(
-            id = WeightTicketId(1),
+            id = WeightTicketId(UUID.randomUUID(), 1),
             consignorParty = consignor,
             status = WeightTicketStatus.DRAFT,
             direction = WeightTicketDirection.INBOUND,
@@ -183,7 +184,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 50,
             newPercentage = 50
         )
@@ -208,7 +209,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalArgumentException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = 60,
                 newPercentage = 50
             )
@@ -225,7 +226,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalArgumentException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = 0,
                 newPercentage = 100
             )
@@ -242,7 +243,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalArgumentException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = 100,
                 newPercentage = 0
             )
@@ -259,7 +260,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalArgumentException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = -10,
                 newPercentage = 110
             )
@@ -277,7 +278,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalStateException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = 50,
                 newPercentage = 50
             )
@@ -290,7 +291,7 @@ class WeightTicketSplitTest {
     fun `should fail when weight ticket has no lines`() {
         // Given
         val originalTicket = WeightTicket(
-            id = WeightTicketId(1),
+            id = WeightTicketId(UUID.randomUUID(), 1),
             consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
             status = WeightTicketStatus.DRAFT,
             direction = WeightTicketDirection.INBOUND,
@@ -309,7 +310,7 @@ class WeightTicketSplitTest {
         // When/Then
         val exception = assertFailsWith<IllegalStateException> {
             originalTicket.split(
-                newId = WeightTicketId(2),
+                newId = WeightTicketId(UUID.randomUUID(), 2),
                 originalPercentage = 50,
                 newPercentage = 50
             )
@@ -333,7 +334,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 33,
             newPercentage = 67
         )
@@ -351,7 +352,7 @@ class WeightTicketSplitTest {
 
         // When
         val newTicket = originalTicket.split(
-            newId = WeightTicketId(2),
+            newId = WeightTicketId(UUID.randomUUID(), 2),
             originalPercentage = 50,
             newPercentage = 50
         )
@@ -372,7 +373,7 @@ class WeightTicketSplitTest {
         )
     ): WeightTicket {
         return WeightTicket(
-            id = WeightTicketId(1),
+            id = WeightTicketId(UUID.randomUUID(), 1),
             consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
             status = status,
             direction = WeightTicketDirection.INBOUND,

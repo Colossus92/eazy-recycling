@@ -5,12 +5,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.UndeclaredW
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
+import java.util.*
 import kotlin.time.Instant
 
 interface WeightTickets {
   fun nextId(): WeightTicketId
   fun save(aggregate: WeightTicket): WeightTicket
   fun findById(id: WeightTicketId): WeightTicket?
+  fun findByNumber(number: Long): WeightTicket?
 
   /**
    * Marks specific weight ticket lines for the given waste stream number and weight ticket IDs as declared.
@@ -23,7 +25,7 @@ interface WeightTickets {
    */
   fun markLinesAsDeclared(
     wasteStreamNumber: WasteStreamNumber,
-    weightTicketIds: List<Long>,
+    weightTicketIds: List<UUID>,
     declaredAt: Instant
   ): Int
 
@@ -39,7 +41,7 @@ interface WeightTickets {
    * @return List of undeclared weight ticket lines
    */
   fun findUndeclaredLines(cutoffDate: YearMonth): List<UndeclaredWeightTicketLine>
-  
+
   /**
    * Nullifies the linked_invoice_id for all weight tickets that reference the given invoice.
    * This is necessary before deleting an invoice to avoid foreign key constraint violations.
@@ -47,5 +49,5 @@ interface WeightTickets {
    * @param invoiceId The invoice ID to remove references to
    * @return The number of weight tickets updated
    */
-  fun nullifyLinkedInvoiceId(invoiceId: java.util.UUID): Int
+  fun nullifyLinkedInvoiceId(invoiceId: UUID): Int
 }

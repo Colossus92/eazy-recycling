@@ -6,8 +6,6 @@ import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -17,7 +15,7 @@ interface CompleteWeightTicket {
 }
 
 data class CompleteWeightTicketCommand(
-  val weightTicketId: WeightTicketId,
+  val weightTicketNumber: Long,
 )
 
 @Service
@@ -30,14 +28,14 @@ class CompleteWeightTicketService(
   private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
   override fun handle(cmd: CompleteWeightTicketCommand) {
-    val weightTicket = weightTickets.findById(cmd.weightTicketId)
-      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketId.number} bestaat niet")
+    val weightTicket = weightTickets.findByNumber(cmd.weightTicketNumber)
+      ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketNumber} bestaat niet")
 
     weightTicket.complete()
     weightTickets.save(weightTicket)
 
     // Trigger PDF generation asynchronously
-    triggerPdfGeneration(cmd.weightTicketId.number)
+    triggerPdfGeneration(cmd.weightTicketNumber)
   }
 
   private fun triggerPdfGeneration(weightTicketId: Long) {

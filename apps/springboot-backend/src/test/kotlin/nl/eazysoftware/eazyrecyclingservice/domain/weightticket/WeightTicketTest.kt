@@ -42,7 +42,7 @@ class WeightTicketTest {
   }
 
   private fun weightTicket(status: WeightTicketStatus = WeightTicketStatus.DRAFT): WeightTicket = WeightTicket(
-    id = WeightTicketId(1),
+    id = WeightTicketId(UUID.randomUUID(), 1),
     consignorParty = Consignor.Company(companyId()),
     status = status,
     direction = WeightTicketDirection.INBOUND,
@@ -86,7 +86,7 @@ class WeightTicketTest {
   @Test
   fun `weight ticket can be created with lines`() {
     val weightTicket = WeightTicket(
-      id = WeightTicketId(1),
+      id = WeightTicketId(UUID.randomUUID(), 1),
       consignorParty = Consignor.Company(companyId()),
       status = WeightTicketStatus.DRAFT,
       lines = SAMPLE_LINES,
@@ -232,7 +232,7 @@ class WeightTicketTest {
   @Test
   fun `can copy weight ticket with all fields`() {
     val originalTicket = WeightTicket(
-      id = WeightTicketId(1),
+      id = WeightTicketId(UUID.randomUUID(), 1),
       consignorParty = Consignor.Company(companyId()),
       status = WeightTicketStatus.COMPLETED,
       lines = SAMPLE_LINES,
@@ -248,7 +248,7 @@ class WeightTicketTest {
       createdAt = Clock.System.now(),
     )
 
-    val newId = WeightTicketId(999)
+    val newId = WeightTicketId(UUID.randomUUID(), 999)
     val copiedTicket = originalTicket.copy(newId)
 
     assertThat(copiedTicket.id).isEqualTo(newId)
@@ -273,7 +273,7 @@ class WeightTicketTest {
     val originalTicket = weightTicket()
     val originalCreatedAt = originalTicket.createdAt
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.createdAt).isNotEqualTo(originalCreatedAt)
   }
@@ -284,7 +284,7 @@ class WeightTicketTest {
       updatedAt = Clock.System.now()
     }
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.updatedAt).isNull()
   }
@@ -296,7 +296,7 @@ class WeightTicketTest {
       weightedAt = now
     }
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.weightedAt).isEqualTo(now)
   }
@@ -307,9 +307,9 @@ class WeightTicketTest {
     val invoicedTicket = weightTicket(WeightTicketStatus.INVOICED)
     val cancelledTicket = weightTicket(WeightTicketStatus.CANCELLED)
 
-    val copiedFromCompleted = completedTicket.copy(WeightTicketId(1))
-    val copiedFromInvoiced = invoicedTicket.copy(WeightTicketId(2))
-    val copiedFromCancelled = cancelledTicket.copy(WeightTicketId(3))
+    val copiedFromCompleted = completedTicket.copy(WeightTicketId(UUID.randomUUID(), 1))
+    val copiedFromInvoiced = invoicedTicket.copy(WeightTicketId(UUID.randomUUID(), 2))
+    val copiedFromCancelled = cancelledTicket.copy(WeightTicketId(UUID.randomUUID(), 3))
 
     assertThat(copiedFromCompleted.status).isEqualTo(WeightTicketStatus.DRAFT)
     assertThat(copiedFromInvoiced.status).isEqualTo(WeightTicketStatus.DRAFT)
@@ -322,7 +322,7 @@ class WeightTicketTest {
       lines = EMPTY_LINES
     }
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.lines.isEmpty()).isTrue()
     assertThat(copiedTicket.lines.getLines()).isEmpty()
@@ -353,7 +353,7 @@ class WeightTicketTest {
       lines = multipleLines
     }
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.lines.getLines()).hasSize(3)
     assertThat(copiedTicket.lines.getLines()[0].waste?.number).isEqualTo("111111111111")
@@ -364,7 +364,7 @@ class WeightTicketTest {
   @Test
   fun `copied weight ticket with null optional fields`() {
     val originalTicket = WeightTicket(
-      id = WeightTicketId(1),
+      id = WeightTicketId(UUID.randomUUID(), 1),
       consignorParty = Consignor.Company(companyId()),
       status = WeightTicketStatus.DRAFT,
       lines = EMPTY_LINES,
@@ -380,7 +380,7 @@ class WeightTicketTest {
       createdAt = Clock.System.now(),
     )
 
-    val copiedTicket = originalTicket.copy(WeightTicketId(999))
+    val copiedTicket = originalTicket.copy(WeightTicketId(UUID.randomUUID(), 999))
 
     assertThat(copiedTicket.carrierParty).isNull()
     assertThat(copiedTicket.pickupLocation).isNull()

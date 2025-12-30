@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.util.*
 import kotlin.time.Clock
 import kotlin.time.toKotlinInstant
 
@@ -182,7 +183,7 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
         totalWeight = 5000,
         totalShipments = 10,
         yearMonth = yearMonth,
-        weightTicketIds = listOf(1L, 2L)
+        weightTicketIds = listOf(UUID.randomUUID(), UUID.randomUUID())
       ),
       MonthlyReceivalDeclaration(
         id = "DECL-002",
@@ -191,7 +192,7 @@ class MonthlyWasteDeclarationSchedulerIntegrationTest : BaseIntegrationTest() {
         totalWeight = 3000,
         totalShipments = 5,
         yearMonth = yearMonth,
-        weightTicketIds = listOf(3L, 4L)
+        weightTicketIds = listOf(UUID.randomUUID(), UUID.randomUUID())
       )
     )
     whenever(monthlyReceivalWasteStreamQuery.findMonthlyReceivalDeclarations(yearMonth))

@@ -198,5 +198,5 @@ data class FirstReceivalWasteStreamQueryResult(
   val totalWeight: BigDecimal,
   val totalShipments: Long,
   val transporters: Array<String>?,
-  val weightTicketIds: Array<Long>?
+  val weightTicketIds: Array<UUID>?
 )

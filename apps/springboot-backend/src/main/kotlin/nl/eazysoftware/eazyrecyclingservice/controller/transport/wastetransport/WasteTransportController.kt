@@ -14,7 +14,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -67,7 +66,7 @@ class WasteTransportController(
     @Valid @RequestBody request: CreateWasteTransportFromWeightTicketRequest
   ): CreateFromWeightTicketResponse {
     val command = CreateWasteTransportFromWeightTicketCommand(
-      weightTicketId = WeightTicketId(request.weightTicketId),
+      weightTicketNumber = request.weightTicketId,
       pickupDateTime = request.pickupDateTime,
       deliveryDateTime = request.deliveryDateTime
     )
@@ -92,7 +91,7 @@ class WasteTransportController(
           displayNumber = view.displayNumber,
           pickupDateTime = view.pickupDateTime,
           status = view.status,
-          weightTicketId = view.weightTicketId
+          weightTicketNumber = view.weightTicketNumber
         )
       }
     )
@@ -107,7 +106,7 @@ class WasteTransportController(
       val displayNumber: String,
       val pickupDateTime: LocalDateTime,
       val status: String,
-      val weightTicketId: Long
+      val weightTicketNumber: Long
     )
   }
 

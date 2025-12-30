@@ -211,6 +211,7 @@ enum class WeightTicketStatus {
 }
 
 data class WeightTicketId(
+  val id: java.util.UUID,
   val number: Long
 )
 

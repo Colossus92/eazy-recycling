@@ -4,7 +4,6 @@ import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import org.springframework.stereotype.Service
@@ -19,7 +18,7 @@ interface CreateInvoiceFromWeightTicket {
 }
 
 data class CreateInvoiceFromWeightTicketCommand(
-    val weightTicketId: WeightTicketId,
+    val weightTicketNumber: Long,
 )
 
 data class CreateInvoiceFromWeightTicketResult(
@@ -38,8 +37,8 @@ class CreateInvoiceFromWeightTicketService(
 
     @Transactional
     override fun handle(cmd: CreateInvoiceFromWeightTicketCommand): CreateInvoiceFromWeightTicketResult {
-        val weightTicket = weightTickets.findById(cmd.weightTicketId)
-            ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketId.number} bestaat niet")
+        val weightTicket = weightTickets.findByNumber(cmd.weightTicketNumber)
+            ?: throw EntityNotFoundException("Weegbon met nummer ${cmd.weightTicketNumber} bestaat niet")
 
         require(weightTicket.status == WeightTicketStatus.COMPLETED) {
             "Factuur kan alleen worden aangemaakt van een voltooide weegbon. Huidige status: ${weightTicket.status}"

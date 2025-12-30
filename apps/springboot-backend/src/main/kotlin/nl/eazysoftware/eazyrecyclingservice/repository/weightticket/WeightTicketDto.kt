@@ -7,13 +7,17 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @Entity
 @Table(name = "weight_tickets")
 data class WeightTicketDto(
   @Id
   @Column(name = "id")
-  val id: Long,
+  val id: UUID = UUID.randomUUID(),
+
+  @Column(name = "number", unique = true, nullable = false)
+  val number: Long,
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "consignor_party_id", nullable = false)
@@ -72,7 +76,7 @@ data class WeightTicketDto(
   val cancellationReason: String?,
 
   @Column(name = "linked_invoice_id")
-  val linkedInvoiceId: java.util.UUID? = null,
+  val linkedInvoiceId: UUID? = null,
 
   @Column(name = "pdf_url")
   val pdfUrl: String? = null,

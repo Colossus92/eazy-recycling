@@ -135,15 +135,15 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val generatedId = response.get("id").asLong()
 
         // Verify weight ticket was saved in the database
-        val savedWeightTicket = weightTicketRepository.findById(generatedId)
-        assertThat(savedWeightTicket).isPresent
-        assertThat(savedWeightTicket.get().id).isEqualTo(generatedId)
-        assertThat(savedWeightTicket.get().truckLicensePlate).isEqualTo("AA-123-BB")
-        assertThat(savedWeightTicket.get().reclamation).isEqualTo("Test reclamation")
-        assertThat(savedWeightTicket.get().note).isEqualTo("Test note")
-        assertThat(savedWeightTicket.get().lines).hasSize(1)
-        assertThat(savedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789012")
-        assertThat(savedWeightTicket.get().lines[0].weightValue).isEqualByComparingTo("150.75")
+        val savedWeightTicket = weightTicketRepository.findByNumber(generatedId)
+        assertThat(savedWeightTicket).isNotNull
+        assertThat(savedWeightTicket!!.number).isEqualTo(generatedId)
+        assertThat(savedWeightTicket.truckLicensePlate).isEqualTo("AA-123-BB")
+        assertThat(savedWeightTicket.reclamation).isEqualTo("Test reclamation")
+        assertThat(savedWeightTicket.note).isEqualTo("Test note")
+        assertThat(savedWeightTicket.lines).hasSize(1)
+        assertThat(savedWeightTicket.lines[0].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(savedWeightTicket.lines[0].weightValue).isEqualByComparingTo("150.75")
     }
 
     @Test
@@ -172,12 +172,12 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val generatedId = response.get("id").asLong()
 
         // Verify weight ticket was saved in the database
-        val savedWeightTicket = weightTicketRepository.findById(generatedId)
-        assertThat(savedWeightTicket).isPresent
-        assertThat(savedWeightTicket.get().id).isEqualTo(generatedId)
-        assertThat(savedWeightTicket.get().truckLicensePlate).isNull()
-        assertThat(savedWeightTicket.get().reclamation).isNull()
-        assertThat(savedWeightTicket.get().note).isNull()
+        val savedWeightTicket = weightTicketRepository.findByNumber(generatedId)
+        assertThat(savedWeightTicket).isNotNull
+        assertThat(savedWeightTicket!!.number).isEqualTo(generatedId)
+        assertThat(savedWeightTicket.truckLicensePlate).isNull()
+        assertThat(savedWeightTicket.reclamation).isNull()
+        assertThat(savedWeightTicket.note).isNull()
     }
 
     @Test
@@ -251,15 +251,15 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val generatedId = objectMapper.readTree(result.response.contentAsString).get("id").asLong()
 
         // Verify all lines were saved
-        val savedWeightTicket = weightTicketRepository.findById(generatedId)
-        assertThat(savedWeightTicket).isPresent
-        assertThat(savedWeightTicket.get().lines).hasSize(3)
-        assertThat(savedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789011")
-        assertThat(savedWeightTicket.get().lines[0].weightValue).isEqualByComparingTo("100.00")
-        assertThat(savedWeightTicket.get().lines[1].wasteStreamNumber).isEqualTo("123456789012")
-        assertThat(savedWeightTicket.get().lines[1].weightValue).isEqualByComparingTo("250.50")
-        assertThat(savedWeightTicket.get().lines[2].wasteStreamNumber).isEqualTo("123456789013")
-        assertThat(savedWeightTicket.get().lines[2].weightValue).isEqualByComparingTo("75.25")
+        val savedWeightTicket = weightTicketRepository.findByNumber(generatedId)
+        assertThat(savedWeightTicket).isNotNull
+        assertThat(savedWeightTicket!!.lines).hasSize(3)
+        assertThat(savedWeightTicket.lines[0].wasteStreamNumber).isEqualTo("123456789011")
+        assertThat(savedWeightTicket.lines[0].weightValue).isEqualByComparingTo("100.00")
+        assertThat(savedWeightTicket.lines[1].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(savedWeightTicket.lines[1].weightValue).isEqualByComparingTo("250.50")
+        assertThat(savedWeightTicket.lines[2].wasteStreamNumber).isEqualTo("123456789013")
+        assertThat(savedWeightTicket.lines[2].weightValue).isEqualByComparingTo("75.25")
     }
 
     @Test
@@ -374,15 +374,15 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(status().isNoContent)
 
         // Then - verify the update was applied including lines
-        val updatedWeightTicket = weightTicketRepository.findById(weightTicketId)
-        assertThat(updatedWeightTicket).isPresent
-        assertThat(updatedWeightTicket.get().truckLicensePlate).isEqualTo("GG-222-HH")
-        assertThat(updatedWeightTicket.get().note).isEqualTo("Updated note")
-        assertThat(updatedWeightTicket.get().lines).hasSize(2)
-        assertThat(updatedWeightTicket.get().lines[0].wasteStreamNumber).isEqualTo("123456789012")
-        assertThat(updatedWeightTicket.get().lines[0].weightValue).isEqualTo("200.00")
-        assertThat(updatedWeightTicket.get().lines[1].wasteStreamNumber).isEqualTo("123456789013")
-      assertThat(updatedWeightTicket.get().lines[1].weightValue).isEqualTo("300.00")
+        val updatedWeightTicket = weightTicketRepository.findByNumber(weightTicketId)
+        assertThat(updatedWeightTicket).isNotNull
+        assertThat(updatedWeightTicket!!.truckLicensePlate).isEqualTo("GG-222-HH")
+        assertThat(updatedWeightTicket.note).isEqualTo("Updated note")
+        assertThat(updatedWeightTicket.lines).hasSize(2)
+        assertThat(updatedWeightTicket.lines[0].wasteStreamNumber).isEqualTo("123456789012")
+        assertThat(updatedWeightTicket.lines[0].weightValue).isEqualTo("200.00")
+        assertThat(updatedWeightTicket.lines[1].wasteStreamNumber).isEqualTo("123456789013")
+      assertThat(updatedWeightTicket.lines[1].weightValue).isEqualTo("300.00")
     }
 
     @Test
@@ -414,10 +414,10 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             .andExpect(status().isNoContent)
 
         // Then - verify the weight ticket status is set to CANCELLED
-        val deletedWeightTicket = weightTicketRepository.findById(weightTicketId)
-        assertThat(deletedWeightTicket).isPresent
-        assertThat(deletedWeightTicket.get().status.name).isEqualTo("CANCELLED")
-        assertThat(deletedWeightTicket.get().cancellationReason).isEqualTo("Good Reason")
+        val deletedWeightTicket = weightTicketRepository.findByNumber(weightTicketId)
+        assertThat(deletedWeightTicket).isNotNull
+        assertThat(deletedWeightTicket!!.status.name).isEqualTo("CANCELLED")
+        assertThat(deletedWeightTicket.cancellationReason).isEqualTo("Good Reason")
     }
 
     @Test
@@ -444,18 +444,18 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             .get("id").asLong()
 
         // Verify initial status is DRAFT
-        val draftWeightTicket = weightTicketRepository.findById(weightTicketId)
-        assertThat(draftWeightTicket).isPresent
-        assertThat(draftWeightTicket.get().status.name).isEqualTo("DRAFT")
+        val draftWeightTicket = weightTicketRepository.findByNumber(weightTicketId)
+        assertThat(draftWeightTicket).isNotNull
+        assertThat(draftWeightTicket!!.status.name).isEqualTo("DRAFT")
 
         // When - complete the weight ticket
         securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
             .andExpect(status().isNoContent)
 
         // Then - verify the weight ticket status is set to COMPLETED
-        val completedWeightTicket = weightTicketRepository.findById(weightTicketId)
-        assertThat(completedWeightTicket).isPresent
-        assertThat(completedWeightTicket.get().status.name).isEqualTo("COMPLETED")
+        val completedWeightTicket = weightTicketRepository.findByNumber(weightTicketId)
+        assertThat(completedWeightTicket).isNotNull
+        assertThat(completedWeightTicket!!.status.name).isEqualTo("COMPLETED")
     }
 
     @Test
@@ -494,7 +494,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             .andReturn()
 
         val response = objectMapper.readTree(invoiceResult.response.contentAsString)
-        val invoiceId = java.util.UUID.fromString(response.get("invoiceId").asText())
+        val invoiceId = UUID.fromString(response.get("invoiceId").asText())
 
         // Then - verify invoice was created with correct data
         val savedInvoice = invoiceRepository.findById(invoiceId)
@@ -504,10 +504,10 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         assertThat(savedInvoice.get().status.name).isEqualTo("DRAFT")
 
         // Verify weight ticket was updated
-        val updatedWeightTicket = weightTicketRepository.findById(weightTicketId)
-        assertThat(updatedWeightTicket).isPresent
-        assertThat(updatedWeightTicket.get().linkedInvoiceId).isEqualTo(invoiceId)
-        assertThat(updatedWeightTicket.get().status.name).isEqualTo("INVOICED")
+        val updatedWeightTicket = weightTicketRepository.findByNumber(weightTicketId)
+        assertThat(updatedWeightTicket).isNotNull
+        assertThat(updatedWeightTicket!!.linkedInvoiceId).isEqualTo(invoiceId)
+        assertThat(updatedWeightTicket.status.name).isEqualTo("INVOICED")
     }
 
     @Test

@@ -5,7 +5,6 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllWeightTicket
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetWeightTicketByNumber
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketDetailView
 import nl.eazysoftware.eazyrecyclingservice.application.query.WeightTicketListView
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,8 +17,8 @@ class WeightTicketService(
     return getAllWeightTickets.execute()
   }
 
-  fun getWeightTicketByNumber(weightTicketId: WeightTicketId): WeightTicketDetailView {
-    return getWeightTicketByNumber.execute(weightTicketId)
-      ?: throw EntityNotFoundException("Geen weegbon gevonden voor nummer $weightTicketId")
+  fun getWeightTicketByNumber(weightTicketNumber: Long): WeightTicketDetailView {
+    return getWeightTicketByNumber.execute(weightTicketNumber)
+      ?: throw EntityNotFoundException("Geen weegbon gevonden voor nummer $weightTicketNumber")
   }
 }
