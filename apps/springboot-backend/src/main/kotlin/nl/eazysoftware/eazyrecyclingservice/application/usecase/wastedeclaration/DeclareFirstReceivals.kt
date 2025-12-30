@@ -56,7 +56,7 @@ class DeclareFirstReceivalsService(
       )
     }
 
-    lmaDeclarations.saveAllPendingFirstReceivals(messages)
+    lmaDeclarations.saveAllPendingFirstReceivals(firstReceivalDeclarations)
     amiceSessions.declareFirstReceivals(messages)
 
     // Mark weight ticket lines as declared - use the exact weight ticket IDs from each declaration

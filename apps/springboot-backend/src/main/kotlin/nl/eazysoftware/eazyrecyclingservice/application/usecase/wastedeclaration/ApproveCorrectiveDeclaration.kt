@@ -4,10 +4,7 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.
 import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -37,6 +34,7 @@ class ApproveCorrectiveDeclarationService(
   private val amiceSessions: AmiceSessions,
   private val wasteStreams: WasteStreams,
   private val firstReceivalMessageMapper: FirstReceivalMessageMapper,
+  private val weightTickets: WeightTickets,
 ) : ApproveCorrectiveDeclaration {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -76,6 +74,18 @@ class ApproveCorrectiveDeclarationService(
       // Update status to PENDING (will be updated to COMPLETED when session result is received)
       val updatedDeclaration = declaration.copy(status = LmaDeclarationDto.Status.PENDING)
       lmaDeclarations.saveAll(listOf(updatedDeclaration))
+
+      // Mark weight ticket lines as declared if this is a late declaration with weight ticket IDs
+      val weightTicketIds = declaration.weightTicketIds
+      if (!weightTicketIds.isNullOrEmpty()) {
+        val declaredAt = kotlin.time.Clock.System.now()
+        val updatedCount = weightTickets.markLinesAsDeclared(
+          wasteStreamNumber = WasteStreamNumber(declaration.wasteStreamNumber),
+          weightTicketIds = weightTicketIds,
+          declaredAt = declaredAt
+        )
+        logger.info("Marked {} weight ticket lines as declared for late declaration: {}", updatedCount, declarationId)
+      }
 
       logger.info("Successfully submitted corrective declaration: {}", declarationId)
 

@@ -1,8 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.ports.out
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
@@ -14,8 +14,8 @@ interface LmaDeclarations {
   fun save(declaration: LmaDeclarationDto): LmaDeclarationDto
   fun findByIds(ids: List<String>): List<LmaDeclarationDto>
   fun findById(id: String): LmaDeclarationDto?
-  fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>)
-  fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>)
+  fun saveAllPendingFirstReceivals(firstReceivals: List<FirstReceivalDeclaration>)
+  fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MonthlyReceivalDeclaration>)
   fun saveCorrectiveDeclaration(declaration: LmaDeclarationDto): LmaDeclarationDto
   fun findAll(pageable: Pageable): Page<LmaDeclaration>
   fun hasExistingDeclaration(wasteStreamNumber: String): Boolean

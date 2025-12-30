@@ -296,6 +296,7 @@ create table lma_declarations (
                                            "created_at" timestamp with time zone not null default now(),
                                            "errors" text[],
                                            "status" text not null,
+                                           "weight_ticket_ids" uuid[],
                                            constraint lma_declarations_amice_uuid_unique unique ("amice_uuid")
 );
 

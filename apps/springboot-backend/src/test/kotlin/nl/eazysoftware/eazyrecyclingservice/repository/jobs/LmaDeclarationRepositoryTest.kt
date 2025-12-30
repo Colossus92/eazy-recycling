@@ -1,10 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import kotlinx.datetime.YearMonth
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
-import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
@@ -162,14 +164,16 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       Timestamp.from(oldTimestamp), wasteStreamNumber
     )
 
-    val firstReceival = EersteOntvangstMeldingDetails().apply {
-      meldingsNummerMelder = "DECL-001"
-      afvalstroomNummer = wasteStreamNumber
-      periodeMelding = "112025"
-      vervoerders = "Transporter A, Transporter B"
-      totaalGewicht = 5000
-      aantalVrachten = 10
-    }
+    val wasteStream = createMockWasteStream(wasteStreamNumber)
+    val firstReceival = FirstReceivalDeclaration(
+      id = "DECL-001",
+      wasteStream = wasteStream,
+      transporters = listOf("Transporter A", "Transporter B"),
+      totalWeight = 5000,
+      totalShipments = 10,
+      yearMonth = YearMonth(2025, 11),
+      weightTicketIds = emptyList()
+    )
 
     // When
     lmaDeclarations.saveAllPendingFirstReceivals(listOf(firstReceival))
@@ -202,14 +206,15 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       Timestamp.from(oldTimestamp), wasteStreamNumber
     )
 
-    val monthlyReceival = MaandelijkseOntvangstMeldingDetails().apply {
-      meldingsNummerMelder = "DECL-002"
-      afvalstroomNummer = wasteStreamNumber
-      periodeMelding = "102025"
-      vervoerders = "Transporter C"
-      totaalGewicht = 3000
-      aantalVrachten = 5
-    }
+    val monthlyReceival = MonthlyReceivalDeclaration(
+      id = "DECL-002",
+      wasteStreamNumber = WasteStreamNumber(wasteStreamNumber),
+      transporters = listOf("Transporter C"),
+      totalWeight = 3000,
+      totalShipments = 5,
+      yearMonth = YearMonth(2025, 10),
+      weightTicketIds = emptyList()
+    )
 
     // When
     lmaDeclarations.saveAllPendingMonthlyReceivals(listOf(monthlyReceival))
@@ -247,23 +252,27 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       Timestamp.from(oldTimestamp), wasteStreamNumber2
     )
 
+    val wasteStream1 = createMockWasteStream(wasteStreamNumber1)
+    val wasteStream2 = createMockWasteStream(wasteStreamNumber2)
     val firstReceivals = listOf(
-      EersteOntvangstMeldingDetails().apply {
-        meldingsNummerMelder = "DECL-003"
-        afvalstroomNummer = wasteStreamNumber1
-        periodeMelding = "112025"
-        vervoerders = "Transporter A"
-        totaalGewicht = 1000
-        aantalVrachten = 2
-      },
-      EersteOntvangstMeldingDetails().apply {
-        meldingsNummerMelder = "DECL-004"
-        afvalstroomNummer = wasteStreamNumber2
-        periodeMelding = "112025"
-        vervoerders = "Transporter B"
-        totaalGewicht = 2000
-        aantalVrachten = 4
-      }
+      FirstReceivalDeclaration(
+        id = "DECL-003",
+        wasteStream = wasteStream1,
+        transporters = listOf("Transporter A"),
+        totalWeight = 1000,
+        totalShipments = 2,
+        yearMonth = YearMonth(2025, 11),
+        weightTicketIds = emptyList()
+      ),
+      FirstReceivalDeclaration(
+        id = "DECL-004",
+        wasteStream = wasteStream2,
+        transporters = listOf("Transporter B"),
+        totalWeight = 2000,
+        totalShipments = 4,
+        yearMonth = YearMonth(2025, 11),
+        weightTicketIds = emptyList()
+      )
     )
 
     // When
@@ -293,14 +302,16 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
     // Given - declaration for non-existent waste stream
     val nonExistentWasteStreamNumber = "999999999999"
 
-    val firstReceival = EersteOntvangstMeldingDetails().apply {
-      meldingsNummerMelder = "DECL-005"
-      afvalstroomNummer = nonExistentWasteStreamNumber
-      periodeMelding = "112025"
-      vervoerders = "Transporter X"
-      totaalGewicht = 500
-      aantalVrachten = 1
-    }
+    val wasteStream = createMockWasteStream(nonExistentWasteStreamNumber)
+    val firstReceival = FirstReceivalDeclaration(
+      id = "DECL-005",
+      wasteStream = wasteStream,
+      transporters = listOf("Transporter X"),
+      totalWeight = 500,
+      totalShipments = 1,
+      yearMonth = YearMonth(2025, 11),
+      weightTicketIds = emptyList()
+    )
 
     // When - should not throw exception
     lmaDeclarations.saveAllPendingFirstReceivals(listOf(firstReceival))
@@ -394,6 +405,32 @@ class LmaDeclarationRepositoryTest : BaseIntegrationTest() {
       VALUES (?, ?, ?, ?, ARRAY[]::text[], ?, ?, ?, NOW(), ARRAY[]::text[], 'PENDING')
       """,
       UUID.randomUUID().toString(), UUID.randomUUID(), wasteStreamNumber, period, totalWeight.toLong(), totalShipments.toLong(), LmaDeclaration.Type.FIRST_RECEIVAL.name
+    )
+  }
+
+  private fun createMockWasteStream(wasteStreamNumber: String): WasteStream {
+    return WasteStream(
+      wasteStreamNumber = WasteStreamNumber(wasteStreamNumber),
+      wasteType = WasteType(
+        name = "Test Waste",
+        euralCode = EuralCode("010101*"),
+        processingMethod = ProcessingMethod("R01")
+      ),
+      collectionType = WasteCollectionType.DEFAULT,
+      pickupLocation = Location.DutchAddress(
+        address = Address(
+          streetName = StreetName("Test Street"),
+          postalCode = DutchPostalCode("1234 AB"),
+          buildingNumber = "10",
+          city = City("Amsterdam")
+        )
+      ),
+      deliveryLocation = WasteDeliveryLocation(
+        processorPartyId = ProcessorPartyId(wasteStreamNumber.substring(0, 5))
+      ),
+      consignorParty = Consignor.Company(CompanyId(UUID.randomUUID())),
+      consignorClassification = ConsignorClassification.PICKUP_PARTY,
+      pickupParty = CompanyId(UUID.randomUUID())
     )
   }
 

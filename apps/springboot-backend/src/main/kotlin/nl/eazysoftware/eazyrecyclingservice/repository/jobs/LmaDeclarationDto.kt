@@ -43,6 +43,9 @@ data class LmaDeclarationDto(
   @Column(name = "status", nullable = false)
   @Enumerated(EnumType.STRING)
   val status: Status,
+
+  @Column(name = "weight_ticket_ids", nullable = true, columnDefinition = "uuid[]")
+  val weightTicketIds: List<UUID>? = null,
 ) {
 
   enum class Status {

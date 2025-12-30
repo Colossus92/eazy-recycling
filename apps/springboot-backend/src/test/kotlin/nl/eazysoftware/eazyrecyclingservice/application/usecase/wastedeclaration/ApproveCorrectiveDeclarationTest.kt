@@ -7,10 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.*
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.AmiceSessions
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclaration
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.LmaDeclarations
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.*
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,6 +36,9 @@ class ApproveCorrectiveDeclarationTest {
   @Mock
   private lateinit var firstReceivalMessageMapper: FirstReceivalMessageMapper
 
+  @Mock
+  private lateinit var weightTickets: WeightTickets
+
   private lateinit var service: ApproveCorrectiveDeclarationService
 
   private val declarationId = "000000000031"
@@ -50,7 +50,8 @@ class ApproveCorrectiveDeclarationTest {
       lmaDeclarations = lmaDeclarations,
       amiceSessions = amiceSessions,
       wasteStreams = wasteStreams,
-      firstReceivalMessageMapper = firstReceivalMessageMapper
+      firstReceivalMessageMapper = firstReceivalMessageMapper,
+      weightTickets = weightTickets
     )
   }
 

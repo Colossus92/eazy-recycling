@@ -13,6 +13,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.util.*
 import kotlin.time.Clock
 import kotlin.time.toJavaInstant
 
@@ -65,6 +66,9 @@ class DetectLateDeclarations(
       // Delete any existing pending late declarations for this waste stream and period
       lmaDeclarations.deletePendingLateDeclarations(wasteStreamNumber, formattedPeriod)
 
+      // Extract weight ticket IDs from the lines
+      val weightTicketIds: List<UUID> = lines.map { it.weightTicketId.id }.distinct()
+
       if (!hasExistingDeclaration) {
         // This is a first receival - create a CORRECTIVE declaration for manual approval
         val declaration = LmaDeclarationDto(
@@ -77,6 +81,7 @@ class DetectLateDeclarations(
           type = LmaDeclaration.Type.FIRST_RECEIVAL,
           createdAt = Clock.System.now().toJavaInstant(),
           status = LmaDeclarationDto.Status.WAITING_APPROVAL,
+          weightTicketIds = weightTicketIds,
         )
 
         lmaDeclarations.saveCorrectiveDeclaration(declaration)
@@ -92,6 +97,7 @@ class DetectLateDeclarations(
           type = LmaDeclaration.Type.MONTHLY_RECEIVAL,
           createdAt = Clock.System.now().toJavaInstant(),
           status = LmaDeclarationDto.Status.WAITING_APPROVAL,
+          weightTicketIds = weightTicketIds,
         )
 
         lmaDeclarations.saveCorrectiveDeclaration(declaration)

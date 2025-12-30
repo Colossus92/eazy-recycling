@@ -45,7 +45,7 @@ class DeclareMonthlyReceivalsService(
 
     val message = monthlyReceivalDeclarations.map { mapToSoapMessage(it) }
 
-    lmaDeclarations.saveAllPendingMonthlyReceivals(message)
+    lmaDeclarations.saveAllPendingMonthlyReceivals(monthlyReceivalDeclarations)
     amiceSessions.declareMonthlyReceivals(message)
 
     // Mark weight ticket lines as declared - use the exact weight ticket IDs from each declaration

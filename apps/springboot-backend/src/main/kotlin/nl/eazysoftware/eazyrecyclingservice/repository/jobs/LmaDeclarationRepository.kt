@@ -1,8 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.jobs
 
 import jakarta.persistence.EntityManager
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.EersteOntvangstMeldingDetails
-import nl.eazysoftware.eazyrecyclingservice.adapters.out.soap.generated.melding.MaandelijkseOntvangstMeldingDetails
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.FirstReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastedeclaration.MonthlyReceivalDeclaration
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toLmaPeriod
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toYearMonth
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
@@ -33,13 +34,13 @@ class LmaDeclarationRepository(
     return jpaRepository.save(declaration)
   }
 
-  override fun saveAllPendingFirstReceivals(firstReceivals: List<EersteOntvangstMeldingDetails>) {
+  override fun saveAllPendingFirstReceivals(firstReceivals: List<FirstReceivalDeclaration>) {
     val declarations = LmaDeclarationMapper.mapFirstReceivals(firstReceivals, LmaDeclarationDto.Status.PENDING)
     jpaRepository.saveAll(declarations)
     touchWasteStreams(declarations.map { it.wasteStreamNumber })
   }
 
-  override fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>) {
+  override fun saveAllPendingMonthlyReceivals(monthlyReceivals: List<MonthlyReceivalDeclaration>) {
     val declarations = LmaDeclarationMapper.mapMonthlyReceivals(monthlyReceivals, LmaDeclarationDto.Status.PENDING)
     jpaRepository.saveAll(declarations)
     touchWasteStreams(declarations.map { it.wasteStreamNumber })
@@ -203,36 +204,38 @@ data class LmaDeclarationQueryResult(
 object LmaDeclarationMapper {
 
   fun mapFirstReceivals(
-    firstReceivals: List<EersteOntvangstMeldingDetails>,
+    firstReceivals: List<FirstReceivalDeclaration>,
     status: LmaDeclarationDto.Status
-  ) = firstReceivals.map { firstReceival ->
+  ) = firstReceivals.map { declaration ->
     LmaDeclarationDto(
-      id = firstReceival.meldingsNummerMelder,
-      wasteStreamNumber = firstReceival.afvalstroomNummer,
-      period = firstReceival.periodeMelding,
-      transporters = firstReceival.vervoerders.split(",").map { it.trim() },
-      totalWeight = firstReceival.totaalGewicht.toLong(),
-      totalShipments = firstReceival.aantalVrachten.toLong(),
+      id = declaration.id,
+      wasteStreamNumber = declaration.wasteStream.wasteStreamNumber.number,
+      period = declaration.yearMonth.toLmaPeriod(),
+      transporters = declaration.transporters,
+      totalWeight = declaration.totalWeight.toLong(),
+      totalShipments = declaration.totalShipments.toLong(),
       type = LmaDeclaration.Type.FIRST_RECEIVAL,
       createdAt = Clock.System.now().toJavaInstant(),
       status = status,
+      weightTicketIds = declaration.weightTicketIds,
     )
   }
 
   fun mapMonthlyReceivals(
-    monthlyReceivals: List<MaandelijkseOntvangstMeldingDetails>,
-    status: LmaDeclarationDto.Status,
-  ) = monthlyReceivals.map { monthlyReceival ->
+    monthlyReceivals: List<MonthlyReceivalDeclaration>,
+    status: LmaDeclarationDto.Status
+  ) = monthlyReceivals.map { declaration ->
     LmaDeclarationDto(
-      id = monthlyReceival.meldingsNummerMelder,
-      wasteStreamNumber = monthlyReceival.afvalstroomNummer,
-      period = monthlyReceival.periodeMelding,
-      transporters = monthlyReceival.vervoerders.split(",").map { it.trim() },
-      totalWeight = monthlyReceival.totaalGewicht.toLong(),
-      totalShipments = monthlyReceival.aantalVrachten.toLong(),
-      type = LmaDeclaration.Type.FIRST_RECEIVAL,
+      id = declaration.id,
+      wasteStreamNumber = declaration.wasteStreamNumber.number,
+      period = declaration.yearMonth.toLmaPeriod(),
+      transporters = declaration.transporters,
+      totalWeight = declaration.totalWeight.toLong(),
+      totalShipments = declaration.totalShipments.toLong(),
+      type = LmaDeclaration.Type.MONTHLY_RECEIVAL,
       createdAt = Clock.System.now().toJavaInstant(),
       status = status,
+      weightTicketIds = declaration.weightTicketIds,
     )
   }
 }
