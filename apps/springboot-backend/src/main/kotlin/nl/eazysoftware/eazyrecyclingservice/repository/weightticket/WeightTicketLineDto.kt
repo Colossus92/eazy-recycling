@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.LineDeclara
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
@@ -24,7 +25,11 @@ data class WeightTicketLineDto(
   @Column(name = "waste_stream_number")
   val wasteStreamNumber: String?,
 
-  @Column(name = "catalog_item_id", nullable = false)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "catalog_item_id", nullable = false)
+  val catalogItem: CatalogItemDto,
+
+  @Column(name = "catalog_item_id", nullable = false, insertable = false, updatable = false)
   val catalogItemId: UUID,
 
   @Column(name = "weight_value", nullable = false, precision = 10, scale = 2)

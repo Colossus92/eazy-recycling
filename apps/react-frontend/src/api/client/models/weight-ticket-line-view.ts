@@ -34,6 +34,12 @@ export interface WeightTicketLineView {
     'catalogItemId': string;
     /**
      * 
+     * @type {string}
+     * @memberof WeightTicketLineView
+     */
+    'itemName': string;
+    /**
+     * 
      * @type {number}
      * @memberof WeightTicketLineView
      */

@@ -288,6 +288,13 @@ async function drawPartySection(
 }
 
 /**
+ * Round a number to 2 decimal places using standard rounding (5 rounds up, 4 rounds down)
+ */
+function roundToTwoDecimals(value: number): number {
+    return Math.round(value * 100) / 100;
+}
+
+/**
  * Draw weight ticket lines with totals
  */
 async function drawLinesTable(
@@ -304,9 +311,14 @@ async function drawLinesTable(
 
     let currentY = y;
 
-    // Calculate gross weight (sum of all lines)
-    const grossWeight = lines.reduce((sum, line) => Number(sum) + Number(line.weight_value || 0), 0);
+    // Calculate gross weight (sum of all lines) and round to 2 decimals
+    const grossWeight = roundToTwoDecimals(
+        lines.reduce((sum, line) => Number(sum) + Number(line.weight_value || 0), 0)
+    );
     const weightUnit = lines.length > 0 ? lines[0].weight_unit : 'kg';
+    
+    // Right-aligned x position for weight values
+    const weightValueX = x + 450;
 
     // Draw Bruto (gross weight)
     page.drawText(`Bruto:`, {
@@ -317,8 +329,10 @@ async function drawLinesTable(
         color: rgb(0, 0, 0),
     });
 
-    page.drawText(`${grossWeight} ${weightUnit}`, {
-        x: x + 300,
+    const brutoText = `${grossWeight.toFixed(2)} ${weightUnit}`;
+    const brutoWidth = boldFont.widthOfTextAtSize(brutoText, 10);
+    page.drawText(brutoText, {
+        x: weightValueX - brutoWidth,
         y: currentY,
         size: 10,
         font: boldFont,
@@ -328,12 +342,13 @@ async function drawLinesTable(
     currentY -= 15;
 
 
-    let tarra = '';
+    let tarraText = '';
     // Draw Tarra if available
     if (tarraWeight !== undefined && tarraUnit) {
-        tarra = `${tarraWeight} ${tarraUnit}`;
+        const roundedTarra = roundToTwoDecimals(tarraWeight);
+        tarraText = `${roundedTarra.toFixed(2)} ${tarraUnit}`;
     } else {
-        tarra = '-';
+        tarraText = '-';
     }
     page.drawText(`Tarra:`, {
         x,
@@ -343,8 +358,9 @@ async function drawLinesTable(
         color: rgb(0, 0, 0),
     });
 
-    page.drawText(`${tarra}`, {
-        x: x + 300,
+    const tarraWidth = regularFont.widthOfTextAtSize(tarraText, 10);
+    page.drawText(tarraText, {
+        x: weightValueX - tarraWidth,
         y: currentY,
         size: 10,
         font: regularFont,
@@ -354,7 +370,7 @@ async function drawLinesTable(
     currentY -= 20;
 
     // Calculate and draw Netto (gross - tarra) in bigger font
-    const nettoWeight = grossWeight - Number(tarraWeight || 0);
+    const nettoWeight = roundToTwoDecimals(grossWeight - Number(tarraWeight || 0));
 
     page.drawText(`Netto:`, {
         x,
@@ -364,8 +380,10 @@ async function drawLinesTable(
         color: rgb(0, 0, 0),
     });
 
-    page.drawText(`${nettoWeight} ${weightUnit}`, {
-        x: x + 300,
+    const nettoText = `${nettoWeight.toFixed(2)} ${weightUnit}`;
+    const nettoWidth = boldFont.widthOfTextAtSize(nettoText, 14);
+    page.drawText(nettoText, {
+        x: weightValueX - nettoWidth,
         y: currentY,
         size: 14,
         font: boldFont,
@@ -385,7 +403,8 @@ async function drawLinesTable(
     currentY -= 13;
     // Draw each line (waste type and weight combined)
     for (const line of lines) {
-        const weightText = `${line.weight_value || 0} ${line.weight_unit || ''}`;
+        const roundedWeight = roundToTwoDecimals(Number(line.weight_value || 0));
+        const weightText = `${roundedWeight.toFixed(2)} ${line.weight_unit || ''}`;
 
         page.drawText(line.waste_type_name || 'Onbekend', {
             x,
@@ -395,8 +414,9 @@ async function drawLinesTable(
             color: rgb(0, 0, 0),
         });
 
+        const lineWeightWidth = regularFont.widthOfTextAtSize(weightText, 9);
         page.drawText(weightText, {
-            x: x + 300,
+            x: weightValueX - lineWeightWidth,
             y: currentY,
             size: 9,
             font: regularFont,

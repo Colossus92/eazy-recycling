@@ -14,7 +14,7 @@ import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
-import { WeightTicketDetailViewConsignorParty, CompanyView } from '@/api/client/models';
+import { CompanyView, WeightTicketDetailViewConsignorParty } from '@/api/client/models';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { WeightTicketDownloadSection } from '@/features/planning/components/drawer/WeightTicketDownloadSection';
 import { WaybillDownloadSection } from '@/features/planning/components/drawer/WaybillDownloadSection';
@@ -113,7 +113,7 @@ export const WeightTicketDetailsDrawer = ({
   const handleTransportClick = () => {
     if (linkedTransport) {
       // Navigate to planning page with transport selected
-      const pickupDate = linkedTransport.pickupDateTime 
+      const pickupDate = linkedTransport.pickupDateTime
         ? new Date(linkedTransport.pickupDateTime).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0];
       navigate(`/?transportId=${linkedTransport.transportId}&date=${pickupDate}`);
@@ -206,7 +206,7 @@ export const WeightTicketDetailsDrawer = ({
                 </span>
               </div>
               {linkedTransport && (
-                <div 
+                <div
                   className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
                   onClick={handleTransportClick}
                 >
@@ -224,7 +224,7 @@ export const WeightTicketDetailsDrawer = ({
                 </div>
               )}
               {linkedInvoiceId && (
-                <div 
+                <div
                   className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
                   onClick={handleInvoiceClick}
                 >
@@ -260,9 +260,8 @@ export const WeightTicketDetailsDrawer = ({
                   className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 border-b border-solid border-color-border-primary last:border-b-0'}
                 >
                   <div className="flex flex-col flex-1 gap-0.5">
-                    <span className={'text-body-2'}>{line.wasteStreamNumber || 'Afvalstroom'}</span>
                     <span className={'text-caption text-color-text-secondary'}>
-                      Item #{line.catalogItemId}
+                      {line.itemName} {line.wasteStreamNumber ? `(${line.wasteStreamNumber})` : ''}
                     </span>
                   </div>
                   <span className={'text-body-2'}>

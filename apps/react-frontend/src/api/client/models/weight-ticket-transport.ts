@@ -49,6 +49,6 @@ export interface WeightTicketTransport {
      * @type {number}
      * @memberof WeightTicketTransport
      */
-    'weightTicketId': number;
+    'weightTicketNumber': number;
 }
 

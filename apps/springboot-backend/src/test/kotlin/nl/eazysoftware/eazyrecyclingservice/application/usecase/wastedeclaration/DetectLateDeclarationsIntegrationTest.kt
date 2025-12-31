@@ -7,10 +7,13 @@ import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.*
@@ -56,6 +59,12 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
 
   @Autowired
   private lateinit var processingMethodRepository: ProcessingMethodRepository
+
+  @Autowired
+  private lateinit var catalogItemRepository: CatalogItemJpaRepository
+
+  @Autowired
+  private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
   private lateinit var processorCompanyId: UUID
   private lateinit var consignorCompanyId: UUID
@@ -461,21 +470,42 @@ class DetectLateDeclarationsIntegrationTest : BaseIntegrationTest() {
       weightedAt = weightedAtInstant,
       cancellationReason = null
     )
-    
+
     // Add lines with parent reference for bidirectional relationship
     val ticketLines = lines.map { (wasteStreamNumber, weightValue) ->
+      val catalogItem = createTestCatalogItem()
       WeightTicketLineDto(
         id = UUID.randomUUID(),
         weightTicket = ticket,
         wasteStreamNumber = wasteStreamNumber,
-        catalogItemId = UUID.randomUUID(),
+        catalogItem = catalogItem,
+        catalogItemId = catalogItem.id,
         weightValue = weightValue.toBigDecimal(),
         weightUnit = WeightUnitDto.kg
       )
     }
     ticket.lines.addAll(ticketLines)
-    
+
     return weightTicketRepository.save(ticket).id
+  }
+
+  private fun createTestCatalogItem(): CatalogItemDto {
+    return catalogItemRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        type = nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType.MATERIAL,
+        code = "TEST-" + UUID.randomUUID().toString().substring(0, 8),
+        name = "Test Material",
+        unitOfMeasure = "kg",
+        vatRate = vatRateJpaRepository.findAll().first(),
+        category = null,
+        consignorParty = null,
+        defaultPrice = null,
+        status = "ACTIVE",
+        purchaseAccountNumber = null,
+        salesAccountNumber = null
+      )
+    )
   }
 
   private fun cleanupDatabase() {

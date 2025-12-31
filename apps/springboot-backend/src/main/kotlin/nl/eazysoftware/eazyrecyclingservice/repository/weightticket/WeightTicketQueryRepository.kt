@@ -59,6 +59,7 @@ class WeightTicketQueryRepository(
         WeightTicketLineView(
           wasteStreamNumber = line.wasteStreamNumber,
           catalogItemId = line.catalogItemId,
+          itemName = line.catalogItem.name,
           weightValue = line.weightValue,
           weightUnit = line.weightUnit.name,
         )

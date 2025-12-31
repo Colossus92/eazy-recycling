@@ -8,6 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
 import org.springframework.stereotype.Component
 import java.util.*
@@ -19,6 +20,7 @@ class WeightTicketMapper(
   private val companies: Companies,
   private val pickupLocationMapper: PickupLocationMapper,
   private val companyMapper: CompanyMapper,
+  private val catalogItemRepository: CatalogItemJpaRepository,
 ) {
 
   fun toDomain(dto: WeightTicketDto): WeightTicket {
@@ -115,12 +117,16 @@ class WeightTicketMapper(
   private fun toDto(domain: WeightTicketLines, weightTicket: WeightTicketDto): MutableList<WeightTicketLineDto> {
     return domain.getLines()
       .map {
+        val catalogItem = catalogItemRepository.findById(it.catalogItemId)
+          .orElseThrow { IllegalArgumentException("Catalog item not found: ${it.catalogItemId}") }
+        
         WeightTicketLineDto(
           id = UUID.randomUUID(),
           weightTicket = weightTicket,
           wasteStreamNumber = it.waste?.number,
-          weightValue = it.weight.value,
+          catalogItem = catalogItem,
           catalogItemId = it.catalogItemId,
+          weightValue = it.weight.value,
           weightUnit = when (it.weight.unit) {
             Weight.WeightUnit.KILOGRAM -> WeightUnitDto.kg
           },

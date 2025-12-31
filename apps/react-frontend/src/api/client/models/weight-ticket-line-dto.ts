@@ -13,6 +13,12 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { CatalogItemDto } from './catalog-item-dto';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketDto } from './weight-ticket-dto';
 
 /**
  * 
@@ -28,16 +34,22 @@ export interface WeightTicketLineDto {
     'id': string;
     /**
      * 
-     * @type {number}
+     * @type {WeightTicketDto}
      * @memberof WeightTicketLineDto
      */
-    'weightTicketId': number;
+    'weightTicket'?: WeightTicketDto;
     /**
      * 
      * @type {string}
      * @memberof WeightTicketLineDto
      */
     'wasteStreamNumber'?: string;
+    /**
+     * 
+     * @type {CatalogItemDto}
+     * @memberof WeightTicketLineDto
+     */
+    'catalogItem': CatalogItemDto;
     /**
      * 
      * @type {string}

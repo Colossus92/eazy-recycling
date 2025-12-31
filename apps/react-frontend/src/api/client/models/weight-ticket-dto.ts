@@ -31,10 +31,16 @@ import type { WeightTicketLineDto } from './weight-ticket-line-dto';
 export interface WeightTicketDto {
     /**
      * 
+     * @type {string}
+     * @memberof WeightTicketDto
+     */
+    'id': string;
+    /**
+     * 
      * @type {number}
      * @memberof WeightTicketDto
      */
-    'id': number;
+    'number': number;
     /**
      * 
      * @type {CompanyDto}

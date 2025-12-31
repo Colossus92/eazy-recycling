@@ -12,6 +12,8 @@ export * from './application-context-class-loader-parent-unnamed-module-descript
 export * from './approve-declaration-response';
 export * from './authorization-url-response';
 export * from './cancel-weight-ticket-request';
+export * from './catalog-item-category-dto';
+export * from './catalog-item-dto';
 export * from './catalog-item-response';
 export * from './company-branch-response';
 export * from './company-consignor';
@@ -133,6 +135,7 @@ export * from './user-role-dto';
 export * from './validation-error-response';
 export * from './validation-request-data-response';
 export * from './vat-breakdown-line-view';
+export * from './vat-rate-dto';
 export * from './vat-rate-request';
 export * from './vat-rate-response';
 export * from './waste-container-dto';

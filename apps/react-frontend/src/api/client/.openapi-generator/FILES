@@ -42,6 +42,8 @@ models/application-context.ts
 models/approve-declaration-response.ts
 models/authorization-url-response.ts
 models/cancel-weight-ticket-request.ts
+models/catalog-item-category-dto.ts
+models/catalog-item-dto.ts
 models/catalog-item-response.ts
 models/company-branch-response.ts
 models/company-consignor-view.ts
@@ -164,6 +166,7 @@ models/user-role-dto.ts
 models/validation-error-response.ts
 models/validation-request-data-response.ts
 models/vat-breakdown-line-view.ts
+models/vat-rate-dto.ts
 models/vat-rate-request.ts
 models/vat-rate-response.ts
 models/waste-container-dto.ts
