@@ -35,7 +35,19 @@ const defaultValues: InvoiceFormValues = {
   invoiceDate: format(new Date(), 'yyyy-MM-dd'),
   invoiceType: 'SALE',
   documentType: 'INVOICE',
-  lines: [],
+  lines: [
+    {
+      catalogItemId: '',
+      catalogItemName: '',
+      date: '',
+      description: '',
+      quantity: '1',
+      unitPrice: '0',
+      unitOfMeasure: '',
+      vatPercentage: '21',
+      orderReference: '',
+    },
+  ],
 };
 
 export const useInvoiceFormHook = () => {
@@ -144,9 +156,21 @@ export const useInvoiceFormHook = () => {
     };
   };
 
+  const validateInvoiceLines = (values: InvoiceFormValues): boolean => {
+    const validLines = values.lines.filter((line) => line.catalogItemId);
+    if (validLines.length === 0) {
+      toastService.error('Minimaal één factuurregel is verplicht');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (): Promise<string | null> => {
     const isValid = await formContext.trigger();
     if (!isValid) return null;
+
+    const values = formContext.getValues();
+    if (!validateInvoiceLines(values)) return null;
 
     setIsSaving(true);
     try {
@@ -183,6 +207,9 @@ export const useInvoiceFormHook = () => {
   const handleSubmitAndFinalize = async (): Promise<string | null> => {
     const isValid = await formContext.trigger();
     if (!isValid) return null;
+
+    const values = formContext.getValues();
+    if (!validateInvoiceLines(values)) return null;
 
     setIsSaving(true);
     try {
@@ -227,6 +254,7 @@ export const useInvoiceFormHook = () => {
     isSaving,
     isReadOnly,
     invoiceNumber,
+    invoiceStatus,
     currentInvoiceId,
     loadInvoice,
     resetForm,

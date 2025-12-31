@@ -241,7 +241,11 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
                   index={index}
                   field={field}
                   update={update}
-                  onRemove={() => remove(index)}
+                  onRemove={() => {
+                    if (fields.length > 1) {
+                      remove(index);
+                    }
+                  }}
                   onCatalogItemSelected={handleCatalogItemSelected}
                   consignorPartyId={customerId}
                   isReadOnly={isReadOnly}

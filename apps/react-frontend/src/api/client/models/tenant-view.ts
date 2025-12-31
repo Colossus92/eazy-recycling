@@ -17,44 +17,26 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface TenantView
  */
-export interface LocalTime {
+export interface TenantView {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TenantView
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
+    'processorPartyId': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof TenantView
      */
-    'value$kotlinx_datetime': string;
+    'companyName': string;
     /**
      * 
-     * @type {number}
-     * @memberof LocalTime
+     * @type {string}
+     * @memberof TenantView
      */
-    'nanosecond': number;
+    'financialEmail': string;
 }
 

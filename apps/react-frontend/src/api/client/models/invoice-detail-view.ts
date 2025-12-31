@@ -22,6 +22,9 @@ import type { InvoiceLineView } from './invoice-line-view';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { InvoiceTotalsView } from './invoice-totals-view';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { TenantView } from './tenant-view';
 
 /**
  * 
@@ -71,6 +74,18 @@ export interface InvoiceDetailView {
      * @memberof InvoiceDetailView
      */
     'customer': CustomerSnapshotView;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceDetailView
+     */
+    'customerEmail'?: string;
+    /**
+     * 
+     * @type {TenantView}
+     * @memberof InvoiceDetailView
+     */
+    'tenant': TenantView;
     /**
      * 
      * @type {string}

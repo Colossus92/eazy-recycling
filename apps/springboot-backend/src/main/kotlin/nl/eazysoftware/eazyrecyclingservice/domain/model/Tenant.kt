@@ -4,4 +4,6 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyI
 
 object Tenant {
   val processorPartyId = ProcessorPartyId("08797")
+  val companyName = "WHD Metaalrecycling"
+  val financialEmail = "hello@eazysoftware.nl"
 }

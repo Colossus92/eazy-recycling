@@ -1,12 +1,17 @@
 import { Button } from '@/components/ui/button/Button';
 import { SplitButton } from '@/components/ui/button/SplitButton';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
+import {
+  EmailComposer,
+  EmailComposerValues,
+} from '@/components/ui/email/EmailComposer';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { DateFormField } from '@/components/ui/form/DateFormField';
 import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { Tab } from '@/components/ui/tab/Tab';
+import { toastService } from '@/components/ui/toast/toastService';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useEffect } from 'react';
 import { FormProvider } from 'react-hook-form';
@@ -14,6 +19,8 @@ import { ClipLoader } from 'react-spinners';
 import { InvoiceLinesSection } from './InvoiceLinesSection';
 import { InvoiceRelatedTab } from './InvoiceRelatedTab';
 import { useInvoiceFormHook } from './useInvoiceFormHook';
+import { useInvoiceEmailFormHook } from './useInvoiceEmailFormHook';
+import { invoiceService } from '@/api/services/invoiceService';
 
 interface InvoiceFormProps {
   isOpen: boolean;
@@ -40,8 +47,20 @@ export const InvoiceForm = ({
     loadInvoice,
     resetForm,
     handleSubmit,
-    handleSubmitAndFinalize,
   } = useInvoiceFormHook();
+
+  const {
+    emailStep,
+    setEmailStep,
+    emailData,
+    isPdfReady,
+    startPdfPolling,
+    prepareEmailData,
+    getEmailDefaultValues,
+    handleOpenPdfAttachment,
+    cancelEmailStep,
+    resetEmailState,
+  } = useInvoiceEmailFormHook();
 
   // Use the hook's currentInvoiceId to determine edit mode (handles newly created invoices)
   const isEditMode = invoiceId !== undefined || currentInvoiceId !== null;
@@ -71,17 +90,110 @@ export const InvoiceForm = ({
     }
   };
 
-  const onSubmitAndFinalize = async () => {
-    const finalizedInvoiceId = await handleSubmitAndFinalize();
-    if (finalizedInvoiceId !== null) {
-      // Refresh the list, form stays open with the finalized invoice loaded
-      onComplete();
+  const onSubmitAndSend = async () => {
+    const isValid = await formContext.trigger();
+    if (!isValid) return;
+
+    const values = formContext.getValues();
+    const validLines = values.lines.filter((line) => line.catalogItemId);
+    if (validLines.length === 0) {
+      toastService.error('Minimaal één factuurregel is verplicht');
+      return;
     }
+
+    setEmailStep('processing-invoice');
+
+    try {
+      let finalizedInvoiceId: string;
+      let invoice;
+
+      if (currentInvoiceId) {
+        // Update existing invoice, then finalize
+        await invoiceService.update(
+          currentInvoiceId,
+          {
+            invoiceDate: values.invoiceDate,
+            lines: values.lines
+              .filter((line) => line.catalogItemId)
+              .map((line) => ({
+                id: line.id || undefined,
+                date: line.date || values.invoiceDate,
+                catalogItemId: line.catalogItemId,
+                description: line.description,
+                quantity: parseFloat(line.quantity) || 0,
+                unitPrice: parseFloat(line.unitPrice) || 0,
+                orderReference: line.orderReference || undefined,
+              })),
+          }
+        );
+        await invoiceService.finalize(currentInvoiceId);
+        finalizedInvoiceId = currentInvoiceId;
+      } else {
+        // Create and finalize in one call
+        const result = await invoiceService.createCompleted({
+          invoiceType: values.invoiceType,
+          documentType: values.documentType,
+          customerId: values.customerId,
+          invoiceDate: values.invoiceDate,
+          lines: values.lines
+            .filter((line) => line.catalogItemId)
+            .map((line) => ({
+              id: line.id || undefined,
+              date: line.date || values.invoiceDate,
+              catalogItemId: line.catalogItemId,
+              description: line.description,
+              quantity: parseFloat(line.quantity) || 0,
+              unitPrice: parseFloat(line.unitPrice) || 0,
+              orderReference: line.orderReference || undefined,
+            })),
+        });
+        finalizedInvoiceId = result.invoiceId;
+      }
+
+      // Load the finalized invoice to get customer details
+      invoice = await invoiceService.getById(finalizedInvoiceId);
+      await loadInvoice(finalizedInvoiceId);
+
+      // Prepare email data
+      const invoiceNum = invoice.invoiceNumber || 'DRAFT';
+      prepareEmailData(
+        invoiceNum,
+        invoice.customer.name,
+        invoice.customerEmail || '',
+        invoice.tenant,
+        invoice.pdfUrl
+      );
+
+      // Start polling if PDF is not ready
+      if (!invoice.pdfUrl) {
+        startPdfPolling(finalizedInvoiceId);
+      }
+
+      // Move to email compose step
+      setEmailStep('email-compose');
+
+      // Refresh the list
+      onComplete();
+    } catch (error) {
+      console.error('Error saving and preparing email:', error);
+      toastService.error(
+        'Er is een fout opgetreden bij het verwerken van de factuur'
+      );
+      setEmailStep('form');
+    }
+  };
+
+  const handleSendEmail = (values: EmailComposerValues) => {
+    // TODO: Implement in next phase - call backend to send email
+    console.log('Sending email:', values);
+    toastService.success('E-mail verzonden (simulatie)');
+    handleClose();
   };
 
   const handleClose = () => {
     setIsOpen(false);
     resetForm();
+    resetEmailState();
   };
 
   const invoiceTypeOptions = [
@@ -93,6 +205,51 @@ export const InvoiceForm = ({
     { value: 'INVOICE', label: 'Factuur' },
     { value: 'CREDIT_NOTE', label: 'Creditnota' },
   ];
+
+  // Render email composer when in email step
+  if (emailStep === 'email-compose' && emailData) {
+    return (
+      <FormDialog
+        isOpen={isOpen}
+        setIsOpen={handleClose}
+        width="w-[800px] h-[90vh]"
+      >
+        <EmailComposer
+          emailHook={{
+            emailStep,
+            setEmailStep,
+            emailData,
+            isPdfReady,
+            startPdfPolling,
+            prepareEmailData,
+            getEmailDefaultValues,
+            handleOpenPdfAttachment,
+            cancelEmailStep,
+            resetEmailState,
+          }}
+          onSend={handleSendEmail}
+        />
+      </FormDialog>
+    );
+  }
+
+  // Render processing invoice state
+  if (emailStep === 'processing-invoice') {
+    return (
+      <FormDialog
+        isOpen={isOpen}
+        setIsOpen={handleClose}
+        width="w-[800px] h-[90vh]"
+      >
+        <div className="flex flex-col items-center justify-center h-full gap-4">
+          <ClipLoader size={40} />
+          <span className="text-body-1 text-color-text-secondary">
+            Factuur wordt verwerkt...
+          </span>
+        </div>
+      </FormDialog>
+    );
+  }
 
   return (
     <FormDialog
@@ -218,11 +375,9 @@ export const InvoiceForm = ({
             {!isReadOnly && (
               <SplitButton
                 primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
-                secondaryLabel={
-                  isEditMode ? 'Verwerken' : 'Opslaan en verwerken'
-                }
+                secondaryLabel="Opslaan & verzenden..."
                 onPrimaryClick={onSubmit}
-                onSecondaryClick={onSubmitAndFinalize}
+                onSecondaryClick={onSubmitAndSend}
                 isSubmitting={isSaving}
               />
             )}

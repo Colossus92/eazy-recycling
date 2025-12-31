@@ -117,6 +117,7 @@ export * from './sync-conflict-dto';
 export * from './sync-conflicts-response';
 export * from './sync-from-exact-response';
 export * from './taglib-descriptor';
+export * from './tenant-view';
 export * from './transport-detail-view';
 export * from './transport-dto';
 export * from './transport-finished-request';

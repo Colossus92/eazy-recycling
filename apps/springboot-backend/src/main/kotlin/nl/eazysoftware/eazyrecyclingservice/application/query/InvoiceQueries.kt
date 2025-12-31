@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -42,10 +44,12 @@ class GetAllInvoicesQuery(
 @Service
 class GetInvoiceByIdQuery(
     private val invoices: Invoices,
+    private val companies: Companies,
 ) : GetInvoiceById {
 
     override fun handle(invoiceId: UUID): InvoiceDetailView? {
         val invoice = invoices.findById(InvoiceId(invoiceId)) ?: return null
+        val customer = companies.findById(invoice.customerSnapshot.companyId) ?: return null
         val totals = invoice.calculateTotals()
 
         return InvoiceDetailView(
@@ -69,6 +73,7 @@ class GetInvoiceByIdQuery(
                 ),
                 vatNumber = invoice.customerSnapshot.vatNumber,
             ),
+            customerEmail = customer.email?.value,
             originalInvoiceId = invoice.originalInvoiceId?.value,
             sourceWeightTicketId = invoice.sourceWeightTicketId?.number,
             lines = invoice.lines.map { line ->
@@ -103,6 +108,11 @@ class GetInvoiceByIdQuery(
                 totalVat = totals.totalVat,
                 totalInclVat = totals.totalInclVat,
             ),
+            tenant = TenantView(
+              processorPartyId = Tenant.processorPartyId.number,
+              companyName = Tenant.companyName,
+              financialEmail = Tenant.financialEmail
+            ),
             createdAt = invoice.createdAt.toString(),
             createdBy = invoice.createdBy,
             updatedAt = invoice.updatedAt?.toString(),
@@ -135,6 +145,11 @@ data class InvoiceDetailView(
     val status: String,
     val invoiceDate: LocalDate,
     val customer: CustomerSnapshotView,
+    /**
+     * Detached form CustomerSnapshotView because email is used for invoice email
+     */
+    val customerEmail: String?,
+    val tenant: TenantView,
     val originalInvoiceId: UUID?,
     val sourceWeightTicketId: Long?,
     val lines: List<InvoiceLineView>,
@@ -146,6 +161,12 @@ data class InvoiceDetailView(
     val finalizedAt: String?,
     val finalizedBy: String?,
     val pdfUrl: String?,
+)
+
+data class TenantView(
+    val processorPartyId: String,
+    val companyName: String,
+    val financialEmail: String,
 )
 
 data class CustomerSnapshotView(
