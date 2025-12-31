@@ -15,6 +15,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJp
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.FirstReceivalWasteStreamQueryAdapter
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.MonthlyReceivalWasteStreamQueryAdapter
@@ -30,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import java.math.BigDecimal
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
@@ -442,6 +444,7 @@ class WasteDeclarationFlowIntegrationTest : BaseIntegrationTest() {
   }
 
   private fun createTestCatalogItem(): CatalogItemDto {
+    val vatRate = vatRateJpaRepository.findAll().firstOrNull() ?: createTestVatRate()
     return catalogItemRepository.save(
       CatalogItemDto(
         id = UUID.randomUUID(),
@@ -449,13 +452,26 @@ class WasteDeclarationFlowIntegrationTest : BaseIntegrationTest() {
         code = "TEST-" + UUID.randomUUID().toString().substring(0, 8),
         name = "Test Material",
         unitOfMeasure = "kg",
-        vatRate = vatRateJpaRepository.findAll().first(),
+        vatRate = vatRate,
         category = null,
         consignorParty = null,
         defaultPrice = null,
         status = "ACTIVE",
         purchaseAccountNumber = null,
         salesAccountNumber = null
+      )
+    )
+  }
+
+  private fun createTestVatRate(): VatRateDto {
+    return vatRateJpaRepository.save(
+      VatRateDto(
+        vatCode = "TEST_VAT",
+        percentage = BigDecimal("21.00"),
+        validFrom = Instant.now().minusSeconds(86400),
+        validTo = null,
+        countryCode = "NL",
+        description = "Test VAT Rate"
       )
     )
   }

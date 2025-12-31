@@ -39,7 +39,7 @@ export const MaterialForm = ({
       code: '',
       name: '',
       materialGroupId: '',
-      unitOfMeasure: '',
+      unitOfMeasure: 'kg',
       vatCode: '',
       purchaseAccountNumber: '',
       salesAccountNumber: '',
@@ -65,7 +65,7 @@ export const MaterialForm = ({
       code: '',
       name: '',
       materialGroupId: '',
-      unitOfMeasure: '',
+      unitOfMeasure: 'kg',
       vatCode: '',
       purchaseAccountNumber: '',
       salesAccountNumber: '',
@@ -151,6 +151,7 @@ export const MaterialForm = ({
                     rules: { required: 'Eenheid is verplicht' },
                     errors,
                   }}
+                  disabled={true}
                 />
               </div>
               <div className="w-3/4">

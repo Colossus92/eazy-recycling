@@ -5,8 +5,13 @@ import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequ
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -18,6 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.math.BigDecimal
+import java.time.Instant
+import java.util.*
 
 class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
@@ -38,7 +46,15 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var weightTicketRepository: WeightTicketJpaRepository
 
+  @Autowired
+  private lateinit var catalogItemRepository: CatalogItemJpaRepository
+
+  @Autowired
+  private lateinit var vatRateRepository: VatRateJpaRepository
+
   private lateinit var testCompany: CompanyDto
+  private lateinit var testCatalogItem: CatalogItemDto
+  private lateinit var testVatRate: VatRateDto
 
   @BeforeEach
   fun setup() {
@@ -50,6 +66,35 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     testCompany = companyRepository.save(TestCompanyFactory.createTestCompany(
       processorId = "12345"
     ))
+
+    // Create test VAT rate and catalog item for weight ticket lines
+    testVatRate = vatRateRepository.save(
+      VatRateDto(
+        vatCode = "VAT21",
+        percentage = BigDecimal("21"),
+        validFrom = Instant.now().minusSeconds(86400),
+        validTo = null,
+        countryCode = "NL",
+        description = "Standard VAT 21%",
+      )
+    )
+
+    testCatalogItem = catalogItemRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        code = "WASTE001",
+        name = "Test Waste Stream",
+        type = CatalogItemType.WASTE_STREAM,
+        unitOfMeasure = "kg",
+        vatRate = testVatRate,
+        category = null,
+        consignorParty = null,
+        defaultPrice = BigDecimal("10.00"),
+        status = "ACTIVE",
+        purchaseAccountNumber = "7000",
+        salesAccountNumber = "8000",
+      )
+    )
   }
 
   @Test
@@ -522,7 +567,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       objectMapper.writeValueAsString(request1)
     ).andExpect(status().isCreated).andReturn()
 
-    val result2 = securedMockMvc.post(
+    securedMockMvc.post(
       "/waste-streams/concept",
       objectMapper.writeValueAsString(request2)
     )
@@ -676,7 +721,8 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = wasteStreamNumber,
-          weightValue = "150.75"
+          weightValue = "150.75",
+          catalogItemId = testCatalogItem.id
         )
       )
     )
@@ -738,7 +784,8 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = wasteStreamNumber,
-          weightValue = "100.00"
+          weightValue = "100.00",
+          catalogItemId = testCatalogItem.id
         )
       )
     )
@@ -747,7 +794,8 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = wasteStreamNumber,
-          weightValue = "200.00"
+          weightValue = "200.00",
+          catalogItemId = testCatalogItem.id
         )
       )
     )

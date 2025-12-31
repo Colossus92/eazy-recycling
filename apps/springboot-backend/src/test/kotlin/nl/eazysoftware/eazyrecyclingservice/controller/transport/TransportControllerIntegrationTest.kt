@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.WasteTransportRequest
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWasteStreamFactory
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestWeightTicketFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerOperation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.EuralRepository
@@ -18,6 +19,8 @@ import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepositor
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyProjectLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.company.ProjectLocationJpaRepository
@@ -27,6 +30,8 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.Transpor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamJpaRepository
@@ -44,6 +49,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.transaction.support.TransactionTemplate
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -88,7 +94,15 @@ class TransportControllerIntegrationTest(
   @Autowired
   private lateinit var processingMethodRepository: ProcessingMethodRepository
 
+  @Autowired
+  private lateinit var catalogItemRepository: CatalogItemJpaRepository
+
+  @Autowired
+  private lateinit var vatRateRepository: VatRateJpaRepository
+
   private lateinit var testCompany: CompanyDto
+  private lateinit var testCatalogItem: CatalogItemDto
+  private lateinit var testVatRate: VatRateDto
   private lateinit var testLocation: PickupLocationDto.DutchAddressDto
   private lateinit var testTruck: TruckDto
   private lateinit var testDriver: ProfileDto
@@ -142,6 +156,35 @@ class TransportControllerIntegrationTest(
       testCompany = companyRepository.save(testCompany)
       testBranch = projectLocationJpaRepository.save(testBranch)
       testLocation = pickupLocationRepository.save(testLocation)
+      
+      // Create test VAT rate and catalog item for weight ticket lines
+      testVatRate = vatRateRepository.save(
+        VatRateDto(
+          vatCode = "VAT21",
+          percentage = BigDecimal("21"),
+          validFrom = Instant.now().minusSeconds(86400),
+          validTo = null,
+          countryCode = "NL",
+          description = "Standard VAT 21%",
+        )
+      )
+
+      testCatalogItem = catalogItemRepository.save(
+        CatalogItemDto(
+          id = UUID.randomUUID(),
+          code = "WASTE001",
+          name = "Test Waste Stream",
+          type = CatalogItemType.WASTE_STREAM,
+          unitOfMeasure = "kg",
+          vatRate = testVatRate,
+          category = null,
+          consignorParty = null,
+          defaultPrice = BigDecimal("10.00"),
+          status = "ACTIVE",
+          purchaseAccountNumber = "7000",
+          salesAccountNumber = "8000",
+        )
+      )
     }
 
 
@@ -754,7 +797,8 @@ class TransportControllerIntegrationTest(
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = testWasteStream.number,
-          weightValue = "150.75"
+          weightValue = "150.75",
+          catalogItemId = testCatalogItem.id
         )
       ),
       truckLicensePlate = testTruck.licensePlate,
@@ -836,7 +880,8 @@ class TransportControllerIntegrationTest(
       lines = listOf(
         TestWeightTicketFactory.createTestWeightTicketLine(
           wasteStreamNumber = testWasteStream.number,
-          weightValue = "100.00"
+          weightValue = "100.00",
+          catalogItemId = testCatalogItem.id
         )
       )
     )

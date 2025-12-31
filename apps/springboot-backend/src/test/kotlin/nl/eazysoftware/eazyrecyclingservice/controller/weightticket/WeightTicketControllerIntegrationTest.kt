@@ -112,7 +112,8 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
-                    weightValue = "150.75"
+                    weightValue = "150.75",
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             truckLicensePlate = "AA-123-BB",
@@ -226,15 +227,18 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789011",
-                    weightValue = "100.00"
+                    weightValue = "100.00",
+                    catalogItemId = testCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
-                    weightValue = "250.50"
+                    weightValue = "250.50",
+                    catalogItemId = testCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789013",
-                    weightValue = "75.25"
+                    weightValue = "75.25",
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             note = "Multiple lines test"
@@ -335,7 +339,8 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
-                    weightValue = "100.00"
+                    weightValue = "100.00",
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             truckLicensePlate = "EE-111-FF",
@@ -356,11 +361,13 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
-                    weightValue = "200.00"
+                    weightValue = "200.00",
+                    catalogItemId = testCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789013",
-                    weightValue = "300.00"
+                    weightValue = "300.00",
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             truckLicensePlate = "GG-222-HH",
@@ -428,7 +435,8 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
             lines = listOf(
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
-                    weightValue = "150.75"
+                    weightValue = "150.75",
+                    catalogItemId = testCatalogItem.id
                 )
             ),
             note = "To be completed"
