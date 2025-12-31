@@ -1,7 +1,7 @@
 import { CatalogItemResponseItemTypeEnum } from '@/api/client';
 import { CatalogItem, catalogService } from '@/api/services/catalogService';
 import clsx from 'clsx';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
 import AsyncSelect from 'react-select/async';
 import { GroupBase } from 'react-select';
@@ -67,14 +67,13 @@ export const CatalogItemAsyncSelectFormField = ({
   const linesErrors = (errors as any)?.lines as Array<Record<string, { message?: string }>> | undefined;
   const error = linesErrors?.[index]?.catalogItemId?.message;
 
-  // Store selected items to display them even when not in search results
-  const [selectedItems, setSelectedItems] = useState<Map<string, CatalogItem>>(
-    new Map()
-  );
-
-  // Track the selected option
-  const [selectedOption, setSelectedOption] = useState<CatalogItemOption | null>(
-    null
+  // Track the selected option - initialize from field value if available
+  const [selectedOption, setSelectedOption] = useState<CatalogItemOption | null>(null);
+  
+  // Generate a unique cache key based on consignorPartyId to prevent cache sharing
+  const cacheKey = useMemo(() => 
+    `catalog-${consignorPartyId || 'all'}-${index}`, 
+    [consignorPartyId, index]
   );
 
   // Debounce implementation
@@ -122,10 +121,6 @@ export const CatalogItemAsyncSelectFormField = ({
         inputValue || undefined,
         consignorPartyId || undefined
       );
-      // Store items for later reference
-      items.forEach((item) => {
-        setSelectedItems((prev) => new Map(prev).set(String(item.id), item));
-      });
       return catalogItemsToGroupedOptions(items);
     },
     [consignorPartyId, catalogItemsToGroupedOptions]
@@ -147,38 +142,46 @@ export const CatalogItemAsyncSelectFormField = ({
     [loadOptions, debounceMs]
   );
 
+  // Track the previous catalogItemId to detect changes
+  const prevCatalogItemIdRef = useRef<string | undefined>(undefined);
+  
   // Load initial selected option from field value
   useEffect(() => {
+    const currentValue = field.catalogItemId;
+    const prevValue = prevCatalogItemIdRef.current;
+    
+    // Update ref for next comparison
+    prevCatalogItemIdRef.current = currentValue;
+    
+    // If field has no value, clear the selection
+    if (!currentValue) {
+      setSelectedOption(null);
+      return;
+    }
+    
+    // If value hasn't changed, skip (prevents unnecessary API calls)
+    if (prevValue === currentValue) {
+      return;
+    }
+    
+    // Load options to find the matching one
     const loadInitialOption = async () => {
-      const currentValue = field.catalogItemId;
-      if (currentValue && !selectedOption) {
-        // Check if we already have this item cached
-        const cachedItem = selectedItems.get(currentValue);
-        if (cachedItem) {
-          setSelectedOption({
-            value: String(cachedItem.id),
-            label: cachedItem.wasteStreamNumber
-              ? `${cachedItem.name} (${cachedItem.wasteStreamNumber})`
-              : cachedItem.name,
-            item: cachedItem,
-          });
-        } else {
-          // Load options to find the matching one
-          const groupedOptions = await loadOptions('');
-          for (const group of groupedOptions) {
-            const matchingOption = group.options.find(
-              (opt) => opt.value === currentValue
-            );
-            if (matchingOption) {
-              setSelectedOption(matchingOption);
-              break;
-            }
-          }
+      const groupedOptions = await loadOptions('');
+      for (const group of groupedOptions) {
+        const matchingOption = group.options.find(
+          (opt) => opt.value === currentValue
+        );
+        if (matchingOption) {
+          setSelectedOption(matchingOption);
+          return;
         }
       }
+      
+      // If no matching option found, clear selection
+      setSelectedOption(null);
     };
     loadInitialOption();
-  }, [field, loadOptions, selectedOption, selectedItems]);
+  }, [field.catalogItemId, loadOptions]);
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
@@ -190,10 +193,11 @@ export const CatalogItemAsyncSelectFormField = ({
       </div>
 
       <AsyncSelect<CatalogItemOption, false, GroupBase<CatalogItemOption>>
+        key={cacheKey}
         value={selectedOption}
         loadOptions={debouncedLoadOptions}
         defaultOptions
-        cacheOptions
+        cacheOptions={false}
         placeholder={placeholder}
         isDisabled={disabled}
         isClearable={true}
@@ -201,6 +205,7 @@ export const CatalogItemAsyncSelectFormField = ({
         noOptionsMessage={() => 'Geen items gevonden'}
         loadingMessage={() => 'Laden...'}
         id={testId || `catalog-item-select-${index}`}
+        instanceId={cacheKey}
         menuPortalTarget={document.body}
         className={clsx(
           'w-full text-body-1',
@@ -286,11 +291,6 @@ export const CatalogItemAsyncSelectFormField = ({
               catalogItemId: option.value,
               wasteStreamNumber: option.item.wasteStreamNumber || undefined,
             }, option.item);
-
-            // Cache the selected item
-            setSelectedItems((prev) =>
-              new Map(prev).set(option.value, option.item)
-            );
           } else {
             // Clear the values
             update(index, {

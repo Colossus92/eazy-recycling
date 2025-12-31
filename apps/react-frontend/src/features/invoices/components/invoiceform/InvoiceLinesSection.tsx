@@ -6,9 +6,9 @@ import {
   useFormContext,
   useWatch,
 } from 'react-hook-form';
+import { useEffect, useMemo, useRef } from 'react';
 import { InvoiceFormValues, InvoiceLineFormValue } from './useInvoiceFormHook';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
-import { useMemo } from 'react';
 import { Button } from '@/components/ui/button/Button';
 import { CatalogItem } from '@/api/services/catalogService';
 
@@ -162,6 +162,42 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
 
   const lines = useWatch({ control, name: 'lines' });
   const customerId = useWatch({ control, name: 'customerId' });
+
+  // Track previous customerId to detect changes
+  const previousCustomerIdRef = useRef<string | undefined>(undefined);
+  const isInitialMount = useRef(true);
+
+  // When customerId changes, clear catalog item selections from lines
+  useEffect(() => {
+    // Skip on initial mount to preserve loaded data
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      previousCustomerIdRef.current = customerId;
+      return;
+    }
+
+    // Only clear if customer actually changed from a previous non-empty value
+    if (
+      previousCustomerIdRef.current !== undefined &&
+      previousCustomerIdRef.current !== '' &&
+      previousCustomerIdRef.current !== customerId &&
+      fields.length > 0
+    ) {
+      // Clear catalog item selections from all lines
+      fields.forEach((_, index) => {
+        const currentLine = formContext.getValues(`lines.${index}`);
+        formContext.setValue(`lines.${index}`, {
+          ...currentLine,
+          catalogItemId: '',
+          catalogItemName: '',
+          unitOfMeasure: '',
+          unitPrice: '0',
+        });
+      });
+    }
+
+    previousCustomerIdRef.current = customerId;
+  }, [customerId, fields, formContext]);
 
   const totals = useMemo(() => {
     let totalExclVat = 0;

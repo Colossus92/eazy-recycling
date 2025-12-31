@@ -347,7 +347,6 @@ export const InvoiceForm = ({
                           />
                         </div>
 
-                        {/* Invoice lines section */}
                         <InvoiceLinesSection isReadOnly={isReadOnly} />
                       </div>
                     </TabPanel>
