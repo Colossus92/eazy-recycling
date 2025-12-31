@@ -13,6 +13,7 @@ import { LMADeclarationStatusTag, LMADeclarationStatusTagProps } from './LMADecl
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import Warning from '@/assets/icons/Warning.svg?react';
 import { Button } from '@/components/ui/button/Button';
+import { WasteStreamDetailsDrawer } from '@/features/wastestreams/components/drawer/WasteStreamDetailsDrawer';
 
 type Column = {
   key: keyof LmaDeclarationView | 'actions';
@@ -25,6 +26,8 @@ type Column = {
 export const LMATab = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedWasteStreamNumber, setSelectedWasteStreamNumber] = useState<string | null>(null);
   const { items, setQuery, isFetching, totalElements, errorHandling, approveDeclaration, isApproving, approvingId } = useLmaDeclarations({
     page,
     pageSize: rowsPerPage,
@@ -133,6 +136,11 @@ export const LMATab = () => {
     setPage(1);
   };
 
+  const handleRowClick = (item: LmaDeclarationView) => {
+    setSelectedWasteStreamNumber(item.wasteStreamNumber);
+    setIsDrawerOpen(true);
+  };
+
   return (
     <>
       <ContentTitleBar setQuery={setQueryAndResetPage} >
@@ -180,7 +188,8 @@ export const LMATab = () => {
                   return (
                     <tr
                       key={index}
-                      className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
+                      className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary cursor-pointer"
+                      onClick={() => handleRowClick(item)}
                     >
                       {columns.map((col) => (
                         <td
@@ -212,6 +221,13 @@ export const LMATab = () => {
           </div>
         )}
       </ErrorBoundary>
+      {selectedWasteStreamNumber && (
+        <WasteStreamDetailsDrawer
+          isDrawerOpen={isDrawerOpen}
+          setIsDrawerOpen={setIsDrawerOpen}
+          wasteStreamNumber={selectedWasteStreamNumber}
+        />
+      )}
     </>
   );
 };
