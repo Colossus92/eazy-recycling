@@ -1,3 +1,5 @@
+create schema if not exists "jobrunr";
+
 create table if not exists companies (
                            id uuid not null,
                            code text,

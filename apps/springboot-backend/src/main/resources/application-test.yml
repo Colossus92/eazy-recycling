@@ -39,3 +39,6 @@ logging:
   structured:
     format:
       console:
+jobrunr:
+  dashboard:
+    enabled: false

@@ -8,12 +8,11 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.verify
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.check
+import org.mockito.kotlin.verify
 import kotlin.time.Clock
 
 @ExtendWith(MockitoExtension::class)
@@ -25,39 +24,31 @@ class MonthlyWasteDeclaratorServiceTest {
   @InjectMocks
   private lateinit var service: MonthlyWasteDeclaratorService
 
-  @Captor
-  private lateinit var jobsCaptor: ArgumentCaptor<MonthlyWasteDeclarationJob>
-
   @Test
   fun `should schedule jobs for previous month`() {
-    // When
-    service.declare()
-
-    // Then - Capture all jobs passed to save
-    verify(monthlyWasteDeclarationJobs).save(
-      jobsCaptor.capture(),
-      jobsCaptor.capture()
-    )
-
-    val capturedJobs = jobsCaptor.allValues
-    assertEquals(2, capturedJobs.size)
-
     // Calculate expected previous month
     val now = Clock.System.now()
     val currentYearMonth = now.toYearMonth()
     val expectedPreviousMonth = currentYearMonth.minusMonth()
 
-    // Verify first receivals job
-    val firstReceivalJob = capturedJobs.find { it.jobType == JobType.FIRST_RECEIVALS }!!
-    assertEquals(expectedPreviousMonth, firstReceivalJob.yearMonth)
-    assertEquals(Status.PENDING, firstReceivalJob.status)
-    assertNull(firstReceivalJob.fulfilled)
+    // When
+    service.declare()
 
-    // Verify monthly receivals job
-    val monthlyReceivalJob = capturedJobs.find { it.jobType == JobType.MONTHLY_RECEIVALS }!!
-    assertEquals(expectedPreviousMonth, monthlyReceivalJob.yearMonth)
-    assertEquals(Status.PENDING, monthlyReceivalJob.status)
-    assertNull(monthlyReceivalJob.fulfilled)
+    // Then - Verify all jobs passed to save
+    verify(monthlyWasteDeclarationJobs).save(
+      check { job ->
+        assertEquals(JobType.FIRST_RECEIVALS, job.jobType)
+        assertEquals(expectedPreviousMonth, job.yearMonth)
+        assertEquals(Status.PENDING, job.status)
+        assertNull(job.fulfilled)
+      },
+      check { job ->
+        assertEquals(JobType.MONTHLY_RECEIVALS, job.jobType)
+        assertEquals(expectedPreviousMonth, job.yearMonth)
+        assertEquals(Status.PENDING, job.status)
+        assertNull(job.fulfilled)
+      }
+    )
   }
 
   @Test
@@ -66,13 +57,11 @@ class MonthlyWasteDeclaratorServiceTest {
     service.declare()
 
     // Then
+    val jobTypes = mutableSetOf<JobType>()
     verify(monthlyWasteDeclarationJobs).save(
-      jobsCaptor.capture(),
-      jobsCaptor.capture()
+      check { job -> jobTypes.add(job.jobType) },
+      check { job -> jobTypes.add(job.jobType) }
     )
-
-    val capturedJobs = jobsCaptor.allValues
-    val jobTypes = capturedJobs.map { it.jobType }.toSet()
 
     assertEquals(setOf(JobType.FIRST_RECEIVALS, JobType.MONTHLY_RECEIVALS), jobTypes)
   }
@@ -84,14 +73,9 @@ class MonthlyWasteDeclaratorServiceTest {
 
     // Then
     verify(monthlyWasteDeclarationJobs).save(
-      jobsCaptor.capture(),
-      jobsCaptor.capture()
+      check { job -> assertEquals(Status.PENDING, job.status) },
+      check { job -> assertEquals(Status.PENDING, job.status) }
     )
-
-    val capturedJobs = jobsCaptor.allValues
-    capturedJobs.forEach { job ->
-      assertEquals(Status.PENDING, job.status)
-    }
   }
 
   @Test
@@ -101,14 +85,9 @@ class MonthlyWasteDeclaratorServiceTest {
 
     // Then
     verify(monthlyWasteDeclarationJobs).save(
-      jobsCaptor.capture(),
-      jobsCaptor.capture()
+      check { job -> assertNull(job.fulfilled) },
+      check { job -> assertNull(job.fulfilled) }
     )
-
-    val capturedJobs = jobsCaptor.allValues
-    capturedJobs.forEach { job ->
-      assertNull(job.fulfilled)
-    }
   }
 
   @Test
@@ -123,16 +102,18 @@ class MonthlyWasteDeclaratorServiceTest {
     val afterCall = Clock.System.now()
 
     verify(monthlyWasteDeclarationJobs).save(
-      jobsCaptor.capture(),
-      jobsCaptor.capture()
-    )
-
-    val capturedJobs = jobsCaptor.allValues
-    capturedJobs.forEach { job ->
-      // Verify created timestamp is between before and after the call
-      assert(job.created >= beforeCall && job.created <= afterCall) {
-        "Expected created timestamp to be between $beforeCall and $afterCall, but was ${job.created}"
+      check { job ->
+        // Verify created timestamp is between before and after the call
+        assert(job.created >= beforeCall && job.created <= afterCall) {
+          "Expected created timestamp to be between $beforeCall and $afterCall, but was ${job.created}"
+        }
+      },
+      check { job ->
+        // Verify created timestamp is between before and after the call
+        assert(job.created >= beforeCall && job.created <= afterCall) {
+          "Expected created timestamp to be between $beforeCall and $afterCall, but was ${job.created}"
+        }
       }
-    }
+    )
   }
 }
