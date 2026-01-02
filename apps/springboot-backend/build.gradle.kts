@@ -5,7 +5,7 @@ plugins {
   id("io.spring.dependency-management") version "1.1.7"
   kotlin("plugin.jpa") version "2.1.20"
   kotlin("kapt") version "2.1.20"
-  id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
+  id("org.jetbrains.kotlin.plugin.serialization") version "2.2.21"
   id("dev.nx.gradle.project-graph") version ("0.1.4")
   id("org.springdoc.openapi-gradle-plugin") version ("1.9.0")
   id("com.github.bjornvester.wsdl2java") version "2.0.2"
@@ -44,6 +44,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-web-services:$springVersion")
   implementation("org.springframework.boot:spring-boot-starter-security:$springVersion")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springVersion")
+  implementation("org.jobrunr:jobrunr-spring-boot-3-starter:8.3.1")
   implementation("org.springframework.ws:spring-ws-core:4.0.11")
 
   // Apache HttpClient for WebServiceTemplate with SSL support
@@ -76,6 +77,8 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.9.0")
   implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.9.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+  implementation("org.jobrunr:jobrunr-kotlin-2.2-support:8.3.1")
   implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
   implementation("jakarta.validation:jakarta.validation-api:3.1.1")
 
