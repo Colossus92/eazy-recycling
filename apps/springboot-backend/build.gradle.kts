@@ -61,7 +61,7 @@ dependencies {
   implementation("com.sun.xml.ws:jaxws-rt:4.0.3")
 
   // Database
-  runtimeOnly("org.postgresql:postgresql:42.7.5")
+  runtimeOnly("org.postgresql:postgresql:42.7.8")
   runtimeOnly("com.h2database:h2:2.3.232")
   implementation(platform("io.github.jan-tennert.supabase:bom:3.2.6"))
   implementation("io.github.jan-tennert.supabase:postgrest-kt")

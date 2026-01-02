@@ -1,0 +1,15 @@
+spring:
+  application.name: eazy-recycling-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:}
+    driver-class-name: org.postgresql.Driver
+
+jobrunr:
+  background-job-server:
+    enabled: false
+  dashboard:
+    enabled: true
+    port: 8000
+  database:
+    table-prefix: jobrunr.
+    type: sql
