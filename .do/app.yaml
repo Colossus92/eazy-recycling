@@ -49,7 +49,16 @@ ingress:
 name: ers
 region: ams
 services:
-  - envs:
+  - alerts:
+      - operator: GREATER_THAN
+        rule: CPU_UTILIZATION
+        value: 75
+        window: FIVE_MINUTES
+      - operator: GREATER_THAN
+        rule: MEM_UTILIZATION
+        value: 75
+        window: FIVE_MINUTES
+    envs:
       - key: SPRING_DATASOURCE_URL
         scope: RUN_AND_BUILD_TIME
         type: SECRET
@@ -134,7 +143,7 @@ services:
       repository: eazy-recycling
       tag: main
     instance_count: 1
-    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    instance_size_slug: apps-d-1vcpu-2gb
     name: ers
 static_sites:
   - build_command: npm install && npm run build
