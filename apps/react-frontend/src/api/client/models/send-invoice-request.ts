@@ -17,38 +17,32 @@
 /**
  * 
  * @export
- * @interface FilterRegistration
+ * @interface SendInvoiceRequest
  */
-export interface FilterRegistration {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof FilterRegistration
-     */
-    'urlPatternMappings'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof FilterRegistration
-     */
-    'servletNameMappings'?: Array<string>;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof FilterRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
+export interface SendInvoiceRequest {
     /**
      * 
      * @type {string}
-     * @memberof FilterRegistration
+     * @memberof SendInvoiceRequest
      */
-    'name'?: string;
+    'to': string;
     /**
      * 
      * @type {string}
-     * @memberof FilterRegistration
+     * @memberof SendInvoiceRequest
      */
-    'className'?: string;
+    'bcc'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendInvoiceRequest
+     */
+    'subject': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendInvoiceRequest
+     */
+    'body': string;
 }
 

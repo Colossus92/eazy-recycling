@@ -13,7 +13,7 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { Tab } from '@/components/ui/tab/Tab';
 import { toastService } from '@/components/ui/toast/toastService';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { InvoiceLinesSection } from './InvoiceLinesSection';
@@ -62,6 +62,8 @@ export const InvoiceForm = ({
     resetEmailState,
   } = useInvoiceEmailFormHook();
 
+  const [isSending, setIsSending] = useState(false);
+
   // Use the hook's currentInvoiceId to determine edit mode (handles newly created invoices)
   const isEditMode = invoiceId !== undefined || currentInvoiceId !== null;
 
@@ -109,23 +111,20 @@ export const InvoiceForm = ({
 
       if (currentInvoiceId) {
         // Update existing invoice, then finalize
-        await invoiceService.update(
-          currentInvoiceId,
-          {
-            invoiceDate: values.invoiceDate,
-            lines: values.lines
-              .filter((line) => line.catalogItemId)
-              .map((line) => ({
-                id: line.id || undefined,
-                date: line.date || values.invoiceDate,
-                catalogItemId: line.catalogItemId,
-                description: line.description,
-                quantity: parseFloat(line.quantity) || 0,
-                unitPrice: parseFloat(line.unitPrice) || 0,
-                orderReference: line.orderReference || undefined,
-              })),
-          }
-        );
+        await invoiceService.update(currentInvoiceId, {
+          invoiceDate: values.invoiceDate,
+          lines: values.lines
+            .filter((line) => line.catalogItemId)
+            .map((line) => ({
+              id: line.id || undefined,
+              date: line.date || values.invoiceDate,
+              catalogItemId: line.catalogItemId,
+              description: line.description,
+              quantity: parseFloat(line.quantity) || 0,
+              unitPrice: parseFloat(line.unitPrice) || 0,
+              orderReference: line.orderReference || undefined,
+            })),
+        });
         await invoiceService.finalize(currentInvoiceId);
         finalizedInvoiceId = currentInvoiceId;
       } else {
@@ -183,11 +182,32 @@ export const InvoiceForm = ({
     }
   };
 
-  const handleSendEmail = (values: EmailComposerValues) => {
-    // TODO: Implement in next phase - call backend to send email
-    console.log('Sending email:', values);
-    toastService.success('E-mail verzonden (simulatie)');
-    handleClose();
+  const handleSendEmail = async (values: EmailComposerValues) => {
+    if (!currentInvoiceId) {
+      toastService.error('Geen factuur geselecteerd');
+      return;
+    }
+
+    setIsSending(true);
+
+    try {
+      await invoiceService.send(currentInvoiceId, {
+        to: values.to,
+        bcc: values.bcc || undefined,
+        subject: values.subject,
+        body: values.body,
+      });
+
+      toastService.success('E-mail wordt verzonden');
+      handleClose();
+    } catch (error) {
+      console.error('Error sending email:', error);
+      toastService.error(
+        'Er is een fout opgetreden bij het verzenden van de e-mail'
+      );
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleClose = () => {
@@ -228,6 +248,7 @@ export const InvoiceForm = ({
             resetEmailState,
           }}
           onSend={handleSendEmail}
+          isSending={isSending}
         />
       </FormDialog>
     );

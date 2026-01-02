@@ -68,7 +68,10 @@ jobrunr:
   database:
     tablePrefix: jobrunr.
   dashboard:
-    enabled: true
+    enabled: false
   jobs:
     metrics:
       enabled: true
+  background-job-server:
+    enabled: true
+    worker-count: 1

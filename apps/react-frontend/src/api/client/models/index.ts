@@ -107,6 +107,7 @@ export * from './proximity-description-view';
 export * from './redirect-view';
 export * from './redirect-view-status-code';
 export * from './refresh-token-response';
+export * from './send-invoice-request';
 export * from './servlet-context';
 export * from './servlet-registration';
 export * from './session-cookie-config';

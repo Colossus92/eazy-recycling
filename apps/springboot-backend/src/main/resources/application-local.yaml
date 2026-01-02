@@ -29,3 +29,7 @@ logging:
   structured:
     format:
       console:
+
+jobrunr:
+  dashboard:
+    enabled: true

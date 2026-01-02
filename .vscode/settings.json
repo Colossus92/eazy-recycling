@@ -3,5 +3,13 @@
     "vitest.enable": true,
     "vitest.commandLine": "npm test --",
     "vitest.workspaceConfig": "apps/react-frontend/vite.config.ts",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+            "default": true
+        }
+    ]
 }

@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.controller.invoice
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllInvoices
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetInvoiceById
 import nl.eazysoftware.eazyrecyclingservice.application.query.InvoiceDetailView
@@ -10,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.InvoiceView
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocumentType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -28,6 +28,7 @@ class InvoiceController(
     private val updateInvoice: UpdateInvoice,
     private val finalizeInvoice: FinalizeInvoice,
     private val deleteInvoice: DeleteInvoice,
+    private val sendInvoice: SendInvoice,
     private val getAllInvoices: GetAllInvoices,
     private val getInvoiceById: GetInvoiceById,
 ) {
@@ -124,6 +125,22 @@ class InvoiceController(
         return finalizeInvoice.handle(FinalizeInvoiceCommand(id))
     }
 
+    @PostMapping("/{id}/send")
+    @ResponseStatus(HttpStatus.OK)
+    fun send(
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: SendInvoiceRequest
+    ): InvoiceResult {
+        val command = SendInvoiceCommand(
+            invoiceId = InvoiceId(id),
+            to = request.to,
+            bcc = request.bcc,
+            subject = request.subject,
+            body = request.body,
+        )
+        return sendInvoice.handle(command)
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: UUID) {
@@ -158,7 +175,6 @@ class InvoiceController(
     data class InvoiceLineRequest(
         val id: UUID? = null,
         val date: LocalDate,
-        @field:NotNull
         val catalogItemId: UUID,
 
         val description: String? = null,
@@ -168,5 +184,18 @@ class InvoiceController(
         val unitPrice: BigDecimal,
 
         val orderReference: String?,
+    )
+
+    data class SendInvoiceRequest(
+        @field:NotBlank
+        val to: String,
+
+        val bcc: String?,
+
+        @field:NotBlank
+        val subject: String,
+
+        @field:NotBlank
+        val body: String,
     )
 }

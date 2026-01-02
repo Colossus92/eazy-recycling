@@ -43,25 +43,25 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'elIgnored'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
     'pageEncoding'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'scriptingInvalid'?: string;
+    'isXml'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'isXml'?: string;
+    'elIgnored'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'scriptingInvalid'?: string;
     /**
      * 
      * @type {Array<string>}

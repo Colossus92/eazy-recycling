@@ -35,6 +35,11 @@ class Invoice(
         this.finalizedBy = finalizedBy
     }
 
+    fun markAsSent() {
+        require(status == InvoiceStatus.FINAL) { "Alleen definitieve facturen kunnen worden verzonden." }
+        this.status = InvoiceStatus.SENT
+    }
+
     fun update(
         invoiceDate: LocalDate = this.invoiceDate,
         lines: List<InvoiceLine> = this.lines,
@@ -94,5 +99,6 @@ enum class InvoiceDocumentType {
 
 enum class InvoiceStatus {
     DRAFT,
-    FINAL
+    FINAL,
+    SENT
 }

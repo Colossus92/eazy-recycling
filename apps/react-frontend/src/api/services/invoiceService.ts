@@ -4,6 +4,7 @@ import {
   InvoiceDetailView,
   InvoiceResult,
   InvoiceView,
+  SendInvoiceRequest,
   UpdateInvoiceRequest,
 } from '../client';
 import { apiInstance } from './apiInstance';
@@ -36,6 +37,10 @@ export const invoiceService = {
 
   finalize: (id: string): Promise<InvoiceResult> => {
     return invoiceApi.finalize(id).then((r) => r.data);
+  },
+
+  send: (id: string, request: SendInvoiceRequest): Promise<InvoiceResult> => {
+    return invoiceApi.send(id, request).then((r) => r.data);
   },
 
   delete: (id: string): Promise<void> => {

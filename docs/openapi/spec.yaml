@@ -1515,6 +1515,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/InvoiceResult"
+  /invoices/{id}/send:
+    post:
+      tags:
+      - invoice-controller
+      operationId: send
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendInvoiceRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InvoiceResult"
   /invoices/{id}/finalize:
     post:
       tags:
@@ -4176,6 +4201,24 @@ components:
       - invoiceDate
       - invoiceType
       - lines
+    SendInvoiceRequest:
+      type: object
+      properties:
+        to:
+          type: string
+          minLength: 1
+        bcc:
+          type: string
+        subject:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+      required:
+      - body
+      - subject
+      - to
     ProjectLocationResult:
       type: object
       properties:
@@ -4333,14 +4376,14 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
         year:
           type: integer
           format: int32
@@ -4396,9 +4439,6 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -4407,6 +4447,9 @@ components:
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4480,11 +4523,11 @@ components:
         value:
           type: string
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         hour:
           type: integer
           format: int32
@@ -5777,11 +5820,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
@@ -5903,13 +5946,13 @@ components:
             type: string
         errorOnELNotFound:
           type: string
-        elIgnored:
-          type: string
         pageEncoding:
           type: string
-        scriptingInvalid:
-          type: string
         isXml:
+          type: string
+        elIgnored:
+          type: string
+        scriptingInvalid:
           type: string
         includePreludes:
           type: array
@@ -6004,11 +6047,11 @@ components:
         attributeNames: {}
         contextPath:
           type: string
+        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        initParameterNames: {}
         sessionTrackingModes:
           type: array
           items:
@@ -6022,6 +6065,10 @@ components:
         sessionTimeout:
           type: integer
           format: int32
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6060,10 +6107,6 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         classLoader:
           type: object
           properties:

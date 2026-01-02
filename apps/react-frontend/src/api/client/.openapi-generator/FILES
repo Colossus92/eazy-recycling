@@ -138,6 +138,7 @@ models/proximity-description-view.ts
 models/redirect-view-status-code.ts
 models/redirect-view.ts
 models/refresh-token-response.ts
+models/send-invoice-request.ts
 models/servlet-context.ts
 models/servlet-registration.ts
 models/session-cookie-config.ts
