@@ -20,6 +20,7 @@ type EmailRequest = {
   attachmentFileName: string;
   attachmentStorageBucket: string;
   attachmentStoragePath: string;
+  invoiceId: string;
 };
 
 function createApiResponse(status: number, body: ApiResponse): Response {
@@ -66,11 +67,11 @@ async function sanitize(req: Request): Promise<{ body: EmailRequest | undefined,
     });
   }
 
-  if (!body || !body.to || !body.subject || !body.body || !body.attachmentFileName || !body.attachmentStorageBucket || !body.attachmentStoragePath) {
+  if (!body || !body.to || !body.subject || !body.body || !body.attachmentFileName || !body.attachmentStorageBucket || !body.attachmentStoragePath || !body.invoiceId) {
     console.warn('Missing required fields');
     response = createApiResponse(400, {
       success: false,
-      message: 'Missing required fields: to, subject, body, attachmentFileName, attachmentStorageBucket, attachmentStoragePath are required',
+      message: 'Missing required fields: to, subject, body, attachmentFileName, attachmentStorageBucket, attachmentStoragePath, invoiceId are required',
     });
   }
 
@@ -97,7 +98,8 @@ Deno.serve(async (req) => {
       bcc: body.bcc,
       subject: body.subject,
       bucket: body.attachmentStorageBucket,
-      path: body.attachmentStoragePath
+      path: body.attachmentStoragePath,
+      invoiceId: body.invoiceId
     });
 
     const result = await downloadFileFromStorage(body.attachmentStorageBucket, body.attachmentStoragePath);
@@ -116,6 +118,7 @@ Deno.serve(async (req) => {
       body.body,
       body.attachmentFileName,
       base64Data,
+      body.invoiceId,
       body.bcc
     );
 

@@ -68,6 +68,7 @@ class SendInvoiceService(
             "attachmentFileName" to pdfFileName,
             "attachmentStorageBucket" to "invoices",
             "attachmentStoragePath" to invoice.pdfUrl,
+            "invoiceId" to invoice.id.value.toString(),
         )
 
         return objectMapper.writeValueAsString(payload)

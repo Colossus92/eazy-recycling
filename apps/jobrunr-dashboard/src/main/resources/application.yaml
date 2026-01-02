@@ -9,7 +9,9 @@ jobrunr:
     enabled: false
   dashboard:
     enabled: true
-    port: 8000
+    port: 8001
   database:
     table-prefix: jobrunr.
     type: sql
+server:
+  port: 8085
