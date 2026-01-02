@@ -169,7 +169,7 @@ export const EmailComposer = ({
                 {attachment.isLoading ? (
                   <ClipLoader size={14} color="currentColor" />
                 ) : (
-                  <FilePdf className="w-4 h-4 text-color-status-error-dark" />
+                  <FilePdf className="w-4 h-4" />
                 )}
                 <span className="text-caption-1 text-color-text-primary">
                   {attachment.name}
