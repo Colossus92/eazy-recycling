@@ -142,25 +142,25 @@ export interface RedirectView {
      * @type {boolean}
      * @memberof RedirectView
      */
-    'propagateQueryProperties'?: boolean;
+    'redirectView'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof RedirectView
      */
-    'redirectView'?: boolean;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof RedirectView
-     */
-    'attributes'?: { [key: string]: string; };
+    'propagateQueryProperties'?: boolean;
     /**
      * 
      * @type {{ [key: string]: any; }}
      * @memberof RedirectView
      */
     'attributesMap'?: { [key: string]: any; };
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof RedirectView
+     */
+    'attributes'?: { [key: string]: string; };
     /**
      * 
      * @type {string}

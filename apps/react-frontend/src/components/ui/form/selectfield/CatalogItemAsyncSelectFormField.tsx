@@ -31,7 +31,11 @@ interface CatalogItemAsyncSelectFormFieldProps {
   required?: boolean;
   index: number;
   field: LineFieldValue;
-  update: (index: number, value: LineFieldValue, selectedItem?: CatalogItem) => void;
+  update: (
+    index: number,
+    value: LineFieldValue,
+    selectedItem?: CatalogItem
+  ) => void;
   errors?: FieldErrors;
 }
 
@@ -64,15 +68,18 @@ export const CatalogItemAsyncSelectFormField = ({
 }: CatalogItemAsyncSelectFormFieldProps) => {
   // Get error for this field
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const linesErrors = (errors as any)?.lines as Array<Record<string, { message?: string }>> | undefined;
+  const linesErrors = (errors as any)?.lines as
+    | Array<Record<string, { message?: string }>>
+    | undefined;
   const error = linesErrors?.[index]?.catalogItemId?.message;
 
   // Track the selected option - initialize from field value if available
-  const [selectedOption, setSelectedOption] = useState<CatalogItemOption | null>(null);
-  
+  const [selectedOption, setSelectedOption] =
+    useState<CatalogItemOption | null>(null);
+
   // Generate a unique cache key based on consignorPartyId to prevent cache sharing
-  const cacheKey = useMemo(() => 
-    `catalog-${consignorPartyId || 'all'}-${index}`, 
+  const cacheKey = useMemo(
+    () => `catalog-${consignorPartyId || 'all'}-${index}`,
     [consignorPartyId, index]
   );
 
@@ -81,9 +88,7 @@ export const CatalogItemAsyncSelectFormField = ({
 
   // Convert catalog items to grouped options
   const catalogItemsToGroupedOptions = useCallback(
-    (
-      items: CatalogItem[]
-    ): GroupBase<CatalogItemOption>[] => {
+    (items: CatalogItem[]): GroupBase<CatalogItemOption>[] => {
       // Group items by type
       const grouped = items.reduce(
         (acc, item) => {
@@ -142,46 +147,63 @@ export const CatalogItemAsyncSelectFormField = ({
     [loadOptions, debounceMs]
   );
 
-  // Track the previous catalogItemId to detect changes
-  const prevCatalogItemIdRef = useRef<string | undefined>(undefined);
-  
+  // Track the previous field values to detect changes
+  const prevFieldRef = useRef<{
+    catalogItemId?: string;
+    wasteStreamNumber?: string;
+  }>({});
+
   // Load initial selected option from field value
   useEffect(() => {
-    const currentValue = field.catalogItemId;
-    const prevValue = prevCatalogItemIdRef.current;
-    
+    const currentCatalogItemId = field.catalogItemId;
+    const currentWasteStreamNumber = field.wasteStreamNumber;
+    const prev = prevFieldRef.current;
+
     // Update ref for next comparison
-    prevCatalogItemIdRef.current = currentValue;
-    
+    prevFieldRef.current = {
+      catalogItemId: currentCatalogItemId,
+      wasteStreamNumber: currentWasteStreamNumber,
+    };
+
     // If field has no value, clear the selection
-    if (!currentValue) {
+    if (!currentCatalogItemId) {
       setSelectedOption(null);
       return;
     }
-    
-    // If value hasn't changed, skip (prevents unnecessary API calls)
-    if (prevValue === currentValue) {
+
+    // If values haven't changed, skip (prevents unnecessary API calls)
+    if (
+      prev.catalogItemId === currentCatalogItemId &&
+      prev.wasteStreamNumber === currentWasteStreamNumber
+    ) {
       return;
     }
-    
+
     // Load options to find the matching one
     const loadInitialOption = async () => {
       const groupedOptions = await loadOptions('');
       for (const group of groupedOptions) {
-        const matchingOption = group.options.find(
-          (opt) => opt.value === currentValue
-        );
+        // For waste streams, match by wasteStreamNumber (which is the unique id)
+        // For materials/products, match by catalogItemId (which equals the unique id)
+        const matchingOption = group.options.find((opt) => {
+          if (currentWasteStreamNumber && opt.item.wasteStreamNumber) {
+            // This is a waste stream - match by waste stream number
+            return opt.item.wasteStreamNumber === currentWasteStreamNumber;
+          }
+          // This is a material/product - match by catalogItemId
+          return opt.item.catalogItemId === currentCatalogItemId;
+        });
         if (matchingOption) {
           setSelectedOption(matchingOption);
           return;
         }
       }
-      
+
       // If no matching option found, clear selection
       setSelectedOption(null);
     };
     loadInitialOption();
-  }, [field.catalogItemId, loadOptions]);
+  }, [field.catalogItemId, field.wasteStreamNumber, loadOptions]);
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
@@ -232,11 +254,7 @@ export const CatalogItemAsyncSelectFormField = ({
             cursor: disabled ? 'not-allowed' : 'default',
             boxShadow: 'none',
             '&:hover': {
-              borderColor: disabled
-                ? '#E3E8F3'
-                : error
-                  ? '#F04438'
-                  : '#1E77F8',
+              borderColor: disabled ? '#E3E8F3' : error ? '#F04438' : '#1E77F8',
               backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
             },
           }),
@@ -286,11 +304,16 @@ export const CatalogItemAsyncSelectFormField = ({
 
           if (option) {
             // Update the field array item with the new values
-            update(index, {
-              ...field,
-              catalogItemId: option.value,
-              wasteStreamNumber: option.item.wasteStreamNumber || undefined,
-            }, option.item);
+            // Use catalogItemId (UUID) for billing, not the unique id (which may be waste stream number)
+            update(
+              index,
+              {
+                ...field,
+                catalogItemId: option.item.catalogItemId,
+                wasteStreamNumber: option.item.wasteStreamNumber || undefined,
+              },
+              option.item
+            );
           } else {
             // Clear the values
             update(index, {

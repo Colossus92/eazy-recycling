@@ -37,6 +37,12 @@ export interface CatalogItemResponse {
      * @type {string}
      * @memberof CatalogItemResponse
      */
+    'catalogItemId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
     'code': string;
     /**
      * 

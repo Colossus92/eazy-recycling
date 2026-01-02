@@ -30,8 +30,11 @@ class CatalogController(
 }
 
 data class CatalogItemResponse(
-  val id: UUID,
+  /** Unique identifier: catalog item UUID for MATERIAL/PRODUCT, waste stream number for WASTE_STREAM */
+  val id: String,
   val itemType: CatalogItemType,
+  /** The catalog item UUID used for billing/pricing (same as id for MATERIAL/PRODUCT) */
+  val catalogItemId: UUID,
   val code: String,
   val name: String,
   val unitOfMeasure: String,
@@ -45,8 +48,13 @@ data class CatalogItemResponse(
 )
 
 fun CatalogItem.toResponse() = CatalogItemResponse(
-  id = id,
+  // For WASTE_STREAM, use the waste stream number as unique ID; otherwise use catalog item UUID
+  id = if (itemType == CatalogItemType.WASTE_STREAM && wasteStreamNumber != null) 
+         wasteStreamNumber.number 
+       else 
+         id.toString(),
   itemType = itemType,
+  catalogItemId = id,  // Always the catalog item UUID for billing
   code = code,
   name = name,
   unitOfMeasure = unitOfMeasure,
