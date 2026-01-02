@@ -195,8 +195,7 @@ export const EmailComposer = ({
         </div>
 
         {/* Footer with actions */}
-        <div className="flex py-3 px-4 justify-between items-center border-t border-color-border-primary">
-          <div className="flex gap-2 justify-end">
+        <div className="flex py-3 px-4 gap-2 justify-end items-center border-t border-color-border-primary">
             <Button
               variant="secondary"
               label="Annuleren"
@@ -210,7 +209,6 @@ export const EmailComposer = ({
               disabled={!isPdfReady || isSending}
               title={!isPdfReady ? 'PDF wordt gegenereerd...' : undefined}
             />
-          </div>
         </div>
       </form>
     </div>

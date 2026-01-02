@@ -62,7 +62,8 @@ export const useInvoiceFormHook = () => {
     mode: 'onChange',
   });
 
-  const isReadOnly = invoiceStatus === 'FINAL';
+  const isFinal = invoiceStatus === 'FINAL';
+  const isReadOnly = invoiceStatus === 'SENT' || isFinal;
 
   const resetForm = useCallback(() => {
     formContext.reset(defaultValues);
@@ -253,6 +254,7 @@ export const useInvoiceFormHook = () => {
     isLoading,
     isSaving,
     isReadOnly,
+    isFinal,
     invoiceNumber,
     invoiceStatus,
     currentInvoiceId,

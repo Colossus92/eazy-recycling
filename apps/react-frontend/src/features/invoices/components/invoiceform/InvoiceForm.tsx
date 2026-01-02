@@ -42,6 +42,7 @@ export const InvoiceForm = ({
     isLoading,
     isSaving,
     isReadOnly,
+    isFinal,
     invoiceNumber,
     currentInvoiceId,
     loadInvoice,
@@ -177,6 +178,44 @@ export const InvoiceForm = ({
       console.error('Error saving and preparing email:', error);
       toastService.error(
         'Er is een fout opgetreden bij het verwerken van de factuur'
+      );
+      setEmailStep('form');
+    }
+  };
+
+  const handleSendFinalInvoice = async () => {
+    if (!currentInvoiceId) {
+      toastService.error('Geen factuur geselecteerd');
+      return;
+    }
+
+    setEmailStep('processing-invoice');
+
+    try {
+      // Load the invoice to get customer details
+      const invoice = await invoiceService.getById(currentInvoiceId);
+
+      // Prepare email data
+      const invoiceNum = invoice.invoiceNumber || 'DRAFT';
+      prepareEmailData(
+        invoiceNum,
+        invoice.customer.name,
+        invoice.customerEmail || '',
+        invoice.tenant,
+        invoice.pdfUrl
+      );
+
+      // Start polling if PDF is not ready
+      if (!invoice.pdfUrl) {
+        startPdfPolling(currentInvoiceId);
+      }
+
+      // Move to email compose step
+      setEmailStep('email-compose');
+    } catch (error) {
+      console.error('Error preparing email:', error);
+      toastService.error(
+        'Er is een fout opgetreden bij het voorbereiden van de e-mail'
       );
       setEmailStep('form');
     }
@@ -392,6 +431,14 @@ export const InvoiceForm = ({
               onClick={handleClose}
               type="button"
             />
+            {isFinal && (
+              <Button
+                variant="primary"
+                label="Verzenden"
+                onClick={handleSendFinalInvoice}
+                type="button"
+              />
+            )}
             {!isReadOnly && (
               <SplitButton
                 primaryLabel={isEditMode ? 'Opslaan' : 'Concept opslaan'}
