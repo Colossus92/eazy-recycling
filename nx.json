@@ -65,7 +65,8 @@
         "testTargetName": "test",
         "classesTargetName": "classes",
         "buildTargetName": "build"
-      }
+      },
+      "exclude": ["apps/jobrunr-dashboard/**"]
     },
     {
       "plugin": "@nx/docker",

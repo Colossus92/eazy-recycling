@@ -67,14 +67,6 @@ async function sanitize(req: Request): Promise<{ body: EmailRequest | undefined,
     });
   }
 
-  if (!body || !body.to || !body.subject || !body.body || !body.attachmentFileName || !body.attachmentStorageBucket || !body.attachmentStoragePath || !body.invoiceId) {
-    console.warn('Missing required fields');
-    response = createApiResponse(400, {
-      success: false,
-      message: 'Missing required fields: to, subject, body, attachmentFileName, attachmentStorageBucket, attachmentStoragePath, invoiceId are required',
-    });
-  }
-
   return {body, response};
 }
 
@@ -99,8 +91,26 @@ Deno.serve(async (req) => {
       subject: body.subject,
       bucket: body.attachmentStorageBucket,
       path: body.attachmentStoragePath,
-      invoiceId: body.invoiceId
+      invoiceId: body.invoiceId,
     });
+
+    if (
+      !body ||
+      !body.to ||
+      !body.subject ||
+      !body.body ||
+      !body.attachmentFileName ||
+      !body.attachmentStorageBucket ||
+      !body.attachmentStoragePath ||
+      !body.invoiceId
+    ) {
+      console.warn('Missing required fields');
+      return createApiResponse(400, {
+        success: false,
+        message:
+          'Missing required fields: to, subject, body, attachmentFileName, attachmentStorageBucket, attachmentStoragePath, invoiceId are required',
+      });
+    }
 
     const result = await downloadFileFromStorage(body.attachmentStorageBucket, body.attachmentStoragePath);
     const base64Data: string = result.base64Data;
