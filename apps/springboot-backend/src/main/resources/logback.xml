@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="Logtail" class="com.logtail.logback.LogtailAppender">
+  <appender name="Logtail" class="nl.eazysoftware.eazyrecyclingservice.config.SafeLogtailAppender">
     <appName>Springboot Backend</appName>
     <sourceToken>${BETTERSTACK_SOURCE_TOKEN}</sourceToken>
     <ingestUrl>https://${BETTERSTACK_INGESTING_HOST}</ingestUrl>
