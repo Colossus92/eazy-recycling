@@ -44,6 +44,7 @@ export const InvoiceForm = ({
     isReadOnly,
     isFinal,
     invoiceNumber,
+    invoiceStatus,
     currentInvoiceId,
     loadInvoice,
     resetForm,
@@ -342,21 +343,21 @@ export const InvoiceForm = ({
           />
 
           {/* Content */}
-          <div className="flex flex-col items-start self-stretch flex-1 gap-5 p-4 h-full">
+          <div className="flex flex-col items-start self-stretch flex-1 gap-5 p-4 min-h-0">
             {isLoading ? (
               <div className="flex justify-center items-center w-full p-8">
                 <ClipLoader size={20} aria-label="Laden..." />
               </div>
             ) : (
-              <div className="flex flex-col items-start self-stretch gap-4 flex-1">
-                <TabGroup className="w-full flex-1 flex flex-col h-full">
-                  <TabList className="relative z-10">
+              <div className="flex flex-col items-start self-stretch gap-4 flex-1 min-h-0">
+                <TabGroup className="w-full flex-1 flex flex-col min-h-0">
+                  <TabList className="relative z-10 flex-shrink-0">
                     <Tab label="Gegevens" />
                     <Tab label="Gerelateerd" />
                   </TabList>
                   <TabPanels className="flex flex-col flex-1 bg-color-surface-primary border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary pt-4 gap-4 min-h-0 -mt-[2px] overflow-y-auto">
                     {/* General Tab */}
-                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
+                    <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4 min-h-0">
                       <div className="flex flex-col gap-6 w-full">
                         {/* Invoice header section */}
                         <div className="grid grid-cols-2 gap-4">
@@ -415,6 +416,7 @@ export const InvoiceForm = ({
                     <TabPanel className="flex flex-col items-start gap-4 px-4 pb-4">
                       <InvoiceRelatedTab
                         invoiceId={currentInvoiceId ?? invoiceId}
+                        currentStatus={invoiceStatus ?? undefined}
                       />
                     </TabPanel>
                   </TabPanels>

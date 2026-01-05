@@ -47,7 +47,7 @@ export const InvoiceCard = ({
       <div className="flex flex-col justify-center items-start gap-1 flex-1">
         <InvoiceStatusTag status={status} />
         <span className="text-subtitle-2 text-color-text-secondary">
-          {invoiceNumber ? `#${invoiceNumber}` : `Concept #${invoiceId}`}
+          {invoiceNumber ? `#${invoiceNumber}` : `#-`}
         </span>
         <span className="text-body-2 text-color-text-secondary">
           Factuurdatum: {formatInstantInCET(invoiceDate, 'dd-MM-yyyy')}

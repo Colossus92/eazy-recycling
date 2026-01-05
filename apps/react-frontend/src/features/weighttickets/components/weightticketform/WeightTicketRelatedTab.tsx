@@ -12,10 +12,12 @@ import { useEffect } from 'react';
 
 interface WeightTicketRelatedTabProps {
   weightTicketId?: number;
+  currentStatus?: string;
 }
 
 export const WeightTicketRelatedTab = ({
   weightTicketId,
+  currentStatus,
 }: WeightTicketRelatedTabProps) => {
 
   const { data, isLoading, error } = useQuery({
@@ -41,8 +43,10 @@ export const WeightTicketRelatedTab = ({
   });
 
   // Poll for new documents every 5 seconds when not in DRAFT state
+  // Use currentStatus from form prop (which updates when user completes the ticket)
+  // rather than cached weightTicketDetails.status
   useEffect(() => {
-    if (!weightTicketDetails || weightTicketDetails.status === 'DRAFT') {
+    if (!weightTicketId || currentStatus === 'DRAFT') {
       return;
     }
 
@@ -51,7 +55,7 @@ export const WeightTicketRelatedTab = ({
     }, 5000);
 
     return () => clearInterval(intervalId);
-  }, [weightTicketDetails, refetchWeightTicketDetails]);
+  }, [weightTicketId, currentStatus, refetchWeightTicketDetails]);
 
   const linkedInvoiceId = weightTicketDetails?.linkedInvoiceId;
 
@@ -94,7 +98,25 @@ export const WeightTicketRelatedTab = ({
 
   const hasLinkedInvoice = !!linkedInvoiceId;
 
+  // Show loading state when finalized but no content yet (PDF is being generated)
+  const isWaitingForContent = currentStatus !== 'DRAFT' && !hasPdf && !hasTransports && !hasLinkedInvoice;
+
   if (!hasPdf && !hasTransports && !hasLinkedInvoice) {
+    if (isWaitingForContent) {
+      return (
+        <div className="flex flex-col justify-center items-center gap-3 p-8">
+          <ClipLoader
+            size={20}
+            color={'text-color-text-invert-primary'}
+            aria-label="Laad spinner"
+          />
+          <span className="text-body-2 text-color-text-secondary text-center">
+            Documenten worden gegenereerd...
+          </span>
+        </div>
+      );
+    }
+    
     return (
       <div className="flex justify-center items-center p-8">
         <span className="text-body-2 text-color-text-secondary">

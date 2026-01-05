@@ -379,7 +379,10 @@ export const WeightTicketForm = ({
                     </TabPanel>
                     {data && (
                       <TabPanel unmount={false} className="flex flex-col items-start gap-4 px-4 pb-4">
-                        <WeightTicketRelatedTab weightTicketId={data.id} />
+                        <WeightTicketRelatedTab 
+                          weightTicketId={data.id} 
+                          currentStatus={data.status}
+                        />
                       </TabPanel>
                     )}
                   </TabPanels>
