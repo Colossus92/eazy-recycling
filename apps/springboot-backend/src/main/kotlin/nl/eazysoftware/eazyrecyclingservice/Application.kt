@@ -27,7 +27,9 @@ import java.util.*
 )
 @EnableScheduling
 @EnableRetry
-@SpringBootApplication
+@SpringBootApplication(
+    exclude = [org.springframework.boot.autoconfigure.webservices.WebServicesAutoConfiguration::class]
+)
 class Application {
     @PostConstruct
     fun init() {

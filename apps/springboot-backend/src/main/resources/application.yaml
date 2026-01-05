@@ -4,6 +4,7 @@ spring:
     url: # Specify in environment variable SPRING_DATASOURCE_URL
     driver-class-name: org.postgresql.Driver
   jpa:
+    open-in-view: true
     properties:
       jakarta.persistence:
         schema-generation.scripts:
@@ -18,7 +19,6 @@ spring:
         format_sql: true
         schema-generation.scripts.action: create
         schema-generation.scripts.create-target: schema.sql
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc.time_zone: UTC
   ssl:
     bundle:
