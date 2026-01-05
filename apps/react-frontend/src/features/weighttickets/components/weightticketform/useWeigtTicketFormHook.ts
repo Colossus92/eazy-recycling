@@ -72,7 +72,7 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       tarraWeightUnit: undefined,
       secondWeighingValue: undefined,
       secondWeighingUnit: undefined,
-      weightedAt: format(new Date(), 'yyyy-MM-dd'),
+      weightedAt: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -205,7 +205,7 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       tarraWeightUnit: undefined,
       secondWeighingValue: NaN,
       secondWeighingUnit: undefined,
-      weightedAt: format(new Date(), 'yyyy-MM-dd'),
+      weightedAt: format(new Date(), "yyyy-MM-dd'T'HH:mm"),
       direction: 'INBOUND',
       pickupLocation: createEmptyLocationFormValue('none'),
       deliveryLocation: createEmptyLocationFormValue('none'),
@@ -277,7 +277,7 @@ const weightTicketDetailsToFormValues = (
     weightedAt: weightTicketDetails.weightedAt
       ? format(
           new Date(weightTicketDetails.weightedAt.toString()),
-          'yyyy-MM-dd'
+          "yyyy-MM-dd'T'HH:mm"
         )
       : undefined,
     pickupLocation: pickupLocationViewToFormValue(

@@ -51,12 +51,6 @@ export interface ServletContext {
     'contextPath'?: string;
     /**
      *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
-    /**
-     *
      * @type {SessionCookieConfig}
      * @memberof ServletContext
      */
@@ -67,6 +61,12 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'virtualServerName'?: string;
+    /**
+     *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
     /**
      *
      * @type {Set<string>}

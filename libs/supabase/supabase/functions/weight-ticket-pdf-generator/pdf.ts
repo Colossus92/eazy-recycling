@@ -1,6 +1,53 @@
 import type { PDFPage } from 'npm:pdf-lib';
 import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib';
-import { formatDateTime, WeightTicketData, WeightTicketLine } from './db.ts';
+
+/**
+ * Type definitions for weight ticket PDF data received from backend
+ */
+export interface WeightTicketPdfData {
+  weightTicket: {
+    id: string;
+    number: number;
+    truckLicensePlate: string;
+    reclamation?: string;
+    direction: string;
+    weightedAt?: string;
+    createdAt: string;
+    weging1: number;
+    weging2: number;
+    grossWeight: number;
+    tarraWeight: number;
+    nettoWeight: number;
+    weightUnit: string;
+  };
+  lines: WeightTicketLine[];
+  consignorParty?: PartyData;
+  carrierParty?: PartyData;
+  pickupLocation?: LocationData;
+  deliveryLocation?: LocationData;
+}
+
+export interface WeightTicketLine {
+  wasteTypeName: string;
+  weightValue: number;
+  weightUnit: string;
+}
+
+export interface PartyData {
+  name?: string;
+  streetName?: string;
+  buildingNumber?: string;
+  postalCode?: string;
+  city?: string;
+}
+
+export interface LocationData {
+  name?: string;
+  streetName?: string;
+  buildingNumber?: string;
+  postalCode?: string;
+  city?: string;
+}
 
 // Hardcoded company address for top right
 const COMPANY_ADDRESS = {
@@ -205,14 +252,7 @@ async function drawPartySection(
     x: number,
     y: number,
     title: string,
-    party?: {
-        name?: string;
-        street_name?: string;
-        building_number?: string;
-        postal_code?: string;
-        city?: string;
-        country?: string;
-    }
+    party?: PartyData | LocationData
 ) {
     const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -252,8 +292,8 @@ async function drawPartySection(
     }
 
     // Draw address
-    if (party.street_name && party.building_number) {
-        page.drawText(`${party.street_name} ${party.building_number}`, {
+    if (party.streetName && party.buildingNumber) {
+        page.drawText(`${party.streetName} ${party.buildingNumber}`, {
             x,
             y: currentY,
             size: 9,
@@ -264,8 +304,8 @@ async function drawPartySection(
     }
 
     // Draw postal code and city
-    if (party.postal_code && party.city) {
-        page.drawText(`${party.postal_code} ${party.city}`, {
+    if (party.postalCode && party.city) {
+        page.drawText(`${party.postalCode} ${party.city}`, {
             x,
             y: currentY,
             size: 9,
@@ -275,27 +315,11 @@ async function drawPartySection(
         currentY -= 12;
     }
 
-    // Draw country
-    if (party.country) {
-        page.drawText(party.country, {
-            x,
-            y: currentY,
-            size: 9,
-            font: regularFont,
-            color: rgb(0, 0, 0),
-        });
-    }
 }
 
-/**
- * Round a number to 2 decimal places using standard rounding (5 rounds up, 4 rounds down)
- */
-function roundToTwoDecimals(value: number): number {
-    return Math.round(value * 100) / 100;
-}
 
 /**
- * Draw weight ticket lines with totals
+ * Draw weight ticket lines with totals using pre-calculated weights from backend
  */
 async function drawLinesTable(
     page: PDFPage,
@@ -303,22 +327,72 @@ async function drawLinesTable(
     x: number,
     y: number,
     lines: WeightTicketLine[],
-    tarraWeight?: number,
-    tarraUnit?: string
+    weging1: number,
+    weging2: number,
+    grossWeight: number,
+    tarraWeight: number,
+    nettoWeight: number,
+    weightUnit: string
 ): Promise<number> {
     const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
     let currentY = y;
-
-    // Calculate gross weight (sum of all lines) and round to 2 decimals
-    const grossWeight = roundToTwoDecimals(
-        lines.reduce((sum, line) => Number(sum) + Number(line.weight_value || 0), 0)
-    );
-    const weightUnit = lines.length > 0 ? lines[0].weight_unit : 'kg';
     
-    // Right-aligned x position for weight values
-    const weightValueX = x + 450;
+    // Use left half of page - more concise layout
+    const weightValueX = x + 220;
+
+    // Draw Weging 1
+    page.drawText(`Weging 1:`, {
+        x,
+        y: currentY,
+        size: 10,
+        font: regularFont,
+        color: rgb(0, 0, 0),
+    });
+
+    const weging1Text = `${weging1.toFixed(2)} ${weightUnit}`;
+    const weging1Width = regularFont.widthOfTextAtSize(weging1Text, 10);
+    page.drawText(weging1Text, {
+        x: weightValueX - weging1Width,
+        y: currentY,
+        size: 10,
+        font: regularFont,
+        color: rgb(0, 0, 0),
+    });
+
+    currentY -= 15;
+
+    // Draw Weging 2
+    page.drawText(`Weging 2:`, {
+        x,
+        y: currentY,
+        size: 10,
+        font: regularFont,
+        color: rgb(0, 0, 0),
+    });
+
+    const weging2Text = `${weging2.toFixed(2)} ${weightUnit}`;
+    const weging2Width = regularFont.widthOfTextAtSize(weging2Text, 10);
+    page.drawText(weging2Text, {
+        x: weightValueX - weging2Width,
+        y: currentY,
+        size: 10,
+        font: regularFont,
+        color: rgb(0, 0, 0),
+    });
+
+    currentY -= 18;
+
+    // Draw separator line
+    page.drawLine({
+        start: { x, y: currentY },
+        end: { x: weightValueX, y: currentY },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+    });
+
+    currentY -= 15;
 
     // Draw Bruto (gross weight)
     page.drawText(`Bruto:`, {
@@ -330,27 +404,20 @@ async function drawLinesTable(
     });
 
     const brutoText = `${grossWeight.toFixed(2)} ${weightUnit}`;
-    const brutoWidth = boldFont.widthOfTextAtSize(brutoText, 10);
+    const brutoWidth = regularFont.widthOfTextAtSize(brutoText, 10);
     page.drawText(brutoText, {
         x: weightValueX - brutoWidth,
         y: currentY,
         size: 10,
-        font: boldFont,
+        font: regularFont,
         color: rgb(0, 0, 0),
     });
 
     currentY -= 15;
 
-
-    let tarraText = '';
-    // Draw Tarra if available
-    if (tarraWeight !== undefined && tarraUnit) {
-        const roundedTarra = roundToTwoDecimals(tarraWeight);
-        tarraText = `${roundedTarra.toFixed(2)} ${tarraUnit}`;
-    } else {
-        tarraText = '-';
-    }
-    page.drawText(`Tarra:`, {
+    // Draw Emballage (instead of Tarra)
+    const emballageText = tarraWeight > 0 ? `${tarraWeight.toFixed(2)} ${weightUnit}` : '-';
+    page.drawText(`Emballage:`, {
         x,
         y: currentY,
         size: 10,
@@ -358,55 +425,63 @@ async function drawLinesTable(
         color: rgb(0, 0, 0),
     });
 
-    const tarraWidth = regularFont.widthOfTextAtSize(tarraText, 10);
-    page.drawText(tarraText, {
-        x: weightValueX - tarraWidth,
+    const emballageWidth = regularFont.widthOfTextAtSize(emballageText, 10);
+    page.drawText(emballageText, {
+        x: weightValueX - emballageWidth,
         y: currentY,
         size: 10,
         font: regularFont,
         color: rgb(0, 0, 0),
     });
 
-    currentY -= 20;
+    currentY -= 18;
 
-    // Calculate and draw Netto (gross - tarra) in bigger font
-    const nettoWeight = roundToTwoDecimals(grossWeight - Number(tarraWeight || 0));
+    // Draw separator line
+    page.drawLine({
+        start: { x, y: currentY },
+        end: { x: weightValueX, y: currentY },
+        thickness: 0.5,
+        color: rgb(0.7, 0.7, 0.7),
+    });
 
+    currentY -= 15;
+
+    // Draw Netto - same font size and weight as Bruto
     page.drawText(`Netto:`, {
         x,
         y: currentY,
-        size: 14,
+        size: 10,
         font: boldFont,
         color: rgb(0, 0, 0),
     });
 
     const nettoText = `${nettoWeight.toFixed(2)} ${weightUnit}`;
-    const nettoWidth = boldFont.widthOfTextAtSize(nettoText, 14);
+    const nettoWidth = regularFont.widthOfTextAtSize(nettoText, 10);
     page.drawText(nettoText, {
         x: weightValueX - nettoWidth,
         y: currentY,
-        size: 14,
-        font: boldFont,
+        size: 10,
+        font: regularFont,
         color: rgb(0, 0, 0),
     });
 
     currentY -= 20;
 
-
     page.drawText('Uitsortering hoofdmaterialen:', {
-        x: 40,
+        x,
         y: currentY,
         size: 11,
         font: boldFont,
         color: rgb(0, 0, 0),
     });
     currentY -= 13;
-    // Draw each line (waste type and weight combined)
+    
+    // Draw each line (waste type and weight combined) - using left half
+    // All weights are pre-calculated and formatted by backend
     for (const line of lines) {
-        const roundedWeight = roundToTwoDecimals(Number(line.weight_value || 0));
-        const weightText = `${roundedWeight.toFixed(2)} ${line.weight_unit || ''}`;
+        const weightText = `${line.weightValue.toFixed(2)} ${line.weightUnit || ''}`;
 
-        page.drawText(line.waste_type_name || 'Onbekend', {
+        page.drawText(line.wasteTypeName || 'Onbekend', {
             x,
             y: currentY,
             size: 9,
@@ -428,14 +503,13 @@ async function drawLinesTable(
 
     currentY -= 8;
 
-
     return currentY;
 }
 
 /**
  * Main function to generate the weight ticket PDF
  */
-export async function generateWeightTicketPdf(data: WeightTicketData): Promise<Uint8Array> {
+export async function generateWeightTicketPdf(data: WeightTicketPdfData): Promise<Uint8Array> {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595.28, 841.89]); // A4 size in points
     const { width, height } = page.getSize();
@@ -455,10 +529,10 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
         40,
         contentY,
         'Kenteken:',
-        data.weightTicket.truck_license_plate
+        data.weightTicket.truckLicensePlate
     );
     contentY -= 15;
-        await drawField(
+    await drawField(
         page,
         pdfDoc,
         40,
@@ -468,14 +542,14 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
     );
     contentY -= 15;
 
-    if (data.weightTicket.weighted_at) {
+    if (data.weightTicket.weightedAt) {
         await drawField(
             page,
             pdfDoc,
             40,
             contentY,
             'Weegdatum:',
-            formatDateTime(data.weightTicket.weighted_at)
+            data.weightTicket.weightedAt
         );
         contentY -= 15;
     }
@@ -486,9 +560,9 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
         40,
         contentY,
         'Gemaakt op:',
-        formatDateTime(data.weightTicket.created_at)
+        data.weightTicket.createdAt
     );
-    contentY -= 30;
+    contentY -= 20;
 
     // Draw a separator line
     page.drawLine({
@@ -497,7 +571,7 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
         thickness: 0.5,
         color: rgb(0.8, 0.8, 0.8),
     });
-    contentY -= 20;
+    contentY -= 15;
 
     // Draw parties section in two columns
     const leftColumnX = 40;
@@ -511,7 +585,7 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
     } else if (data.weightTicket.direction == 'OUTBOUND' && data.deliveryLocation) {
         await drawPartySection(page, pdfDoc, rightColumnX, contentY, 'Losadres', data.deliveryLocation);
     }
-    contentY -= 80;
+    contentY -= 70;
 
     // Draw separator
     page.drawLine({
@@ -520,7 +594,7 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
         thickness: 0.5,
         color: rgb(0.8, 0.8, 0.8),
     });
-    contentY -= 20;
+    contentY -= 15;
 
     // Draw weight ticket lines if available
     if (data.lines && data.lines.length > 0) {
@@ -530,8 +604,12 @@ export async function generateWeightTicketPdf(data: WeightTicketData): Promise<U
             40,
             contentY,
             data.lines,
-            data.weightTicket.tarra_weight_value,
-            data.weightTicket.tarra_weight_unit
+            data.weightTicket.weging1,
+            data.weightTicket.weging2,
+            data.weightTicket.grossWeight,
+            data.weightTicket.tarraWeight,
+            data.weightTicket.nettoWeight,
+            data.weightTicket.weightUnit
         );
         contentY -= 20;
 

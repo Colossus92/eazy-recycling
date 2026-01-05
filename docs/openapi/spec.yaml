@@ -2390,7 +2390,7 @@ components:
           - KG
         weightedAt:
           type: string
-          format: date
+          format: date-time
         carrierParty:
           type: string
           format: uuid
@@ -4376,14 +4376,14 @@ components:
           type: string
           format: date
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
         year:
           type: integer
           format: int32
@@ -4439,6 +4439,9 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
@@ -4447,9 +4450,6 @@ components:
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4523,11 +4523,11 @@ components:
         value:
           type: string
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         hour:
           type: integer
           format: int32
@@ -5927,14 +5927,14 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -5944,15 +5944,15 @@ components:
           type: array
           items:
             type: string
+        elIgnored:
+          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
           type: string
-        isXml:
-          type: string
-        elIgnored:
-          type: string
         scriptingInvalid:
+          type: string
+        isXml:
           type: string
         includePreludes:
           type: array
@@ -6033,13 +6033,13 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
-          writeOnly: true
-        attributesCSV:
-          type: string
           writeOnly: true
     ServletContext:
       type: object
@@ -6047,11 +6047,11 @@ components:
         attributeNames: {}
         contextPath:
           type: string
-        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        initParameterNames: {}
         sessionTrackingModes:
           type: array
           items:
@@ -6173,12 +6173,12 @@ components:
         maxAge:
           type: integer
           format: int32
+        httpOnly:
+          type: boolean
         secure:
           type: boolean
         domain:
           type: string
-        httpOnly:
-          type: boolean
         path:
           type: string
         name:

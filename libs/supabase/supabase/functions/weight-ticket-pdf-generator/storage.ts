@@ -1,5 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
-import { WeightTicketData } from './db.ts';
+import * as postgres from 'https://deno.land/x/postgres@v0.17.0/mod.ts';
 
 /**
  * Storage bucket name for weight ticket PDFs
@@ -24,24 +24,50 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseServiceKey);
 }
 
+// Initialize database connection pool for PDF URL updates
+const databaseUrl = Deno.env.get('SUPABASE_DB_URL') || '';
+const pool = new postgres.Pool(databaseUrl, 3, true);
+
 /**
  * Generate a unique filename and storage path for the weight ticket PDF
  * Format: ddMMYYYY-weegbon-{weightticketid}.pdf
  * Path: /{weightticketid}/filename.pdf
- * @param ticketData - Weight ticket data
+ * @param ticketId - Weight ticket UUID
+ * @param ticketNumber - Weight ticket number
  * @returns Object containing filename and storage path
  */
-export function generateFileName(ticketData: WeightTicketData): { filename: string; storagePath: string } {
+export function generateFileName(ticketId: string, ticketNumber: number): { filename: string; storagePath: string } {
   const now = new Date();
   const day = now.getDate().toString().padStart(2, '0');
   const month = (now.getMonth() + 1).toString().padStart(2, '0');
   const year = now.getFullYear();
-  const filename = `${day}${month}${year}-weegbon-${ticketData.weightTicket.id}.pdf`;
+  const filename = `${day}${month}${year}-weegbon-${ticketNumber}.pdf`;
 
   // Storage path: /{weightticketid}/filename.pdf
-  const storagePath = `${ticketData.weightTicket.id}/${filename}`;
+  const storagePath = `${ticketId}/${filename}`;
 
   return { filename, storagePath };
+}
+
+/**
+ * Update the PDF URL in the weight_tickets table
+ * @param ticketId - Weight ticket UUID
+ * @param pdfUrl - Storage path for the PDF
+ */
+export async function updatePdfUrl(ticketId: string, pdfUrl: string): Promise<void> {
+  let connection;
+  try {
+    connection = await pool.connect();
+    await connection.queryObject`
+      UPDATE weight_tickets
+      SET pdf_url = ${pdfUrl}
+      WHERE id = ${ticketId}::uuid
+    `;
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
 }
 
 /**

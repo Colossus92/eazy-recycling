@@ -1,6 +1,9 @@
-import { fetchWeightTicketData, pool } from './db.ts';
-import { generateWeightTicketPdf } from './pdf.ts';
-import { generateFileName, uploadWeightTicketPdf } from './storage.ts';
+import { generateWeightTicketPdf, WeightTicketPdfData } from './pdf.ts';
+import {
+  generateFileName,
+  updatePdfUrl,
+  uploadWeightTicketPdf,
+} from './storage.ts';
 
 // Type definitions
 type ApiResponse = {
@@ -43,73 +46,53 @@ function createPdfResponse(pdfBytes: Uint8Array, filename: string): Response {
 }
 
 /**
- * Extract ticket ID from request body or URL params
+ * Extract weight ticket PDF data from request body
  * @param req - Request object
- * @returns Ticket ID
+ * @returns Weight ticket PDF data
  */
-async function extractTicketId(req: Request): Promise<string> {
-  const url = new URL(req.url);
-  const ticketIdFromParams = url.searchParams.get('ticketId');
-  
-  if (ticketIdFromParams) {
-    return ticketIdFromParams;
-  }
-
+async function extractPdfData(req: Request): Promise<WeightTicketPdfData> {
   try {
     const body = await req.json();
-    return body.ticketId;
-  } catch {
-    throw new Error('No ticket ID provided');
+
+    if (!body.weightTicket) {
+      throw new Error('Missing weightTicket data in request body');
+    }
+
+    return body as WeightTicketPdfData;
+  } catch (err) {
+    if (err instanceof Error && err.message.includes('Missing')) {
+      throw err;
+    }
+    throw new Error('Invalid request body - expected JSON with weight ticket data');
   }
 }
 
 // Main server handler
 Deno.serve(async (req) => {
-  let connection;
   try {
-    // Extract ticket ID from request
-    const ticketId = await extractTicketId(req);
-    console.log(`Generating PDF for weight ticket ${ticketId}`);
+    // Extract weight ticket data from request body
+    const ticketData = await extractPdfData(req);
+    const ticketNumber = ticketData.weightTicket.number;
 
-    // Fetch weight ticket data
-    const { data: ticketData, response } = await fetchWeightTicketData(ticketId);
-    
-    if (response) {
-      return response;
-    }
-
-    if (!ticketData) {
-      return createApiResponse(404, {
-        success: false,
-        message: 'Weight ticket not found',
-        error: 'No ticket data available'
-      });
-    }
-
-    console.log(`[${ticketId}] Weight ticket found, generating PDF...`);
+    console.log(`Generating PDF for weight ticket ${ticketNumber}`);
 
     // Generate PDF
     const pdfBytes = await generateWeightTicketPdf(ticketData);
-    
-    console.log(`[${ticketId}] PDF successfully generated`);
+
+    console.log(`[${ticketNumber}] PDF successfully generated`);
 
     // Generate filename and storage path
-    const { filename, storagePath } = generateFileName(ticketData);
+    const { filename, storagePath } = generateFileName(ticketData.weightTicket.id, ticketData.weightTicket.number);
 
     // Upload PDF to Supabase storage
     await uploadWeightTicketPdf(pdfBytes, storagePath);
 
-    console.log(`[${ticketId}] PDF uploaded successfully, updating database...`);
+    console.log(`[${ticketNumber}] PDF uploaded successfully, updating database...`);
 
     // Update weight_tickets table with pdf_url
-    connection = await pool.connect();
-    await connection.queryObject`
-      UPDATE weight_tickets
-      SET pdf_url = ${storagePath}
-      WHERE id = ${ticketData.weightTicket.id}
-    `;
+    await updatePdfUrl(ticketData.weightTicket.id, storagePath);
 
-    console.log(`[${ticketId}] Database updated with PDF URL`);
+    console.log(`[${ticketNumber}] Database updated with PDF URL`);
 
     // Return PDF as downloadable file
     return createPdfResponse(pdfBytes, filename);
@@ -124,9 +107,5 @@ Deno.serve(async (req) => {
       message: 'Internal server error',
       error: errorMessage
     });
-  } finally {
-    if (connection) {
-      connection.release();
-    }
   }
 });

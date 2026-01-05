@@ -1,6 +1,6 @@
 import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
-import { DateFormField } from '@/components/ui/form/DateFormField';
+import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
 import { NumberInput } from '@/components/ui/form/NumberInput';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
@@ -143,10 +143,10 @@ export const WeightTicketLinesTab = ({
   return (
     <div className="flex flex-col items-start self-stretch gap-4">
       <div className="w-1/44">
-        <DateFormField
-          title="Datum weging"
-          placeholder="Selecteer een datum"
+        <DateTimeInput
+          title="Datum en tijd weging"
           disabled={disabled}
+          testId="weighted-at-datetime"
           formHook={{
             register,
             name: 'weightedAt',

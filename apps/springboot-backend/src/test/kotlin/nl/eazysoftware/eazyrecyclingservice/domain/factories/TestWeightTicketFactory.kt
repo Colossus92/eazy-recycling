@@ -2,7 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.factories
 
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 object TestWeightTicketFactory {
@@ -14,7 +14,7 @@ object TestWeightTicketFactory {
     truckLicensePlate: String? = "AA-123-BB",
     reclamation: String? = "Test reclamation",
     note: String? = "Test note",
-    weightedAt: LocalDate? = LocalDate.of(2025, 11, 21),
+    weightedAt: LocalDateTime? = LocalDateTime.of(2025, 11, 21, 10, 0),
   ): WeightTicketRequest {
     return WeightTicketRequest(
       consignorParty = ConsignorRequest.CompanyConsignor(consignorCompanyId),
