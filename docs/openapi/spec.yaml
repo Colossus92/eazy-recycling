@@ -5820,11 +5820,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
@@ -5927,14 +5927,14 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -5944,9 +5944,9 @@ components:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
         errorOnELNotFound:
+          type: string
+        elIgnored:
           type: string
         pageEncoding:
           type: string
@@ -6044,7 +6044,6 @@ components:
     ServletContext:
       type: object
       properties:
-        attributeNames: {}
         contextPath:
           type: string
         sessionCookieConfig:
@@ -6107,6 +6106,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        attributeNames: {}
         classLoader:
           type: object
           properties:

@@ -3,6 +3,7 @@ import { MobilePlanningItem } from './MobilePlanningItem';
 import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
 import { Button } from '@/components/ui/button/Button';
 import MapPinArea from '@/assets/icons/MapPinArea.svg?react';
+import { useNavigate } from 'react-router-dom';
 
 interface MobilePlanningItemsProps {
   isLoading: boolean;
@@ -17,6 +18,7 @@ export const MobilePlanningItems = ({
   error,
   selectedDate,
 }: MobilePlanningItemsProps) => {
+  const navigate = useNavigate();
   const getItemsForSelectedDate = () => {
     if (!driverPlanning) return [];
 
@@ -43,7 +45,7 @@ export const MobilePlanningItems = ({
       <Button
         icon={MapPinArea}
         label={"Containerlocatie doorgeven"}
-        onClick={() => console.log("Container locatie doorgeven")}
+        onClick={() => navigate("/mobile/container-location")}
         fullWidth={true}
         variant="primary"
         size='medium'

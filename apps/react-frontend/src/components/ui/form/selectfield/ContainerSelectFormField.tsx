@@ -21,11 +21,13 @@ interface ContainerSelectFormFieldProps<TFieldValues extends FieldValues> {
     control: Control<TFieldValues>;
   };
   disabled?: boolean;
+  required?: boolean;
 }
 
 export const ContainerSelectFormField = <T extends FieldValues>({
   formHook,
   disabled = false,
+  required = false,
 }: ContainerSelectFormFieldProps<T>) => {
   const { data: containers = [] } = useQuery<WasteContainerView[]>({
     queryKey: ['containers'],
@@ -49,6 +51,9 @@ export const ContainerSelectFormField = <T extends FieldValues>({
         name: formHook.name,
         errors: formHook.errors,
         control: formHook.control,
+        rules: {
+          required: required ? 'Container is verplicht' : undefined,
+        },
       }}
     />
   );

@@ -3,6 +3,7 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { MobileSignaturePage } from './pages/MobileSignaturePage.tsx';
 import { MobileReportFinishedPage } from './pages/MobileReportFinishedPage.tsx';
+import { MobileContainerLocationPage } from './pages/MobileContainerLocationPage.tsx';
 import { Provider } from '@/app/Provider.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
 
@@ -34,6 +35,10 @@ export const App = () => {
               <Route
                 path="/mobile/report-ready/:id"
                 element={<MobileReportFinishedPage />}
+              />
+              <Route
+                path="/mobile/container-location"
+                element={<MobileContainerLocationPage />}
               />
               <Route
                 path="/mobile/*"

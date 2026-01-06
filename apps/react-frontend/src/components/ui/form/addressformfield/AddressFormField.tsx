@@ -152,7 +152,7 @@ export const AddressFormField = <TFieldValues extends FieldValues>({
                             </div>
                         )}
 
-                        {currentType === 'none' && (
+                        {(currentType === 'none' && isNoLocationAllowed) && (
                             <div className="w-full flex py-2 pl-2 pr-3 gap-2 border border-solid border-color-border-hover rounded-radius-md items-center ">
                                 <Warning className='size-6 text-color-text-secondary'/>
                                 <div className="flex flex-col gap-1 flex-1 items-start">

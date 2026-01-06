@@ -72,7 +72,7 @@ class WasteStreamCompatibilityService {
     for (stream in wasteStreams.drop(1)) {
       when {
         stream.pickupLocation != firstStream.pickupLocation ->
-          return "Afvalstromen hebben verschillende ophaallokaties"
+          return "Afvalstromen hebben verschillende ophaallocaties"
 
         stream.deliveryLocation.processorPartyId != firstStream.deliveryLocation.processorPartyId ->
           return "Afvalstromen hebben verschillende ontvangende verwerkers"
