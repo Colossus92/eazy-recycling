@@ -31,6 +31,14 @@ const COLOR_LIGHT_GRAY = rgb(0.6, 0.6, 0.6);
 const COLOR_LINE = rgb(0.85, 0.85, 0.85);
 
 /**
+ * Truncate text with ellipsis if it exceeds maxLength
+ */
+function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength - 3) + '...';
+}
+
+/**
  * Draw the header section with logo and tenant info
  */
 async function drawHeader(
@@ -403,7 +411,8 @@ function drawTotalsMultiPage(
   // Material totals rows (left side)
   let matY = totalsStartY - 14;
   for (const mat of data.materialTotals) {
-    currentPage.drawText(mat.material, { x: matColMaterial, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
+    const truncatedMaterial = truncateText(mat.material, 28);
+    currentPage.drawText(truncatedMaterial, { x: matColMaterial, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
     const weightText = `${mat.totalWeight} ${mat.unit}`;
     const weightWidth = fonts.regular.widthOfTextAtSize(weightText, 8);
     currentPage.drawText(weightText, { x: matColWeightEnd - weightWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
@@ -689,7 +698,8 @@ function drawLinesTableMultiPage(
     
     let descY = currentY;
     for (const descLine of descLines) {
-      currentPage.drawText(descLine, { x: colDesc, y: descY, size: 8, font: fonts.regular, color: COLOR_BLACK });
+      const truncatedDesc = truncateText(descLine, 42);
+      currentPage.drawText(truncatedDesc, { x: colDesc, y: descY, size: 8, font: fonts.regular, color: COLOR_BLACK });
       descY -= lineHeight;
     }
     
