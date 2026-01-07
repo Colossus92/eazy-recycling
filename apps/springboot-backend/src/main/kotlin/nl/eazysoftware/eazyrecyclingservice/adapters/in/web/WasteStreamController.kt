@@ -138,6 +138,8 @@ class WasteStreamController(
 }
 
 data class WasteStreamRequest(
+  val wasteStreamNumber: String?,
+
   @field:NotBlank(message = "Naam is verplicht")
   val name: String,
 
@@ -174,6 +176,7 @@ data class WasteStreamRequest(
 ) {
   fun toCommand(): WasteStreamCommand {
     return WasteStreamCommand(
+      wasteStreamNumber = wasteStreamNumber?.let { WasteStreamNumber(it) },
       wasteType = WasteType(
         name = name,
         euralCode = EuralCode(euralCode),

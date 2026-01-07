@@ -53,6 +53,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var vatRateRepository: VatRateJpaRepository
 
   private lateinit var testCompany: CompanyDto
+  private lateinit var tenantCompany: CompanyDto
   private lateinit var testCatalogItem: CatalogItemDto
   private lateinit var testVatRate: VatRateDto
 
@@ -62,9 +63,16 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     weightTicketRepository.deleteAll()
     wasteStreamRepository.deleteAll()
 
+    // Create tenant company (processor ID 08797)
+    tenantCompany = companyRepository.save(TestCompanyFactory.createTestCompany(
+      processorId = "08797",
+      vihbId = "087970VIHB"
+    ))
+
     // Create test company for each test (will be rolled back after each test due to @Transactional)
     testCompany = companyRepository.save(TestCompanyFactory.createTestCompany(
-      processorId = "12345"
+      processorId = "12345",
+      vihbId = "123456VIHB"
     ))
 
     // Create test VAT rate and catalog item for weight ticket lines
@@ -456,6 +464,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000001",
       name = "Glass",
       pickupLocation = pickupLocation,
       processorPartyId = "12345",
@@ -501,6 +510,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000002",
       name = "Glass",
       pickupLocation = pickupLocation1,
       processorPartyId = "12345",
@@ -508,6 +518,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     )
     val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000003",
       name = "Plastic",
       pickupLocation = pickupLocation2, // Different location
       processorPartyId = "12345",
@@ -549,6 +560,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000004",
       name = "Glass",
       pickupLocation = pickupLocation,
       processorPartyId = "12345",
@@ -556,6 +568,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     )
     val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "999990000001",
       name = "Plastic",
       pickupLocation = pickupLocation,
       processorPartyId = "99999", // Different processor
@@ -608,6 +621,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000005",
       name = "Glass",
       pickupLocation = pickupLocation,
       processorPartyId = "12345",
@@ -615,6 +629,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
     )
     val request2 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000006",
       name = "Plastic",
       pickupLocation = pickupLocation,
       processorPartyId = "12345",
@@ -676,6 +691,7 @@ class WasteStreamControllerIntegrationTest : BaseIntegrationTest() {
 
     val request1 = TestWasteStreamFactory.createTestWasteStreamRequest(
       companyId = testCompany.id,
+      wasteStreamNumber = "123450000007",
       name = "Glass",
       euralCode = "16 01 17",
       pickupLocation = pickupLocation,

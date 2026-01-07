@@ -1,9 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase
 
+import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateAndActivateWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.CreateDraftWasteStream
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.PickupLocationCommand
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.WasteStreamCommand
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestCompanyFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.WasteDeliveryLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
@@ -33,6 +35,9 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   private lateinit var createDraftWasteStream: CreateDraftWasteStream
 
   @Autowired
+  private lateinit var createAndActivateWasteStream: CreateAndActivateWasteStream
+
+  @Autowired
   private lateinit var wasteStreamRepo: WasteStreams
 
   @Autowired
@@ -42,15 +47,24 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   private lateinit var transactionTemplate: TransactionTemplate
 
   private lateinit var testCompany: CompanyDto
+  private lateinit var tenantCompany: CompanyDto
 
   @BeforeAll
   fun setupOnce() {
     // Execute in a separate committed transaction
     transactionTemplate.execute {
-      // Create and save company fresh (not detached)
+      // Create and save external processor company
       testCompany = companyRepository.save(
         TestCompanyFactory.createTestCompany(
-          processorId = "12345"
+          processorId = "12345",
+          vihbId = "123456VIHB"
+        )
+      )
+      // Create and save tenant company
+      tenantCompany = companyRepository.save(
+        TestCompanyFactory.createTestCompany(
+          processorId = "08797",
+          vihbId = "087970VIHB"
         )
       )
     }
@@ -68,26 +82,27 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should generate first waste stream number for processor`() {
-    // Given
-    val processorId = ProcessorPartyId("12345")
-    val command = createTestCommand(processorId)
+  fun `should generate waste stream number when processor is current tenant`() {
+    // Given - using the current tenant's processor ID
+    val tenantProcessorId = Tenant.processorPartyId
+    val command = createTestCommand(tenantProcessorId, wasteStreamNumber = null)
 
     // When
     val result = createDraftWasteStream.handle(command)
 
-    // Then
-    assertEquals("123450000001", result.wasteStreamNumber.number)
+    // Then - number should be auto-generated starting with tenant processor ID
+    assertThat(result.wasteStreamNumber.number).startsWith(tenantProcessorId.number)
     assertTrue(wasteStreamRepo.existsById(result.wasteStreamNumber))
   }
 
+
   @Test
   fun `should generate sequential waste stream numbers`() {
-    // Given
-    val processorId = ProcessorPartyId("12345")
-    val command1 = createTestCommand(processorId)
-    val command2 = createTestCommand(processorId)
-    val command3 = createTestCommand(processorId)
+    // Given - tenant processor generates numbers automatically
+    val tenantProcessorId = Tenant.processorPartyId
+    val command1 = createTestCommand(tenantProcessorId)
+    val command2 = createTestCommand(tenantProcessorId)
+    val command3 = createTestCommand(tenantProcessorId)
 
     // When
     val result1 = createDraftWasteStream.handle(command1)
@@ -95,52 +110,107 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
     val result3 = createDraftWasteStream.handle(command3)
 
     // Then
-    assertEquals("123450000001", result1.wasteStreamNumber.number)
-    assertEquals("123450000002", result2.wasteStreamNumber.number)
-    assertEquals("123450000003", result3.wasteStreamNumber.number)
+    assertEquals("087970000001", result1.wasteStreamNumber.number)
+    assertEquals("087970000002", result2.wasteStreamNumber.number)
+    assertEquals("087970000003", result3.wasteStreamNumber.number)
   }
-
   @Test
-  fun `should retrieve highest number correctly from database`() {
-    // Given
-    val processorId = ProcessorPartyId("12345")
-
-    // Create waste streams with gaps in numbering
-    val command1 = createTestCommand(processorId)
-    createDraftWasteStream.handle(command1) // 999990000001
-
-    val command2 = createTestCommand(processorId)
-    createDraftWasteStream.handle(command2) // 999990000002
-
-    val command3 = createTestCommand(processorId)
-    createDraftWasteStream.handle(command3) // 999990000003
-
-    // When - verify next number after existing sequence
-    val command4 = createTestCommand(processorId)
-    val result = createDraftWasteStream.handle(command4)
-
-    // Then
-    assertEquals("123450000004", result.wasteStreamNumber.number)
-  }
-
-  @Test
-  fun `should persist waste stream with generated number`() {
-    // Given
-    val processorId = ProcessorPartyId("12345")
-    val command = createTestCommand(processorId)
+  fun `should accept provided waste stream number when processor is external`() {
+    // Given - external processor (not the current tenant)
+    val externalProcessorId = ProcessorPartyId("12345")
+    val providedNumber = WasteStreamNumber("123450000001")
+    val command = createTestCommand(externalProcessorId, wasteStreamNumber = providedNumber)
 
     // When
     val result = createDraftWasteStream.handle(command)
 
-    // Then
-    val persisted = wasteStreamRepo.findByNumber(result.wasteStreamNumber)
-    assertThat(persisted).isNotNull
-    assertEquals("123450000001", persisted?.wasteStreamNumber?.number)
-    assertEquals(command.wasteType.name, persisted?.wasteType?.name)
+    // Then - should use the provided number
+    assertEquals("123450000001", result.wasteStreamNumber.number)
+    assertTrue(wasteStreamRepo.existsById(result.wasteStreamNumber))
   }
 
-  private fun createTestCommand(processorId: ProcessorPartyId): WasteStreamCommand {
+  @Test
+  fun `should fail when processor is external and no waste stream number provided`() {
+    // Given - external processor without waste stream number
+    val externalProcessorId = ProcessorPartyId("12345")
+    val command = createTestCommand(externalProcessorId, wasteStreamNumber = null)
+
+    // When/Then - should throw IllegalArgumentException
+    val exception = assertThrows<IllegalArgumentException> {
+      createDraftWasteStream.handle(command)
+    }
+    assertThat(exception.message).contains("Afvalstroomnummer is verplicht")
+  }
+
+  @Test
+  fun `should fail when waste stream number already exists - CreateDraft`() {
+    // Given - create first waste stream with external processor
+    val externalProcessorId = ProcessorPartyId("12345")
+    val duplicateNumber = WasteStreamNumber("123450000099")
+    val command1 = createTestCommand(externalProcessorId, wasteStreamNumber = duplicateNumber)
+    createDraftWasteStream.handle(command1)
+
+    // When/Then - creating second waste stream with same number should fail
+    val command2 = createTestCommand(externalProcessorId, wasteStreamNumber = duplicateNumber)
+    val exception = assertThrows<IllegalArgumentException> {
+      createDraftWasteStream.handle(command2)
+    }
+    assertThat(exception.message).contains("Afvalstroom met nummer 123450000099 bestaat al")
+  }
+
+  // ==================== CreateAndActivateWasteStream Tests ====================
+
+  @Test
+  fun `CreateAndActivate - should accept provided waste stream number when processor is external`() {
+    // Given - external processor with provided number
+    val externalProcessorId = ProcessorPartyId("12345")
+    val providedNumber = WasteStreamNumber("123450000002")
+    val command = createTestCommand(externalProcessorId, wasteStreamNumber = providedNumber)
+
+    // When
+    val result = createAndActivateWasteStream.handle(command)
+
+    // Then - should use provided number and validation should succeed (skip external validation)
+    assertThat(result.wasteStreamNumber).isEqualTo("123450000002")
+    assertThat(result.isValid).isTrue()
+  }
+
+  @Test
+  fun `CreateAndActivate - should fail when processor is external and no waste stream number provided`() {
+    // Given - external processor without waste stream number
+    val externalProcessorId = ProcessorPartyId("12345")
+    val command = createTestCommand(externalProcessorId, wasteStreamNumber = null)
+
+    // When/Then - should throw IllegalArgumentException
+    val exception = assertThrows<IllegalArgumentException> {
+      createAndActivateWasteStream.handle(command)
+    }
+    assertThat(exception.message).contains("Afvalstroomnummer is verplicht")
+  }
+
+  @Test
+  fun `CreateAndActivate - should fail when waste stream number already exists`() {
+    // Given - create first waste stream with external processor
+    val externalProcessorId = ProcessorPartyId("12345")
+    val duplicateNumber = WasteStreamNumber("123450000098")
+    val command1 = createTestCommand(externalProcessorId, wasteStreamNumber = duplicateNumber)
+    createAndActivateWasteStream.handle(command1)
+
+    // When/Then - creating second waste stream with same number should fail
+    val command2 = createTestCommand(externalProcessorId, wasteStreamNumber = duplicateNumber)
+    val exception = assertThrows<IllegalArgumentException> {
+      createAndActivateWasteStream.handle(command2)
+    }
+    assertThat(exception.message).contains("Afvalstroom met nummer 123450000098 bestaat al")
+  }
+
+
+  private fun createTestCommand(
+    processorId: ProcessorPartyId,
+    wasteStreamNumber: WasteStreamNumber? = null
+  ): WasteStreamCommand {
     return WasteStreamCommand(
+      wasteStreamNumber = wasteStreamNumber,
       wasteType = WasteType(
           name = "Test Waste",
           euralCode = EuralCode("010101"),

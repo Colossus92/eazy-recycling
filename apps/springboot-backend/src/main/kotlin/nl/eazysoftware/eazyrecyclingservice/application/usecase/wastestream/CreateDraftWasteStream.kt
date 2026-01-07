@@ -20,6 +20,7 @@ interface CreateDraftWasteStream {
  * This follows the hexagonal architecture pattern where the command contains primitive data.
  */
 data class WasteStreamCommand(
+  val wasteStreamNumber: WasteStreamNumber?,
   val wasteType: WasteType,
   val collectionType: WasteCollectionType,
   val pickupLocation: PickupLocationCommand,

@@ -32,6 +32,10 @@ export interface WasteStreamFormValues {
    */
   pickupLocation: LocationFormValue;
   processorPartyId: string;
+  /**
+   * Waste stream number - required when processor is not the current tenant
+   */
+  wasteStreamNumber: string;
   goodsName: string;
   processingMethodCode: string;
   euralCode: string;
@@ -69,6 +73,7 @@ export function useWasteStreamForm(
       pickupPartyId: '',
       pickupLocation: { type: 'company', companyId: '', companyName: '' },
       processorPartyId: '',
+      wasteStreamNumber: '',
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
@@ -186,6 +191,7 @@ export function useWasteStreamForm(
       pickupPartyId: '',
       pickupLocation: { type: 'company', companyId: '', companyName: '' },
       processorPartyId: '',
+      wasteStreamNumber: '',
       goodsName: '',
       processingMethodCode: '',
       euralCode: '',
@@ -245,6 +251,7 @@ const wasteStreamDetailsToFormValues = (
     ),
     processorPartyId:
       wasteStreamDetails.deliveryLocation.processorPartyId || '',
+    wasteStreamNumber: wasteStreamDetails.wasteStreamNumber || '',
     goodsName: wasteStreamDetails.wasteType.name,
     processingMethodCode: wasteStreamDetails.wasteType.processingMethod.code,
     euralCode: wasteStreamDetails.wasteType.euralCode.code,
@@ -259,6 +266,7 @@ const formValuesToCreateWasteStreamRequest = (
   formValues: WasteStreamFormValues
 ): WasteStreamRequest => {
   return {
+    wasteStreamNumber: formValues.wasteStreamNumber || undefined,
     name: formValues.goodsName,
     euralCode: formValues.euralCode,
     processingMethodCode: formValues.processingMethodCode,

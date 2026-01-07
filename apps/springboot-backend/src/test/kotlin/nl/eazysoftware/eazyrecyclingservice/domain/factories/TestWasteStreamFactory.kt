@@ -18,12 +18,13 @@ object TestWasteStreamFactory {
 
   fun createTestWasteStreamRequest(
     companyId: UUID,
+    wasteStreamNumber: String? = null,
     name: String = "Test Waste Stream",
     euralCode: String = "16 01 17",
     processingMethod: String = "A.01",
     wasteCollectionType: String = WasteCollectionType.DEFAULT.name,
     pickupLocation: PickupLocationRequest = createTestPickupLocation(),
-    processorPartyId: String = "12345",
+    processorPartyId: String = "08797",
     consignorPartyId: UUID? = null,
     pickupParty: UUID = companyId,
     dealerParty: UUID? = null,
@@ -32,6 +33,7 @@ object TestWasteStreamFactory {
   ): WasteStreamRequest {
     val consignorParty = ConsignorRequest.CompanyConsignor(consignorPartyId ?: companyId)
     return WasteStreamRequest(
+      wasteStreamNumber = wasteStreamNumber,
       name = name,
       euralCode = euralCode,
       processingMethodCode = processingMethod,

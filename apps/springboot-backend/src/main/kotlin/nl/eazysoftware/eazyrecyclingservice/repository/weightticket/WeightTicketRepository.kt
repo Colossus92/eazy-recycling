@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 import jakarta.persistence.EntityManager
 import kotlinx.datetime.YearMonth
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTimezoneBoundaries
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.UndeclaredWeightTicketLine
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
@@ -97,7 +98,10 @@ class WeightTicketRepository(
                 wt.weighted_at
             FROM weight_ticket_lines wtl
             JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
-            WHERE wt.status IN ('COMPLETED', 'INVOICED')
+            JOIN waste_streams ws ON wtl.waste_stream_number = ws.number
+            JOIN companies proc ON ws.processor_party_id = proc.processor_id
+            WHERE proc.processor_id = '${Tenant.processorPartyId.number}'
+              AND wt.status IN ('COMPLETED', 'INVOICED')
               AND wt.weighted_at < :cutoffDate
               AND (wtl.declared_weight IS NULL OR wtl.declared_weight != wtl.weight_value)
               AND wtl.waste_stream_number IS NOT NULL

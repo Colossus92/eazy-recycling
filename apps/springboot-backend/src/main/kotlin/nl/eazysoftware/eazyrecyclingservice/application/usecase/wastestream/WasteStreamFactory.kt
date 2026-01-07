@@ -1,7 +1,9 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.ConsignorClassification
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
@@ -21,10 +23,8 @@ class WasteStreamFactory(
 
   fun createDraft(cmd: WasteStreamCommand): WasteStream {
     val processorId = cmd.deliveryLocation.processorPartyId
-    val highestExisting = wasteStreams.findHighestNumberForProcessor(processorId)
-    val wasteStreamNumber = numberGenerator.generateNext(processorId, highestExisting)
 
-    // Convert command to domain Location using LocationFactory
+    val wasteStreamNumber = extractWasteStreamNumber(processorId, cmd)
     val pickupLocation = cmd.pickupLocation.toDomain(companies, projectLocations)
 
     return WasteStream(
@@ -41,6 +41,32 @@ class WasteStreamFactory(
       brokerParty = cmd.brokerParty,
       catalogItemId = cmd.catalogItemId
     )
+  }
+
+  private fun extractWasteStreamNumber(
+      processorId: ProcessorPartyId,
+      cmd: WasteStreamCommand
+  ): WasteStreamNumber {
+    val wasteStreamNumber: WasteStreamNumber = when (processorId) {
+      Tenant.processorPartyId -> {
+        val highestExisting = wasteStreams.findHighestNumberForProcessor(processorId)
+        numberGenerator.generateNext(processorId, highestExisting)
+      }
+
+      else -> {
+        require(cmd.wasteStreamNumber != null) {
+          "Afvalstroomnummer is verplicht voor een verwerker anders dan ${Tenant.companyName}"
+        }
+        cmd.wasteStreamNumber
+      }
+    }
+
+    // Check for duplicate waste stream number
+    require(!wasteStreams.existsById(wasteStreamNumber)) {
+      "Afvalstroom met nummer ${wasteStreamNumber.number} bestaat al"
+    }
+
+    return wasteStreamNumber
   }
 
   fun updateExisting(wasteStreamNumber: WasteStreamNumber, cmd: WasteStreamCommand): WasteStream {
@@ -97,7 +123,8 @@ fun PickupLocationCommand.toDomain(companies: Companies, projectLocations: Proje
       ?: throw EntityNotFoundException("Geen projectlocatie gevonden met id $id")
 
     is PickupLocationCommand.PickupCompanyCommand -> {
-      val company = companies.findById(companyId) ?: throw EntityNotFoundException("Geen bedrijf gevonden voor bedrijf met id ${companyId.uuid}")
+      val company = companies.findById(companyId)
+        ?: throw EntityNotFoundException("Geen bedrijf gevonden voor bedrijf met id ${companyId.uuid}")
       Location.Company(
         companyId = companyId,
         name = company.name,
