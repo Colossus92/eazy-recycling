@@ -275,6 +275,15 @@ create index if not exists idx_weight_ticket_lines_declaration_state
   on weight_ticket_lines(declared_weight, last_declared_at)
   where declared_weight is not null;
 
+create table if not exists weight_ticket_product_lines (
+                                 id uuid not null,
+                                 weight_ticket_id uuid not null,
+                                 catalog_item_id uuid not null,
+                                 quantity numeric(15,4) not null,
+                                 unit text not null,
+                                 primary key (id),
+                                 constraint fk_weight_ticket_product_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id)
+);
 
 create table lma_declaration_sessions (
                                                    "id" uuid not null,

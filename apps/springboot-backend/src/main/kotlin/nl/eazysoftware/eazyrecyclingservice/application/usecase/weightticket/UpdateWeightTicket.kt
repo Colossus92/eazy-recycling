@@ -26,6 +26,7 @@ class UpdateWeightTicketService(
 
     weightTicket.update(
       lines = cmd.lines,
+      productLines = cmd.productLines,
       secondWeighing = cmd.secondWeighing,
       tarraWeight = cmd.tarraWeight,
       weightedAt = cmd.weightedAt,

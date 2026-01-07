@@ -9,6 +9,7 @@ data class WeightTicketDetailView(
   val consignorParty: ConsignorView,
   val status: String,
   val lines: List<WeightTicketLineView>,
+  val productLines: List<WeightTicketProductLineView>,
   val secondWeighingValue: BigDecimal?,
   val secondWeighingUnit: String?,
   val tarraWeightValue: BigDecimal?,
@@ -36,4 +37,11 @@ data class WeightTicketLineView(
   val itemName: String,
   val weightValue: BigDecimal,
   val weightUnit: String,
+)
+
+data class WeightTicketProductLineView(
+  val catalogItemId: UUID,
+  val itemName: String,
+  val quantity: BigDecimal,
+  val unit: String,
 )

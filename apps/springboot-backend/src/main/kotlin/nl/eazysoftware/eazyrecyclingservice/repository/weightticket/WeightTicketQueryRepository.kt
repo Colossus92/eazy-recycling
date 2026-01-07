@@ -64,6 +64,14 @@ class WeightTicketQueryRepository(
           weightUnit = line.weightUnit.name,
         )
       },
+      productLines = weightTicket.productLines.map { line ->
+        WeightTicketProductLineView(
+          catalogItemId = line.catalogItemId,
+          itemName = line.catalogItem.name,
+          quantity = line.quantity,
+          unit = line.unit,
+        )
+      },
       secondWeighingValue = weightTicket.secondWeighingValue,
       secondWeighingUnit = weightTicket.secondWeighingUnit.toString(),
       tarraWeightValue = weightTicket.tarraWeightValue,

@@ -15,11 +15,9 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.CancellationReason
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketDirection
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLine
-import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketLines
+import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.*
 import nl.eazysoftware.eazyrecyclingservice.domain.service.WeightTicketService
+import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -40,13 +38,14 @@ class WeightTicketController(
   private val copyWeightTicket: CopyWeightTicket,
   private val completeWeightTicket: CompleteWeightTicket,
   private val createInvoiceFromWeightTicket: CreateInvoiceFromWeightTicket,
+  private val catalogItemRepository: CatalogItemJpaRepository,
 ) {
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   fun create(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
-    val result = create.handle(body.toCommand())
+    val result = create.handle(body.toCommand(catalogItemRepository))
     return CreateWeightTicketResponse(id = result.id.number)
   }
 
@@ -54,7 +53,7 @@ class WeightTicketController(
   @PostMapping("/completed")
   @ResponseStatus(HttpStatus.CREATED)
   fun createCompleted(@RequestBody body: WeightTicketRequest): CreateWeightTicketResponse {
-    val result = createCompleted.handle(body.toCommand())
+    val result = createCompleted.handle(body.toCommand(catalogItemRepository))
     return CreateWeightTicketResponse(id = result.id.number)
   }
 
@@ -81,7 +80,7 @@ class WeightTicketController(
     weightTicketNumber: Long,
     @Valid @RequestBody request: WeightTicketRequest
   ) {
-    updateWeightTicket.handle(weightTicketNumber, request.toCommand())
+    updateWeightTicket.handle(weightTicketNumber, request.toCommand(catalogItemRepository))
   }
 
   @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -198,6 +197,7 @@ data class CancelWeightTicketRequest(
 data class WeightTicketRequest(
   val consignorParty: ConsignorRequest,
   val lines: List<WeightTicketLineRequest>,
+  val productLines: List<WeightTicketProductLineRequest> = emptyList(),
   val tarraWeightValue: String?,
   val tarraWeightUnit: WeightUnitRequest?,
   val secondWeighingValue: String?,
@@ -211,9 +211,10 @@ data class WeightTicketRequest(
   val reclamation: String?,
   val note: String?,
 ) {
-  fun toCommand(): WeightTicketCommand {
+  fun toCommand(catalogItemRepository: CatalogItemJpaRepository): WeightTicketCommand {
     return WeightTicketCommand(
-      lines = lines.toDomain(),
+      lines = lines.toDomain(catalogItemRepository),
+      productLines = productLines.toDomain(catalogItemRepository),
       secondWeighing = secondWeighingValue?.let { toWeight(it, secondWeighingUnit) },
       tarraWeight = tarraWeightValue?.let { toWeight(it, tarraWeightUnit) },
       weightedAt = weightedAt?.toCetKotlinInstant(),
@@ -261,13 +262,37 @@ enum class WeightUnitRequest {
   KG,
 }
 
-fun List<WeightTicketLineRequest>.toDomain(): WeightTicketLines {
+fun List<WeightTicketLineRequest>.toDomain(catalogItemRepository: CatalogItemJpaRepository): WeightTicketLines {
   return WeightTicketLines(
     this.map { line ->
+      val catalogItem = catalogItemRepository.findById(line.catalogItemId)
+        .orElseThrow { IllegalArgumentException("Catalogusitem niet gevonden: ${line.catalogItemId}") }
       WeightTicketLine(
         waste = line.wasteStreamNumber?.let { WasteStreamNumber(it) },
         weight = line.weight.toDomain(),
         catalogItemId = line.catalogItemId,
+        catalogItemType = catalogItem.type,
+      )
+    }
+  )
+}
+
+data class WeightTicketProductLineRequest(
+  val catalogItemId: UUID,
+  val quantity: String,
+  val unit: String,
+)
+
+fun List<WeightTicketProductLineRequest>.toDomain(catalogItemRepository: CatalogItemJpaRepository): WeightTicketProductLines {
+  return WeightTicketProductLines(
+    this.map { line ->
+      val catalogItem = catalogItemRepository.findById(line.catalogItemId)
+        .orElseThrow { IllegalArgumentException("Catalogusitem niet gevonden: ${line.catalogItemId}") }
+      WeightTicketProductLine(
+        catalogItemId = line.catalogItemId,
+        catalogItemType = catalogItem.type,
+        quantity = BigDecimal(line.quantity),
+        unit = line.unit,
       )
     }
   )

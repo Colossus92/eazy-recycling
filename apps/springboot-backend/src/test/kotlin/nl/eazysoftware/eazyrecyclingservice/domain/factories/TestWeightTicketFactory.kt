@@ -11,6 +11,7 @@ object TestWeightTicketFactory {
     carrierParty: UUID? = null,
     consignorCompanyId: UUID = UUID.randomUUID(),
     lines: List<WeightTicketLineRequest> = emptyList(),
+    productLines: List<WeightTicketProductLineRequest> = emptyList(),
     truckLicensePlate: String? = "AA-123-BB",
     reclamation: String? = "Test reclamation",
     note: String? = "Test note",
@@ -26,6 +27,7 @@ object TestWeightTicketFactory {
       tarraWeightValue = null,
       tarraWeightUnit = null,
       lines = lines,
+      productLines = productLines,
       carrierParty = carrierParty,
       truckLicensePlate = truckLicensePlate,
       reclamation = reclamation,
@@ -47,6 +49,18 @@ object TestWeightTicketFactory {
         value = weightValue,
         unit = weightUnit
       )
+    )
+  }
+
+  fun createTestWeightTicketProductLine(
+    catalogItemId: UUID = UUID.randomUUID(),
+    quantity: String = "10.00",
+    unit: String = "st"
+  ): WeightTicketProductLineRequest {
+    return WeightTicketProductLineRequest(
+      catalogItemId = catalogItemId,
+      quantity = quantity,
+      unit = unit
     )
   }
 }

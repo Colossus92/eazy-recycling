@@ -44,9 +44,21 @@ class WeightTicketMapper(
       linkedInvoiceId = dto.linkedInvoiceId,
       pdfUrl = dto.pdfUrl,
       lines = dto.lines
-        .map { it.toDomain(it.catalogItemId) }
+        .map { lineDto ->
+          lineDto.toDomain(lineDto.catalogItemId, lineDto.catalogItem.type)
+        }
         .toMutableList()
         .let { WeightTicketLines(it) },
+      productLines = dto.productLines
+        .map { productLineDto ->
+          WeightTicketProductLine(
+            catalogItemId = productLineDto.catalogItemId,
+            catalogItemType = productLineDto.catalogItem.type,
+            quantity = productLineDto.quantity,
+            unit = productLineDto.unit
+          )
+        }
+        .let { WeightTicketProductLines(it) },
       secondWeighing = dto.secondWeighingValue?.let {
         Weight(
           it,
@@ -83,6 +95,7 @@ class WeightTicketMapper(
       number = domain.id.number,
       consignorParty = companyMapper.toDto(consignorParty),
       lines = mutableListOf(),
+      productLines = mutableListOf(),
       secondWeighingValue = domain.secondWeighing?.value,
       secondWeighingUnit = toDto(domain.secondWeighing?.unit),
       tarraWeightValue = domain.tarraWeight?.value,
@@ -100,10 +113,11 @@ class WeightTicketMapper(
       linkedInvoiceId = domain.linkedInvoiceId,
       pdfUrl = domain.pdfUrl,
     )
-    
+
     // Set lines after creating parent to establish bidirectional relationship
     weightTicketDto.lines.addAll(toDto(domain.lines, weightTicketDto))
-    
+    weightTicketDto.productLines.addAll(toProductLineDto(domain.productLines, weightTicketDto))
+
     return weightTicketDto
   }
 
@@ -118,8 +132,8 @@ class WeightTicketMapper(
     return domain.getLines()
       .map {
         val catalogItem = catalogItemRepository.findById(it.catalogItemId)
-          .orElseThrow { IllegalArgumentException("Catalog item not found: ${it.catalogItemId}") }
-        
+          .orElseThrow { IllegalArgumentException("Item niet gevonden: ${it.catalogItemId}") }
+
         WeightTicketLineDto(
           id = UUID.randomUUID(),
           weightTicket = weightTicket,
@@ -132,6 +146,23 @@ class WeightTicketMapper(
           },
           declaredWeight = it.declarationState.declaredWeight,
           lastDeclaredAt = it.declarationState.lastDeclaredAt?.toJavaInstant(),
+        )
+      }.toMutableList()
+  }
+
+  private fun toProductLineDto(domain: WeightTicketProductLines, weightTicket: WeightTicketDto): MutableList<WeightTicketProductLineDto> {
+    return domain.getLines()
+      .map {
+        val catalogItem = catalogItemRepository.findById(it.catalogItemId)
+          .orElseThrow { IllegalArgumentException("Item niet gevonden: ${it.catalogItemId}") }
+
+        WeightTicketProductLineDto(
+          id = UUID.randomUUID(),
+          weightTicket = weightTicket,
+          catalogItem = catalogItem,
+          catalogItemId = it.catalogItemId,
+          quantity = it.quantity,
+          unit = it.unit,
         )
       }.toMutableList()
   }

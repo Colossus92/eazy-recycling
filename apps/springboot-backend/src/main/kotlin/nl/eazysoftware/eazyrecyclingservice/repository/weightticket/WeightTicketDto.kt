@@ -26,6 +26,9 @@ data class WeightTicketDto(
   @OneToMany(mappedBy = "weightTicket", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
   val lines: MutableList<WeightTicketLineDto> = mutableListOf(),
 
+  @OneToMany(mappedBy = "weightTicket", fetch = FetchType.LAZY, cascade = [CascadeType.ALL], orphanRemoval = true)
+  val productLines: MutableList<WeightTicketProductLineDto> = mutableListOf(),
+
   @Column(name = "second_weighing_value", nullable = true)
   val secondWeighingValue: BigDecimal?,
 

@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -27,6 +28,7 @@ class WeightTicketSplitTest {
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -60,6 +62,7 @@ class WeightTicketSplitTest {
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -85,16 +88,19 @@ class WeightTicketSplitTest {
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                 ),
                 WeightTicketLine(
                     waste = WasteStreamNumber("987654321098"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
                 ),
                 WeightTicketLine(
                     waste = WasteStreamNumber("555555555555"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("50.50"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -127,8 +133,8 @@ class WeightTicketSplitTest {
         val wasteStream2 = WasteStreamNumber("987654321098")
         val originalTicket = createWeightTicketWithLines(
             lines = listOf(
-                WeightTicketLine(waste = wasteStream1, catalogItemId = UUID.randomUUID(), weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)),
-                WeightTicketLine(waste = wasteStream2, catalogItemId = UUID.randomUUID(), weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM))
+                WeightTicketLine(waste = wasteStream1, catalogItemId = UUID.randomUUID(), catalogItemType = CatalogItemType.MATERIAL, weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)),
+                WeightTicketLine(waste = wasteStream2, catalogItemId = UUID.randomUUID(), catalogItemType = CatalogItemType.MATERIAL, weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM))
             )
         )
 
@@ -169,6 +175,7 @@ class WeightTicketSplitTest {
                     WeightTicketLine(
                         waste = WasteStreamNumber("123456789012"),
                         catalogItemId = UUID.randomUUID(),
+                        catalogItemType = CatalogItemType.MATERIAL,
                         weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
                     )
                 )
@@ -327,6 +334,7 @@ class WeightTicketSplitTest {
                 WeightTicketLine(
                     waste = WasteStreamNumber("123456789012"),
                     catalogItemId = UUID.randomUUID(),
+                    catalogItemType = CatalogItemType.MATERIAL,
                     weight = Weight(BigDecimal("100.33"), Weight.WeightUnit.KILOGRAM)
                 )
             )
@@ -368,6 +376,7 @@ class WeightTicketSplitTest {
             WeightTicketLine(
                 waste = WasteStreamNumber("123456789012"),
                 catalogItemId = UUID.randomUUID(),
+                catalogItemType = CatalogItemType.MATERIAL,
                 weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
             )
         )

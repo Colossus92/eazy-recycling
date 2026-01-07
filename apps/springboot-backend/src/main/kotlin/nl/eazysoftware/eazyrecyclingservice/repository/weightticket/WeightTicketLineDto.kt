@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.weightticket
 
 import jakarta.persistence.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.declaration.LineDeclarationState
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Weight
@@ -45,9 +46,10 @@ data class WeightTicketLineDto(
   @Column(name = "last_declared_at")
   val lastDeclaredAt: Instant? = null,
 ) {
-  fun toDomain(catalogItemId: UUID) = WeightTicketLine(
+  fun toDomain(catalogItemId: UUID, catalogItemType: CatalogItemType) = WeightTicketLine(
     waste = this.wasteStreamNumber?.let { WasteStreamNumber(it) },
     catalogItemId = catalogItemId,
+    catalogItemType = catalogItemType,
     weight = Weight(this.weightValue, when(this.weightUnit) {
       WeightUnitDto.kg -> Weight.WeightUnit.KILOGRAM
     }),

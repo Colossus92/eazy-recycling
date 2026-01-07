@@ -21,6 +21,7 @@ class WeightTicket(
   var tarraWeight: Weight?,
   var secondWeighing: Weight?,
   var lines: WeightTicketLines,
+  var productLines: WeightTicketProductLines = WeightTicketProductLines(emptyList()),
   var carrierParty: CompanyId?,
   var direction: WeightTicketDirection,
   var pickupLocation: Location?,
@@ -76,6 +77,7 @@ class WeightTicket(
 
   fun update(
     lines: WeightTicketLines = this.lines,
+    productLines: WeightTicketProductLines = this.productLines,
     carrierParty: CompanyId? = this.carrierParty,
     consignorParty: Consignor = this.consignorParty,
     direction: WeightTicketDirection = this.direction,
@@ -92,6 +94,7 @@ class WeightTicket(
       "Weegbon kan alleen worden gewijzigd als de status concept is."
     }
     this.lines = lines
+    this.productLines = productLines
     this.tarraWeight = tarraWeight
     this.secondWeighing = secondWeighing
     this.weightedAt = weightedAt
@@ -127,6 +130,7 @@ class WeightTicket(
         waste = line.waste,
         weight = line.weight.multiplyByPercentage(originalPercentage),
         catalogItemId = line.catalogItemId,
+        catalogItemType = line.catalogItemType,
       )
     }
 
@@ -135,6 +139,7 @@ class WeightTicket(
         waste = line.waste,
         weight = line.weight.multiplyByPercentage(newPercentage),
         catalogItemId = line.catalogItemId,
+        catalogItemType = line.catalogItemType,
       )
     }
 
@@ -142,12 +147,13 @@ class WeightTicket(
     this.lines = WeightTicketLines(originalLines)
     this.updatedAt = Clock.System.now()
 
-    // 4. Return new aggregate
+    // 4. Return new aggregate (product lines are not split - they stay on original)
     return WeightTicket(
       id = newId,
       consignorParty = this.consignorParty,
       status = WeightTicketStatus.DRAFT,
       lines = WeightTicketLines(newLines),
+      productLines = WeightTicketProductLines(emptyList()),
       secondWeighing = null,
       tarraWeight = null,
       weightedAt = this.weightedAt,
@@ -186,6 +192,15 @@ class WeightTicket(
           waste = line.waste,
           weight = line.weight,
           catalogItemId = line.catalogItemId,
+          catalogItemType = line.catalogItemType,
+        )
+      }),
+      productLines = WeightTicketProductLines(this.productLines.getLines().map { line ->
+        WeightTicketProductLine(
+          catalogItemId = line.catalogItemId,
+          catalogItemType = line.catalogItemType,
+          quantity = line.quantity,
+          unit = line.unit,
         )
       }),
       secondWeighing = this.secondWeighing,

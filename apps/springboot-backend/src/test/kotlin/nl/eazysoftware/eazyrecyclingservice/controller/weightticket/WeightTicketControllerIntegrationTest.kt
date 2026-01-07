@@ -54,6 +54,8 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var testConsignorCompany: CompanyDto
     private lateinit var testCarrierCompany: CompanyDto
     private lateinit var testCatalogItem: CatalogItemDto
+    private lateinit var testMaterialCatalogItem: CatalogItemDto
+    private lateinit var testProductCatalogItem: CatalogItemDto
     private lateinit var testVatRate: VatRateDto
 
     @BeforeEach
@@ -101,6 +103,40 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 salesAccountNumber = "8000",
             )
         )
+
+        testMaterialCatalogItem = catalogItemRepository.save(
+            CatalogItemDto(
+                id = UUID.randomUUID(),
+                code = "MAT001",
+                name = "Test Material",
+                type = CatalogItemType.MATERIAL,
+                unitOfMeasure = "kg",
+                vatRate = testVatRate,
+                category = null,
+                consignorParty = null,
+                defaultPrice = BigDecimal("5.00"),
+                status = "ACTIVE",
+                purchaseAccountNumber = "7001",
+                salesAccountNumber = "8001",
+            )
+        )
+
+        testProductCatalogItem = catalogItemRepository.save(
+            CatalogItemDto(
+                id = UUID.randomUUID(),
+                code = "PROD001",
+                name = "Test Product",
+                type = CatalogItemType.PRODUCT,
+                unitOfMeasure = "st",
+                vatRate = testVatRate,
+                category = null,
+                consignorParty = null,
+                defaultPrice = BigDecimal("15.00"),
+                status = "ACTIVE",
+                purchaseAccountNumber = "7002",
+                salesAccountNumber = "8002",
+            )
+        )
     }
 
     @Test
@@ -113,7 +149,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "150.75",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             truckLicensePlate = "AA-123-BB",
@@ -228,17 +264,17 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789011",
                     weightValue = "100.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "250.50",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789013",
                     weightValue = "75.25",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             note = "Multiple lines test"
@@ -340,7 +376,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "100.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             truckLicensePlate = "EE-111-FF",
@@ -362,12 +398,12 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "200.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 ),
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789013",
                     weightValue = "300.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             truckLicensePlate = "GG-222-HH",
@@ -436,7 +472,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "150.75",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             note = "To be completed"
@@ -475,7 +511,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "150.75",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             ),
             note = "Weight ticket for invoice"
@@ -527,7 +563,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "100.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             )
         )
@@ -555,7 +591,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 TestWeightTicketFactory.createTestWeightTicketLine(
                     wasteStreamNumber = "123456789012",
                     weightValue = "200.00",
-                    catalogItemId = testCatalogItem.id
+                    catalogItemId = testMaterialCatalogItem.id
                 )
             )
         )
@@ -585,5 +621,149 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         // When & Then
         securedMockMvc.post("/weight-tickets/999999/invoice", "")
             .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should create weight ticket with product lines`() {
+        // Given
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "150.75",
+                    catalogItemId = testMaterialCatalogItem.id
+                )
+            ),
+            productLines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketProductLine(
+                    catalogItemId = testProductCatalogItem.id,
+                    quantity = "25.50",
+                    unit = "st"
+                )
+            )
+        )
+
+        // When & Then
+        val result = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").exists())
+            .andReturn()
+
+        // Extract the generated weight ticket ID from response
+        val response = objectMapper.readTree(result.response.contentAsString)
+        val generatedId = response.get("id").asLong()
+
+        // Verify weight ticket was saved with both lines and product lines
+        val savedWeightTicket = weightTicketRepository.findByNumber(generatedId)
+        assertThat(savedWeightTicket).isNotNull
+        assertThat(savedWeightTicket!!.lines).hasSize(1)
+        assertThat(savedWeightTicket.lines[0].catalogItem.type).isEqualTo(CatalogItemType.MATERIAL)
+        assertThat(savedWeightTicket.productLines).hasSize(1)
+        assertThat(savedWeightTicket.productLines[0].catalogItem.type).isEqualTo(CatalogItemType.PRODUCT)
+        assertThat(savedWeightTicket.productLines[0].quantity).isEqualByComparingTo("25.50")
+        assertThat(savedWeightTicket.productLines[0].unit).isEqualTo("st")
+    }
+
+    @Test
+    fun `should get weight ticket with product lines`() {
+        // Given - create a weight ticket with both lines and product lines
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testMaterialCatalogItem.id
+                )
+            ),
+            productLines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketProductLine(
+                    catalogItemId = testProductCatalogItem.id,
+                    quantity = "15.00",
+                    unit = "st"
+                )
+            )
+        )
+
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // When - retrieve the weight ticket
+        val getResult = securedMockMvc.get("/weight-tickets/${weightTicketId}")
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.lines").isArray)
+            .andExpect(jsonPath("$.productLines").isArray)
+            .andReturn()
+
+        // Then - verify both lines and product lines are returned
+        val detailView = objectMapper.readTree(getResult.response.contentAsString)
+        assertThat(detailView.get("lines").size()).isEqualTo(1)
+        assertThat(detailView.get("productLines").size()).isEqualTo(1)
+        assertThat(detailView.get("productLines")[0].get("quantity").asDouble()).isEqualTo(15.00)
+        assertThat(detailView.get("productLines")[0].get("unit").asText()).isEqualTo("st")
+    }
+
+    @Test
+    fun `should reject weight ticket lines with non-MATERIAL catalog items`() {
+        // Given - attempt to create a weight ticket line with a PRODUCT type catalog item
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testProductCatalogItem.id // PRODUCT type - should fail
+                )
+            )
+        )
+
+        // When & Then - should fail with validation error
+        securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `should reject product lines with non-PRODUCT catalog items`() {
+        // Given - attempt to create a product line with a MATERIAL type catalog item
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testMaterialCatalogItem.id
+                )
+            ),
+            productLines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketProductLine(
+                    catalogItemId = testMaterialCatalogItem.id, // MATERIAL type - should fail
+                    quantity = "10.00",
+                    unit = "st"
+                )
+            )
+        )
+
+        // When & Then - should fail with validation error
+        securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isBadRequest)
     }
 }

@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.domain.weightticket
 
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.factories.TestLocationFactory
+import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
@@ -27,6 +28,7 @@ private val SAMPLE_LINES = WeightTicketLines(
     WeightTicketLine(
       waste = WasteStreamNumber("123456789012"),
       catalogItemId = UUID.randomUUID(),
+      catalogItemType = CatalogItemType.MATERIAL,
       weight = Weight(BigDecimal("100.50"), Weight.WeightUnit.KILOGRAM)
     )
   )
@@ -335,16 +337,19 @@ class WeightTicketTest {
         WeightTicketLine(
           waste = WasteStreamNumber("111111111111"),
           catalogItemId = UUID.randomUUID(),
+          catalogItemType = CatalogItemType.MATERIAL,
           weight = Weight(BigDecimal("100.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("222222222222"),
           catalogItemId = UUID.randomUUID(),
+          catalogItemType = CatalogItemType.MATERIAL,
           weight = Weight(BigDecimal("200.00"), Weight.WeightUnit.KILOGRAM)
         ),
         WeightTicketLine(
           waste = WasteStreamNumber("333333333333"),
           catalogItemId = UUID.randomUUID(),
+          catalogItemType = CatalogItemType.MATERIAL,
           weight = Weight(BigDecimal("300.00"), Weight.WeightUnit.KILOGRAM)
         )
       )
