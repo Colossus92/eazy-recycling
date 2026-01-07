@@ -25,6 +25,7 @@ import {
 } from './useWeigtTicketFormHook';
 import { WeightTicketFormActionMenu } from './WeightTicketFormActionMenu';
 import { WeightTicketLinesTab } from './WeightTicketLinesTab';
+import { WeightTicketProductsTab } from './WeightTicketProductsTab';
 import { WeightTicketRelatedTab } from './WeightTicketRelatedTab';
 
 interface WeightTicketFormProps {
@@ -285,6 +286,7 @@ export const WeightTicketForm = ({
                       label="Sorteerweging"
                       hasError={sorteerweginHasError}
                     />
+                    <Tab label="Producten" />
                     <Tab label="Route" hasError={routeHasError} />
                     <Tab label="Gerelateerd" />
                   </TabList>
@@ -356,6 +358,9 @@ export const WeightTicketForm = ({
                     </TabPanel>
                     <TabPanel unmount={false} className="px-4 pb-4">
                       <WeightTicketLinesTab disabled={isDisabled} />
+                    </TabPanel>
+                    <TabPanel unmount={false} className="px-4 pb-4">
+                      <WeightTicketProductsTab disabled={isDisabled} />
                     </TabPanel>
                     <TabPanel unmount={false} className="flex flex-col items-start gap-4 px-4 pb-4">
                       <AddressFormField

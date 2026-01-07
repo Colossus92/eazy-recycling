@@ -72,7 +72,9 @@ class CreateInvoiceFromWeightTicketService(
         )
 
         val allCatalogItems = catalogItems.findAll(null, null)
-        val invoiceLines = weightTicket.lines.getLines().mapIndexed { index, weightTicketLine ->
+        
+        // Create invoice lines from weight ticket lines (materials/waste streams)
+        val materialInvoiceLines = weightTicket.lines.getLines().mapIndexed { index, weightTicketLine ->
             val catalogItem = allCatalogItems.find { it.id == weightTicketLine.catalogItemId }
                 ?: throw IllegalArgumentException("Catalogus item niet gevonden: ${weightTicketLine.catalogItemId}")
 
@@ -102,7 +104,43 @@ class CreateInvoiceFromWeightTicketService(
                 catalogItemType = catalogItem.type,
                 unitOfMeasure = catalogItem.unitOfMeasure,
             )
-        }.toMutableList()
+        }
+
+        // Create invoice lines from weight ticket product lines
+        val startLineNumber = materialInvoiceLines.size + 1
+        val productInvoiceLines = weightTicket.productLines.getLines().mapIndexed { index, productLine ->
+            val catalogItem = allCatalogItems.find { it.id == productLine.catalogItemId }
+                ?: throw IllegalArgumentException("Catalogus item niet gevonden: ${productLine.catalogItemId}")
+
+            val vatRate = vatRates.getVatRateByCode(catalogItem.vatCode)
+                ?: throw IllegalArgumentException("BTW code niet gevonden: ${catalogItem.vatCode}")
+
+            val quantity = productLine.quantity
+            val unitPrice = catalogItem.defaultPrice ?: BigDecimal.ZERO
+            val totalExclVat = quantity.multiply(unitPrice)
+            val vatPercentage = BigDecimal(vatRate.percentage)
+
+            InvoiceLine(
+                id = invoices.nextLineId(),
+                lineNumber = startLineNumber + index,
+                date = LocalDate.now(),
+                description = catalogItem.name,
+                orderReference = "Weegbon ${weightTicket.id.number}",
+                vatCode = catalogItem.vatCode,
+                vatPercentage = vatPercentage,
+                glAccountCode = catalogItem.salesAccountNumber,
+                quantity = quantity,
+                unitPrice = unitPrice,
+                totalExclVat = totalExclVat,
+                catalogItemId = catalogItem.id,
+                catalogItemCode = catalogItem.code,
+                catalogItemName = catalogItem.name,
+                catalogItemType = catalogItem.type,
+                unitOfMeasure = productLine.unit,
+            )
+        }
+
+        val invoiceLines = (materialInvoiceLines + productInvoiceLines).toMutableList()
 
         val invoiceId = invoices.nextId()
         val invoice = Invoice(

@@ -17,38 +17,32 @@
 /**
  * 
  * @export
- * @interface ServletRegistration
+ * @interface WeightTicketProductLineView
  */
-export interface ServletRegistration {
+export interface WeightTicketProductLineView {
     /**
      * 
      * @type {string}
-     * @memberof ServletRegistration
+     * @memberof WeightTicketProductLineView
      */
-    'runAsRole'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ServletRegistration
-     */
-    'mappings'?: Array<string>;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof ServletRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
+    'catalogItemId': string;
     /**
      * 
      * @type {string}
-     * @memberof ServletRegistration
+     * @memberof WeightTicketProductLineView
      */
-    'name'?: string;
+    'itemName': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof WeightTicketProductLineView
+     */
+    'quantity': number;
     /**
      * 
      * @type {string}
-     * @memberof ServletRegistration
+     * @memberof WeightTicketProductLineView
      */
-    'className'?: string;
+    'unit': string;
 }
 

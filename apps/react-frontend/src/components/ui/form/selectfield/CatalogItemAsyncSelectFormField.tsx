@@ -1,10 +1,10 @@
 import { CatalogItemResponseItemTypeEnum } from '@/api/client';
-import { CatalogItem, catalogService } from '@/api/services/catalogService';
+import { useCatalogItems, filterCatalogItems } from '@/api/hooks/useCatalogItems';
+import { CatalogItem, CatalogItemType } from '@/api/services/catalogService';
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
-import AsyncSelect from 'react-select/async';
-import { GroupBase } from 'react-select';
+import Select, { GroupBase, StylesConfig } from 'react-select';
 import { RequiredMarker } from '../RequiredMarker';
 
 interface CatalogItemOption {
@@ -21,13 +21,14 @@ interface LineFieldValue {
   weightUnit: string;
 }
 
+export type CatalogItemTypeFilter = 'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM' | 'MATERIAL_OR_WASTE_STREAM' | 'ALL';
+
 interface CatalogItemAsyncSelectFormFieldProps {
   title: string;
   placeholder: string;
   consignorPartyId?: string;
   disabled?: boolean;
   testId?: string;
-  debounceMs?: number;
   required?: boolean;
   index: number;
   field: LineFieldValue;
@@ -37,6 +38,7 @@ interface CatalogItemAsyncSelectFormFieldProps {
     selectedItem?: CatalogItem
   ) => void;
   errors?: FieldErrors;
+  typeFilter?: CatalogItemTypeFilter;
 }
 
 // Type labels for grouping
@@ -53,18 +55,50 @@ const typeOrder = [
   CatalogItemResponseItemTypeEnum.Product,
 ];
 
+/**
+ * Maps typeFilter to API type parameter for server-side filtering
+ */
+const getApiTypeFilter = (typeFilter: CatalogItemTypeFilter): CatalogItemType | undefined => {
+  switch (typeFilter) {
+    case 'MATERIAL':
+      return CatalogItemResponseItemTypeEnum.Material;
+    case 'PRODUCT':
+      return CatalogItemResponseItemTypeEnum.Product;
+    case 'WASTE_STREAM':
+      return CatalogItemResponseItemTypeEnum.WasteStream;
+    case 'MATERIAL_OR_WASTE_STREAM':
+    case 'ALL':
+    default:
+      return undefined; // Fetch all and filter client-side if needed
+  }
+};
+
+/**
+ * Client-side filter for MATERIAL_OR_WASTE_STREAM type
+ */
+const filterByTypeClient = (items: CatalogItem[], typeFilter: CatalogItemTypeFilter): CatalogItem[] => {
+  if (typeFilter === 'MATERIAL_OR_WASTE_STREAM') {
+    return items.filter(
+      (item) =>
+        item.itemType === CatalogItemResponseItemTypeEnum.Material ||
+        item.itemType === CatalogItemResponseItemTypeEnum.WasteStream
+    );
+  }
+  return items;
+};
+
 export const CatalogItemAsyncSelectFormField = ({
   title,
   placeholder,
   consignorPartyId,
   disabled = false,
   testId,
-  debounceMs = 300,
   required = false,
   index,
   field,
   update,
   errors,
+  typeFilter = 'ALL',
 }: CatalogItemAsyncSelectFormFieldProps) => {
   // Get error for this field
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,23 +107,32 @@ export const CatalogItemAsyncSelectFormField = ({
     | undefined;
   const error = linesErrors?.[index]?.catalogItemId?.message;
 
-  // Track the selected option - initialize from field value if available
-  const [selectedOption, setSelectedOption] =
-    useState<CatalogItemOption | null>(null);
+  // Track the selected option
+  const [selectedOption, setSelectedOption] = useState<CatalogItemOption | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
-  // Generate a unique cache key based on consignorPartyId to prevent cache sharing
-  const cacheKey = useMemo(
-    () => `catalog-${consignorPartyId || 'all'}-${index}`,
-    [consignorPartyId, index]
+  // Generate a unique instance key
+  const instanceKey = useMemo(
+    () => `catalog-${consignorPartyId || 'all'}-${typeFilter}-${index}`,
+    [consignorPartyId, typeFilter, index]
   );
 
-  // Debounce implementation
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Use React Query to fetch and cache catalog items
+  const apiTypeFilter = getApiTypeFilter(typeFilter);
+  const { data: catalogItems = [], isLoading } = useCatalogItems({
+    consignorPartyId,
+    type: apiTypeFilter,
+    enabled: !!consignorPartyId,
+  });
+
+  // Apply client-side filtering if needed (for MATERIAL_OR_WASTE_STREAM)
+  const filteredItems = useMemo(() => {
+    return filterByTypeClient(catalogItems, typeFilter);
+  }, [catalogItems, typeFilter]);
 
   // Convert catalog items to grouped options
   const catalogItemsToGroupedOptions = useCallback(
     (items: CatalogItem[]): GroupBase<CatalogItemOption>[] => {
-      // Group items by type
       const grouped = items.reduce(
         (acc, item) => {
           const type = item.itemType;
@@ -108,7 +151,6 @@ export const CatalogItemAsyncSelectFormField = ({
         {} as Record<string, CatalogItemOption[]>
       );
 
-      // Sort groups by type order and create grouped options
       return typeOrder
         .filter((type) => grouped[type]?.length > 0)
         .map((type) => ({
@@ -119,33 +161,11 @@ export const CatalogItemAsyncSelectFormField = ({
     []
   );
 
-  // Load options for async select
-  const loadOptions = useCallback(
-    async (inputValue: string): Promise<GroupBase<CatalogItemOption>[]> => {
-      const items = await catalogService.search(
-        inputValue || undefined,
-        consignorPartyId || undefined
-      );
-      return catalogItemsToGroupedOptions(items);
-    },
-    [consignorPartyId, catalogItemsToGroupedOptions]
-  );
-
-  const debouncedLoadOptions = useCallback(
-    (
-      inputValue: string,
-      callback: (options: GroupBase<CatalogItemOption>[]) => void
-    ) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
-      timeoutRef.current = setTimeout(() => {
-        loadOptions(inputValue).then(callback);
-      }, debounceMs);
-    },
-    [loadOptions, debounceMs]
-  );
+  // Generate options based on current input value (client-side filtering)
+  const options = useMemo(() => {
+    const searchFiltered = filterCatalogItems(filteredItems, inputValue);
+    return catalogItemsToGroupedOptions(searchFiltered);
+  }, [filteredItems, inputValue, catalogItemsToGroupedOptions]);
 
   // Track the previous field values to detect changes
   const prevFieldRef = useRef<{
@@ -153,57 +173,104 @@ export const CatalogItemAsyncSelectFormField = ({
     wasteStreamNumber?: string;
   }>({});
 
-  // Load initial selected option from field value
+  // Update selected option when field value changes or data loads
   useEffect(() => {
     const currentCatalogItemId = field.catalogItemId;
     const currentWasteStreamNumber = field.wasteStreamNumber;
     const prev = prevFieldRef.current;
 
-    // Update ref for next comparison
     prevFieldRef.current = {
       catalogItemId: currentCatalogItemId,
       wasteStreamNumber: currentWasteStreamNumber,
     };
 
-    // If field has no value, clear the selection
     if (!currentCatalogItemId) {
       setSelectedOption(null);
       return;
     }
 
-    // If values haven't changed, skip (prevents unnecessary API calls)
+    // Skip if values haven't changed and we already have a selection
     if (
       prev.catalogItemId === currentCatalogItemId &&
-      prev.wasteStreamNumber === currentWasteStreamNumber
+      prev.wasteStreamNumber === currentWasteStreamNumber &&
+      selectedOption
     ) {
       return;
     }
 
-    // Load options to find the matching one
-    const loadInitialOption = async () => {
-      const groupedOptions = await loadOptions('');
-      for (const group of groupedOptions) {
-        // For waste streams, match by wasteStreamNumber (which is the unique id)
-        // For materials/products, match by catalogItemId (which equals the unique id)
-        const matchingOption = group.options.find((opt) => {
-          if (currentWasteStreamNumber && opt.item.wasteStreamNumber) {
-            // This is a waste stream - match by waste stream number
-            return opt.item.wasteStreamNumber === currentWasteStreamNumber;
-          }
-          // This is a material/product - match by catalogItemId
-          return opt.item.catalogItemId === currentCatalogItemId;
+    // Find matching option in loaded data
+    for (const item of filteredItems) {
+      const isMatch = currentWasteStreamNumber && item.wasteStreamNumber
+        ? item.wasteStreamNumber === currentWasteStreamNumber
+        : item.catalogItemId === currentCatalogItemId;
+      
+      if (isMatch) {
+        setSelectedOption({
+          value: String(item.id),
+          label: item.wasteStreamNumber
+            ? `${item.name} (${item.wasteStreamNumber})`
+            : item.name,
+          item,
         });
-        if (matchingOption) {
-          setSelectedOption(matchingOption);
-          return;
-        }
+        return;
       }
+    }
 
-      // If no matching option found, clear selection
+    // If no match found and items are loaded, clear selection
+    if (filteredItems.length > 0) {
       setSelectedOption(null);
-    };
-    loadInitialOption();
-  }, [field.catalogItemId, field.wasteStreamNumber, loadOptions]);
+    }
+  }, [field.catalogItemId, field.wasteStreamNumber, filteredItems, selectedOption]);
+
+  const selectStyles: StylesConfig<CatalogItemOption, false, GroupBase<CatalogItemOption>> = {
+    control: (base, state) => ({
+      ...base,
+      minHeight: '40px',
+      height: '40px',
+      borderRadius: '8px',
+      borderWidth: '1px',
+      borderStyle: 'solid',
+      borderColor: disabled
+        ? '#E3E8F3'
+        : error
+          ? '#F04438'
+          : state.isFocused
+            ? '#1E77F8'
+            : '#E3E8F3',
+      backgroundColor: '#FFFFFF',
+      cursor: disabled ? 'not-allowed' : 'default',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: disabled ? '#E3E8F3' : error ? '#F04438' : '#1E77F8',
+        backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
+      },
+    }),
+    menuPortal: (base) => ({
+      ...base,
+      zIndex: 9999,
+    }),
+    group: (base) => ({
+      ...base,
+      paddingTop: 0,
+      paddingBottom: 0,
+    }),
+    groupHeading: (base) => ({
+      ...base,
+      fontWeight: 600,
+      fontSize: '12px',
+      color: '#6B7280',
+      textTransform: 'uppercase',
+      backgroundColor: '#F9FAFB',
+      padding: '8px 12px',
+      marginBottom: 0,
+    }),
+    input: (base) => ({
+      ...base,
+      'input:focus': {
+        boxShadow: 'none',
+      },
+    }),
+  };
 
   return (
     <div className="flex flex-col items-start self-stretch gap-1 w-full">
@@ -214,20 +281,21 @@ export const CatalogItemAsyncSelectFormField = ({
         </span>
       </div>
 
-      <AsyncSelect<CatalogItemOption, false, GroupBase<CatalogItemOption>>
-        key={cacheKey}
+      <Select<CatalogItemOption, false, GroupBase<CatalogItemOption>>
+        key={instanceKey}
         value={selectedOption}
-        loadOptions={debouncedLoadOptions}
-        defaultOptions
-        cacheOptions={false}
+        options={options}
+        onInputChange={(value) => setInputValue(value)}
+        inputValue={inputValue}
         placeholder={placeholder}
         isDisabled={disabled}
+        isLoading={isLoading}
         isClearable={true}
         classNamePrefix="react-select"
         noOptionsMessage={() => 'Geen items gevonden'}
         loadingMessage={() => 'Laden...'}
         id={testId || `catalog-item-select-${index}`}
-        instanceId={cacheKey}
+        instanceId={instanceKey}
         menuPortalTarget={document.body}
         className={clsx(
           'w-full text-body-1',
@@ -235,55 +303,7 @@ export const CatalogItemAsyncSelectFormField = ({
             ? 'text-color-text-disabled cursor-not-allowed'
             : 'text-color-text-secondary'
         )}
-        styles={{
-          control: (base, state) => ({
-            ...base,
-            minHeight: '40px',
-            height: '40px',
-            borderRadius: '8px',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: disabled
-              ? '#E3E8F3'
-              : error
-                ? '#F04438'
-                : state.isFocused
-                  ? '#1E77F8'
-                  : '#E3E8F3',
-            backgroundColor: '#FFFFFF',
-            cursor: disabled ? 'not-allowed' : 'default',
-            boxShadow: 'none',
-            '&:hover': {
-              borderColor: disabled ? '#E3E8F3' : error ? '#F04438' : '#1E77F8',
-              backgroundColor: disabled ? '#FFFFFF' : '#F3F8FF',
-            },
-          }),
-          menuPortal: (base) => ({
-            ...base,
-            zIndex: 9999,
-          }),
-          group: (base) => ({
-            ...base,
-            paddingTop: 0,
-            paddingBottom: 0,
-          }),
-          groupHeading: (base) => ({
-            ...base,
-            fontWeight: 600,
-            fontSize: '12px',
-            color: '#6B7280',
-            textTransform: 'uppercase',
-            backgroundColor: '#F9FAFB',
-            padding: '8px 12px',
-            marginBottom: 0,
-          }),
-          input: (base) => ({
-            ...base,
-            'input:focus': {
-              boxShadow: 'none',
-            },
-          }),
-        }}
+        styles={selectStyles}
         classNames={{
           placeholder: () => clsx('text-color-text-disabled', 'italic'),
           option: ({ isSelected, isFocused }) =>
@@ -303,8 +323,6 @@ export const CatalogItemAsyncSelectFormField = ({
           setSelectedOption(option);
 
           if (option) {
-            // Update the field array item with the new values
-            // Use catalogItemId (UUID) for billing, not the unique id (which may be waste stream number)
             update(
               index,
               {
@@ -315,7 +333,6 @@ export const CatalogItemAsyncSelectFormField = ({
               option.item
             );
           } else {
-            // Clear the values
             update(index, {
               ...field,
               catalogItemId: '',

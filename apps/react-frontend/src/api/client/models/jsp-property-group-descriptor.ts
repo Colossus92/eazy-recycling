@@ -25,60 +25,6 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'buffer'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'deferredSyntaxAllowedAsLiteral'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'errorOnUndeclaredNamespace'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'trimDirectiveWhitespaces'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includeCodas'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'includePreludes'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'scriptingInvalid'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'pageEncoding'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'errorOnELNotFound'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
     'defaultContentType'?: string;
     /**
      * 
@@ -97,6 +43,60 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
+    'errorOnELNotFound'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'pageEncoding'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'scriptingInvalid'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
     'isXml'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includePreludes'?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'includeCodas'?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'deferredSyntaxAllowedAsLiteral'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'trimDirectiveWhitespaces'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'errorOnUndeclaredNamespace'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'buffer'?: string;
 }
 

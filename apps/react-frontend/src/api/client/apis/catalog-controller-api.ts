@@ -34,10 +34,11 @@ export const CatalogControllerApiAxiosParamCreator = function (configuration?: C
          * 
          * @param {string} [query] 
          * @param {string} [consignorPartyId] 
+         * @param {SearchCatalogItemsTypeEnum} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        searchCatalogItems: async (query?: string, consignorPartyId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchCatalogItems: async (query?: string, consignorPartyId?: string, type?: SearchCatalogItemsTypeEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/catalog/items`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -62,6 +63,10 @@ export const CatalogControllerApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['consignorPartyId'] = consignorPartyId;
             }
 
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -84,11 +89,12 @@ export const CatalogControllerApiFp = function(configuration?: Configuration) {
          * 
          * @param {string} [query] 
          * @param {string} [consignorPartyId] 
+         * @param {SearchCatalogItemsTypeEnum} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchCatalogItems(query?: string, consignorPartyId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CatalogItemResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchCatalogItems(query, consignorPartyId, options);
+        async searchCatalogItems(query?: string, consignorPartyId?: string, type?: SearchCatalogItemsTypeEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CatalogItemResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchCatalogItems(query, consignorPartyId, type, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['CatalogControllerApi.searchCatalogItems']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -106,11 +112,12 @@ export const CatalogControllerApiFactory = function (configuration?: Configurati
          * 
          * @param {string} [query] 
          * @param {string} [consignorPartyId] 
+         * @param {'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'} [type] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchCatalogItems(query?: string, consignorPartyId?: string, options?: any): AxiosPromise<Array<CatalogItemResponse>> {
-            return localVarFp.searchCatalogItems(query, consignorPartyId, options).then((request) => request(axios, basePath));
+        searchCatalogItems(query?: string, consignorPartyId?: string, type?: SearchCatalogItemsTypeEnum, options?: any): AxiosPromise<Array<CatalogItemResponse>> {
+            return localVarFp.searchCatalogItems(query, consignorPartyId, type, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -123,11 +130,12 @@ export class CatalogControllerApi extends BaseAPI {
      * 
      * @param {string} [query] 
      * @param {string} [consignorPartyId] 
+     * @param {'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM'} [type] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CatalogControllerApi
      */
-    public searchCatalogItems(query?: string, consignorPartyId?: string, options?: RawAxiosRequestConfig) {
-        return CatalogControllerApiFp(this.configuration).searchCatalogItems(query, consignorPartyId, options).then((request) => request(this.axios, this.basePath));
+    public searchCatalogItems(query?: string, consignorPartyId?: string, type?: SearchCatalogItemsTypeEnum, options?: RawAxiosRequestConfig) {
+        return CatalogControllerApiFp(this.configuration).searchCatalogItems(query, consignorPartyId, type, options).then((request) => request(this.axios, this.basePath));
     }
 }

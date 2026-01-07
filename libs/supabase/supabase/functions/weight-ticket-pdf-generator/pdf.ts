@@ -21,6 +21,7 @@ export interface WeightTicketPdfData {
     weightUnit: string;
   };
   lines: WeightTicketLine[];
+  productLines?: WeightTicketProductLine[];
   consignorParty?: PartyData;
   carrierParty?: PartyData;
   pickupLocation?: LocationData;
@@ -31,6 +32,12 @@ export interface WeightTicketLine {
   wasteTypeName: string;
   weightValue: number;
   weightUnit: string;
+}
+
+export interface WeightTicketProductLine {
+  productName: string;
+  quantity: number;
+  unit: string;
 }
 
 export interface PartyData {
@@ -327,6 +334,7 @@ async function drawLinesTable(
     x: number,
     y: number,
     lines: WeightTicketLine[],
+    productLines: WeightTicketProductLine[],
     weging1: number,
     weging2: number,
     grossWeight: number,
@@ -503,6 +511,45 @@ async function drawLinesTable(
 
     currentY -= 8;
 
+    // Draw product lines section if there are any products
+    if (productLines && productLines.length > 0) {
+        currentY -= 10;
+        
+        page.drawText('Overige producten/diensten:', {
+            x,
+            y: currentY,
+            size: 11,
+            font: boldFont,
+            color: rgb(0, 0, 0),
+        });
+        currentY -= 13;
+        
+        for (const productLine of productLines) {
+            const quantityText = `${productLine.quantity} ${productLine.unit || ''}`;
+
+            page.drawText(productLine.productName || 'Onbekend', {
+                x,
+                y: currentY,
+                size: 9,
+                font: regularFont,
+                color: rgb(0, 0, 0),
+            });
+
+            const quantityWidth = regularFont.widthOfTextAtSize(quantityText, 9);
+            page.drawText(quantityText, {
+                x: weightValueX - quantityWidth,
+                y: currentY,
+                size: 9,
+                font: regularFont,
+                color: rgb(0, 0, 0),
+            });
+
+            currentY -= 12;
+        }
+
+        currentY -= 8;
+    }
+
     return currentY;
 }
 
@@ -604,6 +651,7 @@ export async function generateWeightTicketPdf(data: WeightTicketPdfData): Promis
             40,
             contentY,
             data.lines,
+            data.productLines || [],
             data.weightTicket.weging1,
             data.weightTicket.weging2,
             data.weightTicket.grossWeight,

@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.Consignor
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicket
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.CatalogItems
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
@@ -34,6 +35,7 @@ class CompleteWeightTicketService(
   private val weightTickets: WeightTickets,
   private val companies: Companies,
   private val wasteStreams: WasteStreams,
+  private val catalogItems: CatalogItems,
   private val supabaseClient: SupabaseClient,
 ) : CompleteWeightTicket {
 
@@ -122,6 +124,17 @@ class CompleteWeightTicketService(
       )
     }
 
+    // Build product lines with catalog item names
+    val allCatalogItems = catalogItems.findAll(null, null)
+    val productLines = weightTicket.productLines.getLines().map { line ->
+      val catalogItem = allCatalogItems.find { it.id == line.catalogItemId }
+      WeightTicketProductLineData(
+        productName = catalogItem?.name ?: "Onbekend",
+        quantity = line.quantity.setScale(2, RoundingMode.HALF_UP).toDouble(),
+        unit = line.unit
+      )
+    }
+
     // Calculate all weights in backend (business logic)
     val weging1 = weightTicket.getTotalLinesWeight().setScale(2, RoundingMode.HALF_UP).toDouble()
     val weging2 = weightTicket.secondWeighing?.value?.setScale(2, RoundingMode.HALF_UP)?.toDouble() ?: 0.0
@@ -148,6 +161,7 @@ class CompleteWeightTicketService(
         weightUnit = weightTicket.tarraWeight?.unit?.name?.lowercase() ?: "kg"
       ),
       lines = lines,
+      productLines = productLines,
       consignorParty = consignorParty,
       carrierParty = carrierParty,
       pickupLocation = pickupLocation,
@@ -190,6 +204,7 @@ class CompleteWeightTicketService(
 data class WeightTicketPdfRequest(
   val weightTicket: WeightTicketData,
   val lines: List<WeightTicketLineData>,
+  val productLines: List<WeightTicketProductLineData>,
   val consignorParty: PartyData?,
   val carrierParty: PartyData?,
   val pickupLocation: LocationData?,
@@ -218,6 +233,13 @@ data class WeightTicketLineData(
   val wasteTypeName: String,
   val weightValue: Double,
   val weightUnit: String
+)
+
+@Serializable
+data class WeightTicketProductLineData(
+  val productName: String,
+  val quantity: Double,
+  val unit: String
 )
 
 @Serializable

@@ -29,6 +29,12 @@ export interface WeightTicketLineFormValues {
   weightUnit: string;
 }
 
+export interface WeightTicketProductLineFormValues {
+  catalogItemId: string;
+  quantity: string;
+  unit: string;
+}
+
 export interface WeightTicketFormValues {
   consignorPartyId: string;
   carrierPartyId: string;
@@ -36,6 +42,7 @@ export interface WeightTicketFormValues {
   reclamation: string;
   note: string;
   lines: WeightTicketLineFormValues[];
+  productLines: WeightTicketProductLineFormValues[];
   tarraWeightValue?: number;
   tarraWeightUnit?: string;
   secondWeighingValue?: number;
@@ -68,6 +75,7 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       reclamation: '',
       note: '',
       lines: [],
+      productLines: [],
       tarraWeightValue: undefined,
       tarraWeightUnit: undefined,
       secondWeighingValue: undefined,
@@ -201,6 +209,7 @@ export function useWeightTicketForm(initialWeightTicketNumber?: number) {
       reclamation: '',
       note: '',
       lines: [],
+      productLines: [],
       tarraWeightValue: NaN,
       tarraWeightUnit: undefined,
       secondWeighingValue: NaN,
@@ -269,6 +278,11 @@ const weightTicketDetailsToFormValues = (
       weightValue: line.weightValue?.toString() || '',
       weightUnit: line.weightUnit || 'KG',
     })),
+    productLines: (weightTicketDetails.productLines || []).map((line) => ({
+      catalogItemId: line.catalogItemId?.toString() || '',
+      quantity: line.quantity?.toString() || '',
+      unit: line.unit || 'stuk',
+    })),
     secondWeighingValue: weightTicketDetails.secondWeighingValue,
     secondWeighingUnit: weightTicketDetails.secondWeighingUnit,
     tarraWeightValue: weightTicketDetails.tarraWeightValue,
@@ -327,6 +341,13 @@ const formValuesToWeightTicketRequest = (
           value: normalizeNumberForBackend(line.weightValue) || '0',
           unit: 'KG',
         },
+      })),
+    productLines: formValues.productLines
+      .filter((line) => line.catalogItemId)
+      .map((line) => ({
+        catalogItemId: line.catalogItemId,
+        quantity: normalizeNumberForBackend(line.quantity) || '0',
+        unit: line.unit || 'stuk',
       })),
     tarraWeightValue:
       normalizeNumberForBackend(formValues.tarraWeightValue) || undefined,

@@ -1,4 +1,3 @@
-import Plus from '@/assets/icons/Plus.svg?react';
 import TrashSimple from '@/assets/icons/TrashSimple.svg?react';
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
 import { NumberFormField } from '@/components/ui/form/NumberFormField';
@@ -6,6 +5,7 @@ import { NumberInput } from '@/components/ui/form/NumberInput';
 import { CatalogItemAsyncSelectFormField } from '@/components/ui/form/selectfield/CatalogItemAsyncSelectFormField';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { LineItemSection } from './LineItemSection';
 import { WeightTicketFormValues } from './useWeigtTicketFormHook';
 
 interface WeightTicketLinesTabProps {
@@ -157,34 +157,19 @@ export const WeightTicketLinesTab = ({
           }}
         />
       </div>
-      <div className="flex flex-col items-start self-stretch gap-4 p-4 bg-color-surface-secondary rounded-radius-md">
-        <div className="flex justify-between items-center self-stretch">
-          <span className="text-subtitle-1">Wegingen</span>
-          <button
-            type="button"
-            onClick={handleAddLine}
-            disabled={!hasConsignorSelected || disabled}
-            className="flex items-center justify-center w-8 h-8 rounded-radius-sm bg-color-primary text-color-on-primary hover:bg-color-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            title={
-              disabled
-                ? 'Kan niet bewerken in deze status'
-                : !hasConsignorSelected
-                  ? 'Selecteer eerst een opdrachtgever'
-                  : 'Voeg weging toe'
-            }
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
-
-        {!hasConsignorSelected && (
-          <div className="flex items-center max-w-96">
-            <span className="text-body-2 text-color-text-secondary whitespace-normal break-words">
-              Selecteer eerst een opdrachtgever om wegingen toe te voegen
-            </span>
-          </div>
-        )}
-
+      <LineItemSection
+        title="Wegingen"
+        onAddItem={handleAddLine}
+        addButtonTitle="Voeg weging toe"
+        addButtonDisabledTitle={
+          disabled
+            ? 'Kan niet bewerken in deze status'
+            : 'Selecteer eerst een opdrachtgever'
+        }
+        isAddDisabled={!hasConsignorSelected || disabled}
+        emptyMessage="Selecteer eerst een opdrachtgever om wegingen toe te voegen"
+        showEmptyMessage={!hasConsignorSelected}
+      >
         {fields.length > 0 && (
           <div className="flex flex-col items-start self-stretch gap-4">
             {fields.map((field, index) => (
@@ -387,7 +372,7 @@ export const WeightTicketLinesTab = ({
             )}
           </div>
         )}
-      </div>
+      </LineItemSection>
     </div>
   );
 };

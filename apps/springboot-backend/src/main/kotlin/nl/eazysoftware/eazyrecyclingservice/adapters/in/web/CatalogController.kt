@@ -23,8 +23,10 @@ class CatalogController(
   fun searchCatalogItems(
     @RequestParam(required = false) query: String?,
     @RequestParam(required = false) consignorPartyId: UUID?,
+    @RequestParam(required = false) type: CatalogItemType?,
   ): List<CatalogItemResponse> {
     return catalogQueryService.getCatalogItems(consignorPartyId, query)
+      .filter { if (type == null) true else it.itemType == type }
       .map { it.toResponse() }
   }
 }
