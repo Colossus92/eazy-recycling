@@ -28,6 +28,9 @@ import type { WeightTicketDetailViewConsignorParty } from './weight-ticket-detai
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketLineView } from './weight-ticket-line-view';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketProductLineView } from './weight-ticket-product-line-view';
 
 /**
  * 
@@ -59,6 +62,12 @@ export interface WeightTicketDetailView {
      * @memberof WeightTicketDetailView
      */
     'lines': Array<WeightTicketLineView>;
+    /**
+     * 
+     * @type {Array<WeightTicketProductLineView>}
+     * @memberof WeightTicketDetailView
+     */
+    'productLines': Array<WeightTicketProductLineView>;
     /**
      * 
      * @type {number}

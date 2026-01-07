@@ -18,6 +18,9 @@
 import type { WeightTicketLineRequest } from './weight-ticket-line-request';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { WeightTicketProductLineRequest } from './weight-ticket-product-line-request';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WeightTicketRequestConsignorParty } from './weight-ticket-request-consignor-party';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -41,6 +44,12 @@ export interface WeightTicketRequest {
      * @memberof WeightTicketRequest
      */
     'lines': Array<WeightTicketLineRequest>;
+    /**
+     * 
+     * @type {Array<WeightTicketProductLineRequest>}
+     * @memberof WeightTicketRequest
+     */
+    'productLines': Array<WeightTicketProductLineRequest>;
     /**
      * 
      * @type {string}

@@ -189,6 +189,9 @@ models/weight-ticket-line-dto.ts
 models/weight-ticket-line-request.ts
 models/weight-ticket-line-view.ts
 models/weight-ticket-list-view.ts
+models/weight-ticket-product-line-dto.ts
+models/weight-ticket-product-line-request.ts
+models/weight-ticket-product-line-view.ts
 models/weight-ticket-request-consignor-party.ts
 models/weight-ticket-request-pickup-location.ts
 models/weight-ticket-request.ts

@@ -22,6 +22,9 @@ import type { PickupLocationDto } from './pickup-location-dto';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { WeightTicketLineDto } from './weight-ticket-line-dto';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { WeightTicketProductLineDto } from './weight-ticket-product-line-dto';
 
 /**
  * 
@@ -53,6 +56,12 @@ export interface WeightTicketDto {
      * @memberof WeightTicketDto
      */
     'lines': Array<WeightTicketLineDto>;
+    /**
+     * 
+     * @type {Array<WeightTicketProductLineDto>}
+     * @memberof WeightTicketDto
+     */
+    'productLines': Array<WeightTicketProductLineDto>;
     /**
      * 
      * @type {number}
