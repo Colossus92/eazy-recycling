@@ -1,9 +1,7 @@
-import { format } from 'date-fns';
-import { MobilePlanningItem } from './MobilePlanningItem';
 import { DriverPlanningItem } from '@/api/client/models/driver-planning-item';
-import { Button } from '@/components/ui/button/Button';
-import MapPinArea from '@/assets/icons/MapPinArea.svg?react';
-import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
+import { ContainerLocationButton } from '../containerlocation/ContainerLocationButton';
+import { MobilePlanningItem } from './MobilePlanningItem';
 
 interface MobilePlanningItemsProps {
   isLoading: boolean;
@@ -18,7 +16,6 @@ export const MobilePlanningItems = ({
   error,
   selectedDate,
 }: MobilePlanningItemsProps) => {
-  const navigate = useNavigate();
   const getItemsForSelectedDate = () => {
     if (!driverPlanning) return [];
 
@@ -42,14 +39,7 @@ export const MobilePlanningItems = ({
 
   return (
     <div className="flex-1 flex flex-col items-start self-stretch p-4 gap-5 bg-color-surface-secondary">
-      <Button
-        icon={MapPinArea}
-        label={"Containerlocatie doorgeven"}
-        onClick={() => navigate("/mobile/container-location")}
-        fullWidth={true}
-        variant="primary"
-        size='medium'
-      />
+      <ContainerLocationButton />
       {isLoading ? (
         <div className="flex items-center justify-center w-full p-8">
           <span>Planning wordt geladen...</span>

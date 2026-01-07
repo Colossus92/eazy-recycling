@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ContainerSelectFormField } from "@/components/ui/form/selectfield/ContainerSelectFormField";
 import { FormProvider } from "react-hook-form";
 import { AddressFormField } from "@/components/ui/form/addressformfield";
-import { useMobileContainerLocationForm } from "./useMobileContainerLocationForm";
+import { useMobileContainerLocationForm } from "../../../features/mobile/containerlocation/useMobileContainerLocationForm";
 import { toastService } from "@/components/ui/toast/toastService";
 
 export const MobileContainerLocationPage = () => {

@@ -15,7 +15,7 @@ export const ReportFinishedComponent = ({
 
   return transport.transportHours === null ? (
     <Button
-      variant="secondary"
+      variant="primary"
       label="Gereed melden"
       icon={BxTimeFive}
       iconPosition="left"

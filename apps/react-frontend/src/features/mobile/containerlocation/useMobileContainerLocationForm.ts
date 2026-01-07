@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { containerService } from '@/api/services/containerService';
 import { WasteContainerRequest, WasteContainerView } from '@/api/client/models';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
-import { locationFormValueToPickupLocationRequest } from '@/types/forms/locationConverters';
+import { locationFormValueToPickupLocationRequest, pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
+import { ContainerLocationNavigationState } from './ContainerLocationButton';
 
 export interface ContainerLocationFormValues {
   containerId: string;
@@ -37,6 +40,9 @@ function getWasteContainerLocation(container: WasteContainerView): string {
 
 export const useMobileContainerLocationForm = () => {
   const queryClient = useQueryClient();
+  const { state } = useLocation();
+  const navigationState = state as ContainerLocationNavigationState | undefined;
+
   const formContext = useForm<ContainerLocationFormValues>({
     defaultValues: {
       containerId: '',
@@ -49,6 +55,17 @@ export const useMobileContainerLocationForm = () => {
     queryKey: ['containers'],
     queryFn: () => containerService.getAll(),
   });
+
+  // Preload form with navigation state values
+  useEffect(() => {
+    if (navigationState?.containerId) {
+      formContext.setValue('containerId', navigationState.containerId);
+    }
+    if (navigationState?.deliveryLocation) {
+      const locationFormValue = pickupLocationViewToFormValue(navigationState.deliveryLocation);
+      formContext.setValue('location', locationFormValue);
+    }
+  }, [navigationState, formContext]);
 
   const selectedContainerId = formContext.watch('containerId');
   const selectedContainer = containers.find(c => c.id === selectedContainerId);

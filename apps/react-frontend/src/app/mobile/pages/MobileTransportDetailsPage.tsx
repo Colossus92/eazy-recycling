@@ -15,6 +15,7 @@ import {
   resolveLocationAddress,
   transportService,
 } from '@/api/services/transportService';
+import { ContainerLocationButton } from '@/features/mobile/containerlocation/ContainerLocationButton';
 
 const MobileTransportDetailsTab = lazy(
   () => import('@/features/mobile/planning/MobileTransportDetails')
@@ -135,7 +136,13 @@ export const MobileTransportDetailsPage = () => {
               </span>
             </div>
           </div>
-          <ReportFinishedComponent transport={transport} />
+          <div className="flex flex-col items-start self-stretch gap-4">
+            <ReportFinishedComponent transport={transport} />
+            <ContainerLocationButton
+              containerId={transport.wasteContainer?.id}
+              deliveryLocation={transport.deliveryLocation}
+            />
+          </div>
           <div className="flex flex-col items-start self-stretch gap-4">
             <MobileTabBar
               activeTab={activeTab}
