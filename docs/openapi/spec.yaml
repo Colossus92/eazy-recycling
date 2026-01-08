@@ -5498,6 +5498,8 @@ components:
           type: string
         vatCode:
           type: string
+        vatPercentage:
+          type: number
         categoryName:
           type: string
         consignorPartyId:
@@ -5938,11 +5940,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
@@ -6056,15 +6058,15 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
+        defaultContentType:
+          type: string
         urlPatterns:
           type: array
           items:
             type: string
-        defaultContentType:
+        elIgnored:
           type: string
         errorOnELNotFound:
-          type: string
-        elIgnored:
           type: string
         pageEncoding:
           type: string
@@ -6151,24 +6153,21 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesCSV:
-          type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        contextPath:
-          type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        initParameterNames: {}
         sessionTrackingModes:
           type: array
           items:
@@ -6179,9 +6178,11 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        initParameterNames: {}
         sessionTimeout:
           type: integer
           format: int32
+        attributeNames: {}
         servletRegistrations:
           type: object
           additionalProperties:
@@ -6189,12 +6190,12 @@ components:
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6224,7 +6225,8 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        attributeNames: {}
+        contextPath:
+          type: string
         classLoader:
           type: object
           properties:
@@ -6271,12 +6273,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         initParameters:
           type: object
           additionalProperties:

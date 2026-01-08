@@ -64,6 +64,12 @@ export interface CatalogItemResponse {
     'vatCode': string;
     /**
      * 
+     * @type {number}
+     * @memberof CatalogItemResponse
+     */
+    'vatPercentage'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof CatalogItemResponse
      */

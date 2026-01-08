@@ -133,6 +133,15 @@ const InvoiceLineRow = ({
           disabled={isReadOnly}
         />
       </td>
+      <td className="p-2">
+        <input
+          type="text"
+          className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right bg-color-surface-secondary"
+          disabled
+          value={line?.vatPercentage ? `${line.vatPercentage}%` : ''}
+          readOnly
+        />
+      </td>
       <td className="p-2 text-right text-body-2">
         {formatCurrency(lineTotal)}
       </td>
@@ -249,6 +258,7 @@ export const InvoiceLinesSection = ({
       catalogItemName: item.name,
       unitOfMeasure: item.unitOfMeasure || '',
       unitPrice: String(item.defaultPrice ?? 0),
+      vatPercentage: String(item.vatPercentage ?? 21),
     });
   };
 
@@ -277,11 +287,12 @@ export const InvoiceLinesSection = ({
           <table className="w-full">
             <thead className="bg-color-surface-secondary">
               <tr className="text-caption-2 text-left">
-                <th className="p-2 w-[35%]">Artikel</th>
-                <th className="p-2 w-[12%] text-right">Aantal</th>
-                <th className="p-2 w-[12%]">Eenheid</th>
-                <th className="p-2 w-[15%] text-right">Prijs</th>
-                <th className="p-2 w-[18%] text-right">Totaal</th>
+                <th className="p-2 w-[30%]">Artikel</th>
+                <th className="p-2 w-[10%] text-right">Aantal</th>
+                <th className="p-2 w-[10%]">Eenheid</th>
+                <th className="p-2 w-[12%] text-right">Prijs</th>
+                <th className="p-2 w-[10%] text-right">BTW</th>
+                <th className="p-2 w-[15%] text-right">Totaal</th>
                 <th className="p-2 w-[8%]"></th>
               </tr>
             </thead>
@@ -306,7 +317,7 @@ export const InvoiceLinesSection = ({
             </tbody>
             <tfoot className="bg-color-surface-secondary border-t border-color-border">
               <tr className="text-body-2">
-                <td colSpan={4} className="p-2 text-right">
+                <td colSpan={5} className="p-2 text-right">
                   Subtotaal excl. BTW:
                 </td>
                 <td className="p-2 text-right">
@@ -315,7 +326,7 @@ export const InvoiceLinesSection = ({
                 <td></td>
               </tr>
               <tr className="text-body-2">
-                <td colSpan={4} className="p-2 text-right">
+                <td colSpan={5} className="p-2 text-right">
                   BTW:
                 </td>
                 <td className="p-2 text-right">
@@ -324,7 +335,7 @@ export const InvoiceLinesSection = ({
                 <td></td>
               </tr>
               <tr className="text-subtitle-2">
-                <td colSpan={4} className="p-2 text-right">
+                <td colSpan={5} className="p-2 text-right">
                   Totaal incl. BTW:
                 </td>
                 <td className="p-2 text-right">

@@ -39,12 +39,6 @@ import type { SessionCookieConfig } from './session-cookie-config';
 export interface ServletContext {
     /**
      *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'contextPath'?: string;
-    /**
-     *
      * @type {SessionCookieConfig}
      * @memberof ServletContext
      */
@@ -57,22 +51,28 @@ export interface ServletContext {
     'virtualServerName'?: string;
     /**
      *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
-    /**
-     *
      * @type {Set<string>}
      * @memberof ServletContext
      */
     'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
     /**
      *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
+    /**
+     *
      * @type {number}
      * @memberof ServletContext
      */
     'sessionTimeout'?: number;
+    /**
+     *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
     /**
      *
      * @type {{ [key: string]: ServletRegistration; }}
@@ -87,6 +87,12 @@ export interface ServletContext {
     'effectiveMajorVersion'?: number;
     /**
      *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'servletContextName'?: string;
+    /**
+     *
      * @type {number}
      * @memberof ServletContext
      */
@@ -97,12 +103,6 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'serverInfo'?: string;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'servletContextName'?: string;
     /**
      *
      * @type {{ [key: string]: FilterRegistration; }}
@@ -141,10 +141,10 @@ export interface ServletContext {
     'responseCharacterEncoding'?: string;
     /**
      *
-     * @type {any}
+     * @type {string}
      * @memberof ServletContext
      */
-    'attributeNames'?: any;
+    'contextPath'?: string;
     /**
      *
      * @type {ApplicationContextClassLoaderParentUnnamedModuleClassLoader}
