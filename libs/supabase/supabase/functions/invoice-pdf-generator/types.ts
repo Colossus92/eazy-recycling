@@ -2,7 +2,7 @@
  * Invoice types for PDF generation
  */
 
-export type InvoiceType = 'INKOOPFACTUUR' | 'VERKOOPFACTUUR';
+export type InvoiceType = 'INKOOPFACTUUR' | 'VERKOOPFACTUUR' | 'CREDITFACTUUR';
 
 export interface Address {
   street: string;
@@ -59,6 +59,7 @@ export interface InvoiceData {
   invoiceType: InvoiceType;
   invoiceNumber: string;
   invoiceDate: string;
+  creditedInvoiceNumber?: string;
   paymentTermDays: number;
   companyCode: string;
   tenant: TenantInfo;

@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.Invoice
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocumentType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import org.springframework.stereotype.Service
 import java.time.format.DateTimeFormatter
@@ -14,9 +15,10 @@ class InvoicePdfPayloadBuilder(
 
     fun buildPayload(invoice: Invoice): String {
         val payload = InvoicePdfPayload(
-            invoiceType = mapInvoiceType(invoice.invoiceType),
+            invoiceType = mapInvoiceType(invoice),
             invoiceNumber = invoice.invoiceNumber?.value ?: "",
             invoiceDate = invoice.invoiceDate.format(DateTimeFormatter.ISO_LOCAL_DATE),
+            creditedInvoiceNumber = invoice.creditedInvoiceNumber,
             paymentTermDays = 9,
             companyCode = invoice.customerSnapshot.customerNumber ?: invoice.customerSnapshot.companyId.uuid.toString(),
             tenant = TenantInfoPayload(
@@ -53,7 +55,7 @@ class InvoicePdfPayloadBuilder(
             lines = invoice.lines.map { line ->
                 InvoiceLinePayload(
                     date = line.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
-                    description = buildDescription(line.description, line.catalogItemName, line.orderReference),
+                    description = buildDescription(line.description, line.catalogItemName),
                     orderNumber = line.orderReference,
                     quantity = line.quantity.toDouble(),
                     unit = line.unitOfMeasure,
@@ -73,18 +75,17 @@ class InvoicePdfPayloadBuilder(
         return objectMapper.writeValueAsString(payload)
     }
 
-    private fun mapInvoiceType(type: InvoiceType): String {
-        return when (type) {
-            InvoiceType.PURCHASE -> "INKOOPFACTUUR"
-            InvoiceType.SALE -> "VERKOOPFACTUUR"
-        }
+    private fun mapInvoiceType(invoice: Invoice): String {
+      return  if (invoice.documentType == InvoiceDocumentType.CREDIT_NOTE) "CREDITFACTUUR"
+              else if (invoice.invoiceType == InvoiceType.PURCHASE) "INKOOPFACTUUR"
+              else "VERKOOPFACTUUR"
     }
 
     private fun buildBuildingNumber(number: String?, addition: String?): String {
         return listOfNotNull(number, addition).joinToString(" ")
     }
 
-    private fun buildDescription(description: String, catalogItemName: String, orderReference: String?): List<String> {
+    private fun buildDescription(description: String, catalogItemName: String): List<String> {
         val lines = mutableListOf(catalogItemName)
         if (description.isNotBlank() && description != catalogItemName) {
             lines.add(description)
@@ -111,6 +112,7 @@ data class InvoicePdfPayload(
     val invoiceType: String,
     val invoiceNumber: String,
     val invoiceDate: String,
+    val creditedInvoiceNumber: String?,
     val paymentTermDays: Int,
     val companyCode: String,
     val tenant: TenantInfoPayload,

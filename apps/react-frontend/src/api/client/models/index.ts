@@ -31,6 +31,7 @@ export * from './consignor-view';
 export * from './container-transport-request';
 export * from './copy-weight-ticket-response';
 export * from './create-container-transport-response';
+export * from './create-credit-invoice-request';
 export * from './create-from-weight-ticket-response';
 export * from './create-invoice-from-weight-ticket-result';
 export * from './create-invoice-request';

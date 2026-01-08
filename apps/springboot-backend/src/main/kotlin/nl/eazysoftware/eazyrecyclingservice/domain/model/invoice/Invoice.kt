@@ -17,6 +17,7 @@ class Invoice(
     var invoiceDate: LocalDate,
     val customerSnapshot: CustomerSnapshot,
     val originalInvoiceId: InvoiceId?,
+    val creditedInvoiceNumber: String?,
     val sourceWeightTicketId: WeightTicketId?,
     val lines: MutableList<InvoiceLine>,
     val createdAt: Instant,

@@ -68,6 +68,9 @@ class InvoiceDto(
   @Column(name = "original_invoice_id")
   val originalInvoiceId: UUID?,
 
+  @Column(name = "credited_invoice_number")
+  val creditedInvoiceNumber: String?,
+
   @OneToOne
   @JoinColumn(name = "source_weight_ticket_id", referencedColumnName = "id", nullable = true)
   val weightTicket: WeightTicketDto? = null,

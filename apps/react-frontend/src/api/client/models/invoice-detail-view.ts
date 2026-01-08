@@ -94,6 +94,12 @@ export interface InvoiceDetailView {
     'originalInvoiceId'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof InvoiceDetailView
+     */
+    'creditedInvoiceNumber'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof InvoiceDetailView
      */

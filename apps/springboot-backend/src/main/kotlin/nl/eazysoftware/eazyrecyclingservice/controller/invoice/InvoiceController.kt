@@ -25,6 +25,7 @@ import java.util.*
 class InvoiceController(
     private val createInvoice: CreateInvoice,
     private val createCompletedInvoice: CreateCompletedInvoice,
+    private val createCreditInvoice: CreateCreditInvoice,
     private val updateInvoice: UpdateInvoice,
     private val finalizeInvoice: FinalizeInvoice,
     private val deleteInvoice: DeleteInvoice,
@@ -141,6 +142,19 @@ class InvoiceController(
         return sendInvoice.handle(command)
     }
 
+    @PostMapping("/{id}/credit")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createCredit(
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: CreateCreditInvoiceRequest
+    ): InvoiceResult {
+        val command = CreateCreditInvoiceCommand(
+            originalInvoiceId = id,
+            invoiceDate = request.invoiceDate,
+        )
+        return createCreditInvoice.handle(command)
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: UUID) {
@@ -197,5 +211,9 @@ class InvoiceController(
 
         @field:NotBlank
         val body: String,
+    )
+
+    data class CreateCreditInvoiceRequest(
+        val invoiceDate: LocalDate,
     )
 }

@@ -35,6 +35,7 @@ interface InvoiceLineRowProps {
   onCatalogItemSelected: (index: number, item: CatalogItem) => void;
   consignorPartyId?: string;
   isReadOnly?: boolean;
+  isCreditNote?: boolean;
 }
 
 const InvoiceLineRow = ({
@@ -45,6 +46,7 @@ const InvoiceLineRow = ({
   onCatalogItemSelected,
   consignorPartyId,
   isReadOnly = false,
+  isCreditNote = false,
 }: InvoiceLineRowProps) => {
   const {
     register,
@@ -52,7 +54,10 @@ const InvoiceLineRow = ({
     formState: { errors },
   } = useFormContext<InvoiceFormValues>();
   const line = watch(`lines.${index}`);
-  const lineTotal = parseNumber(line?.quantity) * parseNumber(line?.unitPrice);
+  const rawLineTotal =
+    parseNumber(line?.quantity) * parseNumber(line?.unitPrice);
+  const lineTotal =
+    isCreditNote && rawLineTotal !== 0 ? -rawLineTotal : rawLineTotal;
 
   // Adapt field for CatalogItemAsyncSelectFormField (needs weightValue/weightUnit for compatibility)
   const catalogField = {
@@ -149,9 +154,13 @@ const InvoiceLineRow = ({
 
 interface InvoiceLinesSectionProps {
   isReadOnly?: boolean;
+  isCreditNote?: boolean;
 }
 
-export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionProps) => {
+export const InvoiceLinesSection = ({
+  isReadOnly = false,
+  isCreditNote = false,
+}: InvoiceLinesSectionProps) => {
   const formContext = useFormContext<InvoiceFormValues>();
   const { control } = formContext;
 
@@ -210,8 +219,14 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
       totalExclVat += lineTotal;
       totalVat += lineTotal * (vatPercentage / 100);
     });
-    return { totalExclVat, totalVat, totalInclVat: totalExclVat + totalVat };
-  }, [lines]);
+    // For credit notes, display totals as negative (but don't store them as negative)
+    const multiplier = isCreditNote ? -1 : 1;
+    return {
+      totalExclVat: totalExclVat * multiplier,
+      totalVat: totalVat * multiplier,
+      totalInclVat: (totalExclVat + totalVat) * multiplier,
+    };
+  }, [lines, isCreditNote]);
 
   const handleAddLine = () => {
     append({
@@ -243,12 +258,12 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
         <span className="text-subtitle-1">Factuurregels</span>
         {!isReadOnly && (
           <Button
-            variant='icon'
+            variant="icon"
             showText={false}
             icon={Plus}
             onClick={handleAddLine}
-            title='Voeg regel toe'
-            type='button'
+            title="Voeg regel toe"
+            type="button"
           />
         )}
       </div>
@@ -285,6 +300,7 @@ export const InvoiceLinesSection = ({ isReadOnly = false }: InvoiceLinesSectionP
                   onCatalogItemSelected={handleCatalogItemSelected}
                   consignorPartyId={customerId}
                   isReadOnly={isReadOnly}
+                  isCreditNote={isCreditNote}
                 />
               ))}
             </tbody>

@@ -75,6 +75,7 @@ class GetInvoiceByIdQuery(
             ),
             customerEmail = customer.email?.value,
             originalInvoiceId = invoice.originalInvoiceId?.value,
+            creditedInvoiceNumber = invoice.creditedInvoiceNumber,
             sourceWeightTicketId = invoice.sourceWeightTicketId?.number,
             lines = invoice.lines.map { line ->
                 InvoiceLineView(
@@ -151,6 +152,7 @@ data class InvoiceDetailView(
     val customerEmail: String?,
     val tenant: TenantView,
     val originalInvoiceId: UUID?,
+    val creditedInvoiceNumber: String?,
     val sourceWeightTicketId: Long?,
     val lines: List<InvoiceLineView>,
     val totals: InvoiceTotalsView,

@@ -4,6 +4,7 @@ import Calendar from '@/assets/icons/CalendarDots.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
+import Receipt from '@/assets/icons/Receipt.svg?react';
 import { Drawer } from '@/components/ui/drawer/Drawer';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { WeightTicketDownloadSection } from '@/features/planning/components/drawer/WeightTicketDownloadSection';
@@ -20,11 +21,23 @@ interface InvoiceDetailsDrawerProps {
   onDelete?: () => void;
 }
 
-const formatCurrency = (value: number) => {
+const formatCurrency = (value: number, isCreditNote: boolean = false) => {
+  // For credit notes, show negative values (except 0,00)
+  const displayValue = isCreditNote && value !== 0 ? -value : value;
   return new Intl.NumberFormat('nl-NL', {
     style: 'currency',
     currency: 'EUR',
-  }).format(value);
+  }).format(displayValue);
+};
+
+const getInvoiceTypeLabel = (
+  invoiceType: string,
+  documentType: string
+): string => {
+  if (documentType === 'CREDIT_NOTE') {
+    return 'Credit';
+  }
+  return invoiceType === 'PURCHASE' ? 'Inkoop' : 'Verkoop';
 };
 
 const formatDate = (dateString: string) => {
@@ -59,6 +72,7 @@ export const InvoiceDetailsDrawer = ({
   const sourceWeightTicketId = data?.sourceWeightTicketId;
 
   const isFinal = data?.status === 'FINAL';
+  const isCreditNote = data?.documentType === 'CREDIT_NOTE';
 
   return (
     <Drawer
@@ -101,6 +115,17 @@ export const InvoiceDetailsDrawer = ({
                   </span>
                 </div>
                 <InvoiceStatusTag status={data.status as 'DRAFT' | 'FINAL'} />
+              </div>
+              <div className={'flex items-center gap-2 self-stretch'}>
+                <div className="flex items-center flex-1 gap-2">
+                  <Receipt className={'w-5 h-5 text-color-text-secondary'} />
+                  <span className={'text-body-2 text-color-text-secondary'}>
+                    Type
+                  </span>
+                </div>
+                <span className={'text-body-2 truncate'}>
+                  {getInvoiceTypeLabel(data.invoiceType, data.documentType)}
+                </span>
               </div>
               {data.invoiceNumber && (
                 <div className={'flex items-center gap-2 self-stretch'}>
@@ -196,7 +221,7 @@ export const InvoiceDetailsDrawer = ({
                     </span>
                   </div>
                   <span className={'text-body-2'}>
-                    {formatCurrency(line.totalExclVat)}
+                    {formatCurrency(line.totalExclVat, isCreditNote)}
                   </span>
                 </div>
               ))}
@@ -210,7 +235,7 @@ export const InvoiceDetailsDrawer = ({
                   Subtotaal
                 </span>
                 <span className={'text-body-2'}>
-                  {formatCurrency(data.totals.totalExclVat)}
+                  {formatCurrency(data.totals.totalExclVat, isCreditNote)}
                 </span>
               </div>
               <div
@@ -222,7 +247,7 @@ export const InvoiceDetailsDrawer = ({
                   BTW
                 </span>
                 <span className={'text-body-2'}>
-                  {formatCurrency(data.totals.totalVat)}
+                  {formatCurrency(data.totals.totalVat, isCreditNote)}
                 </span>
               </div>
               <div
@@ -232,7 +257,7 @@ export const InvoiceDetailsDrawer = ({
               >
                 <span className={'text-body-2 font-semibold'}>Totaal</span>
                 <span className={'text-body-2 font-semibold'}>
-                  {formatCurrency(data.totals.totalInclVat)}
+                  {formatCurrency(data.totals.totalInclVat, isCreditNote)}
                 </span>
               </div>
             </div>

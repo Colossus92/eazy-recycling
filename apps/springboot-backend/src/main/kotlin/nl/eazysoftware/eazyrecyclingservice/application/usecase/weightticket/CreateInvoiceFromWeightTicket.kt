@@ -155,6 +155,7 @@ class CreateInvoiceFromWeightTicketService(
             invoiceDate = LocalDate.now(),
             customerSnapshot = customerSnapshot,
             originalInvoiceId = null,
+            creditedInvoiceNumber = null,
             sourceWeightTicketId = weightTicket.id,
             lines = invoiceLines,
             createdAt = Clock.System.now(),

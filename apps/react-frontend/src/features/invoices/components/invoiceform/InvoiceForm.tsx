@@ -7,18 +7,19 @@ import {
 } from '@/components/ui/email/EmailComposer';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import { DateFormField } from '@/components/ui/form/DateFormField';
-import { FormActionMenu } from '@/components/ui/form/FormActionMenu';
 import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { Tab } from '@/components/ui/tab/Tab';
 import { toastService } from '@/components/ui/toast/toastService';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import { FormProvider } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
 import { InvoiceLinesSection } from './InvoiceLinesSection';
 import { InvoiceRelatedTab } from './InvoiceRelatedTab';
 import { useInvoiceFormHook } from './useInvoiceFormHook';
+import { InvoiceFormActionMenu } from './InvoiceFormActionMenu';
 import { useInvoiceEmailFormHook } from './useInvoiceEmailFormHook';
 import { invoiceService } from '@/api/services/invoiceService';
 
@@ -65,15 +66,46 @@ export const InvoiceForm = ({
   } = useInvoiceEmailFormHook();
 
   const [isSending, setIsSending] = useState(false);
+  const [isCreatingCredit, setIsCreatingCredit] = useState(false);
 
   // Use the hook's currentInvoiceId to determine edit mode (handles newly created invoices)
   const isEditMode = invoiceId !== undefined || currentInvoiceId !== null;
 
+  const documentType = formContext.watch('documentType');
+  const isCreditNote = documentType === 'CREDIT_NOTE';
+
   const getFormTitle = () => {
     if (invoiceNumber) {
-      return `Factuur #${invoiceNumber}`;
+      const prefix = isCreditNote ? 'Creditnota' : 'Factuur';
+      return `${prefix} #${invoiceNumber}`;
     }
     return isEditMode ? 'Factuur bewerken' : 'Nieuwe factuur';
+  };
+
+  const handleCreateCreditInvoice = async () => {
+    const idToCredit = currentInvoiceId ?? invoiceId;
+    if (!idToCredit) {
+      toastService.error('Geen factuur geselecteerd');
+      return;
+    }
+
+    setIsCreatingCredit(true);
+    try {
+      const result = await invoiceService.createCredit(idToCredit, {
+        invoiceDate: format(new Date(), 'yyyy-MM-dd'),
+      });
+      toastService.success('Creditnota aangemaakt');
+      // Load the newly created credit invoice
+      await loadInvoice(result.invoiceId);
+      onComplete();
+    } catch (error) {
+      console.error('Error creating credit invoice:', error);
+      toastService.error(
+        'Er is een fout opgetreden bij het aanmaken van de creditnota'
+      );
+    } finally {
+      setIsCreatingCredit(false);
+    }
   };
 
   useEffect(() => {
@@ -261,11 +293,6 @@ export const InvoiceForm = ({
     { value: 'SALE', label: 'Verkoop' },
   ];
 
-  const documentTypeOptions = [
-    { value: 'INVOICE', label: 'Factuur' },
-    { value: 'CREDIT_NOTE', label: 'Creditnota' },
-  ];
-
   // Render email composer when in email step
   if (emailStep === 'email-compose' && emailData) {
     return (
@@ -326,9 +353,8 @@ export const InvoiceForm = ({
           <FormTopBar
             title={getFormTitle()}
             actions={
-              isEditMode &&
-              !isReadOnly && (
-                <FormActionMenu
+              isEditMode && (
+                <InvoiceFormActionMenu
                   onDelete={() => {
                     const idToDelete = currentInvoiceId ?? invoiceId;
                     if (idToDelete) {
@@ -336,6 +362,9 @@ export const InvoiceForm = ({
                       setIsOpen(false);
                     }
                   }}
+                  onCreateCredit={handleCreateCreditInvoice}
+                  isReadOnly={isReadOnly}
+                  isCreditNote={isCreditNote}
                 />
               )
             }
@@ -344,7 +373,7 @@ export const InvoiceForm = ({
 
           {/* Content */}
           <div className="flex flex-col items-start self-stretch flex-1 gap-5 p-4 min-h-0">
-            {isLoading ? (
+            {isLoading || isCreatingCredit ? (
               <div className="flex justify-center items-center w-full p-8">
                 <ClipLoader size={20} aria-label="Laden..." />
               </div>
@@ -394,21 +423,20 @@ export const InvoiceForm = ({
                               errors: formContext.formState.errors,
                             }}
                           />
-                          <SelectFormField
-                            title="Document type"
-                            placeholder="Selecteer document type"
-                            options={documentTypeOptions}
-                            disabled={isReadOnly}
-                            formHook={{
-                              register: formContext.register,
-                              name: 'documentType',
-                              rules: { required: 'Document type is verplicht' },
-                              errors: formContext.formState.errors,
-                            }}
-                          />
+                          <div className="flex flex-col gap-1">
+                            <label className="text-body-2 text-color-text-secondary">
+                              Document type
+                            </label>
+                            <span className="text-body-1 py-2">
+                              {isCreditNote ? 'Creditnota' : 'Factuur'}
+                            </span>
+                          </div>
                         </div>
 
-                        <InvoiceLinesSection isReadOnly={isReadOnly} />
+                        <InvoiceLinesSection
+                          isReadOnly={isReadOnly}
+                          isCreditNote={isCreditNote}
+                        />
                       </div>
                     </TabPanel>
 

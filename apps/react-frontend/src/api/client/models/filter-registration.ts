@@ -34,6 +34,12 @@ export interface FilterRegistration {
     'urlPatternMappings'?: Array<string>;
     /**
      * 
+     * @type {{ [key: string]: string; }}
+     * @memberof FilterRegistration
+     */
+    'initParameters'?: { [key: string]: string; };
+    /**
+     * 
      * @type {string}
      * @memberof FilterRegistration
      */
@@ -44,11 +50,5 @@ export interface FilterRegistration {
      * @memberof FilterRegistration
      */
     'className'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof FilterRegistration
-     */
-    'initParameters'?: { [key: string]: string; };
 }
 

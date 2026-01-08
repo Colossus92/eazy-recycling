@@ -61,6 +61,7 @@ models/consignor-view.ts
 models/container-transport-request.ts
 models/copy-weight-ticket-response.ts
 models/create-container-transport-response.ts
+models/create-credit-invoice-request.ts
 models/create-from-weight-ticket-response.ts
 models/create-invoice-from-weight-ticket-result.ts
 models/create-invoice-request.ts

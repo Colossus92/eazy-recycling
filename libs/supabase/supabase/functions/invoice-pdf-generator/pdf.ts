@@ -1,6 +1,15 @@
-import type { PDFPage, PDFFont } from 'npm:pdf-lib';
+import type { PDFFont, PDFPage } from 'npm:pdf-lib';
 import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib';
-import { InvoiceData, formatCurrency, formatDate } from './types.ts';
+import { formatCurrency as baseCurrency, formatDate, InvoiceData } from './types.ts';
+
+/**
+ * Format currency with optional negation for credit notes
+ */
+function formatCurrency(amount: number, isCreditNote = false): string {
+  // For credit notes, negate the value (except when 0)
+  const displayValue = isCreditNote && amount !== 0 ? -amount : amount;
+  return baseCurrency(displayValue);
+}
 
 // Constants for layout
 const PAGE_WIDTH = 595.28; // A4 width in points
@@ -61,7 +70,7 @@ async function drawHeader(
     const logoPath = new URL('./logo.png', import.meta.url);
     const logoBytes = await Deno.readFile(logoPath);
     const logoImage = await pdfDoc.embedPng(logoBytes);
-    
+
     // Scale logo to fit within max dimensions while maintaining aspect ratio
     const logoScale = Math.min(
       logoMaxWidth / logoImage.width,
@@ -69,7 +78,7 @@ async function drawHeader(
     );
     const scaledWidth = logoImage.width * logoScale;
     const scaledHeight = logoImage.height * logoScale;
-    
+
     page.drawImage(logoImage, {
       x: logoX,
       y: logoY + (logoMaxHeight - scaledHeight), // Align to top
@@ -160,8 +169,15 @@ function drawInvoiceTitle(
   let currentY = startY - 30;
 
   // Invoice type as main title
-  const titleText = data.invoiceType === 'INKOOPFACTUUR' ? 'Inkoopfactuur' : 'Verkoopfactuur';
-  
+  let titleText: string;
+  if (data.invoiceType === 'CREDITFACTUUR') {
+    titleText = 'Creditfactuur';
+  } else if (data.invoiceType === 'INKOOPFACTUUR') {
+    titleText = 'Inkoopfactuur';
+  } else {
+    titleText = 'Verkoopfactuur';
+  }
+
   page.drawText(titleText, {
     x: MARGIN_LEFT,
     y: currentY,
@@ -174,6 +190,18 @@ function drawInvoiceTitle(
   if (data.invoiceType === 'INKOOPFACTUUR') {
     currentY -= 18;
     page.drawText('Inkoopfactuur uitgereikt door afnemer', {
+      x: MARGIN_LEFT,
+      y: currentY,
+      size: 9,
+      font: fonts.regular,
+      color: COLOR_DARK_GRAY,
+    });
+  }
+
+  // If creditfactuur, add reference to original invoice
+  if (data.invoiceType === 'CREDITFACTUUR' && data.creditedInvoiceNumber) {
+    currentY -= 18;
+    page.drawText(`Creditfactuur voor factuur ${data.creditedInvoiceNumber}`, {
       x: MARGIN_LEFT,
       y: currentY,
       size: 9,
@@ -360,29 +388,29 @@ function drawTotalsMultiPage(
 ): { currentY: number; currentPage: PDFPage } {
   const { fonts, data } = ctx;
   let currentPage = ctx.pages[ctx.pages.length - 1];
-  
+
   // Calculate if totals section fits on current page
   const totalsHeight = calculateTotalsHeight(data);
   let currentY = startY;
-  
+
   // Check if we need a new page for totals
   if (currentY - totalsHeight < MARGIN_BOTTOM + 60) {
     // Create new page for totals
     currentPage = ctx.pdfDoc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
     ctx.pages.push(currentPage);
-    
+
     // Draw continuation header
     currentY = drawContinuationHeader(currentPage, data, fonts);
   }
-  
+
   // === Left side: Material totals table ===
   // Use similar spacing as invoice lines table (55pt between Datum and Omschrijving)
   const matColMaterial = MARGIN_LEFT;
   const matColWeightEnd = MARGIN_LEFT + 165;
   const matColAmountEnd = MARGIN_LEFT + 240;
-  
+
   const totalsStartY = currentY;
-  
+
   // Material totals header
   currentPage.drawText('Totalen per materiaal', { x: matColMaterial, y: currentY, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
   const weightHeader = 'Totaal gewicht';
@@ -391,20 +419,22 @@ function drawTotalsMultiPage(
   const amountHeader = 'Totaalbedrag';
   const amountHeaderWidth = fonts.bold.widthOfTextAtSize(amountHeader, 8);
   currentPage.drawText(amountHeader, { x: matColAmountEnd - amountHeaderWidth, y: currentY, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
-  
+
   // === Right side: Invoice totals ===
   const labelX = PAGE_WIDTH - MARGIN_RIGHT - 180;
   const rightAlignX = PAGE_WIDTH - MARGIN_RIGHT;
 
+  const isCreditNote = data.invoiceType === 'CREDITFACTUUR';
+
   currentPage.drawText('Totaal excl. BTW', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-  const exclVatText = formatCurrency(data.totals.totalExclVat);
+  const exclVatText = formatCurrency(data.totals.totalExclVat, isCreditNote);
   const exclVatWidth = fonts.regular.widthOfTextAtSize(exclVatText, 9);
   currentPage.drawText(exclVatText, { x: rightAlignX - exclVatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
 
   currentY -= 14;
 
   currentPage.drawText('BTW', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-  const vatText = formatCurrency(data.totals.vatAmount);
+  const vatText = formatCurrency(data.totals.vatAmount, isCreditNote);
   const vatWidth = fonts.regular.widthOfTextAtSize(vatText, 9);
   currentPage.drawText(vatText, { x: rightAlignX - vatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
 
@@ -416,7 +446,7 @@ function drawTotalsMultiPage(
     const weightText = `${mat.totalWeight} ${mat.unit}`;
     const weightWidth = fonts.regular.widthOfTextAtSize(weightText, 8);
     currentPage.drawText(weightText, { x: matColWeightEnd - weightWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    const amountText = formatCurrency(mat.totalAmount);
+    const amountText = formatCurrency(mat.totalAmount, isCreditNote);
     const amountWidth = fonts.regular.widthOfTextAtSize(amountText, 8);
     currentPage.drawText(amountText, { x: matColAmountEnd - amountWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
     matY -= 12;
@@ -436,7 +466,7 @@ function drawTotalsMultiPage(
 
   // Totaal incl. BTW
   currentPage.drawText('Totaal incl. BTW', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
-  const totalText = formatCurrency(data.totals.totalInclVat);
+  const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
   const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
   currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
 
@@ -584,7 +614,7 @@ function drawPageNumber(
 ): void {
   const pageText = `Pagina ${pageNum} van ${totalPages}`;
   const textWidth = fonts.regular.widthOfTextAtSize(pageText, 8);
-  
+
   page.drawText(pageText, {
     x: PAGE_WIDTH - MARGIN_RIGHT - textWidth,
     y: MARGIN_BOTTOM - 45,
@@ -622,19 +652,19 @@ function drawLinesTableMultiPage(
     page.drawText('Datum', { x: colDate, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
     page.drawText('Omschrijving', { x: colDesc, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
     page.drawText('Ordernr.', { x: colOrder, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
-    
+
     const aantalHeader = 'Aantal';
     const aantalHeaderWidth = fonts.bold.widthOfTextAtSize(aantalHeader, 8);
     page.drawText(aantalHeader, { x: colQtyEnd - aantalHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
-    
+
     const btwHeader = 'BTW';
     const btwHeaderWidth = fonts.bold.widthOfTextAtSize(btwHeader, 8);
     page.drawText(btwHeader, { x: colVatEnd - btwHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
-    
+
     const priceHeader = 'PPE';
     const priceHeaderWidth = fonts.bold.widthOfTextAtSize(priceHeader, 8);
     page.drawText(priceHeader, { x: colPriceEnd - priceHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
-    
+
     const totalHeader = 'Totaal';
     const totalHeaderWidth = fonts.bold.widthOfTextAtSize(totalHeader, 8);
     page.drawText(totalHeader, { x: colTotalEnd - totalHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
@@ -695,29 +725,30 @@ function drawLinesTableMultiPage(
 
     // Draw the row
     currentPage.drawText(formatDate(line.date), { x: colDate, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    
+
     let descY = currentY;
     for (const descLine of descLines) {
       const truncatedDesc = truncateText(descLine, 42);
       currentPage.drawText(truncatedDesc, { x: colDesc, y: descY, size: 8, font: fonts.regular, color: COLOR_BLACK });
       descY -= lineHeight;
     }
-    
+
     currentPage.drawText(line.orderNumber || '-', { x: colOrder, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    
+
     const qtyText = `${line.quantity} ${line.unit}`;
     const qtyWidth = fonts.regular.widthOfTextAtSize(qtyText, 8);
     currentPage.drawText(qtyText, { x: colQtyEnd - qtyWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    
+
     const vatPctText = line.vatPercentage === 'G' ? 'G' : `${line.vatPercentage}%`;
     const vatPctWidth = fonts.regular.widthOfTextAtSize(vatPctText, 8);
     currentPage.drawText(vatPctText, { x: colVatEnd - vatPctWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    
-    const priceText = formatCurrency(line.pricePerUnit);
+
+    const priceText = formatCurrency(line.pricePerUnit); // Keep piece price positive
     const priceWidth = fonts.regular.widthOfTextAtSize(priceText, 8);
     currentPage.drawText(priceText, { x: colPriceEnd - priceWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    
-    const totalText = formatCurrency(line.totalAmount);
+
+    const isCreditNote = ctx.data.invoiceType === 'CREDITFACTUUR';
+    const totalText = formatCurrency(line.totalAmount, isCreditNote);
     const totalWidth = fonts.regular.widthOfTextAtSize(totalText, 8);
     currentPage.drawText(totalText, { x: colTotalEnd - totalWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
 
@@ -771,7 +802,7 @@ export async function generateInvoicePdf(data: InvoiceData): Promise<Uint8Array>
   const totalsResult = drawTotalsMultiPage(ctx, currentY);
   currentY = totalsResult.currentY;
   const currentPage = totalsResult.currentPage;
-  
+
   drawConditions(currentPage, currentY, fonts);
 
   // Draw footer and page numbers on all pages

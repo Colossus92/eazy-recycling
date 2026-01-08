@@ -15,12 +15,14 @@ interface FormActionMenuProps {
   onDelete: () => void;
   deleteText?: string;
   additionalActions?: FormAction[];
+  showDelete?: boolean;
 }
 
 export const FormActionMenu = ({
   onDelete,
   deleteText = 'Verwijderen',
   additionalActions,
+  showDelete = true,
 }: FormActionMenuProps) => {
   return (
     <Menu>
@@ -50,16 +52,18 @@ export const FormActionMenu = ({
         ))}
 
         {/* Standard delete action */}
-        <MenuItem>
-          <div className={'flex flex-col items-start self-stretch p-2'}>
-            <MenuItemButton
-              label={deleteText}
-              icon={TrashSimple}
-              onClick={onDelete}
-              textColor={'text-color-status-error-primary'}
-            />
-          </div>
-        </MenuItem>
+        {showDelete && (
+          <MenuItem>
+            <div className={'flex flex-col items-start self-stretch p-2'}>
+              <MenuItemButton
+                label={deleteText}
+                icon={TrashSimple}
+                onClick={onDelete}
+                textColor={'text-color-status-error-primary'}
+              />
+            </div>
+          </MenuItem>
+        )}
       </MenuItems>
     </Menu>
   );

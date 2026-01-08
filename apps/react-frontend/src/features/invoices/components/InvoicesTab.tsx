@@ -25,11 +25,23 @@ type Column = {
   width: string;
 };
 
-const formatCurrency = (value: number) => {
+const formatCurrency = (item: InvoiceView) => {
+  // For credit notes, show negative values (except 0,00)
+  const displayValue =
+    item.documentType === 'CREDIT_NOTE' && item.totalExclVat !== 0
+      ? -item.totalExclVat
+      : item.totalExclVat;
   return new Intl.NumberFormat('nl-NL', {
     style: 'currency',
     currency: 'EUR',
-  }).format(value);
+  }).format(displayValue);
+};
+
+const getInvoiceTypeLabel = (item: InvoiceView): string => {
+  if (item.documentType === 'CREDIT_NOTE') {
+    return 'Credit';
+  }
+  return item.invoiceType === 'PURCHASE' ? 'Inkoop' : 'Verkoop';
 };
 
 interface InvoicesTabProps {
@@ -124,13 +136,20 @@ export const InvoicesTab = ({
       label: 'Klant',
       accessor: (item) => item.customerName,
       title: (item) => item.customerName,
-      width: '45%',
+      width: '35%',
+    },
+    {
+      key: 'invoiceType',
+      label: 'Type',
+      accessor: (item) => getInvoiceTypeLabel(item),
+      title: (item) => getInvoiceTypeLabel(item),
+      width: '10%',
     },
     {
       key: 'totalExclVat',
       label: 'Totaal (excl. BTW)',
-      accessor: (item) => formatCurrency(item.totalExclVat),
-      title: (item) => formatCurrency(item.totalExclVat),
+      accessor: (item) => formatCurrency(item),
+      title: (item) => formatCurrency(item),
       width: '20%',
     },
     {

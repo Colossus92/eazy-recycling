@@ -1,4 +1,5 @@
 import {
+  CreateCreditInvoiceRequest,
   CreateInvoiceRequest,
   InvoiceControllerApi,
   InvoiceDetailView,
@@ -45,5 +46,9 @@ export const invoiceService = {
 
   delete: (id: string): Promise<void> => {
     return invoiceApi._delete(id).then((r) => r.data);
+  },
+
+  createCredit: (id: string, request: CreateCreditInvoiceRequest) => {
+    return invoiceApi.createCredit(id, request).then((r) => r.data);
   },
 };

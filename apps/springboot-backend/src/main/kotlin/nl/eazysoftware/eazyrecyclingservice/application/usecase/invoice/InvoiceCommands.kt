@@ -13,6 +13,7 @@ data class CreateInvoiceCommand(
     val customerId: UUID,
     val invoiceDate: LocalDate,
     val originalInvoiceId: UUID?,
+    val creditedInvoiceNumber: String? = null,
     val sourceWeightTicketId: WeightTicketId? = null,
     val lines: List<InvoiceLineCommand>,
 )
