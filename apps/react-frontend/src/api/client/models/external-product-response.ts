@@ -17,44 +17,38 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface ExternalProductResponse
  */
-export interface LocalTime {
+export interface ExternalProductResponse {
+    /**
+     * 
+     * @type {number}
+     * @memberof ExternalProductResponse
+     */
+    'id': number;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof ExternalProductResponse
      */
-    'value'?: string;
+    'name': string;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof ExternalProductResponse
      */
-    'hour': number;
+    'price': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof ExternalProductResponse
      */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
+    'priceStatus': number;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof ExternalProductResponse
      */
-    'value$kotlinx_datetime': string;
+    'priceStatusLabel': string;
 }
 

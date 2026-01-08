@@ -17,44 +17,32 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface SyncPreviewSummary
  */
-export interface LocalTime {
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value'?: string;
+export interface SyncPreviewSummary {
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncPreviewSummary
      */
-    'hour': number;
+    'totalToCreate': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncPreviewSummary
      */
-    'minute': number;
+    'totalToUpdate': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncPreviewSummary
      */
-    'second': number;
+    'totalToDelete': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncPreviewSummary
      */
-    'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value$kotlinx_datetime': string;
+    'totalUnchanged': number;
 }
 

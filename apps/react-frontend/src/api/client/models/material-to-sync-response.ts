@@ -17,44 +17,50 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface MaterialToSyncResponse
  */
-export interface LocalTime {
+export interface MaterialToSyncResponse {
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialToSyncResponse
      */
-    'value'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'hour': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'minute': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'second': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof LocalTime
-     */
-    'nanosecond': number;
+    'materialId': string;
     /**
      * 
      * @type {string}
-     * @memberof LocalTime
+     * @memberof MaterialToSyncResponse
      */
-    'value$kotlinx_datetime': string;
+    'materialName': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialToSyncResponse
+     */
+    'currentPrice': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialToSyncResponse
+     */
+    'lastSyncedPrice'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialToSyncResponse
+     */
+    'externalProductId'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialToSyncResponse
+     */
+    'priceStatus': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialToSyncResponse
+     */
+    'priceStatusLabel': string;
 }
 

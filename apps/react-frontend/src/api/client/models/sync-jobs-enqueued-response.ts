@@ -17,44 +17,32 @@
 /**
  * 
  * @export
- * @interface LocalTime
+ * @interface SyncJobsEnqueuedResponse
  */
-export interface LocalTime {
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value'?: string;
+export interface SyncJobsEnqueuedResponse {
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncJobsEnqueuedResponse
      */
-    'hour': number;
+    'createJobsEnqueued': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncJobsEnqueuedResponse
      */
-    'minute': number;
+    'updateJobsEnqueued': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncJobsEnqueuedResponse
      */
-    'second': number;
+    'deleteJobsEnqueued': number;
     /**
      * 
      * @type {number}
-     * @memberof LocalTime
+     * @memberof SyncJobsEnqueuedResponse
      */
-    'nanosecond': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value$kotlinx_datetime': string;
+    'totalJobsEnqueued': number;
 }
 

@@ -11,6 +11,7 @@ apis/lma-import-controller-api.ts
 apis/material-controller-api.ts
 apis/material-group-controller-api.ts
 apis/material-price-controller-api.ts
+apis/material-price-sync-controller-api.ts
 apis/planning-controller-api.ts
 apis/processing-method-controller-api.ts
 apis/product-category-controller-api.ts
@@ -81,6 +82,8 @@ models/dutch-address-view.ts
 models/environment.ts
 models/eural-code-view.ts
 models/eural.ts
+models/external-product-response.ts
+models/external-product-to-delete-response.ts
 models/filter-registration.ts
 models/goods-item-view.ts
 models/goods-request.ts
@@ -107,6 +110,7 @@ models/material-price-request.ts
 models/material-price-response.ts
 models/material-request.ts
 models/material-response.ts
+models/material-to-sync-response.ts
 models/no-pickup-location-request.ts
 models/no-pickup-view.ts
 models/pageable.ts
@@ -149,6 +153,9 @@ models/split-weight-ticket-response.ts
 models/sync-conflict-dto.ts
 models/sync-conflicts-response.ts
 models/sync-from-exact-response.ts
+models/sync-jobs-enqueued-response.ts
+models/sync-preview-response.ts
+models/sync-preview-summary.ts
 models/taglib-descriptor.ts
 models/tenant-view.ts
 models/transport-detail-view.ts
