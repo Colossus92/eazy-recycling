@@ -34,6 +34,7 @@ export interface MasterDataTabProps<T> {
     error: Error | null;
     reset: () => void;
   };
+  additionalActions?: React.ReactNode;
 }
 
 export const MasterDataTab = <T,>({
@@ -45,6 +46,7 @@ export const MasterDataTab = <T,>({
   renderEmptyState,
   isLoading,
   errorHandling,
+  additionalActions = undefined,
 }: MasterDataTabProps<T>) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -61,13 +63,15 @@ export const MasterDataTab = <T,>({
       }
     >
       <ContentTitleBar setQuery={setQueryAndResetPage}>
-        {openAddForm &&
+        {openAddForm && (
           <Button
             variant={'primary'}
             icon={Plus}
             label={'Voeg toe'}
             onClick={openAddForm}
-          />}
+          />
+        )}
+        {additionalActions}
       </ContentTitleBar>
       <ErrorBoundary
         fallbackRender={fallbackRender}

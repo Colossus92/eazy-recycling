@@ -21,6 +21,15 @@ interface MaterialPricingAppSyncJpaRepository : JpaRepository<MaterialPricingApp
     )
     fun findAllForPublishing(): List<MaterialPricingAppSyncDto>
 
+    @Query(
+        """
+        SELECT s FROM MaterialPricingAppSyncDto s
+        JOIN FETCH s.material m
+        WHERE m.id = :materialId
+        """
+    )
+    fun findByMaterialId(materialId: UUID): MaterialPricingAppSyncDto?
+
     @Modifying(clearAutomatically = true)
     @Query(
         """
@@ -47,8 +56,16 @@ class MaterialPricingAppSyncRepository(
         return jpaRepository.findAllForPublishing()
     }
 
+    fun findByMaterialId(materialId: UUID): MaterialPricingAppSyncDto? {
+        return jpaRepository.findByMaterialId(materialId)
+    }
+
     fun save(dto: MaterialPricingAppSyncDto): MaterialPricingAppSyncDto {
         return jpaRepository.save(dto)
+    }
+
+    fun delete(dto: MaterialPricingAppSyncDto) {
+        jpaRepository.delete(dto)
     }
 
     fun updateSyncMetadata(

@@ -28,10 +28,22 @@ export interface SessionCookieConfig {
     'maxAge'?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'secure'?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
     'domain'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {string}
@@ -57,17 +69,5 @@ export interface SessionCookieConfig {
      * @deprecated
      */
     'comment'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'secure'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'httpOnly'?: boolean;
 }
 

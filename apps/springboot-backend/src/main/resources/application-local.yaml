@@ -33,3 +33,7 @@ logging:
 jobrunr:
   dashboard:
     enabled: true
+
+pricing-app:
+  base-url: https://localhost:8082
+  bearer-token: ${PRICING_APP_BEARER_TOKEN:}

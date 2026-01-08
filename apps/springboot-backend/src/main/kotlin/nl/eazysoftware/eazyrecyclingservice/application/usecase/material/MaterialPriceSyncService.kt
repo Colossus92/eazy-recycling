@@ -58,7 +58,7 @@ class MaterialPriceSyncService(
 
             val materialToSync = MaterialToSync(
                 materialId = material.id,
-                materialName = material.name,
+                materialName = syncRecord.externalPricingAppName,
                 currentPrice = currentPrice,
                 lastSyncedPrice = lastSyncedPrice,
                 externalProductId = externalId,
@@ -74,7 +74,7 @@ class MaterialPriceSyncService(
                     // External product was deleted, need to recreate
                     toCreate.add(materialToSync.copy(externalProductId = null))
                 } else if (currentPrice.compareTo(externalProduct.price) != 0 ||
-                    material.name != externalProduct.name
+                    syncRecord.externalPricingAppName != externalProduct.name
                 ) {
                     // Price or name changed, need to update
                     toUpdate.add(materialToSync)

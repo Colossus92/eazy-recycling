@@ -27,6 +27,9 @@ data class MaterialPricingAppSyncDto(
     @Column(name = "external_pricing_app_id")
     val externalPricingAppId: Int? = null,
 
+    @Column(name = "external_pricing_app_name", nullable = false)
+    val externalPricingAppName: String,
+
     @Column(name = "external_pricing_app_synced_at")
     val externalPricingAppSyncedAt: Instant? = null,
 

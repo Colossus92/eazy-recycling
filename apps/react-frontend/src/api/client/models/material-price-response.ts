@@ -62,5 +62,23 @@ export interface MaterialPriceResponse {
      * @memberof MaterialPriceResponse
      */
     'defaultPrice'?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof MaterialPriceResponse
+     */
+    'publishToPricingApp': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialPriceResponse
+     */
+    'externalPricingAppId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'externalPricingAppName'?: string;
 }
 

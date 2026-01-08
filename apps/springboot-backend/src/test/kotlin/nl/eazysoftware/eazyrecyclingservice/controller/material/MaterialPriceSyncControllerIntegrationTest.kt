@@ -421,6 +421,7 @@ class MaterialPriceSyncControllerIntegrationTest : BaseIntegrationTest() {
                 material = savedMaterial,
                 publishToPricingApp = true,
                 externalPricingAppId = externalPricingAppId,
+                externalPricingAppName = name,
                 externalPricingAppSyncedAt = if (externalPricingAppId != null) Instant.now() else null,
                 lastSyncedPrice = lastSyncedPrice
             )

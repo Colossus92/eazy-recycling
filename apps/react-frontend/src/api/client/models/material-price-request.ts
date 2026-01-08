@@ -26,5 +26,23 @@ export interface MaterialPriceRequest {
      * @memberof MaterialPriceRequest
      */
     'price': number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof MaterialPriceRequest
+     */
+    'publishToPricingApp'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof MaterialPriceRequest
+     */
+    'externalPricingAppId'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceRequest
+     */
+    'externalPricingAppName'?: string;
 }
 

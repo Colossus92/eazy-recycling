@@ -432,6 +432,7 @@ create table if not exists material_pricing_app_sync (
                                                publish_to_pricing_app boolean not null default false,
                                                external_pricing_app_id integer,
                                                external_pricing_app_synced_at timestamp with time zone,
+                                               external_pricing_app_name text,
                                                last_synced_price numeric(19,4),
                                                created_at timestamp with time zone not null default now(),
                                                created_by text,

@@ -141,8 +141,19 @@ export const useMaterialPricesCrud = () => {
         setItemToEdit(undefined);
         setIsFormOpen(false);
       },
-      submit: async (catalogItemId: string, price: number) => {
-        const request: MaterialPriceRequest = { price };
+      submit: async (
+        catalogItemId: string,
+        price: number,
+        publishToPricingApp?: boolean,
+        externalPricingAppId?: number,
+        externalPricingAppName?: string
+      ) => {
+        const request: MaterialPriceRequest = {
+          price,
+          publishToPricingApp,
+          externalPricingAppId,
+          externalPricingAppName,
+        };
         if (itemToEdit) {
           return update(itemToEdit.id, request);
         } else {
