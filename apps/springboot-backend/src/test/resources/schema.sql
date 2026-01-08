@@ -425,6 +425,37 @@ create table if not exists catalog_items (
                                           foreign key (vat_code) references vat_rates(vat_code)
 );
 
+-- Material pricing app sync tables
+create table if not exists material_pricing_app_sync (
+                                               id bigint generated always as identity,
+                                               material_id uuid not null unique,
+                                               publish_to_pricing_app boolean not null default false,
+                                               external_pricing_app_id integer,
+                                               external_pricing_app_synced_at timestamp with time zone,
+                                               last_synced_price numeric(19,4),
+                                               created_at timestamp with time zone not null default now(),
+                                               created_by text,
+                                               last_modified_at timestamp with time zone not null default now(),
+                                               last_modified_by text,
+                                               primary key (id),
+                                               foreign key (material_id) references catalog_items(id) on delete cascade
+);
+
+create table if not exists material_price_sync_log (
+                                               id bigint generated always as identity,
+                                               material_id uuid,
+                                               external_product_id integer,
+                                               action text not null,
+                                               price_synced numeric(19,4),
+                                               price_status_sent integer,
+                                               status text not null,
+                                               error_message text,
+                                               synced_at timestamp with time zone not null default now(),
+                                               synced_by text,
+                                               primary key (id),
+                                               foreign key (material_id) references catalog_items(id)
+);
+
 -- Invoice tables
 create table if not exists invoices (
                                           id uuid not null,

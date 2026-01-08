@@ -37,6 +37,10 @@ cors:
 frontend:
   url: ${FRONTEND_URL:http://localhost:5173}
 
+pricing-app:
+  base-url: ${PRICING_APP_BASE_URL:}
+  bearer-token: ${PRICING_APP_BEARER_TOKEN:}
+
 springdoc:
   api-docs:
     enabled: false
