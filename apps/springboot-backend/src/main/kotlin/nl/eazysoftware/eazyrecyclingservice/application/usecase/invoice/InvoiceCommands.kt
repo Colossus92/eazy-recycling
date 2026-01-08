@@ -20,6 +20,8 @@ data class CreateInvoiceCommand(
 
 data class UpdateInvoiceCommand(
     val invoiceId: UUID,
+    val customerId: UUID,
+    val invoiceType: InvoiceType,
     val invoiceDate: LocalDate,
     val lines: List<InvoiceLineCommand>,
 )

@@ -80,6 +80,8 @@ class InvoiceController(
     ): InvoiceResult {
         val command = UpdateInvoiceCommand(
             invoiceId = id,
+            customerId = UUID.fromString(request.customerId),
+            invoiceType = InvoiceType.valueOf(request.invoiceType),
             invoiceDate = request.invoiceDate,
             lines = request.lines.map { line ->
                 InvoiceLineCommand(
@@ -180,6 +182,12 @@ class InvoiceController(
     )
 
     data class UpdateInvoiceRequest(
+        @field:NotBlank
+        val customerId: String,
+
+        @field:NotBlank
+        val invoiceType: String,
+
         val invoiceDate: LocalDate,
 
         @field:Valid

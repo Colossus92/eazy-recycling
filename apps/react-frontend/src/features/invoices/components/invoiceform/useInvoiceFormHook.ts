@@ -152,6 +152,8 @@ export const useInvoiceFormHook = () => {
       }));
 
     return {
+      customerId: values.customerId,
+      invoiceType: values.invoiceType,
       invoiceDate: values.invoiceDate,
       lines,
     };

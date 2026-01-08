@@ -11,11 +11,11 @@ import kotlin.time.Instant
 class Invoice(
     val id: InvoiceId,
     var invoiceNumber: InvoiceNumber?,
-    val invoiceType: InvoiceType,
+    var invoiceType: InvoiceType,
     val documentType: InvoiceDocumentType,
     var status: InvoiceStatus,
     var invoiceDate: LocalDate,
-    val customerSnapshot: CustomerSnapshot,
+    var customerSnapshot: CustomerSnapshot,
     val originalInvoiceId: InvoiceId?,
     val creditedInvoiceNumber: String?,
     val sourceWeightTicketId: WeightTicketId?,
@@ -42,11 +42,15 @@ class Invoice(
     }
 
     fun update(
+        customerSnapshot: CustomerSnapshot = this.customerSnapshot,
+        invoiceType: InvoiceType = this.invoiceType,
         invoiceDate: LocalDate = this.invoiceDate,
         lines: List<InvoiceLine> = this.lines,
         updatedBy: String? = null,
     ) {
         require(status == InvoiceStatus.DRAFT) { "Alleen concept facturen kunnen worden gewijzigd." }
+        this.customerSnapshot = customerSnapshot
+        this.invoiceType = invoiceType
         this.invoiceDate = invoiceDate
         this.lines.clear()
         this.lines.addAll(lines)

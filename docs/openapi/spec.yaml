@@ -3399,6 +3399,12 @@ components:
     UpdateInvoiceRequest:
       type: object
       properties:
+        customerId:
+          type: string
+          minLength: 1
+        invoiceType:
+          type: string
+          minLength: 1
         invoiceDate:
           type: string
           format: date
@@ -3407,7 +3413,9 @@ components:
           items:
             $ref: "#/components/schemas/InvoiceLineRequest"
       required:
+      - customerId
       - invoiceDate
+      - invoiceType
       - lines
     InvoiceResult:
       type: object
@@ -6068,11 +6076,11 @@ components:
           type: string
         errorOnELNotFound:
           type: string
+        isXml:
+          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -6164,10 +6172,15 @@ components:
     ServletContext:
       type: object
       properties:
+        attributeNames: {}
+        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        sessionTimeout:
+          type: integer
+          format: int32
         sessionTrackingModes:
           type: array
           items:
@@ -6178,15 +6191,6 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        initParameterNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        attributeNames: {}
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6225,6 +6229,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         contextPath:
           type: string
         classLoader:
@@ -6293,12 +6301,12 @@ components:
         maxAge:
           type: integer
           format: int32
+        httpOnly:
+          type: boolean
         secure:
           type: boolean
         domain:
           type: string
-        httpOnly:
-          type: boolean
         path:
           type: string
         name:

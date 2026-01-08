@@ -124,14 +124,19 @@ const InvoiceLineRow = ({
         />
       </td>
       <td className="p-2">
-        <input
-          type="number"
-          step="0.01"
-          className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right"
-          placeholder="0.00"
-          {...register(`lines.${index}.unitPrice`)}
-          disabled={isReadOnly}
-        />
+        <div className="relative">
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-body-2 text-color-text-secondary pointer-events-none">
+            €
+          </span>
+          <input
+            type="number"
+            step="0.01"
+            className="w-full pl-6 pr-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right"
+            placeholder="0,00"
+            {...register(`lines.${index}.unitPrice`)}
+            disabled={isReadOnly}
+          />
+        </div>
       </td>
       <td className="p-2">
         <input
@@ -185,7 +190,7 @@ export const InvoiceLinesSection = ({
   const previousCustomerIdRef = useRef<string | undefined>(undefined);
   const isInitialMount = useRef(true);
 
-  // When customerId changes, clear catalog item selections from lines
+  // When customerId changes, reset invoice lines
   useEffect(() => {
     // Skip on initial mount to preserve loaded data
     if (isInitialMount.current) {
@@ -194,28 +199,34 @@ export const InvoiceLinesSection = ({
       return;
     }
 
-    // Only clear if customer actually changed from a previous non-empty value
+    // Only reset if customer actually changed from a previous non-empty value
     if (
       previousCustomerIdRef.current !== undefined &&
       previousCustomerIdRef.current !== '' &&
       previousCustomerIdRef.current !== customerId &&
       fields.length > 0
     ) {
-      // Clear catalog item selections from all lines
-      fields.forEach((_, index) => {
-        const currentLine = formContext.getValues(`lines.${index}`);
-        formContext.setValue(`lines.${index}`, {
-          ...currentLine,
-          catalogItemId: '',
-          catalogItemName: '',
-          unitOfMeasure: '',
-          unitPrice: '0',
-        });
+      // Remove all existing lines
+      for (let i = fields.length - 1; i >= 0; i--) {
+        remove(i);
+      }
+
+      // Add one empty line
+      append({
+        catalogItemId: '',
+        catalogItemName: '',
+        date: '',
+        description: '',
+        quantity: '1',
+        unitPrice: '0,00',
+        unitOfMeasure: '',
+        vatPercentage: '21',
+        orderReference: '',
       });
     }
 
     previousCustomerIdRef.current = customerId;
-  }, [customerId, fields, formContext]);
+  }, [customerId, fields, formContext, remove, append]);
 
   const totals = useMemo(() => {
     let totalExclVat = 0;
@@ -244,7 +255,7 @@ export const InvoiceLinesSection = ({
       date: '',
       description: '',
       quantity: '1',
-      unitPrice: '0',
+      unitPrice: '0,00',
       unitOfMeasure: '',
       vatPercentage: '21',
       orderReference: '',

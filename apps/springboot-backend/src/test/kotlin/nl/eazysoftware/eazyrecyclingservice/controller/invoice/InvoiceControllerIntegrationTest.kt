@@ -188,6 +188,8 @@ class InvoiceControllerIntegrationTest @Autowired constructor(
         val created = objectMapper.readValue(mvcResult.response.contentAsString, InvoiceResult::class.java)
 
         val updateReq = InvoiceController.UpdateInvoiceRequest(
+            customerId = testCompany.id.toString(),
+            invoiceType = "SALE",
             invoiceDate = LocalDate.now().plusDays(1),
             lines = listOf(
                 InvoiceController.InvoiceLineRequest(

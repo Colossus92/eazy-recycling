@@ -1,9 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceLine
-import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceLineId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.*
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.CatalogItems
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.stereotype.Service
@@ -17,6 +18,7 @@ interface UpdateInvoice {
 @Service
 class UpdateInvoiceService(
     private val invoices: Invoices,
+    private val companies: Companies,
     private val catalogItems: CatalogItems,
     private val vatRates: VatRates,
 ) : UpdateInvoice {
@@ -26,11 +28,18 @@ class UpdateInvoiceService(
         val invoice = invoices.findById(InvoiceId(cmd.invoiceId))
             ?: throw IllegalArgumentException("Factuur niet gevonden: ${cmd.invoiceId}")
 
+        val company = companies.findById(CompanyId(cmd.customerId))
+            ?: throw IllegalArgumentException("Bedrijf niet gevonden: ${cmd.customerId}")
+
+        val customerSnapshot = createCustomerSnapshot(company)
+
         val lines = cmd.lines.mapIndexed { index, lineCmd ->
             createInvoiceLine(index + 1, lineCmd)
         }
 
         invoice.update(
+            customerSnapshot = customerSnapshot,
+            invoiceType = cmd.invoiceType,
             invoiceDate = cmd.invoiceDate,
             lines = lines,
             updatedBy = null,
@@ -38,6 +47,23 @@ class UpdateInvoiceService(
 
         val saved = invoices.save(invoice)
         return InvoiceResult(invoiceId = saved.id.value)
+    }
+
+    private fun createCustomerSnapshot(company: Company): CustomerSnapshot {
+        return CustomerSnapshot(
+            companyId = company.companyId,
+            customerNumber = company.code,
+            name = company.name,
+            address = AddressSnapshot(
+                streetName = company.address.streetName.value,
+                buildingNumber = company.address.buildingNumber,
+                buildingNumberAddition = company.address.buildingNumberAddition,
+                postalCode = company.address.postalCode.value,
+                city = company.address.city.value,
+                country = company.address.country,
+            ),
+            vatNumber = null,
+        )
     }
 
     private fun createInvoiceLine(lineNumber: Int, cmd: InvoiceLineCommand): InvoiceLine {

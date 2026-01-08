@@ -28,6 +28,18 @@ export interface UpdateInvoiceRequest {
      * @type {string}
      * @memberof UpdateInvoiceRequest
      */
+    'customerId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateInvoiceRequest
+     */
+    'invoiceType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateInvoiceRequest
+     */
     'invoiceDate': string;
     /**
      * 

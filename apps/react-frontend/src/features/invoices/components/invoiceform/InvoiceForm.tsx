@@ -146,6 +146,8 @@ export const InvoiceForm = ({
       if (currentInvoiceId) {
         // Update existing invoice, then finalize
         await invoiceService.update(currentInvoiceId, {
+          customerId: values.customerId,
+          invoiceType: values.invoiceType,
           invoiceDate: values.invoiceDate,
           lines: values.lines
             .filter((line) => line.catalogItemId)

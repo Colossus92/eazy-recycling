@@ -39,6 +39,18 @@ import type { SessionCookieConfig } from './session-cookie-config';
 export interface ServletContext {
     /**
      *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
+    /**
+     *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'initParameterNames'?: any;
+    /**
+     *
      * @type {SessionCookieConfig}
      * @memberof ServletContext
      */
@@ -51,34 +63,16 @@ export interface ServletContext {
     'virtualServerName'?: string;
     /**
      *
-     * @type {Set<string>}
-     * @memberof ServletContext
-     */
-    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
-    /**
-     *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'initParameterNames'?: any;
-    /**
-     *
      * @type {number}
      * @memberof ServletContext
      */
     'sessionTimeout'?: number;
     /**
      *
-     * @type {any}
+     * @type {Set<string>}
      * @memberof ServletContext
      */
-    'attributeNames'?: any;
-    /**
-     *
-     * @type {{ [key: string]: ServletRegistration; }}
-     * @memberof ServletContext
-     */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
     /**
      *
      * @type {number}
@@ -139,6 +133,12 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'responseCharacterEncoding'?: string;
+    /**
+     *
+     * @type {{ [key: string]: ServletRegistration; }}
+     * @memberof ServletContext
+     */
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
     /**
      *
      * @type {string}
