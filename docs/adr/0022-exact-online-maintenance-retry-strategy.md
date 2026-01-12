@@ -133,6 +133,7 @@ Total: ~63 minutes, covering the 30-minute maintenance window with generous buff
 
 - **Retry (503, 504)**: Transient errors indicating maintenance or temporary unavailability
 - **Don't Retry (400, 401, 403, etc.)**: Permanent errors requiring manual intervention (bad credentials, expired refresh token, etc.)
+- **Retry (IllegalStateException)**: Transient errors indicating maintenance or temporary unavailability. On 12-01-2026 this exception occurred because the response from Exact Online was empty.
 
 ## More information
 

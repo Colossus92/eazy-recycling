@@ -137,7 +137,7 @@ class ExactOAuthService(
      * - exact.oauth.retry.max-delay (default: 600000ms)
      */
     @Retryable(
-        retryFor = [ExactMaintenanceException::class],
+        retryFor = [ExactMaintenanceException::class, IllegalStateException::class],
         maxAttemptsExpression = "\${exact.oauth.retry.max-attempts:10}",
         backoff = Backoff(
             delayExpression = "\${exact.oauth.retry.delay:60000}",
