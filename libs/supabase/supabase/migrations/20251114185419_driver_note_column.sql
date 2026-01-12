@@ -1,1 +1,0 @@
-alter table "public"."transports" add column "driver_note" text;

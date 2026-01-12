@@ -94,6 +94,9 @@ dependencies {
   // CSV parsing for LMA import
   implementation("org.apache.commons:commons-csv:1.14.1")
 
+  // String similarity for fuzzy matching
+  implementation("org.apache.commons:commons-text:1.15.0")
+
   // Mapstruct
   implementation("org.mapstruct:mapstruct:1.6.3")
   kapt("org.mapstruct:mapstruct-processor:1.6.3")

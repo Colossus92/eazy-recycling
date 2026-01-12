@@ -23,6 +23,7 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID>, JpaSpecificati
   fun findByIdAndDeletedAtIsNull(id: UUID): CompanyDto?
   fun findByProcessorIdAndDeletedAtIsNull(processorId: String): CompanyDto?
   fun findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId: String): CompanyDto?
+  fun findAllByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId: String): List<CompanyDto>
   fun findByChamberOfCommerceIdAndDeletedAtNotNull(chamberOfCommerceId: String): CompanyDto?
   fun findByVihbIdAndDeletedAtNotNull(vihbId: String): CompanyDto?
   fun findByProcessorIdAndDeletedAtNotNull(processorId: String): CompanyDto?
@@ -85,6 +86,11 @@ class CompanyRepository(
   override fun findByChamberOfCommerceId(chamberOfCommerceId: String): Company? {
     return jpaRepository.findByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId)
       ?.let { companyMapper.toDomain(it) }
+  }
+
+  override fun findAllByChamberOfCommerceId(chamberOfCommerceId: String): List<Company> {
+    return jpaRepository.findAllByChamberOfCommerceIdAndDeletedAtIsNull(chamberOfCommerceId)
+      .map { companyMapper.toDomain(it) }
   }
 
   override fun existsByChamberOfCommerceId(chamberOfCommerceId: String): Boolean {

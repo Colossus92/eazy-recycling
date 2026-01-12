@@ -119,14 +119,6 @@ CREATE POLICY "Allow authenticated users to read my_new_table"
   USING (true);
 ```
 
-### Applying Migrations Locally
-
-Migrations are automatically applied when you start your local Supabase instance. You can also apply them manually:
-
-```bash
-supabase db push
-```
-
 ### Exporting Data
 
 To export data from your local Supabase database to an SQL file:

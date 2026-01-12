@@ -1,1 +1,0 @@
-alter table "public"."lma_declarations" alter column "type" set not null;
