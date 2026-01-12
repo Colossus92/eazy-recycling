@@ -32,6 +32,7 @@ const mockCompanies: Company[] = [
     },
     chamberOfCommerceId: '12345678',
     vihbId: '123456VIHB',
+    processorId: '12345',
     updatedAt: new Date().toISOString(),
     branches: [],
     roles: [CompleteCompanyViewRolesEnum.Processor],
@@ -535,5 +536,306 @@ describe('CompanyForm', () => {
 
     // onSubmit should not have been called due to validation error
     expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('requires processorId when PROCESSOR role is selected', async () => {
+    render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
+      wrapper,
+    });
+
+    // Fill in required fields
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul bedrijfsnaam in'),
+      'Test Company'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul straatnaam in'),
+      'Test Street'
+    );
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul postcode in'),
+      '1234 ZZ'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul Plaats in'),
+      'Test City'
+    );
+
+    // Select PROCESSOR role by typing into the select input
+    const rolesSelect = screen.getByTestId('roles-select');
+    const rolesInput = rolesSelect.querySelector('input');
+    await userEvent.click(rolesInput!);
+    await userEvent.type(rolesInput!, 'Verwerker{enter}');
+
+    // Leave processorId empty and submit
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Check that validation error appears
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'Vewerkersnummer is verplicht voor bedrijven met de rol Verwerker'
+        )
+      ).toBeInTheDocument();
+    });
+
+    // onSubmit should not have been called
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('allows empty processorId when PROCESSOR role is not selected', async () => {
+    render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
+      wrapper,
+    });
+
+    // Fill in required fields
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul bedrijfsnaam in'),
+      'Test Company'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul straatnaam in'),
+      'Test Street'
+    );
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul postcode in'),
+      '1234 ZZ'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul Plaats in'),
+      'Test City'
+    );
+
+    // Select CARRIER role by typing into the select input
+    const rolesSelect = screen.getByTestId('roles-select');
+    const rolesInput = rolesSelect.querySelector('input');
+    await userEvent.click(rolesInput!);
+    await userEvent.type(rolesInput!, 'Transporteur{enter}');
+
+    // Leave processorId empty and submit
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Form should submit successfully without processorId
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Company',
+          processorId: undefined,
+          roles: ['CARRIER'],
+        })
+      );
+    });
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('validates processorId format when provided', async () => {
+    render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
+      wrapper,
+    });
+
+    // Fill in required fields
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul bedrijfsnaam in'),
+      'Test Company'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul straatnaam in'),
+      'Test Street'
+    );
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul postcode in'),
+      '1234 ZZ'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul Plaats in'),
+      'Test City'
+    );
+
+    // Select PROCESSOR role by typing into the select input
+    const rolesSelect = screen.getByTestId('roles-select');
+    const rolesInput = rolesSelect.querySelector('input');
+    await userEvent.click(rolesInput!);
+    await userEvent.type(rolesInput!, 'Verwerker{enter}');
+
+    // Fill processorId with invalid format (not 5 digits)
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul vewerkersnummer in'),
+      'ABC123'
+    );
+
+    // Submit the form
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Check that validation error appears
+    await waitFor(() => {
+      expect(
+        screen.getByText('Vewerkersnummer moet 5 cijfers bevatten')
+      ).toBeInTheDocument();
+    });
+
+    // onSubmit should not have been called
+    expect(mockOnSubmit).not.toHaveBeenCalled();
+  });
+
+  it('submits form with valid processorId when PROCESSOR role is selected', async () => {
+    render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
+      wrapper,
+    });
+
+    // Fill in required fields
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul bedrijfsnaam in'),
+      'Test Company'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul straatnaam in'),
+      'Test Street'
+    );
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul postcode in'),
+      '1234 ZZ'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul Plaats in'),
+      'Test City'
+    );
+
+    // Select PROCESSOR role by typing into the select input
+    const rolesSelect = screen.getByTestId('roles-select');
+    const rolesInput = rolesSelect.querySelector('input');
+    await userEvent.click(rolesInput!);
+    await userEvent.type(rolesInput!, 'Verwerker{enter}');
+
+    // Fill valid processorId (5 digits)
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul vewerkersnummer in'),
+      '12345'
+    );
+
+    // Submit the form
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Form should submit successfully
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Company',
+          processorId: '12345',
+          roles: ['PROCESSOR'],
+        })
+      );
+    });
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows processorId with whitespace-only to be treated as undefined', async () => {
+    render(<CompanyForm onCancel={mockOnCancel} onSubmit={mockOnSubmit} />, {
+      wrapper,
+    });
+
+    // Fill in required fields
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul bedrijfsnaam in'),
+      'Test Company'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul straatnaam in'),
+      'Test Street'
+    );
+    await userEvent.type(screen.getByTestId('houseNumber'), '42');
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul postcode in'),
+      '1234 ZZ'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul Plaats in'),
+      'Test City'
+    );
+
+    // Select CARRIER role by typing into the select input
+    const rolesSelect = screen.getByTestId('roles-select');
+    const rolesInput = rolesSelect.querySelector('input');
+    await userEvent.click(rolesInput!);
+    await userEvent.type(rolesInput!, 'Transporteur{enter}');
+
+    // Fill processorId with whitespace only
+    await userEvent.type(
+      screen.getByPlaceholderText('Vul vewerkersnummer in'),
+      '   '
+    );
+
+    // Submit the form
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Form should submit with processorId as undefined
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Company',
+          processorId: undefined,
+          roles: ['CARRIER'],
+        })
+      );
+    });
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles edit mode with processor company correctly', async () => {
+    const mockCompany = mockCompanies[0]; // Has PROCESSOR role and processorId
+
+    render(
+      <CompanyForm
+        onCancel={mockOnCancel}
+        onSubmit={mockOnSubmit}
+        company={mockCompany}
+      />,
+      { wrapper }
+    );
+
+    // Wait for form to load with existing data
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Vul bedrijfsnaam in')).toHaveValue(
+        mockCompany.name
+      );
+    });
+
+    // Check that processorId field has the correct value
+    expect(screen.getByPlaceholderText('Vul vewerkersnummer in')).toHaveValue(
+      '12345'
+    );
+
+    // Submit without changing anything
+    const submitButton = screen.getByTestId('submit-button');
+    await userEvent.click(submitButton);
+
+    // Check if onSubmit was called with correct data including processorId
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: mockCompany.id,
+          name: mockCompany.name,
+          processorId: '12345',
+          roles: [CompleteCompanyViewRolesEnum.Processor],
+        })
+      );
+    });
+
+    expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 });

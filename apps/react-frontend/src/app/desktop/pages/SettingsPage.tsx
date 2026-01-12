@@ -299,6 +299,7 @@ export const SettingsPage = () => {
                   syncFromExactMutation.isPending ||
                   !connectionStatus?.connected
                 }
+                loading={syncFromExactMutation.isPending}
               />
             </div>
 

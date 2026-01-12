@@ -2,9 +2,9 @@ package nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
+import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayLocalDateTime
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
@@ -81,7 +81,6 @@ data class VatRateRequest(
     @field:Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Percentage moet een geldig getal zijn")
     val percentage: String,
 
-    @field:NotNull(message = "Geldig vanaf is verplicht")
     val validFrom: LocalDateTime,
 
     val validTo: LocalDateTime?,
@@ -107,8 +106,8 @@ data class VatRateRequest(
 data class VatRateResponse(
     val vatCode: String,
     val percentage: String,
-    val validFrom: String,
-    val validTo: String?,
+    val validFrom: LocalDateTime,
+    val validTo: LocalDateTime?,
     val countryCode: String,
     val description: String,
     val createdAt: Instant? = null,
@@ -121,8 +120,8 @@ fun VatRate.toResponse(): VatRateResponse {
     return VatRateResponse(
         vatCode = vatCode,
         percentage = percentage,
-        validFrom = validFrom.toString(),
-        validTo = validTo?.toString(),
+        validFrom = validFrom.toDisplayLocalDateTime(),
+        validTo = validTo?.toDisplayLocalDateTime(),
         countryCode = countryCode,
         description = description,
         createdAt = createdAt?.toJavaInstant(),

@@ -134,6 +134,7 @@ export const LmaImportTab = () => {
                   label={isImporting ? 'Importeren...' : 'Importeren'}
                   onClick={handleImport}
                   disabled={!selectedFile || isImporting}
+                  loading={isImporting}
                 />
               </div>
 

@@ -350,10 +350,19 @@ export const CompanyForm = ({
                 rules: {
                   validate: (value: string) => {
                     const trimmed = value?.trim() || '';
+                    const selectedRoles = watch('roles') || [];
+                    const hasProcessorRole = selectedRoles.includes(
+                      'PROCESSOR' as CompleteCompanyViewRolesEnum
+                    );
+
+                    if (hasProcessorRole && trimmed === '') {
+                      return 'Vewerkersnummer is verplicht voor bedrijven met de rol Verwerker';
+                    }
+
                     if (trimmed === '') return true;
                     return (
                       /^\d{5}$/.test(trimmed) ||
-                      'Vewerkersnummer moet 5 cijfers bevatten of leeg zijn'
+                      'Vewerkersnummer moet 5 cijfers bevatten'
                     );
                   },
                 },
@@ -383,6 +392,7 @@ export const CompanyForm = ({
             }}
             value={company?.roles}
             isMulti={true}
+            testId="roles-select"
           />
           <AuditMetadataFooter
             createdAt={company?.createdAt}

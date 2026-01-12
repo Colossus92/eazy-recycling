@@ -70,8 +70,8 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         '');
 
 -- Insert user roles referencing the generated user IDs
-INSERT INTO "public"."user_roles" ("user_id", "role") 
-VALUES 
+INSERT INTO "public"."user_roles" ("user_id", "role")
+VALUES
     -- admin@eazyrecycling.nl gets admin, planner, and chauffeur roles
     ((SELECT id FROM auth.users WHERE email = 'admin@eazyrecycling.nl'), 'admin'),
     ((SELECT id FROM auth.users WHERE email = 'admin@eazyrecycling.nl'), 'planner'),
@@ -84,7 +84,7 @@ VALUES
 INSERT INTO "public"."trucks" ("license_plate", "brand", "description", "last_modified_at") VALUES
 	('86-BVB-6', 'Scania', 'Haakarm', '2025-09-19 10:56:08.866574+00');
 
-INSERT INTO "public"."eural" ("code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by") 
+INSERT INTO "public"."eural" ("code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by")
 VALUES ('09 01 11*', 'wegwerpcamera''s met onder 16 06 01, 16 06 02 of 16 06 03 vermelde batterijen 09 01 12 niet onder 09 01 11 vallende wegwerpcamera''s met batterijen', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('16 01 17', 'ferrometalen', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('16 01 18', 'non-ferrometalen', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
@@ -114,7 +114,7 @@ VALUES ('09 01 11*', 'wegwerpcamera''s met onder 16 06 01, 16 06 02 of 16 06 03 
        ('20 01 36', 'niet onder 20 01 21, 20 01 23 en 20 01 35 vallende afgedankte elektrische en elektronische apparatuur', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('20 01 40', 'metalen', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null);
 
-INSERT INTO "public"."processing_methods" ("code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by") 
+INSERT INTO "public"."processing_methods" ("code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by")
 VALUES ('A.01', 'Bewaren', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('A.02', 'Overslag / opbulken', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('B.01', 'Inzetten als veevoer', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
@@ -147,7 +147,7 @@ VALUES ('A.01', 'Bewaren', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10
        ('G.01', 'Direct storten', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null),
        ('G.02', 'Immobiliseren', '2025-12-01 10:42:32.519602+00', null, '2025-12-01 10:42:32.519602+00', null);
 
-INSERT INTO "public"."catalog_item_categories" ("type", "code", "name", "description", "created_at", "created_by", "last_modified_at", "last_modified_by", "id") 
+INSERT INTO "public"."catalog_item_categories" ("type", "code", "name", "description", "created_at", "created_by", "last_modified_at", "last_modified_by", "id")
 VALUES ('MATERIAL', '014', 'Nikkel', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '02004267-9eac-42f9-b1cb-2905840bd1bc'),
        ('MATERIAL', '007', 'Diversen', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '03b74bd6-3ad6-4190-a640-e4138382e051'),
        ('MATERIAL', 'W2', 'WEEEA2', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '088e4632-ce28-4fbb-a1d5-f336dc8ca471'),
@@ -169,7 +169,13 @@ VALUES ('MATERIAL', '014', 'Nikkel', '', '2025-12-01 09:25:09.143787+00', null, 
        ('MATERIAL', 'W6', 'WEEEA6', null, '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'dbc8d737-ecd6-4697-bfef-875f00776c4f'),
        ('MATERIAL', '002', 'Kabel', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'e11b60ff-5552-49bf-b545-7c2358ccdeb2');
 
-INSERT INTO "public"."catalog_items" ("type", "code", "name", "unit_of_measure", "vat_code", "consignor_party_id", "default_price", "status", "purchase_account_number", "sales_account_number", "created_at", "created_by", "last_modified_at", "last_modified_by", "id", "category_id") 
+
+INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid_to", "country_code", "description", "validity", "created_at", "created_by", "last_modified_at", "last_modified_by")
+VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'Aad Admin'),
+       ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:23.437526+00', 'Aad Admin', '2026-01-12 12:17:23.437526+00', 'Aad Admin'),
+       ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:44.657772+00', 'Aad Admin', '2026-01-12 12:17:44.657772+00', 'Aad Admin');
+
+INSERT INTO "public"."catalog_items" ("type", "code", "name", "unit_of_measure", "vat_code", "consignor_party_id", "default_price", "status", "purchase_account_number", "sales_account_number", "created_at", "created_by", "last_modified_at", "last_modified_by", "id", "category_id")
 VALUES ('MATERIAL', '8011', 'Lood', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '010a3d89-9680-49cc-98ff-9ccd50800976', '03b74bd6-3ad6-4190-a640-e4138382e051'),
        ('MATERIAL', '4008', 'Messing Hulzen', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '010f81ff-2b90-4d13-b70b-ae74ecf6ec69', '5438cfa9-f397-4536-a8f5-8681a8dc37f0'),
        ('MATERIAL', '4001', 'Brons', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '02828db6-6876-4da2-862f-a0f8d5673625', '7f4a843b-8278-40ac-ba25-56ce03aff9df'),
@@ -459,7 +465,7 @@ VALUES ('MATERIAL', '8011', 'Lood', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', 
        ('MATERIAL', '2015', 'Koper handgepeld vertint', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'fd746892-69fc-4152-9c44-aa1387555b2d', '7cf92eff-d41b-489f-8a44-c9c9347fc33f'),
        ('MATERIAL', '3', 'Ijzer 3B', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'ffb4b58a-d44a-4182-bddf-84097166d3a3', 'c2697524-b2a2-45df-b691-abe9c5a2a1c6');
 
-INSERT INTO "jobrunr"."jobrunr_migrations" ("id", "script", "installedon") 
+INSERT INTO "jobrunr"."jobrunr_migrations" ("id", "script", "installedon")
 VALUES ('00f35f97-3d46-4ded-b280-d407a0e053a0', 'v003__create_background_job_server_table.sql', '2026-01-02T08:51:07.448884Z'),
        ('245eb53f-e3be-416d-8398-0801b7f4d3fa', 'v004__create_job_stats_view.sql', '2026-01-02T08:51:07.620736Z'),
        ('2f704c40-895f-4b66-9feb-c9742d29afcc', 'v013__alter_table_recurring_job_add_createdAt.sql', '2026-01-02T08:51:08.149345Z'),

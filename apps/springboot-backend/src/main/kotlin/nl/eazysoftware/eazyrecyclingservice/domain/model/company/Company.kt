@@ -21,4 +21,10 @@ data class Company(
   val createdBy: String? = null,
   val updatedAt: Instant? = null,
   val updatedBy: String? = null,
-)
+) {
+  init {
+    require(CompanyRole.PROCESSOR !in roles || processorId != null) {
+      "Companies with PROCESSOR role must have a processorId"
+    }
+  }
+}

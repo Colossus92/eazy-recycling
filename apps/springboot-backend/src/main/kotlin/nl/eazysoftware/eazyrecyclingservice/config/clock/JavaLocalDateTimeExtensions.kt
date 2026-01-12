@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.config.clock
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.time.Instant
+import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 /**
@@ -44,4 +45,12 @@ fun java.time.Instant.toDisplayLocalDateTime(): LocalDateTime {
  */
 fun java.time.Instant.toDisplayLocalDate(): LocalDate {
   return this.atZone(TimeConfiguration.DISPLAY_ZONE_ID).toLocalDate()
+}
+
+/**
+ * Converts a Kotlin Instant (UTC) to a LocalDateTime in the display timezone (CET/CEST).
+ * Use this when displaying UTC timestamps to users.
+ */
+fun Instant.toDisplayLocalDateTime(): LocalDateTime {
+  return this.toJavaInstant().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toLocalDateTime()
 }

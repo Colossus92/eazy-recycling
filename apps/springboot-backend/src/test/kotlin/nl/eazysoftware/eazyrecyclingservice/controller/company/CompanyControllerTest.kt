@@ -713,4 +713,193 @@ class CompanyControllerIntegrationTest @Autowired constructor(
       .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.postalCode").value("6000FF"))
       .andExpect(jsonPath("$.content[?(@.id == '${company.companyId}')].branches[0].address.city").value("Updated City"))
   }
+
+  @Test
+  fun `create company with PROCESSOR role but no processor ID - returns 400`() {
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "11223344",
+      vihbId = "112233VIHB",
+      processorId = null,
+      name = "Test Processor BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.PROCESSOR),
+    )
+
+    securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andExpect(status().isBadRequest)
+  }
+
+  @Test
+  fun `create company with PROCESSOR role and processor ID - success`() {
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "22334455",
+      vihbId = "223344VIHB",
+      processorId = "12345",
+      name = "Test Processor BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.PROCESSOR),
+    )
+
+    securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andExpect(status().isCreated)
+  }
+
+  @Test
+  fun `create company without PROCESSOR role and no processor ID - success`() {
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "33445566",
+      vihbId = "334455VIHB",
+      processorId = null,
+      name = "Test Carrier BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.CARRIER),
+    )
+
+    securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andExpect(status().isCreated)
+  }
+
+  @Test
+  fun `update company to add PROCESSOR role without processor ID - returns 400`() {
+    // Create a company without PROCESSOR role
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "44556677",
+      vihbId = "445566VIHB",
+      processorId = null,
+      name = "Test Company BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.CARRIER),
+    )
+
+    val mvcResult = securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andReturn()
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
+
+    // Update to add PROCESSOR role without processor ID
+    val updateReq = req.copy(roles = listOf(CompanyRole.PROCESSOR, CompanyRole.CARRIER))
+
+    securedMockMvc.put(
+      "/companies/${created.companyId}",
+      objectMapper.writeValueAsString(updateReq)
+    )
+      .andExpect(status().isBadRequest)
+  }
+
+  @Test
+  fun `update company to add PROCESSOR role with processor ID - success`() {
+    // Create a company without PROCESSOR role
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "55667788",
+      vihbId = "556677VIHB",
+      processorId = null,
+      name = "Test Company BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.CARRIER),
+    )
+
+    val mvcResult = securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andReturn()
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
+
+    // Update to add PROCESSOR role with processor ID
+    val updateReq = req.copy(
+      roles = listOf(CompanyRole.PROCESSOR, CompanyRole.CARRIER),
+      processorId = "67890"
+    )
+
+    securedMockMvc.put(
+      "/companies/${created.companyId}",
+      objectMapper.writeValueAsString(updateReq)
+    )
+      .andExpect(status().isOk)
+  }
+
+  @Test
+  fun `update company to remove PROCESSOR role - success even with no processor ID`() {
+    // Create a company with PROCESSOR role
+    val req = CompanyController.CompanyRequest(
+      chamberOfCommerceId = "66778899",
+      vihbId = "667788VIHB",
+      processorId = "11111",
+      name = "Test Processor BV",
+      address = AddressRequest(
+        streetName = "Main St",
+        buildingNumberAddition = "HQ",
+        buildingNumber = "1",
+        postalCode = "1234 AB",
+        city = "Amsterdam",
+        country = "Nederland"
+      ),
+      roles = listOf(CompanyRole.PROCESSOR),
+    )
+
+    val mvcResult = securedMockMvc.post(
+      "/companies",
+      objectMapper.writeValueAsString(req)
+    )
+      .andReturn()
+    val created = objectMapper.readValue(mvcResult.response.contentAsString, CompanyResult::class.java)
+
+    // Update to remove PROCESSOR role and processor ID
+    val updateReq = req.copy(
+      roles = listOf(CompanyRole.CARRIER),
+      processorId = null
+    )
+
+    securedMockMvc.put(
+      "/companies/${created.companyId}",
+      objectMapper.writeValueAsString(updateReq)
+    )
+      .andExpect(status().isOk)
+  }
 }

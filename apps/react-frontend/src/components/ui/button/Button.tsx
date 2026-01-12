@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, FunctionComponent, SVGProps } from 'react';
 import clsx from 'clsx';
+import { ClipLoader } from 'react-spinners';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'icon';
@@ -10,6 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   disabled?: boolean;
   showText?: boolean;
   fullWidth?: boolean;
+  loading?: boolean;
 }
 
 const paddingMap: Record<
@@ -40,9 +42,10 @@ export const Button = ({
   iconPosition = 'left',
   showText = true,
   fullWidth = false,
+  loading = false,
   ...props
 }: ButtonProps) => {
-  const disabled = props.disabled ?? false;
+  const disabled = (props.disabled ?? false) || loading;
   const base = 'inline-flex justify-center items-center flex-shrink-0';
   const sizeClasses = {
     small: 'h-8 gap-1 rounded-radius-sm',
@@ -76,7 +79,8 @@ export const Button = ({
     ),
   }[variant];
   const width = fullWidth ? 'w-full' : '';
-  const iconMode = Icon ? (iconPosition === 'left' ? 'left' : 'right') : 'none';
+  const iconMode =
+    Icon && !loading ? (iconPosition === 'left' ? 'left' : 'right') : 'none';
 
   const paddingClasses = showText ? paddingMap[size][iconMode] : 'p-1.5';
   return (
@@ -87,14 +91,21 @@ export const Button = ({
         paddingClasses,
         variantClasses,
         width,
-        Icon && iconPosition === 'right' ? 'flex-row-reverse' : ''
+        Icon && iconPosition === 'right' && !loading ? 'flex-row-reverse' : ''
       )}
       {...props}
+      disabled={disabled}
     >
-      {Icon && (
+      {loading ? (
         <span className="flex-shrink-0">
-          <Icon />
+          <ClipLoader size={20} color="currentColor" />
         </span>
+      ) : (
+        Icon && (
+          <span className="flex-shrink-0">
+            <Icon />
+          </span>
+        )
       )}
       {showText && <span className="text-subtitle-2">{label}</span>}
     </button>
