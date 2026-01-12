@@ -1,7 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.lmaimport
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportError
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErrorCode
@@ -13,7 +12,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.ProcessingMethodRepositor
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
 import nl.eazysoftware.eazyrecyclingservice.repository.jobs.LmaDeclarationDto
-import org.apache.commons.text.similarity.LevenshteinDistance
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,6 +27,9 @@ class ImportLmaWasteStreamsService(
   private val csvParser: LmaCsvParser,
   private val wasteStreams: WasteStreams,
   private val companies: Companies,
+  private val fuzzyMatcher: FuzzyMatcher,
+  private val catalogItemMapper: WasteStreamCatalogItemMapper,
+  private val catalogItems: CatalogItems,
   private val lmaImportErrors: LmaImportErrors,
   private val euralRepository: EuralRepository,
   private val processingMethodRepository: ProcessingMethodRepository,
@@ -144,7 +145,8 @@ class ImportLmaWasteStreamsService(
         "Handelsregisternummer Ontdoener is verplicht")
 
     // Use smart matching to handle potential duplicate KvK numbers
-    val pickupCompany = findCompanyForLmaImport(kvkNumber, record.naamOntdoener)
+    val candidates = companies.findAllByChamberOfCommerceId(kvkNumber)
+    val pickupCompany = fuzzyMatcher.findBestMatchingCompany(candidates, record.naamOntdoener)
       ?: return createError(record, importBatchId, LmaImportErrorCode.COMPANY_NOT_FOUND,
         "Geen bedrijf gevonden met KvK nummer: $kvkNumber (${record.naamOntdoener ?: "onbekend"})")
 
@@ -179,8 +181,13 @@ class ImportLmaWasteStreamsService(
 
       // Build pickup location
       val pickupLocation = buildPickupLocation(record)
+
+      // Resolve catalog item using hard-coded mappings
+      val wasteStreamName = record.gebruikelijkeNaam ?: record.euralcodeOmschrijving ?: "Onbekend"
+      val catalogItemId = resolveCatalogItemId(wasteStreamName)
+
       val wasteType = WasteType(
-        name = record.gebruikelijkeNaam ?: record.euralcodeOmschrijving ?: "Onbekend",
+        name = wasteStreamName,
         euralCode = EuralCode(euralCode),
         processingMethod = ProcessingMethod(processingMethodCode)
       )
@@ -195,6 +202,7 @@ class ImportLmaWasteStreamsService(
         consignorParty = Consignor.Company(pickupCompany.companyId),
         consignorClassification = ConsignorClassification.PICKUP_PARTY,
         pickupParty = pickupCompany.companyId,
+        catalogItemId = catalogItemId,
         status = WasteStreamStatus.ACTIVE
       )
 
@@ -350,43 +358,30 @@ class ImportLmaWasteStreamsService(
   }
 
   /**
-   * Finds the best matching company for LMA import using Chamber of Commerce ID.
-   * Handles duplicate KvK numbers by using fuzzy name matching.
-   *
-   * @param kvkNumber Chamber of Commerce number from LMA data
-   * @param companyName Company name from LMA data ("Naam Ontdoener" field)
-   * @return Best matching company, or null if no match found
+   * Resolves catalog item ID based on waste stream name using hard-coded mappings.
+   * Returns null if no mapping exists.
    */
-  private fun findCompanyForLmaImport(kvkNumber: String, companyName: String?): Company? {
-    val candidates = companies.findAllByChamberOfCommerceId(kvkNumber)
+  private fun resolveCatalogItemId(wasteStreamName: String): UUID? {
+    val catalogItemName = catalogItemMapper.mapToCatalogItemName(wasteStreamName)
+      ?: return null
 
-    return when (candidates.size) {
-      0 -> null
-      1 -> candidates.first()
-      else -> {
-        // Multiple companies with same KvK - use fuzzy name matching
-        logger.warn("Found ${candidates.size} companies with KvK $kvkNumber: ${candidates.joinToString { it.name }}")
+    // Find catalog item by name (case-insensitive)
+    val allCatalogItems = catalogItems.findAll(consignorPartyId = null, query = null)
+    val matchingItem = allCatalogItems.firstOrNull {
+      it.name.equals(catalogItemName, ignoreCase = true)
+    }
 
-        if (companyName.isNullOrBlank()) {
-          logger.warn("No company name provided for disambiguation, using first match")
-          return candidates.first()
-        }
-
-        // Find best match using Levenshtein distance
-        val levenshtein = LevenshteinDistance()
-        val bestMatch = candidates
-          .map { company ->
-            val distance = levenshtein.apply(company.name.lowercase(), companyName.lowercase())
-            company to distance
-          }
-          .minByOrNull { it.second }
-
-        bestMatch?.let { (company, distance) ->
-          logger.info("Selected company '${company.name}' for KvK $kvkNumber (distance: $distance from '$companyName')")
-          company
-        }
-      }
+    if (matchingItem != null) {
+      logger.debug(
+        "Resolved catalog item '{}' (ID: {}) for waste stream '{}'",
+        matchingItem.name,
+        matchingItem.id,
+        wasteStreamName
+      )
+      return matchingItem.id
+    } else {
+      logger.warn("Catalog item '$catalogItemName' not found for waste stream '$wasteStreamName'")
+      return null
     }
   }
-
 }

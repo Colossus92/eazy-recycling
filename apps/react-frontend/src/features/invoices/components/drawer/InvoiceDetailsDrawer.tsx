@@ -272,7 +272,7 @@ export const InvoiceDetailsDrawer = ({
               />
             )}
             <WeightTicketDownloadSection
-              weightTicketId={sourceWeightTicketId}
+              weightTicketUuid={sourceWeightTicketId?.toString()}
             />
           </DocumentsSection>
         </div>

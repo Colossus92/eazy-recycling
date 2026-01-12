@@ -39,24 +39,6 @@ import type { SessionCookieConfig } from './session-cookie-config';
 export interface ServletContext {
     /**
      *
-     * @type {SessionCookieConfig}
-     * @memberof ServletContext
-     */
-    'sessionCookieConfig'?: SessionCookieConfig;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'virtualServerName'?: string;
-    /**
-     *
-     * @type {Set<string>}
-     * @memberof ServletContext
-     */
-    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
-    /**
-     *
      * @type {string}
      * @memberof ServletContext
      */
@@ -69,16 +51,16 @@ export interface ServletContext {
     'initParameterNames'?: any;
     /**
      *
-     * @type {number}
+     * @type {SessionCookieConfig}
      * @memberof ServletContext
      */
-    'sessionTimeout'?: number;
+    'sessionCookieConfig'?: SessionCookieConfig;
     /**
      *
-     * @type {{ [key: string]: ServletRegistration; }}
+     * @type {string}
      * @memberof ServletContext
      */
-    'servletRegistrations'?: { [key: string]: ServletRegistration; };
+    'virtualServerName'?: string;
     /**
      *
      * @type {number}
@@ -96,13 +78,13 @@ export interface ServletContext {
      * @type {string}
      * @memberof ServletContext
      */
-    'serverInfo'?: string;
+    'servletContextName'?: string;
     /**
      *
      * @type {string}
      * @memberof ServletContext
      */
-    'servletContextName'?: string;
+    'serverInfo'?: string;
     /**
      *
      * @type {{ [key: string]: FilterRegistration; }}
@@ -129,6 +111,12 @@ export interface ServletContext {
     'jspConfigDescriptor'?: JspConfigDescriptor;
     /**
      *
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
+    /**
+     *
      * @type {string}
      * @memberof ServletContext
      */
@@ -139,6 +127,18 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'responseCharacterEncoding'?: string;
+    /**
+     *
+     * @type {Set<string>}
+     * @memberof ServletContext
+     */
+    'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
+    /**
+     *
+     * @type {{ [key: string]: ServletRegistration; }}
+     * @memberof ServletContext
+     */
+    'servletRegistrations'?: { [key: string]: ServletRegistration; };
     /**
      *
      * @type {any}
@@ -165,13 +165,6 @@ export interface ServletContext {
     'minorVersion'?: number;
 }
 
-export const ServletContextSessionTrackingModesEnum = {
-    Cookie: 'COOKIE',
-    Url: 'URL',
-    Ssl: 'SSL'
-} as const;
-
-export type ServletContextSessionTrackingModesEnum = typeof ServletContextSessionTrackingModesEnum[keyof typeof ServletContextSessionTrackingModesEnum];
 export const ServletContextDefaultSessionTrackingModesEnum = {
     Cookie: 'COOKIE',
     Url: 'URL',
@@ -186,5 +179,12 @@ export const ServletContextEffectiveSessionTrackingModesEnum = {
 } as const;
 
 export type ServletContextEffectiveSessionTrackingModesEnum = typeof ServletContextEffectiveSessionTrackingModesEnum[keyof typeof ServletContextEffectiveSessionTrackingModesEnum];
+export const ServletContextSessionTrackingModesEnum = {
+    Cookie: 'COOKIE',
+    Url: 'URL',
+    Ssl: 'SSL'
+} as const;
+
+export type ServletContextSessionTrackingModesEnum = typeof ServletContextSessionTrackingModesEnum[keyof typeof ServletContextSessionTrackingModesEnum];
 
 

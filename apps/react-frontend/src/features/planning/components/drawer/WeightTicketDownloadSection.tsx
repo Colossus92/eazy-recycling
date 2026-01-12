@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import {
-  fetchWeightTicketPdfInfo,
   downloadWeightTicketPdf,
+  fetchWeightTicketPdfInfo,
   WeightTicketPdfInfo,
 } from '@/api/services/weightTicketPdfService';
 
 interface WeightTicketDownloadSectionProps {
-  weightTicketId?: number;
+  weightTicketUuid?: string;
 }
 
 export const WeightTicketDownloadSection = ({
-  weightTicketId,
+  weightTicketUuid,
 }: WeightTicketDownloadSectionProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -20,7 +20,7 @@ export const WeightTicketDownloadSection = ({
 
   useEffect(() => {
     const loadWeightTicketPdfInfo = async () => {
-      if (!weightTicketId) {
+      if (!weightTicketUuid) {
         setIsLoading(false);
         return;
       }
@@ -29,7 +29,7 @@ export const WeightTicketDownloadSection = ({
       setError(null);
 
       try {
-        const info = await fetchWeightTicketPdfInfo(weightTicketId.toString());
+        const info = await fetchWeightTicketPdfInfo(weightTicketUuid);
         setWeightTicketPdfInfo(info);
       } catch (error: any) {
         setError(error.message || 'Onverwachte fout bij het ophalen van weegbon informatie');
@@ -39,18 +39,18 @@ export const WeightTicketDownloadSection = ({
     };
 
     loadWeightTicketPdfInfo();
-  }, [weightTicketId]);
+  }, [weightTicketUuid]);
 
   const handleDirectDownload = () => {
-    if (!weightTicketPdfInfo || isDownloading || !weightTicketId) return;
+    if (!weightTicketPdfInfo || isDownloading || !weightTicketUuid) return;
 
     setIsDownloading(true);
-    downloadWeightTicketPdf(weightTicketPdfInfo, weightTicketId.toString());
+    downloadWeightTicketPdf(weightTicketPdfInfo, weightTicketUuid);
 
     // Reset downloading state after a short delay
     setTimeout(() => setIsDownloading(false), 1000);
   };
-  
+
   return (
     isLoading ? (
       <span className={'text-body-2 text-color-text-secondary'}>

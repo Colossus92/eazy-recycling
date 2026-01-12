@@ -178,6 +178,12 @@ export interface TransportDetailView {
     'weightTicketId'?: number;
     /**
      * 
+     * @type {string}
+     * @memberof TransportDetailView
+     */
+    'weightTicketUuid'?: string;
+    /**
+     * 
      * @type {Array<GoodsItemView>}
      * @memberof TransportDetailView
      */

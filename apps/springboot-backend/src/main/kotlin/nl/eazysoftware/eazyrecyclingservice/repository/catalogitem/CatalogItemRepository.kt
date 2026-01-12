@@ -1,10 +1,13 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.catalogitem
 
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.CatalogItems
+import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -12,6 +15,8 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
+
+    fun findAllByTypeAndStatus(type: CatalogItemType, status: String): List<CatalogItemDto>
 
     @Query(
         value = """
@@ -119,8 +124,51 @@ interface CatalogItemQueryProjection {
 
 @Repository
 class CatalogItemRepository(
-    private val jpaRepository: CatalogItemJpaRepository
+    private val jpaRepository: CatalogItemJpaRepository,
+    @PersistenceContext private val entityManager: EntityManager
 ) : CatalogItems {
+
+    override fun findAllByType(type: CatalogItemType): List<CatalogItem> {
+        return jpaRepository.findAllByTypeAndStatus(type, "ACTIVE")
+            .map { dto ->
+                CatalogItem(
+                    id = dto.id,
+                    type = dto.type,
+                    code = dto.code,
+                    name = dto.name,
+                    unitOfMeasure = dto.unitOfMeasure,
+                    vatCode = dto.vatRate.vatCode,
+                    vatPercentage = dto.vatRate.percentage,
+                    categoryName = dto.category?.name,
+                    consignorPartyId = dto.consignorParty?.id?.let { CompanyId(it) },
+                    defaultPrice = dto.defaultPrice,
+                    purchaseAccountNumber = dto.purchaseAccountNumber,
+                    salesAccountNumber = dto.salesAccountNumber,
+                    wasteStreamNumber = null,
+                    itemType = dto.type
+                )
+            }
+    }
+
+    override fun create(catalogItem: CatalogItem): CatalogItem {
+        // For LMA import, we create a simple material catalog item
+        val dto = CatalogItemDto(
+            id = catalogItem.id,
+            type = catalogItem.type,
+            code = catalogItem.code,
+            name = catalogItem.name,
+            unitOfMeasure = catalogItem.unitOfMeasure,
+            vatRate = entityManager.getReference(VatRateDto::class.java, catalogItem.vatCode),
+            category = null,
+            consignorParty = null,
+            defaultPrice = catalogItem.defaultPrice,
+            status = "ACTIVE",
+            purchaseAccountNumber = catalogItem.purchaseAccountNumber,
+            salesAccountNumber = catalogItem.salesAccountNumber
+        )
+        val saved = jpaRepository.save(dto)
+        return catalogItem.copy(id = saved.id)
+    }
 
     override fun findAll(consignorPartyId: UUID?, query: String?): List<CatalogItem> {
         val results = if (consignorPartyId != null) {

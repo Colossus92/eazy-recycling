@@ -14,7 +14,10 @@ import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import DottedStroke from '@/assets/icons/DottedStroke.svg?react';
 import { WeightTicketStatusTag } from '../WeightTicketStatusTag';
-import { CompanyView, WeightTicketDetailViewConsignorParty } from '@/api/client/models';
+import {
+  CompanyView,
+  WeightTicketDetailViewConsignorParty,
+} from '@/api/client/models';
 import { DocumentsSection } from '@/features/planning/components/drawer/DocumentsSection';
 import { WeightTicketDownloadSection } from '@/features/planning/components/drawer/WeightTicketDownloadSection';
 import { WaybillDownloadSection } from '@/features/planning/components/drawer/WaybillDownloadSection';
@@ -30,9 +33,14 @@ interface WeightTicketDetailsDrawerProps {
   onDelete?: () => void;
 }
 
-const formatDate = (dateString: string | { value$kotlinx_datetime?: string } | undefined) => {
+const formatDate = (
+  dateString: string | { value$kotlinx_datetime?: string } | undefined
+) => {
   if (!dateString) return '-';
-  const dateValue = typeof dateString === 'string' ? dateString : dateString.value$kotlinx_datetime;
+  const dateValue =
+    typeof dateString === 'string'
+      ? dateString
+      : dateString.value$kotlinx_datetime;
   if (!dateValue) return '-';
   return new Date(dateValue).toLocaleDateString('nl-NL', {
     day: '2-digit',
@@ -78,10 +86,12 @@ export const WeightTicketDetailsDrawer = ({
     queryKey: ['weight-ticket-details', weightTicketId],
     queryFn: async () => {
       if (!weightTicketId) return null;
-      return await weightTicketService.getByNumber(weightTicketId).catch((error) => {
-        console.error('Error fetching weight ticket:', error);
-        return null;
-      });
+      return await weightTicketService
+        .getByNumber(weightTicketId)
+        .catch((error) => {
+          console.error('Error fetching weight ticket:', error);
+          return null;
+        });
     },
     enabled: isDrawerOpen && !!weightTicketId,
   });
@@ -101,7 +111,9 @@ export const WeightTicketDetailsDrawer = ({
     queryKey: ['linked-transports', weightTicketId],
     queryFn: async () => {
       if (!weightTicketId) return null;
-      return await weightTicketService.getWasteTransportsByWeightTicketId(weightTicketId);
+      return await weightTicketService.getWasteTransportsByWeightTicketId(
+        weightTicketId
+      );
     },
     enabled: !!weightTicketId,
   });
@@ -116,7 +128,9 @@ export const WeightTicketDetailsDrawer = ({
       const pickupDate = linkedTransport.pickupDateTime
         ? new Date(linkedTransport.pickupDateTime).toISOString().split('T')[0]
         : new Date().toISOString().split('T')[0];
-      navigate(`/?transportId=${linkedTransport.transportId}&date=${pickupDate}`);
+      navigate(
+        `/?transportId=${linkedTransport.transportId}&date=${pickupDate}`
+      );
     }
   };
 
@@ -128,7 +142,8 @@ export const WeightTicketDetailsDrawer = ({
     }
   };
 
-  const totalWeight = data?.lines?.reduce((sum, line) => sum + (line.weightValue || 0), 0) || 0;
+  const totalWeight =
+    data?.lines?.reduce((sum, line) => sum + (line.weightValue || 0), 0) || 0;
 
   return (
     <Drawer
@@ -168,7 +183,15 @@ export const WeightTicketDetailsDrawer = ({
                     Status
                   </span>
                 </div>
-                <WeightTicketStatusTag status={data.status as 'DRAFT' | 'COMPLETED' | 'INVOICED' | 'CANCELLED'} />
+                <WeightTicketStatusTag
+                  status={
+                    data.status as
+                      | 'DRAFT'
+                      | 'COMPLETED'
+                      | 'INVOICED'
+                      | 'CANCELLED'
+                  }
+                />
               </div>
               <div className={'flex items-center gap-2 self-stretch'}>
                 <div className="flex items-center flex-1 gap-2">
@@ -177,9 +200,7 @@ export const WeightTicketDetailsDrawer = ({
                     Weegbonnummer
                   </span>
                 </div>
-                <span className={'text-body-2 truncate'}>
-                  {data.id}
-                </span>
+                <span className={'text-body-2 truncate'}>{data.id}</span>
               </div>
               <div className={'flex items-center gap-2 self-stretch'}>
                 <div className="flex items-center flex-1 gap-2">
@@ -207,25 +228,31 @@ export const WeightTicketDetailsDrawer = ({
               </div>
               {linkedTransport && (
                 <div
-                  className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
+                  className={
+                    'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'
+                  }
                   onClick={handleTransportClick}
                 >
                   <div className="flex items-center flex-1 gap-2">
-                    <Truck
-                      className={'w-5 h-5 text-color-text-secondary'}
-                    />
+                    <Truck className={'w-5 h-5 text-color-text-secondary'} />
                     <span className={'text-body-2 text-color-text-secondary'}>
                       Transport
                     </span>
                   </div>
-                  <span className={'text-body-2 truncate text-color-brand-primary underline'}>
+                  <span
+                    className={
+                      'text-body-2 truncate text-color-brand-primary underline'
+                    }
+                  >
                     {linkedTransport.displayNumber}
                   </span>
                 </div>
               )}
               {linkedInvoiceId && (
                 <div
-                  className={'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'}
+                  className={
+                    'flex items-center gap-2 self-stretch cursor-pointer hover:bg-color-surface-secondary rounded-radius-md -mx-2 px-2 py-1'
+                  }
                   onClick={handleInvoiceClick}
                 >
                   <div className="flex items-center flex-1 gap-2">
@@ -236,7 +263,11 @@ export const WeightTicketDetailsDrawer = ({
                       Factuur
                     </span>
                   </div>
-                  <span className={'text-body-2 truncate text-color-brand-primary underline'}>
+                  <span
+                    className={
+                      'text-body-2 truncate text-color-brand-primary underline'
+                    }
+                  >
                     {linkedInvoice?.invoiceNumber || linkedInvoiceId}
                   </span>
                 </div>
@@ -247,58 +278,109 @@ export const WeightTicketDetailsDrawer = ({
           {/* Summary Section */}
           <div className={'flex flex-col items-start self-stretch gap-3'}>
             <span className={'text-subtitle-1'}>Overzicht</span>
-            <div className={'flex flex-col items-start self-stretch border border-solid border-color-border-primary rounded-radius-md overflow-hidden'}>
+            <div
+              className={
+                'flex flex-col items-start self-stretch border border-solid border-color-border-primary rounded-radius-md overflow-hidden'
+              }
+            >
               {/* Weight Ticket Lines */}
               {data.lines.length === 0 ? (
-                <div className={'flex items-center justify-center self-stretch px-3 py-4'}>
-                  <span className={'text-body-2 text-color-text-secondary'}>Geen sorteerregels</span>
+                <div
+                  className={
+                    'flex items-center justify-center self-stretch px-3 py-4'
+                  }
+                >
+                  <span className={'text-body-2 text-color-text-secondary'}>
+                    Geen sorteerregels
+                  </span>
                 </div>
               ) : (
                 data.lines.map((line, index) => (
-                <div
-                  key={index}
-                  className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 border-b border-solid border-color-border-primary last:border-b-0'}
-                >
-                  <div className="flex flex-col flex-1 gap-0.5">
-                    <span className={'text-caption text-color-text-secondary'}>
-                      {line.itemName} {line.wasteStreamNumber ? `(${line.wasteStreamNumber})` : ''}
+                  <div
+                    key={index}
+                    className={
+                      'flex items-center justify-between gap-4 self-stretch px-3 py-2 border-b border-solid border-color-border-primary last:border-b-0'
+                    }
+                  >
+                    <div className="flex flex-col flex-1 gap-0.5">
+                      <span
+                        className={'text-caption text-color-text-secondary'}
+                      >
+                        {line.itemName}{' '}
+                        {line.wasteStreamNumber
+                          ? `(${line.wasteStreamNumber})`
+                          : ''}
+                      </span>
+                    </div>
+                    <span className={'text-body-2'}>
+                      {formatWeight(line.weightValue, line.weightUnit)}
                     </span>
                   </div>
-                  <span className={'text-body-2'}>
-                    {formatWeight(line.weightValue, line.weightUnit)}
-                  </span>
-                </div>
-              ))
+                ))
               )}
               {/* Totals */}
               {data.lines.length > 0 && (
-              <>
-                <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'}>
-                  <span className={'text-body-2 text-color-text-secondary'}>Weging 1</span>
-                  <span className={'text-body-2'}>{formatWeight(totalWeight, 'kg')}</span>
-                </div>
-                <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'}>
-                  <span className={'text-body-2 text-color-text-secondary'}>Weging 2</span>
-                  <span className={'text-body-2'}>
-                    {data.secondWeighingValue !== null ? formatWeight(data.secondWeighingValue, data.secondWeighingUnit) : '-'}
-                  </span>
-                </div>
-                <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'}>
-                  <span className={'text-body-2 text-color-text-secondary'}>Tarra</span>
-                  <span className={'text-body-2'}>
-                    {data.tarraWeightValue !== null ? formatWeight(data.tarraWeightValue, data.tarraWeightUnit) : '-'}
-                  </span>
-                </div>
-                <div className={'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary border-t border-solid border-color-border-primary'}>
-                  <span className={'text-body-2 font-semibold'}>Netto</span>
-                  <span className={'text-body-2 font-semibold'}>
-                    {formatWeight(
-                      totalWeight - (data.tarraWeightValue || 0),
-                      'kg'
-                    )}
-                  </span>
-                </div>
-              </>
+                <>
+                  <div
+                    className={
+                      'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'
+                    }
+                  >
+                    <span className={'text-body-2 text-color-text-secondary'}>
+                      Weging 1
+                    </span>
+                    <span className={'text-body-2'}>
+                      {formatWeight(totalWeight, 'kg')}
+                    </span>
+                  </div>
+                  <div
+                    className={
+                      'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'
+                    }
+                  >
+                    <span className={'text-body-2 text-color-text-secondary'}>
+                      Weging 2
+                    </span>
+                    <span className={'text-body-2'}>
+                      {data.secondWeighingValue !== null
+                        ? formatWeight(
+                            data.secondWeighingValue,
+                            data.secondWeighingUnit
+                          )
+                        : '-'}
+                    </span>
+                  </div>
+                  <div
+                    className={
+                      'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary'
+                    }
+                  >
+                    <span className={'text-body-2 text-color-text-secondary'}>
+                      Tarra
+                    </span>
+                    <span className={'text-body-2'}>
+                      {data.tarraWeightValue !== null
+                        ? formatWeight(
+                            data.tarraWeightValue,
+                            data.tarraWeightUnit
+                          )
+                        : '-'}
+                    </span>
+                  </div>
+                  <div
+                    className={
+                      'flex items-center justify-between gap-4 self-stretch px-3 py-2 bg-color-surface-secondary border-t border-solid border-color-border-primary'
+                    }
+                  >
+                    <span className={'text-body-2 font-semibold'}>Netto</span>
+                    <span className={'text-body-2 font-semibold'}>
+                      {formatWeight(
+                        totalWeight - (data.tarraWeightValue || 0),
+                        'kg'
+                      )}
+                    </span>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -360,9 +442,13 @@ export const WeightTicketDetailsDrawer = ({
               />
             )}
             {linkedTransport && (
-              <WaybillDownloadSection transportId={linkedTransport.transportId} />
+              <WaybillDownloadSection
+                transportId={linkedTransport.transportId}
+              />
             )}
-            <WeightTicketDownloadSection weightTicketId={weightTicketId ?? undefined} />
+            <WeightTicketDownloadSection
+              weightTicketUuid={weightTicketId?.toString()}
+            />
           </DocumentsSection>
         </div>
       )}

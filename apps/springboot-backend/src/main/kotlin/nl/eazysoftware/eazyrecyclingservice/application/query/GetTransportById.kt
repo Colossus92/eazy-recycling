@@ -168,6 +168,7 @@ class GetTransportByIdService(
       consigneeParty = mapCompany(wasteStream.deliveryLocation.processorPartyId),
       pickupParty = mapCompany(wasteStream.pickupParty),
       weightTicketId = wasteTransport.weightTicketId?.number,
+      weightTicketUuid = wasteTransport.weightTicketId?.id,
     )
   }
 

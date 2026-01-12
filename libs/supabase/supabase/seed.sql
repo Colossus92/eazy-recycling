@@ -170,10 +170,10 @@ VALUES ('MATERIAL', '014', 'Nikkel', '', '2025-12-01 09:25:09.143787+00', null, 
        ('MATERIAL', '002', 'Kabel', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'e11b60ff-5552-49bf-b545-7c2358ccdeb2');
 
 
-INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid_to", "country_code", "description", "validity", "created_at", "created_by", "last_modified_at", "last_modified_by")
-VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'Aad Admin'),
-       ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:23.437526+00', 'Aad Admin', '2026-01-12 12:17:23.437526+00', 'Aad Admin'),
-       ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', '["2024-12-31 23:00:00+00",infinity)', '2026-01-12 12:17:44.657772+00', 'Aad Admin', '2026-01-12 12:17:44.657772+00', 'Aad Admin');
+INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid_to", "country_code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by")
+VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'Aad Admin'),
+       ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', '2026-01-12 12:17:23.437526+00', 'Aad Admin', '2026-01-12 12:17:23.437526+00', 'Aad Admin'),
+       ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', '2026-01-12 12:17:44.657772+00', 'Aad Admin', '2026-01-12 12:17:44.657772+00', 'Aad Admin');
 
 INSERT INTO "public"."catalog_items" ("type", "code", "name", "unit_of_measure", "vat_code", "consignor_party_id", "default_price", "status", "purchase_account_number", "sales_account_number", "created_at", "created_by", "last_modified_at", "last_modified_by", "id", "category_id")
 VALUES ('MATERIAL', '8011', 'Lood', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '010a3d89-9680-49cc-98ff-9ccd50800976', '03b74bd6-3ad6-4190-a640-e4138382e051'),

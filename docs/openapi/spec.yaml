@@ -2705,8 +2705,10 @@ components:
           type: string
         validFrom:
           type: string
+          format: date-time
         validTo:
           type: string
+          format: date-time
         countryCode:
           type: string
         description:
@@ -5146,6 +5148,9 @@ components:
         weightTicketId:
           type: integer
           format: int64
+        weightTicketUuid:
+          type: string
+          format: uuid
         goodsItem:
           type: array
           items:
@@ -6126,11 +6131,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
@@ -6244,36 +6249,36 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        elIgnored:
-          type: string
-        pageEncoding:
-          type: string
         defaultContentType:
           type: string
-        errorOnELNotFound:
+        elIgnored:
           type: string
         urlPatterns:
           type: array
           items:
             type: string
-        scriptingInvalid:
-          type: string
-        isXml:
+        deferredSyntaxAllowedAsLiteral:
           type: string
         errorOnUndeclaredNamespace:
           type: string
-        trimDirectiveWhitespaces:
+        errorOnELNotFound:
           type: string
-        includeCodas:
-          type: array
-          items:
-            type: string
+        isXml:
+          type: string
         includePreludes:
           type: array
           items:
             type: string
+        includeCodas:
+          type: array
+          items:
+            type: string
+        trimDirectiveWhitespaces:
+          type: string
+        pageEncoding:
+          type: string
+        scriptingInvalid:
+          type: string
         buffer:
           type: string
     RedirectView:
@@ -6336,53 +6341,36 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
+        contextPath:
+          type: string
+        initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        contextPath:
-          type: string
-        initParameterNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
         effectiveMinorVersion:
           type: integer
           format: int32
-        serverInfo:
-          type: string
         servletContextName:
+          type: string
+        serverInfo:
           type: string
         filterRegistrations:
           type: object
@@ -6408,10 +6396,27 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         attributeNames: {}
         classLoader:
           type: object
@@ -6476,17 +6481,17 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
-        secure:
-          type: boolean
-        domain:
-          type: string
         httpOnly:
           type: boolean
-        path:
-          type: string
+        secure:
+          type: boolean
         name:
           type: string
         attributes:

@@ -22,6 +22,18 @@
 export interface SessionCookieConfig {
     /**
      * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'domain'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'path'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof SessionCookieConfig
      */
@@ -31,25 +43,13 @@ export interface SessionCookieConfig {
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'secure'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'domain'?: string;
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof SessionCookieConfig
      */
-    'httpOnly'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'path'?: string;
+    'secure'?: boolean;
     /**
      * 
      * @type {string}

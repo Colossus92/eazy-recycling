@@ -224,7 +224,10 @@ export const TransportDetailsDrawer = ({
               </div>
               <div className="flex flex-col items-end">
                 {goodsItems.map((item, index) => (
-                  <span key={index} className={'text-body-2 truncate text-right'}>
+                  <span
+                    key={index}
+                    className={'text-body-2 truncate text-right'}
+                  >
                     {item.name} - {item.netNetWeight} {item.unit} (Hoeveelheid:{' '}
                     {item.quantity})
                   </span>
@@ -256,9 +259,10 @@ export const TransportDetailsDrawer = ({
 
           <DocumentsSection>
             <WaybillDownloadSection transportId={data.id} />
-            <WeightTicketDownloadSection weightTicketId={data.weightTicketId} />
+            <WeightTicketDownloadSection
+              weightTicketUuid={data.weightTicketUuid}
+            />
           </DocumentsSection>
-
         </div>
       )}
     </Drawer>

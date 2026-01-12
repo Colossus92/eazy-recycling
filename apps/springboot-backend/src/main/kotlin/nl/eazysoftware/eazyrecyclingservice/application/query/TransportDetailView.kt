@@ -36,6 +36,7 @@ data class TransportDetailView(
 
   // Waste transport specific details
   val weightTicketId: Long? = null,
+  val weightTicketUuid: UUID? = null,
   val goodsItem: List<GoodsItemView>? = null,
   val consigneeParty: CompanyView? = null,
   val pickupParty: CompanyView? = null,
