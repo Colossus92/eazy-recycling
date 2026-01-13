@@ -182,6 +182,10 @@ end$$;
 
 ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
 
 CREATE OR REPLACE FUNCTION "public"."handle_updated_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
@@ -212,6 +216,10 @@ end;$$;
 
 
 ALTER FUNCTION "public"."handle_updated_user"() OWNER TO "postgres";
+
+create trigger on_auth_user_updated
+  after update on auth.users
+  for each row execute procedure public.handle_updated_user();
 
 SET default_tablespace = '';
 

@@ -27,59 +27,13 @@ VALUES ('00000000-0000-0000-0000-000000000000',
         current_timestamp,
         current_timestamp,
         '{"provider":"email","providers":["email"]}',
-        jsonb_build_object('first_name', 'Aad', 'last_name', 'Admin', 'roles', array ['admin', 'planner']),
-        current_timestamp,
-        current_timestamp,
-        '',
-        '',
-        '',
-        ''),
-        ('00000000-0000-0000-0000-000000000000',
-        gen_random_uuid(),
-        'authenticated',
-        'authenticated',
-        'planner@eazyrecycling.nl',
-        extensions.crypt('password123', extensions.gen_salt('bf'::text)),
-        current_timestamp,
-        current_timestamp,
-        current_timestamp,
-        '{"provider":"email","providers":["email"]}',
-        jsonb_build_object('first_name', 'Peter', 'last_name', 'Planner', 'roles', array ['planner']),
-        current_timestamp,
-        current_timestamp,
-        '',
-        '',
-        '',
-        ''),
-        ('00000000-0000-0000-0000-000000000000',
-        gen_random_uuid(),
-        'authenticated',
-        'authenticated',
-        'chauffeur@eazyrecycling.nl',
-        extensions.crypt('password123', extensions.gen_salt('bf'::text)),
-        current_timestamp,
-        current_timestamp,
-        current_timestamp,
-        '{"provider":"email","providers":["email"]}',
-        jsonb_build_object('first_name', 'Sjaak', 'last_name', 'Chauffeur', 'roles', array ['chauffeur']),
+        jsonb_build_object('first_name', 'Eazy', 'last_name', 'Recycling', 'roles', array ['admin', 'planner']),
         current_timestamp,
         current_timestamp,
         '',
         '',
         '',
         '');
-
--- Insert user roles referencing the generated user IDs
-INSERT INTO "public"."user_roles" ("user_id", "role")
-VALUES
-    -- admin@eazyrecycling.nl gets admin, planner, and chauffeur roles
-    ((SELECT id FROM auth.users WHERE email = 'admin@eazyrecycling.nl'), 'admin'),
-    ((SELECT id FROM auth.users WHERE email = 'admin@eazyrecycling.nl'), 'planner'),
-    ((SELECT id FROM auth.users WHERE email = 'admin@eazyrecycling.nl'), 'chauffeur'),
-    -- planner@eazyrecycling.nl gets planner role
-    ((SELECT id FROM auth.users WHERE email = 'planner@eazyrecycling.nl'), 'planner'),
-    -- chauffeur@eazyrecycling.nl gets chauffeur role
-    ((SELECT id FROM auth.users WHERE email = 'chauffeur@eazyrecycling.nl'), 'chauffeur');
 
 INSERT INTO "public"."trucks" ("license_plate", "brand", "description", "last_modified_at") VALUES
 	('86-BVB-6', 'Scania', 'Haakarm', '2025-09-19 10:56:08.866574+00');
@@ -174,6 +128,8 @@ INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid
 VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'Aad Admin'),
        ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', '2026-01-12 12:17:23.437526+00', 'Aad Admin', '2026-01-12 12:17:23.437526+00', 'Aad Admin'),
        ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', '2026-01-12 12:17:44.657772+00', 'Aad Admin', '2026-01-12 12:17:44.657772+00', 'Aad Admin');
+
+INSERT INTO "public"."pickup_locations" ("id", "created_at", "location_type", "building_number", "building_number_addition", "country", "proximity_description", "city", "postal_code", "street_name", "company_id", "name") VALUES ('NO_PICKUP', '2026-01-12 19:09:09.860605+00', 'NO_PICKUP', null, null, null, null, null, null, null, null, null);
 
 INSERT INTO "public"."catalog_items" ("type", "code", "name", "unit_of_measure", "vat_code", "consignor_party_id", "default_price", "status", "purchase_account_number", "sales_account_number", "created_at", "created_by", "last_modified_at", "last_modified_by", "id", "category_id")
 VALUES ('MATERIAL', '8011', 'Lood', 'kg', 'HOOG', null, null, 'ACTIVE', '6115', '8030', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, '010a3d89-9680-49cc-98ff-9ccd50800976', '03b74bd6-3ad6-4190-a640-e4138382e051'),

@@ -200,9 +200,15 @@ export const CatalogItemAsyncSelectFormField = ({
 
     // Find matching option in loaded data
     for (const item of filteredItems) {
-      const isMatch = currentWasteStreamNumber && item.wasteStreamNumber
-        ? item.wasteStreamNumber === currentWasteStreamNumber
-        : item.catalogItemId === currentCatalogItemId;
+      let isMatch = false;
+      
+      if (currentWasteStreamNumber) {
+        // If we have a waste stream number, ONLY match items with that exact waste stream number
+        isMatch = item.wasteStreamNumber === currentWasteStreamNumber;
+      } else {
+        // If no waste stream number, match by catalogItemId (for materials/products)
+        isMatch = item.catalogItemId === currentCatalogItemId && !item.wasteStreamNumber;
+      }
       
       if (isMatch) {
         setSelectedOption({

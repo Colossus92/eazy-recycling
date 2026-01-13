@@ -210,7 +210,7 @@ export const MaterialPriceForm = ({
               />
               <TextFormField
                 title={'Valuta'}
-                placeholder={'Bijv. EUR'}
+                placeholder={'EUR'}
                 disabled={true}
               />
             </div>

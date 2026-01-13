@@ -208,6 +208,7 @@ export const WeightTicketLinesTab = ({
                       field={field}
                       update={update}
                       errors={errors}
+                      typeFilter={'MATERIAL_OR_WASTE_STREAM'}
                     />
                   </div>
 
