@@ -68,6 +68,7 @@ data class CompanyView(
   val processorId: String?,
   val address: AddressView,
   val email: String?,
+  val isTenantCompany: Boolean = false,
 )
 
 data class AddressView(

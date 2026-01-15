@@ -94,6 +94,12 @@ export interface CompleteCompanyView {
     'email'?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CompleteCompanyView
+     */
+    'isTenantCompany': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof CompleteCompanyView
      */

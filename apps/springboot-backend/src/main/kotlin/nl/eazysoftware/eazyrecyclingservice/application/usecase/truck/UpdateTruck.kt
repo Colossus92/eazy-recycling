@@ -26,10 +26,6 @@ class UpdateTruckService(
       brand = cmd.brand,
       description = cmd.description,
       carrierPartyId = cmd.carrierPartyId,
-      createdAt = null,
-      createdBy = null,
-      updatedAt = null,
-      updatedBy = null
     )
 
     trucks.save(truck)

@@ -36,6 +36,7 @@ const mockCompanies: Company[] = [
     updatedAt: new Date().toISOString(),
     branches: [],
     roles: [CompleteCompanyViewRolesEnum.Processor],
+    isTenantCompany: false,
   },
   {
     id: 'comp-2',
@@ -53,6 +54,7 @@ const mockCompanies: Company[] = [
     updatedAt: new Date().toISOString(),
     branches: [],
     roles: [CompleteCompanyViewRolesEnum.Carrier],
+    isTenantCompany: false,
   },
 ];
 

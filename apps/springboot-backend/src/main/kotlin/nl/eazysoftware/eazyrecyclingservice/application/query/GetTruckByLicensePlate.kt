@@ -29,7 +29,7 @@ class GetTruckByLicensePlateQuery(
       licensePlate = truck.licensePlate.value,
       brand = truck.brand,
       description = truck.description,
-      carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
+      carrierPartyId = truck.carrierPartyId?.uuid?.toString(),
       carrierCompanyName = companyName,
       displayName = truck.displayName,
       createdAt = truck.createdAt,

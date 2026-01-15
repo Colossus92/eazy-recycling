@@ -7,6 +7,8 @@ import {
 } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
+import { useTenantCompany } from '@/hooks/useTenantCompany';
+import { useEffect } from 'react';
 
 export interface ContainerTransportFormValues {
   consignorPartyId: string;
@@ -42,6 +44,7 @@ export function useContainerTransportForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
+  const { data: tenantCompany } = useTenantCompany();
   
   const formContext = useForm<ContainerTransportFormValues>({
     defaultValues: {
@@ -59,6 +62,13 @@ export function useContainerTransportForm(
       note: '',
     },
   });
+
+  // Set tenant company as default carrier for new container transports
+  useEffect(() => {
+    if (!transportId && tenantCompany?.id && !formContext.getValues('carrierPartyId')) {
+      formContext.setValue('carrierPartyId', tenantCompany.id);
+    }
+  }, [transportId, tenantCompany, formContext]);
   
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],

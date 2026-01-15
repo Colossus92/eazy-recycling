@@ -56,4 +56,7 @@ data class CompanyDto(
    */
   @Column(name = "deleted_by", nullable = true)
   val deletedBy: UUID? = null,
+
+  @Column(name = "is_tenant_company", nullable = false)
+  val isTenantCompany: Boolean = false,
 ) : AuditableEntity()

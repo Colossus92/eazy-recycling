@@ -65,5 +65,11 @@ export interface CompanyView {
      * @memberof CompanyView
      */
     'email'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CompanyView
+     */
+    'isTenantCompany': boolean;
 }
 

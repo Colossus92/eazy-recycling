@@ -47,7 +47,7 @@ data class TruckView(
   val brand: String?,
   val description: String?,
   val displayName: String?,
-  val carrierCompanyId: String? = null,
+  val carrierPartyId: String? = null,
   val carrierCompanyName: String? = null,
   val createdAt: Instant? = null,
   val createdByName: String? = null,

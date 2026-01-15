@@ -67,6 +67,7 @@ function toCompany(data: CompanyFormValues): Company {
     updatedAt: new Date().toISOString(),
     roles: data.roles,
     branches: [],
+    isTenantCompany: false,
   };
 
   return company;

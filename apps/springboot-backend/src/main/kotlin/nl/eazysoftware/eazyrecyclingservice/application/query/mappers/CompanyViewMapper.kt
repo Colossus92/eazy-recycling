@@ -23,5 +23,6 @@ class CompanyViewMapper {
       country = company.address.country
     ),
     email = company.email?.value,
+    isTenantCompany = company.isTenantCompany,
   )
 }

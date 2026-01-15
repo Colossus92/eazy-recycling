@@ -19,7 +19,7 @@ class GetAllTrucksQuery(
         brand = truck.brand,
         description = truck.description,
         displayName = truck.displayName,
-        carrierCompanyId = truck.carrierPartyId?.uuid?.toString(),
+        carrierPartyId = truck.carrierPartyId?.uuid?.toString(),
         carrierCompanyName = null, // Will be populated by join if needed
         createdAt = truck.createdAt,
         createdByName = truck.createdBy,

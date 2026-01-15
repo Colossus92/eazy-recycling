@@ -3122,6 +3122,8 @@ components:
         deletedBy:
           type: string
           format: uuid
+        isTenantCompany:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -3137,6 +3139,7 @@ components:
       - id
       - isCustomer
       - isSupplier
+      - isTenantCompany
       - name
       - roles
     PlanningTransportView:
@@ -3555,9 +3558,12 @@ components:
           $ref: "#/components/schemas/AddressView"
         email:
           type: string
+        isTenantCompany:
+          type: boolean
       required:
       - address
       - id
+      - isTenantCompany
       - name
     DutchAddressView:
       allOf:
@@ -5016,7 +5022,7 @@ components:
           type: string
         displayName:
           type: string
-        carrierCompanyId:
+        carrierPartyId:
           type: string
         carrierCompanyName:
           type: string
@@ -5626,6 +5632,8 @@ components:
           type: string
         email:
           type: string
+        isTenantCompany:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -5640,6 +5648,7 @@ components:
       - address
       - branches
       - id
+      - isTenantCompany
       - name
       - roles
     PagedCompanyResponse:
@@ -6251,19 +6260,19 @@ components:
       properties:
         defaultContentType:
           type: string
-        elIgnored:
-          type: string
         urlPatterns:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        errorOnUndeclaredNamespace:
+        elIgnored:
           type: string
         errorOnELNotFound:
           type: string
         isXml:
+          type: string
+        pageEncoding:
+          type: string
+        scriptingInvalid:
           type: string
         includePreludes:
           type: array
@@ -6273,11 +6282,11 @@ components:
           type: array
           items:
             type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         trimDirectiveWhitespaces:
           type: string
-        pageEncoding:
-          type: string
-        scriptingInvalid:
+        errorOnUndeclaredNamespace:
           type: string
         buffer:
           type: string
@@ -6341,26 +6350,37 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributesMap:
+          type: object
+          additionalProperties: {}
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
     ServletContext:
       type: object
       properties:
-        contextPath:
-          type: string
+        attributeNames: {}
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
+          type: string
+        contextPath:
           type: string
         effectiveMajorVersion:
           type: integer
@@ -6403,21 +6423,10 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6481,10 +6490,6 @@ components:
     SessionCookieConfig:
       type: object
       properties:
-        domain:
-          type: string
-        path:
-          type: string
         maxAge:
           type: integer
           format: int32
@@ -6492,6 +6497,10 @@ components:
           type: boolean
         secure:
           type: boolean
+        domain:
+          type: string
+        path:
+          type: string
         name:
           type: string
         attributes:

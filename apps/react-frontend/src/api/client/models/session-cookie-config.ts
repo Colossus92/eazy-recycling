@@ -22,18 +22,6 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'domain'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'path'?: string;
-    /**
-     * 
      * @type {number}
      * @memberof SessionCookieConfig
      */
@@ -50,6 +38,18 @@ export interface SessionCookieConfig {
      * @memberof SessionCookieConfig
      */
     'secure'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'domain'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'path'?: string;
     /**
      * 
      * @type {string}

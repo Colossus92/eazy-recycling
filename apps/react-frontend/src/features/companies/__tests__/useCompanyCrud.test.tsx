@@ -24,6 +24,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
       roles: ['PROCESSOR'],
+      isTenantCompany: false,
     },
     {
       id: 'comp-2',
@@ -41,6 +42,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
       roles: ['CARRIER'],
+      isTenantCompany: false,
     },
     {
       id: 'comp-3',
@@ -58,6 +60,7 @@ vi.mock('@/api/services/companyService.ts', () => {
       updatedAt: '2025-01-01T00:00:00.000Z',
       branches: [],
       roles: ['PROCESSOR', 'CARRIER'],
+      isTenantCompany: false,
     },
   ];
 
@@ -203,6 +206,7 @@ describe('useCompanyCrud', () => {
       branches: [],
       processorId: '12345',
       roles: ['PROCESSOR'],
+      isTenantCompany: false,
     } as Company;
 
     await act(async () => {

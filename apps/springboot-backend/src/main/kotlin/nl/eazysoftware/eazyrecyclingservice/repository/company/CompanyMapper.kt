@@ -35,6 +35,7 @@ class CompanyMapper {
       email = dto.email?.let { Email(it) },
       isSupplier = dto.isSupplier,
       isCustomer = dto.isCustomer,
+      isTenantCompany = dto.isTenantCompany,
       deletedAt = dto.deletedAt?.toKotlinInstant(),
       createdAt = dto.createdAt?.toKotlinInstant(),
       createdBy = dto.createdBy,
@@ -64,6 +65,7 @@ class CompanyMapper {
       email = domain.email?.value,
       isSupplier = domain.isSupplier,
       isCustomer = domain.isCustomer,
+      isTenantCompany = domain.isTenantCompany,
       deletedAt = domain.deletedAt?.toJavaInstant()
     )
   }

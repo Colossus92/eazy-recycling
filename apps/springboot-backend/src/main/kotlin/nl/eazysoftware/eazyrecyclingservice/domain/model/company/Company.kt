@@ -16,6 +16,7 @@ data class Company(
   val email: Email? = null,
   val isSupplier: Boolean = true,
   val isCustomer: Boolean = true,
+  val isTenantCompany: Boolean = false,
   val deletedAt: Instant? = null,
   val createdAt: Instant? = null,
   val createdBy: String? = null,
@@ -25,6 +26,9 @@ data class Company(
   init {
     require(CompanyRole.PROCESSOR !in roles || processorId != null) {
       "Companies with PROCESSOR role must have a processorId"
+    }
+    require(CompanyRole.CARRIER !in roles || vihbNumber != null) {
+      "Companies with CARRIER role must have a vihbNumber"
     }
   }
 }

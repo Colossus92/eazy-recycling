@@ -1,6 +1,6 @@
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider, useForm } from 'react-hook-form';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -11,6 +11,7 @@ import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormFi
 import { TruckRequest } from '@/api/client';
 import { Truck } from '@/api/services/truckService';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { useTenantCompany } from '@/hooks/useTenantCompany';
 
 interface TruckFormProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export interface TruckFormValues {
   brand: string;
   description: string;
   licensePlate: string;
-  carrierCompanyId?: string;
+  carrierPartyId?: string;
 }
 
 function toTruckRequest(data: TruckFormValues) {
@@ -32,7 +33,7 @@ function toTruckRequest(data: TruckFormValues) {
     brand: data.brand,
     description: data.description,
     licensePlate: data.licensePlate,
-    carrierCompanyId: data.carrierCompanyId,
+    carrierPartyId: data.carrierPartyId,
   } as TruckRequest;
 }
 
@@ -41,7 +42,7 @@ function toFormData(truck?: Truck) {
     brand: truck?.brand,
     description: truck?.description,
     licensePlate: truck?.licensePlate,
-    carrierCompanyId: truck?.carrierCompanyId,
+    carrierPartyId: truck?.carrierPartyId,
   } as TruckFormValues;
 }
 
@@ -53,16 +54,24 @@ export const TruckForm = ({
   initialData,
 }: TruckFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
+  const { data: tenantCompany } = useTenantCompany();
   const methods = useForm<TruckFormValues>({
     values: toFormData(initialData),
   });
+
+  // Set tenant company as default carrier for new trucks
+  useEffect(() => {
+    if (!initialData && tenantCompany?.id && !methods.getValues('carrierPartyId')) {
+      methods.setValue('carrierPartyId', tenantCompany.id);
+    }
+  }, [initialData, tenantCompany, methods]);
 
   const cancel = () => {
     methods.reset({
       licensePlate: '',
       description: '',
       brand: '',
-      carrierCompanyId: '',
+      carrierPartyId: '',
     });
     onCancel();
   };

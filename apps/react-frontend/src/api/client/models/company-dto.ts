@@ -109,6 +109,12 @@ export interface CompanyDto {
     'deletedBy'?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof CompanyDto
+     */
+    'isTenantCompany': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof CompanyDto
      */

@@ -321,6 +321,7 @@ export const WeightTicketForm = ({
                           placeholder={'Selecteer een vervoerder'}
                           name={'carrierPartyId'}
                           disabled={isDisabled}
+                          role="CARRIER"
                         />
                       </div>
                       <div className="w-1/2">

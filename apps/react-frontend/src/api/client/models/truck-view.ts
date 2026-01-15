@@ -49,7 +49,7 @@ export interface TruckView {
      * @type {string}
      * @memberof TruckView
      */
-    'carrierCompanyId'?: string;
+    'carrierPartyId'?: string;
     /**
      * 
      * @type {string}

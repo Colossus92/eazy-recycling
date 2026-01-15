@@ -17,7 +17,7 @@ data class TruckDto(
   @Column
   val description: String? = null,
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "carrier_party_id", referencedColumnName = "id")
   val carrierParty: CompanyDto? = null,
 ) : AuditableEntity() {

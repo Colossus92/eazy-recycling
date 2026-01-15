@@ -17,6 +17,7 @@ create table if not exists companies (
                            email text,
                            is_supplier boolean not null default true,
                            is_customer boolean not null default true,
+                           is_tenant_company boolean not null default false,
                            deleted_at timestamp with time zone,
                            deleted_by uuid,
                            created_at timestamp with time zone not null default now(),

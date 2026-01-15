@@ -110,6 +110,16 @@ export const companyService = {
   },
   removeBranch: (companyId: string, branchId: string) =>
     companyApi.deleteBranch(companyId, branchId).then((r) => r.data),
+
+  /**
+   * Get the tenant company (the company with isTenantCompany = true).
+   * Returns the first company found with the tenant flag.
+   */
+  getTenantCompany: async (): Promise<Company | null> => {
+    const response = await companyApi.getCompanies(false, undefined, undefined, 0, 1000);
+    const tenantCompany = response.data.content.find((c) => c.isTenantCompany);
+    return tenantCompany || null;
+  },
 };
 
 function mapToCompanyBranchRequest(

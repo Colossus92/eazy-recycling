@@ -17,6 +17,7 @@ export const ContainerTransportMainSection = () => {
         placeholder={'Selecteer een vervoerder'}
         name={'carrierPartyId'}
         rules={{ required: 'Vervoerder is verplicht' }}
+        role="CARRIER"
       />
       <input
         type="hidden"
