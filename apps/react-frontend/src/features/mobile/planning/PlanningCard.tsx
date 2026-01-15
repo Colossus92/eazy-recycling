@@ -40,6 +40,7 @@ export const PlanningCard = ({
     [DriverPlanningItemStatusEnum.Invoiced, 'border-color-text-disabled bg-color-surface-background'],
   ]);
   const deliveryAddress = resolveLocationAddress(transport.deliveryLocation);
+  const pickupAddress = resolveLocationAddress(transport.pickupLocation);
 
   const deliveryAddressText =
     deliveryAddress?.street +
@@ -65,7 +66,7 @@ export const PlanningCard = ({
           </span>
           <div className={'flex items-center self-stretch gap-1'}>
             <span className={'text-subtitle-1 text-color'}>
-              {deliveryAddress?.city}
+              {pickupAddress?.city}
             </span>
             <div className="flex-shrink-0">
               <CaretRight className={'text-color-text-secondary'} />
