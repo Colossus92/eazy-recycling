@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.company
 
+import nl.eazysoftware.eazyrecyclingservice.config.cache.CacheConfig
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
@@ -8,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncDto
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.CompanySyncRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.SyncStatus
 import org.slf4j.LoggerFactory
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,6 +30,7 @@ class CreateCompanyService(
   private val logger = LoggerFactory.getLogger(javaClass)
 
   @Transactional
+  @CacheEvict(cacheNames = [CacheConfig.COMPANIES_CACHE], allEntries = true)
   override fun handle(cmd: CreateCompanyCommand): CompanyResult {
     // Check for conflicts with active companies (VIHB only - KVK duplicates are allowed, see ADR-0018)
     cmd.vihbNumber?.let { vihb ->

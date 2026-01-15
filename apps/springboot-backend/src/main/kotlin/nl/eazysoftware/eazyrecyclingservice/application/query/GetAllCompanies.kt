@@ -1,9 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.application.query
 
+import nl.eazysoftware.eazyrecyclingservice.config.cache.CacheConfig
 import nl.eazysoftware.eazyrecyclingservice.controller.company.CompanyController
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyRole
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -38,6 +40,10 @@ class GetAllCompaniesQuery(
   private val projectLocations: ProjectLocations,
 ) : GetAllCompanies {
 
+  @Cacheable(
+    cacheNames = [CacheConfig.COMPANIES_CACHE],
+    key = "'search:' + #query + ':' + #role + ':' + #page + ':' + #size + ':' + #includeBranches + ':' + #sortBy + ':' + #sortDirection"
+  )
   override fun searchPaginated(
     query: String?,
     role: CompanyRole?,
