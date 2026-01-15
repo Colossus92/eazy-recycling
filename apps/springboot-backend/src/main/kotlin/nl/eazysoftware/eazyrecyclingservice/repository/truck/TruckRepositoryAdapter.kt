@@ -8,7 +8,22 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
-interface TruckJpaRepository: JpaRepository<TruckDto, String>
+interface TruckJpaRepository: JpaRepository<TruckDto, String> {
+  @org.springframework.data.jpa.repository.Query("""
+    SELECT t FROM TruckDto t
+    LEFT JOIN FETCH t.carrierParty
+    WHERE t.licensePlate NOT IN :excludedLicensePlates
+    ORDER BY t.licensePlate
+  """)
+  fun findAllExcludingLicensePlates(excludedLicensePlates: Set<String>): List<TruckDto>
+
+  @org.springframework.data.jpa.repository.Query("""
+    SELECT t FROM TruckDto t
+    LEFT JOIN FETCH t.carrierParty
+    ORDER BY t.licensePlate
+  """)
+  fun findAllWithCarrierParty(): List<TruckDto>
+}
 
 @Repository
 class TruckRepositoryAdapter(

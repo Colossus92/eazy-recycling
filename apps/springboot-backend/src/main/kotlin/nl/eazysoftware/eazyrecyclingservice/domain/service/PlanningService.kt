@@ -21,6 +21,7 @@ class PlanningService(
     private val trucks: Trucks,
     private val truckMapper: TruckMapper,
     private val entityManager: EntityManager,
+    private val truckJpaRepository: nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository,
 ) {
 
     fun getPlanningByDate(
@@ -32,14 +33,13 @@ class PlanningService(
         val daysInWeek = getDaysInWeek(pickupDate)
         val statuses = status?.split(',') ?: emptyList()
 
-        // Get all transports for the week
-        val transports = transportRepository.findByPickupDateTimeIsBetween(
-            daysInWeek.first().atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant(),
-            daysInWeek.last().atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
-        )
-            .filter { transport -> truckId == null || transport.truck?.licensePlate == truckId }
-            .filter { transport -> driverId == null || transport.driver?.id == driverId }
+        val startInstant = daysInWeek.first().atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
+        val endInstant = daysInWeek.last().atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
+
+        // Optimized query with JOIN FETCH - filters truck/driver at DB level
+        val transports = transportRepository.findForPlanningView(startInstant, endInstant, truckId, driverId)
             .filter { transport -> statuses.isEmpty() || statuses.contains(transport.getStatus().name) }
+
         val dateInfo = daysInWeek.map { it.toString() }
         val transportsView = createTransportsView(transports)
 
@@ -80,20 +80,19 @@ class PlanningService(
             return emptyList()
         }
 
-        val missingTrucks: List<TruckDto>
-
         if (truckId != null) {
             val truck = trucks.findByLicensePlate(LicensePlate(truckId))
                 ?: throw IllegalArgumentException("Vrachtwagen met kenteken $truckId niet gevonden")
-            missingTrucks = listOf(truckMapper.toDto(truck))
-        } else {
-            val existingTrucks = transports.map { it.truck }.toSet()
-            missingTrucks = trucks.findAll()
-                .map { truckMapper.toDto(it) }
-                .filterNot { it in existingTrucks }
+            return listOf(truckMapper.toDto(truck))
         }
 
-        return missingTrucks
+        // Optimized: query only trucks not already in transports, with carrierParty eagerly fetched
+        val existingLicensePlates = transports.mapNotNull { it.truck?.licensePlate }.toSet()
+        return if (existingLicensePlates.isEmpty()) {
+            truckJpaRepository.findAllWithCarrierParty()
+        } else {
+            truckJpaRepository.findAllExcludingLicensePlates(existingLicensePlates)
+        }
     }
 
     private fun getDaysInWeek(day: LocalDate): List<LocalDate> {
