@@ -6,6 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.TimeConfiguration
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.SignaturesRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.SignaturesDto
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.EdgeFunctionJobService
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
@@ -14,7 +16,6 @@ import java.util.*
 @Service
 class WaybillDocumentService(
     private val signaturesRepository: SignaturesRepository,
-    private val pdfGenerationClient: PdfGenerationClient,
     private val transportService: TransportService,
     private val storageClient: StorageClient,
 ) {
@@ -67,7 +68,10 @@ class WaybillDocumentService(
         signaturesRepository.save(signatures)
 
         storageClient.saveSignature(id, request.signature, request.party)
-        pdfGenerationClient.triggerPdfGeneration(id, request.party)
+        
+        BackgroundJob.enqueue<EdgeFunctionJobService> {
+            it.executeGenerateWaybillPdfJob(id.toString(), request.party)
+        }
 
         return getSignatureStatuses(id)
     }

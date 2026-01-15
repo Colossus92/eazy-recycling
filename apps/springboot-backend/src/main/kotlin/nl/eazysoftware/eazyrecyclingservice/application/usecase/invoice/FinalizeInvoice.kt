@@ -1,14 +1,12 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice
 
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.EdgeFunctionJobService
 import nl.eazysoftware.eazyrecyclingservice.application.service.InvoicePdfPayloadBuilder
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.Invoice
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceNumber
-import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionName
-import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.EdgeFunctionOutbox
-import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.HttpMethod
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.EdgeFunctionOutboxRepository
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Invoices
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -24,7 +22,6 @@ data class FinalizeInvoiceCommand(
 @Service
 class FinalizeInvoiceService(
     private val invoices: Invoices,
-    private val outboxRepository: EdgeFunctionOutboxRepository,
     private val invoicePdfPayloadBuilder: InvoicePdfPayloadBuilder,
 ) : FinalizeInvoice {
 
@@ -50,16 +47,10 @@ class FinalizeInvoiceService(
 
     private fun scheduleInvoicePdfGeneration(invoice: Invoice) {
         val payload = invoicePdfPayloadBuilder.buildPayload(invoice)
+        val invoiceId = invoice.id.value.toString()
 
-        val outboxEntry = EdgeFunctionOutbox(
-            id = outboxRepository.nextId(),
-            functionName = EdgeFunctionName.INVOICE_PDF_GENERATOR,
-            httpMethod = HttpMethod.POST,
-            payload = payload,
-            aggregateType = "Invoice",
-            aggregateId = invoice.id.value.toString(),
-        )
-
-        outboxRepository.save(outboxEntry)
+        BackgroundJob.enqueue<EdgeFunctionJobService> {
+            it.executeGeneratePdfJob(invoiceId, payload)
+        }
     }
 }

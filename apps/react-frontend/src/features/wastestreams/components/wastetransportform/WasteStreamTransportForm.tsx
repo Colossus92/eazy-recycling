@@ -11,6 +11,7 @@ import { WasteStreamTransportFormSelectSection } from './WasteStreamTransportFor
 import { WasteStreamTransportFormDetailsSection } from './WasteStreamTransportFormDetailsSection';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { useTenantCompany } from '@/hooks/useTenantCompany';
 
 interface WasteStreamTransportFormProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const WasteStreamTransportForm = ({
   setIsOpen,
   transportId,
 }: WasteStreamTransportFormProps) => {
+  const { data: tenantCompany } = useTenantCompany();
   const {
     data,
     isLoading,
@@ -42,12 +44,15 @@ export const WasteStreamTransportForm = ({
       isSubmitting: mutation.isPending,
     });
 
-  // Reset step when form opens
+  // Reset step and set default carrier when form opens for new transport
   useEffect(() => {
     if (isOpen) {
       reset();
+      if (!transportId && tenantCompany?.id) {
+        formContext.setValue('carrierPartyId', tenantCompany.id);
+      }
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, transportId, tenantCompany, formContext]);
 
   const onCancel = () => {
     resetForm();

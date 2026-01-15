@@ -9,7 +9,6 @@ import { WasteContainerViewLocation } from '@/api/client/models/waste-container-
 import { transportService } from '@/api/services/transportService';
 import { pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
 import { format } from 'date-fns';
-import { useTenantCompany } from '@/hooks/useTenantCompany';
 
 export interface WasteStreamLineFormValue {
   wasteStreamNumber: string;
@@ -173,7 +172,6 @@ export function useWasteStreamTransportForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
-  const { data: tenantCompany } = useTenantCompany();
 
   const formContext = useForm<WasteStreamTransportFormValues>({
     defaultValues: {
@@ -190,12 +188,6 @@ export function useWasteStreamTransportForm(
     },
   });
 
-  // Set tenant company as default carrier for new transports
-  useEffect(() => {
-    if (!transportId && tenantCompany?.id && !formContext.getValues('carrierPartyId')) {
-      formContext.setValue('carrierPartyId', tenantCompany.id);
-    }
-  }, [transportId, tenantCompany, formContext]);
 
   // Fetch transport details when editing
   const { data: transportData, isLoading } = useQuery({

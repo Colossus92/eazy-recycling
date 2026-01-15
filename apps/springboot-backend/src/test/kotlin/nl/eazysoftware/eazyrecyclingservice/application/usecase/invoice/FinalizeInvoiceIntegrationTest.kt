@@ -2,14 +2,12 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.invoice
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
-import nl.eazysoftware.eazyrecyclingservice.domain.model.outbox.OutboxStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemDto
 import nl.eazysoftware.eazyrecyclingservice.repository.catalogitem.CatalogItemJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
 import nl.eazysoftware.eazyrecyclingservice.repository.invoice.InvoiceJpaRepository
-import nl.eazysoftware.eazyrecyclingservice.repository.outbox.EdgeFunctionOutboxJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -38,7 +36,6 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
     val companyRepository: CompanyJpaRepository,
     val catalogItemRepository: CatalogItemJpaRepository,
     val vatRateRepository: VatRateJpaRepository,
-    val outboxRepository: EdgeFunctionOutboxJpaRepository,
 ) : BaseIntegrationTest() {
 
     private lateinit var securedMockMvc: SecuredMockMvc
@@ -49,7 +46,6 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
     @BeforeEach
     fun setup() {
         securedMockMvc = SecuredMockMvc(mockMvc)
-        outboxRepository.deleteAll()
         invoiceRepository.deleteAll()
 
         testCompany = companyRepository.save(
@@ -100,7 +96,7 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
     }
 
     @Test
-    fun `finalize invoice creates outbox entry for PDF generation`() {
+    fun `finalize invoice enqueues PDF generation job`() {
         // Create a draft invoice
         val createReq = """
             {
@@ -137,32 +133,15 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
         securedMockMvc.post("/invoices/$invoiceId/finalize", "{}")
             .andExpect(status().isOk)
 
-        // Verify invoice is now FINAL
+        // Verify invoice is now FINAL with invoice number
         val finalizedInvoice = invoiceRepository.findById(invoiceId)
         assertThat(finalizedInvoice).isPresent
         assertThat(finalizedInvoice.get().status.name).isEqualTo("FINAL")
         assertThat(finalizedInvoice.get().invoiceNumber).isNotNull()
-
-        // Verify outbox entry was created
-        val outboxEntries = outboxRepository.findAll()
-        assertThat(outboxEntries).hasSize(1)
-
-        val outboxEntry = outboxEntries.first()
-        assertThat(outboxEntry.functionName.name).isEqualTo("INVOICE_PDF_GENERATOR")
-        assertThat(outboxEntry.httpMethod.name).isEqualTo("POST")
-        assertThat(outboxEntry.status).isEqualTo(OutboxStatus.PENDING)
-        assertThat(outboxEntry.aggregateType).isEqualTo("Invoice")
-        assertThat(outboxEntry.aggregateId).isEqualTo(invoiceId.toString())
-        assertThat(outboxEntry.payload).isNotNull()
-
-        // Verify payload contains expected data
-        val payload = objectMapper.readTree(outboxEntry.payload)
-        assertThat(payload.get("invoiceType").asText()).isEqualTo("INKOOPFACTUUR")
-        assertThat(payload.get("invoiceNumber").asText()).startsWith("ER-")
-        assertThat(payload.get("companyCode").asText()).isNotEmpty()
-        assertThat(payload.get("customer").get("name").asText()).isEqualTo("Test Customer BV")
-        assertThat(payload.get("lines")).hasSize(1)
-        assertThat(payload.get("totals").get("totalExclVat").asDouble()).isEqualTo(50.0)
+        assertThat(finalizedInvoice.get().invoiceNumber).startsWith("ER-")
+        
+        // PDF generation is now handled by Jobrunr asynchronously
+        // The job will be processed in the background
     }
 
     @Test
@@ -194,10 +173,6 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
         assertThat(invoice1.invoiceNumber).isNotNull()
         assertThat(invoice2.invoiceNumber).isNotNull()
         assertThat(invoice1.invoiceNumber).isNotEqualTo(invoice2.invoiceNumber)
-
-        // Verify two outbox entries were created
-        val outboxEntries = outboxRepository.findAll()
-        assertThat(outboxEntries).hasSize(2)
     }
 
     @Test

@@ -37,9 +37,6 @@ class SignatureServiceTest {
     private lateinit var transportService: TransportService
 
     @Mock
-    private lateinit var pdfGenerationClient: PdfGenerationClient
-
-    @Mock
     private lateinit var storageClient: StorageClient
 
     private lateinit var waybillDocumentService: WaybillDocumentService
@@ -53,7 +50,6 @@ class SignatureServiceTest {
     fun setUp() {
         waybillDocumentService = WaybillDocumentService(
             signaturesRepository,
-            pdfGenerationClient,
             transportService,
             storageClient,
         )
@@ -160,7 +156,6 @@ class SignatureServiceTest {
         assertThrows(IllegalStateException::class.java) { waybillDocumentService.saveSignature(id, request) }
         verifyNoInteractions(signaturesRepository)
         verifyNoInteractions(storageClient)
-        verifyNoInteractions(pdfGenerationClient)
     }
 
     @Test
@@ -176,7 +171,6 @@ class SignatureServiceTest {
         assertThrows(IllegalArgumentException::class.java) { waybillDocumentService.saveSignature(id, request) }
         verify(signaturesRepository, never()).save(any())
         verifyNoInteractions(storageClient)
-        verifyNoInteractions(pdfGenerationClient)
     }
 
     @Nested
@@ -216,7 +210,7 @@ class SignatureServiceTest {
                 assertNull(pickupSignedAt)
             }
             verify(storageClient).saveSignature(id, request.signature, request.party)
-            pdfGenerationClient.triggerPdfGeneration(id, request.party)
+            // PDF generation now handled asynchronously by Jobrunr
         }
 
         @Test
@@ -242,7 +236,7 @@ class SignatureServiceTest {
                 assertNull(pickupSignedAt)
             }
             verify(storageClient).saveSignature(id, request.signature, request.party)
-            pdfGenerationClient.triggerPdfGeneration(id, request.party)
+            // PDF generation now handled asynchronously by Jobrunr
         }
 
         @Test
@@ -268,7 +262,7 @@ class SignatureServiceTest {
                 assertNull(pickupSignedAt)
             }
             verify(storageClient).saveSignature(id, request.signature, request.party)
-            pdfGenerationClient.triggerPdfGeneration(id, request.party)
+            // PDF generation now handled asynchronously by Jobrunr
         }
 
         @Test
@@ -294,7 +288,7 @@ class SignatureServiceTest {
                 assertNull(carrierSignedAt)
             }
             verify(storageClient).saveSignature(id, request.signature, request.party)
-            pdfGenerationClient.triggerPdfGeneration(id, request.party)
+            // PDF generation now handled asynchronously by Jobrunr
         }
 
         @Test
@@ -346,7 +340,7 @@ class SignatureServiceTest {
                 assertEquals(pickupSignedAt, signedAt)
             }
             verify(storageClient).saveSignature(id, request.signature, request.party)
-            pdfGenerationClient.triggerPdfGeneration(id, request.party)
+            // PDF generation now handled asynchronously by Jobrunr
         }
     }
 

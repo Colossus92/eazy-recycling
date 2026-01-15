@@ -12,7 +12,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreams
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
-import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.EdgeFunctionJobService
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -53,7 +54,6 @@ class CreateWasteTransportService(
   private val wasteTransports: WasteTransports,
   private val wasteTransportFactory: WasteTransportFactory,
   private val wasteStreams: WasteStreams,
-  private val pdfGenerationClient: PdfGenerationClient,
 ) : CreateWasteTransport {
 
   @Transactional
@@ -81,7 +81,10 @@ class CreateWasteTransportService(
     )
 
     val savedTransport = wasteTransports.save(wasteTransport)
-    pdfGenerationClient.triggerPdfGeneration(savedTransport.transportId.uuid, "empty")
+    
+    BackgroundJob.enqueue<EdgeFunctionJobService> {
+      it.executeGenerateWaybillPdfJob(savedTransport.transportId.uuid.toString(), "empty")
+    }
 
     return CreateWasteTransportResult(
       transportId = savedTransport.transportId,

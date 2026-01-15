@@ -11,7 +11,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
-import nl.eazysoftware.eazyrecyclingservice.domain.service.PdfGenerationClient
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.EdgeFunctionJobService
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.time.Clock
@@ -50,7 +51,6 @@ data class UpdateContainerTransportResult(
 class UpdateContainerTransportService(
   private val containerTransports: ContainerTransports,
   private val projectLocations: ProjectLocations,
-  private val pdfGenerationClient: PdfGenerationClient,
   private val companies: Companies,
 ) : UpdateContainerTransport {
 
@@ -88,7 +88,10 @@ class UpdateContainerTransportService(
     )
 
     val savedTransport = containerTransports.save(updatedTransport)
-    pdfGenerationClient.triggerPdfGeneration(savedTransport.transportId.uuid, "empty")
+    
+    BackgroundJob.enqueue<EdgeFunctionJobService> {
+      it.executeGenerateWaybillPdfJob(savedTransport.transportId.uuid.toString(), "empty")
+    }
 
     return UpdateContainerTransportResult(
       transportId = savedTransport.transportId,
