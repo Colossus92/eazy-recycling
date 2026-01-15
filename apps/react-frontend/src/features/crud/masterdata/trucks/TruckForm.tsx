@@ -137,7 +137,7 @@ export const TruckForm = ({
                 />
               </div>
               <CompanySelectFormField
-                name="carrierCompanyId"
+                name="carrierPartyId"
                 title="Transporteur"
                 placeholder="Selecteer transporteur"
                 rules={undefined}
