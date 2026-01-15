@@ -8,6 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Trucks
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckMapper
 import nl.eazysoftware.eazyrecyclingservice.test.helpers.TransportDtoHelper
 import org.assertj.core.api.Assertions.assertThat
@@ -38,6 +39,9 @@ class PlanningServiceTest {
     private lateinit var truckMapper: TruckMapper
 
     @Mock
+    private lateinit var truckJpaRepository: TruckJpaRepository
+
+    @Mock
     private lateinit var entityManager: EntityManager
 
     private lateinit var planningService: PlanningService
@@ -45,11 +49,10 @@ class PlanningServiceTest {
     private val truck1Dto = TruckDto(licensePlate = "ABC-123", brand = "Volvo", description = "FH16")
     private val truck2Dto = TruckDto(licensePlate = "XYZ-789", brand = "Mercedes", description = "Actros")
     private val truck1Domain = Truck(LicensePlate("ABC-123"), "Volvo", "FH16", null, null)
-    private val truck2Domain = Truck(LicensePlate("XYZ-789"), "Mercedes", "Actros", null, null)
 
     @BeforeEach
     fun setUp() {
-        planningService = PlanningService(transportRepository, trucks, truckMapper, entityManager)
+        planningService = PlanningService(transportRepository, trucks, truckMapper, entityManager, truckJpaRepository)
     }
 
     @Test
@@ -68,16 +71,16 @@ class PlanningServiceTest {
 
         // When
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
-
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
         ).thenReturn(transports)
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain, truck2Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
-        whenever(truckMapper.toDto(truck2Domain)).thenReturn(truck2Dto)
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(setOf(truck1Dto.licensePlate)))
+            .thenReturn(listOf(truck2Dto))
 
         val result = planningService.getPlanningByDate(pickupDate)
 
@@ -119,9 +122,11 @@ class PlanningServiceTest {
 
         // When
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                truck1Dto.licensePlate,
+                null
             )
         ).thenReturn(transports)
 
@@ -145,20 +150,20 @@ class PlanningServiceTest {
         val sundayOfWeek = LocalDate.of(2025, 5, 25)
 
         val transport1 = TransportDtoHelper.transport(truck = truck1Dto)
-        val transport2 = TransportDtoHelper.transport(truck = truck1Dto, driver = TransportDtoHelper.driver2)
 
-        val transports = listOf(transport1, transport2)
-
-        // When
+        // When - only transport1 should be returned by the query (filtered by driver)
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                TransportDtoHelper.driver1.id
             )
-        ).thenReturn(transports)
+        ).thenReturn(listOf(transport1))
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
+        // getMissingTrucks will call findAllExcludingLicensePlates since transport1 has truck1
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(setOf(truck1Dto.licensePlate)))
+            .thenReturn(emptyList())
 
         val result = planningService.getPlanningByDate(pickupDate, driverId = TransportDtoHelper.driver1.id)
 
@@ -201,14 +206,16 @@ class PlanningServiceTest {
 
         // When
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
         ).thenReturn(transports)
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(setOf(truck1Dto.licensePlate)))
+            .thenReturn(emptyList())
 
         val result = planningService.getPlanningByDate(pickupDate, status = status)
 
@@ -307,15 +314,16 @@ class PlanningServiceTest {
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
         ).thenReturn(transports)
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain, truck2Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
-        whenever(truckMapper.toDto(truck2Domain)).thenReturn(truck2Dto)
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(any()))
+            .thenReturn(listOf(truck1Dto, truck2Dto))
 
         // When
         val result = planningService.reorderTransports(newDate, truck2Dto.licensePlate, transportIds)
@@ -351,13 +359,15 @@ class PlanningServiceTest {
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
                 sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
         ).thenReturn(emptyList())
 
-        whenever(trucks.findAll()).thenReturn(emptyList())
+        whenever(truckJpaRepository.findAllWithCarrierParty()).thenReturn(emptyList())
 
         // When
         val result = planningService.reorderTransports(date, truck1Dto.licensePlate, transportIds)
@@ -384,16 +394,22 @@ class PlanningServiceTest {
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
+        // Mock updated transports with null trucks (reflecting the saved state)
+        val updatedTransport1 = transport1.copy(truck = null, pickupDateTime = date.atStartOfDay().toCetInstant())
+        val updatedTransport2 = transport2.copy(truck = null, pickupDateTime = date.atStartOfDay().toCetInstant())
+
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
                 sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
-        ).thenReturn(listOf(transport1, transport2))
+        ).thenReturn(listOf(updatedTransport1, updatedTransport2))
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain, truck2Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
-        whenever(truckMapper.toDto(truck2Domain)).thenReturn(truck2Dto)
+        // After update, transports have null trucks, so getMissingTrucks calls findAllWithCarrierParty
+        whenever(truckJpaRepository.findAllWithCarrierParty())
+            .thenReturn(listOf(truck1Dto, truck2Dto))
 
         // When
         val result = planningService.reorderTransports(date, notAssignedLicensePlate, transportIds)
@@ -437,16 +453,22 @@ class PlanningServiceTest {
         val mondayOfWeek = date.minusDays(date.dayOfWeek.value - 1L)
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
+        // Mock updated transports with truck2 (reflecting the saved state)
+        val updatedTransport1 = transport1.copy(truck = truck2Dto, pickupDateTime = date.atStartOfDay().toCetInstant())
+        val updatedTransport2 = transport2.copy(truck = truck2Dto, pickupDateTime = date.atStartOfDay().toCetInstant())
+
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
                 sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
-        ).thenReturn(listOf(transport1, transport2))
+        ).thenReturn(listOf(updatedTransport1, updatedTransport2))
 
-        whenever(trucks.findAll()).thenReturn(listOf(truck1Domain, truck2Domain))
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
-        whenever(truckMapper.toDto(truck2Domain)).thenReturn(truck2Dto)
+        // After update, both transports have truck2, so getMissingTrucks calls findAllExcludingLicensePlates
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(setOf(truck2Dto.licensePlate)))
+            .thenReturn(listOf(truck1Dto))
 
         // When
         val result = planningService.reorderTransports(date, truck2Dto.licensePlate, transportIds)
@@ -481,9 +503,11 @@ class PlanningServiceTest {
         val sundayOfWeek = mondayOfWeek.plusDays(6)
 
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
-                sundayOfWeek.atTime(23, 59, 59).toCetInstant()
+                sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                truck1Dto.licensePlate,
+                null
             )
         ).thenReturn(emptyList())
         whenever(trucks.findByLicensePlate(LicensePlate(truck1Dto.licensePlate))).thenReturn(truck1Domain)
@@ -508,9 +532,11 @@ class PlanningServiceTest {
         val transport = TransportDtoHelper.transport(truck1Dto)
 
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
                 sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                truck1Dto.licensePlate,
+                null
             )
         ).thenReturn(listOf(transport))
 
@@ -539,18 +565,16 @@ class PlanningServiceTest {
         val transport = TransportDtoHelper.transport(existingTruck)
 
         whenever(
-            transportRepository.findByPickupDateTimeIsBetween(
+            transportRepository.findForPlanningView(
                 mondayOfWeek.atStartOfDay().toCetInstant(),
                 sundayOfWeek.atTime(23, 59, 59).toCetInstant(),
+                null,
+                null
             )
         ).thenReturn(listOf(transport))
 
-        val existingTruckDomain = Truck(LicensePlate("DEF-456"), "DAF", "XF", null, null)
-        val allTrucksDomain = listOf(existingTruckDomain, truck1Domain, truck2Domain)
-        whenever(trucks.findAll()).thenReturn(allTrucksDomain)
-        whenever(truckMapper.toDto(existingTruckDomain)).thenReturn(existingTruck)
-        whenever(truckMapper.toDto(truck1Domain)).thenReturn(truck1Dto)
-        whenever(truckMapper.toDto(truck2Domain)).thenReturn(truck2Dto)
+        whenever(truckJpaRepository.findAllExcludingLicensePlates(setOf(existingTruck.licensePlate)))
+            .thenReturn(listOf(truck1Dto, truck2Dto))
 
         // When
         val result = planningService.getPlanningByDate(pickupDate)

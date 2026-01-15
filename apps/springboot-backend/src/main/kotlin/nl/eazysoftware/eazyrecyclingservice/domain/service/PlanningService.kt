@@ -9,6 +9,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Trucks
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
+import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckMapper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,11 +18,11 @@ import java.util.*
 
 @Service
 class PlanningService(
-    private val transportRepository: TransportRepository,
-    private val trucks: Trucks,
-    private val truckMapper: TruckMapper,
-    private val entityManager: EntityManager,
-    private val truckJpaRepository: nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository,
+  private val transportRepository: TransportRepository,
+  private val trucks: Trucks,
+  private val truckMapper: TruckMapper,
+  private val entityManager: EntityManager,
+  private val truckJpaRepository: TruckJpaRepository,
 ) {
 
     fun getPlanningByDate(
