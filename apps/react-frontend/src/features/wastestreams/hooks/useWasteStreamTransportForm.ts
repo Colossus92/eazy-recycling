@@ -9,6 +9,7 @@ import { WasteContainerViewLocation } from '@/api/client/models/waste-container-
 import { transportService } from '@/api/services/transportService';
 import { pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
 import { format } from 'date-fns';
+import { useTenantCompany } from '@/hooks/useTenantCompany';
 
 export interface WasteStreamLineFormValue {
   wasteStreamNumber: string;
@@ -23,6 +24,7 @@ export interface WasteStreamTransportFormValues {
   wasteStreamLines: WasteStreamLineFormValue[];
 
   // Step 2: Transport Details
+  carrierPartyId: string;
   truckId?: string;
   driverId?: string;
   pickupDate?: string;
@@ -95,7 +97,7 @@ const formValuesToWasteTransportRequest = (
   formValues: WasteStreamTransportFormValues
 ): WasteTransportRequest => {
   return {
-    carrierPartyId: formValues.consignorPartyId, // TODO replace with actual carrierParty
+    carrierPartyId: formValues.carrierPartyId,
     containerOperation: (formValues.containerOperation || 'PICKUP') as any,
     pickupDateTime: formValues.pickupDate || '',
     deliveryDateTime: formValues.deliveryDate,
@@ -151,6 +153,7 @@ const transportDetailToFormValues = (
   return {
     consignorPartyId: transport.consignorParty?.id || '',
     wasteStreamLines,
+    carrierPartyId: transport.carrierParty.id,
     truckId: transport.truck?.licensePlate || undefined,
     driverId: transport.driver?.id || undefined,
     pickupDate: transport.pickupDateTime
@@ -170,11 +173,13 @@ export function useWasteStreamTransportForm(
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
+  const { data: tenantCompany } = useTenantCompany();
 
   const formContext = useForm<WasteStreamTransportFormValues>({
     defaultValues: {
       consignorPartyId: '',
       wasteStreamLines: [],
+      carrierPartyId: undefined,
       truckId: undefined,
       driverId: undefined,
       pickupDate: '',
@@ -184,6 +189,13 @@ export function useWasteStreamTransportForm(
       comments: undefined,
     },
   });
+
+  // Set tenant company as default carrier for new transports
+  useEffect(() => {
+    if (!transportId && tenantCompany?.id && !formContext.getValues('carrierPartyId')) {
+      formContext.setValue('carrierPartyId', tenantCompany.id);
+    }
+  }, [transportId, tenantCompany, formContext]);
 
   // Fetch transport details when editing
   const { data: transportData, isLoading } = useQuery({
@@ -256,6 +268,7 @@ export function useWasteStreamTransportForm(
     formContext.reset({
       consignorPartyId: '',
       wasteStreamLines: [],
+      carrierPartyId: undefined,
       truckId: undefined,
       driverId: undefined,
       pickupDate: '',

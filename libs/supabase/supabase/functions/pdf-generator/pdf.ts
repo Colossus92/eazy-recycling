@@ -76,13 +76,13 @@ function drawConsignee(page: PDFPage, transportData: TransportData) {
     }
     else if (transportData.carrier_party.id === transportData.consignee.id) {
         x = 242;
-        drawParty(125, 500, page, transportData.consignee);
+        drawParty(125, 500, page, transportData.consignee, false);
         drawCarrierVihb(page, transportData.consignee.vihb_id);
     }
     else {
         x = 404;
         drawParty(125, 500, page, transportData.consignee);
-        drawParty(125, 575, page, transportData.carrier_party);
+        drawParty(125, 575, page, transportData.carrier_party, false);
         drawCarrierVihb(page, transportData.consignee.vihb_id);
     }
 
@@ -98,7 +98,9 @@ function drawParty(
     x: number,
     y: number,
     page: PDFPage,
-    party: { name?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; }) {
+    party: { name?: string; postalCode?: string; city?: string; vihb?: string; street_name?: string; building_number?: string; postal_code?: string; vihb_id?: string; },
+    shouldDrawVihb = true,
+) {
 
     const name = party?.name || '';
     page.drawText(name, {
@@ -128,7 +130,7 @@ function drawParty(
     });
 
     const vihbText = party.vihb_id || party.vihb || '';
-    if (vihbText) {
+    if (vihbText && shouldDrawVihb) {
         page.drawText(vihbText, {
             x: x,
             y: y - 39,

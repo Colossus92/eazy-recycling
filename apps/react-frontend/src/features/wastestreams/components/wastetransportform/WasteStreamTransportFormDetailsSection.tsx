@@ -6,6 +6,7 @@ import { ContainerSelectFormField } from '@/components/ui/form/selectfield/Conta
 import { ContainerOperationSelectFormField } from '@/components/ui/form/selectfield/ContainerOperationSelectFormField';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
 import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
+import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import MapPinArea from '@/assets/icons/MapPinArea.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
@@ -89,6 +90,16 @@ export const WasteStreamTransportFormDetailsSection = () => {
         </h3>
 
         <div className="flex flex-col gap-4">
+          {/* Carrier field */}
+          <div className="w-full">
+            <CompanySelectFormField
+              title="Vervoerder"
+              placeholder="Selecteer een vervoerder"
+              name="carrierPartyId"
+              role="CARRIER"
+            />
+          </div>
+
           {/* Truck and Driver row */}
           <div className="flex gap-4 items-start w-full">
             <div className="flex-1">
