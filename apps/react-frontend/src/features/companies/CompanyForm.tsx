@@ -115,8 +115,8 @@ export const CompanyForm = ({
   const submitAndClose = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSubmitting) return;
-    setIsSubmitting(true);
     await handleSubmit(async (data) => {
+      setIsSubmitting(true);
       try {
         await onSubmit(toCompany(data));
         onCancel();
