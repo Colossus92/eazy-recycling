@@ -1710,6 +1710,17 @@ paths:
           type: integer
           format: int32
           default: 10
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+          default: asc
       responses:
         "200":
           description: OK
@@ -6140,11 +6151,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
@@ -6258,21 +6269,21 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
-          type: string
         urlPatterns:
           type: array
           items:
             type: string
+        defaultContentType:
+          type: string
         elIgnored:
           type: string
         errorOnELNotFound:
           type: string
-        isXml:
-          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
+          type: string
+        isXml:
           type: string
         includePreludes:
           type: array
@@ -6364,33 +6375,21 @@ components:
     ServletContext:
       type: object
       properties:
-        attributeNames: {}
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        initParameterNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
         contextPath:
           type: string
+        initParameterNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
         effectiveMajorVersion:
           type: integer
           format: int32
         effectiveMinorVersion:
           type: integer
           format: int32
-        servletContextName:
-          type: string
         serverInfo:
+          type: string
+        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6416,13 +6415,25 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        attributeNames: {}
         servletRegistrations:
           type: object
           additionalProperties:

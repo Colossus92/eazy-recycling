@@ -17,6 +17,8 @@ interface GetAllCompanies {
    * @param page 0-indexed page number
    * @param size Page size
    * @param includeBranches Whether to include branches in the response
+   * @param sortBy Optional field to sort by (code, name)
+   * @param sortDirection Sort direction (asc, desc)
    * @return Paginated response with companies matching the criteria
    */
   fun searchPaginated(
@@ -24,7 +26,9 @@ interface GetAllCompanies {
     role: CompanyRole?,
     page: Int,
     size: Int,
-    includeBranches: Boolean = false
+    includeBranches: Boolean = false,
+    sortBy: String? = null,
+    sortDirection: String = "asc",
   ): PagedCompanyResponse
 }
 
@@ -39,12 +43,14 @@ class GetAllCompaniesQuery(
     role: CompanyRole?,
     page: Int,
     size: Int,
-    includeBranches: Boolean
+    includeBranches: Boolean,
+    sortBy: String?,
+    sortDirection: String
   ): PagedCompanyResponse {
     val pageable = PageRequest.of(page, size)
 
     // Fetch companies with code already included
-    val companyPage = companies.searchPaginated(query, role, pageable)
+    val companyPage = companies.searchPaginated(query, role, pageable, sortBy, sortDirection)
 
     // Map to views
     val companyViews = companyPage.content.map { company ->

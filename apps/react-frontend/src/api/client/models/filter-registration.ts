@@ -25,13 +25,13 @@ export interface FilterRegistration {
      * @type {Array<string>}
      * @memberof FilterRegistration
      */
-    'urlPatternMappings'?: Array<string>;
+    'servletNameMappings'?: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof FilterRegistration
      */
-    'servletNameMappings'?: Array<string>;
+    'urlPatternMappings'?: Array<string>;
     /**
      * 
      * @type {{ [key: string]: string; }}

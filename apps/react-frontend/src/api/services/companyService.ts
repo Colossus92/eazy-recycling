@@ -33,6 +33,8 @@ export interface GetCompaniesParams {
   query?: string;
   page?: number;
   size?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 }
 
 export const companyService = {
@@ -47,9 +49,11 @@ export const companyService = {
       query,
       page = 0,
       size = 10,
+      sortBy,
+      sortDirection,
     } = params;
     return companyApi
-      .getCompanies(includeBranches, role, query, page, size)
+      .getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection)
       .then((r) => r.data);
   },
 

@@ -2,23 +2,36 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { companyService, Company, PagedCompanyResponse } from '@/api/services/companyService.ts';
 
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortConfig {
+  sortBy: string | null;
+  sortDirection: SortDirection;
+}
+
 export const useCompanyCrud = () => {
   const queryClient = useQueryClient();
   const [query, setQuery] = useState<string>('');
   const [page, setPage] = useState<number>(0); // 0-indexed for API
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    sortBy: null,
+    sortDirection: 'asc',
+  });
 
   const {
     data: pagedResponse,
     error,
     isLoading,
   } = useQuery<PagedCompanyResponse>({
-    queryKey: ['companies', { query, page, size: rowsPerPage }],
+    queryKey: ['companies', { query, page, size: rowsPerPage, sortBy: sortConfig.sortBy, sortDirection: sortConfig.sortDirection }],
     queryFn: () => companyService.getAll({ 
       includeBranches: true, 
       query: query || undefined,
       page,
       size: rowsPerPage,
+      sortBy: sortConfig.sortBy || undefined,
+      sortDirection: sortConfig.sortDirection,
     }),
   });
 
@@ -53,7 +66,10 @@ export const useCompanyCrud = () => {
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['companies'] })
-        .then(() => setIsAdding(false));
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['company'] });
+          setIsAdding(false);
+        });
     },
   });
 
@@ -62,7 +78,10 @@ export const useCompanyCrud = () => {
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ['companies'] })
-        .then(() => setEditing(undefined));
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['company'] });
+          setEditing(undefined);
+        });
     },
   });
 
@@ -71,7 +90,10 @@ export const useCompanyCrud = () => {
     onSuccess: () => {
         queryClient
           .invalidateQueries({ queryKey: ['companies'] })
-          .then(() => setDeleting(undefined));
+          .then(() => {
+            queryClient.invalidateQueries({ queryKey: ['company'] });
+            setDeleting(undefined);
+          });
     },
   });
 
@@ -102,6 +124,11 @@ export const useCompanyCrud = () => {
     });
   };
 
+  const handleSortChange = (newSortConfig: SortConfig) => {
+    setSortConfig(newSortConfig);
+    setPage(0); // Reset to first page when sorting changes
+  };
+
   return {
     displayedCompanies,
     setQuery: handleSetQuery,
@@ -123,5 +150,8 @@ export const useCompanyCrud = () => {
     setRowsPerPage: handleSetRowsPerPage,
     totalElements,
     totalPages,
+    // Sorting
+    sortConfig,
+    setSortConfig: handleSortChange,
   };
 };

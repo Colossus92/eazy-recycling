@@ -96,8 +96,10 @@ class CompanyController(
     @RequestParam(required = false) query: String? = null,
     @RequestParam(required = false, defaultValue = "0") page: Int = 0,
     @RequestParam(required = false, defaultValue = "10") size: Int = 10,
+    @RequestParam(required = false) sortBy: String? = null,
+    @RequestParam(required = false, defaultValue = "asc") sortDirection: String = "asc",
   ): PagedCompanyResponse {
-    return getAllCompaniesQuery.searchPaginated(query, role, page, size, includeBranches)
+    return getAllCompaniesQuery.searchPaginated(query, role, page, size, includeBranches, sortBy, sortDirection)
   }
 
   @GetMapping("/{id}")

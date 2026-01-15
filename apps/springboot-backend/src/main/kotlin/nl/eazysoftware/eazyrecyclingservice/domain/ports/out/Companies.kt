@@ -13,9 +13,11 @@ interface Companies {
    * @param query Optional search query that matches against code, name, city, chamberOfCommerceId, and vihbId
    * @param role Optional role filter
    * @param pageable Pagination parameters
+   * @param sortBy Optional field to sort by (code, name)
+   * @param sortDirection Sort direction (asc, desc)
    * @return Page of companies matching the criteria
    */
-  fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable): Page<Company>
+  fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String? = null, sortDirection: String = "asc"): Page<Company>
   fun findByRole(role: CompanyRole): List<Company>
   fun findById(companyId: CompanyId): Company?
   fun update(company: Company): Company
