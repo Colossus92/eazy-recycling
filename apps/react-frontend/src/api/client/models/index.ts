@@ -40,6 +40,8 @@ export * from './create-user-request';
 export * from './create-waste-stream-response';
 export * from './create-waste-transport-from-weight-ticket-request';
 export * from './create-waste-transport-response';
+export * from './create-weight-ticket-from-transport-request';
+export * from './create-weight-ticket-from-transport-response';
 export * from './create-weight-ticket-response';
 export * from './customer-snapshot-view';
 export * from './default-http-status-code';

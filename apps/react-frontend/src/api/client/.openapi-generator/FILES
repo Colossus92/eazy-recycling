@@ -71,6 +71,8 @@ models/create-user-request.ts
 models/create-waste-stream-response.ts
 models/create-waste-transport-from-weight-ticket-request.ts
 models/create-waste-transport-response.ts
+models/create-weight-ticket-from-transport-request.ts
+models/create-weight-ticket-from-transport-response.ts
 models/create-weight-ticket-response.ts
 models/customer-snapshot-view.ts
 models/default-http-status-code.ts

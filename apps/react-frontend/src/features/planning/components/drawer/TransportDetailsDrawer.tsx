@@ -6,8 +6,9 @@ import {
   resolveLocationAddress,
   transportService,
 } from '@/api/services/transportService';
-import { Drawer } from '@/components/ui/drawer/Drawer';
+import { Drawer, DrawerAction } from '@/components/ui/drawer/Drawer';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
 import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
@@ -32,6 +33,7 @@ interface TransportDetailsDrawerProps {
   transportId: string;
   onEdit?: () => void;
   onDelete?: () => void;
+  onCreateWeightTicket?: () => void;
 }
 
 export const TransportDetailsDrawer = ({
@@ -40,6 +42,7 @@ export const TransportDetailsDrawer = ({
   transportId,
   onEdit,
   onDelete,
+  onCreateWeightTicket,
 }: TransportDetailsDrawerProps) => {
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],
@@ -78,6 +81,19 @@ export const TransportDetailsDrawer = ({
     ? data.wasteContainer.id
     : 'Geen container toegewezen';
 
+  const additionalActions: DrawerAction[] = [];
+  if (
+    onCreateWeightTicket &&
+    data?.transportType === 'WASTE' &&
+    !data?.weightTicketId
+  ) {
+    additionalActions.push({
+      icon: Scale,
+      onClick: onCreateWeightTicket,
+      testId: 'create-weight-ticket-button',
+    });
+  }
+
   return (
     <Drawer
       title={'Transport details'}
@@ -85,6 +101,7 @@ export const TransportDetailsDrawer = ({
       setIsOpen={setIsDrawerOpen}
       onEdit={onEdit}
       onDelete={onDelete}
+      additionalActions={additionalActions}
     >
       {isLoading || (!data && <div>Transport laden...</div>)}
       {!isLoading && data && (

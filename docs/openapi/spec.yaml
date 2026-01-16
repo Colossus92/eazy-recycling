@@ -1064,6 +1064,24 @@ paths:
       responses:
         "204":
           description: No Content
+  /weight-tickets/from-transport:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: createFromTransport
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWeightTicketFromTransportRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateWeightTicketFromTransportResponse"
   /weight-tickets/completed:
     post:
       tags:
@@ -3832,6 +3850,22 @@ components:
           minLength: 1
       required:
       - cancellationReason
+    CreateWeightTicketFromTransportRequest:
+      type: object
+      properties:
+        transportId:
+          type: string
+          format: uuid
+      required:
+      - transportId
+    CreateWeightTicketFromTransportResponse:
+      type: object
+      properties:
+        weightTicketId:
+          type: integer
+          format: int64
+      required:
+      - weightTicketId
     CreateWasteStreamResponse:
       type: object
       properties:
@@ -6269,21 +6303,21 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
+        defaultContentType:
+          type: string
         urlPatterns:
           type: array
           items:
             type: string
-        defaultContentType:
-          type: string
         elIgnored:
           type: string
         errorOnELNotFound:
           type: string
+        isXml:
+          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -6378,18 +6412,36 @@ components:
         contextPath:
           type: string
         initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         sessionTimeout:
           type: integer
           format: int32
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6419,25 +6471,7 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         attributeNames: {}
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
         classLoader:
           type: object
           properties:

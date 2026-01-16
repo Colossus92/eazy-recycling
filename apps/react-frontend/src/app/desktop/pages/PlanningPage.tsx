@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ContentContainer } from '@/components/layouts/ContentContainer.tsx';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar.tsx';
@@ -12,31 +12,39 @@ import { PlanningFilterForm } from '@/features/planning/components/filter/Planni
 import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 import { transportService } from '@/api/services/transportService';
+import { weightTicketService } from '@/api/services/weightTicketService';
 import { toastService } from '@/components/ui/toast/toastService';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const PlanningPage = () => {
-  const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } = usePlanningFilter();
-  const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] = useState(false);
-  const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] = useState(false);
-  const [selectedTransportId, setSelectedTransportId] = useState<string | undefined>();
+  const navigate = useNavigate();
+  const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } =
+    usePlanningFilter();
+  const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] =
+    useState(false);
+  const [isWasteTransportFormOpen, setIsWasteTransportFormOpen] =
+    useState(false);
+  const [selectedTransportId, setSelectedTransportId] = useState<
+    string | undefined
+  >();
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
-  const [isTransportDetailsDrawerOpen, setIsTransportDetailsDrawerOpen] = useState(false);
+  const [isTransportDetailsDrawerOpen, setIsTransportDetailsDrawerOpen] =
+    useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
-  
+
   // Handle URL params for opening transport details drawer from weight ticket
   useEffect(() => {
     const transportId = searchParams.get('transportId');
     const dateParam = searchParams.get('date');
-    
+
     if (transportId) {
       setSelectedTransportId(transportId);
       setIsTransportDetailsDrawerOpen(true);
-      
+
       // Set calendar date if provided
       if (dateParam) {
         const parsedDate = new Date(dateParam);
@@ -44,7 +52,7 @@ export const PlanningPage = () => {
           setCalendarDate(parsedDate);
         }
       }
-      
+
       // Clear the URL params after opening
       setSearchParams({});
     }
@@ -52,7 +60,7 @@ export const PlanningPage = () => {
 
   const handleDeleteTransport = async () => {
     if (!selectedTransportId) return;
-    
+
     try {
       await transportService.deleteTransport(selectedTransportId);
       toastService.success('Transport verwijderd');
@@ -67,11 +75,27 @@ export const PlanningPage = () => {
 
   const handleEditTransport = () => {
     if (!selectedTransportId) return;
-    
+
     // Open the waste transport form for editing
     setIsWasteTransportFormOpen(true);
   };
-  
+
+  const handleCreateWeightTicket = async () => {
+    if (!selectedTransportId) return;
+
+    try {
+      const result =
+        await weightTicketService.createFromTransport(selectedTransportId);
+      toastService.success('Weegbon aangemaakt');
+      await queryClient.invalidateQueries({ queryKey: ['planning'] });
+      setIsTransportDetailsDrawerOpen(false);
+      navigate(`/weight-tickets?weightTicketId=${result.weightTicketId}`);
+    } catch (error) {
+      console.error('Error creating weight ticket:', error);
+      toastService.error('Fout bij het aanmaken van weegbon');
+    }
+  };
+
   return (
     <>
       <ContentContainer title={'Planning'}>
@@ -139,6 +163,7 @@ export const PlanningPage = () => {
           transportId={selectedTransportId}
           onDelete={handleDeleteTransport}
           onEdit={handleEditTransport}
+          onCreateWeightTicket={handleCreateWeightTicket}
         />
       )}
     </>

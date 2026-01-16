@@ -38,6 +38,7 @@ class WeightTicketController(
   private val copyWeightTicket: CopyWeightTicket,
   private val completeWeightTicket: CompleteWeightTicket,
   private val createInvoiceFromWeightTicket: CreateInvoiceFromWeightTicket,
+  private val createWeightTicketFromTransport: CreateWeightTicketFromTransport,
   private val catalogItemRepository: CatalogItemJpaRepository,
 ) {
 
@@ -167,6 +168,22 @@ class WeightTicketController(
       )
     )
   }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/from-transport")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createFromTransport(
+    @Valid @RequestBody request: CreateWeightTicketFromTransportRequest
+  ): CreateWeightTicketFromTransportResponse {
+    val result = createWeightTicketFromTransport.execute(
+      CreateWeightTicketFromTransportCommand(
+        transportId = request.transportId
+      )
+    )
+    return CreateWeightTicketFromTransportResponse(
+      weightTicketId = result.weightTicketId
+    )
+  }
 }
 
 data class SplitWeightTicketRequest(
@@ -192,6 +209,14 @@ data class CopyWeightTicketResponse(
 data class CancelWeightTicketRequest(
   @field:NotBlank(message = "Een reden van annulering is verplicht")
   val cancellationReason: String,
+)
+
+data class CreateWeightTicketFromTransportRequest(
+  val transportId: UUID,
+)
+
+data class CreateWeightTicketFromTransportResponse(
+  val weightTicketId: Long,
 )
 
 data class WeightTicketRequest(

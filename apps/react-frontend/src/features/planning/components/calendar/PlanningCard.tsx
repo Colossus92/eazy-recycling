@@ -5,6 +5,10 @@ import { DeleteTransportDialog } from '../DeleteTransportDialog';
 import { useTransportDeletion } from '../../hooks/useTransportDeletion';
 import { PlanningItem } from '@/features/planning/hooks/usePlanning';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
+import { weightTicketService } from '@/api/services/weightTicketService';
+import { toastService } from '@/components/ui/toast/toastService';
+import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { PlanningCardPopover } from '@/features/planning/components/calendar/PlanningCardPopover.tsx';
 import { ContainerTransportForm } from '@/features/planning/forms/containertransportform/ContainerTransportForm.tsx';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
@@ -24,6 +28,8 @@ export const PlanningCard = ({
   onMouseEnter,
   onMouseLeave,
 }: PlanningCardProps) => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const {
     isDeleting,
     showDeleteDialog,
@@ -42,12 +48,18 @@ export const PlanningCard = ({
       DriverPlanningItemStatusEnum.Unplanned,
       'border-color-status-warning-primary bg-color-status-warning-light',
     ],
-    [DriverPlanningItemStatusEnum.Planned, 'border-color-brand-primary bg-color-status-info-light'],
+    [
+      DriverPlanningItemStatusEnum.Planned,
+      'border-color-brand-primary bg-color-status-info-light',
+    ],
     [
       DriverPlanningItemStatusEnum.Finished,
       'border-color-status-success-primary bg-color-status-success-light',
     ],
-    [DriverPlanningItemStatusEnum.Invoiced, 'border-color-text-disabled bg-color-surface-background'],
+    [
+      DriverPlanningItemStatusEnum.Invoiced,
+      'border-color-text-disabled bg-color-surface-background',
+    ],
   ]);
 
   const truncateCity = (cityName: string) => {
@@ -81,6 +93,22 @@ export const PlanningCard = ({
 
     setIsFormOpen(true);
   };
+
+  const handleCreateWeightTicket = async () => {
+    try {
+      const result = await weightTicketService.createFromTransport(
+        transport.id
+      );
+      toastService.success('Weegbon aangemaakt');
+      await queryClient.invalidateQueries({ queryKey: ['planning'] });
+      setIsDrawerOpen(false);
+      navigate(`/weight-tickets?weightTicketId=${result.weightTicketId}`);
+    } catch (error) {
+      console.error('Error creating weight ticket:', error);
+      toastService.error('Fout bij het aanmaken van weegbon');
+    }
+  };
+
   return (
     <>
       <div
@@ -175,6 +203,7 @@ export const PlanningCard = ({
               ? undefined
               : () => confirmDelete(transport)
           }
+          onCreateWeightTicket={handleCreateWeightTicket}
         />
       )}
       <DeleteTransportDialog

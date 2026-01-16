@@ -57,7 +57,7 @@ class WasteTransport(
    */
   val sequenceNumber: Int,
 
-  val weightTicketId: WeightTicketId? = null,
+  var weightTicketId: WeightTicketId? = null,
 
   val createdAt: Instant? = null,
   val createdBy: String? = null,

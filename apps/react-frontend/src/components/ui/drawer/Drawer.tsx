@@ -1,11 +1,17 @@
 'use client';
 
 import { Dialog, DialogPanel } from '@headlessui/react';
-import { ReactNode } from 'react';
+import { ReactNode, SVGProps } from 'react';
 import X from '@/assets/icons/X.svg?react';
 import Pencil from '@/assets/icons/PencilSimple.svg?react';
 import Trash from '@/assets/icons/TrashSimple.svg?react';
 import { Button } from '@/components/ui/button/Button.tsx';
+
+export interface DrawerAction {
+  icon: React.FunctionComponent<SVGProps<SVGSVGElement>>;
+  onClick: () => void;
+  testId?: string;
+}
 
 interface DrawerProps {
   title: string;
@@ -14,6 +20,7 @@ interface DrawerProps {
   children?: ReactNode;
   onEdit?: () => void;
   onDelete?: () => void;
+  additionalActions?: DrawerAction[];
 }
 
 export const Drawer = ({
@@ -23,10 +30,11 @@ export const Drawer = ({
   children,
   onEdit,
   onDelete,
+  additionalActions,
 }: DrawerProps) => {
   return (
     <Dialog open={isOpen} onClose={setIsOpen} className="relative z-10">
-      <div className="fixed inset-0"/>
+      <div className="fixed inset-0" />
 
       <div className="fixed inset-0 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden">
@@ -45,6 +53,17 @@ export const Drawer = ({
                     <span className="text-h4">{title}</span>
                   </div>
                   <div className={'flex items-center gap-2'}>
+                    {additionalActions?.map((action, index) => (
+                      <Button
+                        key={index}
+                        icon={action.icon}
+                        showText={false}
+                        variant="icon"
+                        iconPosition="right"
+                        onClick={action.onClick}
+                        data-testid={action.testId}
+                      />
+                    ))}
                     {onEdit && (
                       <Button
                         icon={Pencil}
