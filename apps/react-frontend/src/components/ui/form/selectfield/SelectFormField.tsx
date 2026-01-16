@@ -63,7 +63,7 @@ export const SelectFormField = <TFieldValues extends FieldValues>({
         rules={rules}
         defaultValue={value}
         render={({ field }) => (
-          <div data-testid={testId}>
+          <div data-testid={testId} className="w-full">
             <Select
               {...field}
               options={options}
