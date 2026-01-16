@@ -20,6 +20,14 @@ envs:
     scope: RUN_AND_BUILD_TIME
     type: SECRET
     value: EV[1:D0IZTFnHR/cjqKgQJZHKC+2TUZS0pBhr:WOvAUSHuYORiB/2+Lx/dqVR72OaZsQ1FDcnOJ/36zIdz0Lv6GRJc6as7GXoZv2KhVou5MWBLpic=]
+  - key: PRICING_APP_BASE_URL
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:CwcyIweXIfyuKEfklBY2HgAuLLGTS1kj:yLNftWpzpYQGATS2X7QHige1OHjjkcGz+aYUrxQ2ndjLkRJUj2YJZDPe3xKZy2A=]
+  - key: PRICING_APP_BEARER_TOKEN
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: EV[1:PjQJWhY6BueNGkF0OStJecveQ+StDpm1:Wk1vnEXpgr5JOcYSB79VwC3XFIH32r4N4vYCDtBv7kbP1iSr7uOEYbzRPZvBBlE5thpvRZENpVEhz61Qu8tiMczk]
 features:
   - buildpack-stack=ubuntu-22
 ingress:
