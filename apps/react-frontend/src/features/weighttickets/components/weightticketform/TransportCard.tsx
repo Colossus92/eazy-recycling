@@ -59,7 +59,7 @@ export const TransportCard = ({
     const handleViewDetails = () => {
         const pickupDate = new Date(pickupDateTime);
         const dateParam = format(pickupDate, 'yyyy-MM-dd');
-        navigate(`/?transportId=${transportId}&date=${dateParam}`);
+        navigate(`/?highlightTransportId=${transportId}&date=${dateParam}`);
     };
 
     return (

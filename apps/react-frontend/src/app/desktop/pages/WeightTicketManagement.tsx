@@ -139,7 +139,7 @@ export const WeightTicketManagement = () => {
           <span>Transport aangemaakt: {createTransport.response.displayNumber}</span>
           <button
             onClick={() => {
-              navigate(`/?transportId=${createTransport.response!.transportId}&date=${dateParam}`);
+              navigate(`/?highlightTransportId=${createTransport.response!.transportId}&date=${dateParam}`);
             }}
             className="text-left underline hover:no-underline text-color-brand-primary font-semibold"
           >

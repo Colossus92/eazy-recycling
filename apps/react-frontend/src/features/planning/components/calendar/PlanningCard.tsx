@@ -19,6 +19,7 @@ interface PlanningCardProps {
   activePopoverId?: string;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  isHighlighted?: boolean;
 }
 
 export const PlanningCard = ({
@@ -26,6 +27,7 @@ export const PlanningCard = ({
   activePopoverId,
   onMouseEnter,
   onMouseLeave,
+  isHighlighted,
 }: PlanningCardProps) => {
   const {
     isDeleting,
@@ -143,6 +145,20 @@ export const PlanningCard = ({
     };
   }, [showDriverDropdown]);
 
+  // Scroll highlighted card into view within the calendar grid's scrollable container
+  useEffect(() => {
+    if (isHighlighted && cardRef.current) {
+      // Small delay to ensure the calendar has rendered with the correct date
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest',
+        });
+      }, 100);
+    }
+  }, [isHighlighted]);
+
   return (
     <>
       <div
@@ -159,7 +175,7 @@ export const PlanningCard = ({
             onClick={handleSingleClick}
           >
             <div
-              className={`flex flex-col items-start content-center self-stretch py-1.5 pr-1.5 pl-2 gap-3 border-solid border-l-4 rounded-radius-md ${colors.get(transport.status)} `}
+              className={`flex flex-col items-start content-center self-stretch py-1.5 pr-1.5 pl-2 gap-3 border-solid border-l-4 rounded-radius-md ${colors.get(transport.status)} ${isHighlighted ? 'transport-highlight' : ''}`}
             >
               <div className={'flex flex-col items-start self-stretch'}>
                 <span className={'text-subtitle-1 text-color-text-secondary'}>

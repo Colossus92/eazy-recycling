@@ -42,6 +42,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Transport card highlight animation - used when navigating from weight ticket */
+@keyframes transport-highlight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(30, 119, 248, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(30, 119, 248, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(30, 119, 248, 0);
+  }
+}
+
+.transport-highlight {
+  animation: transport-highlight 1s ease-in-out 7;
+}
+
 :root {
     --number-4: 4px;
     --number-6: 6px;

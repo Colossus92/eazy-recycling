@@ -8,11 +8,13 @@ import { useDragAndDrop } from '@/features/planning/hooks/useDragAndDrop';
 interface CalendarGridProps {
   planning?: Planning;
   isLoading?: boolean;
+  highlightedTransportId?: string | null;
 }
 
 export const CalendarGrid = ({
   planning: initialPlanning,
   isLoading,
+  highlightedTransportId,
 }: CalendarGridProps) => {
   const { handleMouseEnter, handleMouseLeave, activePopoverId } = usePopover();
   const { planning, onDragEnd } = useDragAndDrop({ initialPlanning });
@@ -86,6 +88,7 @@ export const CalendarGrid = ({
                                       onMouseLeave={() =>
                                         handleMouseLeave(transport.id)
                                       }
+                                      isHighlighted={highlightedTransportId === transport.id}
                                     />
                                   </div>
                                 )}

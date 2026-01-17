@@ -32,6 +32,7 @@ export const PlanningPage = () => {
   const [calendarDate, setCalendarDate] = useState<Date | undefined>();
   const [isTransportDetailsDrawerOpen, setIsTransportDetailsDrawerOpen] =
     useState(false);
+  const [highlightedTransportId, setHighlightedTransportId] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { createWeightTicket } = useCreateWeightTicketFromTransport();
@@ -39,6 +40,7 @@ export const PlanningPage = () => {
   // Handle URL params for opening transport details drawer from weight ticket
   useEffect(() => {
     const transportId = searchParams.get('transportId');
+    const highlightTransportId = searchParams.get('highlightTransportId');
     const dateParam = searchParams.get('date');
 
     if (transportId) {
@@ -55,6 +57,25 @@ export const PlanningPage = () => {
 
       // Clear the URL params after opening
       setSearchParams({});
+    } else if (highlightTransportId) {
+      // Handle highlight param - just highlight the card, don't open drawer
+      setHighlightedTransportId(highlightTransportId);
+
+      // Set calendar date if provided
+      if (dateParam) {
+        const parsedDate = new Date(dateParam);
+        if (!isNaN(parsedDate.getTime())) {
+          setCalendarDate(parsedDate);
+        }
+      }
+
+      // Clear the URL params after setting highlight
+      setSearchParams({});
+
+      // Auto-clear highlight after animation completes (7 seconds for 7 pulses)
+      setTimeout(() => {
+        setHighlightedTransportId(null);
+      }, 7000);
     }
   }, [searchParams, setSearchParams]);
 
@@ -113,7 +134,7 @@ export const PlanningPage = () => {
           </ContentTitleBar>
           <div className="flex-1 flex flex-col items-start self-stretch h-full">
             <ErrorBoundary fallbackRender={fallbackRender}>
-              <Calendar filters={filters} initialDate={calendarDate} />
+              <Calendar filters={filters} initialDate={calendarDate} highlightedTransportId={highlightedTransportId} />
             </ErrorBoundary>
           </div>
         </div>

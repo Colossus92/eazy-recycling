@@ -7,9 +7,10 @@ import { PlanningFilterParams } from '@/api/services/planningService.ts';
 interface CalendarProps {
   filters: PlanningFilterParams;
   initialDate?: Date;
+  highlightedTransportId?: string | null;
 }
 
-export const Calendar = ({ filters, initialDate }: CalendarProps) => {
+export const Calendar = ({ filters, initialDate, highlightedTransportId }: CalendarProps) => {
   const [date, setDate] = useState(initialDate || new Date());
   const { planning, isLoading, error } = usePlanning(date, filters);
   
@@ -31,7 +32,7 @@ export const Calendar = ({ filters, initialDate }: CalendarProps) => {
     >
       <CalendarToolbar date={date} setDate={setDate} />
       <div className="flex-1 w-full overflow-hidden">
-        <CalendarGrid planning={planning} isLoading={isLoading} />
+        <CalendarGrid planning={planning} isLoading={isLoading} highlightedTransportId={highlightedTransportId} />
       </div>
     </div>
   );
