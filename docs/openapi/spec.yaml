@@ -271,6 +271,31 @@ paths:
       responses:
         "204":
           description: No Content
+  /transport/{id}/driver:
+    put:
+      tags:
+      - transport-controller
+      operationId: updateTransportDriver
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDriverRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransportDto"
   /transport/waste/{id}:
     put:
       tags:
@@ -2797,6 +2822,530 @@ components:
           type: string
       required:
       - licensePlate
+    UpdateDriverRequest:
+      type: object
+      properties:
+        driverId:
+          type: string
+          format: uuid
+    AddressDto:
+      type: object
+      properties:
+        streetName:
+          type: string
+        buildingNumber:
+          type: string
+        buildingNumberAddition:
+          type: string
+        city:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+      required:
+      - buildingNumber
+      - city
+      - country
+      - postalCode
+      - streetName
+    CatalogItemCategoryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - type
+    CatalogItemDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - MATERIAL
+          - PRODUCT
+          - WASTE_STREAM
+        code:
+          type: string
+        name:
+          type: string
+        unitOfMeasure:
+          type: string
+        vatRate:
+          $ref: "#/components/schemas/VatRateDto"
+        category:
+          $ref: "#/components/schemas/CatalogItemCategoryDto"
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDto"
+        defaultPrice:
+          type: number
+        status:
+          type: string
+        purchaseAccountNumber:
+          type: string
+        salesAccountNumber:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - status
+      - type
+      - unitOfMeasure
+      - vatRate
+    CompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        chamberOfCommerceId:
+          type: string
+        vihbId:
+          type: string
+        processorId:
+          type: string
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/AddressDto"
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - CARRIER
+            - PROCESSOR
+        phone:
+          type: string
+        email:
+          type: string
+        isSupplier:
+          type: boolean
+        isCustomer:
+          type: boolean
+        deletedAt:
+          type: string
+          format: date-time
+        deletedBy:
+          type: string
+          format: uuid
+        isTenantCompany:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - address
+      - id
+      - isCustomer
+      - isSupplier
+      - isTenantCompany
+      - name
+      - roles
+    PickupLocationDto:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+      - id
+    ProfileDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRoleDto"
+      required:
+      - id
+      - roles
+    TransportDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDto"
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        pickupLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        pickupDateTime:
+          type: string
+          format: date-time
+        deliveryLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        deliveryDateTime:
+          type: string
+          format: date-time
+        transportType:
+          type: string
+          enum:
+          - CONTAINER
+          - WASTE
+        containerOperation:
+          type: string
+          enum:
+          - EXCHANGE
+          - PICKUP
+          - EMPTY
+          - DELIVERY
+        wasteContainer:
+          $ref: "#/components/schemas/WasteContainerDto"
+        truck:
+          $ref: "#/components/schemas/TruckDto"
+        driver:
+          $ref: "#/components/schemas/ProfileDto"
+        note:
+          type: string
+        goods:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportGoodsDto"
+        transportHours:
+          type: number
+          format: double
+        driverNote:
+          type: string
+        sequenceNumber:
+          type: integer
+          format: int32
+        weightTicket:
+          $ref: "#/components/schemas/WeightTicketDto"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+        status:
+          type: string
+          enum:
+          - UNPLANNED
+          - PLANNED
+          - FINISHED
+          - INVOICED
+      required:
+      - carrierParty
+      - consignorParty
+      - deliveryLocation
+      - id
+      - pickupDateTime
+      - pickupLocation
+      - sequenceNumber
+      - status
+      - transportType
+    TransportGoodsDto:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        netNetWeight:
+          type: number
+          format: double
+        unit:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+      required:
+      - quantity
+      - unit
+      - wasteStreamNumber
+    TruckDto:
+      type: object
+      properties:
+        licensePlate:
+          type: string
+        brand:
+          type: string
+        description:
+          type: string
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+        displayName:
+          type: string
+      required:
+      - displayName
+      - licensePlate
+    UserRoleDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        role:
+          type: string
+      required:
+      - id
+      - role
+    VatRateDto:
+      type: object
+      properties:
+        vatCode:
+          type: string
+        percentage:
+          type: number
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        countryCode:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - countryCode
+      - description
+      - percentage
+      - validFrom
+      - vatCode
+    WasteContainerDto:
+      type: object
+      properties:
+        id:
+          type: string
+        location:
+          $ref: "#/components/schemas/PickupLocationDto"
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - id
+    WeightTicketDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        number:
+          type: integer
+          format: int64
+        consignorParty:
+          $ref: "#/components/schemas/CompanyDto"
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTicketLineDto"
+        productLines:
+          type: array
+          items:
+            $ref: "#/components/schemas/WeightTicketProductLineDto"
+        secondWeighingValue:
+          type: number
+        secondWeighingUnit:
+          type: string
+          enum:
+          - kg
+        tarraWeightValue:
+          type: number
+        tarraWeightUnit:
+          type: string
+          enum:
+          - kg
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        pickupLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        deliveryLocation:
+          $ref: "#/components/schemas/PickupLocationDto"
+        carrierParty:
+          $ref: "#/components/schemas/CompanyDto"
+        truckLicensePlate:
+          type: string
+        reclamation:
+          type: string
+        note:
+          type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - COMPLETED
+          - INVOICED
+          - CANCELLED
+        weightedAt:
+          type: string
+          format: date-time
+        cancellationReason:
+          type: string
+        linkedInvoiceId:
+          type: string
+          format: uuid
+        pdfUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        updatedBy:
+          type: string
+      required:
+      - consignorParty
+      - direction
+      - id
+      - lines
+      - number
+      - productLines
+      - status
+    WeightTicketLineDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        weightTicket:
+          $ref: "#/components/schemas/WeightTicketDto"
+        wasteStreamNumber:
+          type: string
+        catalogItem:
+          $ref: "#/components/schemas/CatalogItemDto"
+        catalogItemId:
+          type: string
+          format: uuid
+        weightValue:
+          type: number
+        weightUnit:
+          type: string
+          enum:
+          - kg
+        declaredWeight:
+          type: number
+        lastDeclaredAt:
+          type: string
+          format: date-time
+      required:
+      - catalogItem
+      - catalogItemId
+      - id
+      - weightUnit
+      - weightValue
+    WeightTicketProductLineDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        weightTicket:
+          required:
+          - consignorParty
+          - id
+          - number
+        catalogItem:
+          $ref: "#/components/schemas/CatalogItemDto"
+        catalogItemId:
+          type: string
+          format: uuid
+        quantity:
+          type: number
+        unit:
+          type: string
+      required:
+      - catalogItem
+      - catalogItemId
+      - id
+      - quantity
+      - unit
     GoodsRequest:
       type: object
       properties:
@@ -3090,86 +3639,6 @@ components:
       - date
       - licensePlate
       - transportIds
-    AddressDto:
-      type: object
-      properties:
-        streetName:
-          type: string
-        buildingNumber:
-          type: string
-        buildingNumberAddition:
-          type: string
-        city:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
-      required:
-      - buildingNumber
-      - city
-      - country
-      - postalCode
-      - streetName
-    CompanyDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        code:
-          type: string
-        chamberOfCommerceId:
-          type: string
-        vihbId:
-          type: string
-        processorId:
-          type: string
-        name:
-          type: string
-        address:
-          $ref: "#/components/schemas/AddressDto"
-        roles:
-          type: array
-          items:
-            type: string
-            enum:
-            - CARRIER
-            - PROCESSOR
-        phone:
-          type: string
-        email:
-          type: string
-        isSupplier:
-          type: boolean
-        isCustomer:
-          type: boolean
-        deletedAt:
-          type: string
-          format: date-time
-        deletedBy:
-          type: string
-          format: uuid
-        isTenantCompany:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - address
-      - id
-      - isCustomer
-      - isSupplier
-      - isTenantCompany
-      - name
-      - roles
     PlanningTransportView:
       type: object
       properties:
@@ -3243,63 +3712,6 @@ components:
       required:
       - dates
       - transports
-    ProfileDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        firstName:
-          type: string
-        lastName:
-          type: string
-        roles:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserRoleDto"
-      required:
-      - id
-      - roles
-    TruckDto:
-      type: object
-      properties:
-        licensePlate:
-          type: string
-        brand:
-          type: string
-        description:
-          type: string
-        carrierParty:
-          $ref: "#/components/schemas/CompanyDto"
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-        displayName:
-          type: string
-      required:
-      - displayName
-      - licensePlate
-    UserRoleDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        userId:
-          type: string
-          format: uuid
-        role:
-          type: string
-      required:
-      - id
-      - role
     MaterialRequest:
       type: object
       properties:
@@ -3947,387 +4359,6 @@ components:
       required:
       - driverNote
       - hours
-    CatalogItemCategoryDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-        code:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - code
-      - id
-      - name
-      - type
-    CatalogItemDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum:
-          - MATERIAL
-          - PRODUCT
-          - WASTE_STREAM
-        code:
-          type: string
-        name:
-          type: string
-        unitOfMeasure:
-          type: string
-        vatRate:
-          $ref: "#/components/schemas/VatRateDto"
-        category:
-          $ref: "#/components/schemas/CatalogItemCategoryDto"
-        consignorParty:
-          $ref: "#/components/schemas/CompanyDto"
-        defaultPrice:
-          type: number
-        status:
-          type: string
-        purchaseAccountNumber:
-          type: string
-        salesAccountNumber:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - code
-      - id
-      - name
-      - status
-      - type
-      - unitOfMeasure
-      - vatRate
-    PickupLocationDto:
-      type: object
-      properties:
-        id:
-          type: string
-      required:
-      - id
-    TransportDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        displayNumber:
-          type: string
-        consignorParty:
-          $ref: "#/components/schemas/CompanyDto"
-        carrierParty:
-          $ref: "#/components/schemas/CompanyDto"
-        pickupLocation:
-          $ref: "#/components/schemas/PickupLocationDto"
-        pickupDateTime:
-          type: string
-          format: date-time
-        deliveryLocation:
-          $ref: "#/components/schemas/PickupLocationDto"
-        deliveryDateTime:
-          type: string
-          format: date-time
-        transportType:
-          type: string
-          enum:
-          - CONTAINER
-          - WASTE
-        containerOperation:
-          type: string
-          enum:
-          - EXCHANGE
-          - PICKUP
-          - EMPTY
-          - DELIVERY
-        wasteContainer:
-          $ref: "#/components/schemas/WasteContainerDto"
-        truck:
-          $ref: "#/components/schemas/TruckDto"
-        driver:
-          $ref: "#/components/schemas/ProfileDto"
-        note:
-          type: string
-        goods:
-          type: array
-          items:
-            $ref: "#/components/schemas/TransportGoodsDto"
-        transportHours:
-          type: number
-          format: double
-        driverNote:
-          type: string
-        sequenceNumber:
-          type: integer
-          format: int32
-        weightTicket:
-          $ref: "#/components/schemas/WeightTicketDto"
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-        status:
-          type: string
-          enum:
-          - UNPLANNED
-          - PLANNED
-          - FINISHED
-          - INVOICED
-      required:
-      - carrierParty
-      - consignorParty
-      - deliveryLocation
-      - id
-      - pickupDateTime
-      - pickupLocation
-      - sequenceNumber
-      - status
-      - transportType
-    TransportGoodsDto:
-      type: object
-      properties:
-        wasteStreamNumber:
-          type: string
-        netNetWeight:
-          type: number
-          format: double
-        unit:
-          type: string
-        quantity:
-          type: integer
-          format: int32
-      required:
-      - quantity
-      - unit
-      - wasteStreamNumber
-    VatRateDto:
-      type: object
-      properties:
-        vatCode:
-          type: string
-        percentage:
-          type: number
-        validFrom:
-          type: string
-          format: date-time
-        validTo:
-          type: string
-          format: date-time
-        countryCode:
-          type: string
-        description:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - countryCode
-      - description
-      - percentage
-      - validFrom
-      - vatCode
-    WasteContainerDto:
-      type: object
-      properties:
-        id:
-          type: string
-        location:
-          $ref: "#/components/schemas/PickupLocationDto"
-        notes:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - id
-    WeightTicketDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        number:
-          type: integer
-          format: int64
-        consignorParty:
-          $ref: "#/components/schemas/CompanyDto"
-        lines:
-          type: array
-          items:
-            $ref: "#/components/schemas/WeightTicketLineDto"
-        productLines:
-          type: array
-          items:
-            $ref: "#/components/schemas/WeightTicketProductLineDto"
-        secondWeighingValue:
-          type: number
-        secondWeighingUnit:
-          type: string
-          enum:
-          - kg
-        tarraWeightValue:
-          type: number
-        tarraWeightUnit:
-          type: string
-          enum:
-          - kg
-        direction:
-          type: string
-          enum:
-          - INBOUND
-          - OUTBOUND
-        pickupLocation:
-          $ref: "#/components/schemas/PickupLocationDto"
-        deliveryLocation:
-          $ref: "#/components/schemas/PickupLocationDto"
-        carrierParty:
-          $ref: "#/components/schemas/CompanyDto"
-        truckLicensePlate:
-          type: string
-        reclamation:
-          type: string
-        note:
-          type: string
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - COMPLETED
-          - INVOICED
-          - CANCELLED
-        weightedAt:
-          type: string
-          format: date-time
-        cancellationReason:
-          type: string
-        linkedInvoiceId:
-          type: string
-          format: uuid
-        pdfUrl:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        createdBy:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-        updatedBy:
-          type: string
-      required:
-      - consignorParty
-      - direction
-      - id
-      - lines
-      - number
-      - productLines
-      - status
-    WeightTicketLineDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        weightTicket:
-          $ref: "#/components/schemas/WeightTicketDto"
-        wasteStreamNumber:
-          type: string
-        catalogItem:
-          $ref: "#/components/schemas/CatalogItemDto"
-        catalogItemId:
-          type: string
-          format: uuid
-        weightValue:
-          type: number
-        weightUnit:
-          type: string
-          enum:
-          - kg
-        declaredWeight:
-          type: number
-        lastDeclaredAt:
-          type: string
-          format: date-time
-      required:
-      - catalogItem
-      - catalogItemId
-      - id
-      - weightUnit
-      - weightValue
-    WeightTicketProductLineDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        weightTicket:
-          required:
-          - consignorParty
-          - id
-          - number
-        catalogItem:
-          $ref: "#/components/schemas/CatalogItemDto"
-        catalogItemId:
-          type: string
-          format: uuid
-        quantity:
-          type: number
-        unit:
-          type: string
-      required:
-      - catalogItem
-      - catalogItemId
-      - id
-      - quantity
-      - unit
     CreateWasteTransportResponse:
       type: object
       properties:
@@ -4605,14 +4636,6 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
         year:
           type: integer
           format: int32
@@ -4652,6 +4675,14 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
       required:
       - day
       - dayOfMonth
@@ -4668,17 +4699,6 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
-        monthNumber:
-          type: integer
-          format: int32
-          deprecated: true
-          description: Use the 'month' property instead
-        nanosecond:
-          type: integer
-          format: int32
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4731,6 +4751,17 @@ components:
         day:
           type: integer
           format: int32
+        monthNumber:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use the 'month' property instead
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
       required:
       - date
       - day
@@ -4752,11 +4783,6 @@ components:
         value:
           type: string
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-        nanosecond:
-          type: integer
-          format: int32
         hour:
           type: integer
           format: int32
@@ -4766,6 +4792,11 @@ components:
         second:
           type: integer
           format: int32
+        nanosecond:
+          type: integer
+          format: int32
+        value$kotlinx_datetime:
+          type: string
       required:
       - hour
       - minute
@@ -5939,6 +5970,11 @@ components:
     ApplicationContext:
       type: object
       properties:
+        parent: {}
+        id:
+          type: string
+        displayName:
+          type: string
         applicationName:
           type: string
         startupDate:
@@ -5946,11 +5982,6 @@ components:
           format: int64
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        parent: {}
-        id:
-          type: string
-        displayName:
-          type: string
         environment:
           $ref: "#/components/schemas/Environment"
         beanDefinitionCount:
@@ -6193,14 +6224,14 @@ components:
           type: array
           items:
             type: string
-        initParameters:
-          type: object
-          additionalProperties:
-            type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     HttpStatus:
       allOf:
       - $ref: "#/components/schemas/HttpStatusCode"
@@ -6277,6 +6308,8 @@ components:
     HttpStatusCode:
       type: object
       properties:
+        error:
+          type: boolean
         is4xxClientError:
           type: boolean
         is5xxServerError:
@@ -6287,37 +6320,29 @@ components:
           type: boolean
         is3xxRedirection:
           type: boolean
-        error:
-          type: boolean
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
+        buffer:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
           type: string
         scriptingInvalid:
-          type: string
-        isXml:
           type: string
         includePreludes:
           type: array
@@ -6327,13 +6352,19 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
+        elIgnored:
           type: string
+        isXml:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
           type: string
-        buffer:
+        deferredSyntaxAllowedAsLiteral:
           type: string
     RedirectView:
       type: object
@@ -6395,83 +6426,20 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        contextPath:
-          type: string
-        initParameterNames: {}
-        serverInfo:
-          type: string
-        servletContextName:
-          type: string
-        effectiveMinorVersion:
-          type: integer
-          format: int32
-        effectiveMajorVersion:
-          type: integer
-          format: int32
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        defaultSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
-        requestCharacterEncoding:
-          type: string
-        responseCharacterEncoding:
-          type: string
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6515,36 +6483,95 @@ components:
         minorVersion:
           type: integer
           format: int32
+        attributeNames: {}
+        initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTimeout:
+          type: integer
+          format: int32
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        serverInfo:
+          type: string
+        contextPath:
+          type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        effectiveMajorVersion:
+          type: integer
+          format: int32
+        effectiveMinorVersion:
+          type: integer
+          format: int32
+        defaultSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        requestCharacterEncoding:
+          type: string
+        responseCharacterEncoding:
+          type: string
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
-        initParameters:
-          type: object
-          additionalProperties:
-            type: string
+        runAsRole:
+          type: string
         name:
           type: string
         className:
           type: string
+        initParameters:
+          type: object
+          additionalProperties:
+            type: string
     SessionCookieConfig:
       type: object
       properties:
         maxAge:
           type: integer
           format: int32
-        httpOnly:
-          type: boolean
-        secure:
-          type: boolean
-        domain:
-          type: string
         path:
+          type: string
+        domain:
           type: string
         name:
           type: string
@@ -6555,12 +6582,16 @@ components:
         comment:
           type: string
           deprecated: true
+        secure:
+          type: boolean
+        httpOnly:
+          type: boolean
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

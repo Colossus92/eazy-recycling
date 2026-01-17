@@ -17,20 +17,14 @@
 /**
  * 
  * @export
- * @interface TaglibDescriptor
+ * @interface UpdateDriverRequest
  */
-export interface TaglibDescriptor {
+export interface UpdateDriverRequest {
     /**
      * 
      * @type {string}
-     * @memberof TaglibDescriptor
+     * @memberof UpdateDriverRequest
      */
-    'taglibLocation'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TaglibDescriptor
-     */
-    'taglibURI'?: string;
+    'driverId'?: string;
 }
 

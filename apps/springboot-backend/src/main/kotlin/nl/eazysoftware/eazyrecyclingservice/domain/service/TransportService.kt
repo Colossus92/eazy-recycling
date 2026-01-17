@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.repository.ProfileRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import org.springframework.data.repository.findByIdOrNull
@@ -10,6 +11,7 @@ import java.util.*
 @Service
 class TransportService(
   private val transportRepository: TransportRepository,
+  private val profileRepository: ProfileRepository,
 ) {
 
     fun getAllTransports(): List<TransportDto> {
@@ -36,5 +38,17 @@ class TransportService(
             )
           }
           ?: throw EntityNotFoundException("Transport met id $id niet gevonden")
+    }
+
+    fun updateTransportDriver(id: UUID, driverId: UUID?): TransportDto {
+        val transport = transportRepository.findByIdOrNull(id)
+            ?: throw EntityNotFoundException("Transport met id $id niet gevonden")
+        
+        val driver = driverId?.let { 
+            profileRepository.findByIdOrNull(it)
+                ?: throw EntityNotFoundException("Chauffeur met id $it niet gevonden")
+        }
+        
+        return transportRepository.save(transport.copy(driver = driver))
     }
 }

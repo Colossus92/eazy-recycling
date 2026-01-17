@@ -58,9 +58,30 @@ class TransportController(
         return transportService.markTransportAsFinished(id, request.hours, request.driverNote)
     }
 
+    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PutMapping(path = ["/{id}/driver"])
+    @Transactional
+    fun updateTransportDriver(@PathVariable id: UUID, @RequestBody request: UpdateDriverRequest): TransportDto {
+        val transport = transportService.getTransportById(id)
+        val status = transport.getStatus()
+
+        if (status != TransportDto.Status.PLANNED && status != TransportDto.Status.UNPLANNED) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Chauffeur kan alleen worden gewijzigd voor transporten met status gepland of ongepland"
+            )
+        }
+
+        return transportService.updateTransportDriver(id, request.driverId)
+    }
+
     data class TransportFinishedRequest(
       val hours: Double,
       val driverNote: String,
+    )
+
+    data class UpdateDriverRequest(
+      val driverId: UUID?
     )
 
     private fun checkAuthorization(transport: TransportDetailView) {

@@ -1,6 +1,6 @@
 import Avatar from 'react-avatar';
 import { Popover, PopoverButton } from '@headlessui/react';
-import { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DeleteTransportDialog } from '../DeleteTransportDialog';
 import { useTransportDeletion } from '../../hooks/useTransportDeletion';
 import { PlanningItem } from '@/features/planning/hooks/usePlanning';
@@ -11,6 +11,8 @@ import { ContainerTransportForm } from '@/features/planning/forms/containertrans
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 import { DriverPlanningItemStatusEnum } from '@/api/client/models/driver-planning-item';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform';
+import { useDrivers } from '../../hooks/useDrivers';
+import { useUpdateTransportDriver } from '../../hooks/useUpdateTransportDriver';
 
 interface PlanningCardProps {
   transport: PlanningItem;
@@ -34,9 +36,13 @@ export const PlanningCard = ({
     cancelDelete,
   } = useTransportDeletion();
   const { createWeightTicket } = useCreateWeightTicketFromTransport();
+  const { drivers } = useDrivers();
+  const { updateDriver, isUpdating } = useUpdateTransportDriver();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showDriverDropdown, setShowDriverDropdown] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const driverDropdownRef = useRef<HTMLDivElement>(null);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isDoubleClickRef = useRef(false);
   const colors = new Map([
@@ -95,6 +101,48 @@ export const PlanningCard = ({
     setIsDrawerOpen(false);
   };
 
+  const canChangeDriver =
+    transport.status === DriverPlanningItemStatusEnum.Planned ||
+    transport.status === DriverPlanningItemStatusEnum.Unplanned;
+
+  const handleDriverClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (canChangeDriver && !isUpdating) {
+      setShowDriverDropdown(!showDriverDropdown);
+    }
+  };
+
+  const handleDriverSelect = (driverId: string) => {
+    updateDriver(
+      { transportId: transport.id, driverId },
+      {
+        onSuccess: () => {
+          setShowDriverDropdown(false);
+        },
+      }
+    );
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        driverDropdownRef.current &&
+        !driverDropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowDriverDropdown(false);
+      }
+    };
+
+    if (showDriverDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDriverDropdown]);
+
   return (
     <>
       <div
@@ -139,19 +187,60 @@ export const PlanningCard = ({
                 </div>
               </div>
 
-              <div className={'flex items-center gap-1'}>
-                {transport.driver ? (
-                  <>
-                    <Avatar
-                      name={`${transport.driver.firstName} ${transport.driver.lastName}`}
-                      maxInitials={2}
-                      size={'20px'}
-                      round={true}
-                    />
-                    {`${transport.driver.firstName} ${transport.driver.lastName}`}
-                  </>
-                ) : (
-                  'Onbekend'
+              <div className="relative" ref={driverDropdownRef}>
+                <div
+                  className={`flex items-center gap-1 ${
+                    canChangeDriver
+                      ? 'cursor-pointer hover:opacity-80'
+                      : 'cursor-not-allowed opacity-60'
+                  }`}
+                  onClick={handleDriverClick}
+                >
+                  {transport.driver ? (
+                    <>
+                      <Avatar
+                        name={`${transport.driver.firstName} ${transport.driver.lastName}`}
+                        maxInitials={2}
+                        size={'20px'}
+                        round={true}
+                      />
+                      {`${transport.driver.firstName} ${transport.driver.lastName}`}
+                    </>
+                  ) : (
+                    'Onbekend'
+                  )}
+                </div>
+
+                {showDriverDropdown && (
+                  <div
+                    className={`absolute z-50 mt-1 w-48 rounded-radius-md shadow-lg ${colors.get(
+                      transport.status
+                    )}`}
+                    style={{ maxHeight: '200px', overflowY: 'auto' }}
+                  >
+                    {drivers.map((driver) => (
+                      <div
+                        key={driver.id}
+                        className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-color-surface-tertiary ${
+                          transport.driver?.firstName === driver.firstName &&
+                          transport.driver?.lastName === driver.lastName
+                            ? 'bg-color-surface-tertiary'
+                            : ''
+                        }`}
+                        onClick={() => handleDriverSelect(driver.id)}
+                      >
+                        <Avatar
+                          name={`${driver.firstName || ''} ${driver.lastName || ''}`}
+                          maxInitials={2}
+                          size={'20px'}
+                          round={true}
+                        />
+                        <span className="text-body-1">
+                          {driver.firstName} {driver.lastName}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

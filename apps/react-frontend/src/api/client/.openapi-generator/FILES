@@ -170,6 +170,7 @@ models/truck-request.ts
 models/truck-result.ts
 models/truck-view.ts
 models/update-container-transport-response.ts
+models/update-driver-request.ts
 models/update-invoice-request.ts
 models/update-user-request.ts
 models/update-waste-transport-response.ts

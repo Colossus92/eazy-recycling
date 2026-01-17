@@ -138,6 +138,7 @@ export * from './truck-request';
 export * from './truck-result';
 export * from './truck-view';
 export * from './update-container-transport-response';
+export * from './update-driver-request';
 export * from './update-invoice-request';
 export * from './update-user-request';
 export * from './update-waste-transport-response';

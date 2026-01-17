@@ -5,6 +5,7 @@ import {
   TransportControllerApi,
   TransportDetailView,
   TransportFinishedRequest,
+  UpdateDriverRequest,
   WasteTransportControllerApi,
   WasteTransportRequest,
 } from '@/api/client';
@@ -137,6 +138,10 @@ export const transportService = {
     wasteTransportApi.updateWasteTransport(id, data),
   reportFinished: (id: string, data: TransportFinishedRequest) =>
     transportApi.markTransportAsFinished(id, data),
+  updateDriver: (id: string, data: UpdateDriverRequest) =>
+    transportApi
+      .updateTransportDriver(id, data)
+      .then((response) => response.data),
 };
 
 export const formValuesToCreateContainerTransportRequest = (
