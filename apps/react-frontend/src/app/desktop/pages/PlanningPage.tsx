@@ -12,15 +12,14 @@ import { PlanningFilterForm } from '@/features/planning/components/filter/Planni
 import { usePlanningFilter } from '@/features/planning/hooks/usePlanningFilter.ts';
 import { fallbackRender } from '@/utils/fallbackRender';
 import { WasteStreamTransportForm } from '@/features/wastestreams/components/wastetransportform/WasteStreamTransportForm.tsx';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
 import { transportService } from '@/api/services/transportService';
-import { weightTicketService } from '@/api/services/weightTicketService';
 import { toastService } from '@/components/ui/toast/toastService';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCreateWeightTicketFromTransport } from '@/features/weighttickets/hooks/useCreateWeightTicketFromTransport';
 
 export const PlanningPage = () => {
-  const navigate = useNavigate();
   const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } =
     usePlanningFilter();
   const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] =
@@ -35,6 +34,7 @@ export const PlanningPage = () => {
     useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryClient = useQueryClient();
+  const { createWeightTicket } = useCreateWeightTicketFromTransport();
 
   // Handle URL params for opening transport details drawer from weight ticket
   useEffect(() => {
@@ -83,17 +83,8 @@ export const PlanningPage = () => {
   const handleCreateWeightTicket = async () => {
     if (!selectedTransportId) return;
 
-    try {
-      const result =
-        await weightTicketService.createFromTransport(selectedTransportId);
-      toastService.success('Weegbon aangemaakt');
-      await queryClient.invalidateQueries({ queryKey: ['planning'] });
-      setIsTransportDetailsDrawerOpen(false);
-      navigate(`/weight-tickets?weightTicketId=${result.weightTicketId}`);
-    } catch (error) {
-      console.error('Error creating weight ticket:', error);
-      toastService.error('Fout bij het aanmaken van weegbon');
-    }
+    await createWeightTicket(selectedTransportId);
+    setIsTransportDetailsDrawerOpen(false);
   };
 
   return (

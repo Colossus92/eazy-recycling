@@ -5,10 +5,7 @@ import { DeleteTransportDialog } from '../DeleteTransportDialog';
 import { useTransportDeletion } from '../../hooks/useTransportDeletion';
 import { PlanningItem } from '@/features/planning/hooks/usePlanning';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
-import { weightTicketService } from '@/api/services/weightTicketService';
-import { toastService } from '@/components/ui/toast/toastService';
-import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useCreateWeightTicketFromTransport } from '@/features/weighttickets/hooks/useCreateWeightTicketFromTransport';
 import { PlanningCardPopover } from '@/features/planning/components/calendar/PlanningCardPopover.tsx';
 import { ContainerTransportForm } from '@/features/planning/forms/containertransportform/ContainerTransportForm.tsx';
 import { TransportDetailsDrawer } from '@/features/planning/components/drawer/TransportDetailsDrawer';
@@ -28,8 +25,6 @@ export const PlanningCard = ({
   onMouseEnter,
   onMouseLeave,
 }: PlanningCardProps) => {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const {
     isDeleting,
     showDeleteDialog,
@@ -38,6 +33,7 @@ export const PlanningCard = ({
     handleDelete,
     cancelDelete,
   } = useTransportDeletion();
+  const { createWeightTicket } = useCreateWeightTicketFromTransport();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -95,18 +91,8 @@ export const PlanningCard = ({
   };
 
   const handleCreateWeightTicket = async () => {
-    try {
-      const result = await weightTicketService.createFromTransport(
-        transport.id
-      );
-      toastService.success('Weegbon aangemaakt');
-      await queryClient.invalidateQueries({ queryKey: ['planning'] });
-      setIsDrawerOpen(false);
-      navigate(`/weight-tickets?weightTicketId=${result.weightTicketId}`);
-    } catch (error) {
-      console.error('Error creating weight ticket:', error);
-      toastService.error('Fout bij het aanmaken van weegbon');
-    }
+    await createWeightTicket(transport.id);
+    setIsDrawerOpen(false);
   };
 
   return (

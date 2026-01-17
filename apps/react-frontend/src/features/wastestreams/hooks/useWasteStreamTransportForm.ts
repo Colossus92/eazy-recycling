@@ -235,8 +235,8 @@ export function useWasteStreamTransportForm(
 
       toastService.success(
         transportId
-          ? 'Afvalstroom transport bijgewerkt'
-          : 'Afvalstroom transport aangemaakt'
+          ? 'Transport bijgewerkt'
+          : 'Transport aangemaakt'
       );
 
       // Reset and close form
