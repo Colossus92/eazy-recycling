@@ -49,7 +49,7 @@ export const MobileTransportDetailsPage = () => {
   });
 
   const pickupAddress =
-    transport && resolveLocationAddress(transport.pickupLocation);
+    transport && resolveLocationAddress(transport.pickupLocation, transport.consignorParty?.name);
   const deliveryAddress =
     transport && resolveLocationAddress(transport.deliveryLocation);
 

@@ -42,10 +42,12 @@ export interface NormalizedAddress {
  * Supports PickupCompanyView (type === 'company') and DutchAddressView (type === 'dutch_address').
  *
  * @param location - The pickup or delivery location from TransportDetailView
+ * @param consignorName - Optional consignor name to use as companyName for dutch_address and proximity types
  * @returns A normalized address object or null if location is invalid
  */
 export const resolveLocationAddress = (
-  location: PickupLocationView
+  location: PickupLocationView,
+  consignorName?: string
 ): NormalizedAddress | null => {
   if (!location) {
     return null;
@@ -70,6 +72,7 @@ export const resolveLocationAddress = (
   // Handle DutchAddressView (type === 'dutch_address')
   if (locationAny.type === 'dutch_address') {
     return {
+      companyName: consignorName,
       street: locationAny.streetName || locationAny.street || '',
       houseNumber: locationAny.buildingNumber || locationAny.houseNumber || '',
       postalCode: locationAny.postalCode || '',
@@ -94,6 +97,7 @@ export const resolveLocationAddress = (
   // Fallback: try to extract address directly if it exists
   if (locationAny.type === 'proximity') {
     return {
+      companyName: consignorName,
       street: locationAny.description,
       houseNumber: '',
       postalCode: locationAny.postalCodeDigits,

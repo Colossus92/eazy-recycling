@@ -80,6 +80,7 @@ export const TransportDetailsDrawer = ({
   const containerText = data?.wasteContainer?.id
     ? data.wasteContainer.id
     : 'Geen container toegewezen';
+  const consignorName = data?.consignorParty?.name;
 
   const additionalActions: DrawerAction[] = [];
   if (
@@ -116,7 +117,7 @@ export const TransportDetailsDrawer = ({
               }
             >
               <div className="flex items-center self-stretch gap-4">
-                <h4>{resolveLocationAddress(data.pickupLocation)?.city}</h4>
+                <h4>{resolveLocationAddress(data.pickupLocation, consignorName)?.city}</h4>
                 <CaretRight />
                 <h4>{resolveLocationAddress(data.deliveryLocation)?.city}</h4>
               </div>
@@ -194,7 +195,7 @@ export const TransportDetailsDrawer = ({
                 </div>
                 <CompanyCard
                   dateTime={data.pickupDateTime}
-                  details={resolveLocationAddress(data.pickupLocation)}
+                  details={resolveLocationAddress(data.pickupLocation, consignorName)}
                 />
               </div>
               <DottedStroke

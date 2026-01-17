@@ -65,7 +65,7 @@ export const MobileReportFinishedPage = () => {
             <div className="flex flex-col items-start self-stretch gap-4">
               <h4>
                 {' '}
-                {resolveLocationAddress(state.transport.pickupLocation)?.city} &gt;{' '}
+                {resolveLocationAddress(state.transport.pickupLocation, state.transport.consignorParty?.name)?.city} &gt;{' '}
                 {resolveLocationAddress(state.transport.deliveryLocation)?.city}
               </h4>
             </div>

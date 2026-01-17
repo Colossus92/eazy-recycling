@@ -79,8 +79,11 @@ export const WasteStreamDetailsDrawer = ({
     enabled: isDrawerOpen && !!wasteStreamNumber,
   });
 
+  const consignorName =
+    (data?.consignorParty as any)?.company?.name ||
+    (data?.consignorParty as any)?.name;
   const pickupDetails = data?.pickupLocation
-    ? resolveLocationAddress(data.pickupLocation as any)
+    ? resolveLocationAddress(data.pickupLocation as any, consignorName)
     : null;
   const deliveryDetails = resolveDeliveryLocationAddress(
     data?.deliveryLocation

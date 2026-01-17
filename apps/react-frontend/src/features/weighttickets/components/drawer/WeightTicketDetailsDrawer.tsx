@@ -396,7 +396,7 @@ export const WeightTicketDetailsDrawer = ({
                       <Ellipse />
                     </div>
                     <CompanyCard
-                      details={resolveLocationAddress(data.pickupLocation)}
+                      details={resolveLocationAddress(data.pickupLocation, getConsignorName(data.consignorParty))}
                     />
                   </div>
                 )}

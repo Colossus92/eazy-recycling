@@ -30,7 +30,7 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
             </div>
             <CompanyCard
               dateTime={transport.pickupDateTime}
-              details={resolveLocationAddress(transport.pickupLocation)}
+              details={resolveLocationAddress(transport.pickupLocation, transport.consignorParty?.name)}
             />
             <DottedStroke
               className="absolute left-[13px]"
