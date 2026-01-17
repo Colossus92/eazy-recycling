@@ -94,6 +94,7 @@ class PlanningControllerSecurityTest : BaseIntegrationTest() {
                   containerId = UUID.randomUUID().toString(),
                   transportType = TransportType.CONTAINER,
                   sequenceNumber = 1,
+                  consignorName = "Test Consignor",
                 )
               )
             )

@@ -31,7 +31,7 @@ export interface TransportGoodsDto {
      * @type {number}
      * @memberof TransportGoodsDto
      */
-    'netNetWeight': number;
+    'netNetWeight'?: number;
     /**
      * 
      * @type {string}

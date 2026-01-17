@@ -98,6 +98,12 @@ export interface PlanningTransportView {
      * @memberof PlanningTransportView
      */
     'sequenceNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PlanningTransportView
+     */
+    'consignorName': string;
 }
 
 export const PlanningTransportViewStatusEnum = {

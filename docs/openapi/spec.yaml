@@ -2817,7 +2817,6 @@ components:
       - quantity
       - unit
       - wasteStreamNumber
-      - weight
     WasteTransportRequest:
       type: object
       properties:
@@ -3207,7 +3206,10 @@ components:
         sequenceNumber:
           type: integer
           format: int32
+        consignorName:
+          type: string
       required:
+      - consignorName
       - id
       - pickupDate
       - sequenceNumber
@@ -4128,7 +4130,6 @@ components:
           type: integer
           format: int32
       required:
-      - netNetWeight
       - quantity
       - unit
       - wasteStreamNumber
@@ -5120,7 +5121,6 @@ components:
       - consignorClassification
       - euralCode
       - name
-      - netNetWeight
       - processingMethodCode
       - quantity
       - unit
@@ -6313,11 +6313,11 @@ components:
           type: string
         errorOnELNotFound:
           type: string
-        isXml:
-          type: string
         pageEncoding:
           type: string
         scriptingInvalid:
+          type: string
+        isXml:
           type: string
         includePreludes:
           type: array
@@ -6398,13 +6398,13 @@ components:
         attributesMap:
           type: object
           additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
         attributes:
           type: object
           additionalProperties:
             type: string
-          writeOnly: true
-        attributesCSV:
-          type: string
           writeOnly: true
     ServletContext:
       type: object
@@ -6412,37 +6412,16 @@ components:
         contextPath:
           type: string
         initParameterNames: {}
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
+        serverInfo:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        effectiveMajorVersion:
-          type: integer
-          format: int32
         servletContextName:
           type: string
         effectiveMinorVersion:
           type: integer
           format: int32
-        serverInfo:
-          type: string
+        effectiveMajorVersion:
+          type: integer
+          format: int32
         filterRegistrations:
           type: object
           additionalProperties:
@@ -6467,10 +6446,31 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         attributeNames: {}
         classLoader:
           type: object
@@ -6518,12 +6518,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         initParameters:
           type: object
           additionalProperties:

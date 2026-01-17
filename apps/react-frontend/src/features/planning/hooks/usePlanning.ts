@@ -25,6 +25,7 @@ export interface PlanningItem {
   containerId?: string;
   transportType: string;
   sequenceNumber: number;
+  consignorName: string;
 }
 
 export interface Planning {

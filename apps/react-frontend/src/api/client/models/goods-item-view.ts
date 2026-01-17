@@ -37,7 +37,7 @@ export interface GoodsItemView {
      * @type {number}
      * @memberof GoodsItemView
      */
-    'netNetWeight': number;
+    'netNetWeight'?: number;
     /**
      * 
      * @type {string}

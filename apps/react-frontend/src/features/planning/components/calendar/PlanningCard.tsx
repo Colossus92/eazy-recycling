@@ -130,7 +130,15 @@ export const PlanningCard = ({
                     {truncateCity(transport.destinationCity || '-')}
                   </span>
                 </div>
+                <div
+                  className={'flex flex-wrap items-center self-stretch gap-2'}
+                >
+                  <span className={'text-caption-1 truncate'}>
+                    {transport.consignorName}
+                  </span>
+                </div>
               </div>
+
               <div className={'flex items-center gap-1'}>
                 {transport.driver ? (
                   <>

@@ -31,7 +31,7 @@ export interface GoodsRequest {
      * @type {number}
      * @memberof GoodsRequest
      */
-    'weight': number;
+    'weight'?: number;
     /**
      * 
      * @type {string}

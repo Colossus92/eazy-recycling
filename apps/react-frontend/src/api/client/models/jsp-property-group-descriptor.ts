@@ -49,12 +49,6 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'isXml'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof JspPropertyGroupDescriptor
-     */
     'pageEncoding'?: string;
     /**
      * 
@@ -62,6 +56,12 @@ export interface JspPropertyGroupDescriptor {
      * @memberof JspPropertyGroupDescriptor
      */
     'scriptingInvalid'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'isXml'?: string;
     /**
      * 
      * @type {Array<string>}

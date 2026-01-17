@@ -32,6 +32,7 @@ data class PlanningTransportView(
     val containerId: String?,
     val transportType: TransportType,
     val sequenceNumber: Int,
+    val consignorName: String,
 ) {
 
   constructor(transportDto: TransportDto) : this(
@@ -48,6 +49,7 @@ data class PlanningTransportView(
     containerId = transportDto.wasteContainer?.id,
     transportType = transportDto.transportType,
     sequenceNumber = transportDto.sequenceNumber,
+    consignorName = transportDto.consignorParty.name,
   )
 }
 
