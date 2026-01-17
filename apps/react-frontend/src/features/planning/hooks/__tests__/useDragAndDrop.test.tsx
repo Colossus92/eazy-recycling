@@ -68,6 +68,7 @@ const createMockPlanningResponse = (basePlanning: Planning): Planning => {
                 ? item.transportType
                 : String(item.transportType),
             sequenceNumber: item.sequenceNumber,
+            consignorName: item.consignorName,
           })),
         ])
       ),
@@ -113,6 +114,7 @@ const mockPlanning: Planning = {
             containerId: '40M001',
             transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 0,
+            consignorName: 'Test Consignor',
           },
         ],
       },
@@ -143,6 +145,7 @@ const mockPlanning: Planning = {
             containerId: '40M001',
             transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 0,
+            consignorName: 'Test Consignor',
           },
           {
             pickupDate: '2025-06-04',
@@ -166,6 +169,7 @@ const mockPlanning: Planning = {
             containerId: undefined,
             transportType: TransportViewTransportTypeEnum.Container,
             sequenceNumber: 2,
+            consignorName: 'Test Consignor',
           },
         ],
         '2025-06-05': [
@@ -191,6 +195,7 @@ const mockPlanning: Planning = {
             containerId: '40M001',
             transportType: TransportViewTransportTypeEnum.Waste,
             sequenceNumber: 0,
+            consignorName: 'Test Consignor',
           },
         ],
       },
