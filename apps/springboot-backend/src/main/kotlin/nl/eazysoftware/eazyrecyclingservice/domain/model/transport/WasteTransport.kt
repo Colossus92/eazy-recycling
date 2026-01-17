@@ -127,7 +127,7 @@ class WasteTransport(
 
 data class GoodsItem(
   val wasteStreamNumber: WasteStreamNumber,
-  val netNetWeight: Double,
+  val netNetWeight: Double?,
   val unit: String,
   val quantity: Int,
 )

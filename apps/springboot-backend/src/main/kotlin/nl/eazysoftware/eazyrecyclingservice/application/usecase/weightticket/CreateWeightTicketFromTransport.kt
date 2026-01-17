@@ -52,11 +52,12 @@ class CreateWeightTicketFromTransportService(
       val catalogItemId = wasteStream.catalogItemId
         ?: throw IllegalStateException("Afvalstroom ${goods.wasteStreamNumber.number} heeft geen gekoppeld catalogusitem")
 
+      val netNetWeight = goods.netNetWeight?.let { BigDecimal.valueOf(it) } ?: BigDecimal.ZERO
       WeightTicketLine(
         waste = goods.wasteStreamNumber,
         catalogItemId = catalogItemId,
         catalogItemType = CatalogItemType.WASTE_STREAM,
-        weight = Weight(BigDecimal.valueOf(goods.netNetWeight), Weight.WeightUnit.KILOGRAM),
+        weight = Weight(netNetWeight, Weight.WeightUnit.KILOGRAM),
       )
     }
 

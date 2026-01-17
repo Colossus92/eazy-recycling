@@ -32,7 +32,7 @@ export interface TransportData {
     name: string;
     quantity: number;
     unit: string;
-    net_net_weight: number;
+    net_net_weight?: number;
     waste_stream_number: string;
     eural_code: string;
     processing_method_code: string;

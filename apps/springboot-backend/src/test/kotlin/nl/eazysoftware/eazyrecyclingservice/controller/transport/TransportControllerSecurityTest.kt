@@ -16,6 +16,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteCollectionType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamStatus
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ContainerTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
@@ -326,7 +327,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       transportType = TransportType.WASTE,
       goods = listOf(
         GoodsItem(
-          wasteStreamNumber = nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber(testWasteStream.number),
+          wasteStreamNumber = WasteStreamNumber(testWasteStream.number),
           netNetWeight = 1000.0,
           unit = "KG",
           quantity = 1

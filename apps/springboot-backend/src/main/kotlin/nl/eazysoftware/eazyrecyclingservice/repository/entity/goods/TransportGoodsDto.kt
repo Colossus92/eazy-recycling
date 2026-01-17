@@ -6,7 +6,7 @@ import jakarta.persistence.Embeddable
 data class TransportGoodsDto(
 
     val wasteStreamNumber: String,
-    val netNetWeight: Double,
+    val netNetWeight: Double?,
     val unit: String,
     val quantity: Int,
 )

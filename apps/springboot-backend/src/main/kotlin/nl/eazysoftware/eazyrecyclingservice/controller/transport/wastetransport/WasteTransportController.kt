@@ -169,7 +169,7 @@ data class CreateWasteTransportFromWeightTicketRequest(
  */
 fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
   require(this.goods.isNotEmpty()) {
-    "Afvalstroomnummer is verplicht voor een afvaltransport"
+    "Afvalstroom is verplicht voor een afvaltransport, kies een afvalstroomnummer"
   }
 
   return CreateWasteTransportCommand(

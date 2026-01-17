@@ -63,7 +63,7 @@ data class DriverView(
 data class GoodsItemView(
   val wasteStreamNumber: String,
   val name: String,
-  val netNetWeight: Double,
+  val netNetWeight: Double?,
   val unit: String,
   val quantity: Int,
   val euralCode: String,
