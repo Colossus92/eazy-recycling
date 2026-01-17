@@ -17,6 +17,7 @@ interface CompanySelectFormFieldProps<TFieldValues extends FieldValues> {
   disabled?: boolean;
   role?: string;
   pageSize?: number;
+  excludeTenant?: boolean;
 }
 
 export const CompanySelectFormField = <TFieldValues extends FieldValues>({
@@ -27,6 +28,7 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
   disabled = false,
   role = undefined,
   pageSize = 20,
+  excludeTenant = false,
 }: CompanySelectFormFieldProps<TFieldValues>) => {
   const formContext = useFormContext<TFieldValues>();
   const queryClient = useQueryClient();
@@ -41,6 +43,7 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
         page,
         size: pageSize,
         role,
+        excludeTenant,
       });
       return {
         options: response.content.map((company) => ({
@@ -50,7 +53,7 @@ export const CompanySelectFormField = <TFieldValues extends FieldValues>({
         hasMore: page < response.totalPages - 1,
       };
     },
-    [role, pageSize]
+    [role, pageSize, excludeTenant]
   );
 
   // Load a single company by ID for initial form population (with caching)

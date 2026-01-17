@@ -21,6 +21,7 @@ interface GetAllCompanies {
    * @param includeBranches Whether to include branches in the response
    * @param sortBy Optional field to sort by (code, name)
    * @param sortDirection Sort direction (asc, desc)
+   * @param excludeTenant Whether to exclude the tenant company from results
    * @return Paginated response with companies matching the criteria
    */
   fun searchPaginated(
@@ -31,6 +32,7 @@ interface GetAllCompanies {
     includeBranches: Boolean = false,
     sortBy: String? = null,
     sortDirection: String = "asc",
+    excludeTenant: Boolean = false,
   ): PagedCompanyResponse
 }
 
@@ -42,7 +44,7 @@ class GetAllCompaniesQuery(
 
   @Cacheable(
     cacheNames = [CacheConfig.COMPANIES_CACHE],
-    key = "'search:' + #query + ':' + #role + ':' + #page + ':' + #size + ':' + #includeBranches + ':' + #sortBy + ':' + #sortDirection"
+    key = "'search:' + #query + ':' + #role + ':' + #page + ':' + #size + ':' + #includeBranches + ':' + #sortBy + ':' + #sortDirection + ':' + #excludeTenant"
   )
   override fun searchPaginated(
     query: String?,
@@ -51,12 +53,13 @@ class GetAllCompaniesQuery(
     size: Int,
     includeBranches: Boolean,
     sortBy: String?,
-    sortDirection: String
+    sortDirection: String,
+    excludeTenant: Boolean
   ): PagedCompanyResponse {
     val pageable = PageRequest.of(page, size)
 
     // Fetch companies with code already included
-    val companyPage = companies.searchPaginated(query, role, pageable, sortBy, sortDirection)
+    val companyPage = companies.searchPaginated(query, role, pageable, sortBy, sortDirection, excludeTenant)
 
     // Map to views
     val companyViews = companyPage.content.map { company ->

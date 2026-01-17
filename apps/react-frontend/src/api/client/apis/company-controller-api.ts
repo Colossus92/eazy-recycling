@@ -241,10 +241,11 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
          * @param {number} [size] 
          * @param {string} [sortBy] 
          * @param {string} [sortDirection] 
+         * @param {boolean} [excludeTenant] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getCompanies: async (includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getCompanies: async (includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/companies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -287,6 +288,10 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
 
             if (sortDirection !== undefined) {
                 localVarQueryParameter['sortDirection'] = sortDirection;
+            }
+
+            if (excludeTenant !== undefined) {
+                localVarQueryParameter['excludeTenant'] = excludeTenant;
             }
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -465,11 +470,12 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
          * @param {number} [size] 
          * @param {string} [sortBy] 
          * @param {string} [sortDirection] 
+         * @param {boolean} [excludeTenant] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PagedCompanyResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, options);
+        async getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PagedCompanyResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['CompanyControllerApi.getCompanies']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -567,11 +573,12 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
          * @param {number} [size] 
          * @param {string} [sortBy] 
          * @param {string} [sortDirection] 
+         * @param {boolean} [excludeTenant] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: any): AxiosPromise<PagedCompanyResponse> {
-            return localVarFp.getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, options).then((request) => request(axios, basePath));
+        getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options?: any): AxiosPromise<PagedCompanyResponse> {
+            return localVarFp.getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -668,12 +675,13 @@ export class CompanyControllerApi extends BaseAPI {
      * @param {number} [size] 
      * @param {string} [sortBy] 
      * @param {string} [sortDirection] 
+     * @param {boolean} [excludeTenant] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CompanyControllerApi
      */
-    public getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, options?: RawAxiosRequestConfig) {
-        return CompanyControllerApiFp(this.configuration).getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, options).then((request) => request(this.axios, this.basePath));
+    public getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options?: RawAxiosRequestConfig) {
+        return CompanyControllerApiFp(this.configuration).getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

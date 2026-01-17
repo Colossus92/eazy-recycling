@@ -1,6 +1,6 @@
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { FormEvent, useEffect } from 'react';
+import { FormEvent } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider, useForm } from 'react-hook-form';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -11,8 +11,6 @@ import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormFi
 import { TruckRequest } from '@/api/client';
 import { Truck } from '@/api/services/truckService';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
-import { useTenantCompany } from '@/hooks/useTenantCompany';
-
 interface TruckFormProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -54,17 +52,9 @@ export const TruckForm = ({
   initialData,
 }: TruckFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
-  const { data: tenantCompany } = useTenantCompany();
   const methods = useForm<TruckFormValues>({
     values: toFormData(initialData),
   });
-
-  // Set tenant company as default carrier for new trucks
-  useEffect(() => {
-    if (!initialData && tenantCompany?.id && !methods.getValues('carrierPartyId')) {
-      methods.setValue('carrierPartyId', tenantCompany.id);
-    }
-  }, [initialData, tenantCompany, methods]);
 
   const cancel = () => {
     methods.reset({
@@ -136,13 +126,19 @@ export const TruckForm = ({
                   disabled={Boolean(initialData?.licensePlate)}
                 />
               </div>
-              <CompanySelectFormField
-                name="carrierPartyId"
-                title="Transporteur"
-                placeholder="Selecteer transporteur"
-                rules={undefined}
-                role="CARRIER"
-              />
+              <div className="flex flex-col gap-1 w-full">
+                <CompanySelectFormField
+                  name="carrierPartyId"
+                  title="Transporteur"
+                  placeholder="Selecteer transporteur"
+                  rules={undefined}
+                  role="CARRIER"
+                  excludeTenant={true}
+                />
+                <span className="text-caption-1 text-color-text-secondary">
+                  Selecteer indien vrachtwagen eigendom is van een externe transporteur.
+                </span>
+              </div>
               <AuditMetadataFooter
                 createdAt={initialData?.createdAt}
                 createdByName={initialData?.createdByName}

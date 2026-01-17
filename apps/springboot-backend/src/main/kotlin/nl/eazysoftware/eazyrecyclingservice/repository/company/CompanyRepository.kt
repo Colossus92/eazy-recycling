@@ -135,13 +135,13 @@ class CompanyRepository(
     jpaRepository.flush()
   }
 
-  override fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String?, sortDirection: String): Page<Company> {
-    val spec = buildSearchSpecification(query, role, sortBy, sortDirection)
+  override fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String?, sortDirection: String, excludeTenant: Boolean): Page<Company> {
+    val spec = buildSearchSpecification(query, role, sortBy, sortDirection, excludeTenant)
     return jpaRepository.findAll(spec, pageable)
       .map { companyMapper.toDomain(it) }
   }
 
-  private fun buildSearchSpecification(query: String?, role: CompanyRole?, sortBy: String?, sortDirection: String): Specification<CompanyDto> {
+  private fun buildSearchSpecification(query: String?, role: CompanyRole?, sortBy: String?, sortDirection: String, excludeTenant: Boolean): Specification<CompanyDto> {
     return Specification { root, criteriaQuery, criteriaBuilder ->
       val predicates = mutableListOf(
         criteriaBuilder.isNull(root.get<Instant?>("deletedAt"))
@@ -150,6 +150,11 @@ class CompanyRepository(
       // Role filter
       if (role != null) {
         predicates.add(criteriaBuilder.isMember(role, root.get("roles")))
+      }
+
+      // Exclude tenant company filter
+      if (excludeTenant) {
+        predicates.add(criteriaBuilder.isFalse(root.get("isTenantCompany")))
       }
 
       // Search query filter - searches across code, name, city, chamberOfCommerceId, vihbId

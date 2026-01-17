@@ -28,24 +28,6 @@ import type { Environment } from './environment';
 export interface ApplicationContext {
     /**
      * 
-     * @type {any}
-     * @memberof ApplicationContext
-     */
-    'parent'?: any;
-    /**
-     * 
-     * @type {string}
-     * @memberof ApplicationContext
-     */
-    'id'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ApplicationContext
-     */
-    'displayName'?: string;
-    /**
-     * 
      * @type {string}
      * @memberof ApplicationContext
      */
@@ -62,6 +44,24 @@ export interface ApplicationContext {
      * @memberof ApplicationContext
      */
     'autowireCapableBeanFactory'?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof ApplicationContext
+     */
+    'parent'?: any;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApplicationContext
+     */
+    'id'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ApplicationContext
+     */
+    'displayName'?: string;
     /**
      * 
      * @type {Environment}

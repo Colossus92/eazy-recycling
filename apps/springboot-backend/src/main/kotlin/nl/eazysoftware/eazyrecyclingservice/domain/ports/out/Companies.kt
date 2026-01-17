@@ -15,9 +15,10 @@ interface Companies {
    * @param pageable Pagination parameters
    * @param sortBy Optional field to sort by (code, name)
    * @param sortDirection Sort direction (asc, desc)
+   * @param excludeTenant Whether to exclude the tenant company from results
    * @return Page of companies matching the criteria
    */
-  fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String? = null, sortDirection: String = "asc"): Page<Company>
+  fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String? = null, sortDirection: String = "asc", excludeTenant: Boolean = false): Page<Company>
   fun findByRole(role: CompanyRole): List<Company>
   fun findById(companyId: CompanyId): Company?
   fun update(company: Company): Company
