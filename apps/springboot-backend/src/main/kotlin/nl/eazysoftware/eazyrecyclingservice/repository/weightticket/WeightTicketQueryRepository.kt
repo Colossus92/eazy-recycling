@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
 import nl.eazysoftware.eazyrecyclingservice.domain.model.weightticket.WeightTicketStatus
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyViewMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import org.springframework.stereotype.Repository
 import kotlin.time.toKotlinInstant
 
@@ -13,7 +14,8 @@ import kotlin.time.toKotlinInstant
 class WeightTicketQueryRepository(
   private val entityManager: EntityManager,
   private val jpaRepository: WeightTicketJpaRepository,
-  private val pickupLocationMapper: PickupLocationMapper
+  private val pickupLocationMapper: PickupLocationMapper,
+  private val transportRepository: TransportRepository
 ) : GetAllWeightTickets, GetWeightTicketByNumber {
 
   override fun execute(): List<WeightTicketListView> {
@@ -51,6 +53,8 @@ class WeightTicketQueryRepository(
   override fun execute(weightTicketNumber: Long): WeightTicketDetailView? {
     val weightTicket = jpaRepository.findByNumber(weightTicketNumber) ?: return null
 
+    val linkedTransport = transportRepository.findByWeightTicketNumber(weightTicketNumber).firstOrNull()
+
     return WeightTicketDetailView(
       id = weightTicket.number,
       consignorParty = ConsignorView.CompanyConsignorView(CompanyViewMapper.map(weightTicket.consignorParty)),
@@ -85,6 +89,7 @@ class WeightTicketQueryRepository(
       note = weightTicket.note,
       cancellationReason = weightTicket.cancellationReason,
       linkedInvoiceId = weightTicket.linkedInvoiceId,
+      linkedTransportId = linkedTransport?.id,
       createdAt = weightTicket.createdAt?.toKotlinInstant()?.toDisplayTime(),
       createdByName = weightTicket.createdBy,
       updatedAt = weightTicket.updatedAt?.toKotlinInstant()?.toDisplayTime(),

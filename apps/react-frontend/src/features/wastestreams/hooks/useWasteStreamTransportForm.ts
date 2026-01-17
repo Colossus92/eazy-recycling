@@ -111,7 +111,7 @@ const formValuesToWasteTransportRequest = (
       )
       .map((line) => ({
         wasteStreamNumber: line.wasteStreamNumber,
-        weight: parseFloat(line.weight || '0'),
+        weight: line.weight ? parseFloat(line.weight) : undefined,
         unit: 'kg',
         quantity: parseInt(line.quantity || '1', 10),
       })),

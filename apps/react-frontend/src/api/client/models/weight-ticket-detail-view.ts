@@ -148,6 +148,12 @@ export interface WeightTicketDetailView {
     'linkedInvoiceId'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof WeightTicketDetailView
+     */
+    'linkedTransportId'?: string;
+    /**
+     * 
      * @type {LocalDateTime}
      * @memberof WeightTicketDetailView
      */

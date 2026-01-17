@@ -23,6 +23,7 @@ data class WeightTicketDetailView(
   val note: String?,
   val cancellationReason: String?,
   val linkedInvoiceId: UUID?,
+  val linkedTransportId: UUID?,
   val createdAt: LocalDateTime?,
   val createdByName: String?,
   val updatedAt: LocalDateTime?,

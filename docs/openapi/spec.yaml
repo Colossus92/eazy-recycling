@@ -4881,6 +4881,9 @@ components:
         linkedInvoiceId:
           type: string
           format: uuid
+        linkedTransportId:
+          type: string
+          format: uuid
         createdAt:
           $ref: "#/components/schemas/LocalDateTime"
         createdByName:
@@ -6341,14 +6344,14 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
@@ -6358,13 +6361,13 @@ components:
           type: array
           items:
             type: string
-        errorOnELNotFound:
-          type: string
-        pageEncoding:
+        elIgnored:
           type: string
         isXml:
           type: string
-        elIgnored:
+        errorOnELNotFound:
+          type: string
+        pageEncoding:
           type: string
         scriptingInvalid:
           type: string
@@ -6444,37 +6447,49 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+          writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
         attributesCSV:
           type: string
           writeOnly: true
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
         contextPath:
           type: string
-        attributeNames: {}
         initParameterNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         effectiveMajorVersion:
           type: integer
           format: int32
+        servletContextName:
+          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
         serverInfo:
-          type: string
-        servletContextName:
           type: string
         filterRegistrations:
           type: object
@@ -6500,27 +6515,15 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
+        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6584,6 +6587,10 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
@@ -6591,10 +6598,6 @@ components:
           type: boolean
         secure:
           type: boolean
-        domain:
-          type: string
-        path:
-          type: string
         name:
           type: string
         attributes:

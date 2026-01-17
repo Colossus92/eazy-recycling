@@ -40,7 +40,7 @@ export const WeightTicketFormActionMenu = ({
       onClick: () => onCopy(weightTicket.id),
     });
   }
-  if (onCreateTransport) {
+  if (onCreateTransport && !weightTicket.linkedTransportId) {
     actions.push({
       label: 'Transport aanmaken',
       icon: TruckTrailer,
