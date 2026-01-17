@@ -31,6 +31,7 @@ export const ContainerTransportForm = ({
     formContext,
     fieldsToValidate,
     mutation,
+    resetForm,
   } = useContainerTransportForm(transportId, () => setIsOpen(false));
   const { step, navigateToStep, next, back, reset, isSubmitting } =
     useFormStepNavigation({
@@ -42,12 +43,13 @@ export const ContainerTransportForm = ({
       isSubmitting: mutation.isPending,
     });
 
-  // Reset step when form opens
+  // Reset form and step when form opens
   useEffect(() => {
     if (isOpen) {
+      resetForm();
       reset();
     }
-  }, [isOpen, reset]);
+  }, [isOpen, reset, resetForm]);
 
   const onCancel = () => {
     reset();

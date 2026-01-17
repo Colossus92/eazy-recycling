@@ -8,7 +8,7 @@ import {
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
 import { useTenantCompany } from '@/hooks/useTenantCompany';
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 
 export interface ContainerTransportFormValues {
   consignorPartyId: string;
@@ -39,36 +39,42 @@ const fieldsToValidate: Array<Array<keyof ContainerTransportFormValues>> = [
   ['truckId', 'driverId', 'containerId', 'note'],
 ];
 
+function getDefaultValues(tenantCompanyId?: string): ContainerTransportFormValues {
+  return {
+    consignorPartyId: '',
+    carrierPartyId: tenantCompanyId ?? '',
+    containerOperation: 'DELIVERY',
+    transportType: 'CONTAINER',
+    pickupLocation: { type: 'none' },
+    pickupDateTime: '',
+    deliveryLocation: { type: 'none' },
+    deliveryDateTime: '',
+    truckId: '',
+    driverId: '',
+    containerId: '',
+    note: '',
+  };
+}
+
 export function useContainerTransportForm(
   transportId?: string,
   onSuccess?: () => void
 ) {
   const queryClient = useQueryClient();
-  const { data: tenantCompany } = useTenantCompany();
+  const { data:  tenantCompany } = useTenantCompany();
   
   const formContext = useForm<ContainerTransportFormValues>({
-    defaultValues: {
-      consignorPartyId: '',
-      carrierPartyId: '',
-      containerOperation: 'DELIVERY',
-      transportType: 'CONTAINER',
-      pickupLocation: { type: 'none' },
-      pickupDateTime: '',
-      deliveryLocation: { type: 'none' },
-      deliveryDateTime: '',
-      truckId: '',
-      driverId: '',
-      containerId: '',
-      note: '',
-    },
+    defaultValues: getDefaultValues(),
   });
 
-  // Set tenant company as default carrier for new container transports
-  useEffect(() => {
-    if (!transportId && tenantCompany?.id && !formContext.getValues('carrierPartyId')) {
-      formContext.setValue('carrierPartyId', tenantCompany.id);
+  // Reset form with tenant company as default carrier for new transports
+  const resetForm = useCallback(() => {
+    if (!transportId) {
+      formContext.reset(getDefaultValues(tenantCompany?.id));
+    } else {
+      formContext.reset();
     }
-  }, [transportId, tenantCompany, formContext]);
+  }, [transportId, tenantCompany?.id, formContext]);
   
   const { data, isLoading } = useQuery({
     queryKey: ['transport', transportId],
@@ -124,5 +130,6 @@ export function useContainerTransportForm(
     mutation,
     data,
     isLoading,
+    resetForm,
   };
 }

@@ -7,7 +7,7 @@
       "request": "launch",
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:5173",
-      "webRoot": "${workspaceFolder}"
+      "webRoot": "${workspaceFolder}/apps/react-frontend/src"
     }
   ]
 }

@@ -2183,6 +2183,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SyncPreviewResponse"
+  /companies/tenant:
+    get:
+      tags:
+      - company-controller
+      operationId: getTenantCompany
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompleteCompanyView"
   /catalog/items:
     get:
       tags:
@@ -6222,11 +6234,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
@@ -6346,13 +6358,13 @@ components:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
         errorOnELNotFound:
+          type: string
+        pageEncoding:
           type: string
         isXml:
           type: string
-        pageEncoding:
+        elIgnored:
           type: string
         scriptingInvalid:
           type: string
@@ -6446,24 +6458,14 @@ components:
     ServletContext:
       type: object
       properties:
+        contextPath:
+          type: string
+        attributeNames: {}
         initParameterNames: {}
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6498,17 +6500,27 @@ components:
           uniqueItems: true
         jspConfigDescriptor:
           $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
         requestCharacterEncoding:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        attributeNames: {}
-        contextPath:
-          type: string
         classLoader:
           type: object
           properties:
@@ -6575,12 +6587,12 @@ components:
         maxAge:
           type: integer
           format: int32
+        httpOnly:
+          type: boolean
         secure:
           type: boolean
         domain:
           type: string
-        httpOnly:
-          type: boolean
         path:
           type: string
         name:

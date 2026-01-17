@@ -305,6 +305,37 @@ export const CompanyControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}}
+         */
+        getTenantCompany: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/companies/tenant`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {string} companyId 
          * @param {string} branchId 
          * @param {AddressRequest} addressRequest 
@@ -482,6 +513,17 @@ export const CompanyControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTenantCompany(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompleteCompanyView>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTenantCompany(options);
+            const index = configuration?.serverIndex ?? 0;
+            const operationBasePath = operationServerMap['CompanyControllerApi.getTenantCompany']?.[index]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
+        },
+        /**
+         * 
          * @param {string} companyId 
          * @param {string} branchId 
          * @param {AddressRequest} addressRequest 
@@ -579,6 +621,14 @@ export const CompanyControllerApiFactory = function (configuration?: Configurati
          */
         getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options?: any): AxiosPromise<PagedCompanyResponse> {
             return localVarFp.getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTenantCompany(options?: any): AxiosPromise<CompleteCompanyView> {
+            return localVarFp.getTenantCompany(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -682,6 +732,16 @@ export class CompanyControllerApi extends BaseAPI {
      */
     public getCompanies(includeBranches?: boolean, role?: GetCompaniesRoleEnum, query?: string, page?: number, size?: number, sortBy?: string, sortDirection?: string, excludeTenant?: boolean, options?: RawAxiosRequestConfig) {
         return CompanyControllerApiFp(this.configuration).getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CompanyControllerApi
+     */
+    public getTenantCompany(options?: RawAxiosRequestConfig) {
+        return CompanyControllerApiFp(this.configuration).getTenantCompany(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

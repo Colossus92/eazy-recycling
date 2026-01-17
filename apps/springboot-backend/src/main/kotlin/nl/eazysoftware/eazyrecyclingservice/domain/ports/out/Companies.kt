@@ -44,4 +44,10 @@ interface Companies {
    * Used to detect constraint violations immediately rather than at commit time.
    */
   fun flush()
+
+  /**
+   * Find the tenant company (the company with isTenantCompany = true).
+   * @return The tenant company or null if not found
+   */
+  fun findTenantCompany(): Company?
 }

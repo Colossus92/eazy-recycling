@@ -44,6 +44,8 @@ interface CompanyJpaRepository : JpaRepository<CompanyDto, UUID>, JpaSpecificati
     @Param("buildingNumber") buildingNumber: String,
     @Param("buildingNumberAddition") buildingNumberAddition: String?
   ): CompanyDto?
+
+  fun findByIsTenantCompanyTrueAndDeletedAtIsNull(): CompanyDto?
 }
 
 @Repository
@@ -133,6 +135,11 @@ class CompanyRepository(
 
   override fun flush() {
     jpaRepository.flush()
+  }
+
+  override fun findTenantCompany(): Company? {
+    return jpaRepository.findByIsTenantCompanyTrueAndDeletedAtIsNull()
+      ?.let { companyMapper.toDomain(it) }
   }
 
   override fun searchPaginated(query: String?, role: CompanyRole?, pageable: Pageable, sortBy: String?, sortDirection: String, excludeTenant: Boolean): Page<Company> {

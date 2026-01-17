@@ -37,13 +37,13 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'elIgnored'?: string;
+    'errorOnELNotFound'?: string;
     /**
      * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'errorOnELNotFound'?: string;
+    'pageEncoding'?: string;
     /**
      * 
      * @type {string}
@@ -55,7 +55,7 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'pageEncoding'?: string;
+    'elIgnored'?: string;
     /**
      * 
      * @type {string}

@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
 import nl.eazysoftware.eazyrecyclingservice.application.query.CompleteCompanyView
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
 import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
+import nl.eazysoftware.eazyrecyclingservice.application.query.GetTenantCompany
 import nl.eazysoftware.eazyrecyclingservice.application.query.PagedCompanyResponse
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.*
@@ -31,6 +32,7 @@ class CompanyController(
   private val deleteCompanyUseCase: DeleteCompany,
   private val getAllCompaniesQuery: GetAllCompanies,
   private val getCompanyByIdQuery: GetCompanyById,
+  private val getTenantCompanyQuery: GetTenantCompany,
   private val createProjectLocation: CreateProjectLocation,
   private val deleteProjectLocation: DeleteProjectLocation,
   private val updateProjectLocation: UpdateProjectLocation,
@@ -101,6 +103,12 @@ class CompanyController(
     @RequestParam(required = false, defaultValue = "false") excludeTenant: Boolean = false,
   ): PagedCompanyResponse {
     return getAllCompaniesQuery.searchPaginated(query, role, page, size, includeBranches, sortBy, sortDirection, excludeTenant)
+  }
+
+  @GetMapping("/tenant")
+  @PreAuthorize(HAS_ANY_ROLE)
+  fun getTenantCompany(): CompleteCompanyView? {
+    return getTenantCompanyQuery.handle()
   }
 
   @GetMapping("/{id}")
