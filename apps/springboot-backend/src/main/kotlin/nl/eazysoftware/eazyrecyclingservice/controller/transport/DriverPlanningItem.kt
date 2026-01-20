@@ -11,7 +11,7 @@ import java.util.*
 data class DriverPlanningItem(
     val id: UUID?,
     val displayNumber: String?,
-    val pickupDateTime: LocalDateTime,
+    val pickupDateTime: LocalDateTime?,
     val deliveryDateTime: LocalDateTime?,
     val pickupLocation: PickupLocationView,
     val deliveryLocation: PickupLocationView,
@@ -21,8 +21,8 @@ data class DriverPlanningItem(
     constructor(transport: TransportDto) : this(
         transport.id,
         transport.displayNumber,
-        transport.pickupDateTime.toDisplayLocalDateTime(),
-        transport.deliveryDateTime?.toDisplayLocalDateTime(),
+        transport.pickupTiming?.toInstant()?.toDisplayLocalDateTime(),
+        transport.deliveryTiming?.toInstant()?.toDisplayLocalDateTime(),
         transport.pickupLocation.toPickupLocationView(),
         transport.deliveryLocation.toPickupLocationView(),
         transport.wasteContainer?.id ?: "-",

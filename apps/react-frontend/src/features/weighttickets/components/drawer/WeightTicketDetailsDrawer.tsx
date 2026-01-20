@@ -125,8 +125,8 @@ export const WeightTicketDetailsDrawer = ({
   const handleTransportClick = () => {
     if (linkedTransport) {
       // Navigate to planning page with transport selected
-      const pickupDate = linkedTransport.pickupDateTime
-        ? new Date(linkedTransport.pickupDateTime).toISOString().split('T')[0]
+      const pickupDate = linkedTransport.pickupDate
+        ? linkedTransport.pickupDate
         : new Date().toISOString().split('T')[0];
       navigate(
         `/?transportId=${linkedTransport.transportId}&date=${pickupDate}`

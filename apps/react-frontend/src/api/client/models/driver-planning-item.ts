@@ -40,7 +40,7 @@ export interface DriverPlanningItem {
      * @type {string}
      * @memberof DriverPlanningItem
      */
-    'pickupDateTime': string;
+    'pickupDateTime'?: string;
     /**
      * 
      * @type {string}

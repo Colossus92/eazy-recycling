@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { TimingConstraintRequest } from './timing-constraint-request';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { WeightTicketRequestPickupLocation } from './weight-ticket-request-pickup-location';
 
 /**
@@ -31,16 +34,16 @@ export interface ContainerTransportRequest {
     'consignorPartyId': string;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintRequest}
      * @memberof ContainerTransportRequest
      */
-    'pickupDateTime': string;
+    'pickup': TimingConstraintRequest;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintRequest}
      * @memberof ContainerTransportRequest
      */
-    'deliveryDateTime'?: string;
+    'delivery'?: TimingConstraintRequest;
     /**
      * 
      * @type {string}

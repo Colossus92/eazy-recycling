@@ -100,43 +100,48 @@ data class UpdateContainerTransportResponse(
 )
 
 /**
- * Extension function to map request to create command
+ * Extension function to map request to create command.
  */
 fun ContainerTransportRequest.toCommand(): CreateContainerTransportCommand {
+  val pickupConstraint = this.pickup?.toDomain()
+  val deliveryConstraint = this.delivery?.toDomain()
+
   return CreateContainerTransportCommand(
     consignorParty = CompanyId(this.consignorPartyId),
     carrierParty = CompanyId(this.carrierPartyId),
     pickupLocation = this.pickupLocation.toCommand(),
-    pickupDateTime = this.pickupDateTime.toCetInstant().toKotlinInstant(),
     deliveryLocation = this.deliveryLocation.toCommand(),
-    deliveryDateTime = this.deliveryDateTime?.toCetInstant()?.toKotlinInstant(),
     transportType = this.transportType,
     wasteContainer = this.containerId?.takeIf { it.isNotBlank() }?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
     truck = this.truckId?.takeIf { it.isNotBlank() }?.let { LicensePlate(it) },
     driver = this.driverId?.let { UserId(it) },
     note = Note(this.note),
+    pickupTimingConstraint = pickupConstraint,
+    deliveryTimingConstraint = deliveryConstraint,
   )
 }
 
 /**
- * Extension function to map request to update command
+ * Extension function to map request to update command.
  */
 fun ContainerTransportRequest.toUpdateCommand(transportId: UUID): UpdateContainerTransportCommand {
+  val pickupConstraint = this.pickup?.toDomain()
+  val deliveryConstraint = this.delivery?.toDomain()
+
   return UpdateContainerTransportCommand(
     transportId = TransportId(transportId),
     consignorParty = CompanyId(this.consignorPartyId),
     carrierParty = CompanyId(this.carrierPartyId),
     pickupLocation = this.pickupLocation.toCommand(),
-    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
     deliveryLocation = this.deliveryLocation.toCommand(),
-    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant(),
     transportType = this.transportType,
     wasteContainer = this.containerId?.takeIf { it.isNotBlank() }?.let { WasteContainerId(it) },
     containerOperation = this.containerOperation,
     truck = this.truckId?.takeIf { it.isNotBlank() }?.let { LicensePlate(it) },
     driver = this.driverId?.let { UserId(it) },
     note = Note(this.note),
+    pickupTimingConstraint = pickupConstraint,
+    deliveryTimingConstraint = deliveryConstraint,
   )
-
 }

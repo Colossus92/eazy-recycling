@@ -151,13 +151,22 @@ export const transportService = {
 export const formValuesToCreateContainerTransportRequest = (
   formValues: ContainerTransportFormValues
 ) => {
+  // TODO: Update to use timing constraints instead of pickupDateTime/deliveryDateTime
   const request: ContainerTransportRequest = {
     consignorPartyId: formValues.consignorPartyId,
     carrierPartyId: formValues.carrierPartyId,
     containerOperation:
       formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
-    pickupDateTime: formValues.pickupDateTime,
-    deliveryDateTime: formValues.deliveryDateTime,
+    pickup: {
+      date: formValues.pickupDateTime?.split('T')[0] || '',
+      mode: 'FIXED',
+      windowStart: formValues.pickupDateTime?.split('T')[1]?.substring(0, 5),
+    },
+    delivery: formValues.deliveryDateTime ? {
+      date: formValues.deliveryDateTime.split('T')[0],
+      mode: 'FIXED',
+      windowStart: formValues.deliveryDateTime.split('T')[1]?.substring(0, 5),
+    } : undefined,
     pickupLocation: locationFormValueToPickupLocationRequest(
       formValues.pickupLocation
     ),
@@ -177,14 +186,23 @@ export const formValuesToCreateContainerTransportRequest = (
 export const transportDetailViewToContainerTransportFormValues = (
   data: TransportDetailView
 ) => {
+  // TODO: Update to properly convert timing constraints to form values
+  // For now, convert timing constraints back to datetime strings for the form
+  const pickupDateTime = data.pickupTiming?.date 
+    ? `${data.pickupTiming.date}T${data.pickupTiming.windowStart || '00:00'}`
+    : '';
+  const deliveryDateTime = data.deliveryTiming?.date
+    ? `${data.deliveryTiming.date}T${data.deliveryTiming.windowStart || '00:00'}`
+    : '';
+
   const formValues: ContainerTransportFormValues = {
     consignorPartyId: data.consignorParty?.id || '',
     carrierPartyId: data.carrierParty?.id || '',
     containerOperation: data.containerOperation || 'DELIVERY',
     pickupLocation: pickupLocationViewToFormValue(data.pickupLocation),
-    pickupDateTime: data.pickupDateTime,
+    pickupDateTime,
     deliveryLocation: pickupLocationViewToFormValue(data.deliveryLocation),
-    deliveryDateTime: data.deliveryDateTime,
+    deliveryDateTime,
     truckId: data.truck?.licensePlate || '',
     driverId: data.driver?.id || '',
     containerId: data.wasteContainer?.id || '',

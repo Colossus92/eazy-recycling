@@ -3029,6 +3029,25 @@ components:
       required:
       - id
       - roles
+    TimingConstraintDto:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        mode:
+          type: string
+          enum:
+          - DATE_ONLY
+          - WINDOW
+          - FIXED
+        windowStart:
+          type: string
+        windowEnd:
+          type: string
+      required:
+      - date
+      - mode
     TransportDto:
       type: object
       properties:
@@ -3043,14 +3062,12 @@ components:
           $ref: "#/components/schemas/CompanyDto"
         pickupLocation:
           $ref: "#/components/schemas/PickupLocationDto"
-        pickupDateTime:
-          type: string
-          format: date-time
+        pickupTiming:
+          $ref: "#/components/schemas/TimingConstraintDto"
         deliveryLocation:
           $ref: "#/components/schemas/PickupLocationDto"
-        deliveryDateTime:
-          type: string
-          format: date-time
+        deliveryTiming:
+          $ref: "#/components/schemas/TimingConstraintDto"
         transportType:
           type: string
           enum:
@@ -3107,7 +3124,6 @@ components:
       - consignorParty
       - deliveryLocation
       - id
-      - pickupDateTime
       - pickupLocation
       - sequenceNumber
       - status
@@ -3384,15 +3400,31 @@ components:
       - quantity
       - unit
       - wasteStreamNumber
+    TimingConstraintRequest:
+      type: object
+      properties:
+        date:
+          type: string
+        mode:
+          type: string
+          enum:
+          - DATE_ONLY
+          - WINDOW
+          - FIXED
+        windowStart:
+          type: string
+        windowEnd:
+          type: string
+      required:
+      - date
+      - mode
     WasteTransportRequest:
       type: object
       properties:
-        pickupDateTime:
-          type: string
-          format: date-time
-        deliveryDateTime:
-          type: string
-          format: date-time
+        pickup:
+          $ref: "#/components/schemas/TimingConstraintRequest"
+        delivery:
+          $ref: "#/components/schemas/TimingConstraintRequest"
         containerOperation:
           type: string
           enum:
@@ -3426,7 +3458,6 @@ components:
       - containerOperation
       - goods
       - note
-      - pickupDateTime
       - transportType
     UpdateWasteTransportResponse:
       type: object
@@ -3445,12 +3476,10 @@ components:
         consignorPartyId:
           type: string
           format: uuid
-        pickupDateTime:
-          type: string
-          format: date-time
-        deliveryDateTime:
-          type: string
-          format: date-time
+        pickup:
+          $ref: "#/components/schemas/TimingConstraintRequest"
+        delivery:
+          $ref: "#/components/schemas/TimingConstraintRequest"
         transportType:
           type: string
           enum:
@@ -3495,7 +3524,7 @@ components:
       - containerOperation
       - deliveryLocation
       - note
-      - pickupDateTime
+      - pickup
       - pickupLocation
       - transportType
     UpdateContainerTransportResponse:
@@ -4408,12 +4437,8 @@ components:
           format: uuid
         displayNumber:
           type: string
-        pickupDateTime:
-          type: string
-          format: date-time
       required:
       - displayNumber
-      - pickupDateTime
       - transportId
     CreateContainerTransportResponse:
       type: object
@@ -5177,6 +5202,20 @@ components:
       - quantity
       - unit
       - wasteStreamNumber
+    TimingConstraintView:
+      type: object
+      properties:
+        date:
+          type: string
+        mode:
+          type: string
+        windowStart:
+          type: string
+        windowEnd:
+          type: string
+      required:
+      - date
+      - mode
     TransportDetailView:
       type: object
       properties:
@@ -5196,8 +5235,8 @@ components:
           - $ref: "#/components/schemas/PickupCompanyView"
           - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
-        pickupDateTime:
-          type: string
+        pickupTiming:
+          $ref: "#/components/schemas/TimingConstraintView"
         deliveryLocation:
           oneOf:
           - $ref: "#/components/schemas/DutchAddressView"
@@ -5205,8 +5244,8 @@ components:
           - $ref: "#/components/schemas/PickupCompanyView"
           - $ref: "#/components/schemas/ProjectLocationView"
           - $ref: "#/components/schemas/ProximityDescriptionView"
-        deliveryDateTime:
-          type: string
+        deliveryTiming:
+          $ref: "#/components/schemas/TimingConstraintView"
         transportType:
           type: string
         status:
@@ -5267,7 +5306,6 @@ components:
       - consignorParty
       - deliveryLocation
       - id
-      - pickupDateTime
       - pickupLocation
       - sequenceNumber
       - status
@@ -5280,9 +5318,10 @@ components:
           format: uuid
         displayNumber:
           type: string
-        pickupDateTime:
+        pickupDate:
           type: string
-          format: date-time
+        deliveryDate:
+          type: string
         status:
           type: string
         weightTicketNumber:
@@ -5290,7 +5329,6 @@ components:
           format: int64
       required:
       - displayNumber
-      - pickupDateTime
       - status
       - transportId
       - weightTicketNumber
@@ -5342,7 +5380,6 @@ components:
           - INVOICED
       required:
       - deliveryLocation
-      - pickupDateTime
       - pickupLocation
       - status
     ExternalProductResponse:
@@ -6237,11 +6274,11 @@ components:
     FilterRegistration:
       type: object
       properties:
-        urlPatternMappings:
+        servletNameMappings:
           type: array
           items:
             type: string
-        servletNameMappings:
+        urlPatternMappings:
           type: array
           items:
             type: string
@@ -6355,16 +6392,6 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -6379,6 +6406,16 @@ components:
           type: array
           items:
             type: string
+        defaultContentType:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
         deferredSyntaxAllowedAsLiteral:
           type: string
         trimDirectiveWhitespaces:
@@ -6447,29 +6484,38 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributesCSV:
+          type: string
+          writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
-        attributesCSV:
-          type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        contextPath:
-          type: string
-        initParameterNames: {}
         sessionTimeout:
           type: integer
           format: int32
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
+          type: string
+        initParameterNames: {}
+        attributeNames: {}
+        contextPath:
           type: string
         sessionTrackingModes:
           type: array
@@ -6481,20 +6527,16 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
         effectiveMajorVersion:
           type: integer
           format: int32
-        servletContextName:
-          type: string
         effectiveMinorVersion:
           type: integer
           format: int32
-        serverInfo:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
         defaultSessionTrackingModes:
           type: array
           items:
@@ -6504,6 +6546,12 @@ components:
             - URL
             - SSL
           uniqueItems: true
+        requestCharacterEncoding:
+          type: string
+        responseCharacterEncoding:
+          type: string
+        serverInfo:
+          type: string
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -6513,17 +6561,6 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        requestCharacterEncoding:
-          type: string
-        responseCharacterEncoding:
-          type: string
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        attributeNames: {}
         classLoader:
           type: object
           properties:
@@ -6610,9 +6647,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

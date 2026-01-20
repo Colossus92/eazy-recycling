@@ -12,7 +12,7 @@ export interface TransportData {
     id: string;
     display_number: string;
     transport_type: string;
-    pickup_date_time: string;
+    pickup_date_time?: string;
     delivery_date_time?: string;
     truck_id?: string;
     note?: string;
@@ -160,8 +160,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         t.id,
         t.display_number,
         t.transport_type,
-        t.pickup_date_time,
-        t.delivery_date_time,
+        t.pickup_date,
+        t.delivery_date,
         t.note,
         t.truck_id
       FROM
@@ -184,8 +184,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
       id: string;
       display_number: string;
       transport_type: string;
-      pickup_date_time: string;
-      delivery_date_time?: string;
+      pickup_date?: string;
+      delivery_date?: string;
       note?: string;
       truck_id: string;
     }
@@ -373,8 +373,8 @@ export async function fetchTransportData(transportId: string): Promise<{ data?: 
         id: String(transport.id),
         display_number: String(transport.display_number),
         transport_type: String(transport.transport_type),
-        pickup_date_time: formatDate(String(transport.pickup_date_time)),
-        delivery_date_time: transport.delivery_date_time ? formatDate(String(transport.delivery_date_time)) : undefined,
+        pickup_date_time: transport.pickup_date ? formatDate(String(transport.pickup_date)) : undefined,
+        delivery_date_time: transport.delivery_date ? formatDate(String(transport.delivery_date)) : undefined,
         note: transport.note ? String(transport.note) : undefined,
         truck_id: transport.truck_id ? String(transport.truck_id) : undefined,
       },

@@ -28,15 +28,15 @@ data class CreateContainerTransportCommand(
   val consignorParty: CompanyId,
   val carrierParty: CompanyId,
   val pickupLocation: PickupLocationCommand,
-  val pickupDateTime: Instant,
   val deliveryLocation: PickupLocationCommand,
-  val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
   val containerOperation: ContainerOperation,
   val truck: LicensePlate?,
   val driver: UserId?,
   val note: Note,
+  val pickupTimingConstraint: TimingConstraint? = null,
+  val deliveryTimingConstraint: TimingConstraint? = null,
 )
 
 data class CreateContainerTransportResult(
@@ -60,9 +60,7 @@ class CreateContainerTransportService(
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
       pickupLocation = cmd.pickupLocation.toDomain(companies, projectLocations),
-      pickupDateTime = cmd.pickupDateTime,
       deliveryLocation = cmd.deliveryLocation.toDomain(companies, projectLocations),
-      deliveryDateTime = cmd.deliveryDateTime,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
       containerOperation = cmd.containerOperation,
@@ -72,7 +70,9 @@ class CreateContainerTransportService(
       transportHours = null,
       driverNote = null,
       updatedAt = Clock.System.now(),
-      sequenceNumber = 9999 // Create as last in line
+      sequenceNumber = 9999, // Create as last in line
+      pickupTimingConstraint = cmd.pickupTimingConstraint,
+      deliveryTimingConstraint = cmd.deliveryTimingConstraint,
     )
 
     val savedTransport = containerTransports.save(containerTransport)

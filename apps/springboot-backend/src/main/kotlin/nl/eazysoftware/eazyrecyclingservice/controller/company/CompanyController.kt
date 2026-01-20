@@ -212,7 +212,7 @@ class CompanyController(
     @field:Pattern(regexp = "^$|^[\\d]{5}$", message = "Verwerkersnummer moet bestaan uit 5 cijfers, of leeg zijn")
     val processorId: String?,
 
-    @field:NotBlank
+    @field:NotBlank(message = "Bedrijfsnaam is verplicht")
     val name: String,
     @field:Valid
     val address: AddressRequest,

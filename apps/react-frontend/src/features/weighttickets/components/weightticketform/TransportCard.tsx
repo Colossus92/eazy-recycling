@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { formatInstantInCET } from '@/utils/dateUtils';
+import { format, parse } from 'date-fns';
 import FilePdf from '@/assets/icons/FilePdf.svg?react';
 import EyeSolid from '@/assets/icons/EyeSolid.svg?react';
 import { fetchWaybillInfo, downloadWaybill } from '@/api/services/waybillService';
@@ -11,14 +10,16 @@ import { Button } from '@/components/ui/button/Button';
 interface TransportCardProps {
     transportId: string;
     displayNumber: string;
-    pickupDateTime: string;
+    pickupDate?: string;
+    deliveryDate?: string;
     status: string;
 }
 
 export const TransportCard = ({
     transportId,
     displayNumber,
-    pickupDateTime,
+    pickupDate,
+    deliveryDate,
     status,
 }: TransportCardProps) => {
     const navigate = useNavigate();
@@ -57,9 +58,14 @@ export const TransportCard = ({
     };
 
     const handleViewDetails = () => {
-        const pickupDate = new Date(pickupDateTime);
-        const dateParam = format(pickupDate, 'yyyy-MM-dd');
-        navigate(`/?highlightTransportId=${transportId}&date=${dateParam}`);
+        // Use pickupDate if available, otherwise use deliveryDate
+        const dateToUse = pickupDate || deliveryDate;
+        if (!dateToUse) {
+            console.error('No date available for transport');
+            return;
+        }
+        // dateToUse is already in yyyy-MM-dd format from the API
+        navigate(`/?highlightTransportId=${transportId}&date=${dateToUse}`);
     };
 
     return (
@@ -72,7 +78,8 @@ export const TransportCard = ({
                     #{displayNumber}
                 </span>
                 <span className="text-body-2 text-color-text-secondary">
-                    Ophaalmoment: {formatInstantInCET(pickupDateTime, 'dd-MM-yyyy HH:mm')}
+                    {pickupDate && `Ophaalmoment: ${format(parse(pickupDate, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')}`}
+                    {!pickupDate && deliveryDate && `Aflevermoment: ${format(parse(deliveryDate, 'yyyy-MM-dd', new Date()), 'dd-MM-yyyy')}`}
                 </span>
             </div>
             <div className="flex items-center gap-2">

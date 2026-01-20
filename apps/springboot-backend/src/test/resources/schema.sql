@@ -70,14 +70,22 @@ create table if not exists locations (
 );
 
 create table if not exists transports (
-                          delivery_date_time timestamp(6) without time zone,
-                          pickup_date_time timestamp(6) without time zone,
+                          id uuid NOT NULL,
                           carrier_party_id uuid,
                           consignor_party_id uuid,
                           driver_id uuid,
-                          id uuid NOT NULL,
                           delivery_location_id character varying(255),
                           pickup_location_id character varying(255),
+                          -- Pickup timing constraint fields
+                          pickup_date date not null,
+                          pickup_timing_mode text not null,
+                          pickup_window_start time,
+                          pickup_window_end time,
+                          -- Delivery timing constraint fields
+                          delivery_date date,
+                          delivery_timing_mode text,
+                          delivery_window_start time,
+                          delivery_window_end time,
                           transport_type text,
                           truck_id character varying(255),
                           display_number text,

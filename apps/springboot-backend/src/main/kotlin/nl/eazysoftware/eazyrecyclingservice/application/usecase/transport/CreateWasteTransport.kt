@@ -30,8 +30,8 @@ interface CreateWasteTransport {
  */
 data class CreateWasteTransportCommand(
   val carrierParty: CompanyId,
-  val pickupDateTime: Instant,
-  val deliveryDateTime: Instant?,
+  val pickupTimingConstraint: TimingConstraint? = null,
+  val deliveryTimingConstraint: TimingConstraint? = null,
   val transportType: TransportType,
   val goods: List<GoodsItem>,
   val wasteContainer: WasteContainerId?,
@@ -44,10 +44,8 @@ data class CreateWasteTransportCommand(
 
 data class CreateWasteTransportResult(
   val transportId: TransportId,
-  val pickupDateTime: LocalDateTime,
   val displayNumber: String,
-) {
-}
+)
 
 @Service
 class CreateWasteTransportService(
@@ -65,8 +63,8 @@ class CreateWasteTransportService(
 
     val wasteTransport = wasteTransportFactory.create(
       carrierParty = cmd.carrierParty,
-      pickupDateTime = cmd.pickupDateTime,
-      deliveryDateTime = cmd.deliveryDateTime,
+      pickupTimingConstraint = cmd.pickupTimingConstraint,
+      deliveryTimingConstraint = cmd.deliveryTimingConstraint,
       goods = cmd.goods,
       wasteStreams = wasteStreams,
       wasteContainer = cmd.wasteContainer,
@@ -89,7 +87,6 @@ class CreateWasteTransportService(
     return CreateWasteTransportResult(
       transportId = savedTransport.transportId,
       displayNumber = savedTransport.displayNumber?.value ?: "Onbekend",
-      pickupDateTime = savedTransport.pickupDateTime.toLocalDateTime(TimeZone.of("Europe/Amsterdam")).toJavaLocalDateTime()
     )
   }
 }

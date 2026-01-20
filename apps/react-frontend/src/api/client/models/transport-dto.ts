@@ -24,6 +24,9 @@ import type { PickupLocationDto } from './pickup-location-dto';
 import type { ProfileDto } from './profile-dto';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { TimingConstraintDto } from './timing-constraint-dto';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { TransportGoodsDto } from './transport-goods-dto';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -73,10 +76,10 @@ export interface TransportDto {
     'pickupLocation': PickupLocationDto;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintDto}
      * @memberof TransportDto
      */
-    'pickupDateTime': string;
+    'pickupTiming'?: TimingConstraintDto;
     /**
      * 
      * @type {PickupLocationDto}
@@ -85,10 +88,10 @@ export interface TransportDto {
     'deliveryLocation': PickupLocationDto;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintDto}
      * @memberof TransportDto
      */
-    'deliveryDateTime'?: string;
+    'deliveryTiming'?: TimingConstraintDto;
     /**
      * 
      * @type {string}

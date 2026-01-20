@@ -106,15 +106,22 @@ class GetTransportByIdService(
     )
   }
 
+  private fun mapTimingConstraint(constraint: TimingConstraint) = TimingConstraintView(
+    date = constraint.date.toString(),
+    mode = constraint.mode.name,
+    windowStart = constraint.windowStart?.toString(),
+    windowEnd = constraint.windowEnd?.toString()
+  )
+
   private fun toView(containerTransport: ContainerTransport) = TransportDetailView(
     id = containerTransport.transportId.uuid,
     displayNumber = containerTransport.displayNumber?.value,
     consignorParty = mapCompany(containerTransport.consignorParty),
     carrierParty = mapCompany(containerTransport.carrierParty),
     pickupLocation = pickupLocationViewMapper.mapLocation(containerTransport.pickupLocation),
-    pickupDateTime = containerTransport.pickupDateTime.toDisplayString(),
+    pickupTiming = containerTransport.pickupTimingConstraint?.let { mapTimingConstraint(it) },
     deliveryLocation = pickupLocationViewMapper.mapLocation(containerTransport.deliveryLocation),
-    deliveryDateTime = containerTransport.deliveryDateTime?.toDisplayString(),
+    deliveryTiming = containerTransport.deliveryTimingConstraint?.let { mapTimingConstraint(it) },
     transportType = containerTransport.transportType.name,
     status = containerTransport.getStatus(),
     truck = containerTransport.truck?.let { mapTruck(it) },
@@ -147,9 +154,9 @@ class GetTransportByIdService(
       },
       carrierParty = mapCompany(wasteTransport.carrierParty),
       pickupLocation = pickupLocationViewMapper.mapLocation(wasteStream.pickupLocation),
-      pickupDateTime = wasteTransport.pickupDateTime.toDisplayString(),
+      pickupTiming = wasteTransport.pickupTimingConstraint?.let { mapTimingConstraint(it) },
       deliveryLocation = mapWasteDeliveryLocation(wasteStream.deliveryLocation),
-      deliveryDateTime = wasteTransport.deliveryDateTime?.toDisplayString(),
+      deliveryTiming = wasteTransport.deliveryTimingConstraint?.let { mapTimingConstraint(it) },
       transportType = wasteTransport.transportType.name,
       status = wasteTransport.getStatus(),
       truck = wasteTransport.truck?.let { mapTruck(it) },

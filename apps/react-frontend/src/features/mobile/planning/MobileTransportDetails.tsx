@@ -29,7 +29,6 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
               <Ellipse />
             </div>
             <CompanyCard
-              dateTime={transport.pickupDateTime}
               details={resolveLocationAddress(transport.pickupLocation, transport.consignorParty?.name)}
             />
             <DottedStroke
@@ -45,7 +44,6 @@ const MobileTransportDetails = ({ transport }: MobileTransportDetailsProps) => {
               <MapPin />
             </div>
             <CompanyCard
-              dateTime={transport.deliveryDateTime}
               details={resolveLocationAddress(transport.deliveryLocation)}
             />
           </div>

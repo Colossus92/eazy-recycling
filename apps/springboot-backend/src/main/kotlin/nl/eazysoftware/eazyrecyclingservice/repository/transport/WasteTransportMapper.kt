@@ -14,6 +14,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.TransportGoodsDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -21,7 +22,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteConta
 import nl.eazysoftware.eazyrecyclingservice.repository.wastestream.WasteStreamRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import org.springframework.stereotype.Component
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -48,11 +48,14 @@ class WasteTransportMapper(
       }
       ?: throw IllegalArgumentException("Verwerker niet gevonden: ${wasteStream.deliveryLocation.processorPartyId.number}")
 
+    val pickupTiming = domain.pickupTimingConstraint?.let { TimingConstraintDto.fromDomain(it) }
+    val deliveryTiming = domain.deliveryTimingConstraint?.let { TimingConstraintDto.fromDomain(it) }
+
     return TransportDto(
       id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
-      pickupDateTime = domain.pickupDateTime.toJavaInstant(),
-      deliveryDateTime = domain.deliveryDateTime?.toJavaInstant(),
+      pickupTiming = pickupTiming,
+      deliveryTiming = deliveryTiming,
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let {
@@ -85,8 +88,8 @@ class WasteTransportMapper(
       transportId = TransportId(dto.id),
       displayNumber = TransportDisplayNumber(dto.displayNumber ?: ""),
       carrierParty = CompanyId(dto.carrierParty.id),
-      pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
-      deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
+      pickupTimingConstraint = dto.pickupTiming?.toDomain(),
+      deliveryTimingConstraint = dto.deliveryTiming?.toDomain(),
       transportType = dto.transportType,
       goods = dto.goods
         ?.let { toDomain(it) }

@@ -5,7 +5,7 @@ import { DriverSelectFormField } from '@/components/ui/form/selectfield/DriverSe
 import { ContainerSelectFormField } from '@/components/ui/form/selectfield/ContainerSelectFormField';
 import { ContainerOperationSelectFormField } from '@/components/ui/form/selectfield/ContainerOperationSelectFormField';
 import { TextAreaFormField } from '@/components/ui/form/TextAreaFormField';
-import { DateTimeInput } from '@/components/ui/form/DateTimeInput';
+import { TransportTimingFormField } from '@/components/ui/form/TransportTimingFormField';
 import { CompanySelectFormField } from '@/components/ui/form/CompanySelectFormField';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import MapPinArea from '@/assets/icons/MapPinArea.svg?react';
@@ -147,29 +147,20 @@ export const WasteStreamTransportFormDetailsSection = () => {
             </div>
           </div>
 
-          {/* Pickup and Delivery date row */}
+          {/* Pickup and Delivery timing row */}
           <div className="flex gap-4 items-start w-full">
             <div className="flex-1">
-              <DateTimeInput
-                title="Ophaalmoment"
-                formHook={{
-                  register: formContext.register,
-                  name: 'pickupDate',
-                  rules: { required: 'Pickup date is required' },
-                  errors: formContext.formState.errors,
-                }}
-                testId="pickup-date"
+              <TransportTimingFormField
+                control={formContext.control}
+                name="pickupTiming"
+                label="Ophaalmoment"
               />
             </div>
             <div className="flex-1">
-              <DateTimeInput
-                title="Aflevermoment"
-                formHook={{
-                  register: formContext.register,
-                  name: 'deliveryDate',
-                  errors: formContext.formState.errors,
-                }}
-                testId="delivery-date"
+              <TransportTimingFormField
+                control={formContext.control}
+                name="deliveryTiming"
+                label="Aflevermoment"
               />
             </div>
           </div>

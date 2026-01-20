@@ -164,13 +164,13 @@ class InvoiceController(
     }
 
     data class CreateInvoiceRequest(
-        @field:NotBlank
+        @field:NotBlank(message = "Factuurtype is verplicht")
         val invoiceType: String,
 
-        @field:NotBlank
+        @field:NotBlank(message = "Documenttype is verplicht")
         val documentType: String,
 
-        @field:NotBlank
+        @field:NotBlank(message = "Klant is verplicht")
         val customerId: String,
 
         val invoiceDate: LocalDate,
@@ -182,10 +182,10 @@ class InvoiceController(
     )
 
     data class UpdateInvoiceRequest(
-        @field:NotBlank
+        @field:NotBlank(message = "Klant is verplicht")
         val customerId: String,
 
-        @field:NotBlank
+        @field:NotBlank(message = "Factuurtype is verplicht")
         val invoiceType: String,
 
         val invoiceDate: LocalDate,
@@ -209,15 +209,15 @@ class InvoiceController(
     )
 
     data class SendInvoiceRequest(
-        @field:NotBlank
+        @field:NotBlank(message = "Ontvanger is verplicht")
         val to: String,
 
         val bcc: String?,
 
-        @field:NotBlank
+        @field:NotBlank(message = "Onderwerp is verplicht")
         val subject: String,
 
-        @field:NotBlank
+        @field:NotBlank(message = "Bericht is verplicht")
         val body: String,
     )
 

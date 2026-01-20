@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.datetime.toJavaLocalDateTime
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.TimingConstraintRequest
 import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.transport.*
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayTime
@@ -25,6 +26,7 @@ import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.Eural
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.goods.ProcessingMethodDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.UserRoleDto
@@ -187,8 +189,18 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       carrierParty = carrier,
       pickupLocation = mockLocationDto(),
       deliveryLocation = mockLocationDto(),
-      pickupDateTime = Instant.now(),
-      deliveryDateTime = Instant.now().plus(1, ChronoUnit.DAYS),
+      pickupTiming = TimingConstraintDto(
+        date = java.time.LocalDate.now(),
+        mode = TimingMode.FIXED,
+        windowStart = java.time.LocalTime.of(10, 0),
+        windowEnd = java.time.LocalTime.of(10, 0)
+      ),
+      deliveryTiming = TimingConstraintDto(
+        date = java.time.LocalDate.now().plusDays(1),
+        mode = TimingMode.FIXED,
+        windowStart = java.time.LocalTime.of(14, 0),
+        windowEnd = java.time.LocalTime.of(14, 0)
+      ),
       transportType = TransportType.CONTAINER,
       note = "Test transport",
       containerOperation = ContainerOperation.DELIVERY,
@@ -267,8 +279,7 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
     whenever(createWasteTransport.handle(any())).thenReturn(
       CreateWasteTransportResult(
         transportId = TransportId(testTransportId),
-          pickupDateTime = now.toDisplayTime().toJavaLocalDateTime(),
-          displayNumber = "25-0001",
+        displayNumber = "25-0001",
       )
     )
 
@@ -294,7 +305,6 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
           city = City("Test City")
         )
       ),
-      pickupDateTime = now,
       deliveryLocation = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Location.DutchAddress(
         address = nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address(
           streetName = StreetName("Test Street"),
@@ -303,7 +313,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
           city = City("Test City")
         )
       ),
-      deliveryDateTime = now,
+      pickupTimingConstraint = TimingConstraint.fromInstant(now),
+      deliveryTimingConstraint = TimingConstraint.fromInstant(now),
       transportType = TransportType.CONTAINER,
       wasteContainer = null,
       containerOperation = ContainerOperation.DELIVERY,
@@ -322,8 +333,8 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       transportId = TransportId(testTransportId),
       displayNumber = null,
       carrierParty = nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(carrier.id),
-      pickupDateTime = now,
-      deliveryDateTime = now,
+      pickupTimingConstraint = TimingConstraint.fromInstant(now),
+      deliveryTimingConstraint = TimingConstraint.fromInstant(now),
       transportType = TransportType.WASTE,
       goods = listOf(
         GoodsItem(
@@ -403,9 +414,19 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
       consignorParty = mockCompany,
       carrierParty = mockCompany,
       pickupLocation = mockLocation,
-      pickupDateTime = "2025-10-28T10:00:00",
+      pickupTiming = TimingConstraintView(
+        date = "2025-10-28",
+        mode = TimingMode.FIXED.name,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
       deliveryLocation = mockLocation,
-      deliveryDateTime = "2025-10-28T14:00:00",
+      deliveryTiming = TimingConstraintView(
+        date = "2025-10-28",
+        mode = TimingMode.FIXED.name,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER.name,
       status = TransportStatus.PLANNED,
       truck = null,
@@ -424,10 +445,22 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
   }
 
   private fun createContainerTransportRequestJson(): String {
+    val pickupDate = java.time.LocalDate.now()
+    val deliveryDate = java.time.LocalDate.now().plusDays(1)
     val request = ContainerTransportRequest(
       consignorPartyId = consignor.id,
-      pickupDateTime = LocalDateTime.now(),
-      deliveryDateTime = LocalDateTime.now().plusDays(1),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriverId,
@@ -447,9 +480,21 @@ class TransportControllerSecurityTest : BaseIntegrationTest() {
   }
 
   private fun createWasteTransportRequestJson(): String {
+    val pickupDate = java.time.LocalDate.now()
+    val deliveryDate = java.time.LocalDate.now().plusDays(1)
     val request = WasteTransportRequest(
-      pickupDateTime = LocalDateTime.now(),
-      deliveryDateTime = LocalDateTime.now().plusDays(1),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       containerOperation = ContainerOperation.PICKUP,
       transportType = TransportType.WASTE,
       driverId = testDriverId,

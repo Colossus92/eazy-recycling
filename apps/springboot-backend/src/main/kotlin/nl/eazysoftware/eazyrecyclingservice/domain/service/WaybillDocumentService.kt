@@ -79,9 +79,9 @@ class WaybillDocumentService(
 
 data class CreateSignatureRequest(
     val signature: String,
-    @field:Email
+    @field:Email(message = "Ongeldig e-mailadres")
     val email: String,
-    @field:NotBlank
+    @field:NotBlank(message = "Partij is verplicht")
     val party: String,
 )
 

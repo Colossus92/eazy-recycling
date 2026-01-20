@@ -3,7 +3,9 @@ package nl.eazysoftware.eazyrecyclingservice.controller.transport
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.PickupLocationRequest
+import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.TimingConstraintRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.ContainerTransportRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingMode
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.containertransport.CreateContainerTransportResponse
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportFromWeightTicketRequest
 import nl.eazysoftware.eazyrecyclingservice.controller.transport.wastetransport.CreateWasteTransportResponse
@@ -285,10 +287,22 @@ class TransportControllerIntegrationTest(
   @Test
   fun `should create container transport`() {
     // Given
+    val pickupDate = java.time.LocalDate.now().plusDays(1)
+    val deliveryDate = java.time.LocalDate.now().plusDays(2)
     val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
@@ -335,9 +349,21 @@ class TransportControllerIntegrationTest(
   @Test
   fun `should create waste transport`() {
     // Given
+    val pickupDate = java.time.LocalDate.now().plusDays(1)
+    val deliveryDate = java.time.LocalDate.now().plusDays(2)
     val request = WasteTransportRequest(
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
@@ -386,10 +412,22 @@ class TransportControllerIntegrationTest(
     val transport = createTestTransport("Original Transport")
     val savedTransport = transportRepository.save(transport)
 
+    val pickupDate = java.time.LocalDate.now().plusDays(3)
+    val deliveryDate = java.time.LocalDate.now().plusDays(4)
     val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(3),
-      deliveryDateTime = LocalDateTime.now().plusDays(4),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
@@ -423,9 +461,21 @@ class TransportControllerIntegrationTest(
   @Test
   fun `should update waste transport`() {
     // Given - create initial waste transport
+    val createPickupDate = java.time.LocalDate.now().plusDays(1)
+    val createDeliveryDate = java.time.LocalDate.now().plusDays(2)
     val createRequest = WasteTransportRequest(
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = createPickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = createDeliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.PICKUP,
       driverId = testDriver.id,
@@ -456,9 +506,21 @@ class TransportControllerIntegrationTest(
     )
 
     // Update the transport
+    val updatePickupDate = java.time.LocalDate.now().plusDays(3)
+    val updateDeliveryDate = java.time.LocalDate.now().plusDays(4)
     val updateRequest = WasteTransportRequest(
-      pickupDateTime = LocalDateTime.now().plusDays(3),
-      deliveryDateTime = LocalDateTime.now().plusDays(4),
+      pickup = TimingConstraintRequest(
+        date = updatePickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = updateDeliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.WASTE,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
@@ -514,10 +576,22 @@ class TransportControllerIntegrationTest(
   fun `should return not found when updating non-existent transport`() {
     // Given
     val nonExistentId = UUID.randomUUID()
+    val pickupDate = java.time.LocalDate.now().plusDays(1)
+    val deliveryDate = java.time.LocalDate.now().plusDays(2)
     val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
@@ -657,10 +731,22 @@ class TransportControllerIntegrationTest(
   @Test
   fun `should update container transport with branch references`() {
     // Given
+    val createPickupDate = java.time.LocalDate.now().plusDays(1)
+    val createDeliveryDate = java.time.LocalDate.now().plusDays(2)
     val createRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = createPickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = createDeliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
@@ -689,10 +775,22 @@ class TransportControllerIntegrationTest(
       CreateContainerTransportResponse::class.java
     )
 
+    val updatePickupDate = java.time.LocalDate.now().plusDays(3)
+    val updateDeliveryDate = java.time.LocalDate.now().plusDays(4)
     val updateRequest = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(3),
-      deliveryDateTime = LocalDateTime.now().plusDays(4),
+      pickup = TimingConstraintRequest(
+        date = updatePickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = updateDeliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.EXCHANGE,
       driverId = testDriver.id,
@@ -742,10 +840,22 @@ class TransportControllerIntegrationTest(
     )
     companyRepository.save(anotherCompany)
 
+    val pickupDate = java.time.LocalDate.now().plusDays(1)
+    val deliveryDate = java.time.LocalDate.now().plusDays(2)
     val request = ContainerTransportRequest(
       consignorPartyId = testCompany.id,
-      pickupDateTime = LocalDateTime.now().plusDays(1),
-      deliveryDateTime = LocalDateTime.now().plusDays(2),
+      pickup = TimingConstraintRequest(
+        date = pickupDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "10:00",
+        windowEnd = "10:00"
+      ),
+      delivery = TimingConstraintRequest(
+        date = deliveryDate.toString(),
+        mode = TimingMode.FIXED,
+        windowStart = "14:00",
+        windowEnd = "14:00"
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       driverId = testDriver.id,
@@ -916,14 +1026,26 @@ class TransportControllerIntegrationTest(
   }
 
   private fun createTestTransport(note: String, goodsItem: TransportGoodsDto? = null): TransportDto {
+    val pickupDate = java.time.LocalDate.now().plusDays(1)
+    val deliveryDate = java.time.LocalDate.now().plusDays(2)
     return TransportDto(
       id = UUID.randomUUID(),
       consignorParty = testCompany,
       carrierParty = testCompany,
       pickupLocation = testLocation,
-      pickupDateTime = LocalDateTime.now().plusDays(1).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+      pickupTiming = nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto(
+        date = pickupDate,
+        mode = TimingMode.FIXED,
+        windowStart = java.time.LocalTime.of(10, 0),
+        windowEnd = java.time.LocalTime.of(10, 0)
+      ),
       deliveryLocation = testLocation,
-      deliveryDateTime = LocalDateTime.now().plusDays(2).atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+      deliveryTiming = nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto(
+        date = deliveryDate,
+        mode = TimingMode.FIXED,
+        windowStart = java.time.LocalTime.of(14, 0),
+        windowEnd = java.time.LocalTime.of(14, 0)
+      ),
       transportType = TransportType.CONTAINER,
       containerOperation = ContainerOperation.DELIVERY,
       truck = testTruck,

@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream.toDo
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingConstraint
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
@@ -31,15 +32,15 @@ data class UpdateContainerTransportCommand(
   val consignorParty: CompanyId,
   val carrierParty: CompanyId,
   val pickupLocation: PickupLocationCommand,
-  val pickupDateTime: Instant,
   val deliveryLocation: PickupLocationCommand,
-  val deliveryDateTime: Instant?,
   val transportType: TransportType,
   val wasteContainer: WasteContainerId?,
   val containerOperation: ContainerOperation?,
   val truck: LicensePlate?,
   val driver: UserId?,
   val note: Note,
+  val pickupTimingConstraint: TimingConstraint? = null,
+  val deliveryTimingConstraint: TimingConstraint? = null,
 )
 
 data class UpdateContainerTransportResult(
@@ -72,9 +73,9 @@ class UpdateContainerTransportService(
       consignorParty = cmd.consignorParty,
       carrierParty = cmd.carrierParty,
       pickupLocation = cmd.pickupLocation.toDomain(companies, projectLocations),
-      pickupDateTime = cmd.pickupDateTime,
       deliveryLocation = cmd.deliveryLocation.toDomain(companies, projectLocations),
-      deliveryDateTime = cmd.deliveryDateTime,
+      pickupTimingConstraint = cmd.pickupTimingConstraint,
+      deliveryTimingConstraint = cmd.deliveryTimingConstraint,
       transportType = cmd.transportType,
       wasteContainer = cmd.wasteContainer,
       containerOperation = cmd.containerOperation,

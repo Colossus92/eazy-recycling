@@ -28,10 +28,13 @@ class GetWasteTransportsFromWeightTicketService(
   override fun execute(weightTicketNumber: Long): List<WeightTicketTransportView> {
     return wasteTransports.findByWeightTicketNumber(weightTicketNumber)
       .map { transport ->
+        val pickupDate = transport.pickupTimingConstraint?.date?.toString()
+        val deliveryDate = transport.deliveryTimingConstraint?.date?.toString()
         WeightTicketTransportView(
           transportId = transport.transportId.uuid,
           displayNumber = transport.displayNumber?.value ?: "",
-          pickupDateTime = LocalDateTime.parse(transport.pickupDateTime.toDisplayString()),
+          pickupDate = pickupDate,
+          deliveryDate = deliveryDate,
           status = transport.getStatus().name,
           weightTicketNumber = weightTicketNumber
         )
@@ -46,7 +49,8 @@ class GetWasteTransportsFromWeightTicketService(
 data class WeightTicketTransportView(
   val transportId: UUID,
   val displayNumber: String,
-  val pickupDateTime: LocalDateTime,
+  val pickupDate: String?,
+  val deliveryDate: String?,
   val status: String,
   val weightTicketNumber: Long
 )

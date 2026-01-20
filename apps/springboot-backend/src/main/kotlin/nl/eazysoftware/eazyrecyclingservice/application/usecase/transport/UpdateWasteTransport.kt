@@ -7,6 +7,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteContainerId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.EdgeFunctionJobService
+import org.jobrunr.scheduling.BackgroundJob
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import kotlin.time.Clock
@@ -23,8 +25,8 @@ interface UpdateWasteTransport {
 data class UpdateWasteTransportCommand(
   val transportId: TransportId,
   val carrierParty: CompanyId,
-  val pickupDateTime: Instant,
-  val deliveryDateTime: Instant,
+  val pickupTimingConstraint: TimingConstraint? = null,
+  val deliveryTimingConstraint: TimingConstraint? = null,
   val transportType: TransportType,
   val goods: List<GoodsItem>,
   val wasteContainer: WasteContainerId?,
@@ -60,8 +62,8 @@ class UpdateWasteTransportService(
       transportId = existingTransport.transportId,
       displayNumber = existingTransport.displayNumber,
       carrierParty = cmd.carrierParty,
-      pickupDateTime = cmd.pickupDateTime,
-      deliveryDateTime = cmd.deliveryDateTime,
+      pickupTimingConstraint = cmd.pickupTimingConstraint,
+      deliveryTimingConstraint = cmd.deliveryTimingConstraint,
       transportType = cmd.transportType,
       goods = cmd.goods,
       wasteContainer = cmd.wasteContainer,
@@ -77,6 +79,10 @@ class UpdateWasteTransportService(
     )
 
     val savedTransport = wasteTransports.save(updatedTransport)
+    
+    BackgroundJob.enqueue<EdgeFunctionJobService> {
+      it.executeGenerateWaybillPdfJob(savedTransport.transportId.uuid.toString(), "empty")
+    }
 
     return UpdateWasteTransportResult(
       transportId = savedTransport.transportId,

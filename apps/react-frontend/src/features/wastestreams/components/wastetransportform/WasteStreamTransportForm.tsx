@@ -80,8 +80,8 @@ export const WasteStreamTransportForm = ({
 
   return (
     <ErrorBoundary fallbackRender={fallbackRender}>
-      <FormDialog isOpen={isOpen} setIsOpen={onCancel} width='w-[600px]'>
-        <div className="w-full h-full">
+      <FormDialog isOpen={isOpen} setIsOpen={onCancel} width='w-[800px]'>
+        <div className="w-full h-[80vh]">
           <FormProvider {...formContext}>
             <form
               className="flex flex-col items-center self-stretch h-full"

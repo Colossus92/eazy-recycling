@@ -145,16 +145,31 @@ export const PlanningCard = ({
     };
   }, [showDriverDropdown]);
 
-  // Scroll highlighted card into view within the calendar grid's scrollable container
+  // Scroll highlighted card into view within the calendar grid's scrollable container only
   useEffect(() => {
     if (isHighlighted && cardRef.current) {
       // Small delay to ensure the calendar has rendered with the correct date
       setTimeout(() => {
-        cardRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest',
-        });
+        const card = cardRef.current;
+        if (!card) return;
+        
+        // Find the scrollable parent container (the overflow-y-scroll div in CalendarGrid)
+        const scrollableParent = card.closest('.overflow-y-scroll');
+        if (scrollableParent) {
+          // Calculate the position to scroll to within the container
+          const cardRect = card.getBoundingClientRect();
+          const containerRect = scrollableParent.getBoundingClientRect();
+          const scrollTop = scrollableParent.scrollTop;
+          
+          // Calculate the target scroll position to center the card in the container
+          const cardTopRelativeToContainer = cardRect.top - containerRect.top + scrollTop;
+          const targetScrollTop = cardTopRelativeToContainer - (containerRect.height / 2) + (cardRect.height / 2);
+          
+          scrollableParent.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            behavior: 'smooth',
+          });
+        }
       }, 100);
     }
   }, [isHighlighted]);

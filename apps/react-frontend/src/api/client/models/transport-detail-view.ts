@@ -24,6 +24,9 @@ import type { DriverView } from './driver-view';
 import type { GoodsItemView } from './goods-item-view';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { TimingConstraintView } from './timing-constraint-view';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { TruckView } from './truck-view';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -70,10 +73,10 @@ export interface TransportDetailView {
     'pickupLocation': WasteContainerViewLocation;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintView}
      * @memberof TransportDetailView
      */
-    'pickupDateTime': string;
+    'pickupTiming'?: TimingConstraintView;
     /**
      * 
      * @type {WasteContainerViewLocation}
@@ -82,10 +85,10 @@ export interface TransportDetailView {
     'deliveryLocation': WasteContainerViewLocation;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintView}
      * @memberof TransportDetailView
      */
-    'deliveryDateTime'?: string;
+    'deliveryTiming'?: TimingConstraintView;
     /**
      * 
      * @type {string}

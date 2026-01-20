@@ -8,7 +8,11 @@ import { TransportDetailView } from '@/api/client/models/transport-detail-view';
 import { WasteContainerViewLocation } from '@/api/client/models/waste-container-view-location';
 import { transportService } from '@/api/services/transportService';
 import { pickupLocationViewToFormValue } from '@/types/forms/locationConverters';
-import { format } from 'date-fns';
+import {
+  TimingConstraint,
+  createEmptyTimingConstraint,
+  TimingMode,
+} from '@/types/forms/TimingConstraint';
 
 export interface WasteStreamLineFormValue {
   wasteStreamNumber: string;
@@ -26,8 +30,8 @@ export interface WasteStreamTransportFormValues {
   carrierPartyId: string;
   truckId?: string;
   driverId?: string;
-  pickupDate?: string;
-  deliveryDate?: string;
+  pickupTiming: TimingConstraint;
+  deliveryTiming?: TimingConstraint;
   comments?: string;
   containerId?: string;
   containerOperation?: string;
@@ -42,7 +46,7 @@ export const fieldsToValidate: Array<
   ['consignorPartyId', 'wasteStreamLines'],
 
   // Step 1: Transport Details
-  ['pickupDate'],
+  ['pickupTiming'],
 ];
 
 /**
@@ -97,9 +101,23 @@ const formValuesToWasteTransportRequest = (
 ): WasteTransportRequest => {
   return {
     carrierPartyId: formValues.carrierPartyId,
-    containerOperation: (formValues.containerOperation || 'PICKUP') as any,
-    pickupDateTime: formValues.pickupDate || '',
-    deliveryDateTime: formValues.deliveryDate,
+    containerOperation: (formValues.containerOperation || 'PICKUP') as WasteTransportRequest['containerOperation'],
+    pickup: formValues.pickupTiming.date
+      ? {
+          date: formValues.pickupTiming.date,
+          mode: formValues.pickupTiming.mode,
+          windowStart: formValues.pickupTiming.windowStart || undefined,
+          windowEnd: formValues.pickupTiming.windowEnd || undefined,
+        }
+      : undefined,
+    delivery: formValues.deliveryTiming?.date
+      ? {
+          date: formValues.deliveryTiming.date,
+          mode: formValues.deliveryTiming.mode,
+          windowStart: formValues.deliveryTiming.windowStart || undefined,
+          windowEnd: formValues.deliveryTiming.windowEnd || undefined,
+        }
+      : undefined,
     truckId: formValues.truckId,
     driverId: formValues.driverId,
     containerId: formValues.containerId,
@@ -155,12 +173,22 @@ const transportDetailToFormValues = (
     carrierPartyId: transport.carrierParty.id,
     truckId: transport.truck?.licensePlate || undefined,
     driverId: transport.driver?.id || undefined,
-    pickupDate: transport.pickupDateTime
-      ? format(new Date(transport.pickupDateTime), "yyyy-MM-dd'T'HH:mm")
-      : '',
-    deliveryDate: transport.deliveryDateTime
-      ? format(new Date(transport.deliveryDateTime), "yyyy-MM-dd'T'HH:mm")
-      : '',
+    pickupTiming: transport.pickupTiming
+      ? {
+          date: transport.pickupTiming.date,
+          mode: transport.pickupTiming.mode as TimingMode,
+          windowStart: transport.pickupTiming.windowStart || null,
+          windowEnd: transport.pickupTiming.windowEnd || null,
+        }
+      : createEmptyTimingConstraint(),
+    deliveryTiming: transport.deliveryTiming
+      ? {
+          date: transport.deliveryTiming.date,
+          mode: transport.deliveryTiming.mode as TimingMode,
+          windowStart: transport.deliveryTiming.windowStart || null,
+          windowEnd: transport.deliveryTiming.windowEnd || null,
+        }
+      : undefined,
     comments: transport.note || undefined,
     containerId: transport.wasteContainer?.id || undefined,
     containerOperation: transport.containerOperation || undefined,
@@ -180,8 +208,8 @@ export function useWasteStreamTransportForm(
       carrierPartyId: undefined,
       truckId: undefined,
       driverId: undefined,
-      pickupDate: '',
-      deliveryDate: '',
+      pickupTiming: createEmptyTimingConstraint(),
+      deliveryTiming: undefined,
       containerId: undefined,
       containerOperation: undefined,
       comments: undefined,
@@ -246,14 +274,7 @@ export function useWasteStreamTransportForm(
         onSuccess();
       }
     },
-    onError: (error: unknown) => {
-      console.error('Error saving waste stream transport:', error);
-
-      toastService.error(
-        `Er is een fout opgetreden bij het ${transportId ? 'bijwerken' : 'aanmaken'} van het transport`
-      );
-      // Keep form open on error
-    },
+    // No onError callback - let errors propagate to GlobalErrorHandler
   });
 
   const resetForm = () => {
@@ -263,8 +284,8 @@ export function useWasteStreamTransportForm(
       carrierPartyId: undefined,
       truckId: undefined,
       driverId: undefined,
-      pickupDate: '',
-      deliveryDate: '',
+      pickupTiming: createEmptyTimingConstraint(),
+      deliveryTiming: undefined,
       containerId: undefined,
       containerOperation: undefined,
       comments: undefined,

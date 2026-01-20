@@ -23,9 +23,15 @@ class WasteTransport(
    */
   val carrierParty: CompanyId,
 
-  val pickupDateTime: Instant,
+  /**
+   * Timing constraint for pickup scheduling (DATE_ONLY, WINDOW, or FIXED).
+   */
+  val pickupTimingConstraint: TimingConstraint? = null,
 
-  val deliveryDateTime: Instant?,
+  /**
+   * Timing constraint for delivery scheduling (DATE_ONLY, WINDOW, or FIXED).
+   */
+  val deliveryTimingConstraint: TimingConstraint? = null,
 
   val transportType: TransportType = TransportType.WASTE,
 
@@ -87,8 +93,8 @@ class WasteTransport(
     fun create(
       displayNumber: TransportDisplayNumber,
       carrierParty: CompanyId,
-      pickupDateTime: Instant,
-      deliveryDateTime: Instant,
+      pickupTimingConstraint: TimingConstraint? = null,
+      deliveryTimingConstraint: TimingConstraint? = null,
       transportType: TransportType = TransportType.WASTE,
       goodsItem: List<GoodsItem>,
       wasteContainer: WasteContainerId?,
@@ -106,8 +112,8 @@ class WasteTransport(
         transportId = TransportId.generate(),
         displayNumber = displayNumber,
         carrierParty = carrierParty,
-        pickupDateTime = pickupDateTime,
-        deliveryDateTime = deliveryDateTime,
+        pickupTimingConstraint = pickupTimingConstraint,
+        deliveryTimingConstraint = deliveryTimingConstraint,
         transportType = transportType,
         goods = goodsItem,
         wasteContainer = wasteContainer,

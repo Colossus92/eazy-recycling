@@ -17,44 +17,41 @@
 /**
  * 
  * @export
- * @interface WeightTicketTransport
+ * @interface TimingConstraintDto
  */
-export interface WeightTicketTransport {
+export interface TimingConstraintDto {
     /**
      * 
      * @type {string}
-     * @memberof WeightTicketTransport
+     * @memberof TimingConstraintDto
      */
-    'transportId': string;
+    'date': string;
     /**
      * 
      * @type {string}
-     * @memberof WeightTicketTransport
+     * @memberof TimingConstraintDto
      */
-    'displayNumber': string;
+    'mode': TimingConstraintDtoModeEnum;
     /**
      * 
      * @type {string}
-     * @memberof WeightTicketTransport
+     * @memberof TimingConstraintDto
      */
-    'pickupDate'?: string;
+    'windowStart'?: string;
     /**
      * 
      * @type {string}
-     * @memberof WeightTicketTransport
+     * @memberof TimingConstraintDto
      */
-    'deliveryDate'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof WeightTicketTransport
-     */
-    'status': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof WeightTicketTransport
-     */
-    'weightTicketNumber': number;
+    'windowEnd'?: string;
 }
+
+export const TimingConstraintDtoModeEnum = {
+    DateOnly: 'DATE_ONLY',
+    Window: 'WINDOW',
+    Fixed: 'FIXED'
+} as const;
+
+export type TimingConstraintDtoModeEnum = typeof TimingConstraintDtoModeEnum[keyof typeof TimingConstraintDtoModeEnum];
+
 

@@ -16,6 +16,9 @@
 // May contain unused imports in some cases
 // @ts-ignore
 import type { GoodsRequest } from './goods-request';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { TimingConstraintRequest } from './timing-constraint-request';
 
 /**
  * 
@@ -25,16 +28,16 @@ import type { GoodsRequest } from './goods-request';
 export interface WasteTransportRequest {
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintRequest}
      * @memberof WasteTransportRequest
      */
-    'pickupDateTime': string;
+    'pickup'?: TimingConstraintRequest;
     /**
      * 
-     * @type {string}
+     * @type {TimingConstraintRequest}
      * @memberof WasteTransportRequest
      */
-    'deliveryDateTime'?: string;
+    'delivery'?: TimingConstraintRequest;
     /**
      * 
      * @type {string}

@@ -43,7 +43,8 @@ export function useFormStepNavigation<T extends FieldValues>({
           await onSubmit(formContext.getValues());
           setStep(0);
         } catch (error) {
-          console.error('Error submitting form:', error);
+          console.warn('Error submitting form:', error);
+          throw error;
         }
       }
     } else {

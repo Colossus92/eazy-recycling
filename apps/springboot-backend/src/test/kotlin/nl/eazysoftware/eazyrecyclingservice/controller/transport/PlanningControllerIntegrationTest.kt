@@ -6,6 +6,8 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingMode
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
@@ -243,10 +245,7 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
     }
 
     private fun createTestTransportsForDriver(date: LocalDate): List<TransportDto> {
-        val pickupDateTime1 = date.atTime(10, 0)
-        val deliveryDateTime1 = date.atTime(12, 0)
-        val pickupDateTime2 = date.atTime(14, 0)
-        val deliveryDateTime2 = date.atTime(16, 0)
+        val javaDate = java.time.LocalDate.of(date.year, date.monthValue, date.dayOfMonth)
 
         val transport1 = TransportDto(
             id = UUID.randomUUID(),
@@ -255,8 +254,18 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
-            deliveryDateTime = deliveryDateTime1.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            pickupTiming = TimingConstraintDto(
+                date = javaDate,
+                mode = TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(10, 0),
+                windowEnd = java.time.LocalTime.of(10, 0)
+            ),
+            deliveryTiming = TimingConstraintDto(
+                date = javaDate,
+                mode = TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(12, 0),
+                windowEnd = java.time.LocalTime.of(12, 0)
+            ),
             note = "Test Transport 1",
             truck = testTruck,
             driver = testDriver,
@@ -271,8 +280,18 @@ class PlanningControllerIntegrationTest : BaseIntegrationTest() {
             carrierParty = testCompany,
             pickupLocation = testPickupLocation,
             deliveryLocation = testDeliveryLocation,
-            pickupDateTime = pickupDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
-            deliveryDateTime = deliveryDateTime2.atZone(ZoneId.of("Europe/Amsterdam")).toInstant(),
+            pickupTiming = TimingConstraintDto(
+                date = javaDate,
+                mode = TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(14, 0),
+                windowEnd = java.time.LocalTime.of(14, 0)
+            ),
+            deliveryTiming = TimingConstraintDto(
+                date = javaDate,
+                mode = TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(16, 0),
+                windowEnd = java.time.LocalTime.of(16, 0)
+            ),
             note = "Test Transport 2",
             truck = testTruck,
             driver = testDriver,

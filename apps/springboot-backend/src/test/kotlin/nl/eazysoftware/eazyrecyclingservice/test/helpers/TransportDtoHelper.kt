@@ -1,14 +1,17 @@
 package nl.eazysoftware.eazyrecyclingservice.test.helpers
 
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingMode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.company.CompanyDto
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.waybill.AddressDto
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.*
 
 object TransportDtoHelper {
@@ -23,9 +26,19 @@ object TransportDtoHelper {
       consignorParty = company,
       carrierParty = company,
       pickupLocation = pickupLocation,
-      pickupDateTime = pickupDateTime.toCetInstant(),
+      pickupTiming = TimingConstraintDto(
+        date = pickupDateTime.toLocalDate(),
+        mode = TimingMode.FIXED,
+        windowStart = pickupDateTime.toLocalTime(),
+        windowEnd = pickupDateTime.toLocalTime()
+      ),
       deliveryLocation = deliveryLocation,
-      deliveryDateTime = LocalDateTime.of(2025, 5, 20, 14, 0).toCetInstant(),
+      deliveryTiming = TimingConstraintDto(
+        date = LocalDate.of(2025, 5, 20),
+        mode = TimingMode.FIXED,
+        windowStart = LocalTime.of(14, 0),
+        windowEnd = LocalTime.of(14, 0)
+      ),
       transportType = TransportType.WASTE,
       truck = truck,
       driver = driver,

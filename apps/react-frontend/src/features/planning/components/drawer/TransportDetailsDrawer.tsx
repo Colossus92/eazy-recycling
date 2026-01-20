@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { formatInstantInCET } from '@/utils/dateUtils';
+import { TimingConstraintView } from '@/api/client';
+import { format, parseISO } from 'date-fns';
+import { nl } from 'date-fns/locale';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
 import {
   resolveLocationAddress,
@@ -11,8 +13,8 @@ import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
 import ShippingContainer from '@/assets/icons/ShippingContainer.svg?react';
-import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
+import Play from '@/assets/icons/Play.svg?react';
 import Ellipse from '@/assets/icons/Ellipse.svg?react';
 import MapPin from '@/assets/icons/MapPin.svg?react';
 import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
@@ -82,6 +84,35 @@ export const TransportDetailsDrawer = ({
     : 'Geen container toegewezen';
   const consignorName = data?.consignorParty?.name;
 
+  // Format timing constraint for display based on mode
+  // Returns: { date: string, time: string | null }
+  const formatTimingDisplay = (timing: TimingConstraintView | undefined): { date: string; time: string | null } => {
+    if (!timing?.date) return { date: '-', time: null };
+    
+    let formattedDate: string;
+    try {
+      formattedDate = format(parseISO(timing.date), 'dd-MM-yyyy', { locale: nl });
+    } catch {
+      formattedDate = timing.date;
+    }
+    
+    switch (timing.mode) {
+      case 'DATE_ONLY':
+        return { date: formattedDate, time: null };
+      case 'FIXED':
+        return { date: formattedDate, time: timing.windowStart || null };
+      case 'WINDOW':
+        return { 
+          date: formattedDate, 
+          time: timing.windowStart && timing.windowEnd 
+            ? `${timing.windowStart} - ${timing.windowEnd}` 
+            : null 
+        };
+      default:
+        return { date: formattedDate, time: null };
+    }
+  };
+
   const additionalActions: DrawerAction[] = [];
   if (
     onCreateWeightTicket &&
@@ -150,23 +181,6 @@ export const TransportDetailsDrawer = ({
                   {data.displayNumber}
                 </span>
               </div>
-              <div className={'flex items-center gap-2 self-stretch'}>
-                <div className="flex items-center flex-1 gap-2">
-                  <CalendarDots
-                    className={'w-5 h-5 text-color-text-secondary'}
-                  />
-                  <span className={'text-body-2 text-color-text-secondary'}>
-                    Datum
-                  </span>
-                </div>
-                <span className={'text-body-2 truncate'}>
-                  {formatInstantInCET(data.pickupDateTime, 'dd-MM-yyyy')}{' '}
-                  {data.deliveryDateTime
-                    ? ' - ' +
-                      formatInstantInCET(data.deliveryDateTime, 'dd-MM-yyyy')
-                    : ''}
-                </span>
-              </div>
               <WeightTicketLinkSection weightTicketId={data.weightTicketId} />
               {data.transportHours && (
                 <div className={'flex items-center gap-2 self-stretch'}>
@@ -189,19 +203,58 @@ export const TransportDetailsDrawer = ({
           <div className="flex flex-col items-start self-stretch gap-3">
             <span className="subtitle-1">Route</span>
             <div className="flex flex-col items-start self-stretch gap-5 relative">
+                            <div className={'flex items-center gap-2 self-stretch'}>
+                <div className="flex items-center flex-1 gap-2">
+                  <Play
+                    className={'w-5 h-5 text-color-text-secondary'}
+                  />
+                  <span className={'text-body-2 text-color-text-secondary'}>
+                    Start
+                  </span>
+                </div>
+                <div className="flex items-end gap-1">
+                  <span className={'text-body-2 truncate'}>
+                    {formatTimingDisplay(data.pickupTiming).date}
+                  </span>
+                  {formatTimingDisplay(data.pickupTiming).time && (
+                    <span className={'text-body-2 text-color-text-secondary truncate'}>
+                      {formatTimingDisplay(data.pickupTiming).time}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className={'flex items-center gap-2 self-stretch'}>
+                <div className="flex items-center flex-1 gap-2">
+                  <MapPin
+                    className={'w-5 h-5 text-color-text-secondary'}
+                  />
+                  <span className={'text-body-2 text-color-text-secondary'}>
+                    Eind
+                  </span>
+                </div>
+                <div className="flex items-end gap-1">
+                  <span className={'text-body-2 truncate'}>
+                    {formatTimingDisplay(data.deliveryTiming).date}
+                  </span>
+                  {formatTimingDisplay(data.deliveryTiming).time && (
+                    <span className={'text-body-2 text-color-text-secondary truncate'}>
+                      {formatTimingDisplay(data.deliveryTiming).time}
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className=" flex items-start gap-2 self-stretch">
                 <div className="flex size-7 p-1 justify-center items-center gap-2 border-[0.875px] border-solid border-color-border-primary bg-color-surface-secondary rounded-full relative z-10">
                   <Ellipse />
                 </div>
                 <CompanyCard
-                  dateTime={data.pickupDateTime}
                   details={resolveLocationAddress(data.pickupLocation, consignorName)}
                 />
               </div>
               <DottedStroke
                 className="absolute left-[13px]"
                 style={{
-                  top: '24px',
+                  top: '44px',
                   height: 'calc(100% - 56px - 1rem)',
                   width: '2px',
                   zIndex: 0,
@@ -212,7 +265,6 @@ export const TransportDetailsDrawer = ({
                   <MapPin />
                 </div>
                 <CompanyCard
-                  dateTime={data.deliveryDateTime}
                   details={resolveLocationAddress(data.deliveryLocation)}
                 />
               </div>

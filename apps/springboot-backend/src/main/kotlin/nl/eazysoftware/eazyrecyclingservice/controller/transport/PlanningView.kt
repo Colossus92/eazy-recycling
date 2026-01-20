@@ -36,9 +36,8 @@ data class PlanningTransportView(
 ) {
 
   constructor(transportDto: TransportDto) : this(
-    pickupDate = transportDto.pickupDateTime.toDisplayLocalDate().toString(),
-    deliveryDate = transportDto.deliveryDateTime?.toDisplayLocalDate()?.toString()
-      .takeIf { transportDto.deliveryDateTime != null },
+    pickupDate = (transportDto.pickupTiming?.toInstant() ?: transportDto.deliveryTiming?.toInstant())?.toDisplayLocalDate().toString(),
+    deliveryDate = transportDto.deliveryTiming?.toInstant()?.toDisplayLocalDate()?.toString(),
     id = transportDto.id.toString(),
     truck = transportDto.truck,
     originCity = getCityFrom(transportDto.pickupLocation),

@@ -8,14 +8,14 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.address.DutchPostalCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.StreetName
 
 data class AddressRequest(
-  @field:NotBlank val street: String,
-  @field:NotBlank val buildingNumber: String,
+  @field:NotBlank(message = "Straatnaam is verplicht") val street: String,
+  @field:NotBlank(message = "Huisnummer is verplicht") val buildingNumber: String,
   val buildingNumberAddition: String? = null,
   @field:Pattern(regexp = "^[1-9][0-9]{3}\\s?[A-Z]{2}$",
-    message = "Invalid Dutch postal code")
+    message = "Ongeldige Nederlandse postcode")
   val postalCode: String,
-  @field:NotBlank val city: String,
-  @field:NotBlank val country: String
+  @field:NotBlank(message = "Woonplaats is verplicht") val city: String,
+  @field:NotBlank(message = "Land is verplicht") val country: String
 ) {
   fun toDomain() = Address(
     StreetName(street),

@@ -119,9 +119,19 @@ class SignatureServiceTest {
             consignorParty = mock(),
             carrierParty = mock(),
             pickupLocation = mock(),
-            pickupDateTime = LocalDateTime.now().toCetInstant(),
+            pickupTiming = nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto(
+                date = java.time.LocalDate.now(),
+                mode = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(10, 0),
+                windowEnd = java.time.LocalTime.of(10, 0)
+            ),
             deliveryLocation = mock(),
-            deliveryDateTime = LocalDateTime.now().toCetInstant(),
+            deliveryTiming = nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto(
+                date = java.time.LocalDate.now(),
+                mode = nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingMode.FIXED,
+                windowStart = java.time.LocalTime.of(14, 0),
+                windowEnd = java.time.LocalTime.of(14, 0)
+            ),
             note = "",
             driver = mock(),
             sequenceNumber = 1

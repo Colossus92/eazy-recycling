@@ -1,12 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { formatInstantInCET } from '@/utils/dateUtils';
 import { lazy, Suspense, useState } from 'react';
-import CalendarDots from '@/assets/icons/CalendarDots.svg?react';
+import { TimingConstraintView } from '@/api/client';
+import { format, parseISO } from 'date-fns';
+import { nl } from 'date-fns/locale';
 import CaretLeft from '@/assets/icons/CaretLeft.svg?react';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import CheckCircleOutline from '@/assets/icons/CheckCircleOutline.svg?react';
 import Hash from '@/assets/icons/Hash.svg?react';
+import Play from '@/assets/icons/Play.svg?react';
+import MapPin from '@/assets/icons/MapPin.svg?react';
 import { TransportStatusTag } from '@/features/planning/components/tag/TransportStatusTag';
 import { MobileTabBar } from '@/components/ui/mobile/MobileTabBar';
 import { Button } from '@/components/ui/button/Button';
@@ -23,6 +26,35 @@ const MobileTransportDetailsTab = lazy(
 const SignaturesTab = lazy(
   () => import('@/features/mobile/planning/SignaturesTab')
 );
+
+// Format timing constraint for display based on mode
+// Returns: { date: string, time: string | null }
+const formatTimingDisplay = (timing: TimingConstraintView | undefined): { date: string; time: string | null } => {
+  if (!timing?.date) return { date: '-', time: null };
+  
+  let formattedDate: string;
+  try {
+    formattedDate = format(parseISO(timing.date), 'dd-MM-yyyy', { locale: nl });
+  } catch {
+    formattedDate = timing.date;
+  }
+  
+  switch (timing.mode) {
+    case 'DATE_ONLY':
+      return { date: formattedDate, time: null };
+    case 'FIXED':
+      return { date: formattedDate, time: timing.windowStart || null };
+    case 'WINDOW':
+      return { 
+        date: formattedDate, 
+        time: timing.windowStart && timing.windowEnd 
+          ? `${timing.windowStart} - ${timing.windowEnd}` 
+          : null 
+      };
+    default:
+      return { date: formattedDate, time: null };
+  }
+};
 
 export const MobileTransportDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -126,14 +158,39 @@ export const MobileTransportDetailsPage = () => {
             </div>
             <div className="flex items-center self-stretch gap-2">
               <div className="flex items-center flex-1 gap-2">
-                <CalendarDots className="size-5 text-color-text-secondary" />
+                <Play className="size-5 text-color-text-secondary" />
                 <span className="text-body-2 text-color-text-secondary">
-                  Datum
+                  Start
                 </span>
               </div>
-              <span className="text-subtitle-2">
-                {formatInstantInCET(transport.pickupDateTime, 'dd-MM-yyyy')}
-              </span>
+              <div className="flex items-end gap-1">
+                <span className="text-subtitle-2">
+                  {formatTimingDisplay(transport.pickupTiming).date}
+                </span>
+                {formatTimingDisplay(transport.pickupTiming).time && (
+                  <span className="text-body-2 text-color-text-secondary">
+                    {formatTimingDisplay(transport.pickupTiming).time}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center self-stretch gap-2">
+              <div className="flex items-center flex-1 gap-2">
+                <MapPin className="size-5 text-color-text-secondary" />
+                <span className="text-body-2 text-color-text-secondary">
+                  Eind
+                </span>
+              </div>
+              <div className="flex items-end gap-1">
+                <span className="text-subtitle-2">
+                  {formatTimingDisplay(transport.deliveryTiming).date}
+                </span>
+                {formatTimingDisplay(transport.deliveryTiming).time && (
+                  <span className="text-body-2 text-color-text-secondary">
+                    {formatTimingDisplay(transport.deliveryTiming).time}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex flex-col items-start self-stretch gap-4">

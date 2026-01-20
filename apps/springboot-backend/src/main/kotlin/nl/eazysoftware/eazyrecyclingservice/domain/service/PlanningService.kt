@@ -7,6 +7,7 @@ import nl.eazysoftware.eazyrecyclingservice.controller.transport.*
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Trucks
 import nl.eazysoftware.eazyrecyclingservice.repository.TransportRepository
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.truck.TruckDto
 import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
@@ -34,11 +35,11 @@ class PlanningService(
         val daysInWeek = getDaysInWeek(pickupDate)
         val statuses = status?.split(',') ?: emptyList()
 
-        val startInstant = daysInWeek.first().atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
-        val endInstant = daysInWeek.last().atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
+        val startDate = daysInWeek.first()
+        val endDate = daysInWeek.last()
 
         // Optimized query with JOIN FETCH - filters truck/driver at DB level
-        val transports = transportRepository.findForPlanningView(startInstant, endInstant, truckId, driverId)
+        val transports = transportRepository.findForPlanningView(startDate, endDate, truckId, driverId)
             .filter { transport -> statuses.isEmpty() || statuses.contains(transport.getStatus().name) }
 
         val dateInfo = daysInWeek.map { it.toString() }
@@ -58,11 +59,18 @@ class PlanningService(
         return PlanningView(dateInfo, transportsView)
     }
 
-    fun createTransportsView(transports: List<TransportDto>) =
-        transports.map { transportDto -> PlanningTransportView(transportDto) }
+    fun createTransportsView(transports: List<TransportDto>): MutableList<PlanningTransportsView> {
+        // Sort transports by effective date (pickup or delivery), then by window start, then by sequence number
+        val sortedTransports = transports.sortedWith(
+            compareBy<TransportDto> { it.pickupTiming?.date ?: it.deliveryTiming?.date }
+                .thenBy { it.pickupTiming?.windowStart }
+                .thenBy { it.sequenceNumber }
+        )
+        
+        return sortedTransports.map { transportDto -> PlanningTransportView(transportDto) }
             .groupBy { transportView -> transportView.truck }
             .map { (truck, transportViews) ->
-                // Group by pickup date
+                // Group by effective date (pickupDate already falls back to deliveryDate in PlanningTransportView)
                 val transportsByDate = transportViews.groupBy { it.pickupDate }
 
                 // Sort each group by sequence number (if available)
@@ -73,6 +81,7 @@ class PlanningService(
 
                 PlanningTransportsView(displayName, sortedTransportsByDate)
             }.toMutableList()
+    }
 
 
     private fun getMissingTrucks(transports: List<TransportDto>, truckId: String?): List<TruckDto> {
@@ -119,16 +128,21 @@ class PlanningService(
                 truck = entityManager.getReference(TruckDto::class.java, licensePlate)
             }
 
-            // Update the date while preserving the time of day
-            val currentDateTime = transport.pickupDateTime.atZone(TimeConfiguration.DISPLAY_ZONE_ID)
-            val newPickupDateTime = date.atTime(currentDateTime.toLocalTime())
-                .atZone(TimeConfiguration.DISPLAY_ZONE_ID)
-                .toInstant()
+            // Update the date while preserving the time of the timing constraint
+            val currentTiming = transport.pickupTiming
+            val newPickupTiming = currentTiming?.let {
+                TimingConstraintDto(
+                    date = java.time.LocalDate.of(date.year, date.monthValue, date.dayOfMonth),
+                    mode = it.mode,
+                    windowStart = it.windowStart,
+                    windowEnd = it.windowEnd
+                )
+            }
 
             transport.copy(
                 truck = truck,
-                pickupDateTime = newPickupDateTime,
-                deliveryDateTime = transport.deliveryDateTime,
+                pickupTiming = newPickupTiming,
+                deliveryTiming = transport.deliveryTiming,
                 sequenceNumber = index,
             )
         }
@@ -139,12 +153,13 @@ class PlanningService(
 
 
     fun getPlanningByDriver(driverId: UUID, startDate: LocalDate, endDate: LocalDate): DriverPlanning {
-        return transportRepository.findByDriverIdAndPickupDateTimeIsBetween(
+        return transportRepository.findByDriverIdAndPickupTimingDateBetween(
             driverId,
-            startDate.atStartOfDay().atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant(),
-            endDate.atTime(23, 59, 59).atZone(TimeConfiguration.DISPLAY_ZONE_ID).toInstant()
+            startDate,
+            endDate
         )
-            .groupBy { it.pickupDateTime.toDisplayLocalDate() }
+            .filter { it.pickupTiming?.date != null || it.deliveryTiming?.date != null }
+            .groupBy { (it.pickupTiming?.date ?: it.deliveryTiming?.date)!! }
             .mapValues { (_, transportsByDate) ->
                 transportsByDate
                     .groupBy { it.truck?.licensePlate ?: "Niet toegewezen" }

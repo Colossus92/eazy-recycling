@@ -17,20 +17,32 @@
 /**
  * 
  * @export
- * @interface CreateFromWeightTicketResponse
+ * @interface TimingConstraintView
  */
-export interface CreateFromWeightTicketResponse {
+export interface TimingConstraintView {
     /**
      * 
      * @type {string}
-     * @memberof CreateFromWeightTicketResponse
+     * @memberof TimingConstraintView
      */
-    'transportId': string;
+    'date': string;
     /**
      * 
      * @type {string}
-     * @memberof CreateFromWeightTicketResponse
+     * @memberof TimingConstraintView
      */
-    'displayNumber': string;
+    'mode': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TimingConstraintView
+     */
+    'windowStart'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TimingConstraintView
+     */
+    'windowEnd'?: string;
 }
 

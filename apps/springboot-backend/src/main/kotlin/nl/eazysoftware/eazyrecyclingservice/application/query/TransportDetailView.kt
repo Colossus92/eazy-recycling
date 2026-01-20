@@ -7,6 +7,16 @@ import java.time.Instant
 import java.util.*
 
 /**
+ * View model for timing constraint details.
+ */
+data class TimingConstraintView(
+  val date: String,
+  val mode: String,
+  val windowStart: String?,
+  val windowEnd: String?
+)
+
+/**
  * View model for container transport details.
  * Flat structure for easy consumption by the frontend.
  */
@@ -16,9 +26,9 @@ data class TransportDetailView(
   val consignorParty: CompanyView,
   val carrierParty: CompanyView,
   val pickupLocation: PickupLocationView,
-  val pickupDateTime: String,
+  val pickupTiming: TimingConstraintView?,
   val deliveryLocation: PickupLocationView,
-  val deliveryDateTime: String?,
+  val deliveryTiming: TimingConstraintView?,
   val transportType: String,
   val status: TransportStatus,
   val truck: TruckView?,

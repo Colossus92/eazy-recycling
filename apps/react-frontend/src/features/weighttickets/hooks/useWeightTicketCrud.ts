@@ -30,6 +30,7 @@ export function useWeightTicketCrud() {
   const [copyResponse, setCopyResponse] = useState<CopyWeightTicketResponse | undefined>(undefined);
   const [itemToCreateTransport, setItemToCreateTransport] = useState<number | undefined>(undefined);
   const [createTransportResponse, setCreateTransportResponse] = useState<CreateFromWeightTicketResponse | undefined>(undefined);
+  const [createTransportPickupDateTime, setCreateTransportPickupDateTime] = useState<string | undefined>(undefined);
   const [createInvoiceResponse, setCreateInvoiceResponse] = useState<CreateInvoiceFromWeightTicketResult | undefined>(undefined);
   const [filters, setFilters] = useState<WeightTicketFilterParams>({ statuses: undefined });
   const [currentFilterFormValues, setCurrentFilterFormValues] = useState<WeightTicketFilterFormValues>({
@@ -230,8 +231,9 @@ export function useWeightTicketCrud() {
         deliveryDateTime
       );
     
-      // Store response for the component to handle toast
+      // Store response and pickup date for the component to handle toast
       setCreateTransportResponse(createResponse);
+      setCreateTransportPickupDateTime(pickupDateTime);
       setItemToCreateTransport(undefined);
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || 'Er is een fout opgetreden bij het aanmaken van transport';
@@ -335,10 +337,14 @@ export function useWeightTicketCrud() {
     createTransport: {
       item: itemToCreateTransport,
       response: createTransportResponse,
+      pickupDateTime: createTransportPickupDateTime,
       initiate: setItemToCreateTransport,
       confirm: createTransport,
       cancel: () => setItemToCreateTransport(undefined),
-      clearResponse: () => setCreateTransportResponse(undefined),
+      clearResponse: () => {
+        setCreateTransportResponse(undefined);
+        setCreateTransportPickupDateTime(undefined);
+      },
     },
     createInvoice: {
       response: createInvoiceResponse,

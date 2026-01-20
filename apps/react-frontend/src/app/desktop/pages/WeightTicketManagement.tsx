@@ -130,9 +130,9 @@ export const WeightTicketManagement = () => {
 
   // Handle transport creation response and show toast
   useEffect(() => {
-    if (createTransport.response) {
-      const pickupDate = new Date(createTransport.response.pickupDateTime);
-      const dateParam = format(pickupDate, 'yyyy-MM-dd');
+    if (createTransport.response && createTransport.pickupDateTime) {
+      // Extract date from pickupDateTime (format: YYYY-MM-DDTHH:mm)
+      const dateParam = createTransport.pickupDateTime.split('T')[0];
       
       const toastContent = (
         <div className="flex flex-col gap-1">

@@ -29,11 +29,17 @@ class ContainerTransport(
 
   val pickupLocation: Location,
 
-  val pickupDateTime: Instant,
-
   val deliveryLocation: Location,
 
-  val deliveryDateTime: Instant?,
+  /**
+   * Timing constraint for pickup (VRPTW support).
+   */
+  val pickupTimingConstraint: TimingConstraint? = null,
+
+  /**
+   * Timing constraint for delivery (VRPTW support).
+   */
+  val deliveryTimingConstraint: TimingConstraint? = null,
 
   val transportType: TransportType,
 
@@ -86,9 +92,7 @@ class ContainerTransport(
       consignorParty: CompanyId,
       carrierParty: CompanyId,
       pickupLocation: Location,
-      pickupDateTime: Instant,
       deliveryLocation: Location,
-      deliveryDateTime: Instant?,
       transportType: TransportType,
       wasteContainer: WasteContainerId?,
       containerOperation: ContainerOperation?,
@@ -99,6 +103,8 @@ class ContainerTransport(
       driverNote: Note?,
       updatedAt: Instant?,
       sequenceNumber: Int,
+      pickupTimingConstraint: TimingConstraint? = null,
+      deliveryTimingConstraint: TimingConstraint? = null,
     ): ContainerTransport {
       return ContainerTransport(
         transportId = TransportId.generate(),
@@ -106,9 +112,9 @@ class ContainerTransport(
         consignorParty = consignorParty,
         carrierParty = carrierParty,
         pickupLocation = pickupLocation,
-        pickupDateTime = pickupDateTime,
         deliveryLocation = deliveryLocation,
-        deliveryDateTime = deliveryDateTime,
+        pickupTimingConstraint = pickupTimingConstraint,
+        deliveryTimingConstraint = deliveryTimingConstraint,
         transportType = transportType,
         wasteContainer = wasteContainer,
         containerOperation = containerOperation,

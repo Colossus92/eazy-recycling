@@ -160,6 +160,9 @@ models/sync-preview-response.ts
 models/sync-preview-summary.ts
 models/taglib-descriptor.ts
 models/tenant-view.ts
+models/timing-constraint-dto.ts
+models/timing-constraint-request.ts
+models/timing-constraint-view.ts
 models/transport-detail-view.ts
 models/transport-dto.ts
 models/transport-finished-request.ts

@@ -3,6 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.transport
 import jakarta.persistence.EntityNotFoundException
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.GoodsItem
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingConstraint
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportType
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteTransports
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WeightTickets
@@ -56,15 +57,15 @@ class CreateWasteTransportFromWeightTicketService(
       )
     }
 
-    // Convert LocalDateTime to Instant using display timezone (CET/CEST)
-    val pickupInstant = cmd.pickupDateTime.toCetKotlinInstant()
-    val deliveryInstant = cmd.deliveryDateTime?.toCetKotlinInstant()
+    // Convert LocalDateTime to TimingConstraint using display timezone (CET/CEST)
+    val pickupConstraint = TimingConstraint.fromInstant(cmd.pickupDateTime.toCetKotlinInstant())
+    val deliveryConstraint = cmd.deliveryDateTime?.let { TimingConstraint.fromInstant(it.toCetKotlinInstant()) }
 
     // Create the WasteTransport using the existing use case
     val createCommand = CreateWasteTransportCommand(
       carrierParty = carrierParty,
-      pickupDateTime = pickupInstant,
-      deliveryDateTime = deliveryInstant,
+      pickupTimingConstraint = pickupConstraint,
+      deliveryTimingConstraint = deliveryConstraint,
       transportType = TransportType.WASTE,
       goods = goods,
       wasteContainer = null,

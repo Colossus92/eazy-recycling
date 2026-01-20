@@ -12,7 +12,6 @@ import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerDto
 import nl.eazysoftware.eazyrecyclingservice.repository.weightticket.WeightTicketDto
 import java.time.Instant
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -45,13 +44,27 @@ data class TransportDto(
   @JoinColumn(name = "pickup_location_id", referencedColumnName = "id")
   val pickupLocation: PickupLocationDto,
 
-  val pickupDateTime: Instant,
+  @Embedded
+  @AttributeOverrides(
+    AttributeOverride(name = "date", column = Column(name = "pickup_date")),
+    AttributeOverride(name = "mode", column = Column(name = "pickup_timing_mode")),
+    AttributeOverride(name = "windowStart", column = Column(name = "pickup_window_start")),
+    AttributeOverride(name = "windowEnd", column = Column(name = "pickup_window_end"))
+  )
+  val pickupTiming: TimingConstraintDto?,
 
   @OneToOne(cascade = [CascadeType.ALL])
   @JoinColumn(name = "delivery_location_id", referencedColumnName = "id")
   val deliveryLocation: PickupLocationDto,
 
-  val deliveryDateTime: Instant?,
+  @Embedded
+  @AttributeOverrides(
+    AttributeOverride(name = "date", column = Column(name = "delivery_date")),
+    AttributeOverride(name = "mode", column = Column(name = "delivery_timing_mode")),
+    AttributeOverride(name = "windowStart", column = Column(name = "delivery_window_start")),
+    AttributeOverride(name = "windowEnd", column = Column(name = "delivery_window_end"))
+  )
+  val deliveryTiming: TimingConstraintDto?,
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = true)

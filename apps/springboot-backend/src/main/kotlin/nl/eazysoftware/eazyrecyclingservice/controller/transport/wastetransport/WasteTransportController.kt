@@ -74,7 +74,6 @@ class WasteTransportController(
     return CreateFromWeightTicketResponse(
       transportId = result.transportId.uuid,
       displayNumber = result.displayNumber,
-      pickupDateTime = result.pickupDateTime,
     )
   }
 
@@ -89,7 +88,8 @@ class WasteTransportController(
         WeightTicketTransportsResponse.WeightTicketTransport(
           transportId = view.transportId,
           displayNumber = view.displayNumber,
-          pickupDateTime = view.pickupDateTime,
+          pickupDate = view.pickupDate,
+          deliveryDate = view.deliveryDate,
           status = view.status,
           weightTicketNumber = view.weightTicketNumber
         )
@@ -104,7 +104,8 @@ class WasteTransportController(
     data class WeightTicketTransport(
       val transportId: UUID,
       val displayNumber: String,
-      val pickupDateTime: LocalDateTime,
+      val pickupDate: String?,
+      val deliveryDate: String?,
       val status: String,
       val weightTicketNumber: Long
     )
@@ -150,7 +151,6 @@ data class CreateWasteTransportResponse(
 data class CreateFromWeightTicketResponse(
   val transportId: UUID,
   val displayNumber: String,
-  val pickupDateTime: LocalDateTime,
 )
 
 data class UpdateWasteTransportResponse(
@@ -165,18 +165,25 @@ data class CreateWasteTransportFromWeightTicketRequest(
 )
 
 /**
- * Extension function to map request to create command
+ * Extension function to map request to create command.
  */
 fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
   require(this.goods.isNotEmpty()) {
     "Afvalstroom is verplicht voor een afvaltransport, kies een afvalstroomnummer"
   }
 
+  val pickupConstraint = this.pickup?.toDomain()
+  val deliveryConstraint = this.delivery?.toDomain()
+
+  // At least one of pickup or delivery must be specified
+  require(pickupConstraint != null || deliveryConstraint != null) {
+    "Er moet minimaal een ophaalmoment of een aflevermoment worden opgegeven"
+  }
+
   return CreateWasteTransportCommand(
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant()
-      ?: Clock.System.now(),
+    pickupTimingConstraint = pickupConstraint,
+    deliveryTimingConstraint = deliveryConstraint,
     transportType = this.transportType,
     goods = this.goods.map {
       GoodsItem(
@@ -195,19 +202,26 @@ fun WasteTransportRequest.toCreateCommand(): CreateWasteTransportCommand {
 }
 
 /**
- * Extension function to map request to update command
+ * Extension function to map request to update command.
  */
 fun WasteTransportRequest.toUpdateCommand(transportId: UUID): UpdateWasteTransportCommand {
   require(this.goods.isNotEmpty()) {
     "Afvalstroomnummer is verplicht voor een afvaltransport"
   }
 
+  val pickupConstraint = this.pickup?.toDomain()
+  val deliveryConstraint = this.delivery?.toDomain()
+
+  // At least one of pickup or delivery must be specified
+  require(pickupConstraint != null || deliveryConstraint != null) {
+    "Er moet minimaal een ophaalmoment of een aflevermoment worden opgegeven"
+  }
+
   return UpdateWasteTransportCommand(
     transportId = TransportId(transportId),
     carrierParty = CompanyId(this.carrierPartyId),
-    pickupDateTime = this.pickupDateTime.toCetKotlinInstant(),
-    deliveryDateTime = this.deliveryDateTime?.toCetKotlinInstant()
-      ?: Clock.System.now(),
+    pickupTimingConstraint = pickupConstraint,
+    deliveryTimingConstraint = deliveryConstraint,
     transportType = this.transportType,
     goods = this.goods.map {
       GoodsItem(

@@ -1,11 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.transport
 
 import jakarta.persistence.EntityManager
-import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetKotlinInstant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.misc.Note
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.ContainerTransport
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.LicensePlate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TimingConstraint
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportDisplayNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.transport.TransportId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.user.UserId
@@ -13,14 +13,13 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.wastecontainer.WasteCon
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.repository.address.PickupLocationMapper
 import nl.eazysoftware.eazyrecyclingservice.repository.company.CompanyMapper
+import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TimingConstraintDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.transport.TransportDto
 import nl.eazysoftware.eazyrecyclingservice.repository.entity.user.ProfileDto
 import nl.eazysoftware.eazyrecyclingservice.repository.truck.TruckJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.repository.wastecontainer.WasteContainerJpaRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import java.time.ZoneId
-import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
 @Component
@@ -40,9 +39,7 @@ class ContainerTransportMapper(
       consignorParty = CompanyId(dto.consignorParty.id),
       carrierParty = CompanyId(dto.carrierParty.id),
       pickupLocation = pickupLocationMapper.toDomain(dto.pickupLocation),
-      pickupDateTime = dto.pickupDateTime.toKotlinInstant(),
       deliveryLocation = pickupLocationMapper.toDomain(dto.deliveryLocation),
-      deliveryDateTime = dto.deliveryDateTime?.toKotlinInstant(),
       transportType = dto.transportType,
       wasteContainer = dto.wasteContainer?.let { WasteContainerId(it.id) },
       containerOperation = dto.containerOperation,
@@ -55,7 +52,9 @@ class ContainerTransportMapper(
       createdBy = dto.createdBy,
       updatedAt = dto.updatedAt?.toKotlinInstant(),
       updatedBy = dto.updatedBy,
-      sequenceNumber = dto.sequenceNumber
+      sequenceNumber = dto.sequenceNumber,
+      pickupTimingConstraint = dto.pickupTiming?.toDomain(),
+      deliveryTimingConstraint = dto.deliveryTiming?.toDomain()
     )
   }
 
@@ -65,15 +64,18 @@ class ContainerTransportMapper(
     val carrierCompany = companies.findById(domain.carrierParty)
       ?: throw IllegalArgumentException("Carrier company not found: ${domain.carrierParty.uuid}")
 
+    val pickupTiming = domain.pickupTimingConstraint?.let { TimingConstraintDto.fromDomain(it) }
+    val deliveryTiming = domain.deliveryTimingConstraint?.let { TimingConstraintDto.fromDomain(it) }
+
     return TransportDto(
       id = domain.transportId.uuid,
       displayNumber = domain.displayNumber?.value,
       consignorParty = companyMapper.toDto(consignorCompany),
       carrierParty = companyMapper.toDto(carrierCompany),
       pickupLocation = pickupLocationMapper.toDto(domain.pickupLocation),
-      pickupDateTime = domain.pickupDateTime.toJavaInstant(),
+      pickupTiming = pickupTiming,
       deliveryLocation = pickupLocationMapper.toDto(domain.deliveryLocation),
-      deliveryDateTime = domain.deliveryDateTime?.toJavaInstant(),
+      deliveryTiming = deliveryTiming,
       transportType = domain.transportType,
       containerOperation = domain.containerOperation,
       wasteContainer = domain.wasteContainer?.let { containerRepository.findByIdOrNull(it.id) },

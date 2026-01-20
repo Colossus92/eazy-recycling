@@ -159,7 +159,8 @@ export const WeightTicketRelatedTab = ({
                 key={transport.transportId}
                 transportId={transport.transportId}
                 displayNumber={transport.displayNumber}
-                pickupDateTime={transport.pickupDateTime}
+                pickupDate={transport.pickupDate}
+                deliveryDate={transport.deliveryDate}
                 status={transport.status}
               />
             ))}
