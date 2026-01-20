@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 @Component
 class WasteStreamFactory(
   private val wasteStreams: WasteStreams,
-  private val numberGenerator: WasteStreamNumberGenerator = WasteStreamNumberGenerator(),
+  private val numberGenerator: WasteStreamNumberGenerator,
   private val companies: Companies,
   private val projectLocations: ProjectLocations
 ) {
@@ -49,8 +49,7 @@ class WasteStreamFactory(
   ): WasteStreamNumber {
     val wasteStreamNumber: WasteStreamNumber = when (processorId) {
       Tenant.processorPartyId -> {
-        val highestExisting = wasteStreams.findHighestNumberForProcessor(processorId)
-        numberGenerator.generateNext(processorId, highestExisting)
+        numberGenerator.generateNext()
       }
 
       else -> {

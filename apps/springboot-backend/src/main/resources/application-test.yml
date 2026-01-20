@@ -11,6 +11,8 @@ spring:
   sql:
     init:
       mode: always
+      data-locations: classpath:data.sql,classpath:functions.sql
+      separator: ";;"
   # Disable SSL configuration to prevent invalid SSL Bundle instantiation
   autoconfigure:
     exclude:

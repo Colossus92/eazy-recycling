@@ -1,133 +1,156 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
-import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumber
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumberGenerator
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamSequences
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class WasteStreamNumberGeneratorTest {
 
-    private val generator = WasteStreamNumberGenerator()
+    private val tenantProcessorId = Tenant.processorPartyId // "08797"
 
     @Test
-    fun `should generate first number when no existing numbers`() {
+    fun `should generate number with correct format using sequence value`() {
         // Given
-        val processorId = ProcessorPartyId("12345")
-        val highestExisting: WasteStreamNumber? = null
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 1L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("123450000001", result.number)
+        assertEquals("087970000001", result.number)
     }
 
     @Test
-    fun `should generate next sequential number`() {
+    fun `should pad sequence value to 7 digits`() {
         // Given
-        val processorId = ProcessorPartyId("12345")
-        val highestExisting = WasteStreamNumber("123450000012")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 42L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("123450000013", result.number)
+        assertEquals("087970000042", result.number)
     }
 
     @Test
     fun `should handle large sequential numbers with correct padding`() {
         // Given
-        val processorId = ProcessorPartyId("98765")
-        val highestExisting = WasteStreamNumber("987650009999")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 10000L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("987650010000", result.number)
-    }
-
-    @Test
-    fun `should maintain zero padding for small numbers`() {
-        // Given
-        val processorId = ProcessorPartyId("00001")
-        val highestExisting = WasteStreamNumber("000010000003")
-
-        // When
-        val result = generator.generateNext(processorId, highestExisting)
-
-        // Then
-        assertEquals("000010000004", result.number)
+        assertEquals("087970010000", result.number)
     }
 
     @Test
     fun `should handle maximum sequential number`() {
         // Given
-        val processorId = ProcessorPartyId("55555")
-        val highestExisting = WasteStreamNumber("555559999998")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 9999999L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("555559999999", result.number)
+        assertEquals("087979999999", result.number)
     }
 
     @Test
     fun `should throw exception when maximum sequential number exceeded`() {
         // Given
-        val processorId = ProcessorPartyId("55555")
-        val highestExisting = WasteStreamNumber("555559999999")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 10000000L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When / Then
         val exception = assertThrows<IllegalArgumentException> {
-            generator.generateNext(processorId, highestExisting)
+            generator.generateNext()
         }
 
-        assertEquals("Maximum aantal afvalstroomnummers bereikt voor verwerker 55555", exception.message)
+        assertEquals("Maximum aantal afvalstroomnummers bereikt voor verwerker ${tenantProcessorId.number}", exception.message)
     }
 
     @Test
     fun `should generate correct format with 12 digits total`() {
         // Given
-        val processorId = ProcessorPartyId("67890")
-        val highestExisting = WasteStreamNumber("678900000100")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 101L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
         assertEquals(12, result.number.length)
-        assertEquals("678900000101", result.number)
+        assertEquals("087970000101", result.number)
     }
 
     @Test
-    fun `should handle transition from 999999 to 1000000`() {
+    fun `should handle 7-digit sequence number without padding`() {
         // Given
-        val processorId = ProcessorPartyId("11111")
-        val highestExisting = WasteStreamNumber("111110999999")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 1000000L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("111111000000", result.number)
+        assertEquals("087971000000", result.number)
     }
 
     @Test
-    fun `generated number should start with processor ID`() {
+    fun `generated number should start with tenant processor ID`() {
         // Given
-        val processorId = ProcessorPartyId("24680")
-        val highestExisting = WasteStreamNumber("246800000042")
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId) = 43L
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
 
         // When
-        val result = generator.generateNext(processorId, highestExisting)
+        val result = generator.generateNext()
 
         // Then
-        assertEquals("24680", result.number.take(5))
-        assertEquals("246800000043", result.number)
+        assertEquals(tenantProcessorId.number, result.number.take(5))
+        assertEquals("087970000043", result.number)
+    }
+
+    @Test
+    fun `should pass tenant processor ID to sequence`() {
+        // Given
+        var capturedProcessorId: ProcessorPartyId? = null
+        val mockSequences = object : WasteStreamSequences {
+            override fun nextValue(processorId: ProcessorPartyId): Long {
+                capturedProcessorId = processorId
+                return 1000000L
+            }
+        }
+        val generator = WasteStreamNumberGenerator(mockSequences)
+
+        // When
+        generator.generateNext()
+
+        // Then
+        assertEquals(tenantProcessorId, capturedProcessorId)
     }
 }

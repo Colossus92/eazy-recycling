@@ -1,39 +1,39 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.waste
 
-import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamSequences
+import org.springframework.stereotype.Component
 
 /**
- * Domain service responsible for generating sequential waste stream numbers.
+ * Domain service responsible for generating sequential waste stream numbers
+ * for the current tenant only.
  *
  * Format: 12 digits total
- * - First 5 digits: processorId (from ProcessorPartyId)
+ * - First 5 digits: processorId (from current Tenant)
  * - Last 7 digits: sequential number (0000001 - 9999999)
  *
- * Example: For processorId "12345"
- * - First number:  123450000001
- * - Second number: 123450000002
+ * Example: For tenant processorId "08797"
+ * - First number:  087970000001
+ * - Second number: 087970000002
  * - etc.
+ *
+ * The sequence is managed in the database, allowing the tenant to have
+ * their own starting value to avoid collisions with external systems.
  */
-class WasteStreamNumberGenerator {
+@Component
+class WasteStreamNumberGenerator(
+  private val sequences: WasteStreamSequences
+) {
 
   /**
-   * Generates the next waste stream number for a given processor.
+   * Generates the next waste stream number for the current tenant.
+   * Uses a database sequence to ensure thread-safety and persistence.
    *
-   * @param processorId The 5-digit processor identification
-   * @param highestExistingNumber The highest sequential number already in use for this processor (null if none exist)
    * @return A new WasteStreamNumber with the next sequential value
    */
-  fun generateNext(
-    processorId: ProcessorPartyId,
-    highestExistingNumber: WasteStreamNumber?
-  ): WasteStreamNumber {
-    val nextSequentialNumber = if (highestExistingNumber == null) {
-      1L
-    } else {
-      // Extract the last 7 digits from the existing number
-      val sequentialPart = highestExistingNumber.number.substring(5).toLong()
-      sequentialPart + 1
-    }
+  fun generateNext(): WasteStreamNumber {
+    val processorId = Tenant.processorPartyId
+    val nextSequentialNumber = sequences.nextValue(processorId)
 
     require(nextSequentialNumber <= 9999999L) {
       "Maximum aantal afvalstroomnummers bereikt voor verwerker ${processorId.number}"

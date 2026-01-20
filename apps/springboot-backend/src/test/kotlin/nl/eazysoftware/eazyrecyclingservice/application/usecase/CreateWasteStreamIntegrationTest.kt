@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
@@ -45,6 +46,9 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
 
   @Autowired
   private lateinit var transactionTemplate: TransactionTemplate
+
+  @Autowired
+  private lateinit var jdbcTemplate: JdbcTemplate
 
   private lateinit var testCompany: CompanyDto
   private lateinit var tenantCompany: CompanyDto

@@ -1,4 +1,4 @@
-create schema if not exists "jobrunr";
+create schema if not exists "jobrunr";;
 
 create table if not exists companies (
                            id uuid not null,
@@ -25,13 +25,13 @@ create table if not exists companies (
                            last_modified_at timestamp with time zone not null default now(),
                            last_modified_by text,
                            primary key (id)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS company_roles (
                            company_id UUID NOT NULL,
                            roles TEXT NOT NULL,
                            CONSTRAINT fk_company_roles_company_id FOREIGN KEY (company_id) REFERENCES companies(id)
-);
+);;
 
 create table if not exists company_project_locations (
                          id uuid not null,
@@ -45,7 +45,7 @@ create table if not exists company_project_locations (
                          created_at timestamp with time zone not null default now(),
                          updated_at timestamp with time zone,
                          primary key (id)
-);
+);;
 
 
 create table if not exists drivers (
@@ -54,7 +54,7 @@ create table if not exists drivers (
                          first_name varchar(255) not null,
                          last_name varchar(255) not null,
                          primary key (id)
-);
+);;
 
 create table if not exists locations (
                            building_name varchar(255),
@@ -67,7 +67,7 @@ create table if not exists locations (
                            postal_code varchar(255),
                            street_name varchar(255),
                            primary key (id)
-);
+);;
 
 create table if not exists transports (
                           id uuid NOT NULL,
@@ -101,7 +101,7 @@ create table if not exists transports (
                           last_modified_at timestamp with time zone not null default now(),
                           last_modified_by text,
                           primary key (id)
-);
+);;
 
 create table if not exists trucks (
                         last_modified_at timestamp(6) not null,
@@ -113,7 +113,7 @@ create table if not exists trucks (
                         description text,
                         carrier_party_id uuid,
                         primary key (license_plate)
-);
+);;
 
 create table if not exists waste_containers (
                            id text,
@@ -124,7 +124,7 @@ create table if not exists waste_containers (
                            last_modified_at timestamp with time zone not null default now(),
                            last_modified_by text,
                            primary key (id)
-);
+);;
 
 create table if not exists waybills (
                           delivery_date_time timestamp(6),
@@ -142,20 +142,20 @@ create table if not exists waybills (
                           note varchar(255),
                           pickup_location_id varchar(255) unique,
                           primary key (uuid)
-);
+);;
 
 create table if not exists profiles (
                            id uuid not null,
                            first_name text not null,
                            last_name text not null
-);
+);;
 
 create table if not exists user_roles (
                                      id uuid not null,
                                      user_id uuid not null,
                                      role text not null,
                                      primary key (id)
-);
+);;
 
 create table if not exists signatures (
                                        transport_id uuid not null,
@@ -171,7 +171,7 @@ create table if not exists signatures (
                                        consignee_signature text,
                                        consignee_email text,
                                        consignee_signed_at timestamp with time zone
-);
+);;
 
 create table if not exists eural (
                                   code text not null,
@@ -180,7 +180,7 @@ create table if not exists eural (
                                   created_by text,
                                   last_modified_at timestamp with time zone not null default now(),
                                   last_modified_by text
-);
+);;
 
 create table if not exists processing_methods (
                                   code text not null,
@@ -189,7 +189,7 @@ create table if not exists processing_methods (
                                   created_by text,
                                   last_modified_at timestamp with time zone not null default now(),
                                   last_modified_by text
-);
+);;
 
 create table if not exists waste_streams (
                                   number text not null,
@@ -212,7 +212,7 @@ create table if not exists waste_streams (
                                   last_modified_at timestamp with time zone not null default now(),
                                   last_modified_by text,
                                   primary key (number)
-);
+);;
 
 create table if not exists transport_goods (
                                           "id" bigint generated by default as identity not null,
@@ -221,7 +221,7 @@ create table if not exists transport_goods (
                                           "quantity" integer not null,
                                           "unit" text,
                                           "waste_stream_number" text not null
-);
+);;
 create table if not exists pickup_locations (
                                  id text not null,
                                  name text,
@@ -236,9 +236,9 @@ create table if not exists pickup_locations (
                                  postal_code text,
                                  company_id uuid,
                                  primary key (id)
-);
+);;
 
-create sequence if not exists weight_tickets_id_seq start with 1 increment by 1;
+create sequence if not exists weight_tickets_id_seq start with 1 increment by 1;;
 
 create table if not exists weight_tickets (
                                  id uuid not null,
@@ -265,7 +265,7 @@ create table if not exists weight_tickets (
                                  last_modified_at timestamp with time zone not null default now(),
                                  last_modified_by text,
                                  primary key (id)
-);
+);;
 
 create table if not exists weight_ticket_lines (
                                  id uuid not null,
@@ -278,11 +278,11 @@ create table if not exists weight_ticket_lines (
                                  last_declared_at timestamp with time zone default null,
                                  primary key (id),
                                  constraint fk_weight_ticket_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id)
-);
+);;
 
 create index if not exists idx_weight_ticket_lines_declaration_state
   on weight_ticket_lines(declared_weight, last_declared_at)
-  where declared_weight is not null;
+  where declared_weight is not null;;
 
 create table if not exists weight_ticket_product_lines (
                                  id uuid not null,
@@ -292,7 +292,7 @@ create table if not exists weight_ticket_product_lines (
                                  unit text not null,
                                  primary key (id),
                                  constraint fk_weight_ticket_product_lines_weight_ticket foreign key (weight_ticket_id) references weight_tickets(id)
-);
+);;
 
 create table lma_declaration_sessions (
                                                    "id" uuid not null,
@@ -302,7 +302,7 @@ create table lma_declaration_sessions (
                                                    "errors" text[],
                                                    "created_at" timestamp with time zone not null,
                                                    "processed_at" timestamp with time zone
-);
+);;
 
 create table lma_declarations (
                                            "id" text not null unique,
@@ -318,7 +318,7 @@ create table lma_declarations (
                                            "status" text not null,
                                            "weight_ticket_ids" uuid[],
                                            constraint lma_declarations_amice_uuid_unique unique ("amice_uuid")
-);
+);;
 
 create table monthly_waste_declaration_jobs (
                                    id uuid not null,
@@ -327,9 +327,9 @@ create table monthly_waste_declaration_jobs (
                                    status text not null,
                                    created_at timestamp with time zone not null,
                                    fulfilled_at timestamp with time zone
-);
+);;
 
-create sequence if not exists receival_declaration_id_seq start with 1 increment by 1 maxvalue 999999999999;
+create sequence if not exists receival_declaration_id_seq start with 1 increment by 1 maxvalue 999999999999;;
 
 create table if not exists vat_rates (
                                          vat_code text not null,
@@ -343,7 +343,7 @@ create table if not exists vat_rates (
                                          last_modified_at timestamp with time zone not null default now(),
                                          last_modified_by text,
                                          primary key (vat_code)
-);
+);;
 
 create table if not exists exact_tokens (
                                             id uuid not null,
@@ -354,7 +354,7 @@ create table if not exists exact_tokens (
                                             created_at timestamp with time zone not null default now(),
                                             updated_at timestamp with time zone not null default now(),
                                             primary key (id)
-);
+);;
 
 create table if not exists companies_sync (
                                                id uuid not null,
@@ -373,7 +373,7 @@ create table if not exists companies_sync (
                                                deleted_locally_at timestamp with time zone,
                                                primary key (id),
                                                foreign key (company_id) references companies(id)
-);
+);;
 
 create table if not exists companies_sync_cursor (
                                                id uuid not null,
@@ -383,7 +383,7 @@ create table if not exists companies_sync_cursor (
                                                updated_at timestamp with time zone not null,
                                                primary key (id),
                                                unique (entity, cursor_type)
-);
+);;
 
 create table if not exists lma_import_errors (
                                                id uuid not null,
@@ -397,7 +397,7 @@ create table if not exists lma_import_errors (
                                                resolved_at timestamp with time zone,
                                                resolved_by text,
                                                primary key (id)
-);
+);;
 
 create table if not exists catalog_item_categories (
                                           id uuid not null,
@@ -410,7 +410,7 @@ create table if not exists catalog_item_categories (
                                           last_modified_at timestamp with time zone not null default now(),
                                           last_modified_by text,
                                           primary key (id)
-);
+);;
 
 create table if not exists catalog_items (
                                           id uuid not null,
@@ -432,7 +432,7 @@ create table if not exists catalog_items (
                                           primary key (id),
                                           foreign key (category_id) references catalog_item_categories(id),
                                           foreign key (vat_code) references vat_rates(vat_code)
-);
+);;
 
 -- Material pricing app sync tables
 create table if not exists material_pricing_app_sync (
@@ -449,7 +449,7 @@ create table if not exists material_pricing_app_sync (
                                                last_modified_by text,
                                                primary key (id),
                                                foreign key (material_id) references catalog_items(id) on delete cascade
-);
+);;
 
 create table if not exists material_price_sync_log (
                                                id bigint generated always as identity,
@@ -464,7 +464,7 @@ create table if not exists material_price_sync_log (
                                                synced_by text,
                                                primary key (id),
                                                foreign key (material_id) references catalog_items(id)
-);
+);;
 
 -- Invoice tables
 create table if not exists invoices (
@@ -497,7 +497,7 @@ create table if not exists invoices (
                                           primary key (id),
                                           foreign key (customer_company_id) references companies(id),
                                           foreign key (original_invoice_id) references invoices(id)
-);
+);;
 
 create table if not exists invoice_lines (
                                           id uuid not null,
@@ -521,9 +521,9 @@ create table if not exists invoice_lines (
                                          foreign key (invoice_id) references invoices(id) on delete cascade,
                                          foreign key (catalog_item_id) references catalog_items(id),
                                          unique (invoice_id, line_number)
-);
+);;
 
-CREATE SEQUENCE IF NOT EXISTS edge_function_outbox_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE IF NOT EXISTS edge_function_outbox_id_seq START WITH 1 INCREMENT BY 1;;
 
 CREATE TABLE IF NOT EXISTS edge_function_outbox (
     id bigint not null default nextval('edge_function_outbox_id_seq'),
@@ -542,12 +542,12 @@ CREATE TABLE IF NOT EXISTS edge_function_outbox (
     constraint chk_function_name check (function_name in ('INVOICE_PDF_GENERATOR')),
     constraint chk_http_method check (http_method in ('GET', 'POST', 'PUT', 'DELETE')),
     constraint chk_status check (status in ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED'))
-);
+);;
 
-CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_status ON edge_function_outbox(status);
-CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_created_at ON edge_function_outbox(created_at);
+CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_status ON edge_function_outbox(status);;
+CREATE INDEX IF NOT EXISTS idx_edge_function_outbox_created_at ON edge_function_outbox(created_at);;
 
 CREATE TABLE IF NOT EXISTS invoice_number_sequences (
     year int not null primary key,
     last_sequence bigint not null default 0
-);
+);;

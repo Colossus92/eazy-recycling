@@ -29,7 +29,7 @@ dergelijke batterijen en accu''s bevatten'),
        ('16 06 02*', 'NiCd-batterijen'),
        ('19 12 10', 'brandbaar afval (RDF)'),
        ('19 12 11*', 'overig afval (inclusief mengsels van materialen) van mechanische afvalverwerking dat gevaarlijke stoffen bevat'),
-       ('19 12 12 o', 'overig, niet onder 19 12 11 vallend afval (inclusief mengsels van materialen) van mechanische afvalverwerking');
+       ('19 12 12 o', 'overig, niet onder 19 12 11 vallend afval (inclusief mengsels van materialen) van mechanische afvalverwerking');;
 
 INSERT INTO processing_methods (code, description)
 VALUES ('A.01', 'Bewaren'),
@@ -62,7 +62,7 @@ VALUES ('A.01', 'Bewaren'),
        ('F.06', 'Verbranden met terugwinnen materiaal (chloor, zwavel ..)'),
        ('F.07', 'Verbranden met terugwinnen energie (bijstoken)'),
        ('G.01', 'Direct storten'),
-       ('G.02', 'Immobiliseren');
+       ('G.02', 'Immobiliseren');;
 
 INSERT INTO companies ("id", "name", "chamber_of_commerce_id", "street_name", "postal_code", "city", "vihb_id", "building_number_addition", "building_number", "country", "processor_id")
-VALUES ('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '85217463', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', null, '8', 'Nederland', '11987');
+VALUES ('6a683b2a-96d6-454c-8cae-4a7e2a03f249', 'Eazy Recycling', '85217463', 'Straat', '1234 AB', 'Rotterdam', '123456VIXX', null, '8', 'Nederland', '11987');;
