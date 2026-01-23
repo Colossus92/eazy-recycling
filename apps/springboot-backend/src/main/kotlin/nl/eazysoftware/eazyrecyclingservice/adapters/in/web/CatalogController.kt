@@ -4,6 +4,7 @@ import nl.eazysoftware.eazyrecyclingservice.application.query.CatalogQueryServic
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
+import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,10 +25,11 @@ class CatalogController(
     @RequestParam(required = false) query: String?,
     @RequestParam(required = false) consignorPartyId: UUID?,
     @RequestParam(required = false) type: CatalogItemType?,
+    @RequestParam(required = false) invoiceType: InvoiceType?,
   ): List<CatalogItemResponse> {
     return catalogQueryService.getCatalogItems(consignorPartyId, query)
       .filter { if (type == null) true else it.itemType == type }
-      .map { it.toResponse() }
+      .map { it.toResponse(invoiceType) }
   }
 }
 
@@ -50,23 +52,31 @@ data class CatalogItemResponse(
   val defaultPrice: BigDecimal?,
 )
 
-fun CatalogItem.toResponse() = CatalogItemResponse(
-  // For WASTE_STREAM, use the waste stream number as unique ID; otherwise use catalog item UUID
-  id = if (itemType == CatalogItemType.WASTE_STREAM && wasteStreamNumber != null) 
-         wasteStreamNumber.number 
-       else 
-         id.toString(),
-  itemType = itemType,
-  catalogItemId = id,  // Always the catalog item UUID for billing
-  code = code,
-  name = name,
-  unitOfMeasure = unitOfMeasure,
-  vatCode = vatCode,
-  vatPercentage = vatPercentage,
-  categoryName = categoryName,
-  consignorPartyId = consignorPartyId?.uuid,
-  purchaseAccountNumber = purchaseAccountNumber,
-  salesAccountNumber = salesAccountNumber,
-  wasteStreamNumber = wasteStreamNumber?.number,
-  defaultPrice = defaultPrice,
-)
+fun CatalogItem.toResponse(invoiceType: InvoiceType? = null): CatalogItemResponse {
+  // For purchase invoices, only PRODUCT prices should be negative (money owed TO the supplier)
+  val priceMultiplier = if (invoiceType == InvoiceType.PURCHASE && itemType == CatalogItemType.PRODUCT) 
+    BigDecimal.ONE.negate() 
+  else 
+    BigDecimal.ONE
+
+  return CatalogItemResponse(
+    // For WASTE_STREAM, use the waste stream number as unique ID; otherwise use catalog item UUID
+    id = if (itemType == CatalogItemType.WASTE_STREAM && wasteStreamNumber != null) 
+           wasteStreamNumber.number 
+         else 
+           id.toString(),
+    itemType = itemType,
+    catalogItemId = id,  // Always the catalog item UUID for billing
+    code = code,
+    name = name,
+    unitOfMeasure = unitOfMeasure,
+    vatCode = vatCode,
+    vatPercentage = vatPercentage,
+    categoryName = categoryName,
+    consignorPartyId = consignorPartyId?.uuid,
+    purchaseAccountNumber = purchaseAccountNumber,
+    salesAccountNumber = salesAccountNumber,
+    wasteStreamNumber = wasteStreamNumber?.number,
+    defaultPrice = defaultPrice?.multiply(priceMultiplier),
+  )
+}

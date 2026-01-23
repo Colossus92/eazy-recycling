@@ -766,4 +766,140 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         )
             .andExpect(status().isBadRequest)
     }
+
+    @Test
+    fun `should negate PRODUCT prices on invoice for INBOUND (PURCHASE) weight ticket`() {
+        // Given - create an INBOUND weight ticket with both material and product lines
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            direction = "INBOUND", // PURCHASE invoice
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testMaterialCatalogItem.id // defaultPrice = 5.00
+                )
+            ),
+            productLines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketProductLine(
+                    catalogItemId = testProductCatalogItem.id, // defaultPrice = 15.00
+                    quantity = "2.00",
+                    unit = "st"
+                )
+            )
+        )
+
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // Complete the weight ticket
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+            .andExpect(status().isNoContent)
+
+        // When - create invoice from weight ticket
+        val invoiceResult = securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val response = objectMapper.readTree(invoiceResult.response.contentAsString)
+        val invoiceId = UUID.fromString(response.get("invoiceId").asText())
+
+        // Then - verify invoice was created with correct price signs
+        val savedInvoice = invoiceRepository.findById(invoiceId)
+        assertThat(savedInvoice).isPresent
+        val invoice = savedInvoice.get()
+        
+        // Invoice should be PURCHASE type
+        assertThat(invoice.invoiceType.name).isEqualTo("PURCHASE")
+        
+        // Should have 2 lines (1 material + 1 product)
+        assertThat(invoice.lines).hasSize(2)
+        
+        // Material line should have POSITIVE price (5.00)
+        val materialLine = invoice.lines.find { it.catalogItemType == CatalogItemType.MATERIAL }
+        assertThat(materialLine).isNotNull
+        assertThat(materialLine!!.unitPrice).isEqualByComparingTo(BigDecimal("5.00"))
+        assertThat(materialLine.totalExclVat).isEqualByComparingTo(BigDecimal("500.00")) // 100 * 5.00
+        
+        // Product line should have NEGATIVE price (-15.00)
+        val productLine = invoice.lines.find { it.catalogItemType == CatalogItemType.PRODUCT }
+        assertThat(productLine).isNotNull
+        assertThat(productLine!!.unitPrice).isEqualByComparingTo(BigDecimal("-15.00"))
+        assertThat(productLine.totalExclVat).isEqualByComparingTo(BigDecimal("-30.00")) // 2 * -15.00
+    }
+
+    @Test
+    fun `should NOT negate PRODUCT prices on invoice for OUTBOUND (SALE) weight ticket`() {
+        // Given - create an OUTBOUND weight ticket with both material and product lines
+        val weightTicketRequest = TestWeightTicketFactory.createTestWeightTicketRequest(
+            consignorCompanyId = testConsignorCompany.id,
+            direction = "OUTBOUND", // SALE invoice
+            lines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketLine(
+                    wasteStreamNumber = "123456789012",
+                    weightValue = "100.00",
+                    catalogItemId = testMaterialCatalogItem.id // defaultPrice = 5.00
+                )
+            ),
+            productLines = listOf(
+                TestWeightTicketFactory.createTestWeightTicketProductLine(
+                    catalogItemId = testProductCatalogItem.id, // defaultPrice = 15.00
+                    quantity = "2.00",
+                    unit = "st"
+                )
+            )
+        )
+
+        val createResult = securedMockMvc.post(
+            "/weight-tickets",
+            objectMapper.writeValueAsString(weightTicketRequest)
+        )
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val weightTicketId = objectMapper.readTree(createResult.response.contentAsString)
+            .get("id").asLong()
+
+        // Complete the weight ticket
+        securedMockMvc.post("/weight-tickets/${weightTicketId}/complete", "")
+            .andExpect(status().isNoContent)
+
+        // When - create invoice from weight ticket
+        val invoiceResult = securedMockMvc.post("/weight-tickets/${weightTicketId}/invoice", "")
+            .andExpect(status().isCreated)
+            .andReturn()
+
+        val response = objectMapper.readTree(invoiceResult.response.contentAsString)
+        val invoiceId = UUID.fromString(response.get("invoiceId").asText())
+
+        // Then - verify invoice was created with all positive prices
+        val savedInvoice = invoiceRepository.findById(invoiceId)
+        assertThat(savedInvoice).isPresent
+        val invoice = savedInvoice.get()
+        
+        // Invoice should be SALE type
+        assertThat(invoice.invoiceType.name).isEqualTo("SALE")
+        
+        // Should have 2 lines (1 material + 1 product)
+        assertThat(invoice.lines).hasSize(2)
+        
+        // Material line should have POSITIVE price (5.00)
+        val materialLine = invoice.lines.find { it.catalogItemType == CatalogItemType.MATERIAL }
+        assertThat(materialLine).isNotNull
+        assertThat(materialLine!!.unitPrice).isEqualByComparingTo(BigDecimal("5.00"))
+        assertThat(materialLine.totalExclVat).isEqualByComparingTo(BigDecimal("500.00")) // 100 * 5.00
+        
+        // Product line should also have POSITIVE price (15.00) for SALE invoices
+        val productLine = invoice.lines.find { it.catalogItemType == CatalogItemType.PRODUCT }
+        assertThat(productLine).isNotNull
+        assertThat(productLine!!.unitPrice).isEqualByComparingTo(BigDecimal("15.00"))
+        assertThat(productLine.totalExclVat).isEqualByComparingTo(BigDecimal("30.00")) // 2 * 15.00
+    }
 }

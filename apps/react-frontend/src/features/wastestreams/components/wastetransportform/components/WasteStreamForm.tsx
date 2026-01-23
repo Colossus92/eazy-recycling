@@ -11,7 +11,7 @@ import { useWasteStreamForm } from '../hooks/useWasteStreamFormHook';
 import { WasteStreamFormRouteSection } from './WasteStreamFormRouteSection';
 import { WasteStreamFormGoodsSection } from './WasteStreamFormGoodsSection';
 import { Note } from '@/features/planning/components/note/Note';
-import { ValidationError } from '@/api/client/models/validation-error';
+import { ValidationErrorResponse } from '@/api/client/models/validation-error-response';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
 
 interface WasteStreamFormProps {
@@ -35,9 +35,9 @@ export const WasteStreamForm = ({
     resetForm,
   } = useWasteStreamForm(wasteStreamNumber, () => setIsOpen(false));
 
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
-    []
-  );
+  const [validationErrors, setValidationErrors] = useState<
+    ValidationErrorResponse[]
+  >([]);
   const isSubmitting = draftMutation.isPending || validateMutation.isPending;
 
   const {
@@ -147,12 +147,14 @@ export const WasteStreamForm = ({
                         note={
                           <>
                             <strong>{error.code}</strong>:{' '}
-                            {error.description.split('\n').map((line, i, arr) => (
-                              <span key={i}>
-                                {line}
-                                {i < arr.length - 1 && <br />}
-                              </span>
-                            ))}
+                            {error.description
+                              .split('\n')
+                              .map((line: string, i: number, arr: string[]) => (
+                                <span key={i}>
+                                  {line}
+                                  {i < arr.length - 1 && <br />}
+                                </span>
+                              ))}
                           </>
                         }
                       />

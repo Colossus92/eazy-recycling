@@ -29,6 +29,7 @@ interface InvoiceFormProps {
   invoiceId?: string;
   onComplete: () => void;
   onDelete: (id: string) => void;
+  onCopy?: (id: string) => void;
 }
 
 export const InvoiceForm = ({
@@ -37,6 +38,7 @@ export const InvoiceForm = ({
   invoiceId,
   onComplete,
   onDelete,
+  onCopy,
 }: InvoiceFormProps) => {
   const {
     formContext,
@@ -365,6 +367,12 @@ export const InvoiceForm = ({
                     }
                   }}
                   onCreateCredit={handleCreateCreditInvoice}
+                  onCopy={() => {
+                    const idToCopy = currentInvoiceId ?? invoiceId;
+                    if (idToCopy && onCopy) {
+                      onCopy(idToCopy);
+                    }
+                  }}
                   isReadOnly={isReadOnly}
                   isCreditNote={isCreditNote}
                 />
@@ -438,6 +446,11 @@ export const InvoiceForm = ({
                         <InvoiceLinesSection
                           isReadOnly={isReadOnly}
                           isCreditNote={isCreditNote}
+                          invoiceType={
+                            formContext.watch('invoiceType') as
+                              | 'PURCHASE'
+                              | 'SALE'
+                          }
                         />
                       </div>
                     </TabPanel>

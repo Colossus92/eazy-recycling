@@ -112,7 +112,7 @@ class GetInvoiceByIdQuery(
             tenant = TenantView(
               processorPartyId = Tenant.processorPartyId.number,
               companyName = Tenant.companyName,
-              financialEmail = Tenant.financialEmail
+              financialEmail = Tenant.getFinancialEmailForInvoiceType(invoice.invoiceType)
             ),
             createdAt = invoice.createdAt.toString(),
             createdBy = invoice.createdBy,

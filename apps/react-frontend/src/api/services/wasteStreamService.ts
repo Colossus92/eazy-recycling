@@ -1,9 +1,12 @@
 import { apiInstance } from './apiInstance';
-import { WasteStreamControllerApi, WasteStreamRequest } from '../client';
-import { WasteStreamDto } from '../client/models/waste-stream-dto';
+import {
+  WasteStreamControllerApi,
+  WasteStreamListView,
+  WasteStreamRequest,
+} from '../client';
 
 const wasteStreamApi = new WasteStreamControllerApi(apiInstance.config);
-export type WasteStream = WasteStreamDto;
+export type WasteStream = WasteStreamListView;
 
 export const wasteStreamService = {
   getAll: (consignor?: string, status?: string) =>

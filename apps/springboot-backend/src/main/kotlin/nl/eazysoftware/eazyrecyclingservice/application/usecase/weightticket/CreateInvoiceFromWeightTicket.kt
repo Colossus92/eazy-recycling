@@ -72,7 +72,13 @@ class CreateInvoiceFromWeightTicketService(
         )
 
         val allCatalogItems = catalogItems.findAll(null, null)
-        
+
+        // Determine invoice type early to apply correct price sign
+        val invoiceType = when(weightTicket.direction) {
+            WeightTicketDirection.INBOUND -> InvoiceType.PURCHASE
+            WeightTicketDirection.OUTBOUND -> InvoiceType.SALE
+        }
+
         // Create invoice lines from weight ticket lines (materials/waste streams)
         val materialInvoiceLines = weightTicket.lines.getLines().mapIndexed { index, weightTicketLine ->
             val catalogItem = allCatalogItems.find { it.id == weightTicketLine.catalogItemId }
@@ -106,7 +112,9 @@ class CreateInvoiceFromWeightTicketService(
             )
         }
 
-        // Create invoice lines from weight ticket product lines
+
+        // For purchase invoices, product prices should be negative (money owed TO the supplier)
+        val productPriceMultiplier = if (invoiceType == InvoiceType.PURCHASE) BigDecimal.ONE.negate() else BigDecimal.ONE
         val startLineNumber = materialInvoiceLines.size + 1
         val productInvoiceLines = weightTicket.productLines.getLines().mapIndexed { index, productLine ->
             val catalogItem = allCatalogItems.find { it.id == productLine.catalogItemId }
@@ -116,7 +124,7 @@ class CreateInvoiceFromWeightTicketService(
                 ?: throw IllegalArgumentException("BTW code niet gevonden: ${catalogItem.vatCode}")
 
             val quantity = productLine.quantity
-            val unitPrice = catalogItem.defaultPrice ?: BigDecimal.ZERO
+            val unitPrice = (catalogItem.defaultPrice ?: BigDecimal.ZERO).multiply(productPriceMultiplier)
             val totalExclVat = quantity.multiply(unitPrice)
             val vatPercentage = BigDecimal(vatRate.percentage)
 
@@ -146,10 +154,7 @@ class CreateInvoiceFromWeightTicketService(
         val invoice = Invoice(
             id = invoiceId,
             invoiceNumber = null,
-            invoiceType = when(weightTicket.direction) {
-              WeightTicketDirection.INBOUND -> InvoiceType.PURCHASE
-              WeightTicketDirection.OUTBOUND -> InvoiceType.SALE
-            },
+            invoiceType = invoiceType,
             documentType = InvoiceDocumentType.INVOICE,
             status = InvoiceStatus.DRAFT,
             invoiceDate = LocalDate.now(),

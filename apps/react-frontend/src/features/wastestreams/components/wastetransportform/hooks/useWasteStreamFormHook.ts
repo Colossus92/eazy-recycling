@@ -8,7 +8,7 @@ import {
   WasteStreamRequest,
 } from '@/api/client';
 import { wasteStreamService } from '@/api/services/wasteStreamService.ts';
-import { WasteStreamDetailViewConsignorParty } from '@/api/client/models/waste-stream-detail-view-consignor-party';
+import { WeightTicketDetailViewConsignorParty } from '@/api/client/models/weight-ticket-detail-view-consignor-party';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
 import {
   locationFormValueToPickupLocationRequest,
@@ -214,8 +214,8 @@ export function useWasteStreamForm(
  * Type guard to check if consignorParty is a company
  */
 const isCompanyConsignor = (
-  consignorParty: WasteStreamDetailViewConsignorParty
-): consignorParty is WasteStreamDetailViewConsignorParty & {
+  consignorParty: WeightTicketDetailViewConsignorParty
+): consignorParty is WeightTicketDetailViewConsignorParty & {
   type: 'company';
   company: CompanyView;
 } => {
@@ -226,7 +226,7 @@ const isCompanyConsignor = (
  * Resolves the consignorParty to CompanyView when it's of type company
  */
 const resolveConsignorCompany = (
-  consignorParty: WasteStreamDetailViewConsignorParty
+  consignorParty: WeightTicketDetailViewConsignorParty
 ): CompanyView | null => {
   if (isCompanyConsignor(consignorParty)) {
     return (consignorParty as any).company;

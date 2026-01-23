@@ -36,6 +36,7 @@ interface InvoiceLineRowProps {
   consignorPartyId?: string;
   isReadOnly?: boolean;
   isCreditNote?: boolean;
+  invoiceType?: 'PURCHASE' | 'SALE';
 }
 
 const InvoiceLineRow = ({
@@ -47,6 +48,7 @@ const InvoiceLineRow = ({
   consignorPartyId,
   isReadOnly = false,
   isCreditNote = false,
+  invoiceType,
 }: InvoiceLineRowProps) => {
   const {
     register,
@@ -103,6 +105,7 @@ const InvoiceLineRow = ({
           update={handleCatalogUpdate}
           errors={errors}
           disabled={isReadOnly}
+          invoiceType={invoiceType}
         />
       </td>
       <td className="p-2">
@@ -169,11 +172,13 @@ const InvoiceLineRow = ({
 interface InvoiceLinesSectionProps {
   isReadOnly?: boolean;
   isCreditNote?: boolean;
+  invoiceType?: 'PURCHASE' | 'SALE';
 }
 
 export const InvoiceLinesSection = ({
   isReadOnly = false,
   isCreditNote = false,
+  invoiceType,
 }: InvoiceLinesSectionProps) => {
   const formContext = useFormContext<InvoiceFormValues>();
   const { control } = formContext;
@@ -186,8 +191,9 @@ export const InvoiceLinesSection = ({
   const lines = useWatch({ control, name: 'lines' });
   const customerId = useWatch({ control, name: 'customerId' });
 
-  // Track previous customerId to detect changes
+  // Track previous customerId and invoiceType to detect changes
   const previousCustomerIdRef = useRef<string | undefined>(undefined);
+  const previousInvoiceTypeRef = useRef<string | undefined>(undefined);
   const isInitialMount = useRef(true);
 
   // When customerId changes, reset invoice lines
@@ -196,6 +202,7 @@ export const InvoiceLinesSection = ({
     if (isInitialMount.current) {
       isInitialMount.current = false;
       previousCustomerIdRef.current = customerId;
+      previousInvoiceTypeRef.current = invoiceType;
       return;
     }
 
@@ -227,6 +234,35 @@ export const InvoiceLinesSection = ({
 
     previousCustomerIdRef.current = customerId;
   }, [customerId, fields, formContext, remove, append]);
+
+  // When invoiceType changes, negate only PRODUCT line prices
+  useEffect(() => {
+    // Skip if no previous value or same value
+    if (
+      previousInvoiceTypeRef.current === undefined ||
+      previousInvoiceTypeRef.current === invoiceType
+    ) {
+      previousInvoiceTypeRef.current = invoiceType;
+      return;
+    }
+
+    // Negate only PRODUCT line prices when switching between PURCHASE and SALE
+    const currentLines = formContext.getValues('lines');
+    currentLines.forEach((line, index) => {
+      // Only negate prices for PRODUCT type items
+      if (line.catalogItemType === 'PRODUCT') {
+        const currentPrice = parseNumber(line.unitPrice);
+        if (currentPrice !== 0) {
+          formContext.setValue(
+            `lines.${index}.unitPrice`,
+            String(-currentPrice)
+          );
+        }
+      }
+    });
+
+    previousInvoiceTypeRef.current = invoiceType;
+  }, [invoiceType, formContext]);
 
   const totals = useMemo(() => {
     let totalExclVat = 0;
@@ -267,6 +303,7 @@ export const InvoiceLinesSection = ({
     formContext.setValue(`lines.${index}`, {
       ...currentLine,
       catalogItemName: item.name,
+      catalogItemType: item.itemType as 'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM',
       unitOfMeasure: item.unitOfMeasure || '',
       unitPrice: String(item.defaultPrice ?? 0),
       vatPercentage: String(item.vatPercentage ?? 21),
@@ -323,6 +360,7 @@ export const InvoiceLinesSection = ({
                   consignorPartyId={customerId}
                   isReadOnly={isReadOnly}
                   isCreditNote={isCreditNote}
+                  invoiceType={invoiceType}
                 />
               ))}
             </tbody>

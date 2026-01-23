@@ -51,4 +51,8 @@ export const invoiceService = {
   createCredit: (id: string, request: CreateCreditInvoiceRequest) => {
     return invoiceApi.createCredit(id, request).then((r) => r.data);
   },
+
+  copy: (id: string): Promise<InvoiceResult> => {
+    return invoiceApi.copy1(id).then((r) => r.data);
+  },
 };

@@ -13,6 +13,7 @@ export interface InvoiceLineFormValue {
   id?: string;
   catalogItemId: string;
   catalogItemName: string;
+  catalogItemType?: 'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM';
   date: string;
   description: string;
   quantity: string;

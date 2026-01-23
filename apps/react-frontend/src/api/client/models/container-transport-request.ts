@@ -37,7 +37,7 @@ export interface ContainerTransportRequest {
      * @type {TimingConstraintRequest}
      * @memberof ContainerTransportRequest
      */
-    'pickup': TimingConstraintRequest;
+    'pickup'?: TimingConstraintRequest;
     /**
      * 
      * @type {TimingConstraintRequest}

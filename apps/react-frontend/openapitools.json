@@ -15,7 +15,9 @@
           "withSeparateModelsAndApi": "true"
         },
         "schemaMappings": {
-          "HttpStatus": "HttpStatusEnum"
+          "HttpStatus": "object",
+          "HttpStatusCode": "object",
+          "DefaultHttpStatusCode": "object"
         }
       }
     }

@@ -9,8 +9,10 @@ import {
   WasteTransportControllerApi,
   WasteTransportRequest,
 } from '@/api/client';
-import { ContainerTransportRequest } from '@/api/client/models/container-transport-request';
-import { CreateContainerTransportRequestContainerOperationEnum } from '@/api/client/models/create-container-transport-request';
+import {
+  ContainerTransportRequest,
+  ContainerTransportRequestContainerOperationEnum,
+} from '@/api/client/models/container-transport-request';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import {
   locationFormValueToPickupLocationRequest,
@@ -156,17 +158,21 @@ export const formValuesToCreateContainerTransportRequest = (
     consignorPartyId: formValues.consignorPartyId,
     carrierPartyId: formValues.carrierPartyId,
     containerOperation:
-      formValues.containerOperation as CreateContainerTransportRequestContainerOperationEnum,
+      formValues.containerOperation as ContainerTransportRequestContainerOperationEnum,
     pickup: {
       date: formValues.pickupDateTime?.split('T')[0] || '',
       mode: 'FIXED',
       windowStart: formValues.pickupDateTime?.split('T')[1]?.substring(0, 5),
     },
-    delivery: formValues.deliveryDateTime ? {
-      date: formValues.deliveryDateTime.split('T')[0],
-      mode: 'FIXED',
-      windowStart: formValues.deliveryDateTime.split('T')[1]?.substring(0, 5),
-    } : undefined,
+    delivery: formValues.deliveryDateTime
+      ? {
+          date: formValues.deliveryDateTime.split('T')[0],
+          mode: 'FIXED',
+          windowStart: formValues.deliveryDateTime
+            .split('T')[1]
+            ?.substring(0, 5),
+        }
+      : undefined,
     pickupLocation: locationFormValueToPickupLocationRequest(
       formValues.pickupLocation
     ),
@@ -188,7 +194,7 @@ export const transportDetailViewToContainerTransportFormValues = (
 ) => {
   // TODO: Update to properly convert timing constraints to form values
   // For now, convert timing constraints back to datetime strings for the form
-  const pickupDateTime = data.pickupTiming?.date 
+  const pickupDateTime = data.pickupTiming?.date
     ? `${data.pickupTiming.date}T${data.pickupTiming.windowStart || '00:00'}`
     : '';
   const deliveryDateTime = data.deliveryTiming?.date

@@ -25,13 +25,26 @@ export interface SessionCookieConfig {
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'domain'?: string;
+    'name'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
     'path'?: string;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SessionCookieConfig
+     */
+    'attributes'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     * @deprecated
+     */
+    'comment'?: string;
     /**
      * 
      * @type {number}
@@ -55,19 +68,6 @@ export interface SessionCookieConfig {
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'name'?: string;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof SessionCookieConfig
-     */
-    'attributes'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     * @deprecated
-     */
-    'comment'?: string;
+    'domain'?: string;
 }
 

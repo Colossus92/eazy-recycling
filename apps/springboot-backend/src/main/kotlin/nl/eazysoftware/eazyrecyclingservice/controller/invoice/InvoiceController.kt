@@ -26,6 +26,7 @@ class InvoiceController(
     private val createInvoice: CreateInvoice,
     private val createCompletedInvoice: CreateCompletedInvoice,
     private val createCreditInvoice: CreateCreditInvoice,
+    private val copyInvoice: CopyInvoice,
     private val updateInvoice: UpdateInvoice,
     private val finalizeInvoice: FinalizeInvoice,
     private val deleteInvoice: DeleteInvoice,
@@ -155,6 +156,12 @@ class InvoiceController(
             invoiceDate = request.invoiceDate,
         )
         return createCreditInvoice.handle(command)
+    }
+
+    @PostMapping("/{id}/copy")
+    @ResponseStatus(HttpStatus.CREATED)
+    fun copy(@PathVariable id: UUID): InvoiceResult {
+        return copyInvoice.handle(CopyInvoiceCommand(originalInvoiceId = id))
     }
 
     @DeleteMapping("/{id}")

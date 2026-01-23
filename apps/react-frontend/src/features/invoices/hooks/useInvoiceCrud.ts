@@ -80,6 +80,15 @@ export const useInvoiceCrud = () => {
     }
   };
 
+  const copyInvoice = async (id: string) => {
+    const result = await invoiceService.copy(id);
+    await fetchInvoices();
+    // Open the newly copied invoice for editing
+    const copiedInvoice = { id: result.invoiceId } as InvoiceView;
+    setFormItem(copiedInvoice);
+    return result;
+  };
+
   return {
     read: {
       items,
@@ -97,6 +106,7 @@ export const useInvoiceCrud = () => {
       openForEdit,
       close: closeForm,
       complete: completeForm,
+      copy: copyInvoice,
     },
     deletion: {
       item: deletionItem,

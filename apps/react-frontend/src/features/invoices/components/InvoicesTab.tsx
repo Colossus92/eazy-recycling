@@ -278,6 +278,7 @@ export const InvoicesTab = ({
         invoiceId={form.item?.id}
         onComplete={form.complete}
         onDelete={deletion.initiate}
+        onCopy={form.copy}
       />
       <DeleteDialog
         isOpen={Boolean(deletion.item)}

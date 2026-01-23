@@ -8,7 +8,7 @@ import { Planning } from '../usePlanning';
 import { toastService } from '@/components/ui/toast/toastService';
 import { planningService } from '@/api/services/planningService';
 import { DriverPlanningItemStatusEnum } from '@/api/client';
-import { TransportViewTransportTypeEnum } from '@/api/client/models/transport-view';
+import { PlanningTransportViewTransportTypeEnum as TransportViewTransportTypeEnum } from '@/api/client/models/planning-transport-view';
 
 // Mock dependencies
 vi.mock('@/api/services/planningService', () => {

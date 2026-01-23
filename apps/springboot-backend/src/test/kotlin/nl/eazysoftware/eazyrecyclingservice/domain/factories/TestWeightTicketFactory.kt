@@ -16,10 +16,11 @@ object TestWeightTicketFactory {
     reclamation: String? = "Test reclamation",
     note: String? = "Test note",
     weightedAt: LocalDateTime? = LocalDateTime.of(2025, 11, 21, 10, 0),
+    direction: String = "INBOUND",
   ): WeightTicketRequest {
     return WeightTicketRequest(
       consignorParty = ConsignorRequest.CompanyConsignor(consignorCompanyId),
-      direction = WeightTicketDirection.INBOUND,
+      direction = WeightTicketDirection.valueOf(direction),
       pickupLocation = null,
       deliveryLocation = null,
       secondWeighingValue = null,

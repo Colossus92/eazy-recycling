@@ -197,4 +197,127 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(status().isOk)
       .andExpect(jsonPath("$.length()").value(0))
   }
+
+  @Test
+  fun `should negate PRODUCT prices for PURCHASE invoice type`() {
+    // Given
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
+    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+
+    catalogItemJpaRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        type = CatalogItemType.PRODUCT,
+        code = "PROD001",
+        name = "Transport Hours",
+        category = category,
+        consignorParty = null,
+        unitOfMeasure = "HOUR",
+        vatRate = vatRate,
+        salesAccountNumber = "8100",
+        purchaseAccountNumber = null,
+        defaultPrice = BigDecimal("50.00"),
+        status = "ACTIVE"
+      )
+    )
+
+    // When & Then - PURCHASE invoice type should negate PRODUCT prices
+    securedMockMvc.get("/catalog/items?invoiceType=PURCHASE")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].itemType").value("PRODUCT"))
+      .andExpect(jsonPath("$[0].defaultPrice").value(-50.00))
+  }
+
+  @Test
+  fun `should NOT negate MATERIAL prices for PURCHASE invoice type`() {
+    // Given
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
+    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+
+    catalogItemJpaRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        type = CatalogItemType.MATERIAL,
+        code = "MAT001",
+        name = "Steel Scrap",
+        category = category,
+        consignorParty = null,
+        unitOfMeasure = "KG",
+        vatRate = vatRate,
+        salesAccountNumber = "8000",
+        purchaseAccountNumber = null,
+        defaultPrice = BigDecimal("25.00"),
+        status = "ACTIVE"
+      )
+    )
+
+    // When & Then - PURCHASE invoice type should NOT negate MATERIAL prices
+    securedMockMvc.get("/catalog/items?invoiceType=PURCHASE")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].itemType").value("MATERIAL"))
+      .andExpect(jsonPath("$[0].defaultPrice").value(25.00))
+  }
+
+  @Test
+  fun `should NOT negate PRODUCT prices for SALE invoice type`() {
+    // Given
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
+    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+
+    catalogItemJpaRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        type = CatalogItemType.PRODUCT,
+        code = "PROD001",
+        name = "Transport Hours",
+        category = category,
+        consignorParty = null,
+        unitOfMeasure = "HOUR",
+        vatRate = vatRate,
+        salesAccountNumber = "8100",
+        purchaseAccountNumber = null,
+        defaultPrice = BigDecimal("50.00"),
+        status = "ACTIVE"
+      )
+    )
+
+    // When & Then - SALE invoice type should NOT negate any prices
+    securedMockMvc.get("/catalog/items?invoiceType=SALE")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].itemType").value("PRODUCT"))
+      .andExpect(jsonPath("$[0].defaultPrice").value(50.00))
+  }
+
+  @Test
+  fun `should NOT negate prices when no invoice type provided`() {
+    // Given
+    val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
+    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+
+    catalogItemJpaRepository.save(
+      CatalogItemDto(
+        id = UUID.randomUUID(),
+        type = CatalogItemType.PRODUCT,
+        code = "PROD001",
+        name = "Transport Hours",
+        category = category,
+        consignorParty = null,
+        unitOfMeasure = "HOUR",
+        vatRate = vatRate,
+        salesAccountNumber = "8100",
+        purchaseAccountNumber = null,
+        defaultPrice = BigDecimal("50.00"),
+        status = "ACTIVE"
+      )
+    )
+
+    // When & Then - No invoice type should NOT negate any prices
+    securedMockMvc.get("/catalog/items")
+      .andExpect(status().isOk)
+      .andExpect(jsonPath("$.length()").value(1))
+      .andExpect(jsonPath("$[0].defaultPrice").value(50.00))
+  }
 }

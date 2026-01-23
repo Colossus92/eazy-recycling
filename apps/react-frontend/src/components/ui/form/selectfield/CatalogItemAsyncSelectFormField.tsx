@@ -1,6 +1,13 @@
 import { CatalogItemResponseItemTypeEnum } from '@/api/client';
-import { useCatalogItems, filterCatalogItems } from '@/api/hooks/useCatalogItems';
-import { CatalogItem, CatalogItemType } from '@/api/services/catalogService';
+import {
+  filterCatalogItems,
+  useCatalogItems,
+} from '@/api/hooks/useCatalogItems';
+import {
+  CatalogItem,
+  CatalogItemType,
+  InvoiceType,
+} from '@/api/services/catalogService';
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FieldErrors } from 'react-hook-form';
@@ -21,7 +28,12 @@ interface LineFieldValue {
   weightUnit: string;
 }
 
-export type CatalogItemTypeFilter = 'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM' | 'MATERIAL_OR_WASTE_STREAM' | 'ALL';
+export type CatalogItemTypeFilter =
+  | 'MATERIAL'
+  | 'PRODUCT'
+  | 'WASTE_STREAM'
+  | 'MATERIAL_OR_WASTE_STREAM'
+  | 'ALL';
 
 interface CatalogItemAsyncSelectFormFieldProps {
   title: string;
@@ -39,6 +51,7 @@ interface CatalogItemAsyncSelectFormFieldProps {
   ) => void;
   errors?: FieldErrors;
   typeFilter?: CatalogItemTypeFilter;
+  invoiceType?: InvoiceType;
 }
 
 // Type labels for grouping
@@ -58,7 +71,9 @@ const typeOrder = [
 /**
  * Maps typeFilter to API type parameter for server-side filtering
  */
-const getApiTypeFilter = (typeFilter: CatalogItemTypeFilter): CatalogItemType | undefined => {
+const getApiTypeFilter = (
+  typeFilter: CatalogItemTypeFilter
+): CatalogItemType | undefined => {
   switch (typeFilter) {
     case 'MATERIAL':
       return CatalogItemResponseItemTypeEnum.Material;
@@ -76,7 +91,10 @@ const getApiTypeFilter = (typeFilter: CatalogItemTypeFilter): CatalogItemType | 
 /**
  * Client-side filter for MATERIAL_OR_WASTE_STREAM type
  */
-const filterByTypeClient = (items: CatalogItem[], typeFilter: CatalogItemTypeFilter): CatalogItem[] => {
+const filterByTypeClient = (
+  items: CatalogItem[],
+  typeFilter: CatalogItemTypeFilter
+): CatalogItem[] => {
   if (typeFilter === 'MATERIAL_OR_WASTE_STREAM') {
     return items.filter(
       (item) =>
@@ -99,6 +117,7 @@ export const CatalogItemAsyncSelectFormField = ({
   update,
   errors,
   typeFilter = 'ALL',
+  invoiceType,
 }: CatalogItemAsyncSelectFormFieldProps) => {
   // Get error for this field
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,13 +127,15 @@ export const CatalogItemAsyncSelectFormField = ({
   const error = linesErrors?.[index]?.catalogItemId?.message;
 
   // Track the selected option
-  const [selectedOption, setSelectedOption] = useState<CatalogItemOption | null>(null);
+  const [selectedOption, setSelectedOption] =
+    useState<CatalogItemOption | null>(null);
   const [inputValue, setInputValue] = useState('');
 
   // Generate a unique instance key
   const instanceKey = useMemo(
-    () => `catalog-${consignorPartyId || 'all'}-${typeFilter}-${index}`,
-    [consignorPartyId, typeFilter, index]
+    () =>
+      `catalog-${consignorPartyId || 'all'}-${typeFilter}-${invoiceType || 'all'}-${index}`,
+    [consignorPartyId, typeFilter, invoiceType, index]
   );
 
   // Use React Query to fetch and cache catalog items
@@ -122,6 +143,7 @@ export const CatalogItemAsyncSelectFormField = ({
   const { data: catalogItems = [], isLoading } = useCatalogItems({
     consignorPartyId,
     type: apiTypeFilter,
+    invoiceType,
     enabled: !!consignorPartyId,
   });
 
@@ -201,15 +223,17 @@ export const CatalogItemAsyncSelectFormField = ({
     // Find matching option in loaded data
     for (const item of filteredItems) {
       let isMatch = false;
-      
+
       if (currentWasteStreamNumber) {
         // If we have a waste stream number, ONLY match items with that exact waste stream number
         isMatch = item.wasteStreamNumber === currentWasteStreamNumber;
       } else {
         // If no waste stream number, match by catalogItemId (for materials/products)
-        isMatch = item.catalogItemId === currentCatalogItemId && !item.wasteStreamNumber;
+        isMatch =
+          item.catalogItemId === currentCatalogItemId &&
+          !item.wasteStreamNumber;
       }
-      
+
       if (isMatch) {
         setSelectedOption({
           value: String(item.id),
@@ -226,9 +250,18 @@ export const CatalogItemAsyncSelectFormField = ({
     if (filteredItems.length > 0) {
       setSelectedOption(null);
     }
-  }, [field.catalogItemId, field.wasteStreamNumber, filteredItems, selectedOption]);
+  }, [
+    field.catalogItemId,
+    field.wasteStreamNumber,
+    filteredItems,
+    selectedOption,
+  ]);
 
-  const selectStyles: StylesConfig<CatalogItemOption, false, GroupBase<CatalogItemOption>> = {
+  const selectStyles: StylesConfig<
+    CatalogItemOption,
+    false,
+    GroupBase<CatalogItemOption>
+  > = {
     control: (base, state) => ({
       ...base,
       minHeight: '40px',
