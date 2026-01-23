@@ -500,29 +500,33 @@ enum class AmiceErrorCode(val code: String) {
 ### Chosen Approach: Weight Ticket Line Declaration Tracking
 
 **Pros:**
+
 - Simple mental model: each line knows its own state
-  - Single query to find what needs declaration
-  - Natural correction support via delta calculation
-  - Leverages existing `lma_declarations` and `lma_declaration_sessions` infrastructure
-  - Clear separation: line state vs. AMICE communication history
-  - Easy reconciliation with AMICE totals
-  - No complex snapshot table joins
+- Single query to find what needs declaration
+- Natural correction support via delta calculation
+- Leverages existing `lma_declarations` and `lma_declaration_sessions` infrastructure
+- Clear separation: line state vs. AMICE communication history
+- Easy reconciliation with AMICE totals
+- No complex snapshot table joins
 
 **Cons:**
+
 - `declared_weight` column denormalizes state
-  - Requires careful handling of concurrent updates to weight ticket lines
+- Requires careful handling of concurrent updates to weight ticket lines
 
 ### Alternative: Immutable Snapshot Table (Rejected)
 
 **Pros:**
+
 - Full history of declared values
-  - Immutable audit trail
+- Immutable audit trail
 
 **Cons:**
+
 - Disconnected from actual declaration logic
-  - Complex queries to determine current state
-  - Risk of snapshot/declaration mismatch
-  - Additional storage overhead
+- Complex queries to determine current state
+- Risk of snapshot/declaration mismatch
+- Additional storage overhead
 
 ## Implementation Notes
 
@@ -542,14 +546,86 @@ Since the system is not yet live in production:
 
 ### AMICE Integration Details
 
-- **Authentication**: Client certificate (2-way SSL)
-  - **Protocol**: SOAP 1.2 over HTTPS
-  - **Endpoints**:
-    - Production: `amice.lma.nl`
-    - Test: `test.lma.nl`
-  - **Rate Limits**:
-    - Status queries: 1 per 5 minutes per waste stream/period
-    - Global: 6 requests per minute per account
+#### Authentication & Certificate Management
+
+**Client Certificate Authentication (2-way SSL)**:
+- **Protocol**: SOAP 1.2 over HTTPS with mutual TLS authentication
+- **Certificate Format**: PKCS#12 (.pfx) containing both private key and certificate chain
+- **Runtime Integration**: Certificate deployed securely via environment variables and container initialization
+
+**Certificate Deployment Flow**:
+
+1. **Development Environment**:
+   - Test certificate stored at `apps/springboot-backend/src/main/resources/certificates/test-amice.pfx`
+   - Referenced directly via `classpath:certificates/test-amice.pfx` path
+
+2. **Exporting Certificate as Base64** (for production deployment):
+
+   ```bash
+   # From project root, encode the certificate file
+   base64 -i apps/springboot-backend/src/main/resources/certificates/test-amice.pfx -o certificate-base64.txt
+   
+   # Or output directly to clipboard (macOS)
+   base64 -i apps/springboot-backend/src/main/resources/certificates/test-amice.pfx | pbcopy
+   
+   # Or as single line (Linux/Unix)
+   base64 -w 0 apps/springboot-backend/src/main/resources/certificates/test-amice.pfx
+   ```
+
+   The resulting base64 string is stored in `.do/app.yaml` as the `CLIENT_PFX_B64` environment variable.
+
+3. **Production Environment (DigitalOcean)**:
+   - Certificate stored as base64-encoded environment variable `CLIENT_PFX_B64` in `.do/app.yaml`
+   - Container startup process (`apps/springboot-backend/Dockerfile`) extracts certificate:
+
+     ```bash
+     # Decode base64 certificate and write to temporary file
+     printf '%s' "$CLIENT_PFX_B64" | base64 -d > /tmp/client.pfx
+     chown $(id -u):$(id -g) /tmp/client.pfx && chmod 600 /tmp/client.pfx
+     ```
+
+   - Environment variable `AMICE_CERTIFICATE_PATH=file:/tmp/client.pfx` points to extracted certificate
+
+4. **Spring Boot SSL Configuration** (`apps/springboot-backend/src/main/resources/application.yaml`):
+
+   ```yaml
+   spring:
+     ssl:
+       bundle:
+         jks:
+           amice-client:
+             keystore:
+               location: ${AMICE_CERTIFICATE_PATH:classpath:certificates/test-amice.pfx}
+               password: ${AMICE_PASSWORD:}
+               type: PKCS12
+   ```
+
+5. **SOAP Client Integration** (`apps/springboot-backend/src/main/kotlin/nl/eazysoftware/eazyrecyclingservice/config/soap/WebServiceTemplateConfiguration.kt`):
+   - SSL Bundle loaded via `sslBundles.getBundle("amice-client")`
+   - SSL Context created and configured for Apache HttpClient
+   - WebServiceTemplate configured with client certificate authentication
+   - HTTP Basic Authentication credentials combined with certificate
+
+**Security Features**:
+- Certificate file permissions set to 600 (owner read/write only)
+- Base64 encoding prevents certificate exposure in deployment logs
+- Environment variable encryption in DigitalOcean platform
+- Certificate validation during SSL handshake ensures authenticity
+
+**Environment Configuration**:
+- `AMICE_CERTIFICATE_ENABLED=true` - Enables certificate-based authentication
+- `AMICE_URL` - AMICE service endpoint URL
+- `AMICE_USERNAME/AMICE_PASSWORD` - HTTP Basic Auth credentials (in addition to certificate)
+
+#### Protocol & Endpoints
+
+- **Protocol**: SOAP 1.2 over HTTPS
+- **Endpoints**:
+  - Production: `amice.lma.nl`
+  - Test: `test.lma.nl`
+- **Rate Limits**:
+  - Status queries: 1 per 5 minutes per waste stream/period
+  - Global: 6 requests per minute per account
 
 ### Future Considerations
 
