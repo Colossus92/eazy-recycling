@@ -118,7 +118,6 @@ jobs:
           EXACT_CLIENT_ID: ${{ secrets.EXACT_CLIENT_ID }}
           EXACT_CLIENT_SECRET: ${{ secrets.EXACT_CLIENT_SECRET }}
           PRICING_APP_BEARER_TOKEN: ${{ secrets.PRICING_APP_BEARER_TOKEN }}
-          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
           SUPABASE_API_JWT_SECRET: ${{ secrets.SUPABASE_API_JWT_SECRET }}
           SUPABASE_API_PUBLISHABLE: ${{ secrets.SUPABASE_API_PUBLISHABLE }}
           SUPABASE_API_SECRET: ${{ secrets.SUPABASE_API_SECRET }}
@@ -127,6 +126,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           PRICING_APP_BASE_URL: ${{ vars.PRICING_APP_BASE_URL }}
+          SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
           SUPABASE_API_URL: ${{ vars.SUPABASE_API_URL }}
           SUPABASE_API_JWT_ISSUER: ${{ vars.SUPABASE_API_JWT_ISSUER }}
           AMICE_URL: ${{ vars.AMICE_URL }}
@@ -147,11 +147,11 @@ jobs:
           cat .do/app.yaml.generated
           echo "=== End of generated app.yaml ==="
 
-      - name: Debug - Reveal SPRING_DATASOURCE_URL (base64)
+      - name: Debug - Reveal SPRING_DATASOURCE_URL
         env:
-          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+          SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
         run: |
-          echo "SPRING_DATASOURCE_URL"
+          echo "SPRING_DATASOURCE_URL:"
           echo "$SPRING_DATASOURCE_URL"
 
       - name: Deploy the app
