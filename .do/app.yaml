@@ -69,8 +69,7 @@ services:
     envs:
       - key: SPRING_DATASOURCE_URL
         scope: RUN_AND_BUILD_TIME
-        type: SECRET
-        value: EV[1:zzvyGr9Od7stKtoTxIgv4Wm4/VxV3qLb:q2HSjT+2veCvwKJA8Xluxl6e0lpBd3K+QYF+gfIcw6GQ8untSc2cM9hFnZkhEIFakuT30QUUptG68pzng3813nIRv3A1gdG3/EoMUBoP/PP0JxPjlBNo3fKlhVa+KRFQOcbqhI3e0H8yvpiWkLUo2V0C9li/c0bsIrYyqnTo1iy0NmyQv5+OFrA8TOrAPxSUZYvyE7Oy]
+        value: "jdbc:postgresql://db.qtnjbdjufwzbmdzndnku.supabase.co:5432/postgres?user=postgres&password=YNYxuwmNAOM9u6Db"
       - key: SUPABASE_API_URL
         scope: RUN_AND_BUILD_TIME
         type: SECRET
