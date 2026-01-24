@@ -11,12 +11,14 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-22.04
-    environment: PRD
     permissions:
       contents: read
       packages: write
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      build_required: ${{ steps.changes.outputs.build_required }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -98,6 +100,13 @@ jobs:
             docker tag apps-springboot-backend $tag
             docker push $tag
           done
+
+  deploy-prd:
+    runs-on: ubuntu-22.04
+    needs: build
+    environment: PRD
+    steps:
+      - uses: actions/checkout@v4
 
       # Generate app.yaml from template using envsubst
       - name: Generate app.yaml from template
