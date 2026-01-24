@@ -18,6 +18,11 @@ import {
   locationFormValueToPickupLocationRequest,
   pickupLocationViewToFormValue,
 } from '@/types/forms/locationConverters';
+import {
+  TimingConstraint,
+  createEmptyTimingConstraint,
+  TimingMode,
+} from '@/types/forms/TimingConstraint';
 import { apiInstance } from './apiInstance';
 
 const transportApi = new TransportControllerApi(apiInstance.config);
@@ -153,24 +158,25 @@ export const transportService = {
 export const formValuesToCreateContainerTransportRequest = (
   formValues: ContainerTransportFormValues
 ) => {
-  // TODO: Update to use timing constraints instead of pickupDateTime/deliveryDateTime
   const request: ContainerTransportRequest = {
     consignorPartyId: formValues.consignorPartyId,
     carrierPartyId: formValues.carrierPartyId,
     containerOperation:
       formValues.containerOperation as ContainerTransportRequestContainerOperationEnum,
-    pickup: {
-      date: formValues.pickupDateTime?.split('T')[0] || '',
-      mode: 'FIXED',
-      windowStart: formValues.pickupDateTime?.split('T')[1]?.substring(0, 5),
-    },
-    delivery: formValues.deliveryDateTime
+    pickup: formValues.pickupTiming.date
       ? {
-          date: formValues.deliveryDateTime.split('T')[0],
-          mode: 'FIXED',
-          windowStart: formValues.deliveryDateTime
-            .split('T')[1]
-            ?.substring(0, 5),
+          date: formValues.pickupTiming.date,
+          mode: formValues.pickupTiming.mode,
+          windowStart: formValues.pickupTiming.windowStart || undefined,
+          windowEnd: formValues.pickupTiming.windowEnd || undefined,
+        }
+      : undefined,
+    delivery: formValues.deliveryTiming?.date
+      ? {
+          date: formValues.deliveryTiming.date,
+          mode: formValues.deliveryTiming.mode,
+          windowStart: formValues.deliveryTiming.windowStart || undefined,
+          windowEnd: formValues.deliveryTiming.windowEnd || undefined,
         }
       : undefined,
     pickupLocation: locationFormValueToPickupLocationRequest(
@@ -192,23 +198,32 @@ export const formValuesToCreateContainerTransportRequest = (
 export const transportDetailViewToContainerTransportFormValues = (
   data: TransportDetailView
 ) => {
-  // TODO: Update to properly convert timing constraints to form values
-  // For now, convert timing constraints back to datetime strings for the form
-  const pickupDateTime = data.pickupTiming?.date
-    ? `${data.pickupTiming.date}T${data.pickupTiming.windowStart || '00:00'}`
-    : '';
-  const deliveryDateTime = data.deliveryTiming?.date
-    ? `${data.deliveryTiming.date}T${data.deliveryTiming.windowStart || '00:00'}`
-    : '';
+  const pickupTiming: TimingConstraint = data.pickupTiming
+    ? {
+        date: data.pickupTiming.date,
+        mode: data.pickupTiming.mode as TimingMode,
+        windowStart: data.pickupTiming.windowStart || null,
+        windowEnd: data.pickupTiming.windowEnd || null,
+      }
+    : createEmptyTimingConstraint();
+
+  const deliveryTiming: TimingConstraint | undefined = data.deliveryTiming
+    ? {
+        date: data.deliveryTiming.date,
+        mode: data.deliveryTiming.mode as TimingMode,
+        windowStart: data.deliveryTiming.windowStart || null,
+        windowEnd: data.deliveryTiming.windowEnd || null,
+      }
+    : undefined;
 
   const formValues: ContainerTransportFormValues = {
     consignorPartyId: data.consignorParty?.id || '',
     carrierPartyId: data.carrierParty?.id || '',
     containerOperation: data.containerOperation || 'DELIVERY',
     pickupLocation: pickupLocationViewToFormValue(data.pickupLocation),
-    pickupDateTime,
+    pickupTiming,
     deliveryLocation: pickupLocationViewToFormValue(data.deliveryLocation),
-    deliveryDateTime,
+    deliveryTiming,
     truckId: data.truck?.licensePlate || '',
     driverId: data.driver?.id || '',
     containerId: data.wasteContainer?.id || '',

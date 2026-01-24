@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form';
-import { DateTimeInput } from '@/components/ui/form/DateTimeInput.tsx';
 import { ContainerTransportFormValues } from '@/features/planning/hooks/useContainerTransportForm';
 import { AddressFormField } from '@/components/ui/form/addressformfield/AddressFormField';
+import { TransportTimingFormField } from '@/components/ui/form/TransportTimingFormField';
 
 export const ContainerTransportFormDeliverySection = () => {
   const formContext = useFormContext<ContainerTransportFormValues>();
@@ -15,13 +15,12 @@ export const ContainerTransportFormDeliverySection = () => {
         entity="transport"
       />
 
-      <DateTimeInput
-        title={'Aflever datum en tijd'}
-        formHook={{
-          register: formContext.register,
-          name: 'deliveryDateTime',
-          errors: formContext.formState.errors,
-        }}
+      <TransportTimingFormField
+        name="deliveryTiming"
+        control={formContext.control}
+        label="Aflever datum en tijd"
+        required={false}
+        testId="delivery-timing"
       />
     </div>
   );

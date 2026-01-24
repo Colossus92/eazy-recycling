@@ -7,6 +7,10 @@ import {
 } from '@/api/services/transportService.ts';
 import { toastService } from '@/components/ui/toast/toastService.ts';
 import { LocationFormValue } from '@/types/forms/LocationFormValue';
+import {
+  TimingConstraint,
+  createEmptyTimingConstraint,
+} from '@/types/forms/TimingConstraint';
 import { useTenantCompany } from '@/hooks/useTenantCompany';
 import { useCallback } from 'react';
 
@@ -16,9 +20,9 @@ export interface ContainerTransportFormValues {
   containerOperation: string;
   transportType: string;
   pickupLocation: LocationFormValue;
-  pickupDateTime: string;
+  pickupTiming: TimingConstraint;
   deliveryLocation: LocationFormValue;
-  deliveryDateTime?: string;
+  deliveryTiming?: TimingConstraint;
   truckId: string;
   driverId: string;
   containerId: string;
@@ -30,10 +34,10 @@ const fieldsToValidate: Array<Array<keyof ContainerTransportFormValues>> = [
   ['consignorPartyId', 'carrierPartyId', 'containerOperation'],
 
   // Step 1: Pickup section fields
-  ['pickupLocation', 'pickupDateTime'],
+  ['pickupLocation', 'pickupTiming'],
 
   // Step 2: Delivery section fields
-  ['deliveryLocation', 'deliveryDateTime'],
+  ['deliveryLocation', 'deliveryTiming'],
 
   // Step 3: Transport details
   ['truckId', 'driverId', 'containerId', 'note'],
@@ -46,9 +50,9 @@ function getDefaultValues(tenantCompanyId?: string): ContainerTransportFormValue
     containerOperation: 'DELIVERY',
     transportType: 'CONTAINER',
     pickupLocation: { type: 'none' },
-    pickupDateTime: '',
+    pickupTiming: createEmptyTimingConstraint(),
     deliveryLocation: { type: 'none' },
-    deliveryDateTime: '',
+    deliveryTiming: createEmptyTimingConstraint(),
     truckId: '',
     driverId: '',
     containerId: '',
