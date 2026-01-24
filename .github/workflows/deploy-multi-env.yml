@@ -147,6 +147,13 @@ jobs:
           cat .do/app.yaml.generated
           echo "=== End of generated app.yaml ==="
 
+      - name: Debug - Reveal SPRING_DATASOURCE_URL (base64)
+        env:
+          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+        run: |
+          echo "SPRING_DATASOURCE_URL"
+          echo "$SPRING_DATASOURCE_URL"
+
       - name: Deploy the app
         uses: digitalocean/app_action/deploy@v2
         with:
