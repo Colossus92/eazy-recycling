@@ -13,6 +13,7 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-22.04
+    environment: PRD
     permissions:
       contents: read
       packages: write
