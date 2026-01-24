@@ -5,6 +5,7 @@ COPY build/libs/app.jar app.jar
 ENTRYPOINT ["/bin/sh", "-c", "\
   echo '[DEBUG] Starting container...' && \
   echo '[DEBUG] Working dir:' $(pwd) && \
+  echo '[DEBUG] SPRING_DATASOURCE_URL:' \"$SPRING_DATASOURCE_URL\" && \
   echo '[DEBUG] Environment variable length (CLIENT_PFX_B64):' $(echo -n \"$CLIENT_PFX_B64\" | wc -c) && \
   umask 077 && \
   printf '%s' \"$CLIENT_PFX_B64\" | base64 -d > /tmp/client.pfx && \
