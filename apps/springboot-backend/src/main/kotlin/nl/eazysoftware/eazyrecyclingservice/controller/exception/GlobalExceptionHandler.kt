@@ -52,10 +52,15 @@ class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException::class)
   fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-    val errors = ex.bindingResult.fieldErrors.joinToString(", ") { "${it.defaultMessage}" }
+    val fieldErrors = ex.bindingResult.fieldErrors.joinToString(", ") { "${it.defaultMessage}" }
+    val globalErrors = ex.bindingResult.globalErrors.joinToString(", ") { "${it.defaultMessage}" }
+    
+    val allErrors = listOf(fieldErrors, globalErrors)
+      .filter { it.isNotEmpty() }
+      .joinToString(", ")
 
     val errorResponse = ErrorResponse(
-      message = errors.ifEmpty { "Validatie mislukt" },
+      message = allErrors.ifEmpty { "Validatie mislukt" },
     )
 
     logException(ex)

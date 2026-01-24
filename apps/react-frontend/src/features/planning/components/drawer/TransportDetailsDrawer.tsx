@@ -4,10 +4,7 @@ import { TimingConstraintView } from '@/api/client';
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { WaybillDownloadSection } from './WaybillDownloadSection';
-import {
-  resolveLocationAddress,
-  transportService,
-} from '@/api/services/transportService';
+import { resolveLocationAddress, transportService, } from '@/api/services/transportService';
 import { Drawer, DrawerAction } from '@/components/ui/drawer/Drawer';
 import CaretRight from '@/assets/icons/CaretRight.svg?react';
 import Scale from '@/assets/icons/Scale.svg?react';
@@ -88,25 +85,25 @@ export const TransportDetailsDrawer = ({
   // Returns: { date: string, time: string | null }
   const formatTimingDisplay = (timing: TimingConstraintView | undefined): { date: string; time: string | null } => {
     if (!timing?.date) return { date: '-', time: null };
-    
+
     let formattedDate: string;
     try {
       formattedDate = format(parseISO(timing.date), 'dd-MM-yyyy', { locale: nl });
     } catch {
       formattedDate = timing.date;
     }
-    
+
     switch (timing.mode) {
       case 'DATE_ONLY':
         return { date: formattedDate, time: null };
       case 'FIXED':
         return { date: formattedDate, time: timing.windowStart || null };
       case 'WINDOW':
-        return { 
-          date: formattedDate, 
-          time: timing.windowStart && timing.windowEnd 
-            ? `${timing.windowStart} - ${timing.windowEnd}` 
-            : null 
+        return {
+          date: formattedDate,
+          time: timing.windowStart && timing.windowEnd
+            ? `${timing.windowStart} - ${timing.windowEnd}`
+            : null
         };
       default:
         return { date: formattedDate, time: null };
@@ -327,12 +324,14 @@ export const TransportDetailsDrawer = ({
           </div>
           {data.note && <Note note={data.note} />}
 
-          <DocumentsSection>
-            <WaybillDownloadSection transportId={data.id} />
-            <WeightTicketDownloadSection
-              weightTicketUuid={data.weightTicketUuid}
-            />
-          </DocumentsSection>
+          {data.transportType !== 'CONTAINER' && (
+            <DocumentsSection>
+              <WaybillDownloadSection transportId={data.id} />
+              <WeightTicketDownloadSection
+                weightTicketUuid={data.weightTicketUuid}
+              />
+            </DocumentsSection>
+          )}
         </div>
       )}
     </Drawer>
