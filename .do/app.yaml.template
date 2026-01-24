@@ -1,0 +1,155 @@
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+  - rule: DEPLOYMENT_LIVE
+domains:
+  - domain: ers.eazysoftware.nl
+    type: PRIMARY
+  - domain: app.eazyrecycling.nl
+    type: ALIAS
+envs:
+  - key: VITE_SUPABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${VITE_SUPABASE_URL}
+  - key: VITE_SUPABASE_ANON_KEY
+    scope: RUN_AND_BUILD_TIME
+    value: ${VITE_SUPABASE_ANON_KEY}
+  - key: VITE_API_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${VITE_API_URL}
+  - key: PRICING_APP_BASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${PRICING_APP_BASE_URL}
+  - key: PRICING_APP_BEARER_TOKEN
+    scope: RUN_AND_BUILD_TIME
+    value: ${PRICING_APP_BEARER_TOKEN}
+features:
+  - buildpack-stack=ubuntu-22
+ingress:
+  rules:
+    - component:
+        name: ers
+      match:
+        path:
+          prefix: /api
+    - component:
+        name: react-frontend
+      match:
+        path:
+          prefix: /
+    - component:
+        name: react-frontend
+        rewrite: /mobile.html
+      match:
+        path:
+          prefix: /mobile
+    - component:
+        name: react-frontend
+        rewrite: /mobile.html
+      match:
+        path:
+          prefix: /mobile/*
+name: ers
+region: ams
+services:
+  - alerts:
+      - operator: GREATER_THAN
+        rule: CPU_UTILIZATION
+        value: 75
+        window: FIVE_MINUTES
+      - operator: GREATER_THAN
+        rule: MEM_UTILIZATION
+        value: 75
+        window: FIVE_MINUTES
+    envs:
+      - key: SPRING_DATASOURCE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${SPRING_DATASOURCE_URL}
+      - key: SUPABASE_API_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SUPABASE_API_URL}
+      - key: SUPABASE_API_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${SUPABASE_API_SECRET}
+      - key: SUPABASE_API_PUBLISHABLE
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${SUPABASE_API_PUBLISHABLE}
+      - key: SUPABASE_API_JWT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${SUPABASE_API_JWT_SECRET}
+      - key: SUPABASE_API_JWT_ISSUER
+        scope: RUN_AND_BUILD_TIME
+        value: ${SUPABASE_API_JWT_ISSUER}
+      - key: CLIENT_PFX_B64
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${CLIENT_PFX_B64}
+      - key: AMICE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${AMICE_URL}
+      - key: AMICE_USERNAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${AMICE_USERNAME}
+      - key: AMICE_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${AMICE_PASSWORD}
+      - key: AMICE_ENABLED
+        scope: RUN_AND_BUILD_TIME
+        value: ${AMICE_ENABLED}
+      - key: AMICE_CERTIFICATE_ENABLED
+        scope: RUN_AND_BUILD_TIME
+        value: ${AMICE_CERTIFICATE_ENABLED}
+      - key: AMICE_CERTIFICATE_PATH
+        scope: RUN_AND_BUILD_TIME
+        value: ${AMICE_CERTIFICATE_PATH}
+      - key: EXACT_CLIENT_ID
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${EXACT_CLIENT_ID}
+      - key: EXACT_CLIENT_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${EXACT_CLIENT_SECRET}
+      - key: EXACT_REDIRECT_URI
+        scope: RUN_AND_BUILD_TIME
+        value: ${EXACT_REDIRECT_URI}
+      - key: FRONTEND_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${FRONTEND_URL}
+      - key: BETTERSTACK_SOURCE_TOKEN
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${BETTERSTACK_SOURCE_TOKEN}
+      - key: BETTERSTACK_INGESTING_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${BETTERSTACK_INGESTING_HOST}
+    health_check:
+      failure_threshold: 20
+      period_seconds: 10
+      success_threshold: 1
+      timeout_seconds: 1
+    http_port: 8080
+    image:
+      registry: colossus92
+      registry_credentials: ${GHCR_REGISTRY_CREDENTIALS}
+      registry_type: GHCR
+      repository: eazy-recycling
+      tag: main
+    instance_count: 1
+    instance_size_slug: apps-d-1vcpu-2gb
+    name: ers
+static_sites:
+  - build_command: npm install && npm run build
+    catchall_document: index.html
+    environment_slug: node-js
+    github:
+      branch: main
+      repo: Colossus92/eazy-recycling
+    name: react-frontend
+    output_dir: ./dist
+    source_dir: ./apps/react-frontend

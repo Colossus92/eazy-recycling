@@ -1,4 +1,4 @@
-name: Build Docker Image and Deploy to DO App Platform
+name: Build and Deploy (Multi-Environment)
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
               - 'nx.json'
               - 'package.json'
               - 'package-lock.json'
-              - '.github/workflows/docker-build.yml'
+              - '.github/workflows/deploy-multi-env.yml'
 
       # Set up Node.js for Nx
       - name: Setup Node.js
@@ -98,7 +98,41 @@ jobs:
             docker push $tag
           done
 
+      # Generate app.yaml from template using envsubst
+      - name: Generate app.yaml from template
+        env:
+          # Secrets
+          AMICE_PASSWORD: ${{ secrets.AMICE_PASSWORD }}
+          BETTERSTACK_SOURCE_TOKEN: ${{ secrets.BETTERSTACK_SOURCE_TOKEN }}
+          CLIENT_PFX_B64: ${{ secrets.CLIENT_PFX_B64 }}
+          EXACT_CLIENT_ID: ${{ secrets.EXACT_CLIENT_ID }}
+          EXACT_CLIENT_SECRET: ${{ secrets.EXACT_CLIENT_SECRET }}
+          PRICING_APP_BEARER_TOKEN: ${{ secrets.PRICING_APP_BEARER_TOKEN }}
+          SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
+          SUPABASE_API_JWT_SECRET: ${{ secrets.SUPABASE_API_JWT_SECRET }}
+          SUPABASE_API_PUBLISHABLE: ${{ secrets.SUPABASE_API_PUBLISHABLE }}
+          SUPABASE_API_SECRET: ${{ secrets.SUPABASE_API_SECRET }}
+          # Variables
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          PRICING_APP_BASE_URL: ${{ vars.PRICING_APP_BASE_URL }}
+          SUPABASE_API_URL: ${{ vars.SUPABASE_API_URL }}
+          SUPABASE_API_JWT_ISSUER: ${{ vars.SUPABASE_API_JWT_ISSUER }}
+          AMICE_URL: ${{ vars.AMICE_URL }}
+          AMICE_USERNAME: ${{ vars.AMICE_USERNAME }}
+          AMICE_ENABLED: ${{ vars.AMICE_ENABLED }}
+          AMICE_CERTIFICATE_ENABLED: ${{ vars.AMICE_CERTIFICATE_ENABLED }}
+          AMICE_CERTIFICATE_PATH: ${{ vars.AMICE_CERTIFICATE_PATH }}
+          EXACT_REDIRECT_URI: ${{ vars.EXACT_REDIRECT_URI }}
+          FRONTEND_URL: ${{ vars.FRONTEND_URL }}
+          BETTERSTACK_INGESTING_HOST: ${{ vars.BETTERSTACK_INGESTING_HOST }}
+          GHCR_REGISTRY_CREDENTIALS: ${{ vars.GHCR_REGISTRY_CREDENTIALS }}
+        run: |
+          envsubst < .do/app.yaml.template > .do/app.yaml.generated
+
       - name: Deploy the app
         uses: digitalocean/app_action/deploy@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app_spec_location: .do/app.yaml.generated
