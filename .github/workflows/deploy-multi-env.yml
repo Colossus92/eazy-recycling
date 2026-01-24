@@ -131,6 +131,12 @@ jobs:
         run: |
           envsubst < .do/app.yaml.template > .do/app.yaml.generated
 
+      - name: Debug - Print generated app.yaml
+        run: |
+          echo "=== Generated app.yaml content ==="
+          cat .do/app.yaml.generated
+          echo "=== End of generated app.yaml ==="
+
       - name: Deploy the app
         uses: digitalocean/app_action/deploy@v2
         with:
