@@ -7,7 +7,11 @@ server:
 spring:
   application.name: eazy-recycling-service
   datasource:
-    url: # Specify in environment variable SPRING_DATASOURCE_URL
+    # Use Supabase Session Pooler (IPv4) - NOT direct connection (IPv6 only)
+    # Format: jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:5432/postgres
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME:}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     open-in-view: true

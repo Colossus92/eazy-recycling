@@ -118,6 +118,7 @@ jobs:
           EXACT_CLIENT_ID: ${{ secrets.EXACT_CLIENT_ID }}
           EXACT_CLIENT_SECRET: ${{ secrets.EXACT_CLIENT_SECRET }}
           PRICING_APP_BEARER_TOKEN: ${{ secrets.PRICING_APP_BEARER_TOKEN }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
           SUPABASE_API_JWT_SECRET: ${{ secrets.SUPABASE_API_JWT_SECRET }}
           SUPABASE_API_PUBLISHABLE: ${{ secrets.SUPABASE_API_PUBLISHABLE }}
           SUPABASE_API_SECRET: ${{ secrets.SUPABASE_API_SECRET }}
@@ -126,7 +127,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           VITE_API_URL: ${{ vars.VITE_API_URL }}
           PRICING_APP_BASE_URL: ${{ vars.PRICING_APP_BASE_URL }}
+          # Database - Use Session Pooler URL (IPv4), not direct connection (IPv6)
           SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ vars.SPRING_DATASOURCE_USERNAME }}
           SUPABASE_API_URL: ${{ vars.SUPABASE_API_URL }}
           SUPABASE_API_JWT_ISSUER: ${{ vars.SUPABASE_API_JWT_ISSUER }}
           AMICE_URL: ${{ vars.AMICE_URL }}

@@ -60,10 +60,25 @@ services:
         value: 75
         window: FIVE_MINUTES
     envs:
+      # ============================================================================
+      # DATABASE CONNECTION - Supabase PostgreSQL
+      # IMPORTANT: Use Session Pooler connection string (IPv4 compatible)
+      # DO NOT use direct connection string (IPv6 only - won't work on DO App Platform)
+      # Session Pooler format: jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres
+      # Direct format (DON'T USE): jdbc:postgresql://db.<project-ref>.supabase.co:5432/postgres
+      # ============================================================================
       - key: SPRING_DATASOURCE_URL
         scope: RUN_AND_BUILD_TIME
-        type: SECRET
+        # URL only, no credentials - use Session Pooler endpoint
         value: ${SPRING_DATASOURCE_URL}
+      - key: SPRING_DATASOURCE_USERNAME
+        scope: RUN_AND_BUILD_TIME
+        # Format: postgres.<project-ref> for pooler, or just 'postgres' for direct
+        value: ${SPRING_DATASOURCE_USERNAME}
+      - key: SPRING_DATASOURCE_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${SPRING_DATASOURCE_PASSWORD}
       - key: SUPABASE_API_URL
         scope: RUN_AND_BUILD_TIME
         value: ${SUPABASE_API_URL}
