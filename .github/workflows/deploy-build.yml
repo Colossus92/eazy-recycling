@@ -3,7 +3,7 @@ name: Build Docker Image and Deploy to DO App Platform
 on:
   push:
     branches:
-      - main
+      - develop
   workflow_dispatch:
 
 env:

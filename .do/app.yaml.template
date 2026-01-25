@@ -3,10 +3,8 @@ alerts:
   - rule: DOMAIN_FAILED
   - rule: DEPLOYMENT_LIVE
 domains:
-  - domain: ers.eazysoftware.nl
-    type: PRIMARY
   - domain: app.eazyrecycling.nl
-    type: ALIAS
+    type: PRIMARY
 envs:
   - key: VITE_SUPABASE_URL
     scope: RUN_AND_BUILD_TIME
