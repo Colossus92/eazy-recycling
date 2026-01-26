@@ -25,6 +25,9 @@ exact:
     refresh-enabled: false
   division: 4002380
 
+tenant:
+  purchase-financial-email: hello+purchase@eazysoftware.nl
+  sales-financial-email: hello+sales@eazysoftware.nl
 logging:
   config: classpath:logback-local.xml
   structured:

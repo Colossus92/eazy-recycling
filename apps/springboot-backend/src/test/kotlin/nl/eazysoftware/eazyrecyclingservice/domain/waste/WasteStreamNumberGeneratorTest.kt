@@ -1,5 +1,6 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.waste
 
+import nl.eazysoftware.eazyrecyclingservice.config.TenantProperties
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStreamNumberGenerator
@@ -10,7 +11,12 @@ import org.junit.jupiter.api.assertThrows
 
 class WasteStreamNumberGeneratorTest {
 
-    private val tenantProcessorId = Tenant.processorPartyId // "08797"
+    private val mockTenantProperties = TenantProperties(
+        purchaseFinancialEmail = "test@purchase.nl",
+        salesFinancialEmail = "test@sales.nl"
+    )
+    private val mockTenant = Tenant(mockTenantProperties)
+    private val tenantProcessorId = mockTenant.processorPartyId // "08797"
 
     @Test
     fun `should generate number with correct format using sequence value`() {
@@ -18,7 +24,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 1L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -33,7 +39,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 42L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -48,7 +54,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 10000L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -63,7 +69,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 9999999L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -78,7 +84,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 10000000L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When / Then
         val exception = assertThrows<IllegalArgumentException> {
@@ -94,7 +100,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 101L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -110,7 +116,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 1000000L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -125,7 +131,7 @@ class WasteStreamNumberGeneratorTest {
         val mockSequences = object : WasteStreamSequences {
             override fun nextValue(processorId: ProcessorPartyId) = 43L
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         val result = generator.generateNext()
@@ -145,7 +151,7 @@ class WasteStreamNumberGeneratorTest {
                 return 1000000L
             }
         }
-        val generator = WasteStreamNumberGenerator(mockSequences)
+        val generator = WasteStreamNumberGenerator(mockSequences, mockTenant)
 
         // When
         generator.generateNext()

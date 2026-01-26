@@ -50,6 +50,9 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   @Autowired
   private lateinit var jdbcTemplate: JdbcTemplate
 
+  @Autowired
+  private lateinit var tenant: Tenant
+
   private lateinit var testCompany: CompanyDto
   private lateinit var tenantCompany: CompanyDto
 
@@ -88,7 +91,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should generate waste stream number when processor is current tenant`() {
     // Given - using the current tenant's processor ID
-    val tenantProcessorId = Tenant.processorPartyId
+    val tenantProcessorId = tenant.processorPartyId
     val command = createTestCommand(tenantProcessorId, wasteStreamNumber = null)
 
     // When
@@ -103,7 +106,7 @@ class CreateWasteStreamIntegrationTest : BaseIntegrationTest() {
   @Test
   fun `should generate sequential waste stream numbers`() {
     // Given - tenant processor generates numbers automatically
-    val tenantProcessorId = Tenant.processorPartyId
+    val tenantProcessorId = tenant.processorPartyId
     val command1 = createTestCommand(tenantProcessorId)
     val command2 = createTestCommand(tenantProcessorId)
     val command3 = createTestCommand(tenantProcessorId)

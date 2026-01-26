@@ -96,6 +96,10 @@ exact:
     authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
   division: ${EXACT_DIVISION:}
+
+tenant:
+  purchase-financial-email: ${PURCHASE_FINANCIAL_EMAIL:}
+  sales-financial-email: ${SALES_FINANCIAL_EMAIL:}
 logging:
   structured:
     format:

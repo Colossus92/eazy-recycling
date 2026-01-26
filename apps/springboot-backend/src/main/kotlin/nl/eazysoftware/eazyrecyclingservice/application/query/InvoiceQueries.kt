@@ -45,6 +45,7 @@ class GetAllInvoicesQuery(
 class GetInvoiceByIdQuery(
     private val invoices: Invoices,
     private val companies: Companies,
+    private val tenant: Tenant,
 ) : GetInvoiceById {
 
     override fun handle(invoiceId: UUID): InvoiceDetailView? {
@@ -110,9 +111,9 @@ class GetInvoiceByIdQuery(
                 totalInclVat = totals.totalInclVat,
             ),
             tenant = TenantView(
-              processorPartyId = Tenant.processorPartyId.number,
-              companyName = Tenant.companyName,
-              financialEmail = Tenant.getFinancialEmailForInvoiceType(invoice.invoiceType)
+              processorPartyId = tenant.processorPartyId.number,
+              companyName = tenant.companyName,
+              financialEmail = tenant.getFinancialEmailForInvoiceType(invoice.invoiceType)
             ),
             createdAt = invoice.createdAt.toString(),
             createdBy = invoice.createdBy,

@@ -2,7 +2,6 @@ package nl.eazysoftware.eazyrecyclingservice.application.usecase.wastestream
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.Tenant
 import nl.eazysoftware.eazyrecyclingservice.domain.model.waste.WasteStream
-import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ValidationError
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidationResult
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.WasteStreamValidator
 import org.slf4j.LoggerFactory
@@ -18,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class ValidateWasteStream(
-  private val wasteStreamValidator: WasteStreamValidator
+  private val wasteStreamValidator: WasteStreamValidator,
+  private val tenant: Tenant,
 ) {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -33,7 +33,7 @@ class ValidateWasteStream(
   fun handle(command: ValidateWasteStreamCommand): WasteStreamValidationResult {
     logger.info("Validating waste stream: ${command.wasteStream.wasteStreamNumber.number}")
 
-    if (command.wasteStream.deliveryLocation.processorPartyId != Tenant.processorPartyId) {
+    if (command.wasteStream.deliveryLocation.processorPartyId != tenant.processorPartyId) {
       return WasteStreamValidationResult(
         wasteStreamNumber = command.wasteStream.wasteStreamNumber.number,
         isValid = true,

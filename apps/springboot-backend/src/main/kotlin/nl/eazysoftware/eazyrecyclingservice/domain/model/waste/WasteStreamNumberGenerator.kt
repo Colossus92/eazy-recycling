@@ -22,7 +22,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class WasteStreamNumberGenerator(
-  private val sequences: WasteStreamSequences
+  private val sequences: WasteStreamSequences,
+  private val tenant: Tenant,
 ) {
 
   /**
@@ -32,7 +33,7 @@ class WasteStreamNumberGenerator(
    * @return A new WasteStreamNumber with the next sequential value
    */
   fun generateNext(): WasteStreamNumber {
-    val processorId = Tenant.processorPartyId
+    val processorId = tenant.processorPartyId
     val nextSequentialNumber = sequences.nextValue(processorId)
 
     require(nextSequentialNumber <= 9999999L) {

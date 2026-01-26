@@ -36,6 +36,7 @@ class FirstReceivalWasteStreamQueryAdapter(
   private val wasteStreamMapper: WasteStreamMapper,
   private val companyRepository: CompanyJpaRepository,
   private val receivalDeclarationFactory: ReceivalDeclarationFactory,
+  private val tenant: Tenant,
 ) : FirstReceivalWasteStreamQuery {
 
   private val logger = LoggerFactory.getLogger(FirstReceivalWasteStreamQueryAdapter::class.java)
@@ -81,7 +82,7 @@ class FirstReceivalWasteStreamQueryAdapter(
         AND wt.status IN ('${WeightTicketStatus.COMPLETED.name}', '${WeightTicketStatus.INVOICED.name}')
       LEFT JOIN companies c ON c.id = wt.carrier_party_id
       LEFT JOIN lma_declarations d ON d.waste_stream_number = ws.number
-      WHERE proc.processor_id = '${Tenant.processorPartyId.number}'
+      WHERE proc.processor_id = '${tenant.processorPartyId.number}'
         AND d.id IS NULL
         AND wt.id IS NOT NULL
       GROUP BY ws.number, ws.name, ws.eural_code, ws.processing_method_code,

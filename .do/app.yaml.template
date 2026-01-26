@@ -137,6 +137,12 @@ services:
       - key: FRONTEND_URL
         scope: RUN_AND_BUILD_TIME
         value: ${FRONTEND_URL}
+      - key: PURCHASE_FINANCIAL_EMAIL
+        scope: RUN_AND_BUILD_TIME
+        value: ${PURCHASE_FINANCIAL_EMAIL}
+      - key: SALES_FINANCIAL_EMAIL
+        scope: RUN_AND_BUILD_TIME
+        value: ${SALES_FINANCIAL_EMAIL}
       - key: BETTERSTACK_SOURCE_TOKEN
         scope: RUN_AND_BUILD_TIME
         type: SECRET

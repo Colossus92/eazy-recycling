@@ -30,7 +30,8 @@ import java.util.*
 @Repository
 class MonthlyReceivalWasteStreamQueryAdapter(
   private val entityManager: EntityManager,
-  private val idGenerator: ReceivalDeclarationIdGenerator
+  private val idGenerator: ReceivalDeclarationIdGenerator,
+  private val tenant: Tenant,
 ) : MonthlyReceivalWasteStreamQuery {
 
   private val logger = LoggerFactory.getLogger(MonthlyReceivalWasteStreamQueryAdapter::class.java)
@@ -60,7 +61,7 @@ class MonthlyReceivalWasteStreamQueryAdapter(
         AND wt.weighted_at < :endOfMonth
         AND wt.status IN ('${WeightTicketStatus.COMPLETED}', '${WeightTicketStatus.INVOICED}')
       LEFT JOIN companies c ON c.id = wt.carrier_party_id
-      WHERE proc.processor_id = '${Tenant.processorPartyId.number}'
+      WHERE proc.processor_id = '${tenant.processorPartyId.number}'
         AND wt.id IS NOT NULL
         AND EXISTS (
           SELECT 1 FROM lma_declarations d

@@ -18,7 +18,8 @@ class WasteStreamFactory(
   private val wasteStreams: WasteStreams,
   private val numberGenerator: WasteStreamNumberGenerator,
   private val companies: Companies,
-  private val projectLocations: ProjectLocations
+  private val projectLocations: ProjectLocations,
+  private val tenant: Tenant
 ) {
 
   fun createDraft(cmd: WasteStreamCommand): WasteStream {
@@ -48,13 +49,13 @@ class WasteStreamFactory(
       cmd: WasteStreamCommand
   ): WasteStreamNumber {
     val wasteStreamNumber: WasteStreamNumber = when (processorId) {
-      Tenant.processorPartyId -> {
+      tenant.processorPartyId -> {
         numberGenerator.generateNext()
       }
 
       else -> {
         require(cmd.wasteStreamNumber != null) {
-          "Afvalstroomnummer is verplicht voor een verwerker anders dan ${Tenant.companyName}"
+          "Afvalstroomnummer is verplicht voor een verwerker anders dan ${tenant.companyName}"
         }
         cmd.wasteStreamNumber
       }

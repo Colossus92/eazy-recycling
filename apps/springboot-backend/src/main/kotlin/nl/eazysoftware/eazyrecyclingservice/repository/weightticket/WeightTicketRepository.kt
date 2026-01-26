@@ -35,7 +35,8 @@ interface WeightTicketJpaRepository : JpaRepository<WeightTicketDto, UUID> {
 class WeightTicketRepository(
     private val jpaRepository: WeightTicketJpaRepository,
     private val mapper: WeightTicketMapper,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
+    private val tenant: Tenant,
 ) : WeightTickets {
 
     override fun nextId(): WeightTicketId {
@@ -100,7 +101,7 @@ class WeightTicketRepository(
             JOIN weight_tickets wt ON wt.id = wtl.weight_ticket_id
             JOIN waste_streams ws ON wtl.waste_stream_number = ws.number
             JOIN companies proc ON ws.processor_party_id = proc.processor_id
-            WHERE proc.processor_id = '${Tenant.processorPartyId.number}'
+            WHERE proc.processor_id = '${tenant.processorPartyId.number}'
               AND wt.status IN ('COMPLETED', 'INVOICED')
               AND wt.weighted_at < :cutoffDate
               AND (wtl.declared_weight IS NULL OR wtl.declared_weight != wtl.weight_value)
