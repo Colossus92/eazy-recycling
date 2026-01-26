@@ -78,6 +78,11 @@ class ExactOnlineSyncAdapterTest {
       ),
       conflictHandler = conflictHandler
     )
+    
+    // Initialize exactDivisionCode using reflection since it's normally injected by @Value
+    val field = ExactOnlineSyncAdapter::class.java.getDeclaredField("exactDivisionCode")
+    field.isAccessible = true
+    field.set(adapter, "4002380")
   }
 
   @Nested

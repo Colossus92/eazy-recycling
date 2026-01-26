@@ -11,6 +11,7 @@ import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.SyncFromExactResult
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.*
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -44,8 +45,10 @@ class ExactOnlineSyncAdapter(
   private val conflictHandler: ExactConflictHandler,
 ) : ExactOnlineSync {
 
+  @Value("\${exact.division:}")
+  private lateinit var exactDivisionCode: String
+
   private val logger = LoggerFactory.getLogger(javaClass)
-  private val EXACT_DIVISION = "4002380" // Division ID from the API endpoint
 
   /**
    * Sync a newly created company to Exact Online
@@ -135,7 +138,7 @@ class ExactOnlineSyncAdapter(
    */
   private fun createExactAccount(company: Company): ExactAccountCreateResponse {
     val restTemplate = exactApiClient.getRestTemplate()
-    val url = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/crm/Accounts"
+    val url = "https://start.exactonline.nl/api/v1/$exactDivisionCode/crm/Accounts"
     val customerStatus = if (company.isCustomer) "C" else "A"
 
     // Note: We do NOT send ID - let Exact auto-generate it
@@ -173,7 +176,7 @@ class ExactOnlineSyncAdapter(
    */
   private fun updateExactAccount(company: Company, exactGuid: UUID) {
     val restTemplate = exactApiClient.getRestTemplate()
-    val url = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/crm/Accounts(guid'$exactGuid')"
+    val url = "https://start.exactonline.nl/api/v1/$exactDivisionCode/crm/Accounts(guid'$exactGuid')"
     val customerStatus = if (company.isCustomer) "C" else "A"
 
     val accountRequest = ExactAccountUpdateRequest(
@@ -501,7 +504,7 @@ class ExactOnlineSyncAdapter(
    * Query parameters are properly encoded for use with URI.create().
    */
   private fun buildAccountsSyncUrl(timestamp: Long): String {
-    val baseUrl = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/CRM/Accounts"
+    val baseUrl = "https://start.exactonline.nl/api/v1/$exactDivisionCode/sync/CRM/Accounts"
     val select = encodeQueryParam("ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier,Timestamp")
     val filter = encodeQueryParam("Timestamp gt ${timestamp}L")
     return "$baseUrl?\$select=$select&\$filter=$filter"
@@ -512,7 +515,7 @@ class ExactOnlineSyncAdapter(
    * Query parameters are properly encoded for use with URI.create().
    */
   private fun buildDeletedSyncUrl(timestamp: Long): String {
-    val baseUrl = "https://start.exactonline.nl/api/v1/$EXACT_DIVISION/sync/Deleted"
+    val baseUrl = "https://start.exactonline.nl/api/v1/$exactDivisionCode/sync/Deleted"
     val select = encodeQueryParam("Timestamp,DeletedBy,DeletedDate,Division,EntityKey,EntityType,ID")
     val filter = encodeQueryParam("Timestamp gt ${timestamp}L")
     return "$baseUrl?\$filter=$filter&\$select=$select"

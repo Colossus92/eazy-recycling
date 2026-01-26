@@ -23,6 +23,7 @@ exact:
     authorization-endpoint: https://start.exactonline.nl/api/oauth2/auth
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
     refresh-enabled: false
+  division: 4002380
 
 logging:
   config: classpath:logback-local.xml

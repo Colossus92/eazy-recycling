@@ -35,6 +35,7 @@ supabase:
 exact:
   oauth:
     refresh-enabled: false
+  division: 4002380
 
 logging:
   config: classpath:logback-local.xml
