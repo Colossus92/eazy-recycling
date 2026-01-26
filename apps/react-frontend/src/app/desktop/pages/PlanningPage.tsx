@@ -20,7 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCreateWeightTicketFromTransport } from '@/features/weighttickets/hooks/useCreateWeightTicketFromTransport';
 
 export const PlanningPage = () => {
-  const { filters, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } =
+  const { filters, formValues, applyFilterFormValues, isDrawerOpen, setIsDrawerOpen } =
     usePlanningFilter();
   const [isContainerTransportFormOpen, setIsContainerTransportFormOpen] =
     useState(false);
@@ -161,6 +161,7 @@ export const PlanningPage = () => {
         <PlanningFilterForm
           onSubmit={applyFilterFormValues}
           closeDialog={() => setIsDrawerOpen(false)}
+          initialValues={formValues}
         />
       </Drawer>
       {selectedTransportId && (

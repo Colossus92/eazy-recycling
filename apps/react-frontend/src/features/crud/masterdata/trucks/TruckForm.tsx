@@ -1,6 +1,6 @@
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
 import { useErrorHandling } from '@/hooks/useErrorHandling';
-import { FormEvent } from 'react';
+import { FormEvent, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { FormProvider, useForm } from 'react-hook-form';
 import { fallbackRender } from '@/utils/fallbackRender';
@@ -31,7 +31,7 @@ function toTruckRequest(data: TruckFormValues) {
     brand: data.brand,
     description: data.description,
     licensePlate: data.licensePlate,
-    carrierPartyId: data.carrierPartyId,
+    carrierPartyId: data.carrierPartyId || undefined,
   } as TruckRequest;
 }
 
@@ -53,15 +53,20 @@ export const TruckForm = ({
 }: TruckFormProps) => {
   const { handleError, ErrorDialogComponent } = useErrorHandling();
   const methods = useForm<TruckFormValues>({
-    values: toFormData(initialData),
+    defaultValues: toFormData(initialData),
   });
+
+  // Reset form when initialData changes (e.g., opening for create vs edit)
+  useEffect(() => {
+    methods.reset(toFormData(initialData));
+  }, [initialData, methods]);
 
   const cancel = () => {
     methods.reset({
       licensePlate: '',
       description: '',
       brand: '',
-      carrierPartyId: '',
+      carrierPartyId: undefined,
     });
     onCancel();
   };

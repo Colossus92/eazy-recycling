@@ -12,8 +12,17 @@ const defaultFilters: PlanningFilterParams = {
 export const usePlanningFilter = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [filters, setFilters] = useState<PlanningFilterParams>(defaultFilters);
+  const [formValues, setFormValues] = useState<TransportPlanningFormValues>({
+    driverId: '',
+    truckId: '',
+    isPlanned: false,
+    isFinished: false,
+    isUnplanned: false,
+    isInvoiced: false,
+  });
 
   const applyFilterFormValues = (values: TransportPlanningFormValues) => {
+    setFormValues(values);
     const statuses: string[] = [];
 
     if (values.isPlanned) statuses.push(DriverPlanningItemStatusEnum.Planned);
@@ -30,6 +39,7 @@ export const usePlanningFilter = () => {
 
   return {
     filters,
+    formValues,
     applyFilterFormValues,
     isDrawerOpen,
     setIsDrawerOpen,

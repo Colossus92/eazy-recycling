@@ -76,8 +76,8 @@ export const planningService = {
     planningApi
       .getPlanningByDate(
         date.toISOString().split('T')[0],
-        filters?.driverId,
         filters?.truckId,
+        filters?.driverId,
         filters?.statuses?.join(',')
       )
       .then((r) => r.data)

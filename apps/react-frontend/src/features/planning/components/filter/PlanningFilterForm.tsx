@@ -46,21 +46,25 @@ const StatusFilterOption = ({
 interface PlanningFilterFormProps {
   closeDialog: () => void;
   onSubmit: (values: TransportPlanningFormValues) => void;
+  initialValues?: TransportPlanningFormValues;
 }
+
+const defaultFormValues: TransportPlanningFormValues = {
+  driverId: '',
+  truckId: '',
+  isPlanned: false,
+  isFinished: false,
+  isUnplanned: false,
+  isInvoiced: false,
+};
 
 export const PlanningFilterForm = ({
   closeDialog,
   onSubmit,
+  initialValues,
 }: PlanningFilterFormProps) => {
   const formContext = useForm<TransportPlanningFormValues>({
-    defaultValues: {
-      driverId: '',
-      truckId: '',
-      isPlanned: false,
-      isFinished: false,
-      isUnplanned: false,
-      isInvoiced: false,
-    },
+    defaultValues: initialValues ?? defaultFormValues,
   });
 
   const handleApplyFilter = formContext.handleSubmit((data) => {
@@ -127,7 +131,7 @@ export const PlanningFilterForm = ({
             variant={'secondary'}
             label={'Reset'}
             fullWidth={true}
-            onClick={() => formContext.reset()}
+            onClick={() => formContext.reset(defaultFormValues)}
           />
         </div>
         <div className={'flex-1'}>
