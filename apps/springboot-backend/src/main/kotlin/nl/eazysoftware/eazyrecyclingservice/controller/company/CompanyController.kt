@@ -3,12 +3,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.company
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
-import nl.eazysoftware.eazyrecyclingservice.application.query.AddressView
-import nl.eazysoftware.eazyrecyclingservice.application.query.CompleteCompanyView
-import nl.eazysoftware.eazyrecyclingservice.application.query.GetAllCompanies
-import nl.eazysoftware.eazyrecyclingservice.application.query.GetCompanyById
-import nl.eazysoftware.eazyrecyclingservice.application.query.GetTenantCompany
-import nl.eazysoftware.eazyrecyclingservice.application.query.PagedCompanyResponse
+import nl.eazysoftware.eazyrecyclingservice.application.query.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.address.*
 import nl.eazysoftware.eazyrecyclingservice.application.usecase.company.*
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
@@ -209,7 +204,7 @@ class CompanyController(
     )
     val vihbId: String?,
 
-    @field:Pattern(regexp = "^$|^[\\d]{5}$", message = "Verwerkersnummer moet bestaan uit 5 cijfers, of leeg zijn")
+    @field:Pattern(regexp = "^$|^[^\\s]{5}$", message = "Verwerkersnummer moet bestaan uit 5 tekens zonder spaties, of leeg zijn")
     val processorId: String?,
 
     @field:NotBlank(message = "Bedrijfsnaam is verplicht")

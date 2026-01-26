@@ -170,7 +170,7 @@ class CompanyControllerValidationTest {
         val violations = validator.validate(company)
         assertThat(violations).hasSize(1)
         assertThat(violations).extracting(ConstraintViolation<*>::getMessage).containsExactly(
-            tuple("Verwerkersnummer moet bestaan uit 5 cijfers, of leeg zijn")
+            tuple("Verwerkersnummer moet bestaan uit 5 tekens zonder spaties, of leeg zijn")
         )
     }
 
@@ -261,27 +261,24 @@ class CompanyControllerValidationTest {
 
         @JvmStatic
         fun validProcessorIds() = listOf(
-            "12345",          // standard 5 digits
-            "00000",          // edge case with all zeros
-            "99999",          // edge case with all nines
-            "54321",          // mixed digits
+            "12345",          // 5 digits
+            "ABCDE",          // 5 letters
+            "A1B2C",          // mixed alphanumeric
+            "!@#$%",          // special characters
+            "Ab-12",          // mixed with dash
             null,             // null is valid
             ""                // empty string is valid
         )
 
         @JvmStatic
         fun invalidProcessorIds() = listOf(
-            "1234",           // 4 digits (too few)
-            "123456",         // 6 digits (too many)
-            "1234A",          // contains letter
-            "12 345",         // contains space
-            "12-345",         // contains dash
-            "12.345",         // contains dot
-            "A2345",          // letter at start
-            "1234A",          // letter at end
-            " 12345",         // leading space
-            "12345 ",         // trailing space
+            "1234",           // 4 characters (too few)
+            "123456",         // 6 characters (too many)
+            "12 34",          // contains space
+            " 1234",          // leading space
+            "1234 ",          // trailing space
             "12 345",         // space in middle
+            "A B C",          // multiple spaces
         )
 
     }
