@@ -138,8 +138,8 @@ class FinalizeInvoiceIntegrationTest @Autowired constructor(
         assertThat(finalizedInvoice).isPresent
         assertThat(finalizedInvoice.get().status.name).isEqualTo("FINAL")
         assertThat(finalizedInvoice.get().invoiceNumber).isNotNull()
-        assertThat(finalizedInvoice.get().invoiceNumber).startsWith("ER-")
-        
+        assertThat(finalizedInvoice.get().invoiceNumber).startsWith("ER")
+
         // PDF generation is now handled by Jobrunr asynchronously
         // The job will be processed in the background
     }

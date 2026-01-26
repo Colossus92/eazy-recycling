@@ -46,6 +46,7 @@ class UpdateCompanyService(
 
     val updatedCompany = Company(
       companyId = cmd.companyId,
+      code = existingCompany.code,
       name = cmd.name,
       chamberOfCommerceId = cmd.chamberOfCommerceId,
       vihbNumber = cmd.vihbNumber,

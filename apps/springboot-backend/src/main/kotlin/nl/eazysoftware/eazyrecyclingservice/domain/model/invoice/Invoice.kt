@@ -84,7 +84,7 @@ data class InvoiceId(val value: UUID)
 data class InvoiceNumber(val value: String) {
     companion object {
         fun generate(prefix: String, year: Int, sequence: Long): InvoiceNumber {
-            val formatted = "$prefix-$year-${sequence.toString().padStart(5, '0')}"
+            val formatted = "$prefix$year${sequence.toString().padStart(5, '0')}"
             return InvoiceNumber(formatted)
         }
 
