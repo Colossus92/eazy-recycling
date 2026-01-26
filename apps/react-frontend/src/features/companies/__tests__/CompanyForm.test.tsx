@@ -679,7 +679,7 @@ describe('CompanyForm', () => {
     // Check that validation error appears
     await waitFor(() => {
       expect(
-        screen.getByText('Vewerkersnummer moet 5 cijfers bevatten')
+        screen.getByText('Vewerkersnummer moet 5 tekens bevatten')
       ).toBeInTheDocument();
     });
 

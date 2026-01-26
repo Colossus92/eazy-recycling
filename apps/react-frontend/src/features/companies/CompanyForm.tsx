@@ -362,8 +362,8 @@ export const CompanyForm = ({
 
                     if (trimmed === '') return true;
                     return (
-                      /^\d{5}$/.test(trimmed) ||
-                      'Vewerkersnummer moet 5 cijfers bevatten'
+                      trimmed.length === 5 ||
+                      'Vewerkersnummer moet 5 tekens bevatten'
                     );
                   },
                 },
