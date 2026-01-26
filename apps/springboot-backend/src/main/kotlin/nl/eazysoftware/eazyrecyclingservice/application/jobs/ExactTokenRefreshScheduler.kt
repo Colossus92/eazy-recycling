@@ -9,6 +9,7 @@ import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.time.Instant
+import java.util.concurrent.ScheduledFuture
 
 /**
  * Scheduled job to automatically refresh Exact Online OAuth tokens before they expire.
@@ -25,6 +26,12 @@ class ExactTokenRefreshScheduler(
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    
+    @Volatile
+    private var scheduledTask: ScheduledFuture<*>? = null
+    
+    @Volatile
+    private var stopped: Boolean = false
 
     companion object {
         private const val REFRESH_BEFORE_EXPIRY_SECONDS = 25L
@@ -35,14 +42,41 @@ class ExactTokenRefreshScheduler(
     fun init() {
         scheduleNextRefresh()
     }
+    
+    /**
+     * Stop all scheduled token refresh tasks and prevent new ones from being scheduled.
+     * Called when the connection is revoked.
+     */
+    @Synchronized
+    fun stop() {
+        logger.info("Stopping Exact Online token refresh scheduler")
+        stopped = true
+        scheduledTask?.cancel(false)
+        scheduledTask = null
+    }
+    
+    /**
+     * Resume scheduling token refresh tasks.
+     * Called when a new connection is established.
+     */
+    @Synchronized
+    fun resume() {
+        logger.info("Resuming Exact Online token refresh scheduler")
+        stopped = false
+        scheduleNextRefresh()
+    }
 
     private fun scheduleNextRefresh() {
+        if (stopped) {
+            logger.debug("Scheduler is stopped, not scheduling next refresh")
+            return
+        }
         try {
             val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()
 
             if (currentToken == null) {
-                logger.debug("No Exact Online tokens found, will retry in {} seconds", RETRY_DELAY_SECONDS)
-                taskScheduler.schedule(::scheduleNextRefresh, Instant.now().plusSeconds(RETRY_DELAY_SECONDS))
+                logger.debug("No Exact Online tokens found, waiting for OAuth connection")
+                // Don't schedule retry - wait for resume() to be called after OAuth
                 return
             }
 
@@ -56,16 +90,20 @@ class ExactTokenRefreshScheduler(
             } else {
                 // Schedule refresh for later
                 logger.info("Scheduled Exact Online token refresh at {} (token expires at: {})", refreshAt, currentToken.expiresAt)
-                taskScheduler.schedule({ refreshTokenAndReschedule(currentToken.refreshToken) }, refreshAt)
+                scheduledTask = taskScheduler.schedule({ refreshTokenAndReschedule(currentToken.refreshToken) }, refreshAt)
             }
 
         } catch (e: Exception) {
             logger.error("Failed to schedule Exact Online token refresh, will retry in {} seconds", RETRY_DELAY_SECONDS, e)
-            taskScheduler.schedule(::scheduleNextRefresh, Instant.now().plusSeconds(RETRY_DELAY_SECONDS))
+            scheduledTask = taskScheduler.schedule(::scheduleNextRefresh, Instant.now().plusSeconds(RETRY_DELAY_SECONDS))
         }
     }
 
     private fun refreshTokenAndReschedule(refreshToken: String) {
+        if (stopped) {
+            logger.debug("Scheduler is stopped, not refreshing token")
+            return
+        }
         try {
             exactOAuthService.refreshAccessToken(refreshToken)
             logger.debug("Successfully refreshed Exact Online token")
@@ -73,7 +111,7 @@ class ExactTokenRefreshScheduler(
             scheduleNextRefresh()
         } catch (e: Exception) {
             logger.error("Failed to refresh Exact Online token, will retry in {} seconds", RETRY_DELAY_SECONDS, e)
-            taskScheduler.schedule(::scheduleNextRefresh, Instant.now().plusSeconds(RETRY_DELAY_SECONDS))
+            scheduledTask = taskScheduler.schedule(::scheduleNextRefresh, Instant.now().plusSeconds(RETRY_DELAY_SECONDS))
         }
     }
 

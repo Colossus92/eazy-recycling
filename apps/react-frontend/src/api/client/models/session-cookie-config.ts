@@ -22,16 +22,40 @@
 export interface SessionCookieConfig {
     /**
      * 
+     * @type {number}
+     * @memberof SessionCookieConfig
+     */
+    'maxAge'?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'httpOnly'?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
-    'name'?: string;
+    'domain'?: string;
     /**
      * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
     'path'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'secure'?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof SessionCookieConfig
+     */
+    'name'?: string;
     /**
      * 
      * @type {{ [key: string]: string; }}
@@ -45,29 +69,5 @@ export interface SessionCookieConfig {
      * @deprecated
      */
     'comment'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof SessionCookieConfig
-     */
-    'maxAge'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'httpOnly'?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'secure'?: boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof SessionCookieConfig
-     */
-    'domain'?: string;
 }
 

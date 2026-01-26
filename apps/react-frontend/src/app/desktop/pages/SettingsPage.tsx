@@ -1,7 +1,7 @@
 import type {
   AuthorizationUrlResponse,
   ConnectionStatusResponse,
-  RefreshTokenResponse,
+  RevokeConnectionResponse,
 } from '@/api/client';
 import { exactOnlineService } from '@/api/services/exactOnlineService.ts';
 import { SyncFromExactResponse } from '@/api/client/models/sync-from-exact-response';
@@ -50,22 +50,22 @@ export const SettingsPage = () => {
     },
   });
 
-  // Mutation to refresh token
-  const refreshTokenMutation = useMutation({
+  // Mutation to revoke connection
+  const revokeConnectionMutation = useMutation({
     mutationFn: async () => {
-      const response = await exactOnlineService.refreshToken();
+      const response = await exactOnlineService.revokeConnection();
       return response.data;
     },
-    onSuccess: (data: RefreshTokenResponse) => {
+    onSuccess: (data: RevokeConnectionResponse) => {
       if (data.success) {
-        toastService.success(data.message || 'Token refreshed successfully');
+        toastService.success(data.message || 'Verbinding verbroken');
         refetchStatus();
       } else {
-        toastService.error(data.message || 'Failed to refresh token');
+        toastService.error(data.message || 'Verbinding verbreken mislukt');
       }
     },
     onError: (error: Error) => {
-      toastService.error(`Failed to refresh token: ${error.message}`);
+      toastService.error(`Verbinding verbreken mislukt: ${error.message}`);
     },
   });
 
@@ -100,8 +100,8 @@ export const SettingsPage = () => {
     }
   };
 
-  const handleRefreshToken = () => {
-    refreshTokenMutation.mutate();
+  const handleRevokeConnection = () => {
+    revokeConnectionMutation.mutate();
   };
 
   const handleTestConnection = () => {
@@ -252,27 +252,35 @@ export const SettingsPage = () => {
           </div>
         )}
 
-        {/* Token Management Section */}
-        <div className="px-6 py-4 border-b border-solid border-color-border-primary">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <h5 className="text-color-text-primary">Token Beheer</h5>
-              <span className="text-sm text-color-text-secondary">
-                Vernieuw het toegangstoken wanneer deze is verlopen. Dit wordt
-                normaal gesproken automatisch gedaan.
-              </span>
-            </div>
+        {/* Revoke Connection Section - Only show when connected */}
+        {connectionStatus?.connected && (
+          <div className="px-6 py-4 border-b border-solid border-color-border-primary">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <h5 className="text-color-text-primary">Verbinding beheren</h5>
+                <span className="text-sm text-color-text-secondary">
+                  Verbreek de verbinding met Exact Online. Dit stopt de
+                  automatische token vernieuwing en verwijdert alle opgeslagen
+                  tokens.
+                </span>
+              </div>
 
-            <div>
-              <Button
-                variant="secondary"
-                label="Vernieuw Token"
-                onClick={handleRefreshToken}
-                disabled={refreshTokenMutation.isPending}
-              />
+              <div>
+                <Button
+                  variant="secondary"
+                  label={
+                    revokeConnectionMutation.isPending
+                      ? 'Verbinding verbreken...'
+                      : 'Verbinding verbreken'
+                  }
+                  onClick={handleRevokeConnection}
+                  disabled={revokeConnectionMutation.isPending}
+                  loading={revokeConnectionMutation.isPending}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Data Synchronization Section */}
         <div className="px-6 py-4">

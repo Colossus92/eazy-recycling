@@ -1,8 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.controller.admin
 
+import nl.eazysoftware.eazyrecyclingservice.application.jobs.ExactTokenRefreshScheduler
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ExactOnlineSync
 import nl.eazysoftware.eazyrecyclingservice.domain.service.ExactOAuthService
+import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -20,6 +22,8 @@ import org.springframework.web.servlet.view.RedirectView
 class ExactOnlineController(
     private val exactOAuthService: ExactOAuthService,
     private val exactOnlineSync: ExactOnlineSync,
+    private val tokenRepository: ExactTokenRepository,
+    private val tokenRefreshScheduler: ExactTokenRefreshScheduler?,
     @Value("\${frontend.url}") private val frontendUrl: String
 ) {
 
@@ -59,7 +63,7 @@ class ExactOnlineController(
      */
     @GetMapping("/callback")
     fun handleCallback(
-        @RequestParam code: String,
+        @RequestParam(required = false) code: String?,
         @RequestParam state: String,
         @RequestParam(required = false) error: String?,
         @RequestParam(required = false) error_description: String?
@@ -77,10 +81,19 @@ class ExactOnlineController(
             return RedirectView("$frontendUrl/settings?exact_error=invalid_state")
         }
 
+        // Ensure code is present for token exchange
+        if (code == null) {
+            logger.error("No authorization code received")
+            return RedirectView("$frontendUrl/settings?exact_error=missing_code")
+        }
+
         try {
             // Exchange code for tokens
             logger.info("Exchanging authorization code for tokens")
             exactOAuthService.exchangeCodeForTokens(code)
+
+            // Resume the token refresh scheduler now that we have valid tokens
+            tokenRefreshScheduler?.resume()
 
             // Redirect back to frontend with success indicator
             return RedirectView("$frontendUrl/settings?exact_connected=true")
@@ -108,20 +121,28 @@ class ExactOnlineController(
     }
 
     /**
-     * POST /api/admin/exact/refresh
+     * POST /api/admin/exact/revoke
      *
-     * Manually refresh the access token (mainly for testing)
+     * Revoke the Exact Online connection by removing all tokens and stopping the refresh scheduler.
      */
     @PreAuthorize(HAS_ROLE_ADMIN)
-    @PostMapping("/refresh")
-    fun refreshToken(): ResponseEntity<RefreshTokenResponse> {
+    @PostMapping("/revoke")
+    fun revokeConnection(): ResponseEntity<RevokeConnectionResponse> {
         return try {
-            exactOAuthService.refreshAccessToken()
-            ResponseEntity.ok(RefreshTokenResponse(success = true, message = "Token refreshed successfully"))
+            logger.info("Revoking Exact Online connection")
+
+            // Stop the token refresh scheduler first (if available)
+            tokenRefreshScheduler?.stop()
+
+            // Delete all tokens from the database
+            tokenRepository.deleteAll()
+
+            logger.info("Exact Online connection revoked successfully")
+            ResponseEntity.ok(RevokeConnectionResponse(success = true, message = "Connection revoked successfully"))
         } catch (e: Exception) {
-            logger.error("Failed to refresh token", e)
+            logger.error("Failed to revoke connection", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(RefreshTokenResponse(success = false, message = "Failed to refresh token: ${e.message}"))
+                .body(RevokeConnectionResponse(success = false, message = "Failed to revoke connection: ${e.message}"))
         }
     }
 
@@ -135,7 +156,7 @@ class ExactOnlineController(
         val message: String
     )
 
-    data class RefreshTokenResponse(
+    data class RevokeConnectionResponse(
         val success: Boolean,
         val message: String
     )

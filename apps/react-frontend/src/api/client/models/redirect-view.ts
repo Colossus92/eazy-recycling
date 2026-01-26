@@ -142,13 +142,13 @@ export interface RedirectView {
      * @type {boolean}
      * @memberof RedirectView
      */
-    'propagateQueryProperties'?: boolean;
+    'redirectView'?: boolean;
     /**
      * 
      * @type {boolean}
      * @memberof RedirectView
      */
-    'redirectView'?: boolean;
+    'propagateQueryProperties'?: boolean;
     /**
      * 
      * @type {{ [key: string]: string; }}
