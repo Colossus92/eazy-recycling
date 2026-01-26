@@ -128,6 +128,9 @@ services:
         scope: RUN_AND_BUILD_TIME
         type: SECRET
         value: ${EXACT_CLIENT_SECRET}
+      - key: EXACT_DIVISION
+        scope: RUN_AND_BUILD_TIME
+        value: ${EXACT_DIVISION}
       - key: EXACT_REDIRECT_URI
         scope: RUN_AND_BUILD_TIME
         value: ${EXACT_REDIRECT_URI}
