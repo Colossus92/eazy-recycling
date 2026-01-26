@@ -13,6 +13,21 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME:}
     password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      # Conservative pool sizing for Supabase (Pool Size: 15)
+      # During rolling deployment: 2 instances × 6 = 12 connections + 3 headroom
+      maximum-pool-size: 6
+      minimum-idle: 2
+      # Connection management
+      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 600000 # 10 minutes
+      max-lifetime: 1800000 # 30 minutes
+      # Health check to detect stale connections
+      connection-test-query: SELECT 1
+      # Faster detection of connection issues
+      validation-timeout: 5000 # 5 seconds
+      # Graceful shutdown during rolling deployment
+      leak-detection-threshold: 60000 # 60 seconds
   jpa:
     open-in-view: true
     properties:
@@ -54,6 +69,18 @@ pricing-app:
 springdoc:
   api-docs:
     enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
 amice:
   enabled: ${AMICE_ENABLED:true}
