@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.config.ExactOnlineProperties
+import nl.eazysoftware.eazyrecyclingservice.config.security.TokenEncryptionService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenDto
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenRepository
 import org.slf4j.LoggerFactory
@@ -24,6 +25,7 @@ import java.util.*
 class ExactOAuthService(
     private val exactProperties: ExactOnlineProperties,
     private val tokenRepository: ExactTokenRepository,
+    private val encryptionService: TokenEncryptionService,
     private val restTemplate: RestTemplate = RestTemplate()
 ) {
 
@@ -117,7 +119,8 @@ class ExactOAuthService(
         val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()
             ?: throw ExactOAuthException("No tokens found to refresh")
 
-        return refreshAccessToken(currentToken.refreshToken)
+        val decryptedRefreshToken = encryptionService.decrypt(currentToken.refreshToken)
+        return refreshAccessToken(decryptedRefreshToken)
     }
 
     /**
@@ -206,11 +209,13 @@ class ExactOAuthService(
 
         if (currentToken.expiresAt.isBefore(expiryThreshold)) {
             logger.info("Token is expiring soon, refreshing...")
-            refreshAccessToken(currentToken.refreshToken)
-            return tokenRepository.findFirstByOrderByCreatedAtDesc()!!.accessToken
+            val decryptedRefreshToken = encryptionService.decrypt(currentToken.refreshToken)
+            refreshAccessToken(decryptedRefreshToken)
+            val newToken = tokenRepository.findFirstByOrderByCreatedAtDesc()!!
+            return encryptionService.decrypt(newToken.accessToken)
         }
 
-        return currentToken.accessToken
+        return encryptionService.decrypt(currentToken.accessToken)
     }
 
     /**
@@ -222,22 +227,27 @@ class ExactOAuthService(
     }
 
     /**
-     * Save or update tokens in the database
+     * Save or update tokens in the database.
+     * Tokens are encrypted before storage using AES-256-GCM.
      */
     private fun saveTokens(tokenResponse: TokenResponse) {
         val expiresAt = Instant.now().plusSeconds(tokenResponse.expiresIn.toLong())
 
+        // Encrypt tokens before storing
+        val encryptedAccessToken = encryptionService.encrypt(tokenResponse.accessToken)
+        val encryptedRefreshToken = encryptionService.encrypt(tokenResponse.refreshToken)
+
         // For simplicity, always create a new token entry (could update existing instead)
         val tokenDto = ExactTokenDto(
-            accessToken = tokenResponse.accessToken,
-            refreshToken = tokenResponse.refreshToken,
+            accessToken = encryptedAccessToken,
+            refreshToken = encryptedRefreshToken,
             tokenType = tokenResponse.tokenType,
             expiresAt = expiresAt,
             updatedAt = Instant.now()
         )
 
         tokenRepository.save(tokenDto)
-      logger.debug("Saved tokens to database, expires at: {}", expiresAt)
+        logger.debug("Saved encrypted tokens to database, expires at: {}", expiresAt)
     }
 
     data class AuthorizationUrlResponse(

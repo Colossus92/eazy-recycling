@@ -1,6 +1,8 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.service
 
 import nl.eazysoftware.eazyrecyclingservice.config.ExactOnlineProperties
+import nl.eazysoftware.eazyrecyclingservice.config.security.EncryptionProperties
+import nl.eazysoftware.eazyrecyclingservice.config.security.TokenEncryptionService
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenDto
 import nl.eazysoftware.eazyrecyclingservice.repository.exact.ExactTokenRepository
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -67,12 +69,26 @@ class ExactOAuthServiceRetryTest {
         }
 
         @Bean
+        fun encryptionProperties(): EncryptionProperties {
+            // Test key: 32 bytes base64 encoded (openssl rand -base64 32)
+            return EncryptionProperties(
+                tokenEncryptionKey = "U5hCWgeAe59r7CJjkiMtyZTnCuKwrLms/x8+U7CttHo="
+            )
+        }
+
+        @Bean
+        fun tokenEncryptionService(encryptionProperties: EncryptionProperties): TokenEncryptionService {
+            return TokenEncryptionService(encryptionProperties)
+        }
+
+        @Bean
         fun exactOAuthService(
             exactProperties: ExactOnlineProperties,
             tokenRepository: ExactTokenRepository,
+            encryptionService: TokenEncryptionService,
             restTemplate: RestTemplate
         ): ExactOAuthService {
-            return ExactOAuthService(exactProperties, tokenRepository, restTemplate)
+            return ExactOAuthService(exactProperties, tokenRepository, encryptionService, restTemplate)
         }
     }
 

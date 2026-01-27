@@ -134,6 +134,10 @@ services:
       - key: EXACT_REDIRECT_URI
         scope: RUN_AND_BUILD_TIME
         value: ${EXACT_REDIRECT_URI}
+      - key: TOKEN_ENCRYPTION_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+        value: ${TOKEN_ENCRYPTION_KEY}
       - key: FRONTEND_URL
         scope: RUN_AND_BUILD_TIME
         value: ${FRONTEND_URL}

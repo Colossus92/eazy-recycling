@@ -97,6 +97,12 @@ exact:
     token-endpoint: https://start.exactonline.nl/api/oauth2/token
   division: ${EXACT_DIVISION:}
 
+# Token encryption - key must be Base64-encoded 32-byte (256-bit) AES key
+# Generate with: openssl rand -base64 32
+security:
+  encryption:
+    token-encryption-key: ${TOKEN_ENCRYPTION_KEY:}
+
 tenant:
   purchase-financial-email: ${PURCHASE_FINANCIAL_EMAIL:}
   sales-financial-email: ${SALES_FINANCIAL_EMAIL:}

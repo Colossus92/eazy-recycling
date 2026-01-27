@@ -37,6 +37,11 @@ exact:
     refresh-enabled: false
   division: 4002380
 
+# Test encryption key (32 bytes base64 encoded) - DO NOT use in production
+security:
+  encryption:
+    token-encryption-key: "U5hCWgeAe59r7CJjkiMtyZTnCuKwrLms/x8+U7CttHo="
+
 logging:
   config: classpath:logback-local.xml
   structured:
