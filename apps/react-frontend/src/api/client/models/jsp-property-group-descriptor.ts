@@ -25,13 +25,7 @@ export interface JspPropertyGroupDescriptor {
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'defaultContentType'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof JspPropertyGroupDescriptor
-     */
-    'urlPatterns'?: Array<string>;
+    'deferredSyntaxAllowedAsLiteral'?: string;
     /**
      * 
      * @type {string}
@@ -46,10 +40,16 @@ export interface JspPropertyGroupDescriptor {
     'isXml'?: string;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof JspPropertyGroupDescriptor
+     */
+    'urlPatterns'?: Array<string>;
+    /**
+     * 
      * @type {string}
      * @memberof JspPropertyGroupDescriptor
      */
-    'deferredSyntaxAllowedAsLiteral'?: string;
+    'defaultContentType'?: string;
     /**
      * 
      * @type {string}

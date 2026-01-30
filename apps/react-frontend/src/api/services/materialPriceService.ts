@@ -3,9 +3,15 @@ import { apiInstance } from './apiInstance';
 
 const materialPriceApi = new MaterialPriceControllerApi(apiInstance.config);
 
+export interface MaterialPriceQueryParams {
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  publishedOnly?: boolean;
+}
+
 export const materialPriceService = {
-  getAll: () =>
-    materialPriceApi.getAllMaterialsWithPrices().then((r) => r.data),
+  getAll: (params?: MaterialPriceQueryParams) =>
+    materialPriceApi.getAllMaterialsWithPrices(params?.sortBy, params?.sortDirection, params?.publishedOnly).then((r) => r.data),
   getById: (id: string) =>
     materialPriceApi.getMaterialPrice(id).then((r) => r.data),
   create: (id: string, materialPrice: MaterialPriceRequest) =>

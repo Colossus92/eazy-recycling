@@ -34,6 +34,12 @@ export interface SessionCookieConfig {
     'httpOnly'?: boolean;
     /**
      * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'secure'?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
@@ -44,12 +50,6 @@ export interface SessionCookieConfig {
      * @memberof SessionCookieConfig
      */
     'path'?: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'secure'?: boolean;
     /**
      * 
      * @type {string}

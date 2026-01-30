@@ -28,16 +28,16 @@ export interface LocalTime {
     'value'?: string;
     /**
      * 
-     * @type {string}
-     * @memberof LocalTime
-     */
-    'value$kotlinx_datetime': string;
-    /**
-     * 
      * @type {number}
      * @memberof LocalTime
      */
     'nanosecond': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LocalTime
+     */
+    'value$kotlinx_datetime': string;
     /**
      * 
      * @type {number}

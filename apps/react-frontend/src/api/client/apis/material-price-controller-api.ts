@@ -110,10 +110,13 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
         },
         /**
          * 
+         * @param {string} [sortBy] 
+         * @param {string} [sortDirection] 
+         * @param {boolean} [publishedOnly] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getAllMaterialsWithPrices: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAllMaterialsWithPrices: async (sortBy?: string, sortDirection?: string, publishedOnly?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/material-prices`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -129,6 +132,18 @@ export const MaterialPriceControllerApiAxiosParamCreator = function (configurati
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (sortBy !== undefined) {
+                localVarQueryParameter['sortBy'] = sortBy;
+            }
+
+            if (sortDirection !== undefined) {
+                localVarQueryParameter['sortDirection'] = sortDirection;
+            }
+
+            if (publishedOnly !== undefined) {
+                localVarQueryParameter['publishedOnly'] = publishedOnly;
+            }
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -251,11 +266,14 @@ export const MaterialPriceControllerApiFp = function(configuration?: Configurati
         },
         /**
          * 
+         * @param {string} [sortBy] 
+         * @param {string} [sortDirection] 
+         * @param {boolean} [publishedOnly] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAllMaterialsWithPrices(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MaterialPriceResponse>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllMaterialsWithPrices(options);
+        async getAllMaterialsWithPrices(sortBy?: string, sortDirection?: string, publishedOnly?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MaterialPriceResponse>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAllMaterialsWithPrices(sortBy, sortDirection, publishedOnly, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['MaterialPriceControllerApi.getAllMaterialsWithPrices']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -315,11 +333,14 @@ export const MaterialPriceControllerApiFactory = function (configuration?: Confi
         },
         /**
          * 
+         * @param {string} [sortBy] 
+         * @param {string} [sortDirection] 
+         * @param {boolean} [publishedOnly] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAllMaterialsWithPrices(options?: any): AxiosPromise<Array<MaterialPriceResponse>> {
-            return localVarFp.getAllMaterialsWithPrices(options).then((request) => request(axios, basePath));
+        getAllMaterialsWithPrices(sortBy?: string, sortDirection?: string, publishedOnly?: boolean, options?: any): AxiosPromise<Array<MaterialPriceResponse>> {
+            return localVarFp.getAllMaterialsWithPrices(sortBy, sortDirection, publishedOnly, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -372,12 +393,15 @@ export class MaterialPriceControllerApi extends BaseAPI {
 
     /**
      * 
+     * @param {string} [sortBy] 
+     * @param {string} [sortDirection] 
+     * @param {boolean} [publishedOnly] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MaterialPriceControllerApi
      */
-    public getAllMaterialsWithPrices(options?: RawAxiosRequestConfig) {
-        return MaterialPriceControllerApiFp(this.configuration).getAllMaterialsWithPrices(options).then((request) => request(this.axios, this.basePath));
+    public getAllMaterialsWithPrices(sortBy?: string, sortDirection?: string, publishedOnly?: boolean, options?: RawAxiosRequestConfig) {
+        return MaterialPriceControllerApiFp(this.configuration).getAllMaterialsWithPrices(sortBy, sortDirection, publishedOnly, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

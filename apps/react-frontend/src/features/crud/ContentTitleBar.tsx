@@ -7,6 +7,7 @@ import { TextInput } from '@/components/ui/form/TextInput.tsx';
 interface ContentTitleBarProps {
   setQuery: (value: string) => void;
   children?: ReactNode;
+  leftActions?: ReactNode;
   setIsFilterOpen?: (value: boolean) => void;
   hideSearchBar?: boolean;
 }
@@ -14,6 +15,7 @@ interface ContentTitleBarProps {
 export const ContentTitleBar = ({
   setQuery,
   children,
+  leftActions,
   setIsFilterOpen,
   hideSearchBar = false,
 }: ContentTitleBarProps) => {
@@ -35,6 +37,7 @@ export const ContentTitleBar = ({
             onClick={() => setIsFilterOpen(true)}
           />
         )}
+        {leftActions}
       </div>
       <div className={'flex justify-end items-center gap-4'}>{children}</div>
     </div>

@@ -2167,6 +2167,23 @@ paths:
       tags:
       - material-price-controller
       operationId: getAllMaterialsWithPrices
+      parameters:
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+          default: asc
+      - name: publishedOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         "200":
           description: OK
@@ -2338,7 +2355,7 @@ paths:
       parameters:
       - name: code
         in: query
-        required: true
+        required: false
         schema:
           type: string
       - name: state
@@ -3901,6 +3918,12 @@ components:
           format: int32
         externalPricingAppName:
           type: string
+        lastModifiedAt:
+          type: string
+          format: date-time
+        externalPricingAppSyncedAt:
+          type: string
+          format: date-time
       required:
       - code
       - id
@@ -4240,7 +4263,7 @@ components:
           pattern: "^$|^[0-9]{6}[VIHBX]{4}$"
         processorId:
           type: string
-          pattern: "^$|^[\\d]{5}$"
+          pattern: "^$|^[^\\s]{5}$"
         name:
           type: string
           minLength: 1
@@ -4705,14 +4728,14 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
         year:
           type: integer
           format: int32
@@ -4768,17 +4791,17 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
+        nanosecond:
+          type: integer
+          format: int32
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        nanosecond:
-          type: integer
-          format: int32
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4852,11 +4875,11 @@ components:
         value:
           type: string
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
         nanosecond:
           type: integer
           format: int32
+        value$kotlinx_datetime:
+          type: string
         hour:
           type: integer
           format: int32
@@ -6418,17 +6441,17 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
           type: string
         urlPatterns:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
+        defaultContentType:
           type: string
         errorOnELNotFound:
           type: string
@@ -6524,13 +6547,24 @@ components:
     ServletContext:
       type: object
       properties:
-        attributeNames: {}
+        serverInfo:
+          type: string
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
         contextPath:
           type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
+        attributeNames: {}
         initParameterNames: {}
         sessionTrackingModes:
           type: array
@@ -6549,17 +6583,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        serverInfo:
-          type: string
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6633,12 +6656,12 @@ components:
     ServletRegistration:
       type: object
       properties:
+        runAsRole:
+          type: string
         mappings:
           type: array
           items:
             type: string
-        runAsRole:
-          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6655,12 +6678,12 @@ components:
           format: int32
         httpOnly:
           type: boolean
+        secure:
+          type: boolean
         domain:
           type: string
         path:
           type: string
-        secure:
-          type: boolean
         name:
           type: string
         attributes:

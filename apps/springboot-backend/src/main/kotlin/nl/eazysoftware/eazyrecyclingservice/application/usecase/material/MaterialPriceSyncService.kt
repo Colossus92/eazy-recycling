@@ -54,32 +54,59 @@ class MaterialPriceSyncService(
             val material = syncRecord.material
             val externalId = syncRecord.externalPricingAppId
             val lastSyncedPrice = syncRecord.lastSyncedPrice
-            val priceStatus = calculatePriceStatus(currentPrice, lastSyncedPrice)
-
-            val materialToSync = MaterialToSync(
-                materialId = material.id,
-                materialName = syncRecord.externalPricingAppName,
-                currentPrice = currentPrice,
-                lastSyncedPrice = lastSyncedPrice,
-                externalProductId = externalId,
-                priceStatus = priceStatus
-            )
 
             if (externalId == null) {
-                // New product to create
+                // New product to create - no previous price to compare
+                val materialToSync = MaterialToSync(
+                    materialId = material.id,
+                    materialName = syncRecord.externalPricingAppName,
+                    currentPrice = currentPrice,
+                    lastSyncedPrice = null,
+                    externalProductId = null,
+                    priceStatus = 0 // No change indicator for new products
+                )
                 toCreate.add(materialToSync)
             } else {
                 val externalProduct = externalProductsById[externalId]
                 if (externalProduct == null) {
                     // External product was deleted, need to recreate
-                    toCreate.add(materialToSync.copy(externalProductId = null))
+                    val materialToSync = MaterialToSync(
+                        materialId = material.id,
+                        materialName = syncRecord.externalPricingAppName,
+                        currentPrice = currentPrice,
+                        lastSyncedPrice = lastSyncedPrice,
+                        externalProductId = null,
+                        priceStatus = 0 // No change indicator for recreated products
+                    )
+                    toCreate.add(materialToSync)
                 } else if (currentPrice.compareTo(externalProduct.price) != 0 ||
                     syncRecord.externalPricingAppName != externalProduct.name
                 ) {
                     // Price or name changed, need to update
+                    // Use external product's current price as the "old" price for comparison
+                    // This ensures we always show the correct price change direction
+                    val priceForComparison = lastSyncedPrice ?: externalProduct.price
+                    val priceStatus = calculatePriceStatus(currentPrice, priceForComparison)
+                    
+                    val materialToSync = MaterialToSync(
+                        materialId = material.id,
+                        materialName = syncRecord.externalPricingAppName,
+                        currentPrice = currentPrice,
+                        lastSyncedPrice = priceForComparison,
+                        externalProductId = externalId,
+                        priceStatus = priceStatus
+                    )
                     toUpdate.add(materialToSync)
                 } else {
                     // No changes needed
+                    val materialToSync = MaterialToSync(
+                        materialId = material.id,
+                        materialName = syncRecord.externalPricingAppName,
+                        currentPrice = currentPrice,
+                        lastSyncedPrice = lastSyncedPrice ?: externalProduct.price,
+                        externalProductId = externalId,
+                        priceStatus = 0 // Unchanged
+                    )
                     unchanged.add(materialToSync)
                 }
             }
