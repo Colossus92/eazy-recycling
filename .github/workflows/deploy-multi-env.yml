@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
   workflow_dispatch:
 
 env:
@@ -17,7 +18,6 @@ jobs:
       contents: read
       packages: write
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
       build_required: ${{ steps.changes.outputs.build_required }}
     steps:
       - uses: actions/checkout@v4
@@ -84,85 +84,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
+      # Determine branch name for tagging
+      - name: Get branch name
+        id: branch
         if: steps.changes.outputs.build_required == 'true'
-        with:
-          images: "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+        run: echo "name=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
-      # Tag and push the image built by Nx
+      # Tag and push the image built by Nx with branch name
       - name: Tag and push Docker image
         if: steps.changes.outputs.build_required == 'true'
         run: |
-          # Tag the image built by Nx with the GitHub Container Registry tags
-          for tag in ${{ steps.meta.outputs.tags }}; do
-            docker tag apps-springboot-backend $tag
-            docker push $tag
-          done
+          BRANCH_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch.outputs.name }}"
+          docker tag apps-springboot-backend $BRANCH_TAG
+          docker push $BRANCH_TAG
+
+  deploy-stg:
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: STG
+      image_tag: develop
+      github_branch: develop
+    secrets: inherit
 
   deploy-prd:
-    runs-on: ubuntu-22.04
     needs: build
-    environment: PRD
-    steps:
-      - uses: actions/checkout@v4
-
-      # Generate app.yaml from template using envsubst
-      - name: Generate app.yaml from template
-        env:
-          # Secrets
-          AMICE_PASSWORD: ${{ secrets.AMICE_PASSWORD }}
-          BETTERSTACK_SOURCE_TOKEN: ${{ secrets.BETTERSTACK_SOURCE_TOKEN }}
-          CLIENT_PFX_B64: ${{ secrets.CLIENT_PFX_B64 }}
-          EXACT_CLIENT_ID: ${{ secrets.EXACT_CLIENT_ID }}
-          EXACT_CLIENT_SECRET: ${{ secrets.EXACT_CLIENT_SECRET }}
-          TOKEN_ENCRYPTION_KEY: ${{ secrets.TOKEN_ENCRYPTION_KEY }}
-          PRICING_APP_BEARER_TOKEN: ${{ secrets.PRICING_APP_BEARER_TOKEN }}
-          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
-          SUPABASE_API_JWT_SECRET: ${{ secrets.SUPABASE_API_JWT_SECRET }}
-          SUPABASE_API_PUBLISHABLE: ${{ secrets.SUPABASE_API_PUBLISHABLE }}
-          SUPABASE_API_SECRET: ${{ secrets.SUPABASE_API_SECRET }}
-          # Variables
-          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          PRICING_APP_BASE_URL: ${{ vars.PRICING_APP_BASE_URL }}
-          # Database - Use Session Pooler URL (IPv4), not direct connection (IPv6)
-          SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
-          SPRING_DATASOURCE_USERNAME: ${{ vars.SPRING_DATASOURCE_USERNAME }}
-          SUPABASE_API_URL: ${{ vars.SUPABASE_API_URL }}
-          SUPABASE_API_JWT_ISSUER: ${{ vars.SUPABASE_API_JWT_ISSUER }}
-          AMICE_URL: ${{ vars.AMICE_URL }}
-          AMICE_USERNAME: ${{ vars.AMICE_USERNAME }}
-          AMICE_ENABLED: ${{ vars.AMICE_ENABLED }}
-          AMICE_CERTIFICATE_ENABLED: ${{ vars.AMICE_CERTIFICATE_ENABLED }}
-          AMICE_CERTIFICATE_PATH: ${{ vars.AMICE_CERTIFICATE_PATH }}
-          EXACT_REDIRECT_URI: ${{ vars.EXACT_REDIRECT_URI }}
-          EXACT_DIVISION: ${{ vars.EXACT_DIVISION }}
-          FRONTEND_URL: ${{ vars.FRONTEND_URL }}
-          PURCHASE_FINANCIAL_EMAIL: ${{ vars.PURCHASE_FINANCIAL_EMAIL }}
-          SALES_FINANCIAL_EMAIL: ${{ vars.SALES_FINANCIAL_EMAIL }}
-          BETTERSTACK_INGESTING_HOST: ${{ vars.BETTERSTACK_INGESTING_HOST }}
-          GHCR_REGISTRY_CREDENTIALS: ${{ vars.GHCR_REGISTRY_CREDENTIALS }}
-        run: |
-          envsubst < .do/app.yaml.template > .do/app.yaml.generated
-
-      - name: Debug - Print generated app.yaml
-        run: |
-          echo "=== Generated app.yaml content ==="
-          cat .do/app.yaml.generated
-          echo "=== End of generated app.yaml ==="
-
-      - name: Debug - Reveal SPRING_DATASOURCE_URL
-        env:
-          SPRING_DATASOURCE_URL: ${{ vars.SPRING_DATASOURCE_URL }}
-        run: |
-          echo "SPRING_DATASOURCE_URL:"
-          echo "$SPRING_DATASOURCE_URL"
-
-      - name: Deploy the app
-        uses: digitalocean/app_action/deploy@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          app_spec_location: .do/app.yaml.generated
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy-reusable.yml
+    with:
+      environment: PRD
+      image_tag: main
+      github_branch: main
+    secrets: inherit

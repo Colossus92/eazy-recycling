@@ -3,7 +3,7 @@ alerts:
   - rule: DOMAIN_FAILED
   - rule: DEPLOYMENT_LIVE
 domains:
-  - domain: app.eazyrecycling.nl
+  - domain: ${APP_DOMAIN}
     type: PRIMARY
 envs:
   - key: VITE_SUPABASE_URL
@@ -165,16 +165,16 @@ services:
       registry_credentials: ${GHCR_REGISTRY_CREDENTIALS}
       registry_type: GHCR
       repository: eazy-recycling
-      tag: main
+      tag: ${IMAGE_TAG}
     instance_count: 1
-    instance_size_slug: apps-d-1vcpu-2gb
+    instance_size_slug: ${INSTANCE_SIZE_SLUG}
     name: ers
 static_sites:
   - build_command: npm install && npm run build
     catchall_document: index.html
     environment_slug: node-js
     github:
-      branch: main
+      branch: ${GITHUB_BRANCH}
       repo: Colossus92/eazy-recycling
     name: react-frontend
     output_dir: ./dist
