@@ -94,7 +94,8 @@ jobs:
       - name: Tag and push Docker image
         if: steps.changes.outputs.build_required == 'true'
         run: |
-          BRANCH_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.branch.outputs.name }}"
+          IMAGE_NAME_LOWER=$(echo "${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          BRANCH_TAG="${{ env.REGISTRY }}/${IMAGE_NAME_LOWER}:${{ steps.branch.outputs.name }}"
           docker tag apps-springboot-backend $BRANCH_TAG
           docker push $BRANCH_TAG
 
