@@ -219,11 +219,9 @@ export const CompanyLocationInput = ({
     const loadInitialCompany = async () => {
       if (watchCompanyId && !selectedCompanyOption) {
         try {
-          // Use React Query's fetchQuery for caching - returns cached data if available
           const company = await queryClient.fetchQuery({
             queryKey: ['company', watchCompanyId],
             queryFn: () => companyService.getById(watchCompanyId),
-            staleTime: 5 * 60 * 1000, // Cache for 5 minutes
           });
           // Update cache with the company
           setCompaniesCache((prev) => {

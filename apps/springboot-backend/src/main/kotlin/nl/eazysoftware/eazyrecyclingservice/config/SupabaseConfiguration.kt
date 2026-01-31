@@ -21,7 +21,6 @@ class SupabaseConfiguration(
     @Bean
     fun supabaseClient(): SupabaseClient {
         logger.info("Supabase URL: ${supabaseProperties.url}")
-      logger.info("Supabase Secret: ${supabaseProperties.secret}")
         return createSupabaseClient(
             supabaseUrl = supabaseProperties.url,
             supabaseKey = supabaseProperties.secret
