@@ -1,4 +1,5 @@
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+const RESEND_FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL');
 
 /**
  * Generates an idempotency key by hashing invoiceId + email address
@@ -24,6 +25,10 @@ export async function sendEmail(
   entityId: string,
   bcc?: string
 ) {
+  if (!RESEND_FROM_EMAIL) {
+    throw new Error('RESEND_FROM_EMAIL environment variable is not set');
+  }
+  
   const idempotencyKey = await generateIdempotencyKey(entityId, to);
   console.log('Generated idempotency key for invoice:', entityId);
   const emailPayload: {
@@ -34,7 +39,7 @@ export async function sendEmail(
     attachments: Array<{ content: string; filename: string }>;
     bcc?: string;
   } = {
-    from: 'noreply@eazysoftware.nl',
+    from: RESEND_FROM_EMAIL,
     to: to,
     subject: subject,
     html: htmlBody,

@@ -1,10 +1,15 @@
 
 // Initialize environment variables
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+const RESEND_FROM_EMAIL = Deno.env.get('RESEND_FROM_EMAIL');
 
 
 
 export async function sendEmail(email: string, base64Data: string) {
+    if (!RESEND_FROM_EMAIL) {
+        throw new Error('RESEND_FROM_EMAIL environment variable is not set');
+    }
+    
     const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -12,7 +17,7 @@ export async function sendEmail(email: string, base64Data: string) {
             Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-            from: 'noreply@eazysoftware.nl',
+            from: RESEND_FROM_EMAIL,
             to: email,
             subject: `Begeleidingsbrief - WHD Metaalrecycling`,
             html: emailHtml,
