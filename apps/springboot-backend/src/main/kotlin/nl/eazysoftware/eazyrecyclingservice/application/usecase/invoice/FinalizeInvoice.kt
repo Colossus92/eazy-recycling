@@ -42,7 +42,7 @@ class FinalizeInvoiceService(
 
     private fun generateInvoiceNumber(year: Int): InvoiceNumber {
         val sequence = invoices.nextInvoiceNumberSequence(year)
-        return InvoiceNumber.generate("ER", year, sequence)
+        return InvoiceNumber.generate("F", year, sequence)
     }
 
     private fun scheduleInvoicePdfGeneration(invoice: Invoice) {
