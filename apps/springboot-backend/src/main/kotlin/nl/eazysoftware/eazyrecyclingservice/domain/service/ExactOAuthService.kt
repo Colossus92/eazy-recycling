@@ -113,17 +113,6 @@ class ExactOAuthService(
     }
 
     /**
-     * Refresh the access token using the refresh token
-     */
-    fun refreshAccessToken(): TokenResponse {
-        val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()
-            ?: throw ExactOAuthException("No tokens found to refresh")
-
-        val decryptedRefreshToken = encryptionService.decrypt(currentToken.refreshToken)
-        return refreshAccessToken(decryptedRefreshToken)
-    }
-
-    /**
      * Refresh the access token using a specific refresh token.
      *
      * Retries automatically on 503/504 errors (e.g., Exact Online maintenance windows)
@@ -140,15 +129,23 @@ class ExactOAuthService(
      * - exact.oauth.retry.max-delay (default: 600000ms)
      */
     @Retryable(
-        retryFor = [ExactMaintenanceException::class, IllegalStateException::class],
-        maxAttemptsExpression = "\${exact.oauth.retry.max-attempts:10}",
-        backoff = Backoff(
-            delayExpression = "\${exact.oauth.retry.delay:60000}",
-            multiplierExpression = "\${exact.oauth.retry.multiplier:1.5}",
-            maxDelayExpression = "\${exact.oauth.retry.max-delay:600000}"
-        )
+      retryFor = [ExactMaintenanceException::class, IllegalStateException::class],
+      maxAttemptsExpression = "\${exact.oauth.retry.max-attempts:10}",
+      backoff = Backoff(
+        delayExpression = "\${exact.oauth.retry.delay:60000}",
+        multiplierExpression = "\${exact.oauth.retry.multiplier:1.5}",
+        maxDelayExpression = "\${exact.oauth.retry.max-delay:600000}"
+      )
     )
-    fun refreshAccessToken(refreshToken: String): TokenResponse {
+    fun refreshAccessToken(): TokenResponse {
+        val currentToken = tokenRepository.findFirstByOrderByCreatedAtDesc()
+            ?: throw ExactOAuthException("No tokens found to refresh")
+
+        val decryptedRefreshToken = encryptionService.decrypt(currentToken.refreshToken)
+        return refreshAccessToken(decryptedRefreshToken)
+    }
+
+   private fun refreshAccessToken(refreshToken: String): TokenResponse {
         val requestBody: MultiValueMap<String, String> = LinkedMultiValueMap()
         requestBody.add("grant_type", "refresh_token")
         requestBody.add("refresh_token", refreshToken)

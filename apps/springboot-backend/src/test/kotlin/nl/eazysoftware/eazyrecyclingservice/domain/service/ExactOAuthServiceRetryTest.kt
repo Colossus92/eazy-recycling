@@ -24,6 +24,7 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig
 import org.springframework.web.client.HttpServerErrorException
 import org.springframework.web.client.RestTemplate
+import java.util.*
 
 /**
  * Tests for ExactOAuthService retry mechanism.
@@ -101,15 +102,35 @@ class ExactOAuthServiceRetryTest {
     @Autowired
     private lateinit var restTemplate: RestTemplate
 
+    @Autowired
+    private lateinit var encryptionService: TokenEncryptionService
+
     @BeforeEach
     fun resetMocks() {
         Mockito.reset(restTemplate, tokenRepository)
     }
 
+    private fun createMockTokenDto(): ExactTokenDto {
+        // Create a token with encrypted refresh token that the service will decrypt
+        val encryptedRefreshToken = encryptionService.encrypt("test-refresh-token")
+        val encryptedAccessToken = encryptionService.encrypt("old-access-token")
+        return ExactTokenDto(
+            id = UUID.randomUUID(),
+            accessToken = encryptedAccessToken,
+            refreshToken = encryptedRefreshToken,
+            tokenType = "bearer",
+            expiresAt = java.time.Instant.now().plusSeconds(600),
+            createdAt = java.time.Instant.now(),
+            updatedAt = java.time.Instant.now()
+        )
+    }
+
     @Test
     fun `refreshAccessToken should retry on 503 Service Unavailable`() {
-        val refreshToken = "test-refresh-token"
         var attemptCount = 0
+
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // First 2 attempts fail with 503, third succeeds
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -133,7 +154,7 @@ class ExactOAuthServiceRetryTest {
             }
 
         // Execute
-        val result = service.refreshAccessToken(refreshToken)
+        val result = service.refreshAccessToken()
 
         // Verify
         assertEquals("new-access-token", result.accessToken)
@@ -143,8 +164,10 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should retry on 504 Gateway Timeout`() {
-        val refreshToken = "test-refresh-token"
         var attemptCount = 0
+
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // First attempt fails with 504, second succeeds
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -165,7 +188,7 @@ class ExactOAuthServiceRetryTest {
             }
 
         // Execute
-        val result = service.refreshAccessToken(refreshToken)
+        val result = service.refreshAccessToken()
 
         // Verify
         assertEquals("new-access-token", result.accessToken)
@@ -175,7 +198,8 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should NOT retry on 401 Unauthorized`() {
-        val refreshToken = "invalid-refresh-token"
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // Simulate 401 error
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -188,7 +212,7 @@ class ExactOAuthServiceRetryTest {
 
         // Execute & Verify - should throw immediately without retry
         assertThrows(ExactOAuthService.ExactOAuthException::class.java) {
-            service.refreshAccessToken(refreshToken)
+            service.refreshAccessToken()
         }
 
         // Should only attempt once (no retry on 401)
@@ -197,7 +221,8 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should NOT retry on 400 Bad Request`() {
-        val refreshToken = "malformed-token"
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // Simulate 400 error
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -210,7 +235,7 @@ class ExactOAuthServiceRetryTest {
 
         // Execute & Verify
         assertThrows(ExactOAuthService.ExactOAuthException::class.java) {
-            service.refreshAccessToken(refreshToken)
+            service.refreshAccessToken()
         }
 
         // Should only attempt once (no retry on 400)
@@ -219,7 +244,8 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should exhaust retries after max attempts`() {
-        val refreshToken = "test-refresh-token"
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // Always return 503
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -232,7 +258,7 @@ class ExactOAuthServiceRetryTest {
 
         // Execute & Verify - should eventually throw after exhausting retries
         assertThrows(ExactOAuthService.ExactMaintenanceException::class.java) {
-            service.refreshAccessToken(refreshToken)
+            service.refreshAccessToken()
         }
 
         // Should attempt 3 times (maxAttempts = 3 in test properties)
@@ -241,8 +267,10 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should save tokens after successful retry`() {
-        val refreshToken = "test-refresh-token"
-        val mockToken = mock<ExactTokenDto>()
+        val mockToken = createMockTokenDto()
+
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(mockToken)
 
         // First attempt fails, second succeeds
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -261,7 +289,7 @@ class ExactOAuthServiceRetryTest {
         whenever(tokenRepository.save(any<ExactTokenDto>())).thenReturn(mockToken)
 
         // Execute
-        val result = service.refreshAccessToken(refreshToken)
+        val result = service.refreshAccessToken()
 
         // Verify tokens were saved
         assertEquals("new-access-token", result.accessToken)
@@ -270,7 +298,8 @@ class ExactOAuthServiceRetryTest {
 
     @Test
     fun `refreshAccessToken should NOT retry on 500 Internal Server Error`() {
-        val refreshToken = "test-refresh-token"
+        // Mock token repository to return a token with encrypted refresh token
+        whenever(tokenRepository.findFirstByOrderByCreatedAtDesc()).thenReturn(createMockTokenDto())
 
         // Simulate 500 error (not 503/504)
         whenever(restTemplate.postForEntity(any<String>(), any<HttpEntity<*>>(), eq(ExactOAuthService.TokenResponse::class.java)))
@@ -283,7 +312,7 @@ class ExactOAuthServiceRetryTest {
 
         // Execute & Verify - should throw ExactOAuthException (not retryable)
         assertThrows(ExactOAuthService.ExactOAuthException::class.java) {
-            service.refreshAccessToken(refreshToken)
+            service.refreshAccessToken()
         }
 
         // Should only attempt once (500 is not in retry list)
