@@ -95,7 +95,7 @@ export const InvoicesTab = ({
       setSelectedInvoiceId(item.id);
       setIsDrawerOpen(true);
       clickTimeoutRef.current = null;
-    }, 200);
+    }, 400);
   };
 
   const handleRowDoubleClick = (item: InvoiceView) => {
