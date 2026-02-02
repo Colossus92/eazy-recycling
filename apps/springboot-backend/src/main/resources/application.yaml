@@ -118,6 +118,7 @@ logging:
 jobrunr:
   database:
     tablePrefix: jobrunr.
+    skip-create: true
   dashboard:
     enabled: false
   jobs:

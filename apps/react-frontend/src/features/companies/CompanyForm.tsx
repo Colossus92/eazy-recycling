@@ -17,6 +17,7 @@ import { AxiosError } from 'axios';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
 import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
+import { sanitizeStreetOrCity } from '@/utils/addressSanitization';
 
 interface CompanyFormProps {
   onCancel: () => void;
@@ -256,6 +257,10 @@ export const CompanyForm = ({
                       value: 43,
                       message: 'Straatnaam mag maximaal 43 tekens bevatten',
                     },
+                    onBlur: (e) => {
+                      const sanitized = sanitizeStreetOrCity(e.target.value);
+                      setValue('street', sanitized);
+                    },
                   },
                   errors,
                 }}
@@ -274,6 +279,10 @@ export const CompanyForm = ({
                     maxLength: {
                       value: 24,
                       message: 'Plaats mag maximaal 24 tekens bevatten',
+                    },
+                    onBlur: (e) => {
+                      const sanitized = sanitizeStreetOrCity(e.target.value);
+                      setValue('city', sanitized);
                     },
                   },
                   errors,

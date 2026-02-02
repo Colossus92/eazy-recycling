@@ -1,7 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.lmaimport
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.*
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.Company
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProcessorPartyId
+import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportError
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportErrorCode
 import nl.eazysoftware.eazyrecyclingservice.domain.model.lmaimport.LmaImportResult
@@ -34,7 +37,8 @@ class ImportLmaWasteStreamsService(
   private val euralRepository: EuralRepository,
   private val processingMethodRepository: ProcessingMethodRepository,
   private val lmaDeclarations: LmaDeclarations,
-  private val idGenerator: ReceivalDeclarationIdGenerator
+  private val idGenerator: ReceivalDeclarationIdGenerator,
+  private val projectLocations: ProjectLocations
 ) : ImportLmaWasteStreams {
 
   private val logger = LoggerFactory.getLogger(javaClass)
@@ -180,7 +184,7 @@ class ImportLmaWasteStreamsService(
       val collectionType = determineCollectionType(record)
 
       // Build pickup location
-      val pickupLocation = buildPickupLocation(record)
+      val pickupLocation = buildPickupLocation(record, pickupCompany)
 
       // Resolve catalog item using hard-coded mappings
       val wasteStreamName = record.gebruikelijkeNaam ?: record.euralcodeOmschrijving ?: "Onbekend"
@@ -290,34 +294,81 @@ class ImportLmaWasteStreamsService(
 
   /**
    * Builds pickup location from CSV record.
-   * Uses ProximityDescription if nabijheidsbeschrijving is present, otherwise DutchAddress.
+   * Uses ProximityDescription if nabijheidsbeschrijving is present,
+   * creates/finds ProjectLocation for addresses different from company address,
+   * otherwise uses Company location.
    */
-  private fun buildPickupLocation(record: LmaCsvRecord): Location {
+  private fun buildPickupLocation(record: LmaCsvRecord, pickupCompany: Company): Location {
     // If there's a proximity description, use that
     if (!record.locatieNabijheid.isNullOrBlank()) {
       return Location.ProximityDescription(
         description = record.locatieNabijheid,
         postalCodeDigits = extractPostalCodeDigits(record.locatiePostcode),
-        city = City(record.locatiePlaats ?: ""),
+        city = City(sanitizeStreetOrCity(record.locatiePlaats)),
         country = record.locatieLand ?: "Nederland"
       )
     }
 
-    // If there's an address, use DutchAddress
+    // If there's an address, check if it matches company address or create project location
     if (!record.locatieStraatnaam.isNullOrBlank()) {
       val address = Address(
-        streetName = StreetName(record.locatieStraatnaam),
+        streetName = StreetName(sanitizeStreetOrCity(record.locatieStraatnaam)),
         buildingNumber = record.locatieHuisnummer ?: "",
         buildingNumberAddition = record.locatieHuisnummerToevoeging,
-        postalCode = DutchPostalCode(record.locatiePostcode ?: ""),
-        city = City(record.locatiePlaats ?: ""),
+        postalCode = DutchPostalCode(sanitizePostalCode(record.locatiePostcode)),
+        city = City(sanitizeStreetOrCity(record.locatiePlaats)),
         country = record.locatieLand ?: "Nederland"
       )
-      return Location.DutchAddress(address)
+
+      // Check if address matches company address
+      if (addressMatchesCompany(address, pickupCompany)) {
+        return Location.Company(
+          companyId = pickupCompany.companyId,
+          name = pickupCompany.name,
+          address = pickupCompany.address
+        )
+      }
+
+      // Create or find project location
+      return getOrCreateProjectLocation(pickupCompany, address)
     }
 
     // No location specified
     return Location.NoLocation
+  }
+
+  /**
+   * Checks if the given address matches the company's address (postal code and building number).
+   */
+  private fun addressMatchesCompany(address: Address, company: Company): Boolean {
+    return address.postalCode.value == company.address.postalCode.value &&
+           address.buildingNumber == company.address.buildingNumber
+  }
+
+  /**
+   * Gets existing project location or creates a new one if it doesn't exist.
+   */
+  private fun getOrCreateProjectLocation(company: Company, address: Address): Location.ProjectLocationSnapshot {
+    // Try to find existing project location
+    val existingLocation = projectLocations.findByCompanyIdAndPostalCodeAndBuildingNumber(
+      companyId = company.companyId,
+      postalCode = address.postalCode,
+      buildingNumber = address.buildingNumber
+    )
+
+    if (existingLocation != null) {
+      return existingLocation.toSnapshot()
+    }
+
+    // Create new project location if not found
+    val projectLocation = CompanyProjectLocation(
+      id = ProjectLocationId(UUID.randomUUID()),
+      companyId = company.companyId,
+      address = address
+    )
+    projectLocations.create(projectLocation)
+    logger.info("Created project location for company ${company.name} at ${address.toAddressLine()}")
+    return projectLocation.toSnapshot()
   }
 
   /**
@@ -327,6 +378,30 @@ class ImportLmaWasteStreamsService(
     if (postalCode.isNullOrBlank()) return ""
     val digits = postalCode.replace(" ", "").take(4)
     return if (digits.all { it.isDigit() }) digits else ""
+  }
+
+  /**
+   * Sanitizes street name or city: first letter uppercase, rest lowercase.
+   * Example: "HOOFDSTRAAT" -> "Hoofdstraat"
+   */
+  private fun sanitizeStreetOrCity(value: String?): String {
+    if (value.isNullOrBlank()) return ""
+    val trimmed = value.trim()
+    return trimmed.lowercase().replaceFirstChar { it.uppercase() }
+  }
+
+  /**
+   * Sanitizes postal code to format "1234 AB".
+   * Example: "2691HA" -> "2691 HA", "2691 ha" -> "2691 HA"
+   */
+  private fun sanitizePostalCode(postalCode: String?): String {
+    if (postalCode.isNullOrBlank()) return ""
+    val cleaned = postalCode.replace(" ", "").trim()
+    if (cleaned.length != 6) return postalCode?.trim() ?: ""
+    
+    val digits = cleaned.substring(0, 4)
+    val letters = cleaned.substring(4, 6).uppercase()
+    return "$digits $letters"
   }
 
   /**

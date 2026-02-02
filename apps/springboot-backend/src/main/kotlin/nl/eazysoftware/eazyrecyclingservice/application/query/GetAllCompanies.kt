@@ -68,12 +68,12 @@ class GetAllCompaniesQuery(
 
     // Add branches if requested
     val viewsWithBranches = if (includeBranches) {
-      val branches = projectLocations.findAll()
+      val branchesByCompanyId = projectLocations.findAll()
         .map { CompanyController.CompanyBranchResponse.from(it) }
+        .groupBy { it.companyId }
 
       companyViews.map { company ->
-        val companyBranches = branches.filter { it.companyId == company.id }
-        company.copy(branches = companyBranches)
+        company.copy(branches = branchesByCompanyId[company.id] ?: emptyList())
       }
     } else {
       companyViews

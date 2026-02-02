@@ -73,7 +73,7 @@ class CreateWeightTicketFromTransportService(
       weightedAt = null,
       carrierParty = transport.carrierParty,
       direction = WeightTicketDirection.INBOUND,
-      pickupLocation = null,
+      pickupLocation = firstWasteStream.pickupLocation,
       deliveryLocation = null,
       truckLicensePlate = transport.truck,
       reclamation = null,
