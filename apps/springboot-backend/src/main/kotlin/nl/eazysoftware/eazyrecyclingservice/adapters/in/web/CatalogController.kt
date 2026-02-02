@@ -50,6 +50,10 @@ data class CatalogItemResponse(
   val salesAccountNumber: String?,
   val wasteStreamNumber: String?,
   val defaultPrice: BigDecimal?,
+  // Pickup location address fields (for waste streams)
+  val pickupStreet: String?,
+  val pickupBuildingNumber: String?,
+  val pickupCity: String?,
 )
 
 fun CatalogItem.toResponse(invoiceType: InvoiceType? = null): CatalogItemResponse {
@@ -78,5 +82,8 @@ fun CatalogItem.toResponse(invoiceType: InvoiceType? = null): CatalogItemRespons
     salesAccountNumber = salesAccountNumber,
     wasteStreamNumber = wasteStreamNumber?.number,
     defaultPrice = defaultPrice?.multiply(priceMultiplier),
+    pickupStreet = pickupStreet,
+    pickupBuildingNumber = pickupBuildingNumber,
+    pickupCity = pickupCity,
   )
 }

@@ -33,12 +33,6 @@ export interface LocalDateTime {
      */
     'value'?: string;
     /**
-     * 
-     * @type {number}
-     * @memberof LocalDateTime
-     */
-    'nanosecond': number;
-    /**
      * Use the \'month\' property instead
      * @type {number}
      * @memberof LocalDateTime
@@ -51,6 +45,12 @@ export interface LocalDateTime {
      * @memberof LocalDateTime
      */
     'value$kotlinx_datetime': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LocalDateTime
+     */
+    'nanosecond': number;
     /**
      * 
      * @type {LocalTime}

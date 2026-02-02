@@ -58,6 +58,9 @@ export const filterCatalogItems = (
     (item) =>
       item.name.toLowerCase().includes(lowerQuery) ||
       item.code?.toLowerCase().includes(lowerQuery) ||
-      item.wasteStreamNumber?.toLowerCase().includes(lowerQuery)
+      item.wasteStreamNumber?.toLowerCase().includes(lowerQuery) ||
+      item.pickupStreet?.toLowerCase().includes(lowerQuery) ||
+      item.pickupBuildingNumber?.toLowerCase().includes(lowerQuery) ||
+      item.pickupCity?.toLowerCase().includes(lowerQuery)
   );
 };

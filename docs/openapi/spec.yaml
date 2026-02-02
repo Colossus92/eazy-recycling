@@ -4791,9 +4791,6 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        nanosecond:
-          type: integer
-          format: int32
         monthNumber:
           type: integer
           format: int32
@@ -4802,6 +4799,9 @@ components:
         value$kotlinx_datetime:
           type: string
           format: date-time
+        nanosecond:
+          type: integer
+          format: int32
         time:
           $ref: "#/components/schemas/LocalTime"
         year:
@@ -4875,11 +4875,11 @@ components:
         value:
           type: string
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
         nanosecond:
           type: integer
           format: int32
-        value$kotlinx_datetime:
-          type: string
         hour:
           type: integer
           format: int32
@@ -5896,6 +5896,12 @@ components:
           type: string
         defaultPrice:
           type: number
+        pickupStreet:
+          type: string
+        pickupBuildingNumber:
+          type: string
+        pickupCity:
+          type: string
       required:
       - catalogItemId
       - code
@@ -6443,15 +6449,15 @@ components:
       properties:
         deferredSyntaxAllowedAsLiteral:
           type: string
-        elIgnored:
-          type: string
-        isXml:
+        defaultContentType:
           type: string
         urlPatterns:
           type: array
           items:
             type: string
-        defaultContentType:
+        elIgnored:
+          type: string
+        isXml:
           type: string
         errorOnELNotFound:
           type: string
@@ -6547,8 +6553,6 @@ components:
     ServletContext:
       type: object
       properties:
-        serverInfo:
-          type: string
         effectiveSessionTrackingModes:
           type: array
           items:
@@ -6558,13 +6562,13 @@ components:
             - URL
             - SSL
           uniqueItems: true
+        attributeNames: {}
         contextPath:
           type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
-        attributeNames: {}
         initParameterNames: {}
         sessionTrackingModes:
           type: array
@@ -6583,6 +6587,8 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
+        serverInfo:
+          type: string
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6656,12 +6662,12 @@ components:
     ServletRegistration:
       type: object
       properties:
-        runAsRole:
-          type: string
         mappings:
           type: array
           items:
             type: string
+        runAsRole:
+          type: string
         initParameters:
           type: object
           additionalProperties:
@@ -6673,6 +6679,10 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
@@ -6680,10 +6690,6 @@ components:
           type: boolean
         secure:
           type: boolean
-        domain:
-          type: string
-        path:
-          type: string
         name:
           type: string
         attributes:

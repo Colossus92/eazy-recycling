@@ -63,10 +63,36 @@ const typeLabels: Record<string, string> = {
 
 // Type order for sorting groups
 const typeOrder = [
-  CatalogItemResponseItemTypeEnum.WasteStream,
   CatalogItemResponseItemTypeEnum.Material,
   CatalogItemResponseItemTypeEnum.Product,
+  CatalogItemResponseItemTypeEnum.WasteStream,
 ];
+
+/**
+ * Formats the label for a catalog item.
+ * For waste streams: "Name (number - street buildingNumber, city)"
+ * For others: "Name"
+ */
+const formatCatalogItemLabel = (item: CatalogItem): string => {
+  if (!item.wasteStreamNumber) {
+    return item.name;
+  }
+
+  // Build address part if available
+  let addressPart = '';
+  if (item.pickupStreet && item.pickupCity) {
+    const streetWithNumber = item.pickupBuildingNumber
+      ? `${item.pickupStreet} ${item.pickupBuildingNumber}`
+      : item.pickupStreet;
+    // Capitalize city: first letter uppercase, rest lowercase
+    const formattedCity =
+      item.pickupCity.charAt(0).toUpperCase() +
+      item.pickupCity.slice(1).toLowerCase();
+    addressPart = ` - ${streetWithNumber}, ${formattedCity}`;
+  }
+
+  return `${item.name} (${item.wasteStreamNumber}${addressPart})`;
+};
 
 /**
  * Maps typeFilter to API type parameter for server-side filtering
@@ -163,9 +189,7 @@ export const CatalogItemAsyncSelectFormField = ({
           }
           acc[type].push({
             value: String(item.id),
-            label: item.wasteStreamNumber
-              ? `${item.name} (${item.wasteStreamNumber})`
-              : item.name,
+            label: formatCatalogItemLabel(item),
             item,
           });
           return acc;
@@ -237,9 +261,7 @@ export const CatalogItemAsyncSelectFormField = ({
       if (isMatch) {
         setSelectedOption({
           value: String(item.id),
-          label: item.wasteStreamNumber
-            ? `${item.name} (${item.wasteStreamNumber})`
-            : item.name,
+          label: formatCatalogItemLabel(item),
           item,
         });
         return;
@@ -287,6 +309,10 @@ export const CatalogItemAsyncSelectFormField = ({
     menuPortal: (base) => ({
       ...base,
       zIndex: 9999,
+    }),
+    menu: (base) => ({
+      ...base,
+      width: '600px',
     }),
     group: (base) => ({
       ...base,

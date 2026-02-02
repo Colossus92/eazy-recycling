@@ -165,14 +165,28 @@ class CompanyRepository(
       }
 
       // Search query filter - searches across code, name, city, chamberOfCommerceId, vihbId
+      // Supports fuzzy search by normalizing both query and fields (removing spaces and special chars)
       if (!query.isNullOrBlank()) {
         val searchPattern = "%${query.lowercase()}%"
+        // Normalized pattern for fuzzy matching (remove spaces and common special chars)
+        val normalizedQuery = query.lowercase().replace(Regex("[\\s&]+"), "")
+        val normalizedSearchPattern = "%${normalizedQuery}%"
+        
+        // Helper function to normalize a field by removing spaces and & characters
+        fun normalizeField(field: jakarta.persistence.criteria.Expression<String>): jakarta.persistence.criteria.Expression<String> {
+          val withoutSpaces = criteriaBuilder.function("REPLACE", String::class.java, field, criteriaBuilder.literal(" "), criteriaBuilder.literal(""))
+          return criteriaBuilder.function("REPLACE", String::class.java, withoutSpaces, criteriaBuilder.literal("&"), criteriaBuilder.literal(""))
+        }
+        
         val searchPredicates = listOf(
+          // Exact match predicates (original behavior)
           criteriaBuilder.like(criteriaBuilder.lower(root.get("code")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get("chamberOfCommerceId")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get("vihbId")), searchPattern),
           criteriaBuilder.like(criteriaBuilder.lower(root.get<Any>("address").get("city")), searchPattern),
+          // Fuzzy match on name (normalized - removes spaces and &)
+          criteriaBuilder.like(normalizeField(criteriaBuilder.lower(root.get("name"))), normalizedSearchPattern),
         )
         predicates.add(criteriaBuilder.or(*searchPredicates.toTypedArray()))
       }

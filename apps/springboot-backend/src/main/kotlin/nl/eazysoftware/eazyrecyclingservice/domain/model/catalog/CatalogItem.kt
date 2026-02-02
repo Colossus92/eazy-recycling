@@ -20,6 +20,10 @@ data class CatalogItem (
   val salesAccountNumber: String?,
   val wasteStreamNumber: WasteStreamNumber?,
   val itemType: CatalogItemType,
+  // Pickup location address fields (for waste streams)
+  val pickupStreet: String? = null,
+  val pickupBuildingNumber: String? = null,
+  val pickupCity: String? = null,
 )
 
 enum class CatalogItemType {
