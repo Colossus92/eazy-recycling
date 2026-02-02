@@ -1089,6 +1089,24 @@ paths:
       responses:
         "204":
           description: No Content
+  /weight-tickets/from-waste-stream:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: createFromWasteStream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWeightTicketFromWasteStreamRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateWeightTicketFromWasteStreamResponse"
   /weight-tickets/from-transport:
     post:
       tags:
@@ -4360,6 +4378,21 @@ components:
           minLength: 1
       required:
       - cancellationReason
+    CreateWeightTicketFromWasteStreamRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+      required:
+      - wasteStreamNumber
+    CreateWeightTicketFromWasteStreamResponse:
+      type: object
+      properties:
+        weightTicketId:
+          type: integer
+          format: int64
+      required:
+      - weightTicketId
     CreateWeightTicketFromTransportRequest:
       type: object
       properties:
@@ -6083,13 +6116,13 @@ components:
     ApplicationContext:
       type: object
       properties:
+        applicationName:
+          type: string
         startupDate:
           type: integer
           format: int64
         autowireCapableBeanFactory:
           $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        applicationName:
-          type: string
         parent: {}
         id:
           type: string
@@ -6436,29 +6469,17 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        defaultContentType:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -6473,6 +6494,18 @@ components:
           type: array
           items:
             type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        defaultContentType:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
@@ -6539,16 +6572,16 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
+        attributesCSV:
+          type: string
           writeOnly: true
         attributesMap:
           type: object
           additionalProperties: {}
-        attributesCSV:
-          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
           writeOnly: true
     ServletContext:
       type: object
@@ -6562,14 +6595,25 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        attributeNames: {}
-        contextPath:
+        servletContextName:
           type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        sessionTimeout:
+          type: integer
+          format: int32
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
         initParameterNames: {}
+        attributeNames: {}
+        contextPath:
+          type: string
         sessionTrackingModes:
           type: array
           items:
@@ -6580,9 +6624,6 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
         servletRegistrations:
           type: object
           additionalProperties:
@@ -6608,14 +6649,6 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
         classLoader:
           type: object
           properties:
@@ -6702,9 +6735,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

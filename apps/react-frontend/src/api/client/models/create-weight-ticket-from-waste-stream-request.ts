@@ -17,20 +17,14 @@
 /**
  * 
  * @export
- * @interface TaglibDescriptor
+ * @interface CreateWeightTicketFromWasteStreamRequest
  */
-export interface TaglibDescriptor {
+export interface CreateWeightTicketFromWasteStreamRequest {
     /**
      * 
      * @type {string}
-     * @memberof TaglibDescriptor
+     * @memberof CreateWeightTicketFromWasteStreamRequest
      */
-    'taglibLocation'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TaglibDescriptor
-     */
-    'taglibURI'?: string;
+    'wasteStreamNumber': string;
 }
 

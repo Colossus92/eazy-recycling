@@ -1,11 +1,15 @@
 /**
- * Sanitizes street name or city: first letter uppercase, rest lowercase.
- * Example: "HOOFDSTRAAT" -> "Hoofdstraat"
+ * Sanitizes street name or city: capitalizes the first letter of each word.
+ * Example: "HOOFDSTRAAT" -> "Hoofdstraat", "test street" -> "Test Street"
  */
 export function sanitizeStreetOrCity(value: string): string {
   if (!value || value.trim() === '') return value;
   const trimmed = value.trim();
-  return trimmed.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+  return trimmed
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**

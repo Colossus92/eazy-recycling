@@ -42,6 +42,8 @@ export * from './create-waste-transport-from-weight-ticket-request';
 export * from './create-waste-transport-response';
 export * from './create-weight-ticket-from-transport-request';
 export * from './create-weight-ticket-from-transport-response';
+export * from './create-weight-ticket-from-waste-stream-request';
+export * from './create-weight-ticket-from-waste-stream-response';
 export * from './create-weight-ticket-response';
 export * from './customer-snapshot-view';
 export * from './delivery-location-view';

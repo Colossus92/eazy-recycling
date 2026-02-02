@@ -39,6 +39,7 @@ class WeightTicketController(
   private val completeWeightTicket: CompleteWeightTicket,
   private val createInvoiceFromWeightTicket: CreateInvoiceFromWeightTicket,
   private val createWeightTicketFromTransport: CreateWeightTicketFromTransport,
+  private val createWeightTicketFromWasteStream: CreateWeightTicketFromWasteStream,
   private val catalogItemRepository: CatalogItemJpaRepository,
 ) {
 
@@ -184,6 +185,22 @@ class WeightTicketController(
       weightTicketId = result.weightTicketId
     )
   }
+
+  @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+  @PostMapping("/from-waste-stream")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun createFromWasteStream(
+    @Valid @RequestBody request: CreateWeightTicketFromWasteStreamRequest
+  ): CreateWeightTicketFromWasteStreamResponse {
+    val result = createWeightTicketFromWasteStream.execute(
+      CreateWeightTicketFromWasteStreamCommand(
+        wasteStreamNumber = request.wasteStreamNumber
+      )
+    )
+    return CreateWeightTicketFromWasteStreamResponse(
+      weightTicketId = result.weightTicketId
+    )
+  }
 }
 
 data class SplitWeightTicketRequest(
@@ -216,6 +233,14 @@ data class CreateWeightTicketFromTransportRequest(
 )
 
 data class CreateWeightTicketFromTransportResponse(
+  val weightTicketId: Long,
+)
+
+data class CreateWeightTicketFromWasteStreamRequest(
+  val wasteStreamNumber: String,
+)
+
+data class CreateWeightTicketFromWasteStreamResponse(
   val weightTicketId: Long,
 )
 

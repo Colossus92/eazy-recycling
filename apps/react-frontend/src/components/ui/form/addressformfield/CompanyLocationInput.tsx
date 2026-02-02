@@ -122,7 +122,7 @@ export const CompanyLocationInput = ({
     ];
 
     return options;
-  }, [selectedCompany]);
+  }, [selectedCompany, watchProjectLocationId]);
 
   const hasCompanySelected =
     watchCompanyId !== undefined &&
@@ -219,22 +219,35 @@ export const CompanyLocationInput = ({
     const loadInitialCompany = async () => {
       if (watchCompanyId && !selectedCompanyOption) {
         try {
-          const company = await queryClient.fetchQuery({
-            queryKey: ['company', watchCompanyId],
-            queryFn: () => companyService.getById(watchCompanyId),
+          // Fetch the specific company with branches using getAll with pagination
+          // This ensures we get the company with all its branches
+          const response = await queryClient.fetchQuery({
+            queryKey: ['company', watchCompanyId, 'with-branches'],
+            queryFn: () =>
+              companyService.getAll({
+                includeBranches: true,
+                query: undefined,
+                page: 0,
+                size: 1000, // Large enough to get all companies
+              }),
           });
-          // Update cache with the company
-          setCompaniesCache((prev) => {
-            const newCache = new Map(prev);
-            newCache.set(company.id!, company);
-            return newCache;
-          });
-          setSelectedCompanyOption({
-            value: company.id!,
-            label: company.name,
-          });
-        } catch {
-          // Company not found, ignore
+
+          const company = response.content.find((c) => c.id === watchCompanyId);
+
+          if (company) {
+            // Update cache with the company (including branches)
+            setCompaniesCache((prev) => {
+              const newCache = new Map(prev);
+              newCache.set(company.id!, company);
+              return newCache;
+            });
+            setSelectedCompanyOption({
+              value: company.id!,
+              label: company.name,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to load company:', error);
         }
       }
     };
@@ -343,7 +356,7 @@ export const CompanyLocationInput = ({
           control={control}
           name={`${String(name)}.companyId` as Path<TFieldValues>}
           rules={{ required: 'Bedrijf is verplicht' }}
-          render={({ field, fieldState }) => (
+          render={({ field: { ref, ...field }, fieldState }) => (
             <>
               <AsyncPaginate
                 {...field}
@@ -406,13 +419,15 @@ export const CompanyLocationInput = ({
                 className="w-full text-body-1 text-color-text-secondary"
                 styles={selectStyles}
                 classNames={selectClassNames}
-                value={
-                  projectLocationOptions.find(
-                    (option) =>
-                      option.value ===
-                      (hasProjectLocationSelected ? watchProjectLocationId : '')
-                  ) || null
-                }
+                value={(() => {
+                  const targetValue = hasProjectLocationSelected
+                    ? watchProjectLocationId
+                    : '';
+                  const foundOption = projectLocationOptions.find(
+                    (option) => option.value === targetValue
+                  );
+                  return foundOption || null;
+                })()}
                 onChange={(selectedOption) => {
                   const value = selectedOption
                     ? (selectedOption as Option).value

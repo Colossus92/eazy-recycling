@@ -73,6 +73,8 @@ models/create-waste-transport-from-weight-ticket-request.ts
 models/create-waste-transport-response.ts
 models/create-weight-ticket-from-transport-request.ts
 models/create-weight-ticket-from-transport-response.ts
+models/create-weight-ticket-from-waste-stream-request.ts
+models/create-weight-ticket-from-waste-stream-response.ts
 models/create-weight-ticket-response.ts
 models/customer-snapshot-view.ts
 models/delivery-location-view.ts

@@ -39,3 +39,7 @@ logging:
   structured:
     format:
       console:
+
+jobrunr:
+  database:
+    skip-create: false

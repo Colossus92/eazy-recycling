@@ -47,6 +47,8 @@ export const weightTicketService = {
     weightTicketApi.createInvoice(weightTicketId).then((r) => r.data),
   createFromTransport: (transportId: string) =>
     weightTicketApi.createFromTransport({ transportId }).then((r) => r.data),
+  createFromWasteStream: (wasteStreamNumber: string) =>
+    weightTicketApi.createFromWasteStream({ wasteStreamNumber }).then((r) => r.data),
   getWasteTransportsByWeightTicketId: (weightTicketId: number) =>
     wasteTransportApi
       .getWasteTransportsByWeightTicketId(weightTicketId)
