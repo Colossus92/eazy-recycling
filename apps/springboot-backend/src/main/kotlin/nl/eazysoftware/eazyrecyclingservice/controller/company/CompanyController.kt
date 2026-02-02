@@ -31,6 +31,10 @@ class CompanyController(
   private val createProjectLocation: CreateProjectLocation,
   private val deleteProjectLocation: DeleteProjectLocation,
   private val updateProjectLocation: UpdateProjectLocation,
+  private val getWasteStreamsByCompany: GetWasteStreamsByCompany,
+  private val getWeightTicketsByCompany: GetWeightTicketsByCompany,
+  private val getTransportsByCompany: GetTransportsByCompany,
+  private val getInvoicesByCompany: GetInvoicesByCompany,
 ) {
 
   @PostMapping
@@ -192,6 +196,30 @@ class CompanyController(
         )
       )
     )
+  }
+
+  @GetMapping("/{id}/waste-streams")
+  @PreAuthorize(HAS_ANY_ROLE)
+  fun getWasteStreamsByCompany(@PathVariable("id") id: UUID): List<WasteStreamByCompanyView> {
+    return getWasteStreamsByCompany.execute(id)
+  }
+
+  @GetMapping("/{id}/weight-tickets")
+  @PreAuthorize(HAS_ANY_ROLE)
+  fun getWeightTicketsByCompany(@PathVariable("id") id: UUID): List<WeightTicketByCompanyView> {
+    return getWeightTicketsByCompany.execute(id)
+  }
+
+  @GetMapping("/{id}/transports")
+  @PreAuthorize(HAS_ANY_ROLE)
+  fun getTransportsByCompany(@PathVariable("id") id: UUID): List<TransportByCompanyView> {
+    return getTransportsByCompany.execute(id)
+  }
+
+  @GetMapping("/{id}/invoices")
+  @PreAuthorize(HAS_ANY_ROLE)
+  fun getInvoicesByCompany(@PathVariable("id") id: UUID): List<InvoiceByCompanyView> {
+    return getInvoicesByCompany.execute(id)
   }
 
   data class CompanyRequest(

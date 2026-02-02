@@ -34,16 +34,16 @@ export interface ApplicationContext {
     'applicationName'?: string;
     /**
      * 
-     * @type {number}
-     * @memberof ApplicationContext
-     */
-    'startupDate'?: number;
-    /**
-     * 
      * @type {any}
      * @memberof ApplicationContext
      */
     'autowireCapableBeanFactory'?: any;
+    /**
+     * 
+     * @type {number}
+     * @memberof ApplicationContext
+     */
+    'startupDate'?: number;
     /**
      * 
      * @type {any}

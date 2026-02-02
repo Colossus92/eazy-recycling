@@ -45,28 +45,16 @@ export interface ServletContext {
     'effectiveSessionTrackingModes'?: Set<ServletContextEffectiveSessionTrackingModesEnum>;
     /**
      *
+     * @type {any}
+     * @memberof ServletContext
+     */
+    'attributeNames'?: any;
+    /**
+     *
      * @type {string}
      * @memberof ServletContext
      */
-    'servletContextName'?: string;
-    /**
-     *
-     * @type {{ [key: string]: FilterRegistration; }}
-     * @memberof ServletContext
-     */
-    'filterRegistrations'?: { [key: string]: FilterRegistration; };
-    /**
-     *
-     * @type {JspConfigDescriptor}
-     * @memberof ServletContext
-     */
-    'jspConfigDescriptor'?: JspConfigDescriptor;
-    /**
-     *
-     * @type {number}
-     * @memberof ServletContext
-     */
-    'sessionTimeout'?: number;
+    'contextPath'?: string;
     /**
      *
      * @type {SessionCookieConfig}
@@ -87,22 +75,16 @@ export interface ServletContext {
     'initParameterNames'?: any;
     /**
      *
-     * @type {any}
-     * @memberof ServletContext
-     */
-    'attributeNames'?: any;
-    /**
-     *
-     * @type {string}
-     * @memberof ServletContext
-     */
-    'contextPath'?: string;
-    /**
-     *
      * @type {Set<string>}
      * @memberof ServletContext
      */
     'sessionTrackingModes'?: Set<ServletContextSessionTrackingModesEnum>;
+    /**
+     *
+     * @type {number}
+     * @memberof ServletContext
+     */
+    'sessionTimeout'?: number;
     /**
      *
      * @type {{ [key: string]: ServletRegistration; }}
@@ -145,6 +127,24 @@ export interface ServletContext {
      * @memberof ServletContext
      */
     'responseCharacterEncoding'?: string;
+    /**
+     *
+     * @type {string}
+     * @memberof ServletContext
+     */
+    'servletContextName'?: string;
+    /**
+     *
+     * @type {{ [key: string]: FilterRegistration; }}
+     * @memberof ServletContext
+     */
+    'filterRegistrations'?: { [key: string]: FilterRegistration; };
+    /**
+     *
+     * @type {JspConfigDescriptor}
+     * @memberof ServletContext
+     */
+    'jspConfigDescriptor'?: JspConfigDescriptor;
     /**
      *
      * @type {ApplicationContextClassLoaderParentUnnamedModuleClassLoader}

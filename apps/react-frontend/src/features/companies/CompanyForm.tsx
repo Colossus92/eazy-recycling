@@ -1,23 +1,23 @@
 import { FieldValues, useForm } from 'react-hook-form';
 import { FormEvent, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { TextFormField } from '@/components/ui/form/TextFormField.tsx';
 import { Company } from '@/api/services/companyService';
 import { FormTopBar } from '@/components/ui/form/FormTopBar.tsx';
 import { FormActionButtons } from '@/components/ui/form/FormActionButtons.tsx';
 import { useErrorHandling } from '@/hooks/useErrorHandling.tsx';
-import { JdenticonAvatar } from '@/components/ui/icon/JdenticonAvatar.tsx';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { PostalCodeFormField } from '@/components/ui/form/PostalCodeFormField';
-import { NumberFormField } from '@/components/ui/form/NumberFormField';
-import { PhoneNumberFormField } from '@/components/ui/form/PhoneNumberFormField';
-import { EmailFormField } from '@/components/ui/form/EmailFormField';
 import { RestoreCompanyDialog } from './RestoreCompanyDialog';
 import { AxiosError } from 'axios';
-import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { CompleteCompanyViewRolesEnum } from '@/api/client/models/complete-company-view';
-import { AuditMetadataFooter } from '@/components/ui/form/AuditMetadataFooter';
-import { sanitizeStreetOrCity } from '@/utils/addressSanitization';
+import { Tab } from '@/components/ui/tab/Tab';
+import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
+import {
+  CompanyInvoicesTab,
+  CompanyTransportsTab,
+  CompanyWasteStreamsTab,
+  CompanyWeightTicketsTab,
+} from './tabs';
+import { CompanyDetailsSection } from './CompanyDetailsSection';
 
 interface CompanyFormProps {
   onCancel: () => void;
@@ -164,259 +164,73 @@ export const CompanyForm = ({
 
   return (
     <ErrorBoundary fallbackRender={fallbackRender}>
-      <form
-        className="flex flex-col items-center self-stretch h-[90vh]"
-        onSubmit={(e) => submitAndClose(e)}
-      >
-        <FormTopBar
-          title={company ? 'Bedrijf aanpassen' : 'Een bedrijf toevoegen'}
-          onClick={onCancel}
-        />
-        <div className="flex flex-col items-center self-stretch flex-1 p-4 gap-4 min-h-0 overflow-y-auto">
-          <JdenticonAvatar value={watch('name')} />
-          <TextFormField
-            title={'Bedrijfsnaam'}
-            placeholder={'Vul bedrijfsnaam in'}
-            formHook={{
-              register,
-              name: 'name',
-              rules: {
-                required: 'Bedrijfsnaam is verplicht',
-                validate: (value: string) => {
-                  const trimmed = value?.trim() || '';
-                  return trimmed !== '' || 'Bedrijfsnaam mag niet leeg zijn';
-                },
-              },
-              errors,
-            }}
-            value={company?.name}
+      <div className={'w-full h-[90vh]'}>
+        <form
+          className="flex flex-col items-center self-stretch h-full"
+          onSubmit={(e) => submitAndClose(e)}
+        >
+          <FormTopBar
+            title={company ? 'Bedrijf aanpassen' : 'Een bedrijf toevoegen'}
+            onClick={onCancel}
           />
-          <div className="p-4 bg-color-surface-secondary rounded-md flex flex-col gap-4">
-            <span className="text-subtitle-1">Adres</span>
-            <div className={'flex items-start gap-4 self-stretch'}>
-              <div className={'flex items-start flex-grow w-1/2'}>
-                <PostalCodeFormField
+          <div className="flex flex-col items-start self-stretch flex-1 p-4 gap-4 min-h-0">
+            {company ? (
+              <TabGroup className="w-full flex-1 flex flex-col min-h-0">
+                <TabList className="relative z-10">
+                  <Tab label="Gegevens" />
+                  <Tab label="Afvalstromen" />
+                  <Tab label="Weegbonnen" />
+                  <Tab label="Transporten" />
+                  <Tab label="Facturen" />
+                </TabList>
+                <TabPanels className="flex flex-col flex-1 bg-color-surface-primary border border-solid rounded-b-radius-lg rounded-tr-radius-lg border-color-border-primary pt-4 gap-4 min-h-0 -mt-[2px] overflow-y-auto">
+                  <TabPanel
+                    unmount={false}
+                    className="flex flex-col items-start gap-4 px-4 pb-4"
+                  >
+                    <CompanyDetailsSection
+                      register={register}
+                      setValue={setValue}
+                      watch={watch}
+                      control={control}
+                      errors={errors}
+                      company={company}
+                    />
+                  </TabPanel>
+                  <TabPanel className="flex flex-col items-start gap-4 min-h-0">
+                    <CompanyWasteStreamsTab companyId={company.id} />
+                  </TabPanel>
+                  <TabPanel className="flex flex-col items-start gap-4 min-h-0">
+                    <CompanyWeightTicketsTab companyId={company.id} />
+                  </TabPanel>
+                  <TabPanel className="flex flex-col items-start gap-4 min-h-0">
+                    <CompanyTransportsTab companyId={company.id} />
+                  </TabPanel>
+                  <TabPanel className="flex flex-col items-start gap-4 min-h-0">
+                    <CompanyInvoicesTab companyId={company.id} />
+                  </TabPanel>
+                </TabPanels>
+              </TabGroup>
+            ) : (
+              <div className="w-full overflow-y-auto flex flex-col items-center gap-4">
+                <CompanyDetailsSection
                   register={register}
                   setValue={setValue}
-                  name="postalCode"
+                  watch={watch}
+                  control={control}
                   errors={errors}
-                  value={company?.address.postalCode}
+                  company={company}
                 />
               </div>
-              <div className={'flex items-start gap-4 w-1/2'}>
-                <NumberFormField
-                  title={'Nummer'}
-                  placeholder={''}
-                  step={1}
-                  formHook={{
-                    register,
-                    name: 'houseNumber',
-                    rules: {
-                      required: 'Huisnummer is verplicht',
-                      min: {
-                        value: 1,
-                        message: 'Ongeldig',
-                      },
-                      maxLength: {
-                        value: 10,
-                        message: 'Huisnummer mag maximaal 10 tekens bevatten',
-                      },
-                    },
-                    errors,
-                  }}
-                  value={company?.address.houseNumber}
-                />
-                <TextFormField
-                  title={'Toevoeging'}
-                  placeholder={''}
-                  formHook={{
-                    register,
-                    name: 'houseNumberAddition',
-                    rules: {
-                      maxLength: {
-                        value: 6,
-                        message: 'Toevoeging mag maximaal 6 tekens bevatten',
-                      },
-                    },
-                    errors,
-                  }}
-                  value={company?.address.houseNumberAddition}
-                />
-              </div>
-            </div>
-            <div className={'flex items-start gap-4 self-stretch'}>
-              <TextFormField
-                title={'Straat'}
-                placeholder={'Vul straatnaam in'}
-                formHook={{
-                  register,
-                  name: 'street',
-                  rules: {
-                    required: 'Straat is verplicht',
-                    maxLength: {
-                      value: 43,
-                      message: 'Straatnaam mag maximaal 43 tekens bevatten',
-                    },
-                    onBlur: (e) => {
-                      const sanitized = sanitizeStreetOrCity(e.target.value);
-                      setValue('street', sanitized);
-                    },
-                  },
-                  errors,
-                }}
-                value={company?.address.street}
-              />
-            </div>
-            <div className={'flex items-start gap-4 self-stretch'}>
-              <TextFormField
-                title={'Plaats'}
-                placeholder={'Vul Plaats in'}
-                formHook={{
-                  register,
-                  name: 'city',
-                  rules: {
-                    required: 'Plaats is verplicht',
-                    maxLength: {
-                      value: 24,
-                      message: 'Plaats mag maximaal 24 tekens bevatten',
-                    },
-                    onBlur: (e) => {
-                      const sanitized = sanitizeStreetOrCity(e.target.value);
-                      setValue('city', sanitized);
-                    },
-                  },
-                  errors,
-                }}
-                value={company?.address.city}
-              />
-            </div>
+            )}
           </div>
-          <div className="flex flex-col items-start self-stretch p-4 bg-color-surface-secondary rounded-md gap-4">
-            <span className="text-subtitle-1">Contact</span>
-            <EmailFormField
-              register={register}
-              errors={errors}
-              name="email"
-              value={company?.email}
-            />
-            <PhoneNumberFormField
-              formHook={{
-                register,
-                name: 'phone',
-                errors,
-              }}
-              value={company?.phone}
-            />
-          </div>
-          <div className={'flex items-start gap-4 self-stretch'}>
-            <TextFormField
-              title={'KvK nummer'}
-              placeholder={'Vul Kvk nummer in'}
-              formHook={{
-                register,
-                name: 'chamberOfCommerceId',
-                rules: {
-                  validate: (value: string) => {
-                    const trimmed = value?.trim() || '';
-                    if (trimmed === '') return true;
-                    return (
-                      /^\d{8}$/.test(trimmed) ||
-                      'KvK nummer moet 8 cijfers bevatten of leeg zijn'
-                    );
-                  },
-                },
-                errors,
-              }}
-              value={company?.chamberOfCommerceId || undefined}
-            />
-            <TextFormField
-              title={'VIHB-nummer'}
-              placeholder={'Vul VIHB-nummer in'}
-              formHook={{
-                register,
-                name: 'vihbId',
-                rules: {
-                  validate: (value: string) => {
-                    const trimmed = value?.trim() || '';
-                    if (trimmed === '') return true;
-                    return (
-                      /^\d{6}[VIHBX]{4}$/i.test(trimmed) ||
-                      'VIHB-nummer moet 6 cijfers en 4 letters (VIHB of X) bevatten of leeg zijn'
-                    );
-                  },
-                },
-                errors,
-              }}
-              value={company?.vihbId || undefined}
-            />
-          </div>
-          <div className={'flex items-start gap-4 self-stretch w-1/2'}>
-            <TextFormField
-              title={'Vewerkersnummer'}
-              placeholder={'Vul vewerkersnummer in'}
-              formHook={{
-                register,
-                name: 'processorId',
-                rules: {
-                  validate: (value: string) => {
-                    const trimmed = value?.trim() || '';
-                    const selectedRoles = watch('roles') || [];
-                    const hasProcessorRole = selectedRoles.includes(
-                      'PROCESSOR' as CompleteCompanyViewRolesEnum
-                    );
-
-                    if (hasProcessorRole && trimmed === '') {
-                      return 'Vewerkersnummer is verplicht voor bedrijven met de rol Verwerker';
-                    }
-
-                    if (trimmed === '') return true;
-                    return (
-                      trimmed.length === 5 ||
-                      'Vewerkersnummer moet 5 tekens bevatten'
-                    );
-                  },
-                },
-                errors,
-              }}
-              value={company?.processorId || undefined}
-            />
-          </div>
-          <SelectFormField
-            title={'Rol(len)'}
-            placeholder={'Selecteer rol(len)'}
-            options={[
-              {
-                value: 'PROCESSOR',
-                label: 'Verwerker',
-              },
-              {
-                value: 'CARRIER',
-                label: 'Transporteur',
-              },
-            ]}
-            formHook={{
-              register,
-              name: 'roles',
-              errors,
-              control,
-            }}
-            value={company?.roles}
-            isMulti={true}
-            testId="roles-select"
+          <FormActionButtons
+            onClick={onCancel}
+            item={company}
+            disabled={isSubmitting}
           />
-          <AuditMetadataFooter
-            createdAt={company?.createdAt}
-            createdByName={company?.createdByName}
-            updatedAt={company?.updatedAt}
-            updatedByName={company?.updatedByName}
-          />
-        </div>
-        <FormActionButtons
-          onClick={onCancel}
-          item={company}
-          disabled={isSubmitting}
-        />
-      </form>
+        </form>
+      </div>
       <RestoreCompanyDialog
         isOpen={softDeleteConflict !== null}
         onClose={handleRestoreCancel}

@@ -91,6 +91,7 @@ models/filter-registration.ts
 models/goods-item-view.ts
 models/goods-request.ts
 models/index.ts
+models/invoice-by-company-view.ts
 models/invoice-detail-view.ts
 models/invoice-line-request.ts
 models/invoice-line-view.ts
@@ -163,6 +164,7 @@ models/tenant-view.ts
 models/timing-constraint-dto.ts
 models/timing-constraint-request.ts
 models/timing-constraint-view.ts
+models/transport-by-company-view.ts
 models/transport-detail-view.ts
 models/transport-dto.ts
 models/transport-finished-request.ts
@@ -189,6 +191,7 @@ models/waste-container-dto.ts
 models/waste-container-request.ts
 models/waste-container-view-location.ts
 models/waste-container-view.ts
+models/waste-stream-by-company-view.ts
 models/waste-stream-detail-view.ts
 models/waste-stream-list-view.ts
 models/waste-stream-request.ts
@@ -196,6 +199,7 @@ models/waste-stream-validation-response.ts
 models/waste-transport-request.ts
 models/waste-type-view.ts
 models/weight-request.ts
+models/weight-ticket-by-company-view.ts
 models/weight-ticket-detail-view-consignor-party.ts
 models/weight-ticket-detail-view.ts
 models/weight-ticket-dto.ts

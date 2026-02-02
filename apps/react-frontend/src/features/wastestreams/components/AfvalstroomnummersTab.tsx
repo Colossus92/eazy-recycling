@@ -14,7 +14,7 @@ import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { useWasteStreamCrud } from '@/features/wastestreams/hooks/useWasteStreamCrud';
 import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import {
@@ -23,6 +23,7 @@ import {
 } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { WasteStreamFilterForm } from '@/features/wastestreams/components/WasteStreamFilterForm';
 import { WasteStreamDetailsDrawer } from '@/features/wastestreams/components/drawer/WasteStreamDetailsDrawer';
+import { useSearchParams } from 'react-router-dom';
 
 type Column = {
   key: keyof WasteStreamListView;
@@ -41,6 +42,37 @@ export const AfvalstroomnummersTab = () => {
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useWasteStreamCrud();
   const { createWeightTicket } = useCreateWeightTicketFromWasteStream();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle URL params for opening waste stream drawer
+  useEffect(() => {
+    const wasteStreamDrawerId = searchParams.get('wasteStreamDrawerId');
+
+    if (wasteStreamDrawerId && read.items && read.items.length > 0) {
+      // Find the waste stream in the full list
+      const wasteStreamIndex = read.items.findIndex(
+        (ws: WasteStreamListView) =>
+          ws.wasteStreamNumber === wasteStreamDrawerId
+      );
+
+      if (wasteStreamIndex !== -1) {
+        const wasteStream = read.items[wasteStreamIndex];
+
+        // Calculate which page the waste stream is on and navigate to it
+        const targetPage = Math.floor(wasteStreamIndex / rowsPerPage) + 1;
+        if (targetPage !== page) {
+          setPage(targetPage);
+        }
+
+        // Open the drawer with the waste stream
+        setSelectedWasteStream(wasteStream);
+        setIsDrawerOpen(true);
+      }
+
+      // Clear the URL params after processing
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, read.items, rowsPerPage, page]);
 
   /**
    * Handle single click to open drawer, double click to open edit form.

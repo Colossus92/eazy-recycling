@@ -151,10 +151,10 @@ export interface RedirectView {
     'propagateQueryProperties'?: boolean;
     /**
      * 
-     * @type {string}
+     * @type {{ [key: string]: string; }}
      * @memberof RedirectView
      */
-    'attributesCSV'?: string;
+    'attributes'?: { [key: string]: string; };
     /**
      * 
      * @type {{ [key: string]: any; }}
@@ -163,9 +163,9 @@ export interface RedirectView {
     'attributesMap'?: { [key: string]: any; };
     /**
      * 
-     * @type {{ [key: string]: string; }}
+     * @type {string}
      * @memberof RedirectView
      */
-    'attributes'?: { [key: string]: string; };
+    'attributesCSV'?: string;
 }
 

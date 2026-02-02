@@ -2237,6 +2237,90 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SyncPreviewResponse"
+  /companies/{id}/weight-tickets:
+    get:
+      tags:
+      - company-controller
+      operationId: getWeightTicketsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeightTicketByCompanyView"
+  /companies/{id}/waste-streams:
+    get:
+      tags:
+      - company-controller
+      operationId: getWasteStreamsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteStreamByCompanyView"
+  /companies/{id}/transports:
+    get:
+      tags:
+      - company-controller
+      operationId: getTransportsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransportByCompanyView"
+  /companies/{id}/invoices:
+    get:
+      tags:
+      - company-controller
+      operationId: getInvoicesByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InvoiceByCompanyView"
   /companies/tenant:
     get:
       tags:
@@ -4761,14 +4845,14 @@ components:
           type: string
           format: date
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
         year:
           type: integer
           format: int32
@@ -4824,14 +4908,14 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         nanosecond:
           type: integer
           format: int32
@@ -5892,6 +5976,78 @@ components:
       - size
       - totalElements
       - totalPages
+    WeightTicketByCompanyView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        totalWeight:
+          type: number
+          format: double
+        weighingDate:
+          type: string
+          format: date-time
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - status
+    WasteStreamByCompanyView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        wasteName:
+          type: string
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - pickupLocation
+      - status
+      - wasteName
+      - wasteStreamNumber
+    TransportByCompanyView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        date:
+          type: string
+          format: date
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - status
+    InvoiceByCompanyView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        invoiceType:
+          type: string
+        totalInclVat:
+          type: number
+        status:
+          type: string
+      required:
+      - id
+      - invoiceType
+      - status
+      - totalInclVat
     CatalogItemResponse:
       type: object
       properties:
@@ -6118,11 +6274,11 @@ components:
       properties:
         applicationName:
           type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         parent: {}
         id:
           type: string
@@ -6469,17 +6625,23 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -6494,18 +6656,12 @@ components:
           type: array
           items:
             type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
         defaultContentType:
           type: string
         urlPatterns:
           type: array
           items:
             type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
@@ -6572,16 +6728,16 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
-        attributesCSV:
-          type: string
-          writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
         attributes:
           type: object
           additionalProperties:
             type: string
+          writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
+        attributesCSV:
+          type: string
           writeOnly: true
     ServletContext:
       type: object
@@ -6595,25 +6751,14 @@ components:
             - URL
             - SSL
           uniqueItems: true
-        servletContextName:
+        attributeNames: {}
+        contextPath:
           type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        sessionTimeout:
-          type: integer
-          format: int32
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
         initParameterNames: {}
-        attributeNames: {}
-        contextPath:
-          type: string
         sessionTrackingModes:
           type: array
           items:
@@ -6624,6 +6769,9 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
+        sessionTimeout:
+          type: integer
+          format: int32
         servletRegistrations:
           type: object
           additionalProperties:
@@ -6649,6 +6797,14 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
         classLoader:
           type: object
           properties:
@@ -6735,9 +6891,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object
