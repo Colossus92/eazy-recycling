@@ -24,6 +24,7 @@ jobs:
       - name: Generate app.yaml from template
         env:
           # Environment-specific configuration
+          DO_APP_NAME: ${{ vars.DO_APP_NAME }}
           APP_DOMAIN: ${{ vars.APP_DOMAIN }}
           INSTANCE_SIZE_SLUG: ${{ vars.INSTANCE_SIZE_SLUG }}
           IMAGE_TAG: ${{ inputs.image_tag }}
@@ -76,3 +77,4 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           app_spec_location: .do/app.yaml.generated
+          project_id: ${{ vars.DO_PROJECT_ID }}

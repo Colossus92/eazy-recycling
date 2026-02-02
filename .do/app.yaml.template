@@ -47,7 +47,7 @@ ingress:
       match:
         path:
           prefix: /mobile/*
-name: ers
+name: ${DO_APP_NAME}
 region: ams
 services:
   - alerts:
