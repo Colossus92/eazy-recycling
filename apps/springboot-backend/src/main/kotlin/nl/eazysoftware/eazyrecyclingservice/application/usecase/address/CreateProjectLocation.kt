@@ -1,12 +1,14 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.address
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.config.cache.CacheConfig
 import nl.eazysoftware.eazyrecyclingservice.domain.model.address.Address
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyProjectLocation
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.ProjectLocationId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Companies
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -34,6 +36,7 @@ class CreateProjectLocationService(
 ) : CreateProjectLocation {
 
   @Transactional
+  @CacheEvict(cacheNames = [CacheConfig.COMPANIES_CACHE], allEntries = true)
   override fun handle(cmd: CreateProjectLocationCommand): ProjectLocationResult {
     if (projectLocations.existsByCompanyIdAndPostalCodeAndBuildingNumber(
         cmd.companyId,
