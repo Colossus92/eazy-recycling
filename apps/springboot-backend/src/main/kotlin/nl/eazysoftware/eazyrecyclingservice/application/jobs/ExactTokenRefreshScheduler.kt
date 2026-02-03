@@ -86,11 +86,11 @@ class ExactTokenRefreshScheduler(
             if (refreshAt.isBefore(now)) {
                 // Token needs immediate refresh
                 logger.info("Exact Online token is expiring soon (expires at: {}), refreshing now...", currentToken.expiresAt)
-                refreshTokenAndReschedule(currentToken.refreshToken)
+                refreshTokenAndReschedule()
             } else {
                 // Schedule refresh for later
                 logger.info("Scheduled Exact Online token refresh at {} (token expires at: {})", refreshAt, currentToken.expiresAt)
-                scheduledTask = taskScheduler.schedule({ refreshTokenAndReschedule(currentToken.refreshToken) }, refreshAt)
+                scheduledTask = taskScheduler.schedule({ refreshTokenAndReschedule() }, refreshAt)
             }
 
         } catch (e: Exception) {
@@ -99,13 +99,14 @@ class ExactTokenRefreshScheduler(
         }
     }
 
-    private fun refreshTokenAndReschedule(refreshToken: String) {
+    private fun refreshTokenAndReschedule() {
         if (stopped) {
             logger.debug("Scheduler is stopped, not refreshing token")
             return
         }
         try {
-            exactOAuthService.refreshAccessToken(refreshToken)
+            // Use no-arg method which handles token decryption internally
+            exactOAuthService.refreshAccessToken()
             logger.debug("Successfully refreshed Exact Online token")
             // Schedule the next refresh based on the new token
             scheduleNextRefresh()

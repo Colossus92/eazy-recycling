@@ -27,10 +27,36 @@ class MaterialPriceController(
 ) {
 
     @GetMapping
-    fun getAllMaterialsWithPrices(): List<MaterialPriceResponse> {
-        return materials.getAllMaterialsWithGroupDetails().map { material ->
+    fun getAllMaterialsWithPrices(
+        @RequestParam(required = false) sortBy: String?,
+        @RequestParam(required = false, defaultValue = "asc") sortDirection: String,
+        @RequestParam(required = false) publishedOnly: Boolean?
+    ): List<MaterialPriceResponse> {
+        val allMaterials = materials.getAllMaterialsWithGroupDetails().map { material ->
             val syncRecord = syncRepository.findByMaterialId(material.getId())
             material.toPriceResponse(syncRecord)
+        }
+        
+        // Filter by published status if requested
+        val filteredMaterials = if (publishedOnly == true) {
+            allMaterials.filter { it.publishToPricingApp }
+        } else {
+            allMaterials
+        }
+        
+        // Apply sorting
+        return when (sortBy) {
+            "code" -> if (sortDirection == "desc") {
+                filteredMaterials.sortedByDescending { it.code }
+            } else {
+                filteredMaterials.sortedBy { it.code }
+            }
+            "name" -> if (sortDirection == "desc") {
+                filteredMaterials.sortedByDescending { it.name }
+            } else {
+                filteredMaterials.sortedBy { it.name }
+            }
+            else -> filteredMaterials
         }
     }
 
@@ -161,6 +187,8 @@ data class MaterialPriceResponse(
     val publishToPricingApp: Boolean = false,
     val externalPricingAppId: Int? = null,
     val externalPricingAppName: String? = null,
+    val lastModifiedAt: java.time.Instant? = null,
+    val externalPricingAppSyncedAt: java.time.Instant? = null,
 )
 
 fun MaterialQueryResult.toPriceResponse(syncRecord: MaterialPricingAppSyncDto? = null): MaterialPriceResponse {
@@ -175,5 +203,7 @@ fun MaterialQueryResult.toPriceResponse(syncRecord: MaterialPricingAppSyncDto? =
         publishToPricingApp = syncRecord?.publishToPricingApp ?: false,
         externalPricingAppId = syncRecord?.externalPricingAppId,
         externalPricingAppName = syncRecord?.externalPricingAppName,
+        lastModifiedAt = syncRecord?.updatedAt,
+        externalPricingAppSyncedAt = syncRecord?.externalPricingAppSyncedAt,
     )
 }

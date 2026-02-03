@@ -104,6 +104,24 @@ export interface CatalogItemResponse {
      * @memberof CatalogItemResponse
      */
     'defaultPrice'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'pickupStreet'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'pickupBuildingNumber'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CatalogItemResponse
+     */
+    'pickupCity'?: string;
 }
 
 export const CatalogItemResponseItemTypeEnum = {

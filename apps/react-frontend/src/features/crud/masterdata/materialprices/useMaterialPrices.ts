@@ -6,16 +6,33 @@ import { materialPriceService } from '@/api/services/materialPriceService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortConfig {
+  sortBy: string | null;
+  sortDirection: SortDirection;
+}
+
 export const useMaterialPricesCrud = () => {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
+  const [publishedOnly, setPublishedOnly] = useState(false);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    sortBy: null,
+    sortDirection: 'asc',
+  });
+
   const {
     data: materialPrices = [],
     error,
     isLoading,
   } = useQuery({
-    queryKey: ['materialPrices'],
-    queryFn: () => materialPriceService.getAll(),
+    queryKey: ['materialPrices', { sortBy: sortConfig.sortBy, sortDirection: sortConfig.sortDirection, publishedOnly }],
+    queryFn: () => materialPriceService.getAll({
+      sortBy: sortConfig.sortBy || undefined,
+      sortDirection: sortConfig.sortDirection,
+      publishedOnly: publishedOnly || undefined,
+    }),
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<
@@ -125,6 +142,12 @@ export const useMaterialPricesCrud = () => {
           queryClient.invalidateQueries({ queryKey: ['materialPrices'] });
         },
       },
+      // Sorting
+      sortConfig,
+      setSortConfig,
+      // Filtering
+      publishedOnly,
+      setPublishedOnly,
     },
     form: {
       isOpen: isFormOpen,

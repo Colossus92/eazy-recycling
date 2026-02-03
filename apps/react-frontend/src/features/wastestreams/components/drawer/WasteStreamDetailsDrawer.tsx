@@ -6,7 +6,7 @@ import {
   NormalizedAddress,
   resolveLocationAddress,
 } from '@/api/services/transportService';
-import { Drawer } from '@/components/ui/drawer/Drawer';
+import { Drawer, DrawerAction } from '@/components/ui/drawer/Drawer';
 import { Button } from '@/components/ui/button/Button';
 import Hash from '@/assets/icons/Hash.svg?react';
 import CheckCircle from '@/assets/icons/CheckCircleOutline.svg?react';
@@ -23,6 +23,7 @@ import {
 } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { DeliveryLocationView } from '@/api/client/models/delivery-location-view';
 import { WeightTicketsTable } from './WeightTicketsTable';
+import { useCreateWeightTicketFromWasteStream } from '@/features/weighttickets/hooks/useCreateWeightTicketFromWasteStream';
 
 interface WasteStreamDetailsDrawerProps {
   isDrawerOpen: boolean;
@@ -65,6 +66,7 @@ export const WasteStreamDetailsDrawer = ({
   const navigate = useNavigate();
   const [isWeightTicketsTableOpen, setIsWeightTicketsTableOpen] =
     useState(false);
+  const { createWeightTicket } = useCreateWeightTicketFromWasteStream();
 
   const { data, isLoading } = useQuery({
     queryKey: ['wasteStream', wasteStreamNumber],
@@ -93,6 +95,14 @@ export const WasteStreamDetailsDrawer = ({
     navigate(`/weight-tickets?weightTicketId=${weightTicketNumber}`);
   };
 
+  const additionalActions: DrawerAction[] = [
+    {
+      icon: Scale,
+      onClick: () => createWeightTicket(wasteStreamNumber),
+      testId: 'create-weight-ticket-button',
+    },
+  ];
+
   return (
     <>
       <Drawer
@@ -101,6 +111,7 @@ export const WasteStreamDetailsDrawer = ({
         setIsOpen={setIsDrawerOpen}
         onEdit={onEdit}
         onDelete={onDelete}
+        additionalActions={additionalActions}
       >
         {isLoading || (!data && <div>Afvalstroomnummer laden...</div>)}
         {!isLoading && data && (

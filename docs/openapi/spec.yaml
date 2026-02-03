@@ -1089,6 +1089,24 @@ paths:
       responses:
         "204":
           description: No Content
+  /weight-tickets/from-waste-stream:
+    post:
+      tags:
+      - weight-ticket-controller
+      operationId: createFromWasteStream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWeightTicketFromWasteStreamRequest"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateWeightTicketFromWasteStreamResponse"
   /weight-tickets/from-transport:
     post:
       tags:
@@ -2167,6 +2185,23 @@ paths:
       tags:
       - material-price-controller
       operationId: getAllMaterialsWithPrices
+      parameters:
+      - name: sortBy
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sortDirection
+        in: query
+        required: false
+        schema:
+          type: string
+          default: asc
+      - name: publishedOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         "200":
           description: OK
@@ -2202,6 +2237,90 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SyncPreviewResponse"
+  /companies/{id}/weight-tickets:
+    get:
+      tags:
+      - company-controller
+      operationId: getWeightTicketsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WeightTicketByCompanyView"
+  /companies/{id}/waste-streams:
+    get:
+      tags:
+      - company-controller
+      operationId: getWasteStreamsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WasteStreamByCompanyView"
+  /companies/{id}/transports:
+    get:
+      tags:
+      - company-controller
+      operationId: getTransportsByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransportByCompanyView"
+  /companies/{id}/invoices:
+    get:
+      tags:
+      - company-controller
+      operationId: getInvoicesByCompany
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InvoiceByCompanyView"
   /companies/tenant:
     get:
       tags:
@@ -2338,7 +2457,7 @@ paths:
       parameters:
       - name: code
         in: query
-        required: true
+        required: false
         schema:
           type: string
       - name: state
@@ -3901,6 +4020,12 @@ components:
           format: int32
         externalPricingAppName:
           type: string
+        lastModifiedAt:
+          type: string
+          format: date-time
+        externalPricingAppSyncedAt:
+          type: string
+          format: date-time
       required:
       - code
       - id
@@ -4240,7 +4365,7 @@ components:
           pattern: "^$|^[0-9]{6}[VIHBX]{4}$"
         processorId:
           type: string
-          pattern: "^$|^[\\d]{5}$"
+          pattern: "^$|^[^\\s]{5}$"
         name:
           type: string
           minLength: 1
@@ -4337,6 +4462,21 @@ components:
           minLength: 1
       required:
       - cancellationReason
+    CreateWeightTicketFromWasteStreamRequest:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+      required:
+      - wasteStreamNumber
+    CreateWeightTicketFromWasteStreamResponse:
+      type: object
+      properties:
+        weightTicketId:
+          type: integer
+          format: int64
+      required:
+      - weightTicketId
     CreateWeightTicketFromTransportRequest:
       type: object
       properties:
@@ -5836,6 +5976,78 @@ components:
       - size
       - totalElements
       - totalPages
+    WeightTicketByCompanyView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        totalWeight:
+          type: number
+          format: double
+        weighingDate:
+          type: string
+          format: date-time
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - status
+    WasteStreamByCompanyView:
+      type: object
+      properties:
+        wasteStreamNumber:
+          type: string
+        wasteName:
+          type: string
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - pickupLocation
+      - status
+      - wasteName
+      - wasteStreamNumber
+    TransportByCompanyView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayNumber:
+          type: string
+        date:
+          type: string
+          format: date
+        pickupLocation:
+          type: string
+        status:
+          type: string
+      required:
+      - id
+      - status
+    InvoiceByCompanyView:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        invoiceType:
+          type: string
+        totalInclVat:
+          type: number
+        status:
+          type: string
+      required:
+      - id
+      - invoiceType
+      - status
+      - totalInclVat
     CatalogItemResponse:
       type: object
       properties:
@@ -5873,6 +6085,12 @@ components:
           type: string
         defaultPrice:
           type: number
+        pickupStreet:
+          type: string
+        pickupBuildingNumber:
+          type: string
+        pickupCity:
+          type: string
       required:
       - catalogItemId
       - code
@@ -6054,13 +6272,13 @@ components:
     ApplicationContext:
       type: object
       properties:
+        applicationName:
+          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
-        applicationName:
-          type: string
         parent: {}
         id:
           type: string
@@ -6418,17 +6636,11 @@ components:
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        defaultContentType:
+        deferredSyntaxAllowedAsLiteral:
           type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
         elIgnored:
           type: string
         isXml:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
           type: string
         errorOnELNotFound:
           type: string
@@ -6441,6 +6653,12 @@ components:
           items:
             type: string
         includeCodas:
+          type: array
+          items:
+            type: string
+        defaultContentType:
+          type: string
+        urlPatterns:
           type: array
           items:
             type: string
@@ -6524,6 +6742,15 @@ components:
     ServletContext:
       type: object
       properties:
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
         attributeNames: {}
         contextPath:
           type: string
@@ -6549,15 +6776,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
         serverInfo:
           type: string
         effectiveMajorVersion:
@@ -6650,15 +6868,15 @@ components:
     SessionCookieConfig:
       type: object
       properties:
+        domain:
+          type: string
+        path:
+          type: string
         maxAge:
           type: integer
           format: int32
         httpOnly:
           type: boolean
-        domain:
-          type: string
-        path:
-          type: string
         secure:
           type: boolean
         name:

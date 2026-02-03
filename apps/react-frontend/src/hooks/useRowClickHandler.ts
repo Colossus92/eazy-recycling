@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 interface UseRowClickHandlerOptions<T> {
   onSingleClick: (item: T) => void;
@@ -14,7 +14,7 @@ interface UseRowClickHandlerResult<T> {
 export function useRowClickHandler<T>({
   onSingleClick,
   onDoubleClick,
-  delay = 200,
+  delay = 400,
 }: UseRowClickHandlerOptions<T>): UseRowClickHandlerResult<T> {
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

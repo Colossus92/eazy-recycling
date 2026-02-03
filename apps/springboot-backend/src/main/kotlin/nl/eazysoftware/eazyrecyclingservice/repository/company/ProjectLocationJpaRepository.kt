@@ -19,6 +19,13 @@ interface ProjectLocationJpaRepository : JpaRepository<CompanyProjectLocationDto
     @Param("postalCode") postalCode: String,
     @Param("buildingNumber") buildingNumber: String
   ): Boolean
+
+  @Query("SELECT p FROM CompanyProjectLocationDto p WHERE p.company.id = :companyId AND p.postalCode = :postalCode AND p.buildingNumber = :buildingNumber")
+  fun findByCompanyIdAndPostalCodeAndBuildingNumber(
+    @Param("companyId") companyId: UUID,
+    @Param("postalCode") postalCode: String,
+    @Param("buildingNumber") buildingNumber: String
+  ): CompanyProjectLocationDto?
 }
 
 @Repository
@@ -36,6 +43,17 @@ class ProjectLocationRepository(
       postalCode.value,
       buildingNumber
     )
+
+  override fun findByCompanyIdAndPostalCodeAndBuildingNumber(
+    companyId: CompanyId,
+    postalCode: DutchPostalCode,
+    buildingNumber: String
+  ) =
+    jpaRepository.findByCompanyIdAndPostalCodeAndBuildingNumber(
+      companyId.uuid,
+      postalCode.value,
+      buildingNumber
+    )?.let { locationMapper.toDomain(it) }
 
   override fun create(location: CompanyProjectLocation) {
     jpaRepository.save(locationMapper.toDto(location))

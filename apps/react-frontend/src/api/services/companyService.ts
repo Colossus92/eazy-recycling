@@ -5,7 +5,11 @@ import {
   CompanyBranchResponse,
   CompanyRequest,
   CompleteCompanyView,
+  InvoiceByCompanyView,
   PagedCompanyResponse,
+  TransportByCompanyView,
+  WasteStreamByCompanyView,
+  WeightTicketByCompanyView,
 } from '../client/models';
 
 const companyApi = new CompanyControllerApi(apiInstance.config);
@@ -55,7 +59,16 @@ export const companyService = {
       excludeTenant = false,
     } = params;
     return companyApi
-      .getCompanies(includeBranches, role, query, page, size, sortBy, sortDirection, excludeTenant)
+      .getCompanies(
+        includeBranches,
+        role,
+        query,
+        page,
+        size,
+        sortBy,
+        sortDirection,
+        excludeTenant
+      )
       .then((r) => r.data);
   },
 
@@ -123,6 +136,42 @@ export const companyService = {
   getTenantCompany: async (): Promise<Company | null> => {
     const response = await companyApi.getTenantCompany();
     return response.data || null;
+  },
+
+  /**
+   * Get waste streams where this company is the consignor.
+   */
+  getWasteStreamsByCompany: (
+    companyId: string
+  ): Promise<WasteStreamByCompanyView[]> => {
+    return companyApi.getWasteStreamsByCompany(companyId).then((r) => r.data);
+  },
+
+  /**
+   * Get weight tickets where this company is the consignor.
+   */
+  getWeightTicketsByCompany: (
+    companyId: string
+  ): Promise<WeightTicketByCompanyView[]> => {
+    return companyApi.getWeightTicketsByCompany(companyId).then((r) => r.data);
+  },
+
+  /**
+   * Get transports where this company is the consignor.
+   */
+  getTransportsByCompany: (
+    companyId: string
+  ): Promise<TransportByCompanyView[]> => {
+    return companyApi.getTransportsByCompany(companyId).then((r) => r.data);
+  },
+
+  /**
+   * Get invoices where this company is the customer.
+   */
+  getInvoicesByCompany: (
+    companyId: string
+  ): Promise<InvoiceByCompanyView[]> => {
+    return companyApi.getInvoicesByCompany(companyId).then((r) => r.data);
   },
 };
 

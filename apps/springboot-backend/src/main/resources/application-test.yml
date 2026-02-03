@@ -50,7 +50,8 @@ logging:
 jobrunr:
   dashboard:
     enabled: false
-
+  database:
+    skip-create: false
 pricing-app:
   base-url: "https://test.example.com/api/v1"
   bearer-token: "test-token"

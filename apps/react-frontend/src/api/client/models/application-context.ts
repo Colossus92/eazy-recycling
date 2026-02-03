@@ -28,10 +28,10 @@ import type { Environment } from './environment';
 export interface ApplicationContext {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof ApplicationContext
      */
-    'startupDate'?: number;
+    'applicationName'?: string;
     /**
      * 
      * @type {any}
@@ -40,10 +40,10 @@ export interface ApplicationContext {
     'autowireCapableBeanFactory'?: any;
     /**
      * 
-     * @type {string}
+     * @type {number}
      * @memberof ApplicationContext
      */
-    'applicationName'?: string;
+    'startupDate'?: number;
     /**
      * 
      * @type {any}

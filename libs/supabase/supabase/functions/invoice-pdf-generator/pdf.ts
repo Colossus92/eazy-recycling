@@ -168,20 +168,20 @@ function drawInvoiceTitle(
 ): number {
   let currentY = startY - 30;
 
-  // Invoice type as main title
+  // Invoice type as main title with invoice number
   let titleText: string;
   if (data.invoiceType === 'CREDITFACTUUR') {
-    titleText = 'Creditfactuur';
+    titleText = `Creditfactuur ${data.invoiceNumber}`;
   } else if (data.invoiceType === 'INKOOPFACTUUR') {
-    titleText = 'Inkoopfactuur';
+    titleText = `Inkoopfactuur ${data.invoiceNumber}`;
   } else {
-    titleText = 'Verkoopfactuur';
+    titleText = `Verkoopfactuur ${data.invoiceNumber}`;
   }
 
   page.drawText(titleText, {
     x: MARGIN_LEFT,
     y: currentY,
-    size: 22,
+    size: 20,
     font: fonts.bold,
     color: COLOR_BLACK,
   });

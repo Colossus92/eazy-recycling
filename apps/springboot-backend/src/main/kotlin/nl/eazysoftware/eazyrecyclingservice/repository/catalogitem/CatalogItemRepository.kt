@@ -33,7 +33,10 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.default_price as defaultPrice,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.sales_account_number as salesAccountNumber,
-                NULL as wasteStreamNumber
+                NULL as wasteStreamNumber,
+                NULL as pickupStreet,
+                NULL as pickupBuildingNumber,
+                NULL as pickupCity
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
@@ -57,11 +60,15 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.default_price as defaultPrice,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.sales_account_number as salesAccountNumber,
-                ws.number as wasteStreamNumber
+                ws.number as wasteStreamNumber,
+                pl.street_name as pickupStreet,
+                pl.building_number as pickupBuildingNumber,
+                pl.city as pickupCity
             FROM waste_streams ws
             INNER JOIN catalog_items ci ON ws.catalog_item_id = ci.id
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
+            LEFT JOIN pickup_locations pl ON ws.pickup_location_id = pl.id
             WHERE ws.status = 'ACTIVE'
               AND ws.consignor_party_id = :consignorPartyId
               AND (:query IS NULL OR LOWER(ws.name) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -91,7 +98,10 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.default_price as defaultPrice,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.sales_account_number as salesAccountNumber,
-                NULL as wasteStreamNumber
+                NULL as wasteStreamNumber,
+                NULL as pickupStreet,
+                NULL as pickupBuildingNumber,
+                NULL as pickupCity
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
             LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
@@ -120,6 +130,9 @@ interface CatalogItemQueryProjection {
     fun getPurchaseAccountNumber(): String?
     fun getSalesAccountNumber(): String?
     fun getWasteStreamNumber(): String?
+    fun getPickupStreet(): String?
+    fun getPickupBuildingNumber(): String?
+    fun getPickupCity(): String?
 }
 
 @Repository
@@ -192,7 +205,10 @@ class CatalogItemRepository(
                 purchaseAccountNumber = projection.getPurchaseAccountNumber(),
                 salesAccountNumber = projection.getSalesAccountNumber(),
                 wasteStreamNumber = projection.getWasteStreamNumber()?.let { WasteStreamNumber(it) },
-                itemType = CatalogItemType.valueOf(projection.getType())
+                itemType = CatalogItemType.valueOf(projection.getType()),
+                pickupStreet = projection.getPickupStreet(),
+                pickupBuildingNumber = projection.getPickupBuildingNumber(),
+                pickupCity = projection.getPickupCity(),
             )
         }
     }

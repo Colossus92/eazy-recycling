@@ -1,8 +1,10 @@
 package nl.eazysoftware.eazyrecyclingservice.application.usecase.address
 
 import jakarta.persistence.EntityNotFoundException
+import nl.eazysoftware.eazyrecyclingservice.config.cache.CacheConfig
 import nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.ProjectLocations
+import org.springframework.cache.annotation.CacheEvict
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -22,6 +24,7 @@ class DeleteProjectLocationService(
 ) : DeleteProjectLocation {
 
   @Transactional
+  @CacheEvict(cacheNames = [CacheConfig.COMPANIES_CACHE], allEntries = true)
   override fun handle(cmd: DeleteProjectLocationCommand) {
     val branch = projectLocations.findById(cmd.projectLocationId)
       ?: throw EntityNotFoundException("Vestiging met id ${cmd.projectLocationId} niet gevonden")

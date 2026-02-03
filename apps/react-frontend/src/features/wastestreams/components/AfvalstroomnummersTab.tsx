@@ -1,18 +1,20 @@
 import { WasteStreamListView } from '@/api/client/models/waste-stream-list-view';
 import BxRecycle from '@/assets/icons/BxRecycle.svg?react';
 import Plus from '@/assets/icons/Plus.svg?react';
+import Scale from '@/assets/icons/Scale.svg?react';
 import { ErrorThrowingComponent } from '@/components/ErrorThrowingComponent';
 import { Button } from '@/components/ui/button/Button';
 import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
 import { Drawer } from '@/components/ui/drawer/Drawer';
-import { ActionMenu } from '@/features/crud/ActionMenu';
+import { ActionMenu, AdditionalAction } from '@/features/crud/ActionMenu';
+import { useCreateWeightTicketFromWasteStream } from '@/features/weighttickets/hooks/useCreateWeightTicketFromWasteStream';
 import { ContentTitleBar } from '@/features/crud/ContentTitleBar';
 import { EmptyState } from '@/features/crud/EmptyState.tsx';
 import { PaginationRow } from '@/features/crud/pagination/PaginationRow';
 import { useWasteStreamCrud } from '@/features/wastestreams/hooks/useWasteStreamCrud';
 import { WasteStreamForm } from '@/features/wastestreams/components/wastetransportform/components/WasteStreamForm';
 import { fallbackRender } from '@/utils/fallbackRender';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
 import {
@@ -21,6 +23,7 @@ import {
 } from '@/features/wastestreams/components/WasteStreamStatusTag';
 import { WasteStreamFilterForm } from '@/features/wastestreams/components/WasteStreamFilterForm';
 import { WasteStreamDetailsDrawer } from '@/features/wastestreams/components/drawer/WasteStreamDetailsDrawer';
+import { useSearchParams } from 'react-router-dom';
 
 type Column = {
   key: keyof WasteStreamListView;
@@ -38,6 +41,38 @@ export const AfvalstroomnummersTab = () => {
     useState<WasteStreamListView | null>(null);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { read, form, deletion } = useWasteStreamCrud();
+  const { createWeightTicket } = useCreateWeightTicketFromWasteStream();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Handle URL params for opening waste stream drawer
+  useEffect(() => {
+    const wasteStreamDrawerId = searchParams.get('wasteStreamDrawerId');
+
+    if (wasteStreamDrawerId && read.items && read.items.length > 0) {
+      // Find the waste stream in the full list
+      const wasteStreamIndex = read.items.findIndex(
+        (ws: WasteStreamListView) =>
+          ws.wasteStreamNumber === wasteStreamDrawerId
+      );
+
+      if (wasteStreamIndex !== -1) {
+        const wasteStream = read.items[wasteStreamIndex];
+
+        // Calculate which page the waste stream is on and navigate to it
+        const targetPage = Math.floor(wasteStreamIndex / rowsPerPage) + 1;
+        if (targetPage !== page) {
+          setPage(targetPage);
+        }
+
+        // Open the drawer with the waste stream
+        setSelectedWasteStream(wasteStream);
+        setIsDrawerOpen(true);
+      }
+
+      // Clear the URL params after processing
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams, read.items, rowsPerPage, page]);
 
   /**
    * Handle single click to open drawer, double click to open edit form.
@@ -72,6 +107,23 @@ export const AfvalstroomnummersTab = () => {
       deletion.initiate(selectedWasteStream);
     }
   };
+
+  const getAdditionalActions = (
+    _item: WasteStreamListView
+  ): AdditionalAction<WasteStreamListView>[] => {
+    return [
+      {
+        label: 'Weegbon',
+        icon: Scale,
+        onClick: (wasteStream) => {
+          if (wasteStream.wasteStreamNumber) {
+            createWeightTicket(wasteStream.wasteStreamNumber);
+          }
+        },
+      },
+    ];
+  };
+
   const columns: Column[] = [
     {
       key: 'wasteStreamNumber',
@@ -199,7 +251,10 @@ export const AfvalstroomnummersTab = () => {
                             {col.accessor(item)}
                           </td>
                         ))}
-                        <td className="p-4 text-center">
+                        <td
+                          className="p-4 text-center"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {item.status !== 'INACTIVE' &&
                             item.status !== 'EXPIRED' && (
                               <ActionMenu<WasteStreamListView>
@@ -208,6 +263,7 @@ export const AfvalstroomnummersTab = () => {
                                   deletion.initiate(wasteStream)
                                 }
                                 item={item}
+                                additionalActions={getAdditionalActions(item)}
                               />
                             )}
                         </td>

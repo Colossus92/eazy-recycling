@@ -81,7 +81,7 @@ export const PlanningCard = ({
         setIsDrawerOpen(true);
       }
       isDoubleClickRef.current = false;
-    }, 250);
+    }, 400);
   };
 
   const handleDoubleClick = (e: React.MouseEvent) => {

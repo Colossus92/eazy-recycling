@@ -80,5 +80,17 @@ export interface MaterialPriceResponse {
      * @memberof MaterialPriceResponse
      */
     'externalPricingAppName'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'lastModifiedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialPriceResponse
+     */
+    'externalPricingAppSyncedAt'?: string;
 }
 

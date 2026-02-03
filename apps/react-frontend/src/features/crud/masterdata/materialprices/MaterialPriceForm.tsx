@@ -13,7 +13,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
-import { Switch } from '@headlessui/react';
+import { Toggle } from '@/components/ui/toggle/Toggle';
 
 interface MaterialPriceFormProps {
   isOpen: boolean;
@@ -217,23 +217,12 @@ export const MaterialPriceForm = ({
 
             {/* Sync to external app section */}
             <div className="flex flex-col items-start self-stretch gap-4 pt-4 border-t border-color-border">
-              <div className="flex items-center justify-start gap-2 self-stretch">
-                <Switch
-                  checked={syncEnabled}
-                  onChange={handleSyncToggle}
-                  className={`${
-                    syncEnabled ? 'bg-color-brand-primary' : 'bg-gray-300'
-                  } relative inline-flex h-6 w-11 items-center rounded-full`}
-                >
-                  <span className="sr-only">Enable notifications</span>
-                  <span
-                    className={`${
-                      syncEnabled ? 'translate-x-6' : 'translate-x-1'
-                    } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-                  />
-                </Switch>
-                <span className="text-caption-2">Sync naar app</span>
-              </div>
+              <Toggle
+                checked={syncEnabled}
+                onChange={handleSyncToggle}
+                label="Sync naar app"
+                testId="sync-to-app-toggle"
+              />
 
               {syncEnabled && (
                 <>

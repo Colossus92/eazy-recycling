@@ -1,4 +1,4 @@
-import { ReactNode, Fragment, useState } from 'react';
+import { Fragment, ReactNode, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ClipLoader } from 'react-spinners';
@@ -116,7 +116,7 @@ export const CompanyManagement = () => {
 
   const renderSortableHeader = (column: ColumnConfig) => {
     const isActive = sortConfig.sortBy === column.id;
-    
+
     if (!column.sortable) {
       return <span>{column.label}</span>;
     }
@@ -257,7 +257,11 @@ export const CompanyManagement = () => {
                               )}
                             </button>
                           )}
-                          <div className={colIndex === 0 && !hasBranches ? 'ml-7' : ''}>
+                          <div
+                            className={
+                              colIndex === 0 && !hasBranches ? 'ml-7' : ''
+                            }
+                          >
                             {col.render(item)}
                           </div>
                         </div>
@@ -339,7 +343,11 @@ export const CompanyManagement = () => {
         </div>
       </ContentContainer>
 
-      <FormDialog isOpen={isAdding} setIsOpen={() => setIsAdding(false)}>
+      <FormDialog
+        isOpen={isAdding}
+        setIsOpen={() => setIsAdding(false)}
+        width="w-[800px]"
+      >
         <CompanyForm
           onCancel={() => setIsAdding(false)}
           onSubmit={handleFormSubmit}
@@ -347,7 +355,11 @@ export const CompanyManagement = () => {
         />
       </FormDialog>
 
-      <FormDialog isOpen={!!editing} setIsOpen={() => setEditing(undefined)}>
+      <FormDialog
+        isOpen={!!editing}
+        setIsOpen={() => setEditing(undefined)}
+        width="w-[800px]"
+      >
         <CompanyForm
           onCancel={() => setEditing(undefined)}
           onSubmit={handleFormSubmit}

@@ -22,18 +22,6 @@
 export interface SessionCookieConfig {
     /**
      * 
-     * @type {number}
-     * @memberof SessionCookieConfig
-     */
-    'maxAge'?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof SessionCookieConfig
-     */
-    'httpOnly'?: boolean;
-    /**
-     * 
      * @type {string}
      * @memberof SessionCookieConfig
      */
@@ -44,6 +32,18 @@ export interface SessionCookieConfig {
      * @memberof SessionCookieConfig
      */
     'path'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SessionCookieConfig
+     */
+    'maxAge'?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof SessionCookieConfig
+     */
+    'httpOnly'?: boolean;
     /**
      * 
      * @type {boolean}

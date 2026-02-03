@@ -13,6 +13,12 @@ interface ProjectLocations {
     buildingNumber: String,
   ): Boolean
 
+  fun findByCompanyIdAndPostalCodeAndBuildingNumber(
+    companyId: CompanyId,
+    postalCode: DutchPostalCode,
+    buildingNumber: String,
+  ): CompanyProjectLocation?
+
   fun create(location: CompanyProjectLocation)
 
   fun findAll(): List<CompanyProjectLocation>
