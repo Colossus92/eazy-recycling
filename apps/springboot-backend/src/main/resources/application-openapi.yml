@@ -43,3 +43,7 @@ logging:
 jobrunr:
   database:
     skip-create: false
+
+jobrunr:
+  database:
+    skip-create: false
