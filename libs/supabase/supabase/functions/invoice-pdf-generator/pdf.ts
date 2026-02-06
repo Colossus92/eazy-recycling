@@ -384,7 +384,8 @@ function calculateTotalsHeight(data: InvoiceData): number {
  */
 function drawTotalsMultiPage(
   ctx: PageContext,
-  startY: number
+  startY: number,
+  allReverseCharge = false
 ): { currentY: number; currentPage: PDFPage } {
   const { fonts, data } = ctx;
   let currentPage = ctx.pages[ctx.pages.length - 1];
@@ -426,17 +427,55 @@ function drawTotalsMultiPage(
 
   const isCreditNote = data.invoiceType === 'CREDITFACTUUR';
 
-  currentPage.drawText('Totaal excl. BTW', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-  const exclVatText = formatCurrency(data.totals.totalExclVat, isCreditNote);
-  const exclVatWidth = fonts.regular.widthOfTextAtSize(exclVatText, 9);
-  currentPage.drawText(exclVatText, { x: rightAlignX - exclVatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
+  if (allReverseCharge) {
+    // All lines are VERLEGD: show only "Totaal" (no subtotal/VAT breakdown)
+    currentPage.drawText('Totaal', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
+    const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
+    const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
+    currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
+  } else {
+    // Normal or mixed: show full breakdown
+    currentPage.drawText('Subtotaal', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
+    const exclVatText = formatCurrency(data.totals.totalExclVat, isCreditNote);
+    const exclVatWidth = fonts.regular.widthOfTextAtSize(exclVatText, 9);
+    currentPage.drawText(exclVatText, { x: rightAlignX - exclVatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
 
-  currentY -= 14;
+    // Collect unique non-zero VAT rates from lines for breakdown
+    const vatBreakdown = new Map<number, number>();
+    for (const line of data.lines) {
+      if (typeof line.vatPercentage === 'number' && line.vatPercentage > 0 && !line.isReverseCharge) {
+        const existing = vatBreakdown.get(line.vatPercentage) || 0;
+        vatBreakdown.set(line.vatPercentage, existing + line.totalAmount * (line.vatPercentage / 100));
+      }
+    }
 
-  currentPage.drawText('BTW', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-  const vatText = formatCurrency(data.totals.vatAmount, isCreditNote);
-  const vatWidth = fonts.regular.widthOfTextAtSize(vatText, 9);
-  currentPage.drawText(vatText, { x: rightAlignX - vatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
+    currentY -= 14;
+
+    // Show each VAT rate line
+    for (const [pct, amount] of vatBreakdown) {
+      currentPage.drawText(`${pct}% btw`, { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
+      const vatLineText = formatCurrency(amount, isCreditNote);
+      const vatLineWidth = fonts.regular.widthOfTextAtSize(vatLineText, 9);
+      currentPage.drawText(vatLineText, { x: rightAlignX - vatLineWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
+      currentY -= 14;
+    }
+
+    // Separator line before total
+    currentPage.drawLine({
+      start: { x: labelX, y: currentY + 4 },
+      end: { x: PAGE_WIDTH - MARGIN_RIGHT, y: currentY + 4 },
+      thickness: 1,
+      color: COLOR_BLACK,
+    });
+
+    currentY -= 12;
+
+    // Totaal incl. BTW
+    currentPage.drawText('Totaal', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
+    const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
+    const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
+    currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
+  }
 
   // Material totals rows (left side)
   let matY = totalsStartY - 14;
@@ -451,24 +490,6 @@ function drawTotalsMultiPage(
     currentPage.drawText(amountText, { x: matColAmountEnd - amountWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
     matY -= 12;
   }
-
-  currentY -= 14;
-
-  // Separator line before total
-  currentPage.drawLine({
-    start: { x: labelX, y: currentY + 4 },
-    end: { x: PAGE_WIDTH - MARGIN_RIGHT, y: currentY + 4 },
-    thickness: 1,
-    color: COLOR_BLACK,
-  });
-
-  currentY -= 12;
-
-  // Totaal incl. BTW
-  currentPage.drawText('Totaal incl. BTW', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
-  const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
-  const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
-  currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
 
   // Return the lowest Y position
   const matTableBottom = totalsStartY - 14 - (data.materialTotals.length * 12);
@@ -626,26 +647,34 @@ function drawPageNumber(
 
 /**
  * Draw the invoice lines table with multi-page support
- * Returns { currentY, currentPage, pageIndex }
+ * Returns { currentY, currentPage, pageIndex, hasReverseChargeLines }
  */
 function drawLinesTableMultiPage(
   ctx: PageContext,
   startY: number
-): { currentY: number; currentPage: PDFPage; pageIndex: number } {
+): { currentY: number; currentPage: PDFPage; pageIndex: number; hasReverseChargeLines: boolean; allReverseCharge: boolean } {
   let currentY = startY;
   let { currentPage, currentPageIndex } = ctx;
   const { fonts, data } = ctx;
 
-  // Column positions - expanded Omschrijving, compact other columns
+  // Determine reverse charge state
+  const reverseChargeLines = data.lines.filter(l => l.isReverseCharge);
+  const hasReverseChargeLines = reverseChargeLines.length > 0;
+  const allReverseCharge = reverseChargeLines.length === data.lines.length;
+
+  // Column positions - adjusted based on whether BTW column is shown
   const colDate = MARGIN_LEFT;           // 50
   const colDesc = MARGIN_LEFT + 55;      // 105
-  const colOrder = MARGIN_LEFT + 230;    // 280 - moved right for more desc space
+  const colOrder = MARGIN_LEFT + 230;    // 280
   const colQty = MARGIN_LEFT + 295;      // 345
-  const colVat = MARGIN_LEFT + 340;      // 390
-  const colPriceEnd = PAGE_WIDTH - MARGIN_RIGHT - 70; // 485 - right edge for price
-  const colTotalEnd = PAGE_WIDTH - MARGIN_RIGHT;      // 555 - right edge for total
   const colQtyEnd = colQty + 50;
+  const colTotalEnd = PAGE_WIDTH - MARGIN_RIGHT;      // 555
+
+  // BTW column only shown when not all lines are reverse charge
+  const showBtwColumn = !allReverseCharge;
+  const colVat = MARGIN_LEFT + 340;      // 390
   const colVatEnd = colVat + 35;
+  const colPriceEnd = PAGE_WIDTH - MARGIN_RIGHT - 70; // 485
 
   // Helper function to draw table headers
   const drawTableHeaders = (page: PDFPage, y: number): number => {
@@ -657,9 +686,11 @@ function drawLinesTableMultiPage(
     const aantalHeaderWidth = fonts.bold.widthOfTextAtSize(aantalHeader, 8);
     page.drawText(aantalHeader, { x: colQtyEnd - aantalHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
 
-    const btwHeader = 'BTW';
-    const btwHeaderWidth = fonts.bold.widthOfTextAtSize(btwHeader, 8);
-    page.drawText(btwHeader, { x: colVatEnd - btwHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
+    if (showBtwColumn) {
+      const btwHeader = 'BTW';
+      const btwHeaderWidth = fonts.bold.widthOfTextAtSize(btwHeader, 8);
+      page.drawText(btwHeader, { x: colVatEnd - btwHeaderWidth, y, size: 8, font: fonts.bold, color: COLOR_DARK_GRAY });
+    }
 
     const priceHeader = 'PPE';
     const priceHeaderWidth = fonts.bold.widthOfTextAtSize(priceHeader, 8);
@@ -739,9 +770,20 @@ function drawLinesTableMultiPage(
     const qtyWidth = fonts.regular.widthOfTextAtSize(qtyText, 8);
     currentPage.drawText(qtyText, { x: colQtyEnd - qtyWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
 
-    const vatPctText = line.vatPercentage === 'G' ? 'G' : `${line.vatPercentage}%`;
-    const vatPctWidth = fonts.regular.widthOfTextAtSize(vatPctText, 8);
-    currentPage.drawText(vatPctText, { x: colVatEnd - vatPctWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
+    if (showBtwColumn) {
+      // Mixed scenario: show percentage or superscript ¹ for VERLEGD lines
+      const isLineReverseCharge = line.isReverseCharge;
+      if (isLineReverseCharge) {
+        // Draw superscript ¹ reference
+        const refText = '\u00B9';
+        const refWidth = fonts.regular.widthOfTextAtSize(refText, 8);
+        currentPage.drawText(refText, { x: colVatEnd - refWidth, y: currentY + 2, size: 6, font: fonts.regular, color: COLOR_DARK_GRAY });
+      } else {
+        const vatPctText = line.vatPercentage === 'G' ? 'G' : `${line.vatPercentage}%`;
+        const vatPctWidth = fonts.regular.widthOfTextAtSize(vatPctText, 8);
+        currentPage.drawText(vatPctText, { x: colVatEnd - vatPctWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
+      }
+    }
 
     const priceText = formatCurrency(line.pricePerUnit); // Keep piece price positive
     const priceWidth = fonts.regular.widthOfTextAtSize(priceText, 8);
@@ -764,7 +806,7 @@ function drawLinesTableMultiPage(
     color: COLOR_LINE,
   });
 
-  return { currentY: currentY - 20, currentPage, pageIndex: currentPageIndex };
+  return { currentY: currentY - 20, currentPage, pageIndex: currentPageIndex, hasReverseChargeLines, allReverseCharge };
 }
 
 /**
@@ -798,8 +840,42 @@ export async function generateInvoicePdf(data: InvoiceData): Promise<Uint8Array>
   const tableResult = drawLinesTableMultiPage(ctx, currentY);
   currentY = tableResult.currentY;
 
+  // Draw "Btw verlegd" footnote if applicable
+  if (tableResult.hasReverseChargeLines) {
+    const lastTablePage = ctx.pages[ctx.pages.length - 1];
+    if (tableResult.allReverseCharge) {
+      // All lines are VERLEGD: simple note without superscript
+      lastTablePage.drawText('Btw verlegd', {
+        x: MARGIN_LEFT,
+        y: currentY,
+        size: 8,
+        font: fonts.regular,
+        color: COLOR_DARK_GRAY,
+      });
+    } else {
+      // Mixed: show superscript ¹ followed by "Btw verlegd"
+      const superscript = '\u00B9';
+      lastTablePage.drawText(superscript, {
+        x: MARGIN_LEFT,
+        y: currentY + 2,
+        size: 8,
+        font: fonts.bold,
+        color: COLOR_DARK_GRAY,
+      });
+      const superscriptWidth = fonts.bold.widthOfTextAtSize(superscript, 8);
+      lastTablePage.drawText(' Btw verlegd', {
+        x: MARGIN_LEFT + superscriptWidth,
+        y: currentY,
+        size: 8,
+        font: fonts.regular,
+        color: COLOR_DARK_GRAY,
+      });
+    }
+    currentY -= 20;
+  }
+
   // Draw totals with multi-page support (may create new page if needed)
-  const totalsResult = drawTotalsMultiPage(ctx, currentY);
+  const totalsResult = drawTotalsMultiPage(ctx, currentY, tableResult.allReverseCharge);
   currentY = totalsResult.currentY;
   const currentPage = totalsResult.currentPage;
 

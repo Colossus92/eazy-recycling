@@ -59,7 +59,9 @@ class InvoicePdfPayloadBuilder(
                     orderNumber = line.orderReference,
                     quantity = line.quantity.toDouble(),
                     unit = line.unitOfMeasure,
+                    vatCode = line.vatCode,
                     vatPercentage = if (line.vatCode == "G") "G" else line.vatPercentage.toInt(),
+                    isReverseCharge = line.isReverseCharge,
                     pricePerUnit = line.unitPrice.toDouble(),
                     totalAmount = line.totalExclVat.toDouble(),
                 )
@@ -154,7 +156,9 @@ data class InvoiceLinePayload(
     val orderNumber: String?,
     val quantity: Double,
     val unit: String,
+    val vatCode: String,
     val vatPercentage: Any,
+    val isReverseCharge: Boolean,
     val pricePerUnit: Double,
     val totalAmount: Double,
 )

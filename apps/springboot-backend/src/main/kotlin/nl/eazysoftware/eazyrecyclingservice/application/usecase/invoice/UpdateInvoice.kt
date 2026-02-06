@@ -87,6 +87,7 @@ class UpdateInvoiceService(
             orderReference = cmd.orderReference,
             vatCode = catalogItem.vatCode,
             vatPercentage = vatPercentage,
+            isReverseCharge = vatRate.isReverseCharge(),
             glAccountCode = catalogItem.salesAccountNumber,
             quantity = cmd.quantity,
             unitPrice = cmd.unitPrice,

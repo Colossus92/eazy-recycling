@@ -58,6 +58,12 @@ export interface InvoiceLineView {
     'vatPercentage': number;
     /**
      * 
+     * @type {boolean}
+     * @memberof InvoiceLineView
+     */
+    'isReverseCharge': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof InvoiceLineView
      */

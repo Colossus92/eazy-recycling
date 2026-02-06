@@ -19,7 +19,9 @@ export interface InvoiceLineFormValue {
   quantity: string;
   unitPrice: string;
   unitOfMeasure: string;
+  vatCode: string;
   vatPercentage: string;
+  isReverseCharge: boolean;
   orderReference: string;
 }
 
@@ -45,7 +47,9 @@ const defaultValues: InvoiceFormValues = {
       quantity: '1',
       unitPrice: '0',
       unitOfMeasure: '',
+      vatCode: '',
       vatPercentage: '21',
+      isReverseCharge: false,
       orderReference: '',
     },
   ],
@@ -97,7 +101,9 @@ export const useInvoiceFormHook = () => {
             quantity: String(line.quantity),
             unitPrice: String(line.unitPrice),
             unitOfMeasure: line.unitOfMeasure || '',
+            vatCode: line.vatCode || '',
             vatPercentage: String(line.vatPercentage),
+            isReverseCharge: line.isReverseCharge ?? false,
             orderReference: line.orderReference || '',
           })),
         });

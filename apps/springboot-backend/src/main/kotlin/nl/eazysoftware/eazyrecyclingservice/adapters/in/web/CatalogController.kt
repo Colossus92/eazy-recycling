@@ -5,6 +5,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItem
 import nl.eazysoftware.eazyrecyclingservice.domain.model.catalog.CatalogItemType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
+import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,7 +18,8 @@ import java.util.*
 @RequestMapping("/catalog")
 @PreAuthorize(HAS_ANY_ROLE)
 class CatalogController(
-  private val catalogQueryService: CatalogQueryService
+  private val catalogQueryService: CatalogQueryService,
+  private val vatRates: VatRates,
 ) {
 
   @GetMapping("/items")
@@ -29,7 +31,10 @@ class CatalogController(
   ): List<CatalogItemResponse> {
     return catalogQueryService.getCatalogItems(consignorPartyId, query)
       .filter { if (type == null) true else it.itemType == type }
-      .map { it.toResponse(invoiceType) }
+      .map { item ->
+        val vatRate = vatRates.getVatRateByCode(item.vatCode)
+        item.toResponse(invoiceType, vatRate?.isReverseCharge() ?: false)
+      }
   }
 }
 
@@ -44,6 +49,7 @@ data class CatalogItemResponse(
   val unitOfMeasure: String,
   val vatCode: String,
   val vatPercentage: BigDecimal?,
+  val isReverseCharge: Boolean,
   val categoryName: String?,
   val consignorPartyId: UUID?,
   val purchaseAccountNumber: String?,
@@ -56,7 +62,7 @@ data class CatalogItemResponse(
   val pickupCity: String?,
 )
 
-fun CatalogItem.toResponse(invoiceType: InvoiceType? = null): CatalogItemResponse {
+fun CatalogItem.toResponse(invoiceType: InvoiceType? = null, isReverseCharge: Boolean = false): CatalogItemResponse {
   // For purchase invoices, only PRODUCT prices should be negative (money owed TO the supplier)
   val priceMultiplier = if (invoiceType == InvoiceType.PURCHASE && itemType == CatalogItemType.PRODUCT) 
     BigDecimal.ONE.negate() 
@@ -76,6 +82,7 @@ fun CatalogItem.toResponse(invoiceType: InvoiceType? = null): CatalogItemRespons
     unitOfMeasure = unitOfMeasure,
     vatCode = vatCode,
     vatPercentage = vatPercentage,
+    isReverseCharge = isReverseCharge,
     categoryName = categoryName,
     consignorPartyId = consignorPartyId?.uuid,
     purchaseAccountNumber = purchaseAccountNumber,

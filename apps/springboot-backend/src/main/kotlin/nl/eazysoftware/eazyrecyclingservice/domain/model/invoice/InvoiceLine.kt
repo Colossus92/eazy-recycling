@@ -13,6 +13,7 @@ data class InvoiceLine(
     val orderReference: String?,
     val vatCode: String,
     val vatPercentage: BigDecimal,
+    val isReverseCharge: Boolean,
     val glAccountCode: String?,
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,

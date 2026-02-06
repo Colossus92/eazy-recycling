@@ -70,6 +70,12 @@ export interface CatalogItemResponse {
     'vatPercentage'?: number;
     /**
      * 
+     * @type {boolean}
+     * @memberof CatalogItemResponse
+     */
+    'isReverseCharge': boolean;
+    /**
+     * 
      * @type {string}
      * @memberof CatalogItemResponse
      */

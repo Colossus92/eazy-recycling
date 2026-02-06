@@ -37,7 +37,9 @@ export interface InvoiceLine {
   orderNumber?: string;
   quantity: number;
   unit: string;
+  vatCode: string;
   vatPercentage: number | 'G'; // 'G' = geen BTW (no VAT)
+  isReverseCharge: boolean;
   pricePerUnit: number;
   totalAmount: number;
 }

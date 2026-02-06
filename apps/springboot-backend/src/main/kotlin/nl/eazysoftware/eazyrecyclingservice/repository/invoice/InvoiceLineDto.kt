@@ -35,6 +35,9 @@ class InvoiceLineDto(
   @Column(name = "vat_percentage", nullable = false)
   val vatPercentage: BigDecimal,
 
+  @Column(name = "is_reverse_charge", nullable = false)
+  val isReverseCharge: Boolean = false,
+
   @Column(name = "gl_account_code")
   val glAccountCode: String?,
 

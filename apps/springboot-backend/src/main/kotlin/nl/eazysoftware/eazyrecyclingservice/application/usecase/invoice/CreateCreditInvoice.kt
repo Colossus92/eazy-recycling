@@ -50,6 +50,7 @@ class CreateCreditInvoiceService(
                 orderReference = line.orderReference,
                 vatCode = line.vatCode,
                 vatPercentage = line.vatPercentage,
+                isReverseCharge = line.isReverseCharge,
                 glAccountCode = line.glAccountCode,
                 quantity = line.quantity,
                 unitPrice = line.unitPrice,

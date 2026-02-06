@@ -2947,11 +2947,6 @@ components:
           type: string
         taxScenario:
           type: string
-          enum:
-          - STANDARD
-          - REVERSE_CHARGE
-          - ZERO_RATED_EXPORT
-          - EXEMPT
         isReverseCharge:
           type: boolean
         createdAt:
@@ -4886,14 +4881,14 @@ components:
           type: string
           format: date
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date
         year:
           type: integer
           format: int32
@@ -4949,14 +4944,14 @@ components:
           type: string
           format: date-time
           writeOnly: true
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         nanosecond:
           type: integer
           format: int32
@@ -5845,6 +5840,8 @@ components:
           type: string
         vatPercentage:
           type: number
+        isReverseCharge:
+          type: boolean
         glAccountCode:
           type: string
         quantity:
@@ -5871,6 +5868,7 @@ components:
       - catalogItemType
       - date
       - id
+      - isReverseCharge
       - lineNumber
       - quantity
       - totalExclVat
@@ -6113,6 +6111,8 @@ components:
           type: string
         vatPercentage:
           type: number
+        isReverseCharge:
+          type: boolean
         categoryName:
           type: string
         consignorPartyId:
@@ -6136,6 +6136,7 @@ components:
       - catalogItemId
       - code
       - id
+      - isReverseCharge
       - itemType
       - name
       - unitOfMeasure
@@ -6313,13 +6314,13 @@ components:
     ApplicationContext:
       type: object
       properties:
-        applicationName:
-          type: string
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
+        applicationName:
+          type: string
         parent: {}
         id:
           type: string
@@ -6666,17 +6667,33 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        jspPropertyGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
         taglibs:
           type: array
           items:
             $ref: "#/components/schemas/TaglibDescriptor"
+        jspPropertyGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/JspPropertyGroupDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
+        trimDirectiveWhitespaces:
+          type: string
+        errorOnUndeclaredNamespace:
+          type: string
+        defaultContentType:
+          type: string
+        urlPatterns:
+          type: array
+          items:
+            type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -6691,22 +6708,6 @@ components:
           type: array
           items:
             type: string
-        defaultContentType:
-          type: string
-        urlPatterns:
-          type: array
-          items:
-            type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        trimDirectiveWhitespaces:
-          type: string
-        errorOnUndeclaredNamespace:
-          type: string
         buffer:
           type: string
     RedirectView:
@@ -6765,68 +6766,24 @@ components:
           type: array
           items:
             type: string
-        redirectView:
-          type: boolean
         propagateQueryProperties:
           type: boolean
-        attributesCSV:
-          type: string
-          writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
+        redirectView:
+          type: boolean
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
+        attributesCSV:
+          type: string
+          writeOnly: true
     ServletContext:
       type: object
       properties:
-        sessionCookieConfig:
-          $ref: "#/components/schemas/SessionCookieConfig"
-        virtualServerName:
-          type: string
-        initParameterNames: {}
-        sessionTimeout:
-          type: integer
-          format: int32
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
-        attributeNames: {}
-        contextPath:
-          type: string
-        sessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-          writeOnly: true
-        servletRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/ServletRegistration"
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        serverInfo:
-          type: string
         effectiveMajorVersion:
           type: integer
           format: int32
@@ -6846,6 +6803,50 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
+        sessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+          writeOnly: true
+        servletRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/ServletRegistration"
+        attributeNames: {}
+        contextPath:
+          type: string
+        initParameterNames: {}
+        sessionCookieConfig:
+          $ref: "#/components/schemas/SessionCookieConfig"
+        virtualServerName:
+          type: string
+        sessionTimeout:
+          type: integer
+          format: int32
+        serverInfo:
+          type: string
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
         classLoader:
           type: object
           properties:
@@ -6932,9 +6933,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibLocation:
-          type: string
         taglibURI:
+          type: string
+        taglibLocation:
           type: string
     AuthorizationUrlResponse:
       type: object

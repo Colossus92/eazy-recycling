@@ -146,7 +146,7 @@ const InvoiceLineRow = ({
           type="text"
           className="w-full px-2 py-1.5 border border-color-border rounded-radius-sm text-body-2 text-right bg-color-surface-secondary"
           disabled
-          value={line?.vatPercentage ? `${line.vatPercentage}%` : ''}
+          value={line?.isReverseCharge ? 'V' : line?.vatPercentage ? `${line.vatPercentage}%` : ''}
           readOnly
         />
       </td>
@@ -227,7 +227,9 @@ export const InvoiceLinesSection = ({
         quantity: '1',
         unitPrice: '0,00',
         unitOfMeasure: '',
+        vatCode: '',
         vatPercentage: '21',
+        isReverseCharge: false,
         orderReference: '',
       });
     }
@@ -267,20 +269,47 @@ export const InvoiceLinesSection = ({
   const totals = useMemo(() => {
     let totalExclVat = 0;
     let totalVat = 0;
+    const vatBreakdown = new Map<string, { label: string; amount: number }>();
+
     lines?.forEach((line: InvoiceLineFormValue) => {
       const qty = parseNumber(line.quantity);
       const price = parseNumber(line.unitPrice);
       const lineTotal = qty * price;
-      const vatPercentage = parseNumber(line.vatPercentage) || 21;
+      const vatPct = parseNumber(line.vatPercentage);
+      const isReverseCharge = line.isReverseCharge ?? false;
+      const vatAmount = isReverseCharge ? 0 : lineTotal * (vatPct / 100);
+
       totalExclVat += lineTotal;
-      totalVat += lineTotal * (vatPercentage / 100);
+      totalVat += vatAmount;
+
+      // Group by vatCode for breakdown
+      if (isReverseCharge) {
+        const key = 'VERLEGD';
+        const existing = vatBreakdown.get(key);
+        vatBreakdown.set(key, {
+          label: 'Btw verlegd',
+          amount: (existing?.amount ?? 0),
+        });
+      } else if (vatPct > 0) {
+        const key = String(vatPct);
+        const existing = vatBreakdown.get(key);
+        vatBreakdown.set(key, {
+          label: `${vatPct}% btw`,
+          amount: (existing?.amount ?? 0) + vatAmount,
+        });
+      }
     });
+
     // For credit notes, display totals as negative (but don't store them as negative)
     const multiplier = isCreditNote ? -1 : 1;
     return {
       totalExclVat: totalExclVat * multiplier,
       totalVat: totalVat * multiplier,
       totalInclVat: (totalExclVat + totalVat) * multiplier,
+      vatBreakdown: Array.from(vatBreakdown.values()).map(v => ({
+        label: v.label,
+        amount: v.amount * multiplier,
+      })),
     };
   }, [lines, isCreditNote]);
 
@@ -293,7 +322,9 @@ export const InvoiceLinesSection = ({
       quantity: '1',
       unitPrice: '0,00',
       unitOfMeasure: '',
+      vatCode: '',
       vatPercentage: '21',
+      isReverseCharge: false,
       orderReference: '',
     });
   };
@@ -306,7 +337,9 @@ export const InvoiceLinesSection = ({
       catalogItemType: item.itemType as 'MATERIAL' | 'PRODUCT' | 'WASTE_STREAM',
       unitOfMeasure: item.unitOfMeasure || '',
       unitPrice: String(item.defaultPrice ?? 0),
+      vatCode: item.vatCode || '',
       vatPercentage: String(item.vatPercentage ?? 21),
+      isReverseCharge: item.isReverseCharge ?? false,
     });
   };
 
@@ -367,25 +400,27 @@ export const InvoiceLinesSection = ({
             <tfoot className="bg-color-surface-secondary border-t border-color-border">
               <tr className="text-body-2">
                 <td colSpan={5} className="p-2 text-right">
-                  Subtotaal excl. BTW:
+                  Subtotaal:
                 </td>
                 <td className="p-2 text-right">
                   {formatCurrency(totals.totalExclVat)}
                 </td>
                 <td></td>
               </tr>
-              <tr className="text-body-2">
-                <td colSpan={5} className="p-2 text-right">
-                  BTW:
-                </td>
-                <td className="p-2 text-right">
-                  {formatCurrency(totals.totalVat)}
-                </td>
-                <td></td>
-              </tr>
+              {totals.vatBreakdown.map((vat, i) => (
+                <tr key={i} className="text-body-2">
+                  <td colSpan={5} className="p-2 text-right">
+                    {vat.label}:
+                  </td>
+                  <td className="p-2 text-right">
+                    {vat.label === 'Btw verlegd' ? '-' : formatCurrency(vat.amount)}
+                  </td>
+                  <td></td>
+                </tr>
+              ))}
               <tr className="text-subtitle-2">
                 <td colSpan={5} className="p-2 text-right">
-                  Totaal incl. BTW:
+                  Totaal:
                 </td>
                 <td className="p-2 text-right">
                   {formatCurrency(totals.totalInclVat)}
