@@ -34,7 +34,7 @@ export const VatRateSelectFormField = ({
         const vatCodeOptions = useMemo(
     () =>
       vatRates.map((rate) => ({
-        value: rate.vatCode,
+        value: rate.id,
         label: `${rate.vatCode} - ${rate.percentage}%`,
       })),
     [vatRates]

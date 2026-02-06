@@ -1,3 +1,5 @@
+import { companyService } from '@/api/services/companyService';
+import { invoiceService } from '@/api/services/invoiceService';
 import { Button } from '@/components/ui/button/Button';
 import { SplitButton } from '@/components/ui/button/SplitButton';
 import { FormDialog } from '@/components/ui/dialog/FormDialog';
@@ -11,22 +13,18 @@ import { FormTopBar } from '@/components/ui/form/FormTopBar';
 import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormField';
 import { Tab } from '@/components/ui/tab/Tab';
 import { toastService } from '@/components/ui/toast/toastService';
+import { Note } from '@/features/planning/components/note/Note';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
+import { InvoiceFormActionMenu } from './InvoiceFormActionMenu';
 import { InvoiceLinesSection } from './InvoiceLinesSection';
 import { InvoiceRelatedTab } from './InvoiceRelatedTab';
-import { useInvoiceFormHook } from './useInvoiceFormHook';
-import { InvoiceFormActionMenu } from './InvoiceFormActionMenu';
 import { useInvoiceEmailFormHook } from './useInvoiceEmailFormHook';
-import { invoiceService } from '@/api/services/invoiceService';
-import { companyService } from '@/api/services/companyService';
-import { useQuery } from '@tanstack/react-query';
-import { InvoiceLineFormValue } from './useInvoiceFormHook';
-import ErrorTriangle from '@/assets/icons/ErrorTriangle.svg?react';
-import { Note } from '@/features/planning/components/note/Note';
+import { InvoiceLineFormValue, useInvoiceFormHook } from './useInvoiceFormHook';
 
 interface InvoiceFormProps {
   isOpen: boolean;

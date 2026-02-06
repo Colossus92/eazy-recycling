@@ -40,7 +40,7 @@ export const MaterialForm = ({
       name: '',
       materialGroupId: '',
       unitOfMeasure: 'kg',
-      vatCode: '',
+      vatRateId: '',
       purchaseAccountNumber: '',
       salesAccountNumber: '',
     },
@@ -53,7 +53,7 @@ export const MaterialForm = ({
         name: initialData.name,
         materialGroupId: initialData.materialGroupId,
         unitOfMeasure: initialData.unitOfMeasure,
-        vatCode: initialData.vatCode,
+        vatRateId: initialData.vatRateId,
         purchaseAccountNumber: initialData.purchaseAccountNumber ?? '',
         salesAccountNumber: initialData.salesAccountNumber ?? '',
       });
@@ -66,7 +66,7 @@ export const MaterialForm = ({
       name: '',
       materialGroupId: '',
       unitOfMeasure: 'kg',
-      vatCode: '',
+      vatRateId: '',
       purchaseAccountNumber: '',
       salesAccountNumber: '',
     });
@@ -82,7 +82,7 @@ export const MaterialForm = ({
           name: data.name,
           materialGroupId: data.materialGroupId,
           unitOfMeasure: data.unitOfMeasure,
-          vatCode: data.vatCode,
+          vatRateId: data.vatRateId,
           salesAccountNumber: data.salesAccountNumber || undefined,
           purchaseAccountNumber: data.purchaseAccountNumber || undefined,
           status: 'ACTIVE',
@@ -158,7 +158,7 @@ export const MaterialForm = ({
                 <VatRateSelectFormField
                   formHook={{
                     register,
-                    name: 'vatCode',
+                    name: 'vatRateId',
                     rules: { required: 'BTW code is verplicht' },
                     errors,
                     control,
