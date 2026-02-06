@@ -61,6 +61,12 @@ export interface ProductResponse {
      * @type {string}
      * @memberof ProductResponse
      */
+    'vatRateId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProductResponse
+     */
     'salesAccountNumber'?: string;
     /**
      * 

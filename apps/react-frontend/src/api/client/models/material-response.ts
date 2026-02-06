@@ -73,6 +73,12 @@ export interface MaterialResponse {
      * @type {string}
      * @memberof MaterialResponse
      */
+    'vatRateId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MaterialResponse
+     */
     'salesAccountNumber'?: string;
     /**
      * 

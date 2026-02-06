@@ -25,6 +25,12 @@ export interface VatRateDto {
      * @type {string}
      * @memberof VatRateDto
      */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateDto
+     */
     'vatCode': string;
     /**
      * 
@@ -56,6 +62,12 @@ export interface VatRateDto {
      * @memberof VatRateDto
      */
     'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateDto
+     */
+    'taxScenario': string;
     /**
      * 
      * @type {string}

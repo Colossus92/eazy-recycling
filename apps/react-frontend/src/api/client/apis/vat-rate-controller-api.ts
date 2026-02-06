@@ -71,15 +71,15 @@ export const VatRateControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        deleteVatRate: async (vatCode: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'vatCode' is not null or undefined
-            assertParamExists('deleteVatRate', 'vatCode', vatCode)
-            const localVarPath = `/vat-rates/{vatCode}`
-                .replace(`{vatCode}`, encodeURIComponent(String(vatCode)));
+        deleteVatRate: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('deleteVatRate', 'id', id)
+            const localVarPath = `/vat-rates/{id}`
+                .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -137,15 +137,15 @@ export const VatRateControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        getVatRateByCode: async (vatCode: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'vatCode' is not null or undefined
-            assertParamExists('getVatRateByCode', 'vatCode', vatCode)
-            const localVarPath = `/vat-rates/{vatCode}`
-                .replace(`{vatCode}`, encodeURIComponent(String(vatCode)));
+        getVatRateById: async (id: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('getVatRateById', 'id', id)
+            const localVarPath = `/vat-rates/{id}`
+                .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -172,18 +172,18 @@ export const VatRateControllerApiAxiosParamCreator = function (configuration?: C
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {VatRateRequest} vatRateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}}
          */
-        updateVatRate: async (vatCode: string, vatRateRequest: VatRateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'vatCode' is not null or undefined
-            assertParamExists('updateVatRate', 'vatCode', vatCode)
+        updateVatRate: async (id: string, vatRateRequest: VatRateRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'id' is not null or undefined
+            assertParamExists('updateVatRate', 'id', id)
             // verify required parameter 'vatRateRequest' is not null or undefined
             assertParamExists('updateVatRate', 'vatRateRequest', vatRateRequest)
-            const localVarPath = `/vat-rates/{vatCode}`
-                .replace(`{vatCode}`, encodeURIComponent(String(vatCode)));
+            const localVarPath = `/vat-rates/{id}`
+                .replace(`{id}`, encodeURIComponent(String(id)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -234,12 +234,12 @@ export const VatRateControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async deleteVatRate(vatCode: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteVatRate(vatCode, options);
+        async deleteVatRate(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteVatRate(id, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['VatRateControllerApi.deleteVatRate']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -257,25 +257,25 @@ export const VatRateControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getVatRateByCode(vatCode: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VatRateResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getVatRateByCode(vatCode, options);
+        async getVatRateById(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VatRateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getVatRateById(id, options);
             const index = configuration?.serverIndex ?? 0;
-            const operationBasePath = operationServerMap['VatRateControllerApi.getVatRateByCode']?.[index]?.url;
+            const operationBasePath = operationServerMap['VatRateControllerApi.getVatRateById']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {VatRateRequest} vatRateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async updateVatRate(vatCode: string, vatRateRequest: VatRateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VatRateResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateVatRate(vatCode, vatRateRequest, options);
+        async updateVatRate(id: string, vatRateRequest: VatRateRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VatRateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateVatRate(id, vatRateRequest, options);
             const index = configuration?.serverIndex ?? 0;
             const operationBasePath = operationServerMap['VatRateControllerApi.updateVatRate']?.[index]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, operationBasePath || basePath);
@@ -300,12 +300,12 @@ export const VatRateControllerApiFactory = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        deleteVatRate(vatCode: string, options?: any): AxiosPromise<void> {
-            return localVarFp.deleteVatRate(vatCode, options).then((request) => request(axios, basePath));
+        deleteVatRate(id: string, options?: any): AxiosPromise<void> {
+            return localVarFp.deleteVatRate(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -317,22 +317,22 @@ export const VatRateControllerApiFactory = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getVatRateByCode(vatCode: string, options?: any): AxiosPromise<VatRateResponse> {
-            return localVarFp.getVatRateByCode(vatCode, options).then((request) => request(axios, basePath));
+        getVatRateById(id: string, options?: any): AxiosPromise<VatRateResponse> {
+            return localVarFp.getVatRateById(id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
-         * @param {string} vatCode 
+         * @param {string} id 
          * @param {VatRateRequest} vatRateRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        updateVatRate(vatCode: string, vatRateRequest: VatRateRequest, options?: any): AxiosPromise<VatRateResponse> {
-            return localVarFp.updateVatRate(vatCode, vatRateRequest, options).then((request) => request(axios, basePath));
+        updateVatRate(id: string, vatRateRequest: VatRateRequest, options?: any): AxiosPromise<VatRateResponse> {
+            return localVarFp.updateVatRate(id, vatRateRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -354,13 +354,13 @@ export class VatRateControllerApi extends BaseAPI {
 
     /**
      * 
-     * @param {string} vatCode 
+     * @param {string} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof VatRateControllerApi
      */
-    public deleteVatRate(vatCode: string, options?: RawAxiosRequestConfig) {
-        return VatRateControllerApiFp(this.configuration).deleteVatRate(vatCode, options).then((request) => request(this.axios, this.basePath));
+    public deleteVatRate(id: string, options?: RawAxiosRequestConfig) {
+        return VatRateControllerApiFp(this.configuration).deleteVatRate(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -375,24 +375,24 @@ export class VatRateControllerApi extends BaseAPI {
 
     /**
      * 
-     * @param {string} vatCode 
+     * @param {string} id 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof VatRateControllerApi
      */
-    public getVatRateByCode(vatCode: string, options?: RawAxiosRequestConfig) {
-        return VatRateControllerApiFp(this.configuration).getVatRateByCode(vatCode, options).then((request) => request(this.axios, this.basePath));
+    public getVatRateById(id: string, options?: RawAxiosRequestConfig) {
+        return VatRateControllerApiFp(this.configuration).getVatRateById(id, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * 
-     * @param {string} vatCode 
+     * @param {string} id 
      * @param {VatRateRequest} vatRateRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof VatRateControllerApi
      */
-    public updateVatRate(vatCode: string, vatRateRequest: VatRateRequest, options?: RawAxiosRequestConfig) {
-        return VatRateControllerApiFp(this.configuration).updateVatRate(vatCode, vatRateRequest, options).then((request) => request(this.axios, this.basePath));
+    public updateVatRate(id: string, vatRateRequest: VatRateRequest, options?: RawAxiosRequestConfig) {
+        return VatRateControllerApiFp(this.configuration).updateVatRate(id, vatRateRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }

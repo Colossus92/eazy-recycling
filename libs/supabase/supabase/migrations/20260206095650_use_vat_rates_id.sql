@@ -45,6 +45,11 @@ ALTER TABLE catalog_items
 ADD CONSTRAINT catalog_items_vat_rate_id_fkey
 FOREIGN KEY (vat_rate_id) REFERENCES vat_rates(id);
 
--- 11. Add column documentation
+-- 11. Move all MATERIAL catalog items to use the VERLEGD vat rate
+UPDATE catalog_items
+SET vat_rate_id = (SELECT id FROM vat_rates WHERE vat_code = 'VERLEGD')
+WHERE type = 'MATERIAL';
+
+-- 12. Add column documentation
 COMMENT ON COLUMN vat_rates.id IS 'Unique identifier for the VAT rate. Used as FK reference from other tables.';
 COMMENT ON COLUMN catalog_items.vat_rate_id IS 'Reference to the VAT rate applied to this catalog item.';

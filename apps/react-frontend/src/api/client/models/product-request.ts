@@ -49,7 +49,7 @@ export interface ProductRequest {
      * @type {string}
      * @memberof ProductRequest
      */
-    'vatCode': string;
+    'vatRateId': string;
     /**
      * 
      * @type {string}

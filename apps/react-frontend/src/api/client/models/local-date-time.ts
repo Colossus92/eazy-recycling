@@ -33,18 +33,18 @@ export interface LocalDateTime {
      */
     'value'?: string;
     /**
-     * 
-     * @type {string}
-     * @memberof LocalDateTime
-     */
-    'value$kotlinx_datetime': string;
-    /**
      * Use the \'month\' property instead
      * @type {number}
      * @memberof LocalDateTime
      * @deprecated
      */
     'monthNumber': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LocalDateTime
+     */
+    'value$kotlinx_datetime': string;
     /**
      * 
      * @type {number}

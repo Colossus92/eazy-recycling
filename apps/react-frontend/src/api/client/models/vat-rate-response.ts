@@ -25,6 +25,12 @@ export interface VatRateResponse {
      * @type {string}
      * @memberof VatRateResponse
      */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
     'vatCode': string;
     /**
      * 
@@ -61,6 +67,18 @@ export interface VatRateResponse {
      * @type {string}
      * @memberof VatRateResponse
      */
+    'taxScenario': VatRateResponseTaxScenarioEnum;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VatRateResponse
+     */
+    'isReverseCharge': boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateResponse
+     */
     'createdAt'?: string;
     /**
      * 
@@ -81,4 +99,14 @@ export interface VatRateResponse {
      */
     'updatedByName'?: string;
 }
+
+export const VatRateResponseTaxScenarioEnum = {
+    Standard: 'STANDARD',
+    ReverseCharge: 'REVERSE_CHARGE',
+    ZeroRatedExport: 'ZERO_RATED_EXPORT',
+    Exempt: 'EXEMPT'
+} as const;
+
+export type VatRateResponseTaxScenarioEnum = typeof VatRateResponseTaxScenarioEnum[keyof typeof VatRateResponseTaxScenarioEnum];
+
 

@@ -26,8 +26,8 @@ export interface MasterDataTabProps<T> {
   data: DataTableProps<T>;
   searchQuery: (query: string) => void;
   openAddForm?: () => void;
-  editAction: (item: T) => void;
-  removeAction: (item: T) => void;
+  editAction?: (item: T) => void;
+  removeAction?: (item: T) => void;
   renderEmptyState: (onClick?: () => void) => ReactNode;
   isLoading: boolean;
   errorHandling: {
@@ -100,7 +100,7 @@ export const MasterDataTab = <T,>({
                     style={{ width: `${col.width}%` }}
                   />
                 ))}
-                <col style={{ width: '63px' }} />
+                {(editAction || removeAction) && <col style={{ width: '63px' }} />}
               </colgroup>
               <thead className="sticky top-0 bg-color-surface-secondary border-solid border-b border-color-border-primary">
                 <tr className="text-subtitle-1">
@@ -112,7 +112,7 @@ export const MasterDataTab = <T,>({
                       {col.label}
                     </th>
                   ))}
-                  <th className="px-4 py-3"></th>
+                  {(editAction || removeAction) && <th className="px-4 py-3"></th>}
                 </tr>
               </thead>
               <tbody>
@@ -122,26 +122,29 @@ export const MasterDataTab = <T,>({
                     <tr
                       key={index}
                       className="text-body-2 border-b border-solid border-color-border-primary hover:bg-color-surface-secondary"
-                      onDoubleClick={() => editAction(item)}
+                      onDoubleClick={() => editAction?.(item)}
                     >
                       {data.columns.map((col) => (
                         <td className="p-4" key={String(col.key)}>
                           {col.accessor(item)}
                         </td>
                       ))}
-                      <td className="p-4 text-center">
-                        <ActionMenu<T>
-                          onEdit={editAction}
-                          onDelete={removeAction}
-                          item={item}
-                        />
-                      </td>
+                      {(editAction || removeAction) && (
+                        <td className="p-4 text-center">
+                          <ActionMenu<T>
+                            onEdit={editAction || (() => {})}
+                            onDelete={removeAction || (() => {})}
+                            item={item}
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))}
               </tbody>
               <tfoot className="sticky bottom-0 bg-color-surface-primary border-solid border-y border-color-border-primary z-10">
                 <tr className="text-body-2 bg-color-surface-primary">
-                  <td colSpan={data.columns.length + 1} className="p-4">
+                  {/* In case there are no actions, don't add a column for the actions button */}
+                  <td colSpan={data.columns.length + ((editAction || removeAction) ? 1 : 0)} className="p-4">
                     <PaginationRow
                       page={page}
                       setPage={setPage}

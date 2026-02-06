@@ -25,12 +25,12 @@ export interface TaglibDescriptor {
      * @type {string}
      * @memberof TaglibDescriptor
      */
-    'taglibURI'?: string;
+    'taglibLocation'?: string;
     /**
      * 
      * @type {string}
      * @memberof TaglibDescriptor
      */
-    'taglibLocation'?: string;
+    'taglibURI'?: string;
 }
 

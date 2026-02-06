@@ -56,5 +56,21 @@ export interface VatRateRequest {
      * @memberof VatRateRequest
      */
     'description': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof VatRateRequest
+     */
+    'taxScenario': VatRateRequestTaxScenarioEnum;
 }
+
+export const VatRateRequestTaxScenarioEnum = {
+    Standard: 'STANDARD',
+    ReverseCharge: 'REVERSE_CHARGE',
+    ZeroRatedExport: 'ZERO_RATED_EXPORT',
+    Exempt: 'EXEMPT'
+} as const;
+
+export type VatRateRequestTaxScenarioEnum = typeof VatRateRequestTaxScenarioEnum[keyof typeof VatRateRequestTaxScenarioEnum];
+
 

@@ -23,9 +23,9 @@ data class VatRate(
 
 data class VatRateId(val value: UUID)
 
-enum class VatTaxScenario {
-  STANDARD,
-  REVERSE_CHARGE,
-  ZERO_RATED_EXPORT,
-  EXEMPT
+enum class VatTaxScenario(val displayName: String) {
+  STANDARD("Standaard"),
+  REVERSE_CHARGE("Verlegd"),
+  ZERO_RATED_EXPORT("Export 0%"),
+  EXEMPT("Vrijgesteld"),
 }

@@ -49,7 +49,7 @@ export interface MaterialRequest {
      * @type {string}
      * @memberof MaterialRequest
      */
-    'vatCode': string;
+    'vatRateId': string;
     /**
      * 
      * @type {string}

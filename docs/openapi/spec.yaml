@@ -93,17 +93,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WasteStreamValidationResponse"
-  /vat-rates/{vatCode}:
+  /vat-rates/{id}:
     get:
       tags:
       - vat-rate-controller
-      operationId: getVatRateByCode
+      operationId: getVatRateById
       parameters:
-      - name: vatCode
+      - name: id
         in: path
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "200":
           description: OK
@@ -116,11 +117,12 @@ paths:
       - vat-rate-controller
       operationId: updateVatRate
       parameters:
-      - name: vatCode
+      - name: id
         in: path
         required: true
         schema:
           type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -139,11 +141,12 @@ paths:
       - vat-rate-controller
       operationId: deleteVatRate
       parameters:
-      - name: vatCode
+      - name: id
         in: path
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "204":
           description: No Content
@@ -2908,15 +2911,26 @@ components:
         description:
           type: string
           minLength: 1
+        taxScenario:
+          type: string
+          enum:
+          - STANDARD
+          - REVERSE_CHARGE
+          - ZERO_RATED_EXPORT
+          - EXEMPT
       required:
       - countryCode
       - description
       - percentage
+      - taxScenario
       - validFrom
       - vatCode
     VatRateResponse:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         vatCode:
           type: string
         percentage:
@@ -2931,6 +2945,15 @@ components:
           type: string
         description:
           type: string
+        taxScenario:
+          type: string
+          enum:
+          - STANDARD
+          - REVERSE_CHARGE
+          - ZERO_RATED_EXPORT
+          - EXEMPT
+        isReverseCharge:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -2944,7 +2967,10 @@ components:
       required:
       - countryCode
       - description
+      - id
+      - isReverseCharge
       - percentage
+      - taxScenario
       - validFrom
       - vatCode
     UpdateUserRequest:
@@ -3334,6 +3360,9 @@ components:
     VatRateDto:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         vatCode:
           type: string
         percentage:
@@ -3348,6 +3377,8 @@ components:
           type: string
         description:
           type: string
+        taxScenario:
+          type: string
         createdAt:
           type: string
           format: date-time
@@ -3361,7 +3392,9 @@ components:
       required:
       - countryCode
       - description
+      - id
       - percentage
+      - taxScenario
       - validFrom
       - vatCode
     WasteContainerDto:
@@ -3698,9 +3731,9 @@ components:
         unitOfMeasure:
           type: string
           minLength: 1
-        vatCode:
+        vatRateId:
           type: string
-          minLength: 1
+          format: uuid
         salesAccountNumber:
           type: string
         purchaseAccountNumber:
@@ -3715,7 +3748,7 @@ components:
       - name
       - status
       - unitOfMeasure
-      - vatCode
+      - vatRateId
     ProductResponse:
       type: object
       properties:
@@ -3733,6 +3766,9 @@ components:
           type: string
         vatCode:
           type: string
+        vatRateId:
+          type: string
+          format: uuid
         salesAccountNumber:
           type: string
         purchaseAccountNumber:
@@ -3756,6 +3792,7 @@ components:
       - status
       - unitOfMeasure
       - vatCode
+      - vatRateId
     ProductCategoryRequest:
       type: object
       properties:
@@ -3919,9 +3956,9 @@ components:
         unitOfMeasure:
           type: string
           minLength: 1
-        vatCode:
+        vatRateId:
           type: string
-          minLength: 1
+          format: uuid
         salesAccountNumber:
           type: string
         purchaseAccountNumber:
@@ -3935,7 +3972,7 @@ components:
       - name
       - status
       - unitOfMeasure
-      - vatCode
+      - vatRateId
     MaterialResponse:
       type: object
       properties:
@@ -3957,6 +3994,9 @@ components:
           type: string
         vatCode:
           type: string
+        vatRateId:
+          type: string
+          format: uuid
         salesAccountNumber:
           type: string
         purchaseAccountNumber:
@@ -3980,6 +4020,7 @@ components:
       - status
       - unitOfMeasure
       - vatCode
+      - vatRateId
     MaterialPriceRequest:
       type: object
       properties:
@@ -4845,14 +4886,14 @@ components:
           type: string
           format: date
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date
         year:
           type: integer
           format: int32
@@ -4908,14 +4949,14 @@ components:
           type: string
           format: date-time
           writeOnly: true
-        value$kotlinx_datetime:
-          type: string
-          format: date-time
         monthNumber:
           type: integer
           format: int32
           deprecated: true
           description: Use the 'month' property instead
+        value$kotlinx_datetime:
+          type: string
+          format: date-time
         nanosecond:
           type: integer
           format: int32
@@ -6274,11 +6315,11 @@ components:
       properties:
         applicationName:
           type: string
-        autowireCapableBeanFactory:
-          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         startupDate:
           type: integer
           format: int64
+        autowireCapableBeanFactory:
+          $ref: "#/components/schemas/AutowireCapableBeanFactory"
         parent: {}
         id:
           type: string
@@ -6625,23 +6666,17 @@ components:
     JspConfigDescriptor:
       type: object
       properties:
-        taglibs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TaglibDescriptor"
         jspPropertyGroups:
           type: array
           items:
             $ref: "#/components/schemas/JspPropertyGroupDescriptor"
+        taglibs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaglibDescriptor"
     JspPropertyGroupDescriptor:
       type: object
       properties:
-        deferredSyntaxAllowedAsLiteral:
-          type: string
-        elIgnored:
-          type: string
-        isXml:
-          type: string
         errorOnELNotFound:
           type: string
         pageEncoding:
@@ -6662,6 +6697,12 @@ components:
           type: array
           items:
             type: string
+        elIgnored:
+          type: string
+        isXml:
+          type: string
+        deferredSyntaxAllowedAsLiteral:
+          type: string
         trimDirectiveWhitespaces:
           type: string
         errorOnUndeclaredNamespace:
@@ -6728,37 +6769,39 @@ components:
           type: boolean
         propagateQueryProperties:
           type: boolean
+        attributesCSV:
+          type: string
+          writeOnly: true
+        attributesMap:
+          type: object
+          additionalProperties: {}
         attributes:
           type: object
           additionalProperties:
             type: string
           writeOnly: true
-        attributesMap:
-          type: object
-          additionalProperties: {}
-        attributesCSV:
-          type: string
-          writeOnly: true
     ServletContext:
       type: object
       properties:
-        effectiveSessionTrackingModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - COOKIE
-            - URL
-            - SSL
-          uniqueItems: true
-        attributeNames: {}
-        contextPath:
-          type: string
         sessionCookieConfig:
           $ref: "#/components/schemas/SessionCookieConfig"
         virtualServerName:
           type: string
         initParameterNames: {}
+        sessionTimeout:
+          type: integer
+          format: int32
+        servletContextName:
+          type: string
+        filterRegistrations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/FilterRegistration"
+        jspConfigDescriptor:
+          $ref: "#/components/schemas/JspConfigDescriptor"
+        attributeNames: {}
+        contextPath:
+          type: string
         sessionTrackingModes:
           type: array
           items:
@@ -6769,13 +6812,19 @@ components:
             - SSL
           uniqueItems: true
           writeOnly: true
-        sessionTimeout:
-          type: integer
-          format: int32
         servletRegistrations:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ServletRegistration"
+        effectiveSessionTrackingModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - COOKIE
+            - URL
+            - SSL
+          uniqueItems: true
         serverInfo:
           type: string
         effectiveMajorVersion:
@@ -6797,14 +6846,6 @@ components:
           type: string
         responseCharacterEncoding:
           type: string
-        servletContextName:
-          type: string
-        filterRegistrations:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/FilterRegistration"
-        jspConfigDescriptor:
-          $ref: "#/components/schemas/JspConfigDescriptor"
         classLoader:
           type: object
           properties:
@@ -6891,9 +6932,9 @@ components:
     TaglibDescriptor:
       type: object
       properties:
-        taglibURI:
-          type: string
         taglibLocation:
+          type: string
+        taglibURI:
           type: string
     AuthorizationUrlResponse:
       type: object

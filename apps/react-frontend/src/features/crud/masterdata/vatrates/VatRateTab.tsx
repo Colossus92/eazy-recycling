@@ -1,13 +1,11 @@
 import { Column, DataTableProps, MasterDataTab } from '../MasterDataTab';
 import { VatRateResponse } from '@/api/client';
-import { useVatRatesCrud } from '@/features/crud/masterdata/vatrates/useVatRates';
-import { DeleteDialog } from '@/components/ui/dialog/DeleteDialog';
-import { VatRateForm } from './VatRateForm';
+import { useVatRates } from '@/features/crud/masterdata/vatrates/useVatRates';
 import { EmptyState } from '../../EmptyState';
 import ArchiveBook from '@/assets/icons/ArchiveBook.svg?react';
 
 export const VatRatesTab = () => {
-  const { read, form, deletion } = useVatRatesCrud();
+  const { items, setSearchQuery, isLoading, errorHandling } = useVatRates();
 
   const columns: Column<VatRateResponse>[] = [
     {
@@ -29,67 +27,36 @@ export const VatRatesTab = () => {
       accessor: (item) => item.countryCode,
     },
     {
-      key: 'validFrom',
-      label: 'Geldig vanaf',
-      width: '15',
-      accessor: (item) => item.validFrom,
-    },
-    {
-      key: 'validTo',
-      label: 'Geldig tot',
-      width: '15',
-      accessor: (item) => item.validTo || '-',
-    },
-    {
       key: 'description',
       label: 'Beschrijving',
-      width: '30',
+      width: '25',
       accessor: (item) => item.description,
+    },
+    {
+      key: 'taxScenario',
+      label: 'Type',
+      width: '20',
+      accessor: (item) => item.taxScenario,
     },
   ];
 
   const data: DataTableProps<VatRateResponse> = {
     columns,
-    items: read.items,
+    items,
   };
 
   return (
-    <>
-      <MasterDataTab
-        data={data}
-        searchQuery={(query) => read.setSearchQuery(query)}
-        openAddForm={form.openForCreate}
-        editAction={(item) => form.openForEdit(item)}
-        removeAction={(item) => deletion.initiate(item)}
-        renderEmptyState={(open) => (
-          <EmptyState
-            icon={ArchiveBook}
-            text={'Geen BTW tarieven gevonden'}
-            onClick={open}
-          />
-        )}
-        isLoading={read.isLoading}
-        errorHandling={read.errorHandling}
-      />
-      {/*
-                Form to add or edit VAT rates
-             */}
-      <VatRateForm
-        isOpen={form.isOpen}
-        onCancel={form.close}
-        onSubmit={form.submit}
-        initialData={form.item}
-      />
-      {/*
-                Dialog to confirm deletion of VAT rates
-             */}
-      <DeleteDialog
-        isOpen={Boolean(deletion.item)}
-        setIsOpen={deletion.cancel}
-        onDelete={() => deletion.item && deletion.confirm(deletion.item)}
-        title={'BTW tarief verwijderen'}
-        description={`Weet u zeker dat u BTW tarief met code ${deletion.item?.vatCode} wilt verwijderen?`}
-      />
-    </>
+    <MasterDataTab
+      data={data}
+      searchQuery={(query) => setSearchQuery(query)}
+      renderEmptyState={() => (
+        <EmptyState
+          icon={ArchiveBook}
+          text={'Geen BTW tarieven gevonden'}
+        />
+      )}
+      isLoading={isLoading}
+      errorHandling={errorHandling}
+    />
   );
 };
