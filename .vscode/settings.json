@@ -1,15 +1,24 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "vitest.enable": true,
-    "vitest.commandLine": "npm test --",
-    "vitest.workspaceConfig": "apps/react-frontend/vite.config.ts",
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
-    "java.configuration.runtimes": [
-        {
-            "name": "JavaSE-21",
-            "path": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
-            "default": true
-        }
-    ]
+  "java.compile.nullAnalysis.mode": "automatic",
+  "vitest.enable": true,
+  "vitest.commandLine": "npm test --",
+  "vitest.workspaceConfig": "apps/react-frontend/vite.config.ts",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.jdt.ls.java.home": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-21",
+      "path": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+      "default": true
+    }
+  ],
+  "kotlin.languageServer.enabled": true,
+  "kotlin.languageServer.path": "",
+  "kotlin.java.home": "/path/to/your/jdk21",
+  "kotlin.compiler.jvm.target": "21",
+  "kotlin.indexing.enabled": true,
+  "kotlin.externalSources.autoConvertToKotlin": false,
+  "kotlin.debugAdapter.enabled": true,
+  "kotlin.scripts.enabled": true,
+  "kotlin.gradle.projectSubdirectories": ["apps/springboot-backend"]
 }

@@ -54,6 +54,14 @@ spring:
             password: ${AMICE_PASSWORD:}
             type: PKCS12
 
+# Supabase Configuration
+supabase:
+  api:
+    url: ${SUPABASE_API_URL:}
+    secret: ${SUPABASE_API_SECRET:}
+    publishable: ${SUPABASE_API_PUBLISHABLE:}
+    jwt-issuer: ${SUPABASE_API_JWT_ISSUER:}
+
 # CORS Configuration
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:https://*.eazysoftware.nl,https://*.eazyrecycling.nl}

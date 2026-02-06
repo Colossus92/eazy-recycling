@@ -5,6 +5,12 @@
         </encoder>
     </appender>
 
+    <!-- Debug logging for Spring Security and JWT validation -->
+    <logger name="org.springframework.security" level="DEBUG"/>
+    <logger name="org.springframework.security.oauth2" level="DEBUG"/>
+    <logger name="org.springframework.security.web" level="DEBUG"/>
+    <logger name="nl.eazysoftware.eazyrecyclingservice.config.security" level="DEBUG"/>
+
     <root level="info">
         <appender-ref ref="CONSOLE" />
     </root>
