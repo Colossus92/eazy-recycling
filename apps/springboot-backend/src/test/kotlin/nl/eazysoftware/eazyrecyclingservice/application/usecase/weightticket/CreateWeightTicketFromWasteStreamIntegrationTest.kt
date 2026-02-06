@@ -96,6 +96,7 @@ class CreateWeightTicketFromWasteStreamIntegrationTest : BaseIntegrationTest() {
                 validTo = null,
                 countryCode = "NL",
                 description = "Standard VAT 21%",
+                taxScenario = "STANDARD",
             )
         )
 

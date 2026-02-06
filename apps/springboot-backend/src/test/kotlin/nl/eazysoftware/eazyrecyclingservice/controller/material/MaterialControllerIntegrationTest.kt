@@ -64,7 +64,8 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.now(),
       validTo = null,
       countryCode = "NL",
-      description = "Test VAT rate 1"
+      description = "Test VAT rate 1",
+      taxScenario = "STANDARD"
     )
     val vatRate2 = VatRateDto(
       vatCode = testVatCode2,
@@ -72,7 +73,8 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.now(),
       validTo = null,
       countryCode = "NL",
-      description = "Test VAT rate 2"
+      description = "Test VAT rate 2",
+      taxScenario = "STANDARD"
     )
     vatRateJpaRepository.saveAll(listOf(vatRate1, vatRate2))
 

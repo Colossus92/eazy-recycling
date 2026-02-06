@@ -2,6 +2,7 @@ package nl.eazysoftware.eazyrecyclingservice.controller.vat
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import nl.eazysoftware.eazyrecyclingservice.adapters.`in`.web.VatRateRequest
+import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatTaxScenario
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateDto
 import nl.eazysoftware.eazyrecyclingservice.repository.vat.VatRateJpaRepository
 import nl.eazysoftware.eazyrecyclingservice.test.config.BaseIntegrationTest
@@ -57,7 +58,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Dutch high VAT rate"
+      description = "Dutch high VAT rate",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then
@@ -88,7 +90,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
       validTo = null,
       countryCode = "NL",
-      description = "Dutch high VAT rate"
+      description = "Dutch high VAT rate",
+      taxScenario = "STANDARD",
     )
     val vatRate2 = VatRateDto(
       vatCode = "NL_LOW",
@@ -96,7 +99,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
       validTo = null,
       countryCode = "NL",
-      description = "Dutch low VAT rate"
+      description = "Dutch low VAT rate",
+      taxScenario = "STANDARD",
     )
     vatRateJpaRepository.saveAll(listOf(vatRate1, vatRate2))
 
@@ -119,7 +123,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
       validTo = null,
       countryCode = "BE",
-      description = "Belgian high VAT rate"
+      description = "Belgian high VAT rate",
+      taxScenario = "STANDARD",
     )
     vatRateJpaRepository.save(vatRate)
 
@@ -149,7 +154,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
       validTo = null,
       countryCode = "DE",
-      description = "German high VAT rate"
+      description = "German high VAT rate",
+      taxScenario = "STANDARD",
     )
     vatRateJpaRepository.save(originalVatRate)
 
@@ -159,7 +165,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = LocalDateTime.of(2024, 12, 31 , 23, 59, 59),
       countryCode = "DE",
-      description = "German high VAT rate (updated)"
+      description = "German high VAT rate (updated)",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then
@@ -189,7 +196,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Non-existent VAT rate"
+      description = "Non-existent VAT rate",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then
@@ -209,7 +217,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
       validTo = null,
       countryCode = "NL",
-      description = "VAT rate to be deleted"
+      description = "VAT rate to be deleted",
+      taxScenario = "STANDARD",
     )
     vatRateJpaRepository.save(vatRate)
 
@@ -237,7 +246,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = LocalDateTime.of(2023, 12, 31, 23, 59, 59),
       countryCode = "FR",
-      description = "Old French VAT rate"
+      description = "Old French VAT rate",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then
@@ -285,7 +295,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Invalid percentage"
+      description = "Invalid percentage",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then
@@ -305,7 +316,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Dutch high VAT rate 2024"
+      description = "Dutch high VAT rate 2024",
+      taxScenario = VatTaxScenario.STANDARD
     )
     val lowRate = VatRateRequest(
       vatCode = "NL_LOW_2024",
@@ -313,7 +325,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Dutch low VAT rate 2024"
+      description = "Dutch low VAT rate 2024",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When
@@ -342,7 +355,8 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       validFrom = LocalDateTime.of(2024, 1, 1 , 0, 0, 0),
       validTo = null,
       countryCode = "NL",
-      description = "Decimal percentage test"
+      description = "Decimal percentage test",
+      taxScenario = VatTaxScenario.STANDARD,
     )
 
     // When & Then

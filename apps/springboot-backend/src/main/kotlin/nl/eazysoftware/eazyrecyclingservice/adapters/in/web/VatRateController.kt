@@ -5,9 +5,10 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toCetInstant
 import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayLocalDateTime
-import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ADMIN_OR_PLANNER
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
+import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatTaxScenario
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -20,16 +21,19 @@ import kotlin.time.toKotlinInstant
 
 @RestController
 @RequestMapping("/vat-rates")
-@PreAuthorize(HAS_ANY_ROLE)
 class VatRateController(
     private val vatRates: VatRates
 ) {
 
+
+    @PreAuthorize(HAS_ANY_ROLE)
     @GetMapping
     fun getAllVatRates(): List<VatRateResponse> {
         return vatRates.getAllVatRates().map { it.toResponse() }
     }
 
+
+    @PreAuthorize(HAS_ANY_ROLE)
     @GetMapping("/{vatCode}")
     fun getVatRateByCode(@PathVariable vatCode: String): VatRateResponse {
         val vatRate = vatRates.getVatRateByCode(vatCode)
@@ -37,7 +41,7 @@ class VatRateController(
         return vatRate.toResponse()
     }
 
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createVatRate(@Valid @RequestBody request: VatRateRequest): VatRateResponse {
@@ -46,7 +50,7 @@ class VatRateController(
         return created.toResponse()
     }
 
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @PutMapping("/{vatCode}")
     fun updateVatRate(
         @PathVariable vatCode: String,
@@ -61,7 +65,7 @@ class VatRateController(
         return updated.toResponse()
     }
 
-    @PreAuthorize(HAS_ADMIN_OR_PLANNER)
+    @PreAuthorize(HAS_ROLE_ADMIN)
     @DeleteMapping("/{vatCode}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteVatRate(@PathVariable vatCode: String) {
@@ -89,7 +93,9 @@ data class VatRateRequest(
     val countryCode: String,
 
     @field:NotBlank(message = "Omschrijving is verplicht")
-    val description: String
+    val description: String,
+
+    val taxScenario: VatTaxScenario,
 ) {
     fun toDomain(overrideVatCode: String? = null): VatRate {
         return VatRate(
@@ -98,7 +104,8 @@ data class VatRateRequest(
             validFrom = validFrom.toCetInstant().toKotlinInstant(),
             validTo = validTo?.toCetInstant()?.toKotlinInstant(),
             countryCode = countryCode,
-            description = description
+            description = description,
+            taxScenario = taxScenario,
         )
     }
 }
@@ -110,6 +117,8 @@ data class VatRateResponse(
     val validTo: LocalDateTime?,
     val countryCode: String,
     val description: String,
+    val taxScenario: VatTaxScenario,
+    val isReverseCharge: Boolean,
     val createdAt: Instant? = null,
     val createdByName: String? = null,
     val updatedAt: Instant? = null,
@@ -124,6 +133,8 @@ fun VatRate.toResponse(): VatRateResponse {
         validTo = validTo?.toDisplayLocalDateTime(),
         countryCode = countryCode,
         description = description,
+        taxScenario = taxScenario,
+        isReverseCharge = isReverseCharge(),
         createdAt = createdAt?.toJavaInstant(),
         createdByName = createdBy,
         updatedAt = updatedAt?.toJavaInstant(),

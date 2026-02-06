@@ -124,10 +124,11 @@ VALUES ('MATERIAL', '014', 'Nikkel', '', '2025-12-01 09:25:09.143787+00', null, 
        ('MATERIAL', '002', 'Kabel', '', '2025-12-01 09:25:09.143787+00', null, '2025-12-01 09:25:09.143787+00', null, 'e11b60ff-5552-49bf-b545-7c2358ccdeb2');
 
 
-INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid_to", "country_code", "description", "created_at", "created_by", "last_modified_at", "last_modified_by")
-VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'Aad Admin'),
-       ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', '2026-01-12 12:17:23.437526+00', 'Aad Admin', '2026-01-12 12:17:23.437526+00', 'Aad Admin'),
-       ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', '2026-01-12 12:17:44.657772+00', 'Aad Admin', '2026-01-12 12:17:44.657772+00', 'Aad Admin');
+INSERT INTO "public"."vat_rates" ("vat_code", "percentage", "valid_from", "valid_to", "country_code", "description", "tax_scenario", "created_at", "created_by", "last_modified_at", "last_modified_by")
+VALUES ('HOOG', '21', '2024-12-31 23:00:00+00', null, 'NL', 'Hoog BTW tarief', 'STANDARD', '2026-01-12 12:17:00.151163+00', 'Aad Admin', '2026-01-12 12:17:00.151163+00', 'SYSTEM'),
+       ('LAAG', '9', '2024-12-31 23:00:00+00', null, 'NL', 'Laag BTW tarief', 'STANDARD', '2026-01-12 12:17:23.437526+00', 'SYSTEM', '2026-01-12 12:17:23.437526+00', 'SYSTEM'),
+       ('VRIJGESTELD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'Vrijgesteld van BTW', 'EXEMPT', '2026-01-12 12:17:44.657772+00', 'SYSTEM', '2026-01-12 12:17:44.657772+00', 'SYSTEM'),
+       ('VERLEGD', '0', '2024-12-31 23:00:00+00', null, 'NL', 'BTW verlegd', 'REVERSE_CHARGE', '2026-01-12 12:17:44.657772+00', 'SYSTEM', '2026-01-12 12:17:44.657772+00', 'SYSTEM');
 
 INSERT INTO "public"."pickup_locations" ("id", "created_at", "location_type", "building_number", "building_number_addition", "country", "proximity_description", "city", "postal_code", "street_name", "company_id", "name") VALUES ('NO_PICKUP', '2026-01-12 19:09:09.860605+00', 'NO_PICKUP', null, null, null, null, null, null, null, null, null);
 

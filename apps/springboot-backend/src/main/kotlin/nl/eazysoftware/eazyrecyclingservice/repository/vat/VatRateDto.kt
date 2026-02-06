@@ -28,5 +28,8 @@ data class VatRateDto(
     val countryCode: String,
 
     @Column(name = "description", nullable = false)
-    val description: String
+    val description: String,
+
+    @Column(name = "tax_scenario", nullable = false)
+    val taxScenario: String,
 ) : AuditableEntity()

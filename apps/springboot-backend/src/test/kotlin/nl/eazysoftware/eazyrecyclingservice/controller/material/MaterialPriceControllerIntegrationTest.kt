@@ -58,7 +58,8 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
                     validFrom = Instant.now(),
                     validTo = null,
                     countryCode = "NL",
-                    description = "21% BTW"
+                    description = "21% BTW",
+                    taxScenario = "STANDARD",
                 )
             )
         }

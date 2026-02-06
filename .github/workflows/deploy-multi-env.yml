@@ -117,8 +117,16 @@ jobs:
       github_branch: develop
     secrets: inherit
 
-  deploy-prd:
+  migrate-prd:
     needs: build
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/supabase-migrate.yml
+    with:
+      environment: PRD
+    secrets: inherit
+
+  deploy-prd:
+    needs: migrate-prd
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy-reusable.yml
     with:

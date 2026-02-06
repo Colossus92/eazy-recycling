@@ -72,7 +72,8 @@ class MaterialPriceSyncControllerIntegrationTest : BaseIntegrationTest() {
             validFrom = Instant.now(),
             validTo = null,
             countryCode = "NL",
-            description = "Test VAT rate for sync"
+            description = "Test VAT rate for sync",
+            taxScenario = "STANDARD",
         )
         vatRateJpaRepository.save(testVatRate!!)
 

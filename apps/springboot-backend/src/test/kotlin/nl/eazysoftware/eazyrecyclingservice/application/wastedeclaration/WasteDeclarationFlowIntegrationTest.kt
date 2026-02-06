@@ -471,7 +471,8 @@ class WasteDeclarationFlowIntegrationTest : BaseIntegrationTest() {
         validFrom = Instant.now().minusSeconds(86400),
         validTo = null,
         countryCode = "NL",
-        description = "Test VAT Rate"
+        description = "Test VAT Rate",
+        taxScenario = "STANDARD",
       )
     )
   }

@@ -158,7 +158,7 @@ class TransportControllerIntegrationTest(
       testCompany = companyRepository.save(testCompany)
       testBranch = projectLocationJpaRepository.save(testBranch)
       testLocation = pickupLocationRepository.save(testLocation)
-      
+
       // Create test VAT rate and catalog item for weight ticket lines
       testVatRate = vatRateRepository.save(
         VatRateDto(
@@ -168,6 +168,7 @@ class TransportControllerIntegrationTest(
           validTo = null,
           countryCode = "NL",
           description = "Standard VAT 21%",
+          taxScenario = "STANDARD",
         )
       )
 

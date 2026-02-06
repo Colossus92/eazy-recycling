@@ -338,6 +338,7 @@ create table if not exists vat_rates (
                                          valid_to timestamp with time zone,
                                          country_code text not null,
                                          description text not null,
+                                         tax_scenario text not null,
                                          created_at timestamp with time zone not null default now(),
                                          created_by text,
                                          last_modified_at timestamp with time zone not null default now(),

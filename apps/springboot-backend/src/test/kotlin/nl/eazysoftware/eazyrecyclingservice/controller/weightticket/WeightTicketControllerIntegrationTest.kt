@@ -84,6 +84,7 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
                 validTo = null,
                 countryCode = "NL",
                 description = "Standard VAT 21%",
+                taxScenario = "STANDARD",
             )
         )
 
@@ -815,19 +816,19 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val savedInvoice = invoiceRepository.findById(invoiceId)
         assertThat(savedInvoice).isPresent
         val invoice = savedInvoice.get()
-        
+
         // Invoice should be PURCHASE type
         assertThat(invoice.invoiceType.name).isEqualTo("PURCHASE")
-        
+
         // Should have 2 lines (1 material + 1 product)
         assertThat(invoice.lines).hasSize(2)
-        
+
         // Material line should have POSITIVE price (5.00)
         val materialLine = invoice.lines.find { it.catalogItemType == CatalogItemType.MATERIAL }
         assertThat(materialLine).isNotNull
         assertThat(materialLine!!.unitPrice).isEqualByComparingTo(BigDecimal("5.00"))
         assertThat(materialLine.totalExclVat).isEqualByComparingTo(BigDecimal("500.00")) // 100 * 5.00
-        
+
         // Product line should have NEGATIVE price (-15.00)
         val productLine = invoice.lines.find { it.catalogItemType == CatalogItemType.PRODUCT }
         assertThat(productLine).isNotNull
@@ -883,19 +884,19 @@ class WeightTicketControllerIntegrationTest : BaseIntegrationTest() {
         val savedInvoice = invoiceRepository.findById(invoiceId)
         assertThat(savedInvoice).isPresent
         val invoice = savedInvoice.get()
-        
+
         // Invoice should be SALE type
         assertThat(invoice.invoiceType.name).isEqualTo("SALE")
-        
+
         // Should have 2 lines (1 material + 1 product)
         assertThat(invoice.lines).hasSize(2)
-        
+
         // Material line should have POSITIVE price (5.00)
         val materialLine = invoice.lines.find { it.catalogItemType == CatalogItemType.MATERIAL }
         assertThat(materialLine).isNotNull
         assertThat(materialLine!!.unitPrice).isEqualByComparingTo(BigDecimal("5.00"))
         assertThat(materialLine.totalExclVat).isEqualByComparingTo(BigDecimal("500.00")) // 100 * 5.00
-        
+
         // Product line should also have POSITIVE price (15.00) for SALE invoices
         val productLine = invoice.lines.find { it.catalogItemType == CatalogItemType.PRODUCT }
         assertThat(productLine).isNotNull
