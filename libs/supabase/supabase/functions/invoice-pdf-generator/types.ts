@@ -35,32 +35,32 @@ export interface InvoiceLine {
   date: string;
   description: string[]; // Array of strings, each string is a line in the description
   orderNumber?: string;
-  quantity: number;
+  quantity: string;
   unit: string;
   vatCode: string;
   vatPercentage: number | 'G'; // 'G' = geen BTW (no VAT)
   isReverseCharge: boolean;
-  pricePerUnit: number;
-  totalAmount: number;
+  pricePerUnit: string;
+  totalAmount: string;
 }
 
 export interface VatBreakdownLine {
   vatPercentage: number;
-  amount: number;
+  amount: string;
 }
 
 export interface InvoiceTotals {
-  totalExclVat: number;
+  totalExclVat: string;
   vatBreakdown: VatBreakdownLine[];
-  vatAmount: number;
-  totalInclVat: number;
+  vatAmount: string;
+  totalInclVat: string;
 }
 
 export interface MaterialTotal {
   material: string;
-  totalWeight: number;
+  totalWeight: string;
   unit: string;
-  totalAmount: number;
+  totalAmount: string;
 }
 
 export interface InvoiceData {
@@ -75,16 +75,6 @@ export interface InvoiceData {
   lines: InvoiceLine[];
   materialTotals: MaterialTotal[];
   totals: InvoiceTotals;
-}
-
-/**
- * Format a number as currency (EUR)
- */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('nl-NL', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(amount);
 }
 
 /**

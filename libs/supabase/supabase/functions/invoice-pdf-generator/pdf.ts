@@ -1,15 +1,6 @@
 import type { PDFFont, PDFPage } from 'npm:pdf-lib';
 import { PDFDocument, rgb, StandardFonts } from 'npm:pdf-lib';
-import { formatCurrency as baseCurrency, formatDate, InvoiceData } from './types.ts';
-
-/**
- * Format currency with optional negation for credit notes
- */
-function formatCurrency(amount: number, isCreditNote = false): string {
-  // For credit notes, negate the value (except when 0)
-  const displayValue = isCreditNote && amount !== 0 ? -amount : amount;
-  return baseCurrency(displayValue);
-}
+import { formatDate, InvoiceData } from './types.ts';
 
 // Constants for layout
 const PAGE_WIDTH = 595.28; // A4 width in points
@@ -425,18 +416,16 @@ function drawTotalsMultiPage(
   const labelX = PAGE_WIDTH - MARGIN_RIGHT - 180;
   const rightAlignX = PAGE_WIDTH - MARGIN_RIGHT;
 
-  const isCreditNote = data.invoiceType === 'CREDITFACTUUR';
-
   if (allReverseCharge) {
     // All lines are VERLEGD: show only "Totaal" (no subtotal/VAT breakdown)
     currentPage.drawText('Totaal', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
-    const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
+    const totalText = data.totals.totalInclVat;
     const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
     currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
   } else {
     // Normal or mixed: show full breakdown
     currentPage.drawText('Subtotaal', { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-    const exclVatText = formatCurrency(data.totals.totalExclVat, isCreditNote);
+    const exclVatText = data.totals.totalExclVat;
     const exclVatWidth = fonts.regular.widthOfTextAtSize(exclVatText, 9);
     currentPage.drawText(exclVatText, { x: rightAlignX - exclVatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
 
@@ -445,7 +434,7 @@ function drawTotalsMultiPage(
     // Show each VAT rate line from backend-provided breakdown
     for (const vat of data.totals.vatBreakdown) {
       currentPage.drawText(`${vat.vatPercentage}% btw`, { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-      const vatLineText = formatCurrency(vat.amount, isCreditNote);
+      const vatLineText = vat.amount;
       const vatLineWidth = fonts.regular.widthOfTextAtSize(vatLineText, 9);
       currentPage.drawText(vatLineText, { x: rightAlignX - vatLineWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
       currentY -= 14;
@@ -463,7 +452,7 @@ function drawTotalsMultiPage(
 
     // Totaal incl. BTW
     currentPage.drawText('Totaal', { x: labelX, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
-    const totalText = formatCurrency(data.totals.totalInclVat, isCreditNote);
+    const totalText = data.totals.totalInclVat;
     const totalWidth = fonts.bold.widthOfTextAtSize(totalText, 11);
     currentPage.drawText(totalText, { x: rightAlignX - totalWidth, y: currentY, size: 11, font: fonts.bold, color: COLOR_BLACK });
   }
@@ -476,7 +465,7 @@ function drawTotalsMultiPage(
     const weightText = `${mat.totalWeight} ${mat.unit}`;
     const weightWidth = fonts.regular.widthOfTextAtSize(weightText, 8);
     currentPage.drawText(weightText, { x: matColWeightEnd - weightWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
-    const amountText = formatCurrency(mat.totalAmount, isCreditNote);
+    const amountText = mat.totalAmount;
     const amountWidth = fonts.regular.widthOfTextAtSize(amountText, 8);
     currentPage.drawText(amountText, { x: matColAmountEnd - amountWidth, y: matY, size: 8, font: fonts.regular, color: COLOR_BLACK });
     matY -= 12;
@@ -776,12 +765,11 @@ function drawLinesTableMultiPage(
       }
     }
 
-    const priceText = formatCurrency(line.pricePerUnit); // Keep piece price positive
+    const priceText = line.pricePerUnit;
     const priceWidth = fonts.regular.widthOfTextAtSize(priceText, 8);
     currentPage.drawText(priceText, { x: colPriceEnd - priceWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
 
-    const isCreditNote = ctx.data.invoiceType === 'CREDITFACTUUR';
-    const totalText = formatCurrency(line.totalAmount, isCreditNote);
+    const totalText = line.totalAmount;
     const totalWidth = fonts.regular.widthOfTextAtSize(totalText, 8);
     currentPage.drawText(totalText, { x: colTotalEnd - totalWidth, y: currentY, size: 8, font: fonts.regular, color: COLOR_BLACK });
 

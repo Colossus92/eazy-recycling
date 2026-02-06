@@ -6,14 +6,36 @@ import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.Invoice
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceDocumentType
 import nl.eazysoftware.eazyrecyclingservice.domain.model.invoice.InvoiceType
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Service
 class InvoicePdfPayloadBuilder(
     private val objectMapper: ObjectMapper,
 ) {
 
+    private val nlLocale = Locale.of("nl", "NL")
+
+    private fun formatCurrency(amount: BigDecimal): String {
+        val formatter = NumberFormat.getCurrencyInstance(nlLocale)
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.format(amount.setScale(2, RoundingMode.HALF_UP))
+    }
+
+    private fun formatNumber(amount: BigDecimal): String {
+        val formatter = NumberFormat.getNumberInstance(nlLocale)
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter.format(amount.setScale(2, RoundingMode.HALF_UP))
+    }
+
     fun buildPayload(invoice: Invoice): String {
+        val isCreditNote = invoice.documentType == InvoiceDocumentType.CREDIT_NOTE
+
         val payload = InvoicePdfPayload(
             invoiceType = mapInvoiceType(invoice),
             invoiceNumber = invoice.invoiceNumber?.value ?: "",
@@ -53,21 +75,22 @@ class InvoicePdfPayloadBuilder(
                 vatNumber = invoice.customerSnapshot.vatNumber,
             ),
             lines = invoice.lines.map { line ->
+                val lineTotal = if (isCreditNote) line.totalExclVat.negate() else line.totalExclVat
                 InvoiceLinePayload(
                     date = line.date.format(DateTimeFormatter.ISO_LOCAL_DATE),
                     description = buildDescription(line.description, line.catalogItemName),
                     orderNumber = line.orderReference,
-                    quantity = line.quantity.toDouble(),
+                    quantity = formatNumber(line.quantity),
                     unit = line.unitOfMeasure,
                     vatCode = line.vatCode,
                     vatPercentage = if (line.vatCode == "G") "G" else line.vatPercentage.toInt(),
                     isReverseCharge = line.isReverseCharge,
-                    pricePerUnit = line.unitPrice.toDouble(),
-                    totalAmount = line.totalExclVat.toDouble(),
+                    pricePerUnit = formatCurrency(line.unitPrice),
+                    totalAmount = formatCurrency(lineTotal),
                 )
             },
-            materialTotals = calculateMaterialTotals(invoice),
-            totals = buildTotals(invoice),
+            materialTotals = calculateMaterialTotals(invoice, isCreditNote),
+            totals = buildTotals(invoice, isCreditNote),
         )
 
         return objectMapper.writeValueAsString(payload)
@@ -91,34 +114,40 @@ class InvoicePdfPayloadBuilder(
         return lines
     }
 
-    private fun buildTotals(invoice: Invoice): InvoiceTotalsPayload {
+    private fun buildTotals(invoice: Invoice, isCreditNote: Boolean): InvoiceTotalsPayload {
         val totals = invoice.calculateTotals()
         val vatBreakdown = totals.vatBreakdown
-            .filter { it.vatAmount.compareTo(java.math.BigDecimal.ZERO) != 0 }
+            .filter { it.vatAmount.compareTo(BigDecimal.ZERO) != 0 }
             .map { line ->
+                val amount = if (isCreditNote) line.vatAmount.negate() else line.vatAmount
                 VatBreakdownPayload(
                     vatPercentage = line.vatPercentage.toInt(),
-                    amount = line.vatAmount.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+                    amount = formatCurrency(amount),
                 )
             }
+        val exclVat = if (isCreditNote) totals.totalExclVat.negate() else totals.totalExclVat
+        val vatAmount = if (isCreditNote) totals.totalVat.negate() else totals.totalVat
+        val inclVat = if (isCreditNote) totals.totalInclVat.negate() else totals.totalInclVat
         return InvoiceTotalsPayload(
-            totalExclVat = totals.totalExclVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+            totalExclVat = formatCurrency(exclVat),
             vatBreakdown = vatBreakdown,
-            vatAmount = totals.totalVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
-            totalInclVat = totals.totalInclVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+            vatAmount = formatCurrency(vatAmount),
+            totalInclVat = formatCurrency(inclVat),
         )
     }
 
-    private fun calculateMaterialTotals(invoice: Invoice): List<MaterialTotalPayload> {
+    private fun calculateMaterialTotals(invoice: Invoice, isCreditNote: Boolean): List<MaterialTotalPayload> {
         return invoice.lines
             .filter { it.catalogItemType == CatalogItemType.MATERIAL }
             .groupBy { it.catalogItemName }
             .map { (materialName, lines) ->
+                val totalAmount = lines.sumOf { it.totalExclVat }
+                val displayAmount = if (isCreditNote) totalAmount.negate() else totalAmount
                 MaterialTotalPayload(
                     material = materialName,
-                    totalWeight = lines.sumOf { it.quantity }.toDouble(),
+                    totalWeight = formatNumber(lines.sumOf { it.quantity }),
                     unit = lines.first().unitOfMeasure,
-                    totalAmount = lines.sumOf { it.totalExclVat }.toDouble(),
+                    totalAmount = formatCurrency(displayAmount),
                 )
             }
     }
@@ -168,30 +197,30 @@ data class InvoiceLinePayload(
     val date: String,
     val description: List<String>,
     val orderNumber: String?,
-    val quantity: Double,
+    val quantity: String,
     val unit: String,
     val vatCode: String,
     val vatPercentage: Any,
     val isReverseCharge: Boolean,
-    val pricePerUnit: Double,
-    val totalAmount: Double,
+    val pricePerUnit: String,
+    val totalAmount: String,
 )
 
 data class MaterialTotalPayload(
     val material: String,
-    val totalWeight: Double,
+    val totalWeight: String,
     val unit: String,
-    val totalAmount: Double,
+    val totalAmount: String,
 )
 
 data class InvoiceTotalsPayload(
-    val totalExclVat: Double,
+    val totalExclVat: String,
     val vatBreakdown: List<VatBreakdownPayload>,
-    val vatAmount: Double,
-    val totalInclVat: Double,
+    val vatAmount: String,
+    val totalInclVat: String,
 )
 
 data class VatBreakdownPayload(
     val vatPercentage: Int,
-    val amount: Double,
+    val amount: String,
 )

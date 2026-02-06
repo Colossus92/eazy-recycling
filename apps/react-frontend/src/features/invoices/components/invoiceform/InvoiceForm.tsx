@@ -94,7 +94,7 @@ export const InvoiceForm = ({
     const hasReverseCharge = watchedLines.some(
       (line: InvoiceLineFormValue) => line.isReverseCharge
     );
-    return hasReverseCharge && !selectedCompany?.vatNumber;
+    return hasReverseCharge && !!selectedCompany && !selectedCompany.vatNumber;
   }, [customerId, watchedLines, selectedCompany]);
 
   const getFormTitle = () => {
