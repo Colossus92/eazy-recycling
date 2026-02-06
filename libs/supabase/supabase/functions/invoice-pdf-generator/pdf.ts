@@ -440,21 +440,12 @@ function drawTotalsMultiPage(
     const exclVatWidth = fonts.regular.widthOfTextAtSize(exclVatText, 9);
     currentPage.drawText(exclVatText, { x: rightAlignX - exclVatWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
 
-    // Collect unique non-zero VAT rates from lines for breakdown
-    const vatBreakdown = new Map<number, number>();
-    for (const line of data.lines) {
-      if (typeof line.vatPercentage === 'number' && line.vatPercentage > 0 && !line.isReverseCharge) {
-        const existing = vatBreakdown.get(line.vatPercentage) || 0;
-        vatBreakdown.set(line.vatPercentage, existing + line.totalAmount * (line.vatPercentage / 100));
-      }
-    }
-
     currentY -= 14;
 
-    // Show each VAT rate line
-    for (const [pct, amount] of vatBreakdown) {
-      currentPage.drawText(`${pct}% btw`, { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
-      const vatLineText = formatCurrency(amount, isCreditNote);
+    // Show each VAT rate line from backend-provided breakdown
+    for (const vat of data.totals.vatBreakdown) {
+      currentPage.drawText(`${vat.vatPercentage}% btw`, { x: labelX, y: currentY, size: 9, font: fonts.regular, color: COLOR_DARK_GRAY });
+      const vatLineText = formatCurrency(vat.amount, isCreditNote);
       const vatLineWidth = fonts.regular.widthOfTextAtSize(vatLineText, 9);
       currentPage.drawText(vatLineText, { x: rightAlignX - vatLineWidth, y: currentY, size: 9, font: fonts.regular, color: COLOR_BLACK });
       currentY -= 14;

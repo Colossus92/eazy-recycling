@@ -67,11 +67,7 @@ class InvoicePdfPayloadBuilder(
                 )
             },
             materialTotals = calculateMaterialTotals(invoice),
-            totals = InvoiceTotalsPayload(
-                totalExclVat = invoice.calculateTotals().totalExclVat.toDouble(),
-                vatAmount = invoice.calculateTotals().totalVat.toDouble(),
-                totalInclVat = invoice.calculateTotals().totalInclVat.toDouble(),
-            ),
+            totals = buildTotals(invoice),
         )
 
         return objectMapper.writeValueAsString(payload)
@@ -93,6 +89,24 @@ class InvoicePdfPayloadBuilder(
             lines.add(description)
         }
         return lines
+    }
+
+    private fun buildTotals(invoice: Invoice): InvoiceTotalsPayload {
+        val totals = invoice.calculateTotals()
+        val vatBreakdown = totals.vatBreakdown
+            .filter { it.vatAmount.compareTo(java.math.BigDecimal.ZERO) != 0 }
+            .map { line ->
+                VatBreakdownPayload(
+                    vatPercentage = line.vatPercentage.toInt(),
+                    amount = line.vatAmount.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+                )
+            }
+        return InvoiceTotalsPayload(
+            totalExclVat = totals.totalExclVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+            vatBreakdown = vatBreakdown,
+            vatAmount = totals.totalVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+            totalInclVat = totals.totalInclVat.setScale(2, java.math.RoundingMode.HALF_UP).toDouble(),
+        )
     }
 
     private fun calculateMaterialTotals(invoice: Invoice): List<MaterialTotalPayload> {
@@ -172,6 +186,12 @@ data class MaterialTotalPayload(
 
 data class InvoiceTotalsPayload(
     val totalExclVat: Double,
+    val vatBreakdown: List<VatBreakdownPayload>,
     val vatAmount: Double,
     val totalInclVat: Double,
+)
+
+data class VatBreakdownPayload(
+    val vatPercentage: Int,
+    val amount: Double,
 )

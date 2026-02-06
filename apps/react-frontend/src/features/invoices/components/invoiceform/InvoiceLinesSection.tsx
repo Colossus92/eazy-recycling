@@ -282,15 +282,8 @@ export const InvoiceLinesSection = ({
       totalExclVat += lineTotal;
       totalVat += vatAmount;
 
-      // Group by vatCode for breakdown
-      if (isReverseCharge) {
-        const key = 'VERLEGD';
-        const existing = vatBreakdown.get(key);
-        vatBreakdown.set(key, {
-          label: 'Btw verlegd',
-          amount: (existing?.amount ?? 0),
-        });
-      } else if (vatPct > 0) {
+      // Group by vatPercentage for breakdown (skip reverse charge lines)
+      if (!isReverseCharge && vatPct > 0) {
         const key = String(vatPct);
         const existing = vatBreakdown.get(key);
         vatBreakdown.set(key, {
@@ -413,7 +406,7 @@ export const InvoiceLinesSection = ({
                     {vat.label}:
                   </td>
                   <td className="p-2 text-right">
-                    {vat.label === 'Btw verlegd' ? '-' : formatCurrency(vat.amount)}
+                    {formatCurrency(vat.amount)}
                   </td>
                   <td></td>
                 </tr>

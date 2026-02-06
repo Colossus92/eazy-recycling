@@ -44,8 +44,14 @@ export interface InvoiceLine {
   totalAmount: number;
 }
 
+export interface VatBreakdownLine {
+  vatPercentage: number;
+  amount: number;
+}
+
 export interface InvoiceTotals {
   totalExclVat: number;
+  vatBreakdown: VatBreakdownLine[];
   vatAmount: number;
   totalInclVat: number;
 }
