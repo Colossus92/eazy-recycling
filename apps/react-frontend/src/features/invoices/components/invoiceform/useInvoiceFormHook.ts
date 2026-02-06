@@ -247,12 +247,6 @@ export const useInvoiceFormHook = () => {
       toastService.success('Factuur succesvol verwerkt');
 
       return finalizedInvoiceId;
-    } catch (error) {
-      console.error('Error saving and finalizing invoice:', error);
-      toastService.error(
-        `Er is een fout opgetreden bij het verwerken van de factuur`
-      );
-      return null;
     } finally {
       setIsSaving(false);
     }

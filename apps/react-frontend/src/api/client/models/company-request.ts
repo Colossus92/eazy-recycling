@@ -71,6 +71,12 @@ export interface CompanyRequest {
      * @memberof CompanyRequest
      */
     'email'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CompanyRequest
+     */
+    'vatNumber'?: string;
 }
 
 export const CompanyRequestRolesEnum = {

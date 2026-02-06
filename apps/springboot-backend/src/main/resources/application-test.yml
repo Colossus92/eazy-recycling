@@ -35,6 +35,7 @@ supabase:
 exact:
   oauth:
     refresh-enabled: false
+    backfill-vat-numbers-enabled: false
   division: 4002380
 
 # Test encryption key (32 bytes base64 encoded) - DO NOT use in production

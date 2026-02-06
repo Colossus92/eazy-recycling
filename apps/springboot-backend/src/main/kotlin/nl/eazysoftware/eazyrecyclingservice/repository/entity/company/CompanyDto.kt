@@ -42,6 +42,9 @@ data class CompanyDto(
   @Column(name = "email", nullable = true)
   val email: String? = null,
 
+  @Column(name = "vat_number", nullable = true)
+  val vatNumber: String? = null,
+
   @Column(name = "is_supplier", nullable = false)
   val isSupplier: Boolean = true,
 

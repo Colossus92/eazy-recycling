@@ -45,6 +45,7 @@ export interface CompanyFormValues extends FieldValues {
   processorId?: string;
   phone?: string;
   email?: string;
+  vatNumber?: string;
   roles: CompleteCompanyViewRolesEnum[];
 }
 
@@ -65,6 +66,7 @@ function toCompany(data: CompanyFormValues): Company {
     processorId: data.processorId?.trim() || undefined,
     phone: data.phone?.trim() || undefined,
     email: data.email?.trim() || undefined,
+    vatNumber: data.vatNumber?.trim() || undefined,
     updatedAt: new Date().toISOString(),
     roles: data.roles,
     branches: [],
@@ -108,6 +110,7 @@ export const CompanyForm = ({
           processorId: company.processorId || '',
           phone: company.phone || '',
           email: company.email || '',
+          vatNumber: company.vatNumber || '',
           roles: company.roles || [],
         }
       : undefined,

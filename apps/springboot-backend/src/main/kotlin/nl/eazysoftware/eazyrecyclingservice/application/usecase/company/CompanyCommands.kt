@@ -17,6 +17,7 @@ data class CreateCompanyCommand(
   val address: Address,
   val phone: PhoneNumber?,
   val email: Email?,
+  val vatNumber: String?,
   val roles: List<CompanyRole>,
 )
 
@@ -29,6 +30,7 @@ data class UpdateCompanyCommand(
   val address: Address,
   val phone: PhoneNumber?,
   val email: Email?,
+  val vatNumber: String?,
   val roles: List<CompanyRole>,
 )
 

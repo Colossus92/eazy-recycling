@@ -12,7 +12,7 @@ import { SelectFormField } from '@/components/ui/form/selectfield/SelectFormFiel
 import { Tab } from '@/components/ui/tab/Tab';
 import { toastService } from '@/components/ui/toast/toastService';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { FormProvider } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
@@ -22,6 +22,11 @@ import { useInvoiceFormHook } from './useInvoiceFormHook';
 import { InvoiceFormActionMenu } from './InvoiceFormActionMenu';
 import { useInvoiceEmailFormHook } from './useInvoiceEmailFormHook';
 import { invoiceService } from '@/api/services/invoiceService';
+import { companyService } from '@/api/services/companyService';
+import { useQuery } from '@tanstack/react-query';
+import { InvoiceLineFormValue } from './useInvoiceFormHook';
+import ErrorTriangle from '@/assets/icons/ErrorTriangle.svg?react';
+import { Note } from '@/features/planning/components/note/Note';
 
 interface InvoiceFormProps {
   isOpen: boolean;
@@ -75,6 +80,24 @@ export const InvoiceForm = ({
 
   const documentType = formContext.watch('documentType');
   const isCreditNote = documentType === 'CREDIT_NOTE';
+
+  const customerId = formContext.watch('customerId');
+  const watchedLines = formContext.watch('lines');
+
+  const { data: selectedCompany } = useQuery({
+    queryKey: ['company', customerId],
+    queryFn: () => companyService.getById(customerId),
+    enabled: !!customerId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const showVatNumberWarning = useMemo(() => {
+    if (!customerId || !watchedLines) return false;
+    const hasReverseCharge = watchedLines.some(
+      (line: InvoiceLineFormValue) => line.isReverseCharge
+    );
+    return hasReverseCharge && !selectedCompany?.vatNumber;
+  }, [customerId, watchedLines, selectedCompany]);
 
   const getFormTitle = () => {
     if (invoiceNumber) {
@@ -212,11 +235,8 @@ export const InvoiceForm = ({
       // Refresh the list
       onComplete();
     } catch (error) {
-      console.error('Error saving and preparing email:', error);
-      toastService.error(
-        'Er is een fout opgetreden bij het verwerken van de factuur'
-      );
       setEmailStep('form');
+      throw error;
     }
   };
 
@@ -442,6 +462,10 @@ export const InvoiceForm = ({
                             </span>
                           </div>
                         </div>
+
+                        {showVatNumberWarning && (
+                          <Note note="Deze factuur bevat btw verlegd regels, maar het geselecteerde bedrijf heeft geen BTW ID. Een BTW ID is verplicht om deze factuur te kunnen verwerken." />
+                        )}
 
                         <InvoiceLinesSection
                           isReadOnly={isReadOnly}

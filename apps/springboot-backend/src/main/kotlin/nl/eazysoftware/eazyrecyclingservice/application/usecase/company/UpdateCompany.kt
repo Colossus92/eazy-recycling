@@ -54,6 +54,7 @@ class UpdateCompanyService(
       address = cmd.address,
       phone = cmd.phone,
       email = cmd.email,
+      vatNumber = cmd.vatNumber,
       roles = cmd.roles,
     )
 

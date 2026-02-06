@@ -29,6 +29,13 @@ interface ExactOnlineSync {
     fun syncFromExact(): SyncFromExactResult
 
     /**
+     * One-off backfill: fetch all Exact accounts and update vatNumber on matched local companies.
+     * Does not affect sync cursors or other company fields.
+     * @return Number of companies updated
+     */
+    fun backfillVatNumbers(): Int
+
+    /**
      * Get all sync records that have conflicts requiring manual resolution.
      */
     fun getConflicts(): List<CompanySyncDto>

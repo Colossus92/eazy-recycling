@@ -85,6 +85,12 @@ export interface CompanyDto {
     'email'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof CompanyDto
+     */
+    'vatNumber'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof CompanyDto
      */

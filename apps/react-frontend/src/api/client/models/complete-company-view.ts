@@ -94,6 +94,12 @@ export interface CompleteCompanyView {
     'email'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof CompleteCompanyView
+     */
+    'vatNumber'?: string;
+    /**
+     * 
      * @type {boolean}
      * @memberof CompleteCompanyView
      */

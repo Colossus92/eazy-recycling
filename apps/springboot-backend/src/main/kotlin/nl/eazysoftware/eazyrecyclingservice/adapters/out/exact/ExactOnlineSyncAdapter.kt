@@ -153,6 +153,7 @@ class ExactOnlineSyncAdapter(
       Phone = company.phone?.value,
       Email = company.email?.value,
       IsSupplier = company.isSupplier,
+      VATNumber = company.vatNumber,
     )
 
     val headers = HttpHeaders()
@@ -190,6 +191,7 @@ class ExactOnlineSyncAdapter(
       Phone = company.phone?.value,
       Email = company.email?.value,
       IsSupplier = company.isSupplier,
+      VATNumber = company.vatNumber,
     )
 
     val headers = HttpHeaders()
@@ -330,6 +332,54 @@ class ExactOnlineSyncAdapter(
       deletedRecordsDeleted = deletedResult.recordsDeleted,
       deletedRecordsNotFound = deletedResult.recordsNotFound
     )
+  }
+
+  /**
+   * One-off backfill: fetch all Exact accounts (from timestamp 0) and update vatNumber
+   * on matched local companies. Does not affect sync cursors or other company fields.
+   */
+  @Transactional
+  override fun backfillVatNumbers(): Int {
+    if (!exactOAuthService.hasValidTokens()) {
+      logger.warn("Skipping VAT number backfill - no valid tokens")
+      throw ExactSyncException("No valid tokens")
+    }
+
+    logger.info("Starting VAT number backfill from Exact Online")
+
+    var updatedCount = 0
+    var nextUrl: String? = buildAccountsSyncUrl(0L)
+
+    while (nextUrl != null) {
+      val response = fetchAccountsFromUrl(nextUrl)
+      val accounts = response.d.results
+
+      logger.info("Fetched ${accounts.size} accounts from Exact for VAT number backfill")
+
+      for (account in accounts) {
+        val vatNumber = account.VATNumber
+        if (vatNumber.isNullOrBlank()) continue
+
+        val syncRecord = companySyncRepository.findByExactGuid(account.ID) ?: continue
+        val companyId = syncRecord.companyId ?: continue
+
+        val company = companies.findById(nl.eazysoftware.eazyrecyclingservice.domain.model.company.CompanyId(companyId))
+        if (company == null || company.vatNumber == vatNumber) continue
+
+        try {
+          companies.update(company.copy(vatNumber = vatNumber))
+          updatedCount++
+          logger.debug("Updated vatNumber for company {} ({}) to {}", company.name, companyId, vatNumber)
+        } catch (e: Exception) {
+          logger.warn("Failed to update vatNumber for company {} ({}): {}", company.name, companyId, e.message)
+        }
+      }
+
+      nextUrl = response.d.next
+    }
+
+    logger.info("VAT number backfill completed: $updatedCount companies updated")
+    return updatedCount
   }
 
   /**
@@ -505,7 +555,7 @@ class ExactOnlineSyncAdapter(
    */
   private fun buildAccountsSyncUrl(timestamp: Long): String {
     val baseUrl = "https://start.exactonline.nl/api/v1/$exactDivisionCode/sync/CRM/Accounts"
-    val select = encodeQueryParam("ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier,Timestamp")
+    val select = encodeQueryParam("ID,Name,Code,AddressLine1,Postcode,City,Country,Email,Phone,ChamberOfCommerce,Status,IsSupplier,VATNumber,Timestamp")
     val filter = encodeQueryParam("Timestamp gt ${timestamp}L")
     return "$baseUrl?\$select=$select&\$filter=$filter"
   }
@@ -600,6 +650,8 @@ class ExactOnlineSyncAdapter(
     val Email: String? = null,
     @get:JsonProperty("IsSupplier")
     val IsSupplier: Boolean,
+    @get:JsonProperty("VATNumber")
+    val VATNumber: String? = null,
   )
 
   data class ExactAccountUpdateRequest(
@@ -623,6 +675,8 @@ class ExactOnlineSyncAdapter(
     val Email: String? = null,
     @get:JsonProperty("IsSupplier")
     val IsSupplier: Boolean,
+    @get:JsonProperty("VATNumber")
+    val VATNumber: String? = null,
   )
 
   data class ExactAccountCreateResponse(
@@ -688,6 +742,8 @@ class ExactOnlineSyncAdapter(
     val Email: String?,
     @field:JsonProperty("IsSupplier")
     val IsSupplier: Boolean?,
+    @field:JsonProperty("VATNumber")
+    val VATNumber: String?,
   )
 
   // Data classes for Exact Online Deleted API

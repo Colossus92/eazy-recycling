@@ -68,7 +68,7 @@ class CreateInvoiceFromWeightTicketService(
                 city = company.address.city.value,
                 country = company.address.country,
             ),
-            vatNumber = null,
+            vatNumber = company.vatNumber,
         )
 
         val allCatalogItems = catalogItems.findAll(null, null)

@@ -214,7 +214,7 @@ export const CompanyDetailsSection = ({
           value={company?.vihbId || undefined}
         />
       </div>
-      <div className={'flex items-start gap-4 self-stretch w-1/2'}>
+      <div className={'flex items-start gap-4 self-stretch'}>
         <TextFormField
           title={'Vewerkersnummer'}
           placeholder={'Vul vewerkersnummer in'}
@@ -243,6 +243,16 @@ export const CompanyDetailsSection = ({
             errors,
           }}
           value={company?.processorId || undefined}
+        />
+        <TextFormField
+          title={'BTW ID'}
+          placeholder={'Vul BTW ID in'}
+          formHook={{
+            register,
+            name: 'vatNumber',
+            errors,
+          }}
+          value={company?.vatNumber || undefined}
         />
       </div>
       <SelectFormField

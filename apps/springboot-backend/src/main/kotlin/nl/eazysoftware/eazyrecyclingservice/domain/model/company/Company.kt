@@ -14,6 +14,7 @@ data class Company(
   val roles: List<CompanyRole> = emptyList(),
   val phone: PhoneNumber? = null,
   val email: Email? = null,
+  val vatNumber: String? = null,
   val isSupplier: Boolean = true,
   val isCustomer: Boolean = true,
   val isTenantCompany: Boolean = false,

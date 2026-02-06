@@ -62,7 +62,7 @@ class UpdateInvoiceService(
                 city = company.address.city.value,
                 country = company.address.country,
             ),
-            vatNumber = null,
+            vatNumber = company.vatNumber,
         )
     }
 

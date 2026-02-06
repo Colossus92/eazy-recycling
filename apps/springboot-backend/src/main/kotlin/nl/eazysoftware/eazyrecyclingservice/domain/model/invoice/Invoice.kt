@@ -30,6 +30,10 @@ class Invoice(
 ) {
     fun finalize(invoiceNumber: InvoiceNumber, finalizedBy: String?) {
         require(status == InvoiceStatus.DRAFT) { "Alleen concept facturen kunnen worden gefinaliseerd." }
+        val hasReverseCharge = lines.any { it.isReverseCharge }
+        require(!hasReverseCharge || !customerSnapshot.vatNumber.isNullOrBlank()) {
+            "Een BTW ID is verplicht op het bedrijf wanneer btw verlegd wordt toegepast."
+        }
         this.invoiceNumber = invoiceNumber
         this.status = InvoiceStatus.FINAL
         this.finalizedAt = Clock.System.now()

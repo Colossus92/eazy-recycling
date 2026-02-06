@@ -101,6 +101,7 @@ class ExactAccountProcessor(
       ),
       phone = account.Phone?.let { PhoneNumber(it) },
       email = account.Email?.let { Email(it) },
+      vatNumber = account.VATNumber,
       isSupplier = account.IsSupplier ?: false,
       isCustomer = account.Status == "C"
     )
@@ -186,6 +187,7 @@ class ExactAccountProcessor(
       roles = emptyList(), // Roles are managed locally
       phone = account.Phone?.let { PhoneNumber(it) },
       email = account.Email?.let { Email(it) },
+      vatNumber = account.VATNumber,
       isSupplier = account.IsSupplier ?: false,
       isCustomer = account.Status == "C"
     )
