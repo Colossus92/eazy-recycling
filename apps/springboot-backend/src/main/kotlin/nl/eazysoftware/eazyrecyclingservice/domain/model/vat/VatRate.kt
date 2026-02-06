@@ -1,9 +1,11 @@
 package nl.eazysoftware.eazyrecyclingservice.domain.model.vat
 
+import java.util.*
 import kotlin.time.Instant
 
 
 data class VatRate(
+  val id: VatRateId,
   val vatCode: String,
   val percentage: String,
   val validFrom: Instant,
@@ -18,6 +20,8 @@ data class VatRate(
 ) {
   fun isReverseCharge(): Boolean = taxScenario == VatTaxScenario.REVERSE_CHARGE
 }
+
+data class VatRateId(val value: UUID)
 
 enum class VatTaxScenario {
   STANDARD,

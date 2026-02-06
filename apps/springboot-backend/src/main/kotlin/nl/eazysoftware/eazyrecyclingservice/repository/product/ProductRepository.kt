@@ -24,7 +24,8 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as categoryCode,
                 cic.name as categoryName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -35,6 +36,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.type = 'PRODUCT'
         """,
     nativeQuery = true
@@ -51,7 +53,8 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as categoryCode,
                 cic.name as categoryName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -62,6 +65,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.id = :id AND ci.type = 'PRODUCT'
         """,
     nativeQuery = true
@@ -78,7 +82,8 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as categoryCode,
                 cic.name as categoryName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -89,6 +94,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.type = 'PRODUCT' AND ci.status = :status
         """,
     nativeQuery = true
@@ -105,7 +111,8 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as categoryCode,
                 cic.name as categoryName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -116,6 +123,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.type = 'PRODUCT'
               AND (LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
                OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
@@ -133,7 +141,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 name = :name,
                 category_id = :categoryId,
                 unit_of_measure = :unitOfMeasure,
-                vat_code = :vatCode,
+                vat_rate_id = :vatRateId,
                 purchase_account_number = :purchaseAccountNumber,
                 sales_account_number = :salesAccountNumber,
                 default_price = :defaultPrice,
@@ -149,7 +157,7 @@ interface ProductJpaRepository : JpaRepository<CatalogItemDto, UUID> {
     name: String,
     categoryId: UUID?,
     unitOfMeasure: String,
-    vatCode: String,
+    vatRateId: UUID,
     purchaseAccountNumber: String?,
     salesAccountNumber: String?,
     defaultPrice: BigDecimal?,
@@ -167,8 +175,16 @@ class ProductRepository(
     return jpaRepository.findAllProducts().map { it.toDomain() }
   }
 
+  override fun getAllProductsWithDetails(): List<ProductQueryResult> {
+    return jpaRepository.findAllProducts()
+  }
+
   override fun getProductById(id: UUID): Product? {
     return jpaRepository.findProductById(id)?.toDomain()
+  }
+
+  override fun getProductWithDetailsById(id: UUID): ProductQueryResult? {
+    return jpaRepository.findProductById(id)
   }
 
   override fun getActiveProducts(): List<Product> {
@@ -193,7 +209,7 @@ class ProductRepository(
       name = product.name,
       categoryId = product.categoryId,
       unitOfMeasure = product.unitOfMeasure,
-      vatCode = product.vatCode,
+      vatRateId = product.vatRateId,
       purchaseAccountNumber = product.purchaseAccountNumber,
       salesAccountNumber = product.salesAccountNumber,
       defaultPrice = product.defaultPrice,
@@ -219,7 +235,7 @@ private fun ProductQueryResult.toDomain(): Product {
     categoryId = getCategoryId(),
     categoryName = getCategoryName(),
     unitOfMeasure = getUnitOfMeasure(),
-    vatCode = getVatCode(),
+    vatRateId = getVatRateId(),
     salesAccountNumber = getSalesAccountNumber(),
     purchaseAccountNumber = getPurchaseAccountNumber(),
     status = getStatus(),

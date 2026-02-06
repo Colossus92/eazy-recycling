@@ -6,6 +6,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.domain.model.product.Product
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.Products
+import nl.eazysoftware.eazyrecyclingservice.repository.product.ProductQueryResult
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -22,12 +23,12 @@ class ProductController(
 
     @GetMapping
     fun getAllProducts(): List<ProductResponse> {
-        return products.getAllProducts().map { it.toResponse() }
+        return products.getAllProductsWithDetails().map { it.toResponse() }
     }
 
     @GetMapping("/{id}")
     fun getProductById(@PathVariable id: UUID): ProductResponse {
-        val product = products.getProductById(id)
+        val product = products.getProductWithDetailsById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
         return product.toResponse()
     }
@@ -38,7 +39,9 @@ class ProductController(
     fun createProduct(@Valid @RequestBody request: ProductRequest): ProductResponse {
         val product = request.toDomain()
         val created = products.createProduct(product)
-        return created.toResponse()
+        return products.getProductWithDetailsById(created.id!!)
+            ?.toResponse()
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het ophalen van het product is mislukt")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -51,8 +54,10 @@ class ProductController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Product met id $id niet gevonden")
 
         val product = request.toDomain()
-        val updated = products.updateProduct(id, product)
-        return updated.toResponse()
+        products.updateProduct(id, product)
+        return products.getProductWithDetailsById(id)
+            ?.toResponse()
+            ?: throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Het ophalen van het aangepaste product is mislukt")
     }
 
     @PreAuthorize(HAS_ADMIN_OR_PLANNER)
@@ -78,8 +83,7 @@ data class ProductRequest(
     @field:NotBlank(message = "Eenheid is verplicht")
     val unitOfMeasure: String,
 
-    @field:NotBlank(message = "VAT code is verplicht")
-    val vatCode: String,
+    val vatRateId: UUID,
 
     val salesAccountNumber: String?,
 
@@ -98,7 +102,7 @@ data class ProductRequest(
             categoryId = categoryId,
             categoryName = null,
             unitOfMeasure = unitOfMeasure,
-            vatCode = vatCode,
+            vatRateId = vatRateId,
             salesAccountNumber = salesAccountNumber,
             purchaseAccountNumber = purchaseAccountNumber,
             status = status,
@@ -116,6 +120,7 @@ data class ProductResponse(
     val categoryId: UUID?,
     val unitOfMeasure: String,
     val vatCode: String,
+    val vatRateId: UUID,
     val salesAccountNumber: String?,
     val purchaseAccountNumber: String?,
     val status: String,
@@ -126,21 +131,22 @@ data class ProductResponse(
     val updatedByName: String?,
 )
 
-fun Product.toResponse(): ProductResponse {
+fun ProductQueryResult.toResponse(): ProductResponse {
     return ProductResponse(
-        id = id!!,
-        code = code,
-        name = name,
-        categoryId = categoryId,
-        unitOfMeasure = unitOfMeasure,
-        vatCode = vatCode,
-        salesAccountNumber = salesAccountNumber,
-        purchaseAccountNumber = purchaseAccountNumber,
-        status = status,
-        defaultPrice = defaultPrice,
-        createdAt = createdAt?.toString(),
-        createdByName = createdBy,
-        updatedAt = updatedAt?.toString(),
-        updatedByName = updatedBy,
+        id = getId(),
+        code = getCode(),
+        name = getName(),
+        categoryId = getCategoryId(),
+        unitOfMeasure = getUnitOfMeasure(),
+        vatCode = getVatCode(),
+        vatRateId = getVatRateId(),
+        salesAccountNumber = getSalesAccountNumber(),
+        purchaseAccountNumber = getPurchaseAccountNumber(),
+        status = getStatus(),
+        defaultPrice = getDefaultPrice(),
+        createdAt = getCreatedAt()?.toString(),
+        createdByName = getCreatedBy(),
+        updatedAt = getUpdatedAt()?.toString(),
+        updatedByName = getUpdatedBy(),
     )
 }

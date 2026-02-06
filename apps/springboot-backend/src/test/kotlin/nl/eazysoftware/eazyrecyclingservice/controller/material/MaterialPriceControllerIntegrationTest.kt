@@ -42,7 +42,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
     private var testCategoryId: UUID? = null
-    private val testVatCode = "VAT21"
+    private val testVatRateId: UUID = UUID.randomUUID()
 
     @BeforeEach
     fun setup() {
@@ -50,10 +50,11 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
         catalogItemJpaRepository.deleteAll()
         catalogItemCategoryJpaRepository.deleteAll()
 
-        if (!vatRateJpaRepository.existsById(testVatCode)) {
+        if (!vatRateJpaRepository.existsById(testVatRateId)) {
             vatRateJpaRepository.save(
                 VatRateDto(
-                    vatCode = testVatCode,
+                    id = testVatRateId,
+                    vatCode = "VAT21",
                     percentage = BigDecimal("21.00"),
                     validFrom = Instant.now(),
                     validTo = null,
@@ -80,7 +81,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should return all materials with prices`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -128,7 +129,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should return material price by id`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -167,7 +168,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should create price for material without price`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -199,7 +200,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should return 409 when creating price for material that already has price`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -229,7 +230,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should update price for material`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -261,7 +262,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should delete price for material`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(
@@ -294,7 +295,7 @@ class MaterialPriceControllerIntegrationTest : BaseIntegrationTest() {
     fun `should return 400 when price is negative`() {
         // Given
         val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-        val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+        val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
         val material = catalogItemJpaRepository.save(
             CatalogItemDto(

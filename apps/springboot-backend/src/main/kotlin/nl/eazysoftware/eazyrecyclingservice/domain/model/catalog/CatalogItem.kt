@@ -13,6 +13,7 @@ data class CatalogItem (
   val unitOfMeasure: String,
   val vatCode: String,
   val vatPercentage: BigDecimal?,
+  val vatRateId: UUID? = null,
   val categoryName: String?,
   val consignorPartyId: CompanyId?,
   val defaultPrice: BigDecimal?,

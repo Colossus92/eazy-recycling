@@ -9,7 +9,7 @@ data class Material(
   val name: String,
   val materialGroupId: UUID?,
   val unitOfMeasure: String,
-  val vatCode: String,
+  val vatRateId: UUID,
   val purchaseAccountNumber: String?,
   val salesAccountNumber: String?,
   val status: String,

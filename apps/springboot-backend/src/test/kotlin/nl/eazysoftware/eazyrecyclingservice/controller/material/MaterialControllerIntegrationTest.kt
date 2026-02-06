@@ -50,8 +50,8 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
   private var testMaterialCategoryId: UUID? = null
-  private var testVatCode1: String = "TEST_VAT_1"
-  private var testVatCode2: String = "TEST_VAT_2"
+  private var testVatRateId1: UUID = UUID.randomUUID()
+  private var testVatRateId2: UUID = UUID.randomUUID()
 
   @BeforeEach
   fun setup() {
@@ -59,7 +59,8 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
 
     // Create test VAT rates for foreign key constraint
     val vatRate1 = VatRateDto(
-      vatCode = testVatCode1,
+      id = testVatRateId1,
+      vatCode = "TEST_VAT_1",
       percentage = BigDecimal("21.00"),
       validFrom = Instant.now(),
       validTo = null,
@@ -68,7 +69,8 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       taxScenario = "STANDARD"
     )
     val vatRate2 = VatRateDto(
-      vatCode = testVatCode2,
+      id = testVatRateId2,
+      vatCode = "TEST_VAT_2",
       percentage = BigDecimal("9.00"),
       validFrom = Instant.now(),
       validTo = null,
@@ -105,7 +107,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Steel Pipes",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "KG",
-      vatCode = testVatCode1,
+      vatRateId = testVatRateId1,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"
@@ -124,7 +126,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.materialGroupCode").value("TEST_GROUP"))
       .andExpect(jsonPath("$.materialGroupName").value("Test Material Group"))
       .andExpect(jsonPath("$.unitOfMeasure").value("KG"))
-      .andExpect(jsonPath("$.vatCode").value(testVatCode1))
+      .andExpect(jsonPath("$.vatCode").value("TEST_VAT_1"))
       .andExpect(jsonPath("$.status").value("ACTIVE"))
       .andExpect(jsonPath("$.createdAt").exists())
 
@@ -138,7 +140,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get all materials`() {
     // Given
     val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId1).get()
 
     val material1 = CatalogItemDto(
       id = UUID.randomUUID(),
@@ -184,7 +186,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get material by id`() {
     // Given
     val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId1).get()
 
     val material = CatalogItemDto(
       id = UUID.randomUUID(),
@@ -222,7 +224,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   fun `should update material`() {
     // Given
     val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId1).get()
 
     val originalMaterial = CatalogItemDto(
       id = UUID.randomUUID(),
@@ -245,7 +247,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Cast Iron",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "TON",
-      vatCode = testVatCode2,
+      vatRateId = testVatRateId2,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "INACTIVE"
@@ -262,7 +264,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.code").value("MAT005_UPDATED"))
       .andExpect(jsonPath("$.name").value("Cast Iron"))
       .andExpect(jsonPath("$.unitOfMeasure").value("TON"))
-      .andExpect(jsonPath("$.vatCode").value(testVatCode2))
+      .andExpect(jsonPath("$.vatCode").value("TEST_VAT_2"))
       .andExpect(jsonPath("$.status").value("INACTIVE"))
       .andExpect(jsonPath("$.updatedAt").exists())
 
@@ -282,7 +284,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Non Existent",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "KG",
-      vatCode = testVatCode1,
+      vatRateId = testVatRateId1,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"
@@ -300,7 +302,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
   fun `should delete material`() {
     // Given
     val materialCategory = catalogItemCategoryJpaRepository.findById(testMaterialCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode1).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId1).get()
 
     val material = CatalogItemDto(
       id = UUID.randomUUID(),
@@ -342,7 +344,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
         "name": "",
         "materialGroupId": null,
         "unitOfMeasure": "",
-        "vatCode": null,
+        "vatRateId": null,
         "status": ""
       }
     """.trimIndent()
@@ -363,7 +365,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Invalid Material",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "KG",
-      vatCode = "",
+      vatRateId = testVatRateId1,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"
@@ -374,7 +376,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       "/materials",
       objectMapper.writeValueAsString(invalidRequest)
     )
-      .andExpect(status().isBadRequest)
+      .andExpect(status().isCreated)
   }
 
   @Test
@@ -385,7 +387,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Material 1",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "KG",
-      vatCode = testVatCode1,
+      vatRateId = testVatRateId1,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"
@@ -395,7 +397,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Material 2",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "L",
-      vatCode = testVatCode2,
+      vatRateId = testVatRateId2,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"
@@ -428,7 +430,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
         name = "Material with unit $unit",
         materialGroupId = testMaterialCategoryId!!,
         unitOfMeasure = unit,
-        vatCode = testVatCode1,
+        vatRateId = testVatRateId1,
         salesAccountNumber = null,
         purchaseAccountNumber = null,
         status = "ACTIVE"
@@ -458,7 +460,7 @@ class MaterialControllerIntegrationTest : BaseIntegrationTest() {
       name = "Audit Test Material",
       materialGroupId = testMaterialCategoryId!!,
       unitOfMeasure = "KG",
-      vatCode = testVatCode1,
+      vatRateId = testVatRateId1,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE"

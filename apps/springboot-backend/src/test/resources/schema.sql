@@ -332,7 +332,8 @@ create table monthly_waste_declaration_jobs (
 create sequence if not exists receival_declaration_id_seq start with 1 increment by 1 maxvalue 999999999999;;
 
 create table if not exists vat_rates (
-                                         vat_code text not null,
+                                         id uuid not null,
+                                         vat_code text not null unique,
                                          percentage numeric not null,
                                          valid_from timestamp with time zone not null,
                                          valid_to timestamp with time zone,
@@ -343,7 +344,7 @@ create table if not exists vat_rates (
                                          created_by text,
                                          last_modified_at timestamp with time zone not null default now(),
                                          last_modified_by text,
-                                         primary key (vat_code)
+                                         primary key (id)
 );;
 
 create table if not exists exact_tokens (
@@ -421,7 +422,7 @@ create table if not exists catalog_items (
                                           category_id uuid,
                                           consignor_party_id uuid,
                                           unit_of_measure text not null,
-                                          vat_code text not null,
+                                          vat_rate_id uuid not null,
                                           sales_account_number text,
                                           purchase_account_number text,
                                           default_price numeric(15,4),
@@ -432,7 +433,7 @@ create table if not exists catalog_items (
                                           last_modified_by text,
                                           primary key (id),
                                           foreign key (category_id) references catalog_item_categories(id),
-                                          foreign key (vat_code) references vat_rates(vat_code)
+                                          foreign key (vat_rate_id) references vat_rates(id)
 );;
 
 -- Material pricing app sync tables

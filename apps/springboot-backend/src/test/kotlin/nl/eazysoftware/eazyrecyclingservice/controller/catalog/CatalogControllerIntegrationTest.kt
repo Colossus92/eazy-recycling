@@ -42,7 +42,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
   private var testCategoryId: UUID? = null
-  private val testVatCode = "VAT21"
+  private val testVatRateId: UUID = UUID.randomUUID()
 
   @BeforeEach
   fun setup() {
@@ -50,10 +50,11 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
     catalogItemJpaRepository.deleteAll()
     catalogItemCategoryJpaRepository.deleteAll()
 
-    if (!vatRateJpaRepository.existsById(testVatCode)) {
+    if (!vatRateJpaRepository.existsById(testVatRateId)) {
       vatRateJpaRepository.save(
         VatRateDto(
-          vatCode = testVatCode,
+          id = testVatRateId,
+          vatCode = "VAT21",
           percentage = BigDecimal("21.00"),
           validFrom = Instant.now(),
           validTo = null,
@@ -80,7 +81,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should search catalog items by query`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
@@ -126,7 +127,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should return all catalog items when no query provided`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     repeat(3) { i ->
       catalogItemJpaRepository.save(
@@ -157,7 +158,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should return catalog item with correct response fields`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
@@ -184,7 +185,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$[0].name").value("Steel Pipes"))
       .andExpect(jsonPath("$[0].itemType").value("MATERIAL"))
       .andExpect(jsonPath("$[0].unitOfMeasure").value("KG"))
-      .andExpect(jsonPath("$[0].vatCode").value(testVatCode))
+      .andExpect(jsonPath("$[0].vatCode").value("VAT21"))
       .andExpect(jsonPath("$[0].categoryName").value("Test Category"))
       .andExpect(jsonPath("$[0].salesAccountNumber").value("8000"))
       .andExpect(jsonPath("$[0].purchaseAccountNumber").value("7000"))
@@ -203,7 +204,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should negate PRODUCT prices for PURCHASE invoice type`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
@@ -234,7 +235,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should NOT negate MATERIAL prices for PURCHASE invoice type`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
@@ -265,7 +266,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should NOT negate PRODUCT prices for SALE invoice type`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(
@@ -296,7 +297,7 @@ class CatalogControllerIntegrationTest : BaseIntegrationTest() {
   fun `should NOT negate prices when no invoice type provided`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     catalogItemJpaRepository.save(
       CatalogItemDto(

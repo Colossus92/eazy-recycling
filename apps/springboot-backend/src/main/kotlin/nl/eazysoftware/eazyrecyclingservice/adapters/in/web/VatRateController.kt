@@ -8,6 +8,7 @@ import nl.eazysoftware.eazyrecyclingservice.config.clock.toDisplayLocalDateTime
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ANY_ROLE
 import nl.eazysoftware.eazyrecyclingservice.config.security.SecurityExpressions.HAS_ROLE_ADMIN
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRateId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatTaxScenario
 import nl.eazysoftware.eazyrecyclingservice.domain.ports.out.VatRates
 import org.springframework.http.HttpStatus
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 import java.time.LocalDateTime
+import java.util.*
 import kotlin.time.toJavaInstant
 import kotlin.time.toKotlinInstant
 
@@ -34,10 +36,10 @@ class VatRateController(
 
 
     @PreAuthorize(HAS_ANY_ROLE)
-    @GetMapping("/{vatCode}")
-    fun getVatRateByCode(@PathVariable vatCode: String): VatRateResponse {
-        val vatRate = vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
+    @GetMapping("/{id}")
+    fun getVatRateById(@PathVariable id: UUID): VatRateResponse {
+        val vatRate = vatRates.getVatRateById(VatRateId(id))
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met id $id niet gevonden")
         return vatRate.toResponse()
     }
 
@@ -51,29 +53,29 @@ class VatRateController(
     }
 
     @PreAuthorize(HAS_ROLE_ADMIN)
-    @PutMapping("/{vatCode}")
+    @PutMapping("/{id}")
     fun updateVatRate(
-        @PathVariable vatCode: String,
+        @PathVariable id: UUID,
         @Valid @RequestBody request: VatRateRequest
     ): VatRateResponse {
         // Check if VAT rate exists
-        vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
+        vatRates.getVatRateById(VatRateId(id))
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met id $id niet gevonden")
 
-        val vatRate = request.toDomain(vatCode)
-        val updated = vatRates.updateVatRate(vatCode, vatRate)
+        val vatRate = request.toDomain(id)
+        val updated = vatRates.updateVatRate(VatRateId(id), vatRate)
         return updated.toResponse()
     }
 
     @PreAuthorize(HAS_ROLE_ADMIN)
-    @DeleteMapping("/{vatCode}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteVatRate(@PathVariable vatCode: String) {
+    fun deleteVatRate(@PathVariable id: UUID) {
         // Check if VAT rate exists
-        vatRates.getVatRateByCode(vatCode)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met code $vatCode niet gevonden")
+        vatRates.getVatRateById(VatRateId(id))
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "BTW tarief met id $id niet gevonden")
 
-        vatRates.deleteVatRate(vatCode)
+        vatRates.deleteVatRate(VatRateId(id))
     }
 }
 
@@ -97,9 +99,10 @@ data class VatRateRequest(
 
     val taxScenario: VatTaxScenario,
 ) {
-    fun toDomain(overrideVatCode: String? = null): VatRate {
+    fun toDomain(id: UUID = UUID.randomUUID()): VatRate {
         return VatRate(
-            vatCode = overrideVatCode ?: vatCode,
+            id = VatRateId(id),
+            vatCode = vatCode,
             percentage = percentage,
             validFrom = validFrom.toCetInstant().toKotlinInstant(),
             validTo = validTo?.toCetInstant()?.toKotlinInstant(),
@@ -111,6 +114,7 @@ data class VatRateRequest(
 }
 
 data class VatRateResponse(
+    val id: UUID,
     val vatCode: String,
     val percentage: String,
     val validFrom: LocalDateTime,
@@ -127,6 +131,7 @@ data class VatRateResponse(
 
 fun VatRate.toResponse(): VatRateResponse {
     return VatRateResponse(
+        id = id.value,
         vatCode = vatCode,
         percentage = percentage,
         validFrom = validFrom.toDisplayLocalDateTime(),

@@ -24,7 +24,8 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as materialGroupCode,
                 cic.name as materialGroupName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -35,6 +36,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.type = 'MATERIAL'
         """,
     nativeQuery = true
@@ -51,7 +53,8 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as materialGroupCode,
                 cic.name as materialGroupName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -62,6 +65,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.id = :id AND ci.type = 'MATERIAL'
         """,
     nativeQuery = true
@@ -78,7 +82,8 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 cic.code as materialGroupCode,
                 cic.name as materialGroupName,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
+                vr.id as vatRateId,
                 ci.sales_account_number as salesAccountNumber,
                 ci.purchase_account_number as purchaseAccountNumber,
                 ci.default_price as defaultPrice,
@@ -89,6 +94,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.last_modified_by as updatedBy
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.type = 'MATERIAL'
               AND (LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
                OR LOWER(ci.code) LIKE LOWER(CONCAT('%', :query, '%')))
@@ -117,7 +123,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 name = :name,
                 category_id = :categoryId,
                 unit_of_measure = :unitOfMeasure,
-                vat_code = :vatCode,
+                vat_rate_id = :vatRateId,
                 purchase_account_number = :purchaseAccountNumber,
                 sales_account_number = :salesAccountNumber,
                 status = :status,
@@ -132,7 +138,7 @@ interface MaterialJpaRepository : JpaRepository<CatalogItemDto, UUID> {
     name: String,
     categoryId: UUID?,
     unitOfMeasure: String,
-    vatCode: String,
+    vatRateId: UUID,
     purchaseAccountNumber: String?,
     salesAccountNumber: String?,
     status: String
@@ -171,7 +177,7 @@ class MaterialRepository(
       name = material.name,
       categoryId = material.materialGroupId,
       unitOfMeasure = material.unitOfMeasure,
-      vatCode = material.vatCode,
+      vatRateId = material.vatRateId,
       purchaseAccountNumber = material.purchaseAccountNumber,
       salesAccountNumber = material.salesAccountNumber,
       status = material.status

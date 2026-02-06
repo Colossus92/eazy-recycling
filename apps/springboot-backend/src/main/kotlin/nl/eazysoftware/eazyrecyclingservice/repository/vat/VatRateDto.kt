@@ -7,12 +7,16 @@ import jakarta.persistence.Table
 import nl.eazysoftware.eazyrecyclingservice.repository.AuditableEntity
 import java.math.BigDecimal
 import java.time.Instant
+import java.util.*
 
 @Entity
 @Table(name = "vat_rates")
 data class VatRateDto(
     @Id
-    @Column(name = "vat_code")
+    @Column(name = "id")
+    val id: UUID = UUID.randomUUID(),
+
+    @Column(name = "vat_code", nullable = false)
     val vatCode: String,
 
     @Column(name = "percentage", nullable = false)

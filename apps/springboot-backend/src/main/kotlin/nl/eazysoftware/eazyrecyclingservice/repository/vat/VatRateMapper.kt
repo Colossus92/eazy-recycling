@@ -1,6 +1,7 @@
 package nl.eazysoftware.eazyrecyclingservice.repository.vat
 
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRate
+import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatRateId
 import nl.eazysoftware.eazyrecyclingservice.domain.model.vat.VatTaxScenario
 import org.springframework.stereotype.Component
 import kotlin.time.toJavaInstant
@@ -11,6 +12,7 @@ class VatRateMapper {
 
     fun toDto(domain: VatRate): VatRateDto {
         return VatRateDto(
+            id = domain.id.value,
             vatCode = domain.vatCode,
             percentage = domain.percentage.toBigDecimal(),
             validFrom = domain.validFrom.toJavaInstant(),
@@ -23,6 +25,7 @@ class VatRateMapper {
 
     fun toDomain(dto: VatRateDto): VatRate {
         return VatRate(
+            id = VatRateId(dto.id),
             vatCode = dto.vatCode,
             percentage = dto.percentage.toString(),
             validFrom = dto.validFrom.toKotlinInstant(),

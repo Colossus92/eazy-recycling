@@ -48,7 +48,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   private lateinit var vatRateJpaRepository: VatRateJpaRepository
 
   private var testCategoryId: UUID? = null
-  private val testVatCode = "VAT21"
+  private val testVatRateId: UUID = UUID.randomUUID()
 
   @BeforeEach
   fun setup() {
@@ -58,10 +58,11 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       productJpaRepository.deleteById(it.getId())
     }
 
-    if (!vatRateJpaRepository.existsById(testVatCode)) {
+    if (!vatRateJpaRepository.existsById(testVatRateId)) {
       vatRateJpaRepository.save(
         VatRateDto(
-          vatCode = testVatCode,
+          id = testVatRateId,
+          vatCode = "VAT21",
           percentage = BigDecimal("21.00"),
           validFrom = Instant.now(),
           validTo = null,
@@ -92,7 +93,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       name = "Test Product",
       categoryId = testCategoryId,
       unitOfMeasure = "HOUR",
-      vatCode = testVatCode,
+      vatRateId = testVatRateId,
       salesAccountNumber = "8100",
       purchaseAccountNumber = null,
       status = "ACTIVE",
@@ -111,7 +112,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.name").value("Test Product"))
       .andExpect(jsonPath("$.categoryId").value(testCategoryId.toString()))
       .andExpect(jsonPath("$.unitOfMeasure").value("HOUR"))
-      .andExpect(jsonPath("$.vatCode").value(testVatCode))
+      .andExpect(jsonPath("$.vatCode").value("VAT21"))
       .andExpect(jsonPath("$.salesAccountNumber").value("8100"))
       .andExpect(jsonPath("$.status").value("ACTIVE"))
       .andExpect(jsonPath("$.defaultPrice").value(50.00))
@@ -127,7 +128,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get all products`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     productJpaRepository.save(
       CatalogItemDto(
@@ -174,7 +175,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get product by id`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     val product = productJpaRepository.save(
       CatalogItemDto(
@@ -214,7 +215,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   fun `should update product`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     val product = productJpaRepository.save(
       CatalogItemDto(
@@ -238,7 +239,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       name = "Updated Product",
       categoryId = testCategoryId,
       unitOfMeasure = "PIECE",
-      vatCode = testVatCode,
+      vatRateId = testVatRateId,
       salesAccountNumber = "8200",
       purchaseAccountNumber = null,
       status = "INACTIVE",
@@ -270,7 +271,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
       name = "Non Existent",
       categoryId = testCategoryId,
       unitOfMeasure = "HOUR",
-      vatCode = testVatCode,
+      vatRateId = testVatRateId,
       salesAccountNumber = null,
       purchaseAccountNumber = null,
       status = "ACTIVE",
@@ -289,7 +290,7 @@ class ProductControllerIntegrationTest : BaseIntegrationTest() {
   fun `should delete product`() {
     // Given
     val category = catalogItemCategoryJpaRepository.findById(testCategoryId!!).get()
-    val vatRate = vatRateJpaRepository.findById(testVatCode).get()
+    val vatRate = vatRateJpaRepository.findById(testVatRateId).get()
 
     val product = productJpaRepository.save(
       CatalogItemDto(

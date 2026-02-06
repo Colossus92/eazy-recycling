@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDateTime
+import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -75,7 +76,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.description").value("Dutch high VAT rate"))
 
     // Verify VAT rate was saved in the database
-    val savedVatRate = vatRateJpaRepository.findByIdOrNull("NL_HIGH")
+    val savedVatRate = vatRateJpaRepository.findByVatCode("NL_HIGH")
     assertThat(savedVatRate).isNotNull
     assertThat(savedVatRate?.percentage).isEqualTo(BigDecimal("21.00"))
     assertThat(savedVatRate?.countryCode).isEqualTo("NL")
@@ -85,6 +86,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
   fun `should get all VAT rates`() {
     // Given
     val vatRate1 = VatRateDto(
+      id = UUID.randomUUID(),
       vatCode = "NL_HIGH",
       percentage = BigDecimal("21.00"),
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
@@ -94,6 +96,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       taxScenario = "STANDARD",
     )
     val vatRate2 = VatRateDto(
+      id = UUID.randomUUID(),
       vatCode = "NL_LOW",
       percentage = BigDecimal("9.00"),
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
@@ -115,9 +118,10 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should get VAT rate by code`() {
+  fun `should get VAT rate by id`() {
     // Given
     val vatRate = VatRateDto(
+      id = UUID.randomUUID(),
       vatCode = "BE_HIGH",
       percentage = BigDecimal("21.00"),
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
@@ -126,10 +130,10 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       description = "Belgian high VAT rate",
       taxScenario = "STANDARD",
     )
-    vatRateJpaRepository.save(vatRate)
+    val saved = vatRateJpaRepository.save(vatRate)
 
     // When & Then
-    securedMockMvc.get("/vat-rates/BE_HIGH")
+    securedMockMvc.get("/vat-rates/${saved.id}")
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(jsonPath("$.vatCode").value("BE_HIGH"))
@@ -139,9 +143,9 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
   }
 
   @Test
-  fun `should return not found when getting VAT rate with non-existent code`() {
+  fun `should return not found when getting VAT rate with non-existent id`() {
     // When & Then
-    securedMockMvc.get("/vat-rates/NON_EXISTENT")
+    securedMockMvc.get("/vat-rates/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -149,6 +153,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
   fun `should update VAT rate`() {
     // Given
     val originalVatRate = VatRateDto(
+      id = UUID.randomUUID(),
       vatCode = "DE_HIGH",
       percentage = BigDecimal("19.00"),
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
@@ -157,7 +162,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       description = "German high VAT rate",
       taxScenario = "STANDARD",
     )
-    vatRateJpaRepository.save(originalVatRate)
+    val saved = vatRateJpaRepository.save(originalVatRate)
 
     val updatedVatRateRequest = VatRateRequest(
       vatCode = "DE_HIGH",
@@ -171,7 +176,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/vat-rates/DE_HIGH",
+      "/vat-rates/${saved.id}",
       objectMapper.writeValueAsString(updatedVatRateRequest)
     )
       .andExpect(status().isOk)
@@ -180,7 +185,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.description").value("German high VAT rate (updated)"))
 
     // Verify VAT rate was updated in the database
-    val savedVatRate = vatRateJpaRepository.findByIdOrNull("DE_HIGH")
+    val savedVatRate = vatRateJpaRepository.findByIdOrNull(saved.id)
     assertThat(savedVatRate).isNotNull
     assertThat(savedVatRate?.percentage).isEqualTo(BigDecimal("20.00"))
     assertThat(savedVatRate?.description).isEqualTo("German high VAT rate (updated)")
@@ -202,7 +207,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
 
     // When & Then
     securedMockMvc.put(
-      "/vat-rates/NON_EXISTENT",
+      "/vat-rates/${UUID.randomUUID()}",
       objectMapper.writeValueAsString(vatRateRequest)
     )
       .andExpect(status().isNotFound)
@@ -212,6 +217,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
   fun `should delete VAT rate`() {
     // Given
     val vatRate = VatRateDto(
+      id = UUID.randomUUID(),
       vatCode = "DELETE_ME",
       percentage = BigDecimal("21.00"),
       validFrom = Instant.parse("2024-01-01T00:00:00Z"),
@@ -220,20 +226,20 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       description = "VAT rate to be deleted",
       taxScenario = "STANDARD",
     )
-    vatRateJpaRepository.save(vatRate)
+    val saved = vatRateJpaRepository.save(vatRate)
 
     // When & Then
-    securedMockMvc.delete("/vat-rates/DELETE_ME")
+    securedMockMvc.delete("/vat-rates/${saved.id}")
       .andExpect(status().isNoContent)
 
     // Verify VAT rate was deleted
-    assertThat(vatRateJpaRepository.findByIdOrNull("DELETE_ME")).isNull()
+    assertThat(vatRateJpaRepository.findByIdOrNull(saved.id)).isNull()
   }
 
   @Test
   fun `should return not found when deleting non-existent VAT rate`() {
     // When & Then
-    securedMockMvc.delete("/vat-rates/NON_EXISTENT")
+    securedMockMvc.delete("/vat-rates/${UUID.randomUUID()}")
       .andExpect(status().isNotFound)
   }
 
@@ -260,7 +266,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.validTo").exists())
 
     // Verify VAT rate was saved with validTo
-    val savedVatRate = vatRateJpaRepository.findByIdOrNull("FR_OLD")
+    val savedVatRate = vatRateJpaRepository.findByVatCode("FR_OLD")
     assertThat(savedVatRate).isNotNull
     assertThat(savedVatRate?.validTo).isNotNull()
   }
@@ -368,7 +374,7 @@ class VatRateControllerIntegrationTest : BaseIntegrationTest() {
       .andExpect(jsonPath("$.percentage").value("21.50"))
 
     // Verify precision is maintained
-    val savedVatRate = vatRateJpaRepository.findByIdOrNull("DECIMAL_TEST")
+    val savedVatRate = vatRateJpaRepository.findByVatCode("DECIMAL_TEST")
     assertThat(savedVatRate?.percentage).isEqualTo(BigDecimal("21.50"))
   }
 }

@@ -11,7 +11,7 @@ data class Product(
     val categoryId: UUID?,
     val categoryName: String?,
     val unitOfMeasure: String,
-    val vatCode: String,
+    val vatRateId: UUID,
     val salesAccountNumber: String?,
     val purchaseAccountNumber: String?,
     val status: String,

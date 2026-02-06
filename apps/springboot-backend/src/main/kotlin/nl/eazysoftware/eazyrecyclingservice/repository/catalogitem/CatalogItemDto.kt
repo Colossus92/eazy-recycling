@@ -29,7 +29,7 @@ data class CatalogItemDto(
   val unitOfMeasure: String,
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "vat_code", nullable = false, referencedColumnName = "vat_code")
+  @JoinColumn(name = "vat_rate_id", nullable = false, referencedColumnName = "id")
   val vatRate: VatRateDto,
 
   @ManyToOne(fetch = FetchType.LAZY)

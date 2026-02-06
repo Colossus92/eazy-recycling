@@ -87,8 +87,7 @@ data class MaterialRequest(
   @field:NotBlank(message = "Eenheid is verplicht")
     val unitOfMeasure: String,
 
-  @field:NotBlank(message = "VAT code is verplicht")
-    val vatCode: String,
+    val vatRateId: UUID,
 
   val salesAccountNumber: String?,
 
@@ -104,7 +103,7 @@ data class MaterialRequest(
             name = name,
             materialGroupId = materialGroupId,
             unitOfMeasure = unitOfMeasure,
-            vatCode = vatCode,
+            vatRateId = vatRateId,
             salesAccountNumber = salesAccountNumber,
             purchaseAccountNumber = purchaseAccountNumber,
             status = status,
@@ -123,6 +122,7 @@ data class MaterialResponse(
   val materialGroupName: String?,
   val unitOfMeasure: String,
   val vatCode: String,
+  val vatRateId: UUID,
   val salesAccountNumber: String?,
   val purchaseAccountNumber: String?,
   val defaultPrice: BigDecimal?,
@@ -143,6 +143,7 @@ fun MaterialQueryResult.toResponse(): MaterialResponse {
         materialGroupName = getMaterialGroupName(),
         unitOfMeasure = getUnitOfMeasure(),
         vatCode = getVatCode(),
+        vatRateId = getVatRateId(),
         salesAccountNumber = getSalesAccountNumber(),
         purchaseAccountNumber = getPurchaseAccountNumber(),
         defaultPrice = getDefaultPrice(),

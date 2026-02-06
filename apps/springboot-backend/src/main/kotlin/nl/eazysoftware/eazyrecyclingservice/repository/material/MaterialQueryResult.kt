@@ -16,6 +16,7 @@ interface MaterialQueryResult {
     fun getMaterialGroupName(): String?
     fun getUnitOfMeasure(): String
     fun getVatCode(): String
+    fun getVatRateId(): UUID
     fun getSalesAccountNumber(): String?
     fun getPurchaseAccountNumber(): String?
     fun getDefaultPrice(): java.math.BigDecimal?

@@ -26,7 +26,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.code as code,
                 ci.name as name,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
                 CAST(vr.percentage AS DECIMAL) as vatPercentage,
                 cic.name as categoryName,
                 ci.consignor_party_id as consignorPartyId,
@@ -39,7 +39,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 NULL as pickupCity
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
-            LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.status = 'ACTIVE'
               AND (ci.consignor_party_id IS NULL OR ci.consignor_party_id = :consignorPartyId)
               AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -53,7 +53,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.code as code,
                 ws.name as name,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
                 CAST(vr.percentage AS DECIMAL) as vatPercentage,
                 cic.name as categoryName,
                 ws.consignor_party_id as consignorPartyId,
@@ -67,7 +67,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
             FROM waste_streams ws
             INNER JOIN catalog_items ci ON ws.catalog_item_id = ci.id
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
-            LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             LEFT JOIN pickup_locations pl ON ws.pickup_location_id = pl.id
             WHERE ws.status = 'ACTIVE'
               AND ws.consignor_party_id = :consignorPartyId
@@ -91,7 +91,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 ci.code as code,
                 ci.name as name,
                 ci.unit_of_measure as unitOfMeasure,
-                ci.vat_code as vatCode,
+                vr.vat_code as vatCode,
                 CAST(vr.percentage AS DECIMAL) as vatPercentage,
                 cic.name as categoryName,
                 ci.consignor_party_id as consignorPartyId,
@@ -104,7 +104,7 @@ interface CatalogItemJpaRepository : JpaRepository<CatalogItemDto, UUID> {
                 NULL as pickupCity
             FROM catalog_items ci
             LEFT JOIN catalog_item_categories cic ON ci.category_id = cic.id
-            LEFT JOIN vat_rates vr ON ci.vat_code = vr.vat_code
+            LEFT JOIN vat_rates vr ON ci.vat_rate_id = vr.id
             WHERE ci.status = 'ACTIVE'
               AND ci.consignor_party_id IS NULL
               AND (:query IS NULL OR LOWER(ci.name) LIKE LOWER(CONCAT('%', :query, '%'))
@@ -152,6 +152,7 @@ class CatalogItemRepository(
                     unitOfMeasure = dto.unitOfMeasure,
                     vatCode = dto.vatRate.vatCode,
                     vatPercentage = dto.vatRate.percentage,
+                    vatRateId = dto.vatRate.id,
                     categoryName = dto.category?.name,
                     consignorPartyId = dto.consignorParty?.id?.let { CompanyId(it) },
                     defaultPrice = dto.defaultPrice,
@@ -171,7 +172,7 @@ class CatalogItemRepository(
             code = catalogItem.code,
             name = catalogItem.name,
             unitOfMeasure = catalogItem.unitOfMeasure,
-            vatRate = entityManager.getReference(VatRateDto::class.java, catalogItem.vatCode),
+            vatRate = entityManager.getReference(VatRateDto::class.java, catalogItem.vatRateId),
             category = null,
             consignorParty = null,
             defaultPrice = catalogItem.defaultPrice,

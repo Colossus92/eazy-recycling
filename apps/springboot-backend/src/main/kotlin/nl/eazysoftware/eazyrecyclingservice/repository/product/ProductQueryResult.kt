@@ -17,6 +17,7 @@ interface ProductQueryResult {
   fun getCategoryName(): String?
   fun getUnitOfMeasure(): String
   fun getVatCode(): String
+  fun getVatRateId(): UUID
   fun getSalesAccountNumber(): String?
   fun getPurchaseAccountNumber(): String?
   fun getDefaultPrice(): BigDecimal?
